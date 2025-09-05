@@ -1,0 +1,31 @@
+[h1]The Extraoridinary Additions[/h1]
+
+A medium-sized content mod to spice up any playthrough!
+
+[h3]New Bosses[/h3]
+(currently) 3 new challenging bosses to encounter
+
+[h3]Extended Weaponry[/h3]
+Numerous amounts of weapons and gadgets to obtain
+along with neat reworks of some vanilla weapons!
+
+FAQ:
+[olist]
+[*] Does this mod work with Boss Checklist? - hopefully (maybe)
+[*] Is there any world generation to be aware of? - Yes, after DoG
+[*] Do the bosses work in multiplayer? - pretty much, but expect some oddities
+[/olist]
+
+[i]Everything unintentional is 100% unintentional :)[/i]
+
+[i]Developed by:[/i]
+Orbmer Doug - Owner/Programmer/Sprites
+SomeRandomMalePerson - Sprites/Sounds/Music
+AshesPlus - Occasional Sounds
+
+Due Credits:
+[list]
+[*] Infernum
+[*] Calamity
+[*] Particle Library
+[/list]

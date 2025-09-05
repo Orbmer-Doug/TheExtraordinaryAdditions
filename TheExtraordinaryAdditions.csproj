@@ -1,0 +1,71 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<!-- Import tModLoader mod properties -->
+	<Import Project="..\tModLoader.targets" />
+
+	<!-- General -->
+	<PropertyGroup>
+	  <Configurations>Debug;Release;SubworldLib</Configurations>
+	  <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+	  <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
+	  <RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
+	  <TargetFramework>net8.0</TargetFramework>
+	  <PublicizerRuntimeStrategies>IgnoresAccessChecksTo</PublicizerRuntimeStrategies>
+	  <PublicizerClearCacheOnClean>true</PublicizerClearCacheOnClean>
+	</PropertyGroup>
+	<ItemGroup>
+	  <Reference Remove="Libraries\NetEasy_v0.1.8.dll" />
+	  <Reference Remove="Libraries\NetSerializer.dll" />
+	  <Reference Remove="Libraries\SubworldLibrary.dll" />
+	</ItemGroup>
+
+	<!-- References -->
+	<ItemGroup>
+	  <Folder Include="Assets\Audio\Misc\" />
+	  <Folder Include="Assets\Audio\Calamity\" />
+	  <Folder Include="Assets\Audio\Fire\" />
+	  <Folder Include="Assets\Audio\Electric\" />
+	  <Folder Include="Assets\Audio\Blast\" />
+	  <Folder Include="Assets\Audio\Ambient\" />
+	  <Folder Include="Assets\Audio\RoR\" />
+	  <Folder Include="Assets\Audio\Ultrakill\" />
+	  <Folder Include="Assets\Textures\Grayscale\" />
+	  <Folder Include="Assets\Textures\Items\Weapons\Multi\Late\" />
+	  <Folder Include="Assets\Textures\AsterlinBackgrounds\" />
+	  <Folder Include="Assets\Textures\Noises\" />
+	  <Folder Include="Assets\Textures\Projectiles\Melee\Late\Zenith\" />
+	  <Folder Include="Assets\Textures\Projectiles\Multi\Late\Zenith\" />
+	  <Folder Include="Assets\Textures\Projectiles\Misc\" />
+	  <Folder Include="Assets\Textures\Projectiles\Vanilla\Early\" />
+	  <Folder Include="Assets\Textures\Projectiles\Vanilla\Late\" />
+	  <Folder Include="Content\Items\Equipable\Dyes\" />
+	  <Folder Include="Content\Items\Weapons\Multi\Late\" />
+	  <Folder Include="Content\Projectiles\Multi\Late\" />
+	  <Folder Include="Content\Projectiles\Multi\Zenith\" />
+	  <Folder Include="Content\Projectiles\Vanilla\Late\" />
+	</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="Krafs.Publicizer" Version="2.3.0">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
+	  <Publicize Include="tModLoader:Terraria.ModLoader.RarityLoader.rarities" />
+	  <Publicize Include="tModLoader:Terraria.Player.ItemCheck_EmitUseVisuals" />
+	  <Publicize Include="tModLoader" IncludeCompilerGeneratedMembers="false" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Reference Include="NetEasy">
+	    <HintPath>Libraries\NetEasy_v0.1.8.dll</HintPath>
+	  </Reference>
+	  <Reference Include="NetSerializer">
+	    <HintPath>Libraries\NetSerializer.dll</HintPath>
+	  </Reference>
+	  <Reference Include="SubworldLibrary">
+	    <HintPath>..\TheExtraordinaryAdditions\Libraries\SubworldLibrary.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Update="tModLoader.CodeAssist" Version="0.1.5" />
+	</ItemGroup>
+
+</Project>

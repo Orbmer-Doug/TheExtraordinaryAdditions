@@ -1,0 +1,2406 @@
+Mods: {
+	TheExtraordinaryAdditions: {
+		Projectiles: {
+			AbsorbantLight.DisplayName: Absorbant Light
+			ArcanePortal.DisplayName: Arcane Portal
+			BlindingLight.DisplayName: Blinding Light
+			CyberneticSword.DisplayName: Cybernetic Sword
+			DartBomb.DisplayName: Dart Bomb
+			DisintegrationBeam.DisplayName: Disintegration Beam
+			ExperimentalGammaRay.DisplayName: Experimental Gamma Ray
+			FallingPillar.DisplayName: Falling Pillar
+			GodPiercingDart.DisplayName: God Piercing Dart
+			HyperAttunedExtirpationNuke.DisplayName: Hyper Attuned Extirpation Nuke
+			JudgementHammer.DisplayName: Judgement Hammer
+			LightBlast.DisplayName: Light Blast
+			LightPillar.DisplayName: Light Pillar
+			LightrippingBeam.DisplayName: Lightripping Beam
+			NovaeBlast.DisplayName: Novae Blast
+			NovaeBomb.DisplayName: Novae Bomb
+			OverloadedLightDart.DisplayName: Overloaded Light Dart
+			Rockball.DisplayName: Rockball
+			SeethingRockball.DisplayName: Seething Rockball
+			SpacedSlice.DisplayName: Spaced Slice
+			SpacedSliceCreator.DisplayName: Spaced Slice Creator
+			TechnicBomb.DisplayName: Technic Bomb
+			TelegraphedSlice.DisplayName: Telegraphed Slice
+			VaporizingStar.DisplayName: Vaporizing Star
+			BloodBeacon.DisplayName: Blood Beacon
+			BloodDroplet.DisplayName: Blood Droplet
+			BloodletRelay.DisplayName: Bloodlet Relay
+			BloodMoonlet.DisplayName: Blood Moonlet
+			BloodRay.DisplayName: Blood Ray
+			BloodShot.DisplayName: Blood Shot
+			ConcentratedBloodExplosion.DisplayName: Concentrated Blood Explosion
+			ExsanguinationLance.DisplayName: Exsanguination Lance
+			HemoglobBarrier.DisplayName: Hemoglob Barrier
+			HemoglobTelegraph.DisplayName: Hemoglob Telegraph
+			MassExplosion.DisplayName: Mass Explosion
+			SanguineAssimilation.DisplayName: Sanguine Assimilation
+			SanguinePortal.DisplayName: Sanguine Portal
+			StarTelegraph.DisplayName: Star Telegraph
+			StygainRoar.DisplayName: Stygain Roar
+			TaintedStar.DisplayName: Tainted Star
+			WrithingEyeball.DisplayName: Writhing Eyeball
+			CavitationBubble.DisplayName: Cavitation Bubble
+			ControlledTornado.DisplayName: Controlled Tornado
+			MysteriousPortal.DisplayName: Mysterious Portal
+			TerminusDeathray.DisplayName: Terminus Deathray
+			LargeRipCurrent.DisplayName: Large Rip Current
+			MassiveWhirlpool.DisplayName: Massive Whirlpool
+			OceanColumn.DisplayName: Ocean Column
+			PressuredWatorBeam.DisplayName: Pressured Wator Beam
+			TheAbyssalCurrents.DisplayName: The Abyssal Currents
+			TideBolt.DisplayName: Tide Bolt
+			TideSlice.DisplayName: Tide Slice
+			TorrentialRain.DisplayName: Torrential Rain
+			Tsunami.DisplayName: Tsunami
+			Whirlpool.DisplayName: Whirlpool
+			EmptyRound.DisplayName: Empty Round
+			GlassShell.DisplayName: Glass Shell
+			RifleBullet.DisplayName: Rifle Bullet
+			GlacialSpike.DisplayName: Glacial Spike
+			HeavyFrostBlast.DisplayName: Heavy Frost Blast
+			OverheatedBlast.DisplayName: Overheated Blast
+			Razorflake.DisplayName: Razorflake
+			GlacialShell.DisplayName: Glacial Shell
+			LightningVolt.DisplayName: Lightning Volt
+			Sunray.DisplayName: Sunray
+			ParmaJawn.DisplayName: Parma Jawn
+			Rebar.DisplayName: Rebar
+			ExampleSwing.DisplayName: Example Swing
+			ExampleWhip.DisplayName: Example Whip
+			BiomePointer.DisplayName: Biome Pointer
+			FulminicSpark.DisplayName: Fulminic Spark
+			HealingFungus.DisplayName: Healing Fungus
+			ProximityDart.DisplayName: Proximity Dart
+			_500kg.DisplayName: _500kg
+			AncientRetaliation.DisplayName: Ancient Retaliation
+			BouncyIcicle.DisplayName: Bouncy Icicle
+			CrossDiscHoldout.DisplayName: Cross Disc Holdout
+			CrossSwing.DisplayName: Cross Swing
+			DiscSlash.DisplayName: Disc Slash
+			ScarletMeteor.DisplayName: Scarlet Meteor
+			ScarletMeteorExplosion.DisplayName: Scarlet Meteor Explosion
+			ShockLightning.DisplayName: Shock Lightning
+			VRP.DisplayName: VRP
+			WaveSiphon.DisplayName: Wave Siphon
+			CryogenicBlast.DisplayName: Cryogenic Blast
+			BlackHole.DisplayName: Black Hole
+			CollapsingStar.DisplayName: Collapsing Star
+			Constellation.DisplayName: Constellation
+			GammaRay.DisplayName: Gamma Ray
+			HighSpeedDebris.DisplayName: High Speed Debris
+			Kilonova.DisplayName: Kilonova
+			KilonovaShockwave.DisplayName: Kilonova Shockwave
+			LuminescentChaser.DisplayName: Luminescent Chaser
+			ScreenSplit.DisplayName: Screen Split
+			SpaceRip.DisplayName: Space Rip
+			TheExingendies.DisplayName: The Exingendies
+			SharpTie.DisplayName: Sharp Tie
+			StratagemMark.DisplayName: Stratagem Mark
+			WhiteVoid.DisplayName: White Void
+			AuroricShield.DisplayName: Auroric Shield
+			EclipsedAura.DisplayName: Eclipsed Aura
+			IcyShards.DisplayName: Icy Shards
+			InsigniaBlaze.DisplayName: Insignia Blaze
+			KnashingTeeth.DisplayName: Knashing Teeth
+			LightSpirit.DisplayName: Light Spirit
+			LightSpiritStar.DisplayName: Light Spirit Star
+			Myceliumite.DisplayName: Myceliumite
+			RejuvenationHover.DisplayName: Rejuvenation Hover
+			SandBlast.DisplayName: Sand Blast
+			SanguineRay.DisplayName: Sanguine Ray
+			ShroomiteDash.DisplayName: Shroomite Dash
+			ShroomiteDashImpact.DisplayName: Shroomite Dash Impact
+			StygainAura.DisplayName: Stygain Aura
+			TremorSpike.DisplayName: Tremor Spike
+			BrewingLightningStrike.DisplayName: Brewing Lightning Strike
+			BrewingStormsHoldout.DisplayName: Brewing Storms Holdout
+			HellfireHoldout.DisplayName: Hellfire Holdout
+			HellishNapalm.DisplayName: Hellish Napalm
+			LightningNimbusSparks.DisplayName: Lightning Nimbus Sparks
+			SnareGas.DisplayName: Snare Gas
+			SnareHoldout.DisplayName: Snare Holdout
+			Comet.DisplayName: Comet
+			CometBlast.DisplayName: Comet Blast
+			CometStormHoldout.DisplayName: Comet Storm Holdout
+			ControllableTornado.DisplayName: Controllable Tornado
+			EpidemicHoldout.DisplayName: Epidemic Holdout
+			EpidemicLob.DisplayName: Epidemic Lob
+			EpidemicSpear.DisplayName: Epidemic Spear
+			PyroclasticHover.DisplayName: Pyroclastic Hover
+			SerratedBolt.DisplayName: Serrated Bolt
+			SuperheatedPlasmaArrayHoldout.DisplayName: Superheated Plasma Array Holdout
+			SuperheatedPlasmaBeam.DisplayName: Superheated Plasma Beam
+			TesselesticBeam.DisplayName: Tesselestic Beam
+			TesselesticLightning.DisplayName: Tesselestic Lightning
+			TesselesticMeltdownProj.DisplayName: Tesselestic Meltdown Proj
+			TheCursedTechnique.DisplayName: The Cursed Technique
+			ConcentratedEnergy.DisplayName: Concentrated Energy
+			NeedleStar.DisplayName: Needle Star
+			Seams.DisplayName: Seams
+			SeamsCreator.DisplayName: Seams Creator
+			SeamstressMagic.DisplayName: Seamstress Magic
+			SewingNeedle.DisplayName: Sewing Needle
+			SupernovaGas.DisplayName: Supernova Gas
+			AcheronHeld.DisplayName: Acheron Held
+			AttunedBloodRain.DisplayName: Attuned Blood Rain
+			FireballHoldout.DisplayName: Fireball Holdout
+			FireballProj.DisplayName: Fireball Proj
+			FrostyIcicle.DisplayName: Frosty Icicle
+			HellishLance.DisplayName: Hellish Lance
+			IceMistHeld.DisplayName: Ice Mist Held
+			SanguineLance.DisplayName: Sanguine Lance
+			SanguineSteelsHoldout.DisplayName: Sanguine Steels Holdout
+			StarlessHoldout.DisplayName: Starless Holdout
+			StarWater.DisplayName: Star Water
+			StarWaterBreak.DisplayName: Star Water Break
+			TheStarsAreAfraid.DisplayName: The Stars Are Afraid
+			VirulentFlower.DisplayName: Virulent Flower
+			VirulentHoldout.DisplayName: Virulent Holdout
+			VirulentPunch.DisplayName: Virulent Punch
+			VirulentSeed.DisplayName: Virulent Seed
+			BirchStickLance.DisplayName: Birch Stick Lance
+			Birch.DisplayName: Birch
+			ForkStab.DisplayName: Fork Stab
+			MeteorSpawn.DisplayName: Meteor Spawn
+			MeteorSwing.DisplayName: Meteor Swing
+			ObsidianMaceProj.DisplayName: Obsidian Mace Proj
+			ObsidianPow.DisplayName: Obsidian Pow
+			AbyssalCurrentsHoldout.DisplayName: Abyssal Currents Holdout
+			CallerOfBirdsCall.DisplayName: Caller Of Birds Call
+			Cosmiportal.DisplayName: Cosmiportal
+			CosmireapHoldout.DisplayName: Cosmireap Holdout
+			LaceratedSpace.DisplayName: Lacerated Space
+			NovaBlast.DisplayName: Nova Blast
+			CyberneticBlast.DisplayName: Cybernetic Blast
+			CyberneticSwing.DisplayName: Cybernetic Swing
+			EverbladedSwing.DisplayName: Everbladed Swing
+			HyperSlash.DisplayName: Hyper Slash
+			CondereFulminaHoldout.DisplayName: Condere Fulmina Holdout
+			HonedLightning.DisplayName: Honed Lightning
+			LightningChain.DisplayName: Lightning Chain
+			HeavenForgedSpear.DisplayName: Heaven Forged Spear
+			HeavenForgedSwing.DisplayName: Heaven Forged Swing
+			KatanaCleave.DisplayName: Katana Cleave
+			KatanaSlice.DisplayName: Katana Slice
+			KatanaSweep.DisplayName: Katana Sweep
+			OceanSlash.DisplayName: Ocean Slash
+			Pigeon.DisplayName: Pigeon
+			RendedFlares.DisplayName: Rended Flares
+			RendedStarHoldout.DisplayName: Rended Star Holdout
+			SpoonShockwave.DisplayName: Spoon Shockwave
+			SpoonSwing.DisplayName: Spoon Swing
+			SunspotSword.DisplayName: Sunspot Sword
+			TorrentialCleave.DisplayName: Torrential Cleave
+			DeicidePortal.DisplayName: Deicide Portal
+			DivineLightning.DisplayName: Divine Lightning
+			FinalStrikeHoldout.DisplayName: Final Strike Holdout
+			Streaks.DisplayName: Streaks
+			AlucardsSwordThrow.DisplayName: Alucards Sword Throw
+			AstralKatanaSweep.DisplayName: Astral Katana Sweep
+			AstralKatanaThrow.DisplayName: Astral Katana Throw
+			BergcrusherSwing.DisplayName: Bergcrusher Swing
+			CryingEye.DisplayName: Crying Eye
+			CryingTear.DisplayName: Crying Tear
+			DecayingCutleryStab.DisplayName: Decaying Cutlery Stab
+			EtherealSwing.DisplayName: Ethereal Swing
+			GlacialShards.DisplayName: Glacial Shards
+			Glacier.DisplayName: Glacier
+			HellFlame.DisplayName: Hell Flame
+			HellsToothpickHeld.DisplayName: Hells Toothpick Held
+			HolyDart.DisplayName: Holy Dart
+			HolySwordSwing.DisplayName: Holy Sword Swing
+			IchorGlobule.DisplayName: Ichor Globule
+			JudgeSpear.DisplayName: Judge Spear
+			JudgeSwing.DisplayName: Judge Swing
+			KnifeStab.DisplayName: Knife Stab
+			MimicrySlash.DisplayName: Mimicry Slash
+			MimicrySpear.DisplayName: Mimicry Spear
+			SangueGlare.DisplayName: Sangue Glare
+			SangueSpin.DisplayName: Sangue Spin
+			SillyPinkSwing.DisplayName: Silly Pink Swing
+			SolarBrandSparks.DisplayName: Solar Brand Sparks
+			SolarBrandSword.DisplayName: Solar Brand Sword
+			SolemButterflyGrief.DisplayName: Solem Butterfly Grief
+			SolemButterflyLament.DisplayName: Solem Butterfly Lament
+			SolemnLamentProj.DisplayName: Solemn Lament Proj
+			ThreadripperYo.DisplayName: Threadripper Yo
+			AshyWaterBalloonProjectile.DisplayName: Ashy Water Balloon Projectile
+			BeetleHoldout.DisplayName: Beetle Holdout
+			CannonHoldout.DisplayName: Cannon Holdout
+			GodDummyProjectile.DisplayName: God Dummy Projectile
+			ShatteredComet.DisplayName: Shattered Comet
+			SmartPistolHeld.DisplayName: Smart Pistol Held
+			SmartShot.DisplayName: Smart Shot
+			SmartTracer.DisplayName: Smart Tracer
+			testRope.DisplayName: test Rope
+			TomeHoldout.DisplayName: Tome Holdout
+			FulgurSwing.DisplayName: Fulgur Swing
+			FulgurZap.DisplayName: Fulgur Zap
+			ShockJavelin.DisplayName: Shock Javelin
+			GunGunSword.DisplayName: Gun Gun Sword
+			GunSwordSword.DisplayName: Gun Sword Sword
+			SkeleShot.DisplayName: Skele Shot
+			SplinteredBone.DisplayName: Splintered Bone
+			Antfly.DisplayName: Antfly
+			DoohickeyRun.DisplayName: Doohickey Run
+			Gearcat.DisplayName: Gearcat
+			JellyfishVro.DisplayName: Jellyfish Vro
+			LilBloodSquid.DisplayName: Lil Blood Squid
+			qwerFlame.DisplayName: qwer Flame
+			_9mm.DisplayName: _9mm
+			BeanFire.DisplayName: Bean Fire
+			BoneFlintlockHeld.DisplayName: Bone Flintlock Held
+			CalciumBomb.DisplayName: Calcium Bomb
+			CalciumShot.DisplayName: Calcium Shot
+			CalciumSplinter.DisplayName: Calcium Splinter
+			CrystallineBlast.DisplayName: Crystalline Blast
+			DownpourHeld.DisplayName: Downpour Held
+			LooseSawbladeProj.DisplayName: Loose Sawblade Proj
+			ObsidianShot.DisplayName: Obsidian Shot
+			RainDrop.DisplayName: Rain Drop
+			SnapcurveHeld.DisplayName: Snapcurve Held
+			TheSpores.DisplayName: The Spores
+			AlchemicCyclone.DisplayName: Alchemic Cyclone
+			AlchemicCycloneThrown.DisplayName: Alchemic Cyclone Thrown
+			AntiBulletp.DisplayName: Anti Bulletp
+			AntiBulletShell.DisplayName: Anti Bullet Shell
+			AntiBulletShrapnel.DisplayName: Anti Bullet Shrapnel
+			AntiMatterCannonHoldout.DisplayName: Anti Matter Cannon Holdout
+			CosmicBlast.DisplayName: Cosmic Blast
+			CosmicBlastHidden.DisplayName: Cosmic Blast Hidden
+			CosmicImplosionHoldout.DisplayName: Cosmic Implosion Holdout
+			CosmicSlugCharge.DisplayName: Cosmic Slug Charge
+			EmpyreanRipshot.DisplayName: Empyrean Ripshot
+			EtherealRipBlast.DisplayName: Ethereal Rip Blast
+			Florescence.DisplayName: Florescence
+			GalaxyShell.DisplayName: Galaxy Shell
+			GaussBallisticWarheadHoldout.DisplayName: Gauss Ballistic Warhead Holdout
+			GaussBallisticWarheadRocket.DisplayName: Gauss Ballistic Warhead Rocket
+			GaussBoom.DisplayName: Gauss Boom
+			GaussShockwave.DisplayName: Gauss Shockwave
+			HeavenForgedHoldout.DisplayName: Heaven Forged Holdout
+			HeavyLaser.DisplayName: Heavy Laser
+			HeavyLaserRifleHold.DisplayName: Heavy Laser Rifle Hold
+			IonizedPlasma.DisplayName: Ionized Plasma
+			LanikeaHoldout.DisplayName: Lanikea Holdout
+			LightripBlast.DisplayName: Lightrip Blast
+			LightripBullet.DisplayName: Lightrip Bullet
+			LightripPortal.DisplayName: Lightrip Portal
+			LuminiteBlast.DisplayName: Luminite Blast
+			LuminiteRocket.DisplayName: Luminite Rocket
+			MatterPincerHoldout.DisplayName: Matter Pincer Holdout
+			MicroGunHoldout.DisplayName: Micro Gun Holdout
+			MicroRound.DisplayName: Micro Round
+			SunsplitHoldout.DisplayName: Sunsplit Holdout
+			TechnicBlitzripperProj.DisplayName: Technic Blitzripper Proj
+			VolatilePlasmaGlobule.DisplayName: Volatile Plasma Globule
+			VolatileStar.DisplayName: Volatile Star
+			CoalescedAmalgam.DisplayName: Coalesced Amalgam
+			CoalescenceHoldout.DisplayName: Coalescence Holdout
+			DivinityArrow.DisplayName: Divinity Arrow
+			ExtraordinaryHyperBlast.DisplayName: Extraordinary Hyper Blast
+			AcceleratingLight.DisplayName: Accelerating Light
+			AdvancedOnyxBlast.DisplayName: Advanced Onyx Blast
+			Grub.DisplayName: Grub
+			GrubShrapnel.DisplayName: Grub Shrapnel
+			Laser.DisplayName: Laser
+			LaserGuide.DisplayName: Laser Guide
+			Maggot.DisplayName: Maggot
+			Slug.DisplayName: Slug
+			TankHeadHoldout.DisplayName: Tank Head Holdout
+			TheSwarm.DisplayName: The Swarm
+			BobmHoldout.DisplayName: Bobm Holdout
+			BowOfGreekFlamesHeld.DisplayName: Bow Of Greek Flames Held
+			CharringBarrageHoldout.DisplayName: Charring Barrage Holdout
+			CharringBlast.DisplayName: Charring Blast
+			CharringBlastBlast.DisplayName: Charring Blast Blast
+			EbonyNovaBlasterHeld.DisplayName: Ebony Nova Blaster Held
+			EbonySnipe.DisplayName: Ebony Snipe
+			FunnyRock.DisplayName: Funny Rock
+			GarciaShotgunHoldout.DisplayName: Garcia Shotgun Holdout
+			GreatJesterArrow.DisplayName: Great Jester Arrow
+			GreekBombArrow.DisplayName: Greek Bomb Arrow
+			GreekNapalm.DisplayName: Greek Napalm
+			HailfireExplosion.DisplayName: Hailfire Explosion
+			HailfireHoldout.DisplayName: Hailfire Holdout
+			HailfireShell.DisplayName: Hailfire Shell
+			HallowedGreatbowHeld.DisplayName: Hallowed Greatbow Held
+			HemoglobbedCapsuleThrown.DisplayName: Hemoglobbed Capsule Thrown
+			LesserBloodBeacon.DisplayName: Lesser Blood Beacon
+			MartianCapsule.DisplayName: Martian Capsule
+			MartianLaser.DisplayName: Martian Laser
+			RockLightning.DisplayName: Rock Lightning
+			ShotgunBullet.DisplayName: Shotgun Bullet
+			StickBoom.DisplayName: Stick Boom
+			TheAnvil.DisplayName: The Anvil
+			ThePropane.DisplayName: The Propane
+			Tornado.DisplayName: Tornado
+			TorrentialLightning.DisplayName: Torrential Lightning
+			TorrentialStormsHeld.DisplayName: Torrential Storms Held
+			EnchantedShield.DisplayName: Enchanted Shield
+			StellarKunaiProj.DisplayName: Stellar Kunai Proj
+			TimberWhip.DisplayName: Timber Whip
+			AbyssalShadows.DisplayName: Abyssal Shadows
+			AvragenMinion.DisplayName: Avragen Minion
+			ConsumingVoid.DisplayName: Consuming Void
+			FleetDaggers.DisplayName: Fleet Daggers
+			TenebrisBlast.DisplayName: Tenebris Blast
+			VoidBeam.DisplayName: Void Beam
+			DelugeWhip.DisplayName: Deluge Whip
+			LivingStarFlareMinion.DisplayName: Living Star Flare Minion
+			LokiBoom.DisplayName: Loki Boom
+			SuperIztMinion.DisplayName: Super Izt Minion
+			ThrashedVoid.DisplayName: Thrashed Void
+			VoidBlast.DisplayName: Void Blast
+			AttorcoppeProjectile.DisplayName: Attorcoppe Projectile
+			BatSummon.DisplayName: Bat Summon
+			DroneLaser.DisplayName: Drone Laser
+			EclipseWhip.DisplayName: Eclipse Whip
+			ExsanguinationProj.DisplayName: Exsanguination Proj
+			IchorWhipProjectile.DisplayName: Ichor Whip Projectile
+			IztMinion.DisplayName: Izt Minion
+			LazerDrone.DisplayName: Lazer Drone
+			RemoteHoldout.DisplayName: Remote Holdout
+			TheTongueWhip.DisplayName: The Tongue Whip
+			WitheredShredderShield.DisplayName: Withered Shredder Shield
+			UnitCircle.DisplayName: Unit Circle
+			AmberStaffHoldout.DisplayName: Amber Staff Holdout
+			AmethystStaffHoldout.DisplayName: Amethyst Staff Holdout
+			BlastSkull.DisplayName: Blast Skull
+			BookOfSkullsHoldout.DisplayName: Book Of Skulls Holdout
+			CorruptOrb.DisplayName: Corrupt Orb
+			CrimtaneArrow.DisplayName: Crimtane Arrow
+			DarkArrow.DisplayName: Dark Arrow
+			DiamondStaffHoldout.DisplayName: Diamond Staff Holdout
+			EmeraldStaffHoldout.DisplayName: Emerald Staff Holdout
+			HomingSkull.DisplayName: Homing Skull
+			MiniValor.DisplayName: Mini Valor
+			PhoenixRound.DisplayName: Phoenix Round
+			RubyStaffHoldout.DisplayName: Ruby Staff Holdout
+			SapphireStaffHoldout.DisplayName: Sapphire Staff Holdout
+			SpaceRay.DisplayName: Space Ray
+			TopazStaffHoldout.DisplayName: Topaz Staff Holdout
+			WaterStream.DisplayName: Water Stream
+			FancyChainsaw.DisplayName: Fancy Chainsaw
+			FancyDrill.DisplayName: Fancy Drill
+			LunarFlare.DisplayName: Lunar Flare
+			BreakerBeam.DisplayName: Breaker Beam
+			BreakerBladeCrush.DisplayName: Breaker Blade Crush
+			BreakerStorm.DisplayName: Breaker Storm
+			CrystalShard.DisplayName: Crystal Shard
+			CrystalStormHoldout.DisplayName: Crystal Storm Holdout
+			CursedEruption.DisplayName: Cursed Eruption
+			CursedFlamesHoldout.DisplayName: Cursed Flames Holdout
+			DissipatingLight.DisplayName: Dissipating Light
+			DivineArrow.DisplayName: Divine Arrow
+			EnhancedMagnetSphere.DisplayName: Enhanced Magnet Sphere
+			GoldenShowerHoldout.DisplayName: Golden Shower Holdout
+			HeatRayHoldout.DisplayName: Heat Ray Holdout
+			HorsemenDive.DisplayName: Horsemen Dive
+			HorsemenSwing.DisplayName: Horsemen Swing
+			IchorStream.DisplayName: Ichor Stream
+			IchorStreamBlast.DisplayName: Ichor Stream Blast
+			IchorSwirl.DisplayName: Ichor Swirl
+			InfernalBlast.DisplayName: Infernal Blast
+			InfernalFork.DisplayName: Infernal Fork
+			InfluxWaverCreator.DisplayName: Influx Waver Creator
+			InfluxWaverProj.DisplayName: Influx Waver Proj
+			InfluxWaverSwing.DisplayName: Influx Waver Swing
+			KrakenTentacle.DisplayName: Kraken Tentacle
+			LaserBlast.DisplayName: Laser Blast
+			MeltGlobule.DisplayName: Melt Globule
+			MeltRay.DisplayName: Melt Ray
+			RagingCursedFire.DisplayName: Raging Cursed Fire
+			ScorchRay.DisplayName: Scorch Ray
+			SnowmanCannonHoldout.DisplayName: Snowman Cannon Holdout
+			SnowmanRocket.DisplayName: Snowman Rocket
+			TinyServant.DisplayName: Tiny Servant
+			SwungAxe.DisplayName: Swung Axe
+			SwungHammer.DisplayName: Swung Hammer
+			SwungPickaxe.DisplayName: Swung Pickaxe
+			qwerIKArm.DisplayName: qwer
+			VermillionTear.DisplayName: Vermillion Tear
+			ExplosionProjectile.DisplayName: Explosion Projectile
+			qwerBossProj.DisplayName: qwer Boss Proj
+			qwerBossProj2.DisplayName: qwer Boss Proj2
+			MinionBossEye.DisplayName: Minion Boss Eye
+			qwerik.DisplayName: qwerik
+			qwerTrAIL.DisplayName: qwer Tr A I L
+			qwerproj.DisplayName: qwerproj
+			qwerPA.DisplayName: qwer P A
+			CondensedSoulMass.DisplayName: Condensed Soul Mass
+			TheLightripBullet.DisplayName: The Lightrip Bullet
+			TheTechnicBlitzripper.DisplayName: The Technic Blitzripper
+			TheTesselesticMeltdown.DisplayName: The Tesselestic Meltdown
+			BurstingLight.DisplayName: Bursting Light
+			RadiantPulser.DisplayName: Radiant Pulser
+			DartBomb2.DisplayName: Dart Bomb2
+			ControlledTesselesticBeam.DisplayName: Controlled Tesselestic Beam
+			HonedTesselesticLightning.DisplayName: Honed Tesselestic Lightning
+			DisintegrationBurst.DisplayName: Disintegration Burst
+			PillarFalling.DisplayName: Pillar Falling
+			qwerfuck.DisplayName: qwerfuck
+			SoulForgedRift.DisplayName: Soul Forged Rift
+			TranscendentSoulRay.DisplayName: Transcendent Soul Ray
+			OverchargedLaser.DisplayName: Overcharged Laser
+			TechnicBlast.DisplayName: Technic Blast
+			TechnicPortal.DisplayName: Technic Portal
+			RadiantBeam.DisplayName: Radiant Beam
+			VaporizingSupergiant.DisplayName: Vaporizing Supergiant
+			DisintegrationNova.DisplayName: Disintegration Nova
+			BarrageBeam.DisplayName: Barrage Beam
+			BarrageBeamAlt.DisplayName: Barrage Beam Alt
+			FloatingScreen.DisplayName: Floating Screen
+			ConvergingFlame.DisplayName: Converging Flame
+			qwerFlag.DisplayName: qwer Flag
+			qwerDIALOGUE.DisplayName: qwer D I A L O G U E
+		}
+
+		Keybinds: {
+			Teleport.DisplayName: Teleport
+			SetBonus.DisplayName: Set Bonus
+			Misc.DisplayName: Misc.
+			"Shield Parry.DisplayName": Shield Parry
+			"Open Cross Disc Elements.DisplayName": Open Cross Disc Interface
+		}
+
+		Biomes: {
+			CloudedCraterBiome: {
+				DisplayName: Clouded Crater Biome
+				TownNPCDialogueName: the Clouded Crater Biome
+			}
+		}
+
+		Tiles: {
+			FierceBattlePlaced.MapEntry: Fierce Battle
+			InfiniteBlock.MapEntry: Infinite
+			JazzBlock.MapEntry: Jazz
+			SereneSatellitePlaced.MapEntry: Serene Satellite
+			SpiderMusicTile.MapEntry: Spider Music Box
+			FlagPolePlaced.MapEntry: TEA Flag
+
+			Placeables: {
+				AuroraTurretBanner: {
+					DisplayName: Aurora Turret Banner
+					Tooltip: ""
+				}
+
+				DuneProwlerAssaultBanner: {
+					DisplayName: Dune Prowler Assault Banner
+					Tooltip: ""
+				}
+
+				DuneProwlerSniperBanner: {
+					DisplayName: Dune Prowler Sniper Banner
+					Tooltip: ""
+				}
+
+				FulminationSpiritBanner: {
+					DisplayName: Fulmination Spirit Banner
+					Tooltip: ""
+				}
+
+				SolarGuardianBanner: {
+					DisplayName: Solar Guardian Banner
+					Tooltip: ""
+				}
+			}
+		}
+
+		Buffs: {
+			CrimsonBlessing: {
+				DisplayName: Crimson Blessing
+				Description: You are empowered by the Blood Moon
+			}
+
+			DesertsBlessing: {
+				DisplayName: Desert's Blessing
+				Description: Spirits may aid you
+			}
+
+			EternalRest: {
+				DisplayName: Eternal Rest
+				Description: You are empowered
+			}
+
+			SupremeWaterbreathing: {
+				DisplayName: Supreme Waterbreathing
+				Description: You dont fear the deep as much
+			}
+
+			WinterHeart: {
+				DisplayName: Winter Heart
+				Description: Can anyone else feel their fingers?
+			}
+
+			AshyWater: {
+				DisplayName: Ashy Water
+				Description: You are ashy and firey
+			}
+
+			AuroricCooldown: {
+				DisplayName: Auroric Cooldown
+				Description: Regaining ice...
+			}
+
+			CorporealVaporization: {
+				DisplayName: Corporeal Vaporization
+				Description: Your soul burns
+			}
+
+			CrimsonBlessingCooldown: {
+				DisplayName: Crimson Blessing Cooldown
+				Description: You cant handle anymore of the blessing
+			}
+
+			Curse: {
+				DisplayName: Curse
+				Description: Get cursed
+			}
+
+			DentedBySpoon: {
+				DisplayName: Dented by Spoon
+				Description: The spoons metal rattles your very being
+			}
+
+			Eclipsed: {
+				DisplayName: Eclipsed
+				Description: Solar flares and freezing moons
+			}
+
+			EternalRestCooldown: {
+				DisplayName: EternalRestCooldown
+				Description: You cant handle anymore of the blessing
+			}
+
+			FulminationCooldown: {
+				DisplayName: Fulmination Cooldown
+				Description: Recharging lightning
+			}
+
+			HemorrhageTransfer: {
+				DisplayName: Hemorrhage Transfer
+				Description: It appears when coalescent masses are alive Stygain Heart can absorb your blood and break through the thickest armor...
+			}
+
+			KunaiTag: {
+				DisplayName: Kunai Tag
+				Description: The image of a cell grows in my mind... unaware of the destruction around it...
+			}
+
+			Overheat: {
+				DisplayName: Overheat
+				Description: Your weapon is too hot to run properly!
+			}
+
+			PlasmaIncineration: {
+				DisplayName: Plasma Incineration
+				Description: Engulfed in flames
+			}
+
+			TheTiesCooldown: {
+				DisplayName: The Ties Cooldown
+				Description: The Tie requires rest
+			}
+
+			VoidDebuff: {
+				DisplayName: Void
+				Description: there seem to be words on my screen
+			}
+
+			Wavebroken: {
+				DisplayName: Wavebroken
+				Description: Pounded by tides
+			}
+
+			AvragenPresence: {
+				DisplayName: Avragen Presence
+				Description: Something very powerful fights for you
+			}
+
+			BubbleMan: {
+				DisplayName: Bubble Man
+				Description: it does a little dance
+			}
+
+			DoohickeyBuff: {
+				DisplayName: Doohickey
+				Description: Might cause wreckage of your walls
+			}
+
+			FlockOfRazorShields: {
+				DisplayName: Flock of Razor Shields
+				Description: Quite sharp!
+			}
+
+			FlockOfShields: {
+				DisplayName: Flock of Shields
+				Description: Quite sturdy!
+			}
+
+			HorrorsBeyondYourComprehension: {
+				DisplayName: Horrors Beyond Your Comprehension
+				Description: A little blood squid follows you
+			}
+
+			LaserDrones: {
+				DisplayName: Lazer Drones
+				Description: Not as sturdy as you would think...
+			}
+
+			LittleStar: {
+				DisplayName: Little Star
+				Description: Twinkle twinkle...
+			}
+
+			LokiBuff: {
+				DisplayName: Loki
+				Description: Cute little guy...
+			}
+
+			MidnightBats: {
+				DisplayName: Midnight Bats
+				Description: Is not a naked molerat...
+			}
+
+			SuperLoki: {
+				DisplayName: Super Loki
+				Description: Godly little guy...
+			}
+
+			MyceliumCooldown: {
+				DisplayName: Mycelium Cooldown
+				Description: The mycelium must grow back...
+			}
+
+			AntflyBuff: {
+				DisplayName: Antfly
+				Description: flutter
+			}
+
+			GearcatBuff: {
+				DisplayName: Gearcat
+				Description: Handy!
+			}
+
+			JudgingAsterlin: {
+				DisplayName: Judging Asterlin
+				Description: It judges
+			}
+		}
+
+		Items: {
+			MechanicalInNature: {
+				DisplayName: Mechanical In Nature
+				Tooltip: ""
+			}
+
+			AridFlask: {
+				DisplayName: Arid Flask
+				Tooltip: Weapons have a chance to fire Sandblast
+			}
+
+			TreasureBagAbysslon: {
+				DisplayName: Treasure Bag Abysslon
+				Tooltip: ""
+			}
+
+			TreasureBagStygainHeart: {
+				DisplayName: Treasure Bag Stygain Heart
+				Tooltip: ""
+			}
+
+			TreasureBoxAsterlin: {
+				DisplayName: Treasure Box Asterlin
+				Tooltip: ""
+			}
+
+			FrigidTonic: {
+				DisplayName: Frigid Tonic
+				Tooltip: Increases healing from hearts, grants immunity to chilled, and gives a slight increase in endurance
+			}
+
+			SupremeWaterbreathingPotion: {
+				DisplayName: Supreme Waterbreathing Potion
+				Tooltip: Breathe anywhere
+			}
+
+			FulminicEye: {
+				DisplayName: Fulminic Eye
+				Tooltip: Shoots small lightning sparks at nearby enemies and increases movement speed by 10%
+			}
+
+			FungalSatchel: {
+				DisplayName: Fungal Satchel
+				Tooltip:
+					'''
+					Has a chance for critical strikes to release healing mushrooms
+					Emit a blue aura of light
+					'''
+			}
+
+			PrimevalToolkit: {
+				DisplayName: Primeval Toolkit
+				Tooltip:
+					'''
+					The tungsten cube is absolutely necessary
+					Increases tile range and placing speed
+					If underground the tools are amplified in power
+					Turn on visibility to get a tungsten cube effect
+					'''
+			}
+
+			TungstenCube: {
+				DisplayName: Tungsten Cube
+				Tooltip:
+					'''
+					'Note: only 95% Tungsten!'
+					Hugely increased armor penetration and attackers are hurt when they hit you
+					Various changes in mobility
+					'''
+			}
+
+			AncientBoon: {
+				DisplayName: Ancient Boon
+				Tooltip:
+					'''
+					Balances elemental load
+					Regenerates flight time while not flying in the air
+					Multiplies defense and retaliates with darts if you get hit
+					'''
+			}
+
+			AshersWhiteTie: {
+				DisplayName: Asher's White Tie
+				Tooltip:
+					'''
+					Revives you from a attack that would of killed you on a 90 second cooldown
+					Summons child ties to protect you
+					"Smells funny..."
+					'''
+			}
+
+			GarciaShotgun: {
+				DisplayName: Garcia's Shotgun
+				Tooltip: A former catholic priest choice of weapon
+			}
+
+			CryogenicSpaceCanister: {
+				DisplayName: Cryogenic Space Canister
+				Tooltip:
+					'''
+					Grants immunity to most ice and fire debuffs and periodically creates ice crystals that home back on the cursor when using items
+					Gives 20 defense while charging up a powerful blast as long as weapon heat is at 0
+					Otherwise, gives 15 increased armor penetration and a significant cooling of heat
+					'''
+			}
+
+			GodGauntlet: {
+				DisplayName: God Gauntlet
+				Tooltip: ""
+			}
+
+			TungstenTie: {
+				DisplayName: Tungsten Tie
+				Tooltip:
+					'''
+					Revives you from a attack that would of killed you on a 80 second cooldown
+					Summons child ties to protect you
+					'''
+			}
+
+			BandOfSunrays: {
+				DisplayName: Band of Sunrays
+				Tooltip:
+					'''
+					Summons three light spirits to protect you
+					Affected by the damage of your strongest class
+					'''
+			}
+
+			EclipsedOnesCloak: {
+				DisplayName: Eclipsed Ones Cloak
+				Tooltip:
+					'''
+					Creates a freezing aura around the player which does a 1/7 of the damage of your held item
+					Attempts to push away non-boss enemies and slows nearby weak projectiles
+					'''
+			}
+
+			FlameInsignia: {
+				DisplayName: Flame Insignia
+				Tooltip:
+					'''
+					Creates a aura to burn the nearest 10 enemies with incinerating flames
+					10% increased critical strike chance
+					'''
+			}
+
+			NitrogenCoolingPack: {
+				DisplayName: Nitrogen Cooling Pack
+				Tooltip:
+					'''
+					Cools down laser weapons and gives immunity to most ice and fire debuffs
+					Periodically creates ice crystals that home back on the cursor when using items
+					Allows weapons to penetrate 10 enemy defense
+					'''
+			}
+
+			OrigamiWings: {
+				DisplayName: Origami Wings
+				Tooltip:
+					'''
+					'Withholds a soul of a burger wizard'
+					Increases max life by 35
+					'''
+			}
+
+			RejuvenationArtifact: {
+				DisplayName: Rejuvenation Artifact
+				Tooltip:
+					'''
+					Increases power of healing potions
+					Creates a wavy crystal that connects to other players in a short radius
+					Connected players have accelerated life regen, grab hearts from further away, and get periodically healed 10 health
+					'''
+			}
+
+			WingsOfTwilight: {
+				DisplayName: Wings of Twilight
+				Tooltip:
+					'''
+					'The twilight was endured, and we now face towards dawn. Has the birds' twittering in the forest finally stopped?'
+					Gives different bonus' based on the damage class you are holding
+					'''
+			}
+
+			PetersUshanka: {
+				DisplayName: Peters Ushanka
+				Tooltip:
+					'''
+					8% increased ranged critical strike chance
+					"Peter boing boing"
+					'''
+				Tip: Perhaps putting on attire for maids would strengthen peters power...
+				SetBonus:
+					'''
+					12% increased ranged damage and movement speed
+					Reduces damage taken by 5%
+					Increases defense by 10
+					Summons 2 little peter guns to fire spores at evil
+					Permanent Tipsy
+					'''
+			}
+
+			VoltChestplate: {
+				DisplayName: Volt Chestplate
+				Tooltip: +40 max mana and 6% increased melee and mage critical strike chance
+			}
+
+			VoltGrieves: {
+				DisplayName: Volt Grieves
+				Tooltip: 12% increased movement speed, 3% increased magic damage, and 5% increased melee attack speed
+			}
+
+			VoltHelmet: {
+				DisplayName: Volt Helmet
+				Tooltip:
+					'''
+					10% reduced mana cost
+					+20 max mana
+					5% increased melee critical strike chance and damage
+					'''
+				SetBonus:
+					'''
+					Press {0} to release a powerful lightning bolt
+					6% increased melee attack speed
+					'''
+			}
+
+			AbsoluteCoreplate: {
+				DisplayName: Absolute Coreplate
+				Tooltip:
+					'''
+					+110 max life
+					+1 life regen
+					Increased effectiveness of life regen
+					'''
+			}
+
+			AbsoluteGreathelm: {
+				DisplayName: Absolute Greathelm
+				Tooltip:
+					'''
+					35% increased damage
+					25% increased critical strike chance
+					'''
+				SetBonus:
+					'''
+					Ignore water
+					Enemies are much more likely to target you
+					25% reduced mana cost
+					+90 max mana
+					+4 max minions
+					+2 max turrets
+					Press {0} to conjure a consuming void on a 10 second cooldown
+					'''
+			}
+
+			AbsoluteGreaves: {
+				DisplayName: Absolute Greaves
+				Tooltip:
+					'''
+					No fall damage
+					Increased run acceleration and increased slowdown acceleration
+					30% increased movement speed
+					'''
+			}
+
+			AvatarDress: {
+				DisplayName: Avatar Dress
+				Tooltip: Worn by a blue-haired avatar
+			}
+
+			AvatarHorns: {
+				DisplayName: Avatar Horns
+				Tooltip: Worn by a blue-haired avatar
+			}
+
+			AvatarLeggings: {
+				DisplayName: Avatar Leggings
+				Tooltip: Worn by a blue-haired avatar
+			}
+
+			BlueLeggings: {
+				DisplayName: Blue Leggings
+				Tooltip: 25% increased melee crit chance. Immune to Electrified
+			}
+
+			BlueTopHat: {
+				DisplayName: Blue Top Hat
+				Tooltip: 25% increased melee damage. Immune to Chilled
+				SetBonus:
+					'''
+					+40 max life
+					25% increased movement speed
+					Press {0} to release a swarm of mycelium that chase down evil
+					The amount of mycelium released is significantly increased if done from the ground
+					'''
+			}
+
+			BlueTuxedo: {
+				DisplayName: Blue Tuxedo
+				Tooltip: 30% increased melee attack speed. Immune to Distorted
+			}
+
+			MimicryChestplate: {
+				DisplayName: Mimicry Chestplate
+				Tooltip: 10% increased critical strike chance and 9% increased damage
+			}
+
+			MimicryLeggings: {
+				DisplayName: Mimicry Leggings
+				Tooltip: 45% increased movement speed and 4% increased critical strike chance
+			}
+
+			Mimicry: {
+				DisplayName: Mimicry
+				Tooltip:
+					'''
+					"It's form is sloppy, as if saying your yearning to imitate the form of a human should have ended at greed.
+					When the otherworldly eyes stare at you, you will tremble."
+					Heals 10 points of life on the first strike
+					Hold <right> to charge a puncturing spear attack
+					'''
+			}
+
+			NothingThereHelmet: {
+				DisplayName: Nothing There Helmet
+				Tooltip:
+					'''
+					15% reduced mana usage and +50 max mana
+					17% increased magic and summon damage
+					+2 max minions and +1 sentry slot
+					'''
+				SetBonus:
+					'''
+					Increases health by 10%, further increases movement speed by 30%
+					Pressing {0} calls upon crimson fangs to appear around the cursor and crush enemies
+					'''
+			}
+
+			RedMistHelmet: {
+				DisplayName: Red Mist Helmet
+				Tooltip:
+					'''
+					12% increase to melee and ranged damage and 8% increased melee attack speed
+					10% increased movement speed
+					20+ increased maximum life
+					'''
+				SetBonus:
+					'''
+					Reduces how much knockback you take by 60% but reduces the effectiveness of knockback immunity by 85%
+					Press {0} to engage a damaging aura that gains strength on hit, yielding more with un-segmented bosses. Upon death it heals you based on power and releases a laser beam if at maximum strength
+					'''
+			}
+
+			SpecteriteChestPiece: {
+				DisplayName: Specterite Chest Piece
+				Tooltip: 30% chance to save ammo and 25% increased damage.
+			}
+
+			SpecteriteGreaves: {
+				DisplayName: Specterite Greaves
+				Tooltip: 10% increased ranged crit chance and 50% increased movement speed.
+			}
+
+			SpecteriteMask: {
+				DisplayName: Specterite Mask
+				Tooltip: 18% increased ranged damage and critical strike chance.
+				SetBonus: Hold down {0} to reel up a charge that launches you toward the cursor on release
+			}
+
+			TremorGreathelm: {
+				DisplayName: Tremor Greathelm
+				Tooltip:
+					'''
+					Subterranean helmet of noble quality
+					+65 increased mana
+					18% reduced mana cost
+					12% increased magic critical chance
+					'''
+				SetBonus:
+					'''
+					Enemies are more likely to target you
+					Press {0} to engage 3 spikes to rapidly home at the spot of your cursor
+					'''
+			}
+
+			TremorPlating: {
+				DisplayName: Tremor Plating
+				Tooltip:
+					'''
+					Reduces damage taken by 5%
+					8% increased magic critical strike chance
+					+20 max life
+					'''
+			}
+
+			TremorSheathe: {
+				DisplayName: Tremor Sheathe
+				Tooltip:
+					'''
+					Reduces damage taken by 5%
+					10% increased magic damage
+					+50 max life
+					'''
+			}
+
+			EclipsedOnesHat: {
+				DisplayName: Eclipsed Ones Hat
+				Tooltip: ""
+			}
+
+			EclipsedOnesLeggings: {
+				DisplayName: Eclipsed Ones Leggings
+				Tooltip: ""
+			}
+
+			ShockCatalyst: {
+				DisplayName: Shock Catalyst
+				Tooltip: Lightning stored in a mostly workable form
+			}
+
+			FerrymansToken: {
+				DisplayName: Ferrymans Token
+				Tooltip:
+					'''
+					"Let me pay forth once more
+					 For all the malice that has come before"
+					'''
+			}
+
+			CracklingFragments: {
+				DisplayName: Crackling Fragments
+				Tooltip: Ice that has been aged by countless blizzards
+			}
+
+			CrumpledBlueprint: {
+				DisplayName: Crumpled Blueprint
+				Tooltip: Seems like it can still make something
+			}
+
+			EmblazenedEmber: {
+				DisplayName: Emblazened Ember
+				Tooltip: Torrid, everburning flames of the desert
+			}
+
+			FulguriteInAJar: {
+				DisplayName: Fulgurite In A Jar
+				Tooltip: Power emnates from the petrified lightning
+			}
+
+			MythicScrap: {
+				DisplayName: Mythic Scrap
+				Tooltip: Incredibly dense alloy
+			}
+
+			PlasmaCore: {
+				DisplayName: Plasma Core
+				Tooltip: Star-boiling heat held in a vessel
+			}
+
+			StygianEyeball: {
+				DisplayName: Stygian Eyeball
+				Tooltip: ""
+			}
+
+			TremorAlloy: {
+				DisplayName: Tremor Alloy
+				Tooltip: "'Trembles as if the subterranean sun billows through the rock'"
+			}
+
+			WrithingLight: {
+				DisplayName: Writhing Light
+				Tooltip: Bursting frantically with scorching heat
+			}
+
+			AshyWaterBalloon: {
+				DisplayName: Ashy Water Balloon
+				Tooltip: "'Filled with Calamitas bathwater'"
+			}
+
+			TortoiseShell: {
+				DisplayName: Tortoise Shell
+				Tooltip: Wait a second...
+			}
+
+			BrokenRebar: {
+				DisplayName: Broken Rebar
+				Tooltip: ""
+			}
+
+			CrimsonCalamari: {
+				DisplayName: Crimson Calamari
+				Tooltip: "'NOT responsible for eldritch occurences...'"
+			}
+
+			CrimsonCarvedBeetle: {
+				DisplayName: Crimson Carved Beetle
+				Tooltip: Summons Stygain Heart while under the veil of night
+				Tooltip2: Right-Click to turn off/on super blood moons
+				TurnOff: The Blood Moon begins to calm...
+				TurnOn: The Blood Moon seethes in malice!
+			}
+
+			JellyfishSnack: {
+				DisplayName: Jellyfish Snack
+				Tooltip: bubble, man
+			}
+
+			Lifeseed: {
+				DisplayName: Lifeseed
+				Tooltip: ""
+			}
+
+			SmallGear: {
+				DisplayName: Small Gear
+				Tooltip: ""
+			}
+
+			TomeOfArchivalScripts: {
+				DisplayName: Tome of Archival Scripts
+				Tooltip: ""
+			}
+
+			WorldShatteredFragment: {
+				DisplayName: World Shattered Fragment
+				Tooltip: ""
+			}
+
+			AbysslonTrophy: {
+				DisplayName: Abysslon Trophy
+				Tooltip: ""
+			}
+
+			AngelsRage: {
+				DisplayName: Angels Rage
+				Tooltip: Sonic Forces - Beyond Infinite
+			}
+
+			FierceBattle: {
+				DisplayName: Fierce Battle
+				Tooltip: CrossCode OST EX - S-Rank Battle
+			}
+
+			LockedCyberneticSword: {
+				DisplayName: Locked Cybernetic Sword
+				Tooltip:
+					'''
+					A powerful sword left behind by Asterlin!
+					Unfortunately it is locked with a AES-256 cipher...
+					'''
+			}
+
+			MeteorBlock: {
+				DisplayName: Meteor Block
+				Tooltip: ""
+			}
+
+			GreenBlock: {
+				DisplayName: Green Block
+				Tooltip: For when you need a green block i guess...
+			}
+
+			Polarity: {
+				DisplayName: Polarity
+				Tooltip: fun
+			}
+
+			SereneSatellite: {
+				DisplayName: Serene Satellite
+				Tooltip: Debussy - Clair De Lune
+			}
+
+			SpiderMusic: {
+				DisplayName: Spider Music
+				Tooltip: Jerma985 - The Giant Enemy Spider
+			}
+
+			StygianHeartTrophy: {
+				DisplayName: Stygian Heart Trophy
+				Tooltip: ""
+			}
+
+			WereYouFoolin: {
+				DisplayName: Were You Foolin
+				Tooltip: Russ Morgan Orchestra - Were You Foolin
+			}
+
+			BiomeFinder: {
+				DisplayName: Biome Finder
+				Tooltip:
+					'''
+					A device which locates a block closest to the player
+					<right> to cycle through different important biomes
+					'It is a little rusty, might need a few presses to pick up a signal'
+					'''
+			}
+
+			BriefcaseOfBees: {
+				DisplayName: Briefcase Of Bees
+				Tooltip: now concludes the life and times of BEE
+			}
+
+			DeconstructionArray: {
+				DisplayName: Deconstruction Array
+				Tooltip: ""
+			}
+
+			GodDummy: {
+				DisplayName: God Dummy
+				Tooltip: ""
+			}
+
+			IndustrialBlastDartKit: {
+				DisplayName: Industrial Blast Dart Kit
+				Tooltip: Throws darts that explode on impact
+			}
+
+			PortableDONTTOUCHME: {
+				DisplayName: Portable DONT TOUCH ME
+				Tooltip: seriously, just dont...
+			}
+
+			CrossDisc: {
+				DisplayName: Cross Disc
+				Tooltip:
+					'''
+					The elemental balance bar shows how much you have, if used too much a overcharge will occur
+					Hold G to bring up element selection and hover the mouse over the desired side
+					Hold <left> to charge up VRP's and release to fire. The more charged, the more powerful.
+					However if spinning too fast, accuracy is reduced
+					<right> to swing the disc
+					Hold SHIFT to see an expanded description for melee attacks
+					'''
+				FeelingIceolated: Cold releases chilling icicles which bounce
+				LightningReturns: Shock causes lightning to strike upon hitting enemies
+				PlayingWithFire: Heat releases meteors from the sky
+				WhatDoYouMeanNotEarth: Wave releases siphoning orbs that heal you
+				balls: For all m
+			}
+
+			BrewingStorms: {
+				DisplayName: Brewing Storms
+				Tooltip:
+					'''
+					Releases lightning sparks
+					Passively charges up a powerful lightning bolt, with hits from sparks speeding up the process
+					'''
+			}
+
+			NoxiousSnare: {
+				DisplayName: Noxious Snare
+				Tooltip: Shoots piercing spores out of the cursor while its in a poisonous aura
+			}
+
+			TomeOfHellfire: {
+				DisplayName: Tome of Hellfire
+				Tooltip: ""
+			}
+
+			ChannelingOfLivingEmbers: {
+				DisplayName: Channeling Of Living Embers
+				Tooltip: Billows scorching flames
+			}
+
+			CometStorm: {
+				DisplayName: Comet Storm
+				Tooltip: ""
+			}
+
+			Epidemic: {
+				DisplayName: Epidemic
+				Tooltip:
+					'''
+					<left> to release sticky globs of plague that quickly explode
+					Hold <right> to charge a spear and release for 300% extra damage
+					'''
+			}
+
+			HollowPurple: {
+				DisplayName: Hollow Purple
+				Tooltip: The cursed technique
+			}
+
+			RealitySeamstressesGlove: {
+				DisplayName: Reality Seamstresses Glove
+				Tooltip:
+					'''
+					Glove worn by a revered yet unusual seamstress
+					Conjure a magic circle that shoots burst of homing darts that explode in homing stars then fires a powerful, infinitely piercing needle that rips apart the threads of your enemies
+					'''
+			}
+
+			SerratedTempest: {
+				DisplayName: Serrated Tempest
+				Tooltip:
+					'''
+					Swirl around a controllable tornado which pulls in enemies and releases darts
+					Darts home into the largest cluster of enemies
+					'''
+			}
+
+			SuperheatedPlasmaArray: {
+				DisplayName: Superheated Plasma Array
+				Tooltip: Torch enemies into melds of molten plasma
+			}
+
+			TesselesticMeltdown: {
+				DisplayName: Tesselestic Meltdown
+				Tooltip:
+					'''
+					<left> to channel lightning, continously getting faster and gaining more unstability
+					If too unstable, the staff will backfire and render <left>ing unusable
+					Hold <right> to charge a lightripping beam
+					'''
+			}
+
+			Acheron: {
+				DisplayName: Acheron
+				Tooltip: Raises piercing lances from the underworld that have a chance to explode into burning scythes.
+			}
+
+			Fireball: {
+				DisplayName: Fireball
+				Tooltip: It's wizard time
+			}
+
+			IceMistStaff: {
+				DisplayName: Ice Mist Staff
+				Tooltip:
+					'''
+					Conjures storms of icicles
+					Enemies near you are inflicted with frostburn
+					'''
+			}
+
+			LanceOfSanguineSteels: {
+				DisplayName: Lance of Sanguine Steels
+				Tooltip: Conjures a portal to release a torrent of lances
+			}
+
+			StarlessSea: {
+				DisplayName: Starless Sea
+				Tooltip:
+					'''
+					'The wrath of thousands of souls, washed away'
+					Passively creates shards of crystalline water above the player
+					Any shards which are ready can be released with <left>ing, getting exponentially fast
+					Shards get more powerful the faster they go
+					'''
+				Tooltip2:
+					'''
+					Passively creates blood lances to orbit the player
+					Release lances with <left>
+					Lances are especially powerful against blood/eldritch enemies
+					'''
+			}
+
+			VirulentEntrapment: {
+				DisplayName: Virulent Entrapment
+				Tooltip:
+					'''
+					Summons flowers in a large poisonous aura
+					Spawns powerful spore explosions at the cursor while its in the aura
+					Touching a flower with the explosion makes it pop and release seeds that momentarily go to the cursor
+					'''
+			}
+
+			BirchStick: {
+				DisplayName: Birch Stick
+				Tooltip: <right> to reel back the stick for 80% increased damage and poke things, sending you backwards upon striking ground or enemies
+			}
+
+			Fork: {
+				DisplayName: Fork
+				Tooltip: A vastly inferior spoon... but can be rather stabby!
+			}
+
+			MeteorKatana: {
+				DisplayName: Meteor Katana
+				Tooltip:
+					'''
+					Getting 3 consecutive hits on a enemy creates a meteor, up to 3
+					<right> to release all meteors
+					'''
+			}
+
+			ObsidianFlail: {
+				DisplayName: Obsidian Flail
+				Tooltip: ""
+			}
+
+			AbyssalCurrents: {
+				DisplayName: Abyssal Currents
+				Tooltip: Throw a powerful spear that infinitely pierces
+			}
+
+			CallerOfBirds: {
+				DisplayName: Caller Of Birds
+				Tooltip:
+					'''
+					birdie
+					Hitting enemies with bread restore flight and speed
+					'''
+			}
+
+			CondereFulmina: {
+				DisplayName: Condere Fulmina
+				Tooltip:
+					'''
+					Reel back a powerful spear that quickly charges over time
+					Strikes enemies with powerful bolts and chains of lightning
+					'''
+			}
+
+			Cosmireaper: {
+				DisplayName: Cosmireaper
+				Tooltip:
+					'''
+					Reel back a weighty reaper
+					<right> while held to cycle through various states
+					'''
+			}
+
+			CyberneticRocketGauntlets: {
+				DisplayName: Cybernetic Rocket Gauntlets
+				Tooltip:
+					'''
+					<left> or <right> to start attacks with different combos
+					L - L causes the fist to do a punch, doing extreme knockback and causing an explosion on hit
+					L - R parries projectiles and reflects them back at the cursor
+					R - R swings down with the fist
+					R - L swings up with the fist
+					Swings with the fist do double damage and ignore armor
+					'''
+			}
+
+			EtherealClaymore: {
+				DisplayName: Ethereal Claymore
+				Tooltip: Pirouette around a heavy claymore which ignores armor
+			}
+
+			EverbladedHeaven: {
+				DisplayName: Everbladed Heaven
+				Tooltip:
+					'''
+					"Slay, maim, and pacify the savage into multilated shreds of their former selves"
+					<left> to swipe the katana, causing hyper frequency energy slashes upon slicing enemies
+					Moving the cursor farther away from the player makes the blade do more precise strikes, increasing damage but decreasing the radius
+					<right> to do a dash with the blade
+					'''
+			}
+
+			FinalStrike: {
+				DisplayName: Final Strike
+				Tooltip:
+					'''
+					Charges a infinitely piercing spear that leaves a wake of sword tears
+					Hold <right> to stab with the spear
+					Getting 10 stabs with the spear creates a portal
+					If the spear is thrown through this portal, it will redirect and supercharge to the cursor to obliterate anything
+					'''
+			}
+
+			HeavenForgedSword: {
+				DisplayName: Heaven Forged Sword
+				Tooltip: ""
+			}
+
+			RendedStar: {
+				DisplayName: Rended Star
+				Tooltip:
+					'''
+					A plasma latticed greatsword donned with a incinerating flame to melt down any and all it touches
+					Hold down Left Click to charge the blade and lunge, releasing multiple homing fireballs and extending the blade momentarily for big damage
+					'''
+			}
+
+			Sunspot: {
+				DisplayName: Sunspot
+				Tooltip: Burns foes with the heat of solar flares
+			}
+
+			TheSpoon: {
+				DisplayName: The Spoon
+				Tooltip:
+					'''
+					A masterful, absolute weapon
+					'You drop the chair leg and Boom! Nobody expects a Spoon!'
+					'''
+			}
+
+			TorrentialTides: {
+				DisplayName: Torrential Tides
+				Tooltip: ""
+			}
+
+			TripleKatanas: {
+				DisplayName: Triple Katanas
+				Tooltip:
+					'''
+					Sweep a katana that creates copies of itself
+					Katana copies deal less damage and cannot crit
+					<right> to jump with the blade, causing a whirlwind of slices
+					'''
+			}
+
+			AlucardsSword: {
+				DisplayName: Alucards Sword
+				Tooltip: Throw out a sword that chases the cursor.
+			}
+
+			Bergcrusher: {
+				DisplayName: Bergcrusher
+				Tooltip:
+					'''
+					A titanic greatsword of windtorn ice
+					Hold <right> to reel back the blade, creating a glacier on hit with enemies
+					Hitting the glacier with the blade breaks it into shards
+					'''
+			}
+
+			BirchTree: {
+				DisplayName: Birch Tree
+				Tooltip: '''"I Love Trees"'''
+			}
+
+			ComicallyLargeKnife: {
+				DisplayName: Comically Large Knife
+				Tooltip: Is curiously enchanted to be especially effective against all that are bats or snakes
+			}
+
+			CryingEyeOfCthulhu: {
+				DisplayName: Crying Eye of Cthulhu
+				Tooltip: Now agitated, the eye is enraged and is superiorly quick
+			}
+
+			DecayingCutlery: {
+				DisplayName: Decaying Cutlery
+				Tooltip:
+					'''
+					Pike foes with armor crunching god blood
+					Getting three consecutive hits swings the spear on the next attack, releasing 4 homing globs of ichor
+					'''
+			}
+
+			HellsToothpick: {
+				DisplayName: Hells Toothpick
+				Tooltip: Charge up a shortsword which releases a flame whose power is proportionate to how much the blade was charged
+			}
+
+			ImpureAstralKatanas: {
+				DisplayName: Impure Astral Katanas
+				Tooltip:
+					'''
+					Material of the astral landscape in a weaponized and impure form
+					Rains exploding stars from the sky on hit
+					'''
+			}
+
+			JudgeOfHellsArmaments: {
+				DisplayName: Judge of Hells Armaments
+				Tooltip:
+					'''
+					"Machine, turn back now..."
+					Slice and dice with swords of justice
+					<right> to teleport to the cursor and do a dive
+					'''
+			}
+
+			PairOfScissors: {
+				DisplayName: Pair Of Scissors
+				Tooltip: A cause of evil
+			}
+
+			RejuvenatedHolySword: {
+				DisplayName: Rejuvenated Holy Sword
+				Tooltip:
+					'''
+					<right> to hold out the sword and call down heavens light, marking any enemy caught in it
+					Swinging the sword with marked enemies releases darts of disintegrating light to chase after them
+					A max of 7 darts can emerge in one swing
+					'''
+			}
+
+			Sangue: {
+				DisplayName: Sangue
+				Tooltip:
+					'''
+					Hold <left> to spin the blade and release it, going farther the faster its spun and giving a empowering blessing on hit with enemies
+					This blessing makes spinning faster and causes weaker homing glares to erupt from the sword
+					'''
+			}
+
+			SillyPinkHammer: {
+				DisplayName: Silly Pink Hammer
+				Tooltip: Reel back a very not-safe hammer to crash down and release a beautiful party!
+			}
+
+			SolarBrand: {
+				DisplayName: Solar Brand
+				Tooltip: Emits homing sparks when swung
+			}
+
+			SolemnLament: {
+				DisplayName: Solemn Lament
+				Tooltip: ""
+			}
+
+			Threadripper: {
+				DisplayName: Threadripper
+				Tooltip: ""
+			}
+
+			ChainStrikeJavelin: {
+				DisplayName: Chain Strike Javelin
+				Tooltip: Throw shock javelins that chain though one extra target after hitting one
+			}
+
+			FulgurSpear: {
+				DisplayName: Fulgur Spear
+				Tooltip: Swing and whirl around a spear that conducts sparks to nearby enemies at the cost of 2 mana
+			}
+
+			BoneGunsword: {
+				DisplayName: Bone Gunsword
+				Tooltip:
+					'''
+					<left> to swing the sword for double damage and erupt bones on strike with enemies
+					Hold <right> to fire as a gun for ranged damage
+					'''
+			}
+
+			BeanBurrito: {
+				DisplayName: Bean Burrito
+				Tooltip: The Mexican specialty.
+			}
+
+			BoneFlintlock: {
+				DisplayName: Bone Flintlock
+				Tooltip:
+					'''
+					Fires quick piercing calcium shots
+					<right> to throw a skull bomb that goes on cooldown
+					If the skull bomb is shot 8 bone splinters erupt, sticking to everything
+					'''
+			}
+
+			CrystallineSnapcurve: {
+				DisplayName: Crystalline Snapcurve
+				Tooltip: Charge up a bouncing ball of energy that pierces, losing power and scale on each hit with an enemy or tile
+			}
+
+			Downpour: {
+				DisplayName: Downpour
+				Tooltip: ""
+			}
+
+			LooseSawblade: {
+				DisplayName: Loose Sawblade
+				Tooltip:
+					'''
+					Throw sawblades that lodge themselves into things
+					Holding this item in the hotbar for 5 seconds charges up the sawblades and throws 3 for double the damage, knockback, and speed
+					'''
+			}
+
+			ObsidianRound: {
+				DisplayName: Obsidian Round
+				Tooltip: Quick going but quick falling ammunition which pierces 1 enemy
+			}
+
+			AlchemicCyclone: {
+				DisplayName: Alchemic Cyclone
+				Tooltip: Throw a volatile flask which erupts a homing cyclone
+			}
+
+			AntiMatterCannon: {
+				DisplayName: Anti Matter Cannon
+				Tooltip: Fires infinitely piercing bullets that tear through the thickest armor and fly off shrapnel on hit with enemies
+			}
+
+			CosmicImplosion: {
+				DisplayName: Cosmic Implosion
+				Tooltip:
+					'''
+					Fires empyrean bolts that supercharge upon hitting an enemy, causing an attaching void that quickly explodes
+					The void also ignores all armor and puts non-boss enemies around it into stasis
+					'''
+			}
+
+			FlorescenceRounds: {
+				DisplayName: Florescence Rounds
+				Tooltip:
+					'''
+					Extraordinary ammunition that homes in and pounces on targets. 
+					The faster the target is going the longer the bullet last and the faster the speed
+					This buff only works when it is within homing distance of the target
+					'''
+			}
+
+			GaussBallisticWarheadLauncher: {
+				DisplayName: Gauss Ballistic Warhead Launcher
+				Tooltip:
+					'''
+					<left> to charge up and fire a large rocket which explodes violently
+					<right> to further charge up the launcher and make the next shot rocket become supercharged
+					A targeting system on the launcher makes any rockets home into the enemy closest to your cursor, albeit after a short delay
+					Middle Click to lock/unlock on a enemy that has been fully targeted
+					All rockets have a limited fuel, only going so far before plummeting
+					'''
+			}
+
+			HeavenForgedCannon: {
+				DisplayName: Heaven Forged Cannon
+				Tooltip: Point blank shots are guaranteed critical strikes
+			}
+
+			HeavyLaserRifle: {
+				DisplayName: Heavy Laser Rifle
+				Tooltip: Initiates precision blast of solar cores to rend enemies
+			}
+
+			Lanikea: {
+				DisplayName: Lanikea
+				Tooltip:
+					'''
+					A cosmic shotgun that fires spreads of exploding stars, getting greater choke the longer of a wait between fire
+					Waiting long enough turns the stars into a large spread of piercing slug rounds
+					'''
+			}
+
+			LightripRounds: {
+				DisplayName: Lightrip Rounds
+				Tooltip: Swift armor piercing ammunition that supercharges on shot, causing a explosion on hit with anything
+			}
+
+			MicroGun: {
+				DisplayName: Micro Gun
+				Tooltip:
+					'''
+					'The pinnacle of fire rate now lays upon your hands...'
+					Fires storms of bullets that ignore all armor
+					'''
+			}
+
+			SunsplitHorizon: {
+				DisplayName: Sunsplit Horizon
+				Tooltip: Billows vaporizing plasma that shines as bright as a star
+			}
+
+			TechnicBlitzripper: {
+				DisplayName: Technic Blitzripper
+				Tooltip: Hold <right> to charge a god-sundering blast that infinitely pierces
+			}
+
+			UnparalleledCoalescence: {
+				DisplayName: Unparalleled Coalescence
+				Tooltip:
+					'''
+					Reels back 3 arrows of absolute divinity that slowly converge on themselves, gaining more power until at their zenith
+					The first stage allows the arrows to superhome into enemies after bouncing off tiles, creating amalgamated essences
+					The second stage allow the arrows to infinitely pierce
+					And the final stage allows the arrows to create large explosions
+					"A masterful combination of elements attained with stellar collapse creates a devastating armament"
+					'''
+			}
+
+			AnvilAndPropane: {
+				DisplayName: Anvil And Propane
+				Tooltip:
+					'''
+					'who thought this was a good idea'
+					An anvil drops and ignites a propane can
+					The propane does double damage and makes a large blast if ignited on its own terms
+					The anvil quickly descends and slides on tiles, causing untold destruction if one has the wisdom to send it falling at immense speeds
+					'''
+			}
+
+			BobmOnAStick: {
+				DisplayName: Bobm On A Stick
+				Tooltip:
+					'''
+					legalize "nuclear" bombs
+					Curiously hold out a bobm on a stick that explodes on impact with most living things
+					Owner of this weapon will be effected by it (but takes much less damage)
+					'''
+			}
+
+			BowOfGreekFlames: {
+				DisplayName: Bow Of Greek Flames
+				Tooltip: Fires a powerful cursed arrow that explodes in napalm
+			}
+
+			CharringBarrage: {
+				DisplayName: Charring Barrage
+				Tooltip: Discharges blast of hellfire.
+			}
+
+			Hailfire: {
+				DisplayName: Hailfire
+				Tooltip:
+					'''
+					Fire burst of grenade shells that stick to everything with a max of 6 out at a time
+					The longer they are left the larger the explosion and damage. They max out after 5 seconds.
+					<right> to explode grenade shells
+					'''
+			}
+
+			HallowedGreatbow: {
+				DisplayName: Hallowed Greatbow
+				Tooltip: Fires two accelerating bolts of light
+			}
+
+			HemoglobbedCapsule: {
+				DisplayName: Hemoglobbed Capsule
+				Tooltip: Charges a concentrated blood orb capable of calling a portable blood beacon
+			}
+
+			MartianLaserCapsule: {
+				DisplayName: Martian Laser Capsule
+				Tooltip: ""
+			}
+
+			SmartPistolMK6: {
+				DisplayName: Smart Pistol MK6
+				Tooltip: Search for enemies within a cone and lock onto them, press <left> once ready
+			}
+
+			TheRebar: {
+				DisplayName: The Rebar
+				Tooltip: Rapidly fling Rebar
+			}
+
+			TorrentialStorms: {
+				DisplayName: Torrential Storms
+				Tooltip:
+					'''
+					Slowly pulls back a bow which releases a lightning bolt to the cursor
+					Power is determined by how far the string was pulled
+					'''
+			}
+
+			RampantShields: {
+				DisplayName: Rampant Shields
+				Tooltip: ""
+			}
+
+			StellarKunai: {
+				DisplayName: Stellar Kunai
+				Tooltip:
+					'''
+					Throw out a kunai that sticks into enemies and can be called back by pressing <right>
+					Kunai that are stuck into enemies hit again when called back
+					'''
+			}
+
+			TimberLash: {
+				DisplayName: Timber Lash
+				Tooltip: Simple whip made of forest-y resources
+			}
+
+			Avragen: {
+				DisplayName: Avragen
+				Tooltip:
+					'''
+					Requires 12 minion slots
+					A blazing apparation fights for you by swapping between three phases
+					Phase 1 releases a death beam that tracks the location of the target
+					Phase 2 releases fleets of exploding daggers to nearby enemies
+					Phase 3 releases vortexes of consuming void that chase the enemy in the densest group of enemies
+					Swaps between phase 2 and 3 if a sporadic amount of enemies are nearby
+					Automatically swaps to phase 2 if at least two enemies are near you
+					'''
+			}
+
+			LivingStarFlare: {
+				DisplayName: Living Star Flare
+				Tooltip: ""
+			}
+
+			ScriptureOfTheSuperLoki: {
+				DisplayName: Scripture of The Super Loki
+				Tooltip: Calls upon a Super Loki
+			}
+
+			TidalDeluge: {
+				DisplayName: Tidal Deluge
+				Tooltip:
+					'''
+					35 summon tag damage
+					Strike enemies with the tip to apply tag damage and inflict a powerful debuff
+					'''
+			}
+
+			Atorcoppe: {
+				DisplayName: Atorcoppe
+				Tooltip: Throws 2 fangs that inject deadly poison into enemies
+			}
+
+			AttunedBloodSquidStaff: {
+				DisplayName: Attuned Blood Squid Staff
+				Tooltip: ""
+			}
+
+			BatLantern: {
+				DisplayName: Bat Lantern
+				Tooltip: Calls in Midnight Bats. Effected by magic and summon damage
+			}
+
+			EclipsedDuo: {
+				DisplayName: Eclipsed Duo
+				Tooltip: Strike enemies to power up the whips, with sufficient power causing an eruption of homing energies
+			}
+
+			IchorWhip: {
+				DisplayName: Ichor Whip
+				Tooltip: Sprays foes in ichor.
+			}
+
+			LokiShrine: {
+				DisplayName: Loki Shrine
+				Tooltip: Spawns a loki
+			}
+
+			TheTongue: {
+				DisplayName: The Tongue
+				Tooltip:
+					'''
+					Flail around a fairly gross tongue that goes toward your cursor
+					Damage is effected by how close to the tip the strike was and how fast the tongue is swinging
+					Tip strikes have a chance to release homing ichor if moving fast enough
+					'''
+			}
+
+			WitheredShredder: {
+				DisplayName: Withered Shredder
+				Tooltip: ""
+			}
+
+			MechanicalInNature2: {
+				DisplayName: Mechanical In Nature2
+				Tooltip: ""
+			}
+
+			Ladikerfos: {
+				DisplayName: Ladikerfos
+				Tooltip: ""
+			}
+
+			RainDance: {
+				DisplayName: Rain Dance
+				Tooltip: ""
+			}
+
+			TroubledTank: {
+				DisplayName: Troubled Tank
+				Tooltip:
+					'''
+					Holds out a meticulous tank
+					<right> to cycle through mysterious modes of destruction that may require cooldowns...
+					Slug: Releases a small bouncing slug that does 1.5x damage
+					Grub: Unleash a terrifying grub that violenty erupts in wall piercing shrapnel.
+					Lazer: shoot a regular bouncing lazer for 1.25x damage
+					Maggot: Let enemies carry the burden of a maggot
+					Bees: 'You have angered the hive!'
+					"Is this an AZ Tanks reference!?"
+					"Emissaries of Wibtor, the Devourer of Souls"
+					'''
+			}
+
+			DeepestNadir: {
+				DisplayName: Deepest Nadir
+				Tooltip:
+					'''
+					20 summon tag damage
+					20% summon tag critical strike chance
+					Throws out multiple whips that cause explosions at their peak
+					'''
+			}
+
+			Rimesplitter: {
+				DisplayName: Rimesplitter
+				Tooltip:
+					'''
+					Press [KEY] to engage a shield that bashes enemies and projectiles
+					Bashed projectiles temporarily have significantly reduced damage
+					Immunity to most ice debuffs
+					Grants immunity to knockback
+					'''
+			}
+
+			Exsanguination: {
+				DisplayName: Exsanguination
+				Tooltip:
+					'''
+					Latches onto enemies with life to spare
+					Pressing <left> while latched erupts a blood clot to heal you
+					'''
+			}
+
+			DevItem: {
+				DisplayName: Dev Item
+				Tooltip: ""
+			}
+
+			Eagle500kgBomb: {
+				DisplayName: Eagle 500kg Bomb
+				Tooltip: This is democracy!
+			}
+
+			CopperWireWrappedRock: {
+				DisplayName: Copper Wire Wrapped Rock
+				Tooltip:
+					'''
+					Strikes non-organic enemies with lightning
+					"you WILL throw this at power lines"
+					'''
+			}
+
+			HiTechRemote: {
+				DisplayName: Hi-Tech Remote
+				Tooltip:
+					'''
+					While holding the remote:
+					Hold <left> and <right> to summon drones
+					Holding <left> manually makes the drones release lasers to the cursor
+					Holding <right> charges the drones next shot up to catastrophic degrees
+					If not holding the remote, drones automatically fire at the closest target
+					'''
+			}
+
+			ExampleSwingItem: {
+				Tooltip: ""
+				DisplayName: Example Swing Item
+			}
+
+			ExampleWhipItem: {
+				DisplayName: Example Whip Item
+				Tooltip: ""
+			}
+
+			EbonyNovaBlaster: {
+				DisplayName: Ebony Nova Blaster
+				Tooltip:
+					'''
+					Fires concentrated shots of dark onyx energy
+					Shots don't stop if they do more damage than the enemies available health
+					'''
+			}
+
+			PyroclasticVeil: {
+				DisplayName: Pyroclastic Veil
+				Tooltip: Spews torrents of searing magma
+			}
+
+			MatterDisintegrationDrill: {
+				DisplayName: Matter Disintegration Drill
+				Tooltip:
+					'''
+					A plasma-latticed drill that supercharges a precise laser
+					<right> while the beam is out to enhance its destructive power
+					'''
+			}
+
+			PaintCoveredCamera: {
+				DisplayName: Paint Covered Camera
+				Tooltip: ""
+			}
+
+			MinionBossSummonItem: {
+				DisplayName: Minion Boss Summon Item
+				Tooltip: ""
+			}
+
+			TVRemote: {
+				DisplayName: TV Remote
+				Tooltip: "'I wonder whats on TV...'"
+			}
+
+			FlagPole: {
+				DisplayName: Flag Pole
+				Tooltip: ""
+			}
+
+			EbonyNovaBlaster2: {
+				DisplayName: Ebony Nova Blaster2
+				Tooltip: ""
+			}
+		}
+
+		Content: {
+			Items: {
+				Rimesplitter: {
+					DisplayName: Rimesplitter
+					Tooltip: ""
+				}
+
+				Weapons: {
+					Summoner: {
+						Middle: {
+							OddMotherboard: {
+								DisplayName: Odd Motherboard
+								Tooltip: ""
+							}
+						}
+					}
+				}
+			}
+		}
+
+		NPCs: {
+			Asterlin: {
+				DisplayName: Asterlin
+				Bestiary:
+					'''
+					A god-like machine recently sent out on a expedition to absorb a unfathomably dense collection of souls, resulting in the clouded crater
+					Its origins are completely unknown, given its usage of lightspeed travel to someplace in the universe
+					Whatever the undisclosed intentions of the otherworldly scientist that presumably made it are, they have been stopped from fully attaining such power
+					'''
+				OverheatTemperatureWarning: "[{0}] [NEXUS Worker/WARNING]: CORE TEMPERATURES EXCEEDING 7000 DEGREES"
+				OverheatImminent: "[{0}] [NEXUS Worker/WARNING]: OVERHEATING IMMINENT..."
+				OverheatHeatsinks: "[{0}] [NEXUS Worker/INFO]: Activating heat sinks..."
+				OverheatEyeScan: "[{0}] [NEXUS Worker/STATUS]: VISUAL CORTEX MODULE SCAN..."
+				OverheatEyeScan1: "[{0}] [NEXUS Worker/STATUS]: VISUAL PROCESSING ACCURACY: ADEPT"
+				OverheatEyeScan2: "[{0}] [NEXUS Worker/STATUS]: INERTIAL GUIDANCE SYSTEM: OK"
+				OverheatEyeScan3: "[{0}] [NEXUS Worker/STATUS]: INTERPLANETARY TRANSMITTER: OK"
+				OverheatLegScans: "[{0}] [NEXUS Worker/STATUS]: LEG MODULE (2) SCAN..."
+				OverheatLegScans1: "[{0}] [NEXUS Worker/STATUS]: INSTANT PROPULSION SYSTEM: OK"
+				OverheatLegScans2: "[{0}] [NEXUS Worker/STATUS]: CONTINUOUS PROPULSION SYSTEM: OK"
+				OverheatLegScans3: "[{0}] [NEXUS Worker/STATUS]: POTENTIAL ENERGY STORAGE SYSTEM: OK"
+				OverheatCoreScan: "[{0}] [NEXUS Worker/STATUS]: CORE MODULE SCAN..."
+				OverheatCoreScan1: "[{0}] [NEXUS Worker/STATUS]: SOUL ENERGY TRANSUMATION SYSTEM: OK"
+				OverheatCoreScan2: "[{0}] [NEXUS Worker/STATUS]: AUTOMATIC REORIENTATION SYSTEM: OK"
+				OverheatCoreScan3: "[{0}] [NEXUS Worker/STATUS]: INERTIA CORRECTION SYSTEM: OK"
+				OverheatArmScans: "[{0}] [NEXUS Worker/STATUS]: ARM MODULE (2) SCAN..."
+				OverheatArmScans1: "[{0}] [NEXUS Worker/STATUS]: ARSENAL MATERIALIZATION SYSTEM: OK"
+				OverheatArmScans2: "[{0}] [NEXUS Worker/STATUS]: SOUL ENERGY CONDUIT: OK"
+				OverheatUhOh: "[{0}] [NEXUS Worker/INFO]: Utilizing remaining reservoir of hyper-condensed soul energy"
+			}
+
+			StygainHeart: {
+				DisplayName: Stygain Heart
+				Bestiary: When disturbed enough creatures of the blood moon serve themselves to a supposed greater purpose, congealing their flesh for reconstruction of a eldritch being
+			}
+
+			StygainShield.DisplayName: Stygain Shield
+
+			Abysslon: {
+				DisplayName: Abysslon
+				Bestiary:
+					'''
+					A brackish war spirit of the abyss gone dormant after a catastrophic uprising against those who it once ran by.
+					In writing, it was said to have forged a spear of unimaginable control over water after attempts of understanding eidolon scripture.
+					'''
+			}
+
+			CreepyOldMan: {
+				DisplayName: Creepy Old Man
+				Bestiary: Floundering about in the caverns of the world, the creepy old man sells illegal contents from who knows where
+				Name1: Gary the Decrepit
+				Name2: Larry the Feeble
+				Name3: Henry the Mad
+				Name4: Ralph the Frail
+				Name5: Stinky Pete
+				Name6: Sticky Joe
+				Name7: Sergey the Senile
+				Name8: Josh the Jeriatric
+				Name9: Mr. Armstrong
+				Name10: Mr. Richey
+				Chat1: Got some legal items at a reasonable price!
+				Chat2: You are required to look at this stuff. This is a contractual obligation.
+				Chat3: This stuff is really good for cleaning rooms!
+				Chat4: I'm creepy? Who says I'm creepy?
+				Chat5: I am not responsible for anything that may happen to you with these wonderful products.
+				Chat6: I have the greatest of ideas.
+				Chat7: Guess what? I have dementia. Guess what? I have dementia. Guess wha-
+			}
+
+			DuneProwlerAssault.DisplayName: Dune Prowler Assault
+			DuneProwlerSniper.DisplayName: Dune Prowler Sniper
+			GlassFocusedSniper.DisplayName: Glass Focused Sniper
+			RaggedRifle.DisplayName: Ragged Rifle
+			AuroraTurretBase.DisplayName: Aurora Turret Base
+			AuroraTurretHead.DisplayName: Aurora Turret Head
+			FulminationSpirit.DisplayName: Fulmination Spirit
+			SolarGuardian.DisplayName: Solar Guardian
+			GodDummyNPC.DisplayName: God Dummy NPC
+			TheGiantEnemySpiderGround.DisplayName: The Giant Enemy Spider Ground
+			TheGiantEnemySpiderWall.DisplayName: The Giant Enemy Spider Wall
+
+			TheGiantSnailFromAncientTimes: {
+				DisplayName: The Giant Snail From Ancient Times
+				Bestiary: The rival from archaic time periods
+				Awaken: The jeriatric snail has awoken from its frozen slumber
+			}
+
+			CoalescentMass.DisplayName: Coalescent Mass
+
+			AuroraGuard: {
+				DisplayName: Aurora Guard
+				Bestiary: Abandoned automated machinery of a long-gone clan left to be influenced by the enchanted ice of the tundra that guns down deemed threats
+			}
+
+			qwerBoss.DisplayName: qwer Boss
+			MinionBossBody.DisplayName: Minion Boss Body
+			MinionBossMinion.DisplayName: Minion Boss Minion
+		}
+
+		Configs: {
+			AdditionsConfigClient: {
+				DisplayName: Additions Config
+
+				Headers: {
+					Graphical: Graphical
+					UI: UI
+				}
+
+				VisualIntensity: {
+					Label: Visual Intensity
+					Tooltip: (Certain!) Flashes, sudden blurs, etc. will be toned done depending on number. 0 to turn off.
+				}
+
+				ScreenshakePower: {
+					Label: Screenshake Power
+					Tooltip: Determines how strong the screen should be pushed.
+				}
+			}
+
+			AdditionsConfigServer: {
+				DisplayName: Additions Config
+
+				Headers: {
+					Gameplay: Gameplay
+					Graphical: Graphical
+				}
+
+				UseCustomAI: {
+					Label: Use Custom AI
+					Tooltip: Determines if TEA can modify specific vanilla items/projectiles/npcs. Turn off if your finding incompatibilities or simply don't want the changes.
+				}
+
+				ToolOverhaul: {
+					Label: Tool Overhaul
+					Tooltip: Determines if TEA can modify all tools in the game. Turn off if your finding incompatibilities or simply don't want the changes.
+				}
+			}
+		}
+
+		BossChecklistIntegration: {
+			StygainHeart: {
+				EntryName: Stygain Heart
+				SpawnInfo: Bring yourself under its ire by using a beetle that leeches its power
+				DespawnMessage: Stygain Heart returns to trying to eviscerate the sanguine moon...
+			}
+
+			Abysslon: {
+				EntryName: Abysslon
+				SpawnInfo: Awaken it by fiddling around with an ancient scroll while in the ocean
+				DespawnMessage: Abysslon returns to the depths of the ocean in search of stronger powers...
+			}
+
+			Asterlin: {
+				EntryName: Asterlin
+				SpawnInfo: Rebuild a certain machine in a crashed meteorite and destroy a glowing orb in a clouded land
+				DespawnMessage: Asterlin returns to their mission.
+			}
+		}
+
+		AdditionsGlobalNPC.SuperBloodMoonBegin: Creatures of the blood moon devote themselves to a unknown power...
+
+		AdditionsGlobalItem: {
+			DemonBow: Striking a enemy empowers your next shot to do a critical strike
+			TendonBow: Shoots an additional two slow blood globs that do a quarter of the bows damage
+			PhoenixBlaster: Right Click to shoot a explosive round
+			InfluxWaver: Swing over a energy blade that fires sword copies that strike rapidly
+			Horsemen: Right-Click to do a dash with the blade for double damage on a 3 second cooldown
+			Kraken: Summons 3 tentacles that attack enemies in close proximity
+			TheEyeOfCthulhu: Hits cause small homing servants to erupt out of the yoyo
+			Valor: Summons three extra mini valors to circle around the yoyo
+			AquaScepter: Streams home in on enemies if you're standing in water
+			VikingHelmet: 20% increased damage, 15% increased critical strike chance, and 50% increased attack speed for axes
+			HallowedRepeater: Converts arrows into divine arrows that explode on hit
+			MagnetSphere: Conjures magnet spheres that arc electricity between them, with a max of one sphere arcing to 3 other spheres
+			CursedFlames: Right Click to erupt a short, yet powerful gout of flames
+			GoldenShower: Hold down Right Click to release multiple powerful ichor blast upward
+			AmethystStaff: Bolts make a very small explosion
+			TopazStaff: Hold to charge a bolt then release to fire
+			SapphireStaff: Increased knockback on bolts
+			EmeraldStaff: Bolts have a chance to heal you
+			AmberStaff: Bolts redirect to another enemy one time
+			RubyStaff: Bolts may set enemies on fire
+			DiamondStaff: Bolts slightly curve to your cursor
+			BookofSkulls: Hold down Right Click to charge up a triple shot of explosive skulls
+			HeatRay: Right Click to blast a melt ray that erupts molten lava that sticks to everything
+			BreakerBlade:
+				'''
+				Gain limit by striking enemies, being hit, or manually charging after using the sword while holding S
+				At max limit you fall fast, have 50% increased movement speed, and any sword attack is greatly buffed
+				However, maximum limit can only be held for 15 seconds
+				'''
+		}
+
+		ToolModifier: {
+			HammerInfo: Hold Right-Click while using to break multiple walls at once!
+			ChainsawInfo: Can break living wood/leaves
+		}
+
+		StarfieldMainMenu.Name: Starfield
+		Emotes.OldManBubble.Command: creepyoldman
+	}
+}

@@ -1,0 +1,94 @@
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System.IO;
+using Terraria;
+using Terraria.ModLoader;
+using TheExtraordinaryAdditions.Common.Particles;
+using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Primitives;
+using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+
+namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Early;
+
+public class SpaceRay : ModProjectile, ILocalizedModType, IModType
+{
+    public override string Texture => AssetRegistry.Invis;
+
+    public const int Lifetime = 30;
+    public override void SetDefaults()
+    {
+        Projectile.width = Projectile.height = 5;
+        Projectile.friendly = true;
+        Projectile.ignoreWater = true;
+        Projectile.tileCollide = true;
+        Projectile.DamageType = DamageClass.Magic;
+        Projectile.timeLeft = Lifetime;
+        Projectile.stopsDealingDamageAfterPenetrateHits = true;
+        Projectile.MaxUpdates = 2;
+    }
+
+    public ref float Time => ref Projectile.ai[0];
+    public bool Hit
+    {
+        get => Projectile.ai[1] == 1f;
+        set => Projectile.ai[1] = value.ToInt();
+    }
+
+    public Player Owner => Main.player[Projectile.owner];
+    public Vector2 End;
+    public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(End);
+    public override void ReceiveExtraAI(BinaryReader reader) => End = reader.ReadVector2();
+    public override void AI()
+    {
+        if (trail == null || trail._disposed)
+            trail = new(tip, WidthFunct, ColorFunct, null, 50);
+
+        Vector2 expected = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero) * Animators.MakePoly(3f).OutFunction.Evaluate(Time, 0f, Lifetime, 0f, 1000f);
+        End = LaserCollision(Projectile.Center, expected, CollisionTarget.Tiles | CollisionTarget.NPCs, WidthFunct(.5f));
+        if (End != expected && !Hit)
+        {
+            Hit = true;
+        }
+        points.SetPoints(Projectile.Center.GetLaserControlPoints(End, 50));
+
+        Projectile.Opacity = InverseLerp(0f, 10f, Projectile.timeLeft);
+
+        if (!Hit)
+            Time++;
+    }
+
+    public override bool ShouldUpdatePosition() => false;
+
+    public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+    {
+        return targetHitbox.LineCollision(Projectile.Center, End + Projectile.velocity.SafeNormalize(Vector2.Zero) * 10f, WidthFunct(.5f));
+    }
+
+    public float WidthFunct(float c)
+    {
+        return Projectile.height * Projectile.Opacity;
+    }
+
+    public Color ColorFunct(SystemVector2 c, Vector2 pos)
+    {
+        return Color.LimeGreen * InverseLerp(0f, .04f, c.X) * Projectile.Opacity;
+    }
+
+    public ManualTrailPoints points = new(50);
+    public OptimizedPrimitiveTrail trail;
+    public static readonly ITrailTip tip = new RoundedTip(10);
+    public override bool PreDraw(ref Color lightColor)
+    {
+        void draw()
+        {
+            if (trail == null || points == null)
+                return;
+
+            ManagedShader shader = ShaderRegistry.FlameTrail;
+            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FireNoise), 1, SamplerState.LinearWrap);
+            trail.DrawTippedTrail(shader, points.Points, tip);
+        }
+        PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
+        return false;
+    }
+}

@@ -1,0 +1,21 @@
+Exingenedies: {
+	DisplayName: Exingenedies
+	Tooltip:
+		'''
+
+		Various attacks can result in percentage damage
+		Cycles through four modes automatically though they can be skipped through by pressing [KEY]
+		Mode 1 releases homing luminescent chasers to rip enemies out of reality whilst creating screen tears
+		Mode 2 creates lacerations in space that infinitely pierce while making healing constellations
+		Mode 3 conjures a star out of the galaxy that vaporizes enemies while ejecting high speed debris that violently explode on impact with anything
+		<right> while a star is out to manually return it to the galaxy
+		Pressing [KEY2] overrides into Mode 4, charging up a gamma ray to rapidly vaporize anything. Press [KEY2] again to resume to normal modes
+		'''
+	Line: "Remniscient of the ascension past yourself, that cosmic pulchritude interweaving the infinite lattice of existence, expanding your vessels thought to transcend past matter "
+	Shift: Pressing {0} and {1} while a star is out may cause a miraculous blast that shines brighter than the galaxy whence it came from
+}
+
+DivineSpiritCatalyst: {
+	DisplayName: Divine Spirit Catalyst
+	Tooltip: "A inconveivably powerful catalystic assimilation of elements tempered by divine light and latticed with limitless energies capable of bending reality to its will "
+}

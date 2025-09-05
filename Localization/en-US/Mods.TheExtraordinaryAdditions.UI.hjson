@@ -1,0 +1,23 @@
+Heat: Heat
+HeatShiftText: Hold SHIFT for more information on a weapons Heat
+HeatInfoText:
+	'''
+	Most weapons with the unique rarity of being attributed to lasers has Heat
+	Heat will build as you use the weapon itself, and once too hot will burst the player into flames and cease the ability to use the weapon until its sufficiently cooled
+	Some equipment will offset this factor and lessen the chance of the weapon being too hot
+	Hold Middle-Click to drag the bar
+	'''
+ElementalBalance: Elemental Balance
+ElementalBalanceShiftText: Hold SHIFT for more information on the Cross Disc
+ElementalBalanceText:
+	'''
+	Similar to a laser weapons Heat
+	Various modes of the Cross Disc will use more or less Elemental Balance
+	If it overloads you cannot use other elemental modes until it has regained stability
+	'''
+DummyInfo:
+	'''
+	Left-Click buttons to increase/turn on values for the dummy
+	Right-Click to do just the opposite
+	Hold Middle-Click on the background to re-position
+	'''
