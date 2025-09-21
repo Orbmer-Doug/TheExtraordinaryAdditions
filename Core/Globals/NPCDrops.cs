@@ -5,6 +5,7 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Late;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Early;
+using TheExtraordinaryAdditions.Content.Items.Equipable.Pets;
 using TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 using TheExtraordinaryAdditions.Content.Items.Novelty;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Middle;
@@ -47,11 +48,9 @@ public class NPCDrops : GlobalNPC
             case NPCID.WallofFlesh:
                 npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<HellsToothpick>(), 3, 1, 1));
                 break;
-        }
-
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && npc.type == calamityMod.Find<ModNPC>("SupremeCalamitas").Type)
-        {
-            npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<AshyWaterBalloon>(), 1, 69, 69));
+            case NPCID.BloodJelly | NPCID.BlueJellyfish | NPCID.GreenJellyfish | NPCID.PinkJellyfish:
+                npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<JellyfishSnack>(), 40));
+                break;
         }
     }
 }

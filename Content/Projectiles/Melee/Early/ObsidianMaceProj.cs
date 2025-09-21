@@ -4,8 +4,6 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
-using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Early;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -52,7 +50,22 @@ public class ObsidianMaceProj : ModProjectile
         get => (int)Projectile.Additions().ExtraAI[3];
         set => Projectile.Additions().ExtraAI[3] = value;
     }
-    public ref float Angle => ref Projectile.Additions().ExtraAI[4];
+
+    public const int LaunchTimeLimit = 15;
+    public float LaunchSpeed => 25f * Speed;
+    public float MaxLaunchLength => 800f;
+    public float RetractAcceleration => 3f * Speed;
+    public float MaxRetractSpeed => 30f * Speed;
+    public float ForcedRetractAcceleration => 6f * Speed;
+    public float MaxForcedRetractSpeed => 40f * Speed;
+    public const float TotalSpeedUpTime = 80f;
+
+    public const int DefaultHitCooldown = 10;
+    public const int SpinHitCooldown = 10;
+    public const int MovingHitCooldown = 10;
+    public const int RicochetTimeLimit = LaunchTimeLimit + 15;
+    public float LaunchRange => LaunchSpeed * LaunchTimeLimit;
+    public float MaxDroppedRange => LaunchRange + 160f;
 
     public override void SetStaticDefaults()
     {
@@ -87,41 +100,15 @@ public class ObsidianMaceProj : ModProjectile
         {
             after ??= new(10, () => Projectile.Center);
             InitDir = Center.SafeDirectionTo(Modded.mouseWorld).X.NonZeroSign();
-            if (this.RunLocal())
-                Projectile.velocity = Center.SafeDirectionTo(Modded.mouseWorld);
-
             Init = true;
             this.Sync();
         }
 
         Vector2 mountedCenter = Owner.MountedCenter;
         bool shouldOwnerHitCheck = false;
-        int launchTimeLimit = 15;
-        float launchSpeed = 25f;
-        float maxLaunchLength = 800f;
-        float retractAcceleration = 3f;
-        float maxRetractSpeed = 30f;
-        float forcedRetractAcceleration = 6f;
-        float maxForcedRetractSpeed = 40f;
-        float totalSpeedUpTime = 80f;
 
-        int defaultHitCooldown = 10;
-        int spinHitCooldown = 10;
-        int movingHitCooldown = 10;
-        int ricochetTimeLimit = launchTimeLimit + 15;
-
-        // Scaling these speeds and accelerations by the Owners melee speed makes the weapon more responsive if the Owner boosts it or general weapon speed
-        launchSpeed *= Speed;
-        retractAcceleration *= Speed;
-        maxRetractSpeed *= Speed;
-        forcedRetractAcceleration *= Speed;
-        maxForcedRetractSpeed *= Speed;
-        float launchRange = launchSpeed * launchTimeLimit;
-        float maxDroppedRange = launchRange + 160f;
-        Projectile.localNPCHitCooldown = defaultHitCooldown;
+        Projectile.localNPCHitCooldown = DefaultHitCooldown;
         Projectile.tileCollide = State != MaceState.Spinning;
-
-        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 0, 0, 0f, null, true, .3f));
 
         switch (State)
         {
@@ -133,32 +120,29 @@ public class ObsidianMaceProj : ModProjectile
                         Vector2 unitVectorTowardsMouse = mountedCenter.DirectionTo(Modded.mouseWorld).SafeNormalize(Vector2.UnitX * Owner.direction);
                         Owner.ChangeDir(InitDir);
 
-                        // Wait until the mace is somewhat in range of the pointed direction
-                        if (!Owner.channel && Center.IsInFieldOfView(Center.AngleTo(Modded.mouseWorld), Projectile.Center, .5f, 200f) && Projectile.Opacity >= 1f)
+                        if (!Owner.channel)
                         {
                             SoundID.Item1.Play(Projectile.Center, .9f, -.4f);
                             State = MaceState.LaunchingForward;
                             Time = 0f;
-                            Projectile.velocity = unitVectorTowardsMouse * launchSpeed + Owner.velocity;
+                            Projectile.velocity = unitVectorTowardsMouse * LaunchSpeed + Owner.velocity;
                             Projectile.Center = mountedCenter;
                             this.Sync();
                             Projectile.ResetLocalNPCHitImmunity();
-                            Projectile.localNPCHitCooldown = movingHitCooldown;
+                            Projectile.localNPCHitCooldown = MovingHitCooldown;
                             break;
                         }
                     }
 
-                    Spin = (Spin + (Utils.Remap(Time, 0f, totalSpeedUpTime / Speed, 1f, 4f * Speed))) % totalSpeedUpTime;
-                    Angle = Angle.SmoothAngleLerp(Center.AngleTo(Modded.mouseWorld), .6f, .2f);
-                    float theta = WrapAngle360(Projectile.velocity.ToRotation()) + Utils.Remap(Spin, InitDir < 0f ? totalSpeedUpTime : 0f, InitDir < 0f ? 0f : totalSpeedUpTime, 0f, MathHelper.TwoPi);
-                    Projectile.Center = Owner.GetFrontHandPositionImproved() + Utility.GetPointOnRotatedEllipse(150f, 80f, Angle, theta);
+                    Spin = (Spin + (Utils.Remap(Time, 0f, TotalSpeedUpTime / Speed, 1f, 4f * Speed))) % TotalSpeedUpTime;
+                    float theta = Utils.Remap(Spin, InitDir < 0f ? TotalSpeedUpTime : 0f, InitDir < 0f ? 0f : TotalSpeedUpTime, 0f, MathHelper.TwoPi);
+                    Projectile.Center = Owner.GetFrontHandPositionImproved() + Utility.GetPointOnRotatedEllipse(150f, 80f, InitDir == -1 ? MathHelper.Pi : 0f, theta);
 
                     if (Main.rand.NextBool())
                         ParticleRegistry.SpawnGlowParticle(Projectile.Center, (Projectile.rotation + MathHelper.PiOver2).ToRotationVector2() * Main.rand.NextFloat(2f, 5f),
                             Main.rand.Next(30, 50), Main.rand.NextFloat(20f, 40f), Color.DarkViolet, .6f);
 
-                    Projectile.localNPCHitCooldown = spinHitCooldown; // set the hit speed to the spinning hit speed
-                    Projectile.Opacity = InverseLerp(0f, 20f, Time);
+                    Projectile.localNPCHitCooldown = SpinHitCooldown; // set the hit speed to the spinning hit speed
                     Time++;
                     this.Sync();
                     break;
@@ -166,8 +150,8 @@ public class ObsidianMaceProj : ModProjectile
 
             case MaceState.LaunchingForward:
                 {
-                    bool shouldSwitchToRetracting = Time++ >= launchTimeLimit;
-                    shouldSwitchToRetracting |= Projectile.Distance(mountedCenter) >= maxLaunchLength;
+                    bool shouldSwitchToRetracting = Time++ >= LaunchTimeLimit;
+                    shouldSwitchToRetracting |= Projectile.Distance(mountedCenter) >= MaxLaunchLength;
                     if (Owner.controlUseItem)
                     {
                         State = MaceState.Dropping;
@@ -186,7 +170,7 @@ public class ObsidianMaceProj : ModProjectile
                     }
 
                     Owner.ChangeDir((Owner.Center.X < Projectile.Center.X).ToDirectionInt());
-                    Projectile.localNPCHitCooldown = movingHitCooldown;
+                    Projectile.localNPCHitCooldown = MovingHitCooldown;
 
                     Vector2 pos = Projectile.RandAreaInEntity();
                     Vector2 vel = -Projectile.velocity * Main.rand.NextFloat(.1f, .4f);
@@ -198,7 +182,7 @@ public class ObsidianMaceProj : ModProjectile
             case MaceState.Retracting:
                 {
                     Vector2 unitVectorTowardsOwner = Projectile.DirectionTo(mountedCenter).SafeNormalize(Vector2.Zero);
-                    if (Projectile.Distance(mountedCenter) <= maxRetractSpeed)
+                    if (Projectile.Distance(mountedCenter) <= MaxRetractSpeed)
                     {
                         Projectile.Kill();
                         return;
@@ -214,7 +198,7 @@ public class ObsidianMaceProj : ModProjectile
                     else
                     {
                         Projectile.velocity *= 0.98f;
-                        Projectile.velocity = Projectile.velocity.MoveTowards(unitVectorTowardsOwner * maxRetractSpeed, retractAcceleration);
+                        Projectile.velocity = Projectile.velocity.MoveTowards(unitVectorTowardsOwner * MaxRetractSpeed, RetractAcceleration);
                         Owner.ChangeDir((Owner.Center.X < Projectile.Center.X).ToDirectionInt());
                     }
                     break;
@@ -224,14 +208,14 @@ public class ObsidianMaceProj : ModProjectile
                 {
                     Projectile.tileCollide = false;
                     Vector2 unitVectorTowardsOwner = Projectile.DirectionTo(mountedCenter).SafeNormalize(Vector2.Zero);
-                    if (Projectile.Distance(mountedCenter) <= maxForcedRetractSpeed)
+                    if (Projectile.Distance(mountedCenter) <= MaxForcedRetractSpeed)
                     {
                         Projectile.Kill();
                         return;
                     }
 
                     Projectile.velocity *= 0.98f;
-                    Projectile.velocity = Projectile.velocity.MoveTowards(unitVectorTowardsOwner * maxForcedRetractSpeed, forcedRetractAcceleration);
+                    Projectile.velocity = Projectile.velocity.MoveTowards(unitVectorTowardsOwner * MaxForcedRetractSpeed, ForcedRetractAcceleration);
                     Vector2 target = Projectile.Center + Projectile.velocity;
                     Vector2 value = mountedCenter.DirectionFrom(target).SafeNormalize(Vector2.Zero);
                     if (Vector2.Dot(unitVectorTowardsOwner, value) < 0f)
@@ -245,7 +229,7 @@ public class ObsidianMaceProj : ModProjectile
                 }
 
             case MaceState.Ricochet:
-                if (Time++ >= ricochetTimeLimit)
+                if (Time++ >= RicochetTimeLimit)
                 {
                     State = MaceState.Dropping;
                     Time = 0f;
@@ -253,7 +237,7 @@ public class ObsidianMaceProj : ModProjectile
                 }
                 else
                 {
-                    Projectile.localNPCHitCooldown = movingHitCooldown;
+                    Projectile.localNPCHitCooldown = MovingHitCooldown;
                     Projectile.velocity.Y += 0.6f;
                     Projectile.velocity.X *= 0.95f;
                     Owner.ChangeDir((Owner.Center.X < Projectile.Center.X).ToDirectionInt());
@@ -261,7 +245,7 @@ public class ObsidianMaceProj : ModProjectile
                 break;
 
             case MaceState.Dropping:
-                if (!Owner.controlUseItem || Projectile.Distance(mountedCenter) > maxDroppedRange)
+                if (!Owner.controlUseItem || Projectile.Distance(mountedCenter) > MaxDroppedRange)
                 {
                     State = MaceState.ForcedRetracting;
                     Time = 0f;
@@ -279,6 +263,7 @@ public class ObsidianMaceProj : ModProjectile
         Projectile.direction = (Projectile.velocity.X > 0f).ToDirectionInt();
         Projectile.spriteDirection = Projectile.direction;
         Projectile.ownerHitCheck = shouldOwnerHitCheck;
+        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 0, 0, 0f, null, true, .3f));
 
         bool freeRotation = State == MaceState.Ricochet || State == MaceState.Dropping;
         if (freeRotation)
@@ -384,7 +369,6 @@ public class ObsidianMaceProj : ModProjectile
             Projectile.position -= velocity;
         }
 
-        // Here the tiles spawn dust indicating they've been hit
         if (impactIntensity > 0 && !Main.dedServ)
         {
             for (int i = 0; i < impactIntensity; i++)
@@ -408,19 +392,16 @@ public class ObsidianMaceProj : ModProjectile
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
     {
-        // Flails do 20% more damage while spinning
         if (State == MaceState.Spinning)
         {
             modifiers.SourceDamage *= 1.2f;
         }
 
-        // Flails do 100% more damage while launched or retracting
         else if (State == MaceState.LaunchingForward || State == MaceState.Retracting)
         {
             modifiers.SourceDamage *= 2f;
         }
 
-        // The hitDirection is always set to hit away from the player, even if the flail damages the npc while returning
         modifiers.HitDirectionOverride = (Owner.Center.X < target.Center.X).ToDirectionInt();
 
         if (State == MaceState.Spinning)
@@ -498,7 +479,7 @@ public class ObsidianPow : ModProjectile
     }
 
     public override bool ShouldUpdatePosition() => false;
-    
+
     public override void AI()
     {
         if (Projectile.ai[0] == 0f)

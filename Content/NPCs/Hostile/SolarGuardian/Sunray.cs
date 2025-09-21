@@ -1,8 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework.Graphics;
+using System;
 using Terraria;
-using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
+using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -12,60 +14,68 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.SolarGuardian;
 public class Sunray : ModProjectile, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetStaticDefaults()
     {
-        ProjectileID.Sets.DrawScreenCheckFluff[Type] = 10000;
-        ProjectileID.Sets.TrailingMode[Projectile.type] = 1;
-        ProjectileID.Sets.TrailCacheLength[Projectile.type] = 50;
+        ProjectileID.Sets.DrawScreenCheckFluff[Type] = 2000;
     }
-    private const int Lifetime = 45;
+
+    public const int Lifetime = 220;
     public override void SetDefaults()
     {
-        Projectile.width =
-        Projectile.height = 32;
-        Projectile.alpha = 255;
-        Projectile.penetrate = 4;
-        Projectile.ignoreWater = true;
-        Projectile.tileCollide = false;
-        Projectile.friendly = false;
-        Projectile.hostile = true;
+        Projectile.Size = new(52);
+        Projectile.penetrate = 3;
+        Projectile.ignoreWater = Projectile.hostile = Projectile.stopsDealingDamageAfterPenetrateHits = true;
+        Projectile.tileCollide = Projectile.friendly = false;
         Projectile.MaxUpdates = 3;
         Projectile.timeLeft = Projectile.MaxUpdates * Lifetime;
-        Projectile.stopsDealingDamageAfterPenetrateHits = true;
+    }
+
+    public int Time
+    {
+        get => (int)Projectile.ai[0];
+        set => Projectile.ai[0] = value;
     }
     public override void AI()
     {
-        Projectile.oldPos[1] = Projectile.oldPos[0];
-        float adjustedTimeLife = Projectile.timeLeft / Projectile.MaxUpdates;
-        Projectile.Opacity = Projectile.scale = GetLerpBump(0f, 9f, Lifetime, Lifetime - 9f, adjustedTimeLife);
-        Lighting.AddLight(Projectile.Center, Color.Orange.ToVector3() * 1.1f);
+        if (trail == null || trail._disposed)
+            trail = new(WidthFunct, ColorFunct, null, 20);
+        points.Update(Projectile.Center);
 
-        if (Projectile.velocity.Length() < 16f) Projectile.velocity *= 1.03f;
+        if (Projectile.velocity.Length() < 30f)
+            Projectile.velocity *= 1.01f;
+
+        Projectile.Opacity = Animators.MakePoly(3f).InFunction(InverseLerp(0f, 40f, Time));
+        Projectile.scale = Animators.MakePoly(2f).OutFunction(InverseLerp(0f, 40f, Projectile.timeLeft));
+        Time++;
     }
 
-    public float WidthFunction(float completionRatio)
+    public float WidthFunct(float c)
     {
-        return Convert01To010(completionRatio) * Projectile.scale * Projectile.width;
+        float tipInterpolant = MathF.Sqrt(1f - Animators.MakePoly(4f).InFunction(InverseLerp(0.3f, 0f, c)));
+        float width = InverseLerp(1f, 0.4f, c) * tipInterpolant * Projectile.scale;
+        return width * Projectile.width;
     }
 
-    public Color ColorFunction(Vector2 completionRatio)
+    public Color ColorFunct(SystemVector2 c, Vector2 pos)
     {
-        return MulticolorLerp(Sin01(Projectile.identity / 3f + completionRatio.X * 20f + Main.GlobalTimeWrappedHourly * 1.1f),
-            new Color(Main.rand.Next(255, 255), 172, 28), new Color(Main.rand.Next(255, 255), 172, 28));
-    }
-    public override void OnHitPlayer(Player target, Player.HurtInfo info)
-    {
-        target.AddBuff(BuffID.OnFire3, 180, true, false);
+        return new Color(255, 172, 28) * Projectile.Opacity;
     }
 
+    public OptimizedPrimitiveTrail trail;
+    public TrailPoints points = new(20);
     public override bool PreDraw(ref Color lightColor)
     {
-        ManagedShader shader = ShaderRegistry.SpecialLightningTrail;
-        shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Perlin), 1);
-        shader.Render();
+        void draw()
+        {
+            if (trail == null || trail._disposed || points == null)
+                return;
 
-        //PrimitiveTrail trail = new(Projectile.oldPos, shader, WidthFunction, ColorFunction, (c) => Projectile.Size / 2, 20);
-        //trail.DrawTrail();
+            ManagedShader shader = ShaderRegistry.SpecialLightningTrail;
+            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Perlin), 1, SamplerState.LinearWrap);
+            trail.DrawTrail(shader, points.Points, 100);
+        }
+        PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;
     }
 }

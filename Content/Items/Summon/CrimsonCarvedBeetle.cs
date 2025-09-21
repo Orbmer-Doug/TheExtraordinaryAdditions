@@ -19,7 +19,6 @@ public class CrimsonCarvedBeetle : ModItem, ILocalizedModType, IModType
     {
         Main.RegisterItemAnimation(Item.type, new DrawAnimationVertical(15, 5, false));
         ItemID.Sets.AnimatesAsSoul[Type] = true;
-
         ItemID.Sets.SortingPriorityBossSpawns[Type] = 10;
     }
 
@@ -41,31 +40,30 @@ public class CrimsonCarvedBeetle : ModItem, ILocalizedModType, IModType
 
     public override void ModifyResearchSorting(ref ItemGroup itemGroup)
     {
-        itemGroup = (ItemGroup)90;
+        itemGroup = ItemGroup.BossItem;
     }
 
     public override bool CanUseItem(Player player)
     {
         if (!Main.dayTime && !NPC.AnyNPCs(ModContent.NPCType<StygainHeart>()))
             return player.ownedProjectileCounts[Item.shoot] <= 0;
-
         return false;
     }
 
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
-        player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI, 0f, player.Additions().MouseRight.Current.ToInt());
+        player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI, 0f, (player.altFunctionUse == ItemAlternativeFunctionID.ActivatedAndUsed).ToInt());
         return false;
     }
 
     public override bool AltFunctionUse(Player player)
     {
-        return DownedBossSystem.Instance.StygainDowned;
+        return BossDownedSaveSystem.HasDefeated<StygainHeart>();
     }
 
     public override void ModifyTooltips(List<TooltipLine> list)
     {
-        if (DownedBossSystem.Instance.StygainDowned)
+        if (BossDownedSaveSystem.HasDefeated<StygainHeart>())
             list.ModifyTooltip([new(Mod, "CrimsonCarvedBeetle", this.GetLocalizedValue("Tooltip2"))]);
     }
 

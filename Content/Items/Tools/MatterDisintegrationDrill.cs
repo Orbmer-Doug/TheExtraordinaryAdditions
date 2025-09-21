@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using CalamityMod.Items.Materials;
+using CalamityMod.Items.Tools;
+using System.Collections.Generic;
 using Terraria;
-using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Materials.Middle;
@@ -40,31 +41,14 @@ public class MatterDisintegrationDrill : ModItem, ILocalizedModType, IModType
         Item.tileBoost = 56;
     }
 
-    public override void HoldItem(Player player)
-    {
-        player.Additions().SyncMouse = true;
-    }
-
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("ShadowspecBar", out ModItem ShadowspecBar) && calamityMod.TryFind("MarniteObliterator", out ModItem MarniteObliterator))
-        {
-            recipe.AddIngredient(ShadowspecBar, 5);
-            recipe.AddIngredient(ModContent.ItemType<PlasmaCore>(), 1);
-            recipe.AddIngredient(MarniteObliterator, 1);
-            recipe.AddTile(TileID.HeavyWorkBench);
-            recipe.AddTile(TileID.MythrilAnvil);
-        }
-        else
-        {
-            recipe.AddIngredient(ModContent.ItemType<PlasmaCore>(), 1);
-            recipe.AddRecipeGroup("AnyCopperBar", 15);
-            recipe.AddIngredient(ItemID.LunarBar, 20);
-            recipe.AddTile(TileID.HeavyWorkBench);
-            recipe.AddTile(TileID.MythrilAnvil);
-        }
+        recipe.AddIngredient(ModContent.ItemType<ShadowspecBar>(), 5);
+        recipe.AddIngredient(ModContent.ItemType<PlasmaCore>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<MarniteObliterator>(), 1);
+        recipe.AddTile(TileID.HeavyWorkBench);
+        recipe.AddTile(TileID.MythrilAnvil);
         recipe.Register();
     }
 }

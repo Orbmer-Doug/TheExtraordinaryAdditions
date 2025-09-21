@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
 using Terraria.Audio;
@@ -6,7 +6,6 @@ using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Early;
 using TheExtraordinaryAdditions.Content.Items.Materials.Early;
 using TheExtraordinaryAdditions.Content.Items.Placeable.Banners;
@@ -15,15 +14,20 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Lightning;
 
+/// <summary>
+/// Phase 1 - release bolts
+/// Phase 2 - slo down and charge up a lightning strike and attempt to hit player
+/// Remember to smoothen rotation
+/// </summary>
 public class FulminationSpirit : ModNPC
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.FulminationSpirit);
     public override void SetStaticDefaults()
     {
         Main.npcFrameCount[NPC.type] = 6;
-
         NPCID.Sets.TrailingMode[NPC.type] = 1;
     }
+
     public override bool? CanFallThroughPlatforms()
     {
         return true;
@@ -40,19 +44,19 @@ public class FulminationSpirit : ModNPC
         {
             NPC.damage = 40;
             NPC.defense = 4;
-            NPC.lifeMax = 1200;
+            NPC.lifeMax = 800;
         }
         if (Main.hardMode)
         {
             NPC.damage = 50;
             NPC.defense = 8;
-            NPC.lifeMax = 1900;
+            NPC.lifeMax = 1500;
         }
         if (NPC.downedPlantBoss)
         {
-            NPC.defense = 16;
-            NPC.lifeMax = 2400;
             NPC.damage = 60;
+            NPC.defense = 16;
+            NPC.lifeMax = 2000;
         }
         NPC.knockBackResist = 0f;
         NPC.value = Item.buyPrice(0, 0, 80, 50);
@@ -74,20 +78,18 @@ public class FulminationSpirit : ModNPC
     {
         bestiaryEntry.Info.AddRange([
                 BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Sky,
-
-                new FlavorTextBestiaryInfoElement("When mother nature burns away the filth of the land with destructive power, lightning gains sentience by power of excess energies")
+                new FlavorTextBestiaryInfoElement(this.GetLocalizedValue("Bestiary"))
             ]);
 
     }
 
     public override float SpawnChance(NPCSpawnInfo spawnInfo)
     {
-        if (spawnInfo.Player.ZoneSkyHeight)
-        {
+        if (spawnInfo.Sky)
             return 0.09f;
-        }
         return 0f;
     }
+
     public override void FindFrame(int frameHeight)
     {
         NPC.frameCounter += 0.15f;
@@ -96,178 +98,186 @@ public class FulminationSpirit : ModNPC
         NPC.frame.Y = frame * frameHeight;
     }
 
+    public static int VoltDamage => Main.hardMode ? DifficultyBasedValue(26, 52, 78) : DifficultyBasedValue(70, 140, 210);
+    public static int FireWait => DifficultyBasedValue(90, 70, 60);
+    public static int startFindingTarget => SecondsToFrames(3);
+    public static int maxFindingTargetTime => SecondsToFrames(6);
+    public static int findingTargetWait => SecondsToFrames(4);
+    public static float maxSpeed => 7f;
+    public static float bounceFactor => 0.7f;
+    public static float maxDistanceForSpeedBoost => 600f;
+
+    public int Time
+    {
+        get => (int)NPC.ai[0];
+        set => NPC.ai[0] = value;
+    }
+    public int FireTime
+    {
+        get => (int)NPC.ai[1];
+        set => NPC.ai[1] = value;
+    }
+    public int CantHitTimer
+    {
+        get => (int)NPC.ai[2];
+        set => NPC.ai[2] = value;
+    }
+
     public override void AI()
     {
-        Player target = Main.player[NPC.target];
-        if (NPC.target < 0 || NPC.target == 255 || target.dead)
+        NPC.SearchForPlayerTarget(out Player target, false);
+
+        float acceleration = .17f;
+        bool canHit = Collision.CanHitLine(NPC.Center, 4, 4, target.position, target.width, target.height);
+        bool finding = CantHitTimer >= startFindingTarget;
+
+        Vector2 destination = target.Center - Vector2.UnitY * NPC.height;
+        Vector2 snappedTargetPos = new Vector2(
+            (int)(destination.X / 8f) * 8,
+            (int)(destination.Y / 8f) * 8
+        );
+        Vector2 snappedNpcPos = new Vector2(
+            (int)(NPC.Center.X / 8f) * 8,
+            (int)(NPC.Center.Y / 8f) * 8
+        );
+
+        // Calculate direction vector from NPC to target
+        Vector2 dir = snappedTargetPos - snappedNpcPos;
+        float distanceToTarget = dir.Length();
+        bool isFarFromTarget = distanceToTarget > maxDistanceForSpeedBoost;
+
+        // Handle zero distance to avoid division by zero
+        if (distanceToTarget == 0f)
+            dir = NPC.velocity; // Maintain current velocity direction
+        else
+            // Normalize direction and scale by max speed
+            dir = dir / distanceToTarget * maxSpeed;
+
+        if (target.dead)
+            dir = new Vector2(NPC.direction * maxSpeed / 2f, -maxSpeed / 2f);
+
+        // Fly around if it cant hit the player
+        if (!canHit)
         {
-            NPC.TargetClosest(true);
-        }
-        float num = 7f;
-        float acceleration = 0.17f;
-        Vector2 source = NPC.Center;
-        float targetX = target.Center.X;
-        float targetY = target.Center.Y;
-        targetX = (int)(targetX / 8f) * 8;
-        targetY = (int)(targetY / 8f) * 8;
-        source.X = (int)(source.X / 8f) * 8;
-        source.Y = (int)(source.Y / 8f) * 8;
-        targetX -= source.X;
-        targetY -= source.Y;
-        float distance = (float)Math.Sqrt(targetX * targetX + targetY * targetY);
-        float distance2 = distance;
-        bool flag = false;
-        if (distance > 600f)
-        {
-            flag = true;
-        }
-        if (distance == 0f)
-        {
-            targetX = NPC.velocity.X;
-            targetY = NPC.velocity.Y;
+            CantHitTimer++;
+            if (finding)
+            {
+                isFarFromTarget = false;
+                acceleration /= 2;
+                dir = -dir;
+
+                int realDir = float.IsNegative(MathF.Cos(NPC.AngleTo(target.Center + target.velocity))) ? -1 : 1;
+                dir = dir.RotatedBy(.95f * (NPC.Center.Y > target.Center.Y).ToDirectionInt() * realDir);
+            }
+            if (CantHitTimer > (startFindingTarget + maxFindingTargetTime))
+                CantHitTimer = -findingTargetWait; // Give some time to fly back to try again
         }
         else
-        {
-            distance = num / distance;
-            targetX *= distance;
-            targetY *= distance;
-        }
-        if (distance2 > 100f)
-        {
-            NPC.ai[0] += 1f;
-            if (NPC.ai[0] > 0f)
-            {
-                NPC.velocity.Y += 0.023f;
-            }
-            else
-            {
-                NPC.velocity.Y -= 0.023f;
-            }
-            if (NPC.ai[0] < -100f || NPC.ai[0] > 100f)
-            {
-                NPC.velocity.X += 0.023f;
-            }
-            else
-            {
-                NPC.velocity.X -= 0.023f;
-            }
-            if (NPC.ai[0] > 200f)
-            {
-                NPC.ai[0] = -200f;
-            }
-        }
-        if (target.dead)
-        {
-            targetX = NPC.direction * num / 2f;
-            targetY = (0f - num) / 2f;
-        }
-        if (NPC.velocity.X < targetX)
-        {
+            CantHitTimer = 0;
+
+        // Adjust velocity towards target direction
+        if (NPC.velocity.X < dir.X)
             NPC.velocity.X += acceleration;
-        }
-        else if (NPC.velocity.X > targetX)
-        {
+        else if (NPC.velocity.X > dir.X)
             NPC.velocity.X -= acceleration;
-        }
-        if (NPC.velocity.Y < targetY)
-        {
+        if (NPC.velocity.Y < dir.Y)
             NPC.velocity.Y += acceleration;
-        }
-        else if (NPC.velocity.Y > targetY)
-        {
+        else if (NPC.velocity.Y > dir.Y)
             NPC.velocity.Y -= acceleration;
-        }
-        NPC.localAI[0] += 1f;
-        float whentofire = Main.expertMode ? 60f : Main.masterMode ? 50f : 100f;
-        if (Main.netMode != NetmodeID.MultiplayerClient && NPC.localAI[0] >= whentofire)
+
+        float pushForce = .2f;
+        foreach (NPC npc in Main.ActiveNPCs)
         {
-            NPC.localAI[0] = 0f;
-            if (Collision.CanHit(NPC.position, NPC.width, NPC.height, target.position, target.width, target.height))
+            if (npc.type != Type || npc.whoAmI == NPC.whoAmI)
+                continue;
+
+            float taxicabDist = Math.Abs(NPC.position.X - npc.position.X) + Math.Abs(NPC.position.Y - npc.position.Y);
+            if (taxicabDist < NPC.width)
             {
-                int dmg = 10;
-                if (Main.expertMode)
-                {
-                    dmg += 15;
-                }
-                if (NPC.downedPlantBoss)
-                {
-                    targetX *= 1.3f;
-                    targetY *= 1.3f;
-                    dmg = 45;
-                }
-                int projType = ModContent.ProjectileType<LightningVolt>();
-                Vector2 vel = new(targetX, targetY);
-                NPC.Shoot(source, vel, projType, dmg, 0f, Main.myPlayer, 1f, 0f, 0f);
-                for (int i = 0; i < 20; i++)
-                {
-                    ParticleRegistry.SpawnSparkParticle(source, vel.RotatedByRandom(.3f), Main.rand.Next(36, 48), Main.rand.NextFloat(.85f, 1.2f), Color.Purple);
-                }
+                if (NPC.position.X < npc.position.X)
+                    NPC.velocity.X -= pushForce;
+                else
+                    NPC.velocity.X += pushForce;
+
+                if (NPC.position.Y < npc.position.Y)
+                    NPC.velocity.Y -= pushForce;
+                else
+                    NPC.velocity.Y += pushForce;
             }
         }
-        int num9 = (int)NPC.Center.X;
-        int num2 = (int)NPC.Center.Y;
-        int num10 = num9 / 16;
-        num2 /= 16;
-        if (!WorldGen.SolidTile(num10, num2, false))
+
+        NPC.rotation = NPC.rotation.AngleLerp(finding ? NPC.velocity.ToRotation() : NPC.AngleTo(target.Center + target.velocity), .2f);
+        NPC.spriteDirection = float.IsNegative(MathF.Cos(NPC.rotation)) ? -1 : 1;
+
+        // Push away if too close on same axis
+        if (NPC.Center.X > target.Center.X - 20f && NPC.Center.X < target.Center.X)
+            NPC.velocity.X -= .1f;
+        if (NPC.Center.X < target.Center.X + 20f && NPC.Center.X > target.Center.X)
+            NPC.velocity.X += .1f;
+
+        if (FireTime > FireWait && canHit)
         {
-            Lighting.AddLight((int)NPC.Center.X / 16, (int)NPC.Center.Y / 16, 0.5f, 0f, 0.5f);
+            Vector2 vel = NPC.rotation.ToRotationVector2();
+            if (this.RunServer())
+                NPC.NewNPCProj(NPC.Center, vel * 10f, ModContent.ProjectileType<LightningVolt>(), VoltDamage, 0f);
+            for (int i = 0; i < 14; i++)
+            {
+                ParticleRegistry.SpawnSparkParticle(NPC.Center, vel.RotatedByRandom(.5f) * Main.rand.NextFloat(7f, 15f), Main.rand.Next(30, 45), Main.rand.NextFloat(.9f, 1.4f), Color.Purple);
+            }
+            FireTime = 0;
+            NPC.netUpdate = true;
         }
-        if (targetX > 0f)
+        FireTime++;
+
+        Vector2 tilePosition = NPC.Center / 16f;
+        if (!WorldGen.SolidTile((int)tilePosition.X, (int)tilePosition.Y, false))
         {
-            NPC.spriteDirection = 1;
-            NPC.rotation = (float)Math.Atan2(targetY, targetX);
+            Lighting.AddLight((int)tilePosition.X, (int)tilePosition.Y, 0.5f, 0f, 0.5f);
         }
-        if (targetX < 0f)
-        {
-            NPC.spriteDirection = -1;
-            NPC.rotation = (float)Math.Atan2(targetY, targetX) + (float)Math.PI;
-        }
-        float num3 = 0.7f;
+
+        // Handle collision with tiles
         if (NPC.collideX)
         {
             NPC.netUpdate = true;
-            NPC.velocity.X = NPC.oldVelocity.X * (0f - num3);
+            NPC.velocity.X = -NPC.oldVelocity.X * bounceFactor;
+
             if (NPC.direction == -1 && NPC.velocity.X > 0f && NPC.velocity.X < 2f)
-            {
                 NPC.velocity.X = 2f;
-            }
             if (NPC.direction == 1 && NPC.velocity.X < 0f && NPC.velocity.X > -2f)
-            {
                 NPC.velocity.X = -2f;
-            }
         }
+
         if (NPC.collideY)
         {
             NPC.netUpdate = true;
-            NPC.velocity.Y = NPC.oldVelocity.Y * (0f - num3);
+            NPC.velocity.Y = -NPC.oldVelocity.Y * bounceFactor;
+
             if (NPC.velocity.Y > 0f && NPC.velocity.Y < 1.5f)
-            {
                 NPC.velocity.Y = 2f;
-            }
             if (NPC.velocity.Y < 0f && NPC.velocity.Y > -1.5f)
-            {
                 NPC.velocity.Y = -2f;
-            }
         }
-        if (flag)
+
+        // Apply speed boost when far from target
+        if (isFarFromTarget)
         {
-            if (NPC.velocity.X > 0f && targetX > 0f || NPC.velocity.X < 0f && targetX < 0f)
+            if ((NPC.velocity.X > 0f && dir.X > 0f) || (NPC.velocity.X < 0f && dir.X < 0f))
             {
                 if (Math.Abs(NPC.velocity.X) < 12f)
-                {
                     NPC.velocity.X *= 1.05f;
-                }
             }
             else
-            {
                 NPC.velocity.X *= 0.9f;
-            }
         }
-        if ((NPC.velocity.X > 0f && NPC.oldVelocity.X < 0f || NPC.velocity.X < 0f && NPC.oldVelocity.X > 0f || NPC.velocity.Y > 0f && NPC.oldVelocity.Y < 0f || NPC.velocity.Y < 0f && NPC.oldVelocity.Y > 0f) && !NPC.justHit)
+
+        if (((NPC.velocity.X > 0f && NPC.oldVelocity.X < 0f) || (NPC.velocity.X < 0f && NPC.oldVelocity.X > 0f) ||
+             (NPC.velocity.Y > 0f && NPC.oldVelocity.Y < 0f) || (NPC.velocity.Y < 0f && NPC.oldVelocity.Y > 0f)) && !NPC.justHit)
         {
             NPC.netUpdate = true;
         }
+        Time++;
     }
+
     public override void ModifyNPCLoot(NPCLoot npcLoot)
     {
         npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<ShockCatalyst>(), 1, 4, 10));
@@ -283,6 +293,7 @@ public class FulminationSpirit : ModNPC
         {
             target.AddBuff(BuffID.Electrified, 180, true, false);
         }
+
         for (int i = 0; i < 30; i++)
         {
             float offsetAngle = Main.rand.NextFloat(MathHelper.TwoPi);
@@ -290,6 +301,7 @@ public class FulminationSpirit : ModNPC
             Dust dust = Dust.NewDustPerfect(target.Center, DustID.WitherLightning, shootVelocity, default, default, 1.6f);
             dust.noGravity = true;
         }
+
         SoundEngine.PlaySound(SoundID.NPCHit52, target.Center);
     }
 
@@ -309,5 +321,18 @@ public class FulminationSpirit : ModNPC
             Dust lightning = Main.dust[Dust.NewDust(new Vector2(NPC.position.X, NPC.position.Y), NPC.width, NPC.height, DustID.WitherLightning, 0f, 0f, 100, default, 3f)];
             lightning.velocity *= 5f;
         }
+    }
+
+    public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
+    {
+        if (NPC.IsABestiaryIconDummy)
+            return true;
+
+        Texture2D tex = NPC.ThisNPCTexture();
+        Vector2 orig = NPC.frame.Size() / 2;
+        float rot = NPC.spriteDirection == -1 ? NPC.rotation + MathHelper.Pi : NPC.rotation;
+        SpriteEffects fx = NPC.spriteDirection == 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+        spriteBatch.DrawBetter(tex, NPC.Center, NPC.frame, Color.White, rot, orig, 1f, fx);
+        return false;
     }
 }

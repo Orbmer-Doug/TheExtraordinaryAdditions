@@ -67,12 +67,11 @@ public class CollapsingStar : ModProjectile, ILocalizedModType, IModType, IHasSc
     public ref float OldScale => ref Projectile.Additions().ExtraAI[2];
     public Projectile Genedies => Main.projectile[(int)Projectile.Additions().ExtraAI[3]];
 
-    public LoopedSound slot;
+    public LoopedSoundInstance slot;
     public override void AI()
     {
-        SoundStyle style = AssetRegistry.GetSound(AdditionsSound.sunAura) with { MaxInstances = 30 };
-        slot ??= new LoopedSound(style, new ProjectileAudioTracker(Projectile).IsActiveAndInGame);
-        slot.Update(() => Projectile.Center, () => Utils.Remap(GrowTimer, 0f, GrowTime, 0f, 1.1f), () => 0f);
+        slot ??= LoopedSoundManager.CreateNew(new(AdditionsSound.sunAura, () => Utils.Remap(GrowTimer, 0f, GrowTime, 0f, 1.1f)), () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
+        slot?.Update(Projectile.Center);
 
         TheExingendies gen = Genedies.As<TheExingendies>();
         bool available = gen != null && gen.Projectile.active && Genedies.active && Genedies.owner == Projectile.owner;

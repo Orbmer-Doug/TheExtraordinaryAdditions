@@ -28,7 +28,7 @@ public class Acheron : ModItem
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
-        tooltips.ColorLocalization(new Color(100, 0, 171));
+        tooltips.ColorLocalization(new Color(200, 0, 241));
     }
 
     public override void SetDefaults()

@@ -36,7 +36,7 @@ public partial class Asterlin : ModNPC
     public const float DesperationDrama_MaxHeatDistortionArea = 1200f;
     public const float DesperationDrama_MaxHeatDistortionStrength = 1.2f;
 
-    public LoopedSound Ominous;
+    public LoopedSoundInstance Ominous;
     public void DoBehavior_DesperationDrama()
     {
         if (Dialogue_Manager == null)
@@ -45,13 +45,15 @@ public partial class Asterlin : ModNPC
             Dialogue_Manager.AddSentence(FullDialogue);
         }
 
-        Ominous ??= new(AssetRegistry.GetSound(AdditionsSound.PipIdle), () => NPC.active && CurrentState == AsterlinAIType.DesperationDrama && !Main.gameMenu);
-        Ominous?.Update(position: () => NPC.Center, volume: () => InverseLerp(FullDialogue.GetTimeToSnippet(1), FullDialogue.GetTimeToSnippet(2), AITimer) * .4f, pitch: () => 1f);
+        Ominous ??= LoopedSoundManager.CreateNew(new(AdditionsSound.PipIdle, () => InverseLerp(FullDialogue.GetTimeToSnippet(1), FullDialogue.GetTimeToSnippet(2), AITimer) * .4f), 
+            () => CurrentState != AsterlinAIType.DesperationDrama || AdditionsLoopedSound.NPCNotActive(NPC));
+        Ominous?.Update(NPC.Center);
 
         HeatDistortionArea = Animators.Sine.InOutFunction.Evaluate(AITimer, SecondsToFrames(2.6f), SecondsToFrames(4f), EnterPhase3_MaxHeatDistortionArea, DesperationDrama_MaxHeatDistortionArea);
         HeatDistortionStrength = Animators.MakePoly(3f).InFunction.Evaluate(AITimer, SecondsToFrames(2.6f), SecondsToFrames(4f), EnterPhase3_MaxHeatDistortionStrength, DesperationDrama_MaxHeatDistortionStrength);
         //VentGlowInterpolant = Utils.Remap(AITimer, 0f, 120f, .5f, 1f);
         GlowInterpolant = Utils.Remap(AITimer, FullDialogue.GetTimeToSnippet(16), FullDialogue.GetTimeToSnippet(17), 0f, .4f);
+        PowerInterpolant = Utils.Remap(AITimer, FullDialogue.GetTimeToSnippet(16), FullDialogue.GetTimeToSnippet(17), 0f, 1f);
 
         SetLegFlamesInterpolant(InverseLerp(70f, 0f, AITimer));
         SetLeftLegRotation(LeftLegRotation.AngleLerp(-1.5f * Direction, .2f));
@@ -70,6 +72,7 @@ public partial class Asterlin : ModNPC
         {
             Dialogue_ScreenInterpolant = InverseLerp(DesperationDrama_CameraScrollTime, DesperationDrama_CameraScrollTime + DesperationDrama_ScreenPullupTime, AITimer);
             Dialogue_FindingChannel = true;
+            NPC.netUpdate = true;
         }
         else
         {
@@ -78,14 +81,19 @@ public partial class Asterlin : ModNPC
             {
                 Dialogue_ScreenInterpolant = 1f - InverseLerp(startToFade, startToFade + DesperationDrama_ScreenPullupTime, AITimer);
                 Dialogue_FindingChannel = true;
+                NPC.netUpdate = true;
             }
             else
+            {
                 Dialogue_FindingChannel = false;
+                NPC.netUpdate = true;
+            }
 
             if (!DesperationDrama_BeginDialogue)
             {
                 Dialogue_Manager.Start();
                 DesperationDrama_BeginDialogue = true;
+                NPC.netUpdate = true;
             }
             Dialogue_Manager.Update(.02f);
 

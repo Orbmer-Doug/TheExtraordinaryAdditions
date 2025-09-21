@@ -457,6 +457,14 @@ Mods: {
 			ConvergingFlame.DisplayName: Converging Flame
 			qwerFlag.DisplayName: qwer Flag
 			qwerDIALOGUE.DisplayName: qwer D I A L O G U E
+			GlassFocusedShot.DisplayName: Glass Focused Shot
+			GlassFocusedSniper.DisplayName: Glass Focused Sniper
+			TransmitterLightspeed.DisplayName: Transmitter Lightspeed
+			LivingStarBeam.DisplayName: Living Star Beam
+			BergIcicle.DisplayName: Berg Icicle
+			Bergwave.DisplayName: Bergwave
+			EvenFancierPickaxe.DisplayName: Even Fancier Pickaxe
+			FancyTool.DisplayName: Fancy Tool
 		}
 
 		Keybinds: {
@@ -508,6 +516,18 @@ Mods: {
 					Tooltip: ""
 				}
 			}
+
+			TechnicTransmitterPlaced: {
+				MapEntry: Technic Transmitter
+				CloudSave: Turn off cloud save to use the transmitter! There has been known issues with cloud save and subworld library.
+			}
+
+			RainDancePlaced.MapEntry: Rain Dance Placed
+			AngelsRagePlaced.MapEntry: Angels Rage Placed
+			SpiderMusicPlaced.MapEntry: Spider Music Placed
+			WereYouFoolinPlaced.MapEntry: Were You Foolin Placed
+			MenuMusicPlaced.MapEntry: Menu Music Placed
+			SnailRoarPlaced.MapEntry: Snail Roar Placed
 		}
 
 		Buffs: {
@@ -694,8 +714,8 @@ Mods: {
 
 		Items: {
 			MechanicalInNature: {
-				DisplayName: Mechanical In Nature
-				Tooltip: ""
+				DisplayName: Music Box (Clouded Crater)
+				Tooltip: SomeRandomMalePerson - Mechanical In Nature (Slowed)
 			}
 
 			AridFlask: {
@@ -703,18 +723,13 @@ Mods: {
 				Tooltip: Weapons have a chance to fire Sandblast
 			}
 
-			TreasureBagAbysslon: {
-				DisplayName: Treasure Bag Abysslon
-				Tooltip: ""
-			}
-
 			TreasureBagStygainHeart: {
-				DisplayName: Treasure Bag Stygain Heart
+				DisplayName: Treasure Bag (Stygain Heart)
 				Tooltip: ""
 			}
 
 			TreasureBoxAsterlin: {
-				DisplayName: Treasure Box Asterlin
+				DisplayName: Treasure Box (Asterlin)
 				Tooltip: ""
 			}
 
@@ -877,24 +892,6 @@ Mods: {
 					'''
 			}
 
-			PetersUshanka: {
-				DisplayName: Peters Ushanka
-				Tooltip:
-					'''
-					8% increased ranged critical strike chance
-					"Peter boing boing"
-					'''
-				Tip: Perhaps putting on attire for maids would strengthen peters power...
-				SetBonus:
-					'''
-					12% increased ranged damage and movement speed
-					Reduces damage taken by 5%
-					Increases defense by 10
-					Summons 2 little peter guns to fire spores at evil
-					Permanent Tipsy
-					'''
-			}
-
 			VoltChestplate: {
 				DisplayName: Volt Chestplate
 				Tooltip: +40 max mana and 6% increased melee and mage critical strike chance
@@ -945,7 +942,7 @@ Mods: {
 					+90 max mana
 					+4 max minions
 					+2 max turrets
-					Press {0} to conjure a consuming void on a 10 second cooldown
+					Press {0} to conjure a consuming void on a 15 second cooldown
 					'''
 			}
 
@@ -1114,15 +1111,6 @@ Mods: {
 				Tooltip: Lightning stored in a mostly workable form
 			}
 
-			FerrymansToken: {
-				DisplayName: Ferrymans Token
-				Tooltip:
-					'''
-					"Let me pay forth once more
-					 For all the malice that has come before"
-					'''
-			}
-
 			CracklingFragments: {
 				DisplayName: Crackling Fragments
 				Tooltip: Ice that has been aged by countless blizzards
@@ -1221,28 +1209,19 @@ Mods: {
 				Tooltip: ""
 			}
 
-			AbysslonTrophy: {
-				DisplayName: Abysslon Trophy
-				Tooltip: ""
-			}
-
 			AngelsRage: {
-				DisplayName: Angels Rage
+				DisplayName: Music Box (Angels Rage)
 				Tooltip: Sonic Forces - Beyond Infinite
 			}
 
 			FierceBattle: {
-				DisplayName: Fierce Battle
+				DisplayName: Music Box (Fierce Battle)
 				Tooltip: CrossCode OST EX - S-Rank Battle
 			}
 
 			LockedCyberneticSword: {
 				DisplayName: Locked Cybernetic Sword
-				Tooltip:
-					'''
-					A powerful sword left behind by Asterlin!
-					Unfortunately it is locked with a AES-256 cipher...
-					'''
+				Tooltip: Unfortunately it is locked with a AES-256 cipher...
 			}
 
 			MeteorBlock: {
@@ -1261,22 +1240,22 @@ Mods: {
 			}
 
 			SereneSatellite: {
-				DisplayName: Serene Satellite
+				DisplayName: Music Box (Serene Satellite)
 				Tooltip: Debussy - Clair De Lune
 			}
 
 			SpiderMusic: {
-				DisplayName: Spider Music
+				DisplayName: Music Box (Spider)
 				Tooltip: Jerma985 - The Giant Enemy Spider
 			}
 
-			StygianHeartTrophy: {
-				DisplayName: Stygian Heart Trophy
+			StygainHeartTrophy: {
+				DisplayName: Stygain Heart Trophy
 				Tooltip: ""
 			}
 
 			WereYouFoolin: {
-				DisplayName: Were You Foolin
+				DisplayName: Music Box (Terminal)
 				Tooltip: Russ Morgan Orchestra - Were You Foolin
 			}
 
@@ -1302,7 +1281,14 @@ Mods: {
 
 			GodDummy: {
 				DisplayName: God Dummy
-				Tooltip: ""
+				Tooltip:
+					'''
+					Summons a dummy that can be removed and customized by right-clicking while held
+					If Maximum Life is at 200,000 the dummy becomes invincible
+					A max of 25 dummies can exist at once
+					If a boss is alive it cannot be struck
+					'Now this is testing!'
+					'''
 			}
 
 			IndustrialBlastDartKit: {
@@ -1608,9 +1594,9 @@ Mods: {
 				DisplayName: Bergcrusher
 				Tooltip:
 					'''
-					A titanic greatsword of windtorn ice
-					Hold <right> to reel back the blade, creating a glacier on hit with enemies
-					Hitting the glacier with the blade breaks it into shards
+					A titanic greataxe of windtorn ice
+					Striking enemies creates shards of ice
+					Hitting the ice causes it to burst towards your cursor
 					'''
 			}
 
@@ -1679,11 +1665,7 @@ Mods: {
 
 			Sangue: {
 				DisplayName: Sangue
-				Tooltip:
-					'''
-					Hold <left> to spin the blade and release it, going farther the faster its spun and giving a empowering blessing on hit with enemies
-					This blessing makes spinning faster and causes weaker homing glares to erupt from the sword
-					'''
+				Tooltip: ""
 			}
 
 			SillyPinkHammer: {
@@ -2033,18 +2015,18 @@ Mods: {
 			}
 
 			MechanicalInNature2: {
-				DisplayName: Mechanical In Nature2
-				Tooltip: ""
+				DisplayName: Music Box (Asterlin)
+				Tooltip: SomeRandomMalePerson - Mechanical In Nature
 			}
 
 			Ladikerfos: {
-				DisplayName: Ladikerfos
-				Tooltip: ""
+				DisplayName: Music Box (Stygain Heart)
+				Tooltip: KEYGEN CHURCH - Ladikerfos
 			}
 
 			RainDance: {
-				DisplayName: Rain Dance
-				Tooltip: ""
+				DisplayName: Music Box (Abysslon)
+				Tooltip: SomeRandomMalePerson - Rain Dance
 			}
 
 			TroubledTank: {
@@ -2177,9 +2159,24 @@ Mods: {
 				Tooltip: ""
 			}
 
-			EbonyNovaBlaster2: {
-				DisplayName: Ebony Nova Blaster2
+			TechnicTransmitter: {
+				DisplayName: Technic Transmitter
 				Tooltip: ""
+			}
+
+			MenuMusic: {
+				DisplayName: Music Box (Menu)
+				Tooltip: SomeRandomMalePerson - Protostar
+			}
+
+			SnailRoar: {
+				DisplayName: Music Box (Snail)
+				Tooltip: SomeRandomMalePerson - sickest beat ever
+			}
+
+			FrigidGale: {
+				DisplayName: Music Box (Aurora Guard)
+				Tooltip: SomeRandomMalePerson - Frigid Gale
 			}
 		}
 
@@ -2236,17 +2233,7 @@ Mods: {
 			StygainHeart: {
 				DisplayName: Stygain Heart
 				Bestiary: When disturbed enough creatures of the blood moon serve themselves to a supposed greater purpose, congealing their flesh for reconstruction of a eldritch being
-			}
-
-			StygainShield.DisplayName: Stygain Shield
-
-			Abysslon: {
-				DisplayName: Abysslon
-				Bestiary:
-					'''
-					A brackish war spirit of the abyss gone dormant after a catastrophic uprising against those who it once ran by.
-					In writing, it was said to have forged a spear of unimaginable control over water after attempts of understanding eidolon scripture.
-					'''
+				Ominous: A storm brews...
 			}
 
 			CreepyOldMan: {
@@ -2271,17 +2258,27 @@ Mods: {
 				Chat7: Guess what? I have dementia. Guess what? I have dementia. Guess wha-
 			}
 
-			DuneProwlerAssault.DisplayName: Dune Prowler Assault
-			DuneProwlerSniper.DisplayName: Dune Prowler Sniper
-			GlassFocusedSniper.DisplayName: Glass Focused Sniper
-			RaggedRifle.DisplayName: Ragged Rifle
-			AuroraTurretBase.DisplayName: Aurora Turret Base
-			AuroraTurretHead.DisplayName: Aurora Turret Head
-			FulminationSpirit.DisplayName: Fulmination Spirit
-			SolarGuardian.DisplayName: Solar Guardian
+			DuneProwler: {
+				DisplayName: Dune Prowler
+				Bestiary: Brutes of the clan that resides within the arid desert that chases foes
+			}
+
+			GlassPiercer: {
+				DisplayName: Glass Piercer
+				Bestiary: Stealthy versions of the arid desert clan, these sharpshooters are lethal to anything not behind cover
+			}
+
+			FulminationSpirit: {
+				DisplayName: Fulmination Spirit
+				Bestiary: When mother nature burns away the filth of the land with destructive power, lightning gains sentience by power of excess energies
+			}
+
+			SolarGuardian: {
+				DisplayName: Solar Guardian
+				Bestiary: Blazing cores erupted from solar flares on stars given sentience
+			}
+
 			GodDummyNPC.DisplayName: God Dummy NPC
-			TheGiantEnemySpiderGround.DisplayName: The Giant Enemy Spider Ground
-			TheGiantEnemySpiderWall.DisplayName: The Giant Enemy Spider Wall
 
 			TheGiantSnailFromAncientTimes: {
 				DisplayName: The Giant Snail From Ancient Times
@@ -2296,9 +2293,9 @@ Mods: {
 				Bestiary: Abandoned automated machinery of a long-gone clan left to be influenced by the enchanted ice of the tundra that guns down deemed threats
 			}
 
-			qwerBoss.DisplayName: qwer Boss
 			MinionBossBody.DisplayName: Minion Boss Body
 			MinionBossMinion.DisplayName: Minion Boss Minion
+			EncasingGlacier.DisplayName: Encasing Glacier
 		}
 
 		Configs: {
@@ -2348,24 +2345,24 @@ Mods: {
 				DespawnMessage: Stygain Heart returns to trying to eviscerate the sanguine moon...
 			}
 
-			Abysslon: {
-				EntryName: Abysslon
-				SpawnInfo: Awaken it by fiddling around with an ancient scroll while in the ocean
-				DespawnMessage: Abysslon returns to the depths of the ocean in search of stronger powers...
-			}
-
 			Asterlin: {
 				EntryName: Asterlin
-				SpawnInfo: Rebuild a certain machine in a crashed meteorite and destroy a glowing orb in a clouded land
+				SpawnInfo: Rebuild a certain machine and destroy a glowing orb in a clouded land
 				DespawnMessage: Asterlin returns to their mission.
+			}
+
+			AuroraGuard: {
+				EntryName: Aurora Guard
+				SpawnInfo: Throw a single frost core into water during a blizzard
+				DespawnMessage: An Aurora Guard returns to searching what it must defend.
 			}
 		}
 
 		AdditionsGlobalNPC.SuperBloodMoonBegin: Creatures of the blood moon devote themselves to a unknown power...
 
 		AdditionsGlobalItem: {
-			DemonBow: Striking a enemy empowers your next shot to do a critical strike
-			TendonBow: Shoots an additional two slow blood globs that do a quarter of the bows damage
+			DemonBow: Wooden arrows get converted into dark arrows that emit homing flames
+			TendonBow: Wooden arrows get coverted into blood arrows which stick into enemies
 			PhoenixBlaster: Right Click to shoot a explosive round
 			InfluxWaver: Swing over a energy blade that fires sword copies that strike rapidly
 			Horsemen: Right-Click to do a dash with the blade for double damage on a 3 second cooldown
@@ -2398,6 +2395,19 @@ Mods: {
 		ToolModifier: {
 			HammerInfo: Hold Right-Click while using to break multiple walls at once!
 			ChainsawInfo: Can break living wood/leaves
+		}
+
+		Cooldowns: {
+			Absolute: White Void Cooldown
+			AstralDash: Astral Dash Cooldown
+			Pumpkin: Horsemen Dash Cooldown
+			SkullBomb: Calcium Bomb Wait
+			SkullKablooey: Gunsword Cooldown
+			RedMist: Red Mist Aura Cooldown
+			Tremor: Tremor Spike Cooldown
+			Fungus: the myceliumite must grow
+			Mimicry: Teeth Cooldown
+			CyberParry: Parry Cooldown
 		}
 
 		StarfieldMainMenu.Name: Starfield

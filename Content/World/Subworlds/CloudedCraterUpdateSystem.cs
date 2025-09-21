@@ -1,8 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Projectiles.Melee;
+using CalamityMod.Projectiles.Ranged;
 using SubworldLibrary;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Events;
@@ -11,41 +9,16 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Tools;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 using TheExtraordinaryAdditions.Content.Projectiles.Misc;
-using TheExtraordinaryAdditions.Core.CrossCompatibility;
+using TheExtraordinaryAdditions.Content.Tiles;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Netcode;
 using TheExtraordinaryAdditions.Core.Systems;
-using TheExtraordinaryAdditions.Core.Utilities;
 using static TheExtraordinaryAdditions.Content.World.Subworlds.CloudedCrater;
 
 namespace TheExtraordinaryAdditions.Content.World.Subworlds;
 
 public class CloudedCraterUpdateSystem : ModSystem
 {
-    public static int WorldDestroyBeamID
-    {
-        get;
-        private set;
-    } = -10000;
-
-    public static int CrystalCrusherRayID
-    {
-        get;
-        private set;
-    } = -10000;
-
-    public static int MortarRoundID
-    {
-        get;
-        private set;
-    } = -10000;
-
-    public static int RubberMortarRoundID
-    {
-        get;
-        private set;
-    } = -10000;
-
     public static bool WasInSubworldLastUpdateFrame
     {
         get;
@@ -54,33 +27,16 @@ public class CloudedCraterUpdateSystem : ModSystem
 
     public override void OnModLoad()
     {
-        // Subscribe to various events.
-        //GlobalPlayer.PostUpdateEvent += CreateWind;
         AdditionsGlobalItem.CanUseItemEvent += DisableCelestialSigil;
         AdditionsGlobalItem.CanUseItemEvent += DisableProblematicItems;
         //AdditionsGlobalProjectile.PreAIEvent += KillProblematicProjectiles;
-        AdditionsGlobalTile.NearbyEffectsEvent += MakeTombsGo1984;
+        AdditionsGlobalTile.NearbyEffectsEvent += ObliterateTom;
         AdditionsGlobalTile.IsTileUnbreakableEvent += DisallowTileBreakage;
         AdditionsGlobalWall.IsWallUnbreakableEvent += DisallowWallBreakage;
     }
 
-    public override void PostSetupContent()
-    {
-        WorldDestroyBeamID = ModContent.ProjectileType<CannonHoldout>();
-        if (ModReferences.BaseCalamity is not null)
-        {
-            if (ModReferences.BaseCalamity.TryFind("CrystylCrusherRay", out ModProjectile ray))
-                CrystalCrusherRayID = ray.Type;
-            if (ModReferences.BaseCalamity.TryFind("MortarRoundProj", out ModProjectile mortar))
-                MortarRoundID = mortar.Type;
-            if (ModReferences.BaseCalamity.TryFind("RubberMortarRoundProj", out ModProjectile rubberMortar))
-                RubberMortarRoundID = rubberMortar.Type;
-        }
-    }
-
     private bool DisableCelestialSigil(Item item, Player player)
     {
-        // Immediately return true if the player isn't even in the subworld.
         if (!WasInSubworldLastUpdateFrame)
             return true;
 
@@ -89,11 +45,10 @@ public class CloudedCraterUpdateSystem : ModSystem
 
     private bool DisableProblematicItems(Item item, Player player)
     {
-        // Immediately return true if the player isn't even in the subworld.
         if (!WasInSubworldLastUpdateFrame)
             return true;
 
-        // Disable liquid placing/removing items.
+        // Disable liquid placing/removing items
         int itemID = item.type;
         bool isSponge = itemID == ItemID.SuperAbsorbantSponge || itemID == ItemID.LavaAbsorbantSponge || itemID == ItemID.HoneyAbsorbantSponge || itemID == ItemID.UltraAbsorbantSponge;
         bool isRegularBucket = itemID == ItemID.EmptyBucket || itemID == ItemID.WaterBucket || itemID == ItemID.LavaBucket || itemID == ItemID.HoneyBucket;
@@ -103,7 +58,7 @@ public class CloudedCraterUpdateSystem : ModSystem
 
     private bool KillProblematicProjectiles(Projectile projectile)
     {
-        // Don't do anything if this event is called outside of the crater
+        // Dont do anything if this event is called outside of the crater
         if (!WasInSubworldLastUpdateFrame)
             return true;
 
@@ -113,17 +68,16 @@ public class CloudedCraterUpdateSystem : ModSystem
             return false;
         }
 
-        // Prevent tombs from cluttering things up in the crater
-        bool isTomb = projectile.type is ProjectileID.Tombstone or ProjectileID.Gravestone or ProjectileID.RichGravestone1 or ProjectileID.RichGravestone2 or
+        // no tombs
+        if (projectile.type is ProjectileID.Tombstone or ProjectileID.Gravestone or ProjectileID.RichGravestone1 or ProjectileID.RichGravestone2 or
             ProjectileID.RichGravestone3 or ProjectileID.RichGravestone4 or ProjectileID.RichGravestone4 or ProjectileID.Headstone or ProjectileID.Obelisk or
-            ProjectileID.GraveMarker or ProjectileID.CrossGraveMarker or ProjectileID.Headstone;
-        if (isTomb)
+            ProjectileID.GraveMarker or ProjectileID.CrossGraveMarker or ProjectileID.Headstone)
             projectile.active = false;
 
-        // Prevent crystyl crusher's beam and other tile-manipulating items like the sandgun from working in the crater and messing up tiles
-        if (projectile.type == WorldDestroyBeamID)
+        // Prevent tile-manipulating items from working messing up tiles
+        if (projectile.type == ModContent.ProjectileType<CannonHoldout>())
             projectile.active = false;
-        if (projectile.type == CrystalCrusherRayID)
+        if (projectile.type == ModContent.ProjectileType<CrystylCrusherRay>())
             projectile.active = false;
         if (projectile.type == ProjectileID.DirtBomb || projectile.type == ProjectileID.DirtStickyBomb)
             projectile.active = false;
@@ -136,8 +90,7 @@ public class CloudedCraterUpdateSystem : ModSystem
         if (projectile.type == ProjectileID.CrimsandBallFalling || projectile.type == ProjectileID.CrimsandBallGun)
             projectile.active = false;
 
-
-        // From the Dirt Rod
+        // dirt rod
         if (projectile.type == ProjectileID.DirtBall)
             projectile.Kill();
 
@@ -146,7 +99,8 @@ public class CloudedCraterUpdateSystem : ModSystem
         bool wetRocket = projectile.type == ProjectileID.WetRocket || projectile.type == ProjectileID.WetSnowmanRocket;
         bool honeyRocket = projectile.type == ProjectileID.HoneyRocket || projectile.type == ProjectileID.HoneySnowmanRocket;
         bool lavaRocket = projectile.type == ProjectileID.LavaRocket || projectile.type == ProjectileID.LavaSnowmanRocket;
-        bool rocket = dryRocket || wetRocket || honeyRocket || lavaRocket || projectile.type == MortarRoundID || projectile.type == RubberMortarRoundID;
+        bool rocket = dryRocket || wetRocket || honeyRocket || lavaRocket ||
+            projectile.type == ModContent.ProjectileType<MortarRoundProj>() || projectile.type == ModContent.ProjectileType<RubberMortarRoundProj>();
 
         bool dryMisc = projectile.type == ProjectileID.DryGrenade || projectile.type == ProjectileID.DryMine;
         bool wetMisc = projectile.type == ProjectileID.WetGrenade || projectile.type == ProjectileID.WetMine;
@@ -160,7 +114,7 @@ public class CloudedCraterUpdateSystem : ModSystem
         return true;
     }
 
-    private void MakeTombsGo1984(int x, int y, int type, bool closer)
+    private void ObliterateTom(int x, int y, int type, bool closer)
     {
         if (!WasInSubworldLastUpdateFrame)
             return;
@@ -172,13 +126,11 @@ public class CloudedCraterUpdateSystem : ModSystem
 
     private bool DisallowTileBreakage(int x, int y, int type)
     {
-        // True = Tiles are unbreakable, False = Tiles are breakable.
         return WasInSubworldLastUpdateFrame;
     }
 
     private bool DisallowWallBreakage(int x, int y, int type)
     {
-        // True = Walls are unbreakable, False = Walls are breakable.
         return WasInSubworldLastUpdateFrame;
     }
 
@@ -214,7 +166,7 @@ public class CloudedCraterUpdateSystem : ModSystem
         // Everything beyond this point applies solely to the subworld
         if (!WasInSubworldLastUpdateFrame)
             return;
-        
+
         SubworldSpecificUpdateBehaviors();
     }
 
@@ -230,7 +182,7 @@ public class CloudedCraterUpdateSystem : ModSystem
                 NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, index);
             Main.npc[index].netUpdate = true;
         }
-        
+
         // Strong wind towards the west, the same direction as the background
         Main.windSpeedTarget = MathHelper.Lerp(0.88f, 1.32f, AperiodicSin(Main.GameUpdateCount * 0.02f) * 0.5f + 0.5f);
         Main.windSpeedCurrent = MathHelper.Lerp(Main.windSpeedCurrent, Main.windSpeedTarget, 0.03f);
@@ -247,7 +199,7 @@ public class CloudedCraterUpdateSystem : ModSystem
             AdditionsNetcode.SyncWorld();
         }
 
-        // annoying
+        // remove the annoying stars
         foreach (Projectile proj in Main.ActiveProjectiles)
         {
             if (proj.type != ProjectileID.FallingStar)
@@ -265,7 +217,6 @@ public class CloudedCraterUpdateSystem : ModSystem
         }
     }
 
-    // TODO: fade out the white screen after teleporting
     public static void PlayerEnterEffects()
     {
         for (int i = 0; i < Main.maxPlayers; i++)
@@ -274,8 +225,8 @@ public class CloudedCraterUpdateSystem : ModSystem
             if (!p.active || p.dead)
                 continue;
 
-            //if (Main.myPlayer == i)
-
+            if (Main.myPlayer == i)
+                Projectile.NewProjectile(new EntitySource_WorldEvent(), p.Center, Vector2.Zero, ModContent.ProjectileType<TransmitterLightspeed>(), 0, 0f, Main.myPlayer, 0f, ai1: 1f);
             ScreenShakeSystem.New(new(7f, .6f), p.Center);
         }
     }

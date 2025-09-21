@@ -38,14 +38,10 @@ public class TheTongue : ModItem
     {
         tooltips.ColorLocalization(new Color(219, 195, 11));
     }
+
     public override bool CanUseItem(Player player)
     {
-        return !Main.projectile.Any((Projectile n) => n.active && n.owner == player.whoAmI && n.type == ModContent.ProjectileType<TheTongueWhip>());
-    }
-
-    public override void HoldItem(Player player)
-    {
-        player.Additions().SyncMouse = true;
+        return player.ownedProjectileCounts[Item.shoot] <= 0;
     }
 
     public override void AddRecipes()

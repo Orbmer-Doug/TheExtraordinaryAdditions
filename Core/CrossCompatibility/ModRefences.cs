@@ -4,11 +4,6 @@ namespace TheExtraordinaryAdditions.Core.CrossCompatibility;
 
 public class ModReferences : ModSystem
 {
-    public static Mod BaseCalamity
-    {
-        get;
-        internal set;
-    }
     public static Mod Fables
     {
         get;
@@ -24,7 +19,7 @@ public class ModReferences : ModSystem
         get;
         private set;
     }
-    public static Mod NycrosNohitMod
+    public static Mod WotG
     {
         get;
         private set;
@@ -32,15 +27,13 @@ public class ModReferences : ModSystem
 
     public override void Load()
     {
-        if (ModLoader.TryGetMod("CalamityMod", out Mod cal))
-            BaseCalamity = cal;
         if (ModLoader.TryGetMod("CalamityFables", out Mod fablesssomgg))
             Fables = fablesssomgg;
         if (ModLoader.TryGetMod("BossChecklist", out Mod bcl))
             BossChecklist = bcl;
         if (ModLoader.TryGetMod("Infernum", out Mod inf))
             Infernum = inf;
-        if (ModLoader.TryGetMod("EfficientNohits", out Mod efh))
-            NycrosNohitMod = efh;
+        if (ModLoader.TryGetMod("NoxusBoss", out Mod knocksus))
+            WotG = knocksus;
     }
 }

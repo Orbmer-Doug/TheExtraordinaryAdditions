@@ -84,7 +84,7 @@ public class OverchargedLaser : ProjOwnedByNPC<Asterlin>
 
             ManagedShader shader = AssetRegistry.GetShader("OverchargedLaserShader");
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FlameMap1), 1, SamplerState.AnisotropicWrap);
-            shader.TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly * 1.2f);
+            shader.TrySetParameter("time", Main.GlobalTimeWrappedHourly * 1.2f);
             trail.DrawTrail(shader, points.Points, 200, true, true);
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);

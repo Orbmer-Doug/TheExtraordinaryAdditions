@@ -1,7 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Items.Materials;
+using CalamityMod.Items.Weapons.Ranged;
 using System.Collections.Generic;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -47,20 +47,10 @@ public class CosmicImplosion : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("EternalBlizzard", out ModItem EternalBlizzard) && calamityMod.TryFind("DarkPlasma", out ModItem DarkPlasma) && calamityMod.TryFind("CoreofCalamity", out ModItem CoreofCalamity) && calamityMod.TryFind("AscendantSpiritEssence", out ModItem AscendantSpiritEssence) && calamityMod.TryFind("GalacticaSingularity", out ModItem GalacticaSingularity))
-        {
-            recipe.AddIngredient(EternalBlizzard.Type, 1);
-            recipe.AddIngredient(GalacticaSingularity, 10);
-            recipe.AddIngredient(DarkPlasma, 8);
-            recipe.AddTile(TileID.VoidMonolith);
-        }
-        else
-        {
-            recipe.AddIngredient(ItemID.DD2BallistraTowerT3Popper, 1);
-            recipe.AddIngredient(ItemID.SoulofFlight, 120);
-            recipe.AddIngredient(ItemID.LunarOre, 120);
-            recipe.AddTile(TileID.VoidMonolith);
-        }
+        recipe.AddIngredient(ModContent.ItemType<EternalBlizzard>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<GalacticaSingularity>(), 10);
+        recipe.AddIngredient(ModContent.ItemType<DarkPlasma>(), 8);
+        recipe.AddTile(TileID.VoidMonolith);
         recipe.Register();
     }
 }

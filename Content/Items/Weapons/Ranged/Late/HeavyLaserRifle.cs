@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Items.Materials;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Terraria;
@@ -66,25 +66,13 @@ public class HeavyLaserRifle : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("DivineGeode", out ModItem DivineGeode) && calamityMod.TryFind("UnholyEssence", out ModItem UnholyEssence) && calamityMod.TryFind("CoreofSunlight", out ModItem CoreofSunlight))
-        {
-            recipe.AddIngredient(ItemID.LaserMachinegun, 1);
-            recipe.AddIngredient(ModContent.ItemType<PlasmaCore>(), 1);
-            recipe.AddIngredient(ItemID.LunarBar, 14);
-            recipe.AddIngredient(ItemID.Wire, 120);
-            recipe.AddIngredient(ItemID.Glass, 30);
-            recipe.AddIngredient(CoreofSunlight.Type, 12);
-            recipe.AddTile(TileID.LunarCraftingStation);
-        }
-        else
-        {
-            recipe.AddIngredient(ItemID.LaserMachinegun, 1);
-            recipe.AddIngredient(ModContent.ItemType<PlasmaCore>(), 1);
-            recipe.AddIngredient(ItemID.LunarBar, 14);
-            recipe.AddIngredient(ItemID.Wire, 120);
-            recipe.AddIngredient(ItemID.Glass, 30);
-            recipe.AddTile(TileID.LunarCraftingStation);
-        }
+        recipe.AddIngredient(ItemID.LaserMachinegun, 1);
+        recipe.AddIngredient(ModContent.ItemType<PlasmaCore>(), 1);
+        recipe.AddIngredient(ItemID.LunarBar, 14);
+        recipe.AddIngredient(ItemID.Wire, 120);
+        recipe.AddIngredient(ItemID.Glass, 30);
+        recipe.AddIngredient(ModContent.ItemType<CoreofSunlight>(), 12);
+        recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();
     }
 }

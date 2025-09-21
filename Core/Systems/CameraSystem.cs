@@ -18,7 +18,6 @@ public sealed class CameraSystem : ModSystem
     /// </summary>
     public static Vector2 UnmodifiedCameraPosition =>
         Main.LocalPlayer.TopLeft + new Vector2(Main.LocalPlayer.width * 0.5f, Main.LocalPlayer.height - 21f) - Main.ScreenSize.ToVector2() * 0.5f + Vector2.UnitY * Main.LocalPlayer.gfxOffY;
-
     public static Rectangle CameraRect => new((int)Main.Camera.ScaledPosition.X, (int)Main.Camera.ScaledPosition.Y, (int)Main.Camera.ScaledSize.X, (int)Main.Camera.ScaledSize.Y);
 
     public delegate void CameraModifierDelegate(Action innerAction);
@@ -54,7 +53,6 @@ public sealed class CameraSystem : ModSystem
 
             innerAction();
 
-            //var flooredPosition = new Vector2(MathF.Floor(Main.screenPosition.X * 0.5f), MathF.Floor(Main.screenPosition.Y * 0.5f)) * 2f;
             Vector2 flooredPosition = new(MathF.Floor(Main.screenPosition.X), MathF.Floor(Main.screenPosition.Y));
 
             flooredPosition += Vector2.One;

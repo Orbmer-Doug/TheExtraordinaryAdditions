@@ -3,6 +3,7 @@ using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -68,7 +69,6 @@ public class CyberneticSwing : ModProjectile
     public ref float Reel => ref Projectile.Additions().ExtraAI[1];
     public ref float Dist => ref Projectile.Additions().ExtraAI[2];
     public ref float OldDist => ref Projectile.Additions().ExtraAI[3];
-    public ref int ParryWait => ref Owner.GetModPlayer<CyberneticPlayer>().parryWait;
 
     public override void SetDefaults()
     {
@@ -167,7 +167,7 @@ public class CyberneticSwing : ModProjectile
             Projectile.Kill();
         }
 
-        if (ParryWait <= 0)
+        if (!CalUtils.HasCooldown(Owner, CyberneticParryCooldown.ID))
         {
             foreach (Projectile proj in Main.ActiveProjectiles)
             {
@@ -305,8 +305,8 @@ public class CyberneticSwing : ModProjectile
 
     public override void OnKill(int timeLeft)
     {
-        if (State == SwingState.Parry && !HitTarget)
-            ParryWait = SecondsToFrames(4);
+        if (State == SwingState.Parry && !HitTarget && !CalUtils.HasCooldown(Owner, CyberneticParryCooldown.ID))
+            CalUtils.AddCooldown(Owner, CyberneticParryCooldown.ID, SecondsToFrames(4));
     }
 
     public float WidthFunct(float c) => MathHelper.SmoothStep(Projectile.height, 0f, c);
@@ -369,11 +369,11 @@ public class CyberneticSwing : ModProjectile
                 effects |= SpriteEffects.FlipHorizontally;
         }
 
-        bool miss = (State == SwingState.Parry && ParryWait > 0);
+        bool miss = (State == SwingState.Parry && CalUtils.HasCooldown(Owner, CyberneticParryCooldown.ID));
         Projectile.DrawProjectileBackglow((miss ? Color.Red : Color.Cyan) * .5f * Projectile.Opacity, 2f, 0, 8, effects);
         Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(miss ? Color.Red : Color.White), rotation, origin, Projectile.scale, effects, 0f);
 
-        if (State == SwingState.Parry && ParryWait <= 0)
+        if (State == SwingState.Parry && !CalUtils.HasCooldown(Owner, CyberneticParryCooldown.ID))
         {
             ManagedShader shader = AssetRegistry.GetShader("ForcefieldLimited");
             shader.TrySetParameter("direction", Projectile.velocity.ToRotation());

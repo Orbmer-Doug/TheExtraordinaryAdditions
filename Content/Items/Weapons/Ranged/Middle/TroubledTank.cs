@@ -39,11 +39,6 @@ public class TroubledTank : ModItem, ILocalizedModType, IModType
     {
         return false;
     }
-
-    public override void HoldItem(Player player)
-    {
-        player.Additions().SyncMouse = true;
-    }
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();

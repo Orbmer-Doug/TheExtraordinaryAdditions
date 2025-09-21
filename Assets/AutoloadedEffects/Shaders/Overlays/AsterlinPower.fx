@@ -10,6 +10,7 @@ sampler2D tex = sampler_state
 };
 float time : register(c0);
 float resolution : register(c1);
+float opacity : register(c2);
 
 // Simple 2D noise function
 float random(float2 st)
@@ -89,7 +90,7 @@ float4 PixelShaderFunction(float2 coords : TEXCOORD0, float4 sampleColor : COLOR
     color *= finalFactor;
     
     // Fix opacity to overlay on asterlin
-    color *= .32;
+    color *= .32 * opacity;
     
     return lerp(float4(0, 0, 0, 0), hiAsterlin + float4(color, 1.0) * sampleColor, any(hiAsterlin));
 }

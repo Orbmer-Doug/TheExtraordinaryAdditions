@@ -5,6 +5,7 @@ using System.IO;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ModLoader;
+using TheExtraordinaryAdditions.Assets.Audio;
 using TheExtraordinaryAdditions.Common.Particles.Metaball;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Late;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
@@ -19,8 +20,6 @@ public class PyroclasticHover : BaseIdleHoldoutProjectile
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.PyroclasticVeil);
     public override int AssociatedItemID => ModContent.ItemType<PyroclasticVeil>();
     public override int IntendedProjectileType => ModContent.ProjectileType<PyroclasticHover>();
-
-    public SlotId FlameSoundSlot;
 
     public static readonly int AppearTime = SecondsToFrames(.8f);
     public static readonly int FadeTime = SecondsToFrames(.4f);
@@ -38,6 +37,8 @@ public class PyroclasticHover : BaseIdleHoldoutProjectile
         Projectile.width = Projectile.height = CircleSize;
         Projectile.DamageType = DamageClass.Magic;
     }
+
+    public LoopedSoundInstance fire;
 
     public override void SafeAI()
     {
@@ -72,9 +73,6 @@ public class PyroclasticHover : BaseIdleHoldoutProjectile
         {
             if (AppearTimer > 0f)
             {
-                if (SoundEngine.TryGetActiveSound(FlameSoundSlot, out var t) && t.IsPlaying)
-                    t.Stop();
-
                 AppearTimer--;
             }
             else
@@ -95,12 +93,10 @@ public class PyroclasticHover : BaseIdleHoldoutProjectile
             MetaballRegistry.SpawnLavaMetaball(Projectile.Center, Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.2f) * 14f, SecondsToFrames(7), 120, Owner.whoAmI, Projectile.damage);
             if (Time % 2 == 1)
                 Item.CheckManaBetter(Owner, 1, true);
-
-            if (SoundEngine.TryGetActiveSound(FlameSoundSlot, out var t) && t.IsPlaying)
-                t.Position = Projectile.Center;
-            else
-                FlameSoundSlot = AdditionsSound.FireBreathe4.Play(Projectile.Center, .6f, .2f);
         }
+
+        fire ??= LoopedSoundManager.CreateNew(new AdditionsLoopedSound(AdditionsSound.FireBreathe4, () => .6f, () => .2f), () => AdditionsLoopedSound.ProjectileNotActive(Projectile), () => AppearCompletion >= 1f);
+        fire.Update(Projectile.Center);
 
         float dist = Animators.MakePoly(4f).InOutFunction.Evaluate(CircleSize, CircleSize * 2.2f, AppearCompletion);
         Projectile.Center = Vector2.SmoothStep(Projectile.Center, Owner.Center + PolarVector(dist, Projectile.rotation), MathHelper.Lerp(.3f, .5f, AppearCompletion));
@@ -122,12 +118,6 @@ public class PyroclasticHover : BaseIdleHoldoutProjectile
             Projectile.Kill();
             return;
         }
-    }
-
-    public override void OnKill(int timeLeft)
-    {
-        if (SoundEngine.TryGetActiveSound(FlameSoundSlot, out var t) && t.IsPlaying)
-            t.Stop();
     }
 
     public override bool PreDraw(ref Color lightColor)

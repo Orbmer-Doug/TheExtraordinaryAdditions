@@ -2,28 +2,30 @@
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Systems;
+using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain;
 
 public sealed partial class StygainHeart : ModNPC
 {
-    public void DoAttack_MoonBarrage(NPC npc, Player target, ref float attackTimer, bool inPhase2)
+    public void DoAttack_MoonBarrage(Player target, bool inPhase2)
     {
         Vector2 hoverDestination = target.Center + new Vector2(target.velocity.X, -(Main.getGoodWorld ? 420f : 300f) + target.velocity.Y);
 
-        npc.velocity = Vector2.SmoothStep(npc.velocity, npc.SafeDirectionTo(hoverDestination) * MathHelper.Min(npc.Distance(hoverDestination), 32f), .5f);
-        npc.rotation = npc.rotation.AngleLerp(npc.velocity.X * 0.07f, 0.08f);
+        NPC.velocity = Vector2.SmoothStep(NPC.velocity, NPC.SafeDirectionTo(hoverDestination) * MathHelper.Min(NPC.Distance(hoverDestination), 32f), .5f);
+        NPC.rotation = NPC.rotation.AngleLerp(NPC.velocity.X * 0.07f, 0.08f);
 
-        npc.damage = 0;
+        NPC.damage = 0;
 
         int shootCycleTime = 61;
         int eyeCount = DifficultyBasedValue(15, 16, 18, 20, 24, 26);
         int moonCount = Main.getGoodWorld ? 5 : 3;
         float moonSpeed = DifficultyBasedValue(10.5f, 10.2f, 10f, 9.6f, 9.2f, 8.5f);
-        float wrappedTime = attackTimer % shootCycleTime;
+        int wrappedTime = AttackTimer % shootCycleTime;
         ref float count = ref NPC.AdditionsInfo().ExtraAI[2];
 
         if (inPhase2 && HasDoneBloodBeacon == true)
@@ -35,22 +37,25 @@ public sealed partial class StygainHeart : ModNPC
         float offsetAngle = RandomRotation();
         if (wrappedTime == shootCycleTime - 1f)
         {
-            for (int i = 0; i < moonCount; i++)
+            if (this.RunServer())
             {
-                Vector2 shootVelocity = (MathHelper.TwoPi * i / moonCount + offsetAngle).ToRotationVector2() * moonSpeed;
-                npc.NewNPCProj(npc.Center, shootVelocity, ModContent.ProjectileType<BloodMoonlet>(), BloodBeaconDamage / 2, 10f);
-            }
-            for (int i = 0; i < eyeCount; i++)
-            {
-                Vector2 shootVelocity = (MathHelper.TwoPi * i / eyeCount + offsetAngle).ToRotationVector2() * 4f;
-                npc.NewNPCProj(npc.Center, shootVelocity, ModContent.ProjectileType<WrithingEyeball>(), RadialEyesDamage, 0f);
+                for (int i = 0; i < moonCount; i++)
+                {
+                    Vector2 shootVelocity = (MathHelper.TwoPi * i / moonCount + offsetAngle).ToRotationVector2() * moonSpeed;
+                    NPC.NewNPCProj(NPC.Center, shootVelocity, ModContent.ProjectileType<BloodMoonlet>(), BloodBeaconDamage / 2, 10f);
+                }
+                for (int i = 0; i < eyeCount; i++)
+                {
+                    Vector2 shootVelocity = (MathHelper.TwoPi * i / eyeCount + offsetAngle).ToRotationVector2() * 4f;
+                    NPC.NewNPCProj(NPC.Center, shootVelocity, ModContent.ProjectileType<WrithingEyeball>(), RadialEyesDamage, 0f);
+                }
             }
 
-            SoundID.NPCHit18.Play(npc.Center, 1f, -.1f, .2f);
-            SoundID.Item28.Play(npc.Center, 1.4f, -.1f, .1f);
+            SoundID.NPCHit18.Play(NPC.Center, 1f, -.1f, .2f);
+            SoundID.Item28.Play(NPC.Center, 1.4f, -.1f, .1f);
 
             count++;
-            npc.netUpdate = true;
+            NPC.netUpdate = true;
         }
 
         if (count >= 5)
@@ -58,75 +63,79 @@ public sealed partial class StygainHeart : ModNPC
     }
 
     public static float BarrierSize => DifficultyBasedValue(700f, 600f, 500f, 480f, 470f, 460f);
-    public void DoAttack_DartCyclone(NPC npc, Player target, ref float attackTimer)
+    public void DoAttack_DartCyclone(Player target)
     {
         int dartShootTime = SecondsToFrames(6);
         int dartShootDelay = SecondsToFrames(1f);
         int dartBurstReleaseRate = DifficultyBasedValue(12, 10, 8, 7, 7, 7);
         int dartShootCount = DifficultyBasedValue(8, 10, 11, 12, 12, 12);
         float dartShootSpeed = DifficultyBasedValue(2.5f, 3f, 3.2f, 3.5f, 3.8f, 3.9f);
-        float totalTime = dartShootTime + dartShootDelay + HemoglobTelegraph.TeleTime;
+        int totalTime = dartShootTime + dartShootDelay + HemoglobTelegraph.TeleTime;
 
         // Hover near the target.
-        if (attackTimer < dartShootDelay)
+        if (AttackTimer < dartShootDelay)
         {
-            Vector2 hoverDestination = target.Center + new Vector2((npc.Center.X > target.Center.X).ToDirectionInt() * 400f, -70f);
-            float distanceToDestination = npc.Distance(hoverDestination);
-            Vector2 idealVelocity = npc.SafeDirectionTo(hoverDestination) * MathHelper.Min(distanceToDestination, 30f);
-            npc.SimpleFlyMovement(Vector2.Lerp(idealVelocity, (hoverDestination - npc.Center) * 0.15f, Utils.GetLerpValue(280f, 540f, distanceToDestination, true)), 0.5f);
+            Vector2 hoverDestination = target.Center + new Vector2((NPC.Center.X > target.Center.X).ToDirectionInt() * 400f, -70f);
+            float distanceToDestination = NPC.Distance(hoverDestination);
+            Vector2 idealVelocity = NPC.SafeDirectionTo(hoverDestination) * MathHelper.Min(distanceToDestination, 30f);
+            NPC.SimpleFlyMovement(Vector2.Lerp(idealVelocity, (hoverDestination - NPC.Center) * 0.15f, Utils.GetLerpValue(280f, 540f, distanceToDestination, true)), 0.5f);
         }
         else
         {
-            npc.velocity = Vector2.SmoothStep(npc.velocity, Vector2.Zero, .4f);
+            NPC.velocity = Vector2.SmoothStep(NPC.velocity, Vector2.Zero, .4f);
         }
 
         // Set the rotations
-        npc.spriteDirection = (target.Center.X > npc.Center.X).ToDirectionInt();
-        npc.rotation = npc.rotation.AngleLerp(npc.velocity.X * 0.14f, 0.19f);
+        NPC.spriteDirection = (target.Center.X > NPC.Center.X).ToDirectionInt();
+        NPC.rotation = NPC.rotation.AngleLerp(NPC.velocity.X * 0.14f, 0.19f);
 
         // Create the telegraph
-        if (attackTimer == dartShootDelay)
+        if (AttackTimer == dartShootDelay)
         {
-            npc.NewNPCProj(npc.Center, Vector2.Zero, ModContent.ProjectileType<BloodMoonlet>(), BloodBeaconDamage, 10f, -1, 0f, 1f);
-            npc.NewNPCProj(npc.Center, Vector2.Zero, ModContent.ProjectileType<HemoglobTelegraph>(), 0, 0f, -1);
-            npc.netUpdate = true;
+            if (this.RunServer())
+            {
+                NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<BloodMoonlet>(), BloodBeaconDamage, 10f, -1, 0f, 1f);
+                NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<HemoglobTelegraph>(), 0, 0f, -1);
+            }
+            NPC.netUpdate = true;
         }
 
         // Charge energy while waiting
-        if (attackTimer.BetweenNum(dartShootDelay, dartShootDelay + HemoglobTelegraph.TeleTime))
+        if (AttackTimer.BetweenNum(dartShootDelay, dartShootDelay + HemoglobTelegraph.TeleTime))
         {
-            Vector2 pos = npc.Center + Main.rand.NextVector2Circular(200f, 200f);
+            Vector2 pos = NPC.Center + Main.rand.NextVector2Circular(200f, 200f);
             Vector2 vel = RandomVelocity(2f, 4f, 10f);
             int time = Main.rand.Next(20, 30);
             float scale = Main.rand.NextFloat(.4f, .8f);
-            ParticleRegistry.SpawnSparkParticle(pos, vel, time, scale, Color.Crimson, false, false, npc.Center);
+            ParticleRegistry.SpawnSparkParticle(pos, vel, time, scale, Color.Crimson, false, false, NPC.Center);
         }
 
         // Start the barrier
-        if (attackTimer == dartShootDelay + HemoglobTelegraph.TeleTime)
+        if (AttackTimer == dartShootDelay + HemoglobTelegraph.TeleTime && this.RunServer())
         {
-            npc.NewNPCProj(npc.Center, Vector2.Zero, ModContent.ProjectileType<HemoglobBarrier>(), BloodBeaconDamage, 0f, -1, npc.whoAmI, 0f, 0f, 0f, target.whoAmI);
-            npc.netUpdate = true;
+            NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<HemoglobBarrier>(), BloodBeaconDamage, 0f, NPC.whoAmI, 0f, 0f, 0f, target.whoAmI);
+            NPC.netUpdate = true;
         }
 
         // Begin releasing darts
-        bool startFiring = attackTimer.BetweenNum(dartShootDelay + HemoglobTelegraph.TeleTime, totalTime, true);
-        bool releaseRate = attackTimer % dartBurstReleaseRate == dartBurstReleaseRate - 1f;
+        bool startFiring = AttackTimer.BetweenNum(dartShootDelay + HemoglobTelegraph.TeleTime, totalTime, true);
+        bool releaseRate = AttackTimer % dartBurstReleaseRate == dartBurstReleaseRate - 1f;
 
-        if (Main.netMode != NetmodeID.MultiplayerClient && startFiring && releaseRate)
+        if (startFiring && releaseRate)
         {
-            float shootOffsetAngle = 3f * MathHelper.Pi * (attackTimer - (dartShootDelay)) / (dartShootTime);
+            float shootOffsetAngle = 3f * MathHelper.Pi * (AttackTimer - (dartShootDelay)) / (dartShootTime);
             for (int i = 0; i < dartShootCount; i++)
             {
                 Vector2 dartVelocity = (MathHelper.TwoPi * i / dartShootCount + shootOffsetAngle).ToRotationVector2() * dartShootSpeed * .5f;
                 int dart = ModContent.ProjectileType<BloodRay>();
-                npc.NewNPCProj(npc.Center, dartVelocity, dart, BulletTwirlDamage, 0f, -1, 0f, npc.whoAmI, target.whoAmI);
-                ParticleRegistry.SpawnBloomLineParticle(npc.Center, dartVelocity.RotatedByRandom(.1f) * Main.rand.NextFloat(1f, 4f), Main.rand.Next(25, 40), Main.rand.NextFloat(.3f, .5f), Color.DarkRed);
+                if (this.RunServer())
+                    NPC.NewNPCProj(NPC.Center, dartVelocity, dart, BulletTwirlDamage, 0f, -1, 0f, NPC.whoAmI, target.whoAmI);
+                ParticleRegistry.SpawnBloomLineParticle(NPC.Center, dartVelocity.RotatedByRandom(.1f) * Main.rand.NextFloat(1f, 4f), Main.rand.Next(25, 40), Main.rand.NextFloat(.3f, .5f), Color.DarkRed);
             }
-            AdditionsSound.etherealHit4.Play(npc.Center, 1.4f, 0f, .2f, 50);
+            AdditionsSound.etherealHit4.Play(NPC.Center, 1.4f, 0f, .2f, 50);
         }
 
-        if (attackTimer > totalTime)
+        if (AttackTimer > totalTime)
             SelectNextAttack();
     }
 
@@ -259,23 +268,28 @@ public sealed partial class StygainHeart : ModNPC
                         if (releaseCounter % 2 == 1)
                             pos.Y -= spearSpacing;
 
-                        ExsanguinationLance lance = Main.projectile[NPC.NewNPCProj(pos, (Vector2.UnitX * x).RotatedBy(rot),
-                            ModContent.ProjectileType<ExsanguinationLance>(), BloodBeaconLanceDamage, 0f)].As<ExsanguinationLance>();
-                        lance.Free = true;
+                        if (this.RunServer())
+                        {
+                            Projectile lance = Main.projectile[NPC.NewNPCProj(pos, (Vector2.UnitX * x).RotatedBy(rot),
+                                ModContent.ProjectileType<ExsanguinationLance>(), BloodBeaconLanceDamage, 0f, 0f, ai1: 1)];
+                            lance.ai[1] = 1;
+                            lance.netUpdate = true;
+                            lance.netSpam = 0;
+                        }
                     }
                 }
                 AdditionsSound.etherealHit4.Play(NPC.Center, 1.5f, 0f, .2f, 50);
 
                 releaseCounter++;
+                NPC.netUpdate = true;
             }
 
-            if (AttackTimer % moonRelease == (moonRelease - 1))
+            if (AttackTimer % moonRelease == (moonRelease - 1) && this.RunServer())
             {
                 int type = ModContent.ProjectileType<BloodMoonlet>();
                 Vector2 pos = new(NPC.Center.X, target.Center.Y + Main.rand.NextFloat(-120f, 120f));
                 Vector2 vel = pos.SafeDirectionTo(target.Center) * Main.rand.NextFloat(15f, 20f);
                 NPC.NewNPCProj(pos, vel, type, BloodBeaconDamage / 2, 0f, -1);
-                NPC.netUpdate = true;
                 SoundID.Item28.Play(pos, 0f, -.3f);
             }
         }

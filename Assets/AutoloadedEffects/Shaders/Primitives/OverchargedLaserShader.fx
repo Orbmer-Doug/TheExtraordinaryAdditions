@@ -1,6 +1,6 @@
 sampler tex : register(s1);
 matrix transformMatrix;
-float globalTime;
+float time;
 
 struct VertexShaderInput
 {
@@ -38,7 +38,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
     float4 color = input.Color;
     float2 coords = input.TextureCoordinates;
     
-    float distanceOffset = (tex2D(tex, coords + float2(globalTime * -2.8 + 1, 0)) - 0.5) * .5;
+    float distanceOffset = (tex2D(tex, coords + float2(time * -2.8 + 1, 0)) - 0.5) * .5;
     float distanceFromCenter = distance(coords.y, 0.5) + distanceOffset;
     float glow = pow(abs(0.25 / distanceFromCenter), 1.5) * QuadraticBump(coords.y) * .92 * 1.5;
     

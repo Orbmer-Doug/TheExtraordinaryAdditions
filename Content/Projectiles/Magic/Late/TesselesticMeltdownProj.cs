@@ -105,9 +105,8 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
                 break;
         }
 
-        SoundStyle style = AssetRegistry.GetSound(AdditionsSound.ElectricityContinuous);
-        slot ??= new LoopedSound(style, () => CurrentState == State.Barrage && new ProjectileAudioTracker(Projectile).IsActiveAndInGame());
-        slot.Update(() => Projectile.Center, () => .67f, () => 0f);
+        slot ??= LoopedSoundManager.CreateNew(new(AdditionsSound.ElectricityContinuous, () => .67f, null), () => AdditionsLoopedSound.ProjectileNotActive(Projectile), () => CurrentState == State.Barrage);
+        slot?.Update(Projectile.Center);
 
         if (CurrentState != State.Idle)
             Time++;
@@ -141,7 +140,7 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
         Time = 0f;
     }
 
-    public LoopedSound slot;
+    public LoopedSoundInstance slot;
     public const int LightningWait = 50;
     public float HeatInterpolant => InverseLerp(0f, LightningWait, Heat);
     public Color HeatColor => Color.Lerp(Color.DeepSkyBlue, Color.Red, HeatInterpolant);
@@ -285,10 +284,17 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
         Vector2 drawPosition = Rect().Top - Main.screenPosition;
         Vector2 origin = noiseTexture.Size() * 0.5f;
 
-        float opac = ReelCompletion;
-        if (SubState != BeamState.Reel && Utility.FindProjectile(out Projectile beam, ModContent.ProjectileType<TesselesticBeam>(), Owner.whoAmI))
-            opac = InverseLerp(TesselesticBeam.BeamTime + TesselesticBeam.CollapseTime + TesselesticBeam.LaserExpandTime,
-            TesselesticBeam.BeamTime + TesselesticBeam.LaserExpandTime, beam.ai[0]);
+        float opac = CurrentState == State.Idle ? 0f : ReelCompletion;
+        if (SubState != BeamState.Reel)
+        {
+            if (Utility.FindProjectile(out Projectile beam, ModContent.ProjectileType<TesselesticBeam>(), Owner.whoAmI))
+            {
+                opac = InverseLerp(TesselesticBeam.BeamTime + TesselesticBeam.CollapseTime + TesselesticBeam.LaserExpandTime,
+                TesselesticBeam.BeamTime + TesselesticBeam.LaserExpandTime, beam.ai[0]);
+            }
+            else
+                opac = 0f;
+        }
         opac *= .7f;
 
         Color col1 = ColorSwap(Color.Cyan, Color.DeepSkyBlue * 1.2f, 1f);

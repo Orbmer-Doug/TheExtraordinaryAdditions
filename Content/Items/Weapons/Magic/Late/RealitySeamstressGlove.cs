@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Items.Materials;
+using CalamityMod.Tiles.Furniture.CraftingStations;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,6 @@ using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Early;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Magic.Late.Zenith;
@@ -110,37 +110,20 @@ public class RealitySeamstressesGlove : ModItem, ILocalizedModType, IModType
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("AuricBar", out ModItem AuricBar) && calamityMod.TryFind("CosmicAnvil", out ModTile CosmicAnvil) && calamityMod.TryFind("AscendantSpiritEssence", out ModItem AscendantSpiritEssence) && calamityMod.TryFind("CosmiliteBar", out ModItem CosmiliteBar) && calamityMod.TryFind("DubiousPlating", out ModItem DubiousPlating))
-        {
-            recipe.AddIngredient(ModContent.ItemType<BrewingStorms>(), 1);
-            recipe.AddIngredient(ItemID.MeteorStaff, 1);
-            recipe.AddIngredient(ModContent.ItemType<Acheron>(), 1);
-            recipe.AddIngredient(ItemID.FairyQueenMagicItem, 1);
-            recipe.AddIngredient(ModContent.ItemType<StarlessSea>(), 1);
-            recipe.AddIngredient(ItemID.LunarFlareBook, 1);
-            recipe.AddIngredient(ModContent.ItemType<PyroclasticVeil>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<Epidemic>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<CometStorm>(), 1);
-            recipe.AddIngredient(ItemID.Silk, 14);
-            recipe.AddIngredient(CosmiliteBar.Type, 5);
-            recipe.AddIngredient(AscendantSpiritEssence.Type, 10);
-            recipe.AddIngredient(AuricBar.Type, 5);
-            recipe.AddTile(CosmicAnvil.Type);
-        }
-        else
-        {
-            recipe.AddIngredient(ModContent.ItemType<BrewingStorms>(), 1);
-            recipe.AddIngredient(ItemID.MeteorStaff, 1);
-            recipe.AddIngredient(ModContent.ItemType<Acheron>(), 1);
-            recipe.AddIngredient(ItemID.FairyQueenMagicItem, 1);
-            recipe.AddIngredient(ModContent.ItemType<StarlessSea>(), 1);
-            recipe.AddIngredient(ItemID.LunarFlareBook, 1);
-            recipe.AddIngredient(ModContent.ItemType<PyroclasticVeil>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<Epidemic>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<CometStorm>(), 1);
-            recipe.AddIngredient(ItemID.Silk, 14);
-            recipe.AddTile(TileID.LunarCraftingStation);
-        }
+        recipe.AddIngredient(ModContent.ItemType<BrewingStorms>(), 1);
+        recipe.AddIngredient(ItemID.MeteorStaff, 1);
+        recipe.AddIngredient(ModContent.ItemType<Acheron>(), 1);
+        recipe.AddIngredient(ItemID.FairyQueenMagicItem, 1);
+        recipe.AddIngredient(ModContent.ItemType<StarlessSea>(), 1);
+        recipe.AddIngredient(ItemID.LunarFlareBook, 1);
+        recipe.AddIngredient(ModContent.ItemType<PyroclasticVeil>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<Epidemic>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<CometStorm>(), 1);
+        recipe.AddIngredient(ItemID.Silk, 14);
+        recipe.AddIngredient(ModContent.ItemType<CosmiliteBar>(), 5);
+        recipe.AddIngredient(ModContent.ItemType<AscendantSpiritEssence>(), 10);
+        recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 5);
+        recipe.AddTile(ModContent.TileType<CosmicAnvil>());
         recipe.Register();
     }
 }

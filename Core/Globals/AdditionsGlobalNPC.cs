@@ -1,18 +1,17 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.ModLoader.IO;
 using TheExtraordinaryAdditions.Common.Particles.Shader;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Pets;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Middle;
 using TheExtraordinaryAdditions.Core.DataStructures;
+using TheExtraordinaryAdditions.Core.Netcode;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -36,8 +35,6 @@ public class AdditionsGlobalNPC : GlobalNPC
     public int StarKunai;
     public int Cursed;
     #endregion Whip
-
-    internal ReferencedValueRegistry valueRegistry = new();
 
     public delegate void EditSpawnRateDelegate(Player player, ref int spawnRate, ref int maxSpawns);
 
@@ -88,7 +85,7 @@ public class AdditionsGlobalNPC : GlobalNPC
             // Negate positive life regen
             if (npc.lifeRegen > 0)
                 npc.lifeRegen = 0;
-            
+
             // Half life per second
             npc.lifeRegen -= lifeRegenValue;
 
@@ -326,6 +323,7 @@ public class AdditionsGlobalNPC : GlobalNPC
 
                     DisplayText(GetText(Name + ".SuperBloodMoonBegin").Value, Color.Crimson);
                     SuperBloodMoonSystem.SuperBloodMoon = true;
+                    AdditionsNetcode.SyncAdditionsBloodMoon(Main.myPlayer);
                 }
                 break;
         }

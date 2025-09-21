@@ -4,15 +4,17 @@ Within blood, sweat, and tears I present to you THE LIST
 
 NPCs:
 - Aurora Turret is now a mini-boss
-- Solar Guardian is much more threatening and rewarding than before
+- Solar Guardian is much more threatening
 - Desert Prowlers should be not stupid now and have much better visuals
-- Reworked Fulmination Spirits attacks
+- Fulmination Spirit is a little smarter
 
 Items:
 - Biome Pointer has a new option for the shimmer and can capture a larger distance
 - Removed Deconstruction Array
 - Removed Origami Wings
 - Removed Gravity Defying Cluster Bomb
+- Removed Ferryman's Token
+- Peter's Ushanka is GONE
 
 Weapons:
 Nearly every weapon has been reworked/overhauled graphically and/or functionally. Try them all!
@@ -35,12 +37,11 @@ Nearly every weapon has been reworked/overhauled graphically and/or functionally
 - Resprited Sunsplit Horizon
 - Resprited Abyssal Currents
 - Resprited Hailfire
-- Grinded out just about every sprite that had even the smallest amount of mixels in it
+- Grinded out just about every sprite that had even the smallest amount of mixels, grixels, and janding in it
 - Renamed Broken Tank Head to "Troubled Tank"
 
 Armors:
 All armors should have a unique and functional set bonus
-- Peter's Ushanka now has a set bonus with the maid set
 - Resprited Red Mist / Nothing There armor
 - Resprited Avatar (not emptiness) armor and moved it to vanity
 - Resprited Specterite Armor
@@ -54,38 +55,33 @@ Tool Overhaul:
 - Added a config option for the overhaul
 
 Bosses:
-All new death animations that make much more sense (particulary Abysslons)
-Should actually sync well in multiplayer though oddities may still arise (should be nowhere near what asterlin was though lol)
-All boss attacks 'should' be more fair. Doesn't mean their any less difficult!
+All boss attacks 'should' be more fair. Doesn't mean they're any less difficult!
 
 Overhauled Stygain Heart:
+- Resprited (no longer smooth)
 - After Golem is defeated, blood moons and their enemies are empowered permanently until having an option for them after defeating Stygain Heart.
 - Fixed having incorrect health
 - Instead of a shield, up to three stationary masses can spawn around the fight, allowing Stygain's attacks to lifesteal
 
-Overhauled Abysslon:
-- After Moon Lord is defeated, the ocean sides of the world are cursed with water spririts until Abysslon is defeated
+Removed Abysslon:
+It was hard to make ideas and there was absolutely no motivation to continue development......
+bye bye abysslon!!
+most Abysslon content is still left in however, especially the music box
 
 Overhauled Asterlin:
-- Right after the Devourer of Gods is defeated, 3 special golden meteorites crash around the world...
-- No longer feels a little too chatty during desperation
+- New model with posable limbs (no longer stiff)
+- Random attack pattern between the 3 phases. Every fight is different!
+- Fixed the bug with being a little too chatty during desperation
 
 Misc:
 - Added new client and server configs
-- Added the fabled scripture to the mods name (unforseen consquences)
+- Added support for Calamity's cooldowns
+	This is the primary way cooldowns in TEA are represented
 
-Graphics:
+Technical:
 - Optimized most graphical occurences (e.g. trails behind swords, particles), there should be much less of a chance for your computer to explode
 - Screenshakes are now much more smooth and natural
 - Redid all unique item rarities and fixed some bugs pertaining to zoom
 
 Stats:
 
-
-Dont expect too much more updates after this one, as development has pretty much slowed down
-There is one more planned boss to do in time but I feel I have been working on this mod for a LONG while now
-If there is others willing to contribute I would be happy to let them join!
-
-// should it be done? what fate will be bestowed upon my single soul if i simply ammended the words "(Cal Addon)" to the title?
-// either i will be mauled to death (accusations and molten comments) or the most insignificant amount of popularity will arise idk
-// maybe even put on spotlight on gitgud or gameraiders (most likely if that path is what happens)

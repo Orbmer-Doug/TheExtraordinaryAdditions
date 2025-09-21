@@ -20,7 +20,13 @@ public partial class Asterlin : ModNPC
         {
             return NPC.AdditionsInfo().ExtraAI[0] >= Swings_MaxSwingCount && Sword == null;
         });
-        StateMachine.RegisterStateEntryCallback(AsterlinAIType.Swings, () => { NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<CyberneticSword>(), MediumAttackDamage, 0f); });
+        StateMachine.RegisterStateEntryCallback(AsterlinAIType.Swings, () => 
+        {
+            if (this.RunServer())
+            {
+                NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<CyberneticSword>(), MediumAttackDamage, 0f);
+            }
+        });
         StateMachine.RegisterStateBehavior(AsterlinAIType.Swings, DoBehavior_Swings);
     }
 

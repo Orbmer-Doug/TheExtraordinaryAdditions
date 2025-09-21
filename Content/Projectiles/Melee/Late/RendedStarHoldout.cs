@@ -27,7 +27,7 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
     public override int IntendedProjectileType => ModContent.ProjectileType<RendedStarHoldout>();
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.RendedStar);
 
-    public LoopedSound slot;
+    public LoopedSoundInstance slot;
 
     public const int MaxHeight = 500;
     public const int Points = 200;
@@ -135,9 +135,8 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
         RotationUpdate = .18f;
 
         // Update fire sounds
-        SoundStyle style = AssetRegistry.GetSound(AdditionsSound.HeavyFireLoop);
-        slot ??= new LoopedSound(style, new ProjectileAudioTracker(Projectile).IsActiveAndInGame);
-        slot.Update(() => Projectile.Center, () => .47f * Projectile.scale, () => 0f);
+        slot ??= LoopedSoundManager.CreateNew(new(AdditionsSound.HeavyFireLoop, () => .47f * Projectile.scale), () => AdditionsLoopedSound.ProjectileNotActive(Projectile), () => Projectile.active);
+        slot?.Update(Projectile.Center);
 
         float towards = Projectile.rotation - MathHelper.PiOver2;
         Projectile.velocity = towards.ToRotationVector2();
@@ -147,7 +146,6 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
         Owner.ChangeDir(Projectile.velocity.X.NonZeroSign());
         Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, towards);
         Owner.SetBackHandBetter(Player.CompositeArmStretchAmount.Full, towards);
-        Owner.fullRotation = MathHelper.Clamp(Owner.velocity.X * .03f, -.15f, .15f);
         Owner.heldProj = Projectile.whoAmI;
 
         Projectile.scale = Projectile.Opacity = MakePoly(2.7f).InFunction(FadeInterpolant);
@@ -205,7 +203,6 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
 
     public override void OnKill(int timeLeft)
     {
-        Owner.fullRotation = 0f;
     }
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)

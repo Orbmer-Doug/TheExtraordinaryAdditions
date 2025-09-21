@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Items.Materials;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent.Creative;
@@ -51,20 +51,11 @@ public class CometStorm : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("RuinousSoul", out ModItem RuinousSoul) && calamityMod.TryFind("Lumenyl", out ModItem Lumenyl) && calamityMod.TryFind("DarkPlasma", out ModItem DarkPlasma))
-        {
-            recipe.AddIngredient(ItemID.MeteorStaff, 1);
-            recipe.AddIngredient(Lumenyl.Type, 10);
-            recipe.AddIngredient(RuinousSoul.Type, 5);
-            recipe.AddIngredient(DarkPlasma.Type, 6);
-            recipe.AddTile(TileID.LunarCraftingStation);
-        }
-        else
-        {
-            recipe.AddIngredient(ItemID.MeteorStaff, 1);
-            recipe.AddIngredient(ItemID.LunarBar, 15);
-            recipe.AddTile(TileID.LunarCraftingStation);
-        }
+        recipe.AddIngredient(ItemID.MeteorStaff, 1);
+        recipe.AddIngredient(ModContent.ItemType<Lumenyl>(), 10);
+        recipe.AddIngredient(ModContent.ItemType<RuinousSoul>(), 5);
+        recipe.AddIngredient(ModContent.ItemType<DarkPlasma>(), 6);
+        recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();
     }
 }

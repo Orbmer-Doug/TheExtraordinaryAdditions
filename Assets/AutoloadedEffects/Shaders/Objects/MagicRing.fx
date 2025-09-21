@@ -5,7 +5,7 @@ float3 secondCol;
 float opacity;
 float time;
 float cosine;
-float fade = .65;
+static const float fade = .65;
 
 float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 uv : TEXCOORD0) : COLOR0
 {

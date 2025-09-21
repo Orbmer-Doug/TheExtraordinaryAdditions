@@ -1,14 +1,14 @@
 sampler baseTexture : register(s0);
 
-float globalTime;
-float4 glowColor = float4(1, .8, .6, 1);
-float glowPower = .1;
+float globalTime : register(c0);
+float4 glowColor : register(c1) = float4(1, .8, .6, 1);
+float glowPower : register(c2) = .1;
+float2 resolution : register(c3);
 #define TwoPi 6.283185307
 
 float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 coords : TEXCOORD0) : COLOR0
 {
-    float res = 1000;
-    coords = round(coords * res) / res;
+    coords = round(coords * (resolution / 2)) / (resolution / 2);
     float2 polar = float2(atan2(coords.y - 0.5, coords.x - 0.5) / TwoPi + 0.5, distance(coords, 0.5));
     
     float noiseA = tex2D(baseTexture, polar * float2(2, 0.02) + float2(0, globalTime * -0.11));

@@ -1,9 +1,11 @@
-﻿using Terraria;
+﻿using CalamityMod.Items.Potions;
+using Terraria;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Consumable.BossBags;
+using TheExtraordinaryAdditions.Content.Items.Equipable.Pets;
 using TheExtraordinaryAdditions.Content.Items.Placeable;
 using TheExtraordinaryAdditions.Content.Items.Placeable.Base;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Late;
@@ -33,8 +35,8 @@ public partial class Asterlin
         NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers()
         {
             CustomTexturePath = AssetRegistry.GetTexturePath(AdditionsTexture.Asterlin_BossChecklist),
-            PortraitScale = 0.6f,
-            PortraitPositionYOverride = -40
+            PortraitScale = .4f,
+            PortraitPositionYOverride = 100
         };
         NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, drawModifiers);
     }
@@ -74,22 +76,6 @@ public partial class Asterlin
         }
 
         NPC.scale = NPC.Opacity = ZPosition = 1f;
-        Initialize();
-    }
-
-    public override void Load()
-    {
-        LoadDialogue();
-        MusicBoxAutoloader.Create(Mod, AssetRegistry.AutoloadedPrefix + "MechanicalInNature2", AssetRegistry.GetMusicPath(AdditionsSound.MechanicalInNature2), out _, out _);
-    }
-
-    public override void Unload()
-    {
-        UnloadDialogue();
-    }
-
-    public void Initialize()
-    {
         leftArm = new JointChain(
                 NPC.Center,
                 (LeftAngledBackLimbRect.Height, null), // Back limb
@@ -105,6 +91,17 @@ public partial class Asterlin
             );
     }
 
+    public override void Load()
+    {
+        LoadTarget();
+        LoadDialogue();
+    }
+
+    public override void Unload()
+    {
+        UnloadDialogue();
+    }
+
     public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position) => false;
     public override void BossHeadSlot(ref int index)
     {
@@ -118,14 +115,13 @@ public partial class Asterlin
         NPC.lifeMax = (int)(NPC.lifeMax * bossAdjustment / (Main.masterMode ? 3f : 2f));
     }
 
-    public override void BossLoot(ref int potionType) => potionType = ItemID.SuperHealingPotion;
+    public override void BossLoot(ref int potionType) => potionType = ModContent.ItemType<OmegaHealingPotion>();
 
     public override void ModifyNPCLoot(NPCLoot npcLoot)
     {
         npcLoot.Add(ItemDropRule.BossBag(ModContent.ItemType<TreasureBoxAsterlin>()));
-        //npcLoot.Add(ItemDropRule.MasterModeDropOnAllPlayers(ModContent.ItemType<JellyfishSnack>()));
+        npcLoot.Add(ItemDropRule.MasterModeDropOnAllPlayers(ModContent.ItemType<TVRemote>()));
         npcLoot.Add(ModContent.ItemType<LockedCyberneticSword>(), 1);
-        //itemLoot.Add(ModContent.ItemType<FerrymansToken>(), 1);
 
         LeadingConditionRule normalOnly = npcLoot.DefineNormalOnlyDropSet();
         int[] weapons =

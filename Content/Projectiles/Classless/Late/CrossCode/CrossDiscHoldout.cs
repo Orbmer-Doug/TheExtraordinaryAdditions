@@ -65,7 +65,6 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
     #endregion Defaults
 
     #region Definitions
-    public Vector2 Center => Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
 
     /// <summary>
     /// Describes cross disc elements
@@ -131,7 +130,6 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
     #endregion Definitions
 
     #region AI
-    public BouncePrediction PredictionLine = new();
     public override void SafeAI()
     {
         if (Item.ModItem is not CrossDisc || Item.type != ModContent.ItemType<CrossDisc>() || Owner.dead || !Owner.active)
@@ -252,7 +250,6 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
 
         if (Modded.MouseLeft.Current && this.RunLocal())
         {
-            PredictionLine.Update(Projectile.Center, Projectile.velocity.SafeNormalize(Vector2.Zero));
             Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, Projectile.rotation);
             Owner.moveSpeed *= .75f;
 
@@ -376,6 +373,7 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
             int frame = (int)(FullReticleProgress * 3f);
             Rectangle dotFrame = normalReticle.Frame(1, 4, 0, frame);
 
+            /*
             if (FullReticleProgress >= 1f)
             {
                 for (int i = 1; i < PredictionLine.PathPoints.Count; i++)
@@ -384,9 +382,10 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
                     Main.spriteBatch.Draw(normalReticle, pos - screenPos, dotFrame, Color.White * opacity, 0f, dotFrame.Size() / 2, 1f, 0, 0f);
                 }
             }
-            else
+            else*/
             {
-                for (float i = 0f; i < 500f; i += 100f)
+                int maxDist = FullReticleProgress >= 1f ? 1000 : 500;
+                for (int i = 0; i < maxDist; i += 100)
                 {
                     Vector2 pos = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedBy(Spread) * i;
                     Main.spriteBatch.Draw(normalReticle, pos - screenPos, dotFrame, Color.White * opacity, 0f, dotFrame.Size() / 2, 1f, 0, 0f);
@@ -405,6 +404,7 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
     #endregion Drawing
 }
 
+/* Still pretty scuffed, thank red for tile code...
 public struct BouncePrediction
 {
     private const float MaxDistance = 2000f;
@@ -557,3 +557,4 @@ public struct BouncePrediction
         return Vector2.UnitY; // Default to upward if no clear side
     }
 }
+*/

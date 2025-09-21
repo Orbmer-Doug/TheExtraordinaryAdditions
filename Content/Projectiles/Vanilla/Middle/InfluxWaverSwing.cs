@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.IO;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -37,8 +38,7 @@ public class InfluxWaverSwing : BaseSwordSwing
         if (Animation() >= .26f && !PlayedSound)
         {
             if (this.RunLocal())
-                Main.projectile[Projectile.NewProj(Center, Projectile.velocity * 7f, ModContent.ProjectileType<InfluxWaverProj>(),
-                    Projectile.damage, Projectile.knockBack, Projectile.owner)].As<InfluxWaverProj>().Copy = false;
+                Projectile.NewProj(Center, Projectile.velocity * 7f, ModContent.ProjectileType<InfluxWaverProj>(), Projectile.damage, Projectile.knockBack, Projectile.owner, 0f, 0f);
 
             SoundID.Item1.Play(Projectile.Center, 1f, 0f, .2f);
             PlayedSound = true;
@@ -131,9 +131,15 @@ public class InfluxWaverCreator : ModProjectile
         set => Projectile.ai[0] = value;
     }
 
-    public NPC target;
+    public int TargetIndex
+    {
+        get => (int)Projectile.ai[1];
+        set => Projectile.ai[1] = value;
+    }
+
     public override void AI()
     {
+        NPC target = Main.npc?[TargetIndex] ?? null;
         if (target == null || !target.active || !target.CanHomeInto())
         {
             Projectile.Kill();
@@ -154,6 +160,7 @@ public class InfluxWaverCreator : ModProjectile
             slash.Center = pos;
             slash.End = pos + PolarVector(dist, angle - offset);
             slash.Copy = true;
+            slash.Sync();
         }
         Time++;
     }
@@ -199,6 +206,26 @@ public class InfluxWaverProj : ModProjectile
         set;
     }
 
+    public override void SendExtraAI(BinaryWriter writer)
+    {
+        writer.WriteVector2(Start);
+        writer.WriteVector2(Center);
+        writer.WriteVector2(End);
+        writer.Write(Projectile.friendly);
+        writer.Write(Projectile.hostile);
+        writer.Write(Projectile.timeLeft);
+    }
+
+    public override void ReceiveExtraAI(BinaryReader reader)
+    {
+        Start = reader.ReadVector2();
+        Center = reader.ReadVector2();
+        End = reader.ReadVector2();
+        Projectile.friendly = reader.ReadBoolean();
+        Projectile.hostile = reader.ReadBoolean();
+        Projectile.timeLeft = reader.ReadInt32();
+    }
+
     public ref float Time => ref Projectile.ai[0];
     public bool Copy
     {
@@ -232,6 +259,7 @@ public class InfluxWaverProj : ModProjectile
             {
                 Projectile.timeLeft = 400;
             }
+            this.Sync();
         }
         Projectile.Opacity = InverseLerp(0f, 10f * Projectile.MaxUpdates, Time) * InverseLerp(0f, FadeTime, Projectile.timeLeft);
 
@@ -258,7 +286,11 @@ public class InfluxWaverProj : ModProjectile
 
             if (Projectile.timeLeft < FadeTime + 10)
             {
-                Projectile.friendly = Projectile.hostile = false;
+                if (Projectile.friendly)
+                {
+                    Projectile.friendly = Projectile.hostile = false;
+                    this.Sync();
+                }
                 Projectile.velocity *= .9f;
             }
         }
@@ -280,10 +312,9 @@ public class InfluxWaverProj : ModProjectile
 
             if (this.RunLocal())
             {
-                InfluxWaverCreator creator = Main.projectile[Projectile.NewProj(target.Center, Vector2.Zero,
-                    ModContent.ProjectileType<InfluxWaverCreator>(), Projectile.damage, Projectile.knockBack, Projectile.owner)].As<InfluxWaverCreator>();
-                creator.target = target;
+                Projectile.NewProj(target.Center, Vector2.Zero, ModContent.ProjectileType<InfluxWaverCreator>(), Projectile.damage, Projectile.knockBack, Projectile.owner, 0f, target.whoAmI);
             }
+            this.Sync();
         }
     }
 

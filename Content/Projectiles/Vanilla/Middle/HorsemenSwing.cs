@@ -261,17 +261,3 @@ public class HorsemenDive : ModProjectile
         return false;
     }
 }
-
-public class HorsemenPlayer : ModPlayer
-{
-    public int Wait;
-    public override void PostUpdateMiscEffects()
-    {
-        if (Wait > 0)
-            Wait--;
-    }
-    public override void UpdateDead()
-    {
-        Wait = 0;
-    }
-}

@@ -58,17 +58,17 @@ public class ChasersDrawer : ModSystem
         gd.SetRenderTarget(ChaserTargetPrevious);
         gd.Clear(Color.Transparent);
 
-        // Draw the contents of the previous frame to the target.
-        // The color represents exponential decay factors for each RGBA component, since this performs repeated draws across multiple frames.
+        // Draw the contents of the previous frame to the target
+        // The color represents exponential decay factors for each RGBA component
         Main.spriteBatch.Draw(ChaserTarget, Vector2.Zero, new(0.52f, 0.95f, 0.95f, 0.85f));
 
-        // Draw the blur shader to the result.
+        // Draw the blur shader to the result
         ApplyBlurEffects();
 
-        // Draw all slash projectiles to the render target.
+        // Draw all slash projectiles to the render target
         DrawAllSlashes();
 
-        // Return to the backbuffer.
+        // Return to the backbuffer
         Main.spriteBatch.End();
         gd.SetRenderTarget(null);
 

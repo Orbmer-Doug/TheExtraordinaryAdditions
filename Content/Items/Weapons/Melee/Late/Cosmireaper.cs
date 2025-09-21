@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Items.Materials;
+using CalamityMod.Tiles.Furniture.CraftingStations;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
@@ -53,21 +54,10 @@ public class Cosmireaper : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("CosmiliteBar", out ModItem CosmiliteBar)
-            && calamityMod.TryFind("CosmicAnvil", out ModTile CosmicAnvil)
-            && calamityMod.TryFind("AscendantSpiritEssence", out ModItem AscendantSpiritEssence))
-        {
-            recipe.AddIngredient(ItemID.Sickle, 1);
-            recipe.AddIngredient(AscendantSpiritEssence.Type, 2);
-            recipe.AddIngredient(CosmiliteBar.Type, 16);
-            recipe.AddTile(CosmicAnvil.Type);
-        }
-        else
-        {
-            recipe.AddIngredient(ItemID.Sickle, 1);
-            recipe.AddIngredient(ItemID.LunarBar, 16);
-            recipe.AddTile(TileID.LunarCraftingStation);
-        }
+        recipe.AddIngredient(ItemID.Sickle, 1);
+        recipe.AddIngredient(ModContent.ItemType<AscendantSpiritEssence>(), 2);
+        recipe.AddIngredient(ModContent.ItemType<CosmiliteBar>(), 16);
+        recipe.AddTile(ModContent.TileType<CosmicAnvil>());
         recipe.Register();
     }
 }

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using CalamityMod.Items.Materials;
+using CalamityMod.Items.Placeables;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -43,22 +45,10 @@ public class NitrogenCoolingPack : ModItem, ILocalizedModType
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("CryonicBar", out ModItem CryonicBar) && calamityMod.TryFind("CoreofEleum", out ModItem CoreofEleum) && calamityMod.TryFind("Voidstone", out ModItem Voidstone) && calamityMod.TryFind("GalacticaSingularity", out ModItem GalacticaSingularity))
-        {
-            recipe.AddIngredient(Voidstone.Type, 75);
-            recipe.AddIngredient(CryonicBar.Type, 10);
-            recipe.AddIngredient(CoreofEleum.Type, 8);
-            recipe.AddTile(TileID.MythrilAnvil);
-            recipe.AddTile(TileID.IceMachine);
-        }
-        else
-        {
-            recipe.AddIngredient(ItemID.Ectoplasm, 15);
-            recipe.AddIngredient(ItemID.IceBlock, 500);
-            recipe.AddIngredient(RecipeGroupID.IronBar, 12);
-            recipe.AddTile(TileID.MythrilAnvil);
-            recipe.AddTile(TileID.IceMachine);
-        }
+        recipe.AddIngredient(ModContent.ItemType<Voidstone>(), 75);
+        recipe.AddIngredient(ModContent.ItemType<CryonicBar>(), 10);
+        recipe.AddIngredient(ModContent.ItemType<CoreofEleum>(), 8);
+        recipe.AddTile(TileID.MythrilAnvil);
         recipe.Register();
     }
 }

@@ -67,13 +67,17 @@ public class TechnicBomb : ProjOwnedByNPC<Asterlin>
 
             p.As<TheLightripBullet>().HitEffects();
             AdditionsSound.ElectricalPowBoom.Play(Projectile.Center, 1f, 0f, .14f);
-            float rand = RandomRotation();
-            for (int i = 0; i < 3; i++)
+            if (this.RunServer())
             {
-                Vector2 vel = (MathHelper.TwoPi * InverseLerp(0f, 3, i) + rand).ToRotationVector2().RotatedByRandom(.3f) * 3f;
-                SpawnProjectile(Projectile.Center, vel, ModContent.ProjectileType<OverchargedLaser>(), Asterlin.LightAttackDamage, 0f);
+                float rand = RandomRotation();
+                for (int i = 0; i < 3; i++)
+                {
+                    Vector2 vel = (MathHelper.TwoPi * InverseLerp(0f, 3, i) + rand).ToRotationVector2().RotatedByRandom(.3f) * 3f;
+                    SpawnProjectile(Projectile.Center, vel, ModContent.ProjectileType<OverchargedLaser>(), Asterlin.LightAttackDamage, 0f);
+                }
+                SpawnProjectile(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<TechnicBlast>(), Asterlin.MediumAttackDamage, 0f);
             }
-            SpawnProjectile(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<TechnicBlast>(), Asterlin.MediumAttackDamage, 0f);
+                
             Hit = true;
             Projectile.Kill();
         }

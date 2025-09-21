@@ -33,8 +33,7 @@ public class CreepyOldMan : ModNPC
         NPCID.Sets.HatOffsetY[Type] = 4;
         NPCID.Sets.ShimmerTownTransform[NPC.type] = false;
 
-        // This sets entry is the most important part of this NPC. Since it is true, it tells the game that we want this NPC to act like a town NPC without ACTUALLY being one.
-        // Essentially making him skeleton merchant
+        // Tell the game that we want this NPC to act like a town NPC without ACTUALLY being one
         NPCID.Sets.ActsLikeTownNPC[Type] = true;
         NPCID.Sets.NoTownNPCHappiness[Type] = true;
         NPCID.Sets.SpawnsWithCustomName[Type] = true;
@@ -92,16 +91,8 @@ public class CreepyOldMan : ModNPC
         }
         else
         {
-            int headGore = Mod.Find<ModGore>($"{Name}_Gore_Head").Type;
-            int armGore = Mod.Find<ModGore>($"{Name}_Gore_Arm").Type;
-            int legGore = Mod.Find<ModGore>($"{Name}_Gore_Leg").Type;
-
-            // Spawn the gores
-            Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, headGore, 1f);
-            Gore.NewGore(NPC.GetSource_Death(), NPC.position + new Vector2(0, 20), NPC.velocity, armGore);
-            Gore.NewGore(NPC.GetSource_Death(), NPC.position + new Vector2(0, 20), NPC.velocity, armGore);
-            Gore.NewGore(NPC.GetSource_Death(), NPC.position + new Vector2(0, 34), NPC.velocity, legGore);
-            Gore.NewGore(NPC.GetSource_Death(), NPC.position + new Vector2(0, 34), NPC.velocity, legGore);
+            for (int i = 0; i < 60; i++)
+                Dust.NewDustPerfect(NPC.RandAreaInEntity(), DustID.Cloud, Main.rand.NextVector2Circular(3f, 3f), Main.rand.Next(0, 120), default, Main.rand.NextFloat(.7f, 1.2f));
         }
     }
 

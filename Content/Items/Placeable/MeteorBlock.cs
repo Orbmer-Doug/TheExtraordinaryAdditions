@@ -24,6 +24,6 @@ public class MeteorBlock : ModItem, ILocalizedModType, IModType
         Item.useTime = 10;
         Item.useStyle = ItemUseStyleID.Swing;
         Item.consumable = true;
-        Item.createTile = ModContent.TileType<MeteorBlockTile>();
+        Item.createTile = ModContent.TileType<MeteorBlockPlaced>();
     }
 }

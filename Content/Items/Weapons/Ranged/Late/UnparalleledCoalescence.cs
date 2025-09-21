@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Items.Materials;
+using CalamityMod.Tiles.Furniture.CraftingStations;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Terraria;
@@ -47,50 +48,25 @@ public class UnparalleledCoalescence : ModItem
         Item.noUseGraphic = true;
     }
 
-    public override void HoldItem(Player player)
-    {
-        player.Additions().SyncMouse = true;
-    }
-
     public override bool CanShoot(Player player) => false;
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("AuricBar", out ModItem AuricBar) && calamityMod.TryFind("CosmicAnvil", out ModTile CosmicAnvil) && calamityMod.TryFind("AscendantSpiritEssence", out ModItem AscendantSpiritEssence) && calamityMod.TryFind("DivineGeode", out ModItem DivineGeode) && calamityMod.TryFind("DubiousPlating", out ModItem DubiousPlating))
-        {
-            recipe.AddIngredient(ItemID.CopperBow, 1);
-            recipe.AddIngredient(ItemID.DaedalusStormbow, 1);
-            recipe.AddIngredient(ModContent.ItemType<CharringBarrage>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<HallowedGreatbow>(), 1);
-            recipe.AddIngredient(ItemID.Tsunami, 1);
-            recipe.AddIngredient(ItemID.FairyQueenRangedItem, 1);
-            recipe.AddIngredient(ItemID.Phantasm, 1);
-            recipe.AddIngredient(ItemID.Celeb2, 1);
-            recipe.AddIngredient(ModContent.ItemType<HeavenForgedCannon>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<Lanikea>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<CosmicImplosion>(), 1);
-            recipe.AddIngredient(DivineGeode.Type, 15);
-            recipe.AddIngredient(AscendantSpiritEssence.Type, 5);
-            recipe.AddIngredient(AuricBar.Type, 5);
-            recipe.AddTile(CosmicAnvil.Type);
-        }
-        else
-        {
-            recipe.AddIngredient(ItemID.CopperBow, 1);
-            recipe.AddIngredient(ItemID.DaedalusStormbow, 1);
-            recipe.AddIngredient(ModContent.ItemType<CharringBarrage>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<HallowedGreatbow>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<EbonyNovaBlaster>(), 1);
-            recipe.AddIngredient(ItemID.Tsunami, 1);
-            recipe.AddIngredient(ItemID.FairyQueenRangedItem, 1);
-            recipe.AddIngredient(ItemID.Phantasm, 1);
-            recipe.AddIngredient(ItemID.Celeb2, 1);
-            recipe.AddIngredient(ModContent.ItemType<Lanikea>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<HeavenForgedCannon>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<CosmicImplosion>(), 1);
-            recipe.AddTile(TileID.LunarCraftingStation);
-        }
+        recipe.AddIngredient(ItemID.CopperBow, 1);
+        recipe.AddIngredient(ItemID.DaedalusStormbow, 1);
+        recipe.AddIngredient(ModContent.ItemType<CharringBarrage>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<HallowedGreatbow>(), 1);
+        recipe.AddIngredient(ItemID.Tsunami, 1);
+        recipe.AddIngredient(ItemID.FairyQueenRangedItem, 1);
+        recipe.AddIngredient(ItemID.Phantasm, 1);
+        recipe.AddIngredient(ItemID.Celeb2, 1);
+        recipe.AddIngredient(ModContent.ItemType<HeavenForgedCannon>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<Lanikea>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<CosmicImplosion>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<DivineGeode>(), 15);
+        recipe.AddIngredient(ModContent.ItemType<AscendantSpiritEssence>(), 5);
+        recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 5);
+        recipe.AddTile(ModContent.TileType<CosmicAnvil>());
         recipe.Register();
     }
-
 }

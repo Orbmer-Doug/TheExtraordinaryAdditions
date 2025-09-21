@@ -1,6 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Items.Materials;
 using System.Collections.Generic;
-using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -48,39 +47,22 @@ public class Epidemic : ModItem
         Item.noUseGraphic = true;
     }
 
-    public override void HoldItem(Player player)
-    {
-        player.Additions().SyncMouse = true;
-    }
     public override bool CanShoot(Player player) => false;
     public override bool CanUseItem(Player player)
     {
-        return !Main.projectile.Any((n) => n.active && n.owner == player.whoAmI && n.type == ModContent.ProjectileType<EpidemicHoldout>());
+        return player.ownedProjectileCounts[Item.shoot] <= 0;
     }
 
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("UelibloomBar", out ModItem UelibloomBar) && calamityMod.TryFind("MurkyPaste", out ModItem MurkyPaste))
-        {
-            recipe.AddIngredient(ModContent.ItemType<VirulentEntrapment>(), 1);
-            recipe.AddIngredient(ItemID.Stinger, 6);
-            recipe.AddIngredient(ItemID.Vine, 3);
-            recipe.AddIngredient(ItemID.JungleSpores, 14);
-            recipe.AddIngredient(ItemID.MudBlock, 400);
-            recipe.AddIngredient(MurkyPaste.Type, 4);
-            recipe.AddIngredient(UelibloomBar.Type, 10);
-        }
-        else
-        {
-            recipe.AddIngredient(ModContent.ItemType<VirulentEntrapment>(), 1);
-            recipe.AddIngredient(ItemID.Stinger, 6);
-            recipe.AddIngredient(ItemID.Vine, 3);
-            recipe.AddIngredient(ItemID.JungleSpores, 14);
-            recipe.AddIngredient(ItemID.MudBlock, 400);
-            recipe.AddIngredient(ItemID.LunarBar, 10);
-        }
-
+        recipe.AddIngredient(ModContent.ItemType<VirulentEntrapment>(), 1);
+        recipe.AddIngredient(ItemID.Stinger, 6);
+        recipe.AddIngredient(ItemID.Vine, 3);
+        recipe.AddIngredient(ItemID.JungleSpores, 14);
+        recipe.AddIngredient(ItemID.MudBlock, 400);
+        recipe.AddIngredient(ModContent.ItemType<MurkyPaste>(), 4);
+        recipe.AddIngredient(ModContent.ItemType<UelibloomBar>(), 10);
         recipe.AddTile(TileID.Bookcases);
         recipe.Register();
     }

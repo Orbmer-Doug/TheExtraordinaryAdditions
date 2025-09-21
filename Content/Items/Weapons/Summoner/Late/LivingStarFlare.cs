@@ -6,6 +6,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Assets;
 using TheExtraordinaryAdditions.Content.Buffs.Summon;
+using TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
 using TheExtraordinaryAdditions.Content.Projectiles.Summoner.Late;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
 using TheExtraordinaryAdditions.Core.Globals;
@@ -42,61 +43,45 @@ public class LivingStarFlare : ModItem
 
     public override bool CanUseItem(Player player)
     {
-        if (player.ownedProjectileCounts[Item.shoot] <= 0)
-        {
-            return player.maxMinions >= 8;
-        }
-        return false;
+        return true;
     }
 
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
-        player.AddBuff(Item.buffType, 2);
         Projectile.NewProjectile(source, player.Additions().mouseWorld, Utils.NextVector2Circular(Main.rand, 2f, 2f), Item.shoot, damage, knockback, player.whoAmI, 0f, 0f, 0f);
         return false;
     }
 
     private static void DrawStar(Vector2 drawPosition)
     {
-        // dont worry the player wont incinerate
-
-        Texture2D noise = AssetRegistry.GetTexture(AdditionsTexture.FractalNoise);
+        Texture2D noise = AssetRegistry.GetTexture(AdditionsTexture.FlameMap1);
         ManagedShader fireball = ShaderRegistry.FireballShader;
+        fireball.SetTexture(noise, 1, SamplerState.AnisotropicWrap);
         fireball.TrySetParameter("mainColor", Color.Lerp(Color.Goldenrod, Color.Gold, 0.3f).ToVector3());
-        fireball.TrySetParameter("resolution", new Vector2(250f, 250f));
+        fireball.TrySetParameter("resolution", new Vector2(60f));
+        fireball.TrySetParameter("time", Main.GlobalTimeWrappedHourly * (0.04f + 0.32f));
         fireball.TrySetParameter("opacity", 1f);
-        fireball.SetTexture(noise, 1, SamplerState.LinearWrap);
 
-        float[] scaleFactors =
-        [
-                1f, 0.8f, 0.7f, 0.57f, 0.44f, 0.32f, 0.22f
-        ];
-        for (int i = 0; i < scaleFactors.Length; i++)
-        {
-            fireball.TrySetParameter("time", Main.GlobalTimeWrappedHourly * (i * 0.04f + 0.32f));
-            fireball.Render();
-            int scale = (int)(50f * scaleFactors[i]);
-            Main.spriteBatch.DrawBetterRect(noise, new Rectangle((int)drawPosition.X, (int)drawPosition.Y, scale, scale), null, Color.White, 0f, noise.Size() * 0.5f, SpriteEffects.None, false);
-        }
+        Texture2D invis = AssetRegistry.GetTexture(AdditionsTexture.Invisible);
+        fireball.Render();
+        Main.spriteBatch.Draw(invis, drawPosition, null, Color.White, 0f, invis.Size() * 0.5f, 60f, SpriteEffects.None, 0f);
     }
 
     public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
     {
         Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, null, null, null, null, Main.UIScaleMatrix);
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, null, Main.UIScaleMatrix);
 
         DrawStar(position);
 
         Main.spriteBatch.End();
         Main.spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, Main.UIScaleMatrix);
-
         return false;
     }
-
     public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
     {
-        Main.spriteBatch.PrepareForShaders(BlendState.Additive);
-        DrawStar(Item.position - Main.screenPosition);
+        Main.spriteBatch.PrepareForShaders();
+        DrawStar(Item.position - Main.screenPosition + Item.Size / 2);
         Main.spriteBatch.ExitShaderRegion();
 
         return false;

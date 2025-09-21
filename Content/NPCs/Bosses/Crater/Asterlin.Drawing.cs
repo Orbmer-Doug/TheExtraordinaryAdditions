@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -14,6 +15,8 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
 public partial class Asterlin : ModNPC, IHasScreenShader
 {
+    public static AsterlinTarget target;
+
     // i dont actually want to make a atlas system but i dont want 19 images in the asset folder
     public static readonly Rectangle HeadRect = new(0, 0, 46, 60);
     public static readonly Rectangle BodyRect = new(46, 0, 104, 156);
@@ -87,6 +90,8 @@ public partial class Asterlin : ModNPC, IHasScreenShader
     public float GlowInterpolant;
 
     public float VentGlowInterpolant;
+
+    public float PowerInterpolant;
 
     // Create a lot of backing bools for aforementioned fields to control
     // whether or not they should resume to their idle state or should be manipulated in AI
@@ -494,10 +499,13 @@ public partial class Asterlin : ModNPC, IHasScreenShader
     {
         void engulf()
         {
-            ManagedShader shader = AssetRegistry.GetShader("FlameEngulfShader");
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TurbulentNoise), 1, SamplerState.AnisotropicWrap);
-            shader.TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly * 1.2f);
-            FlameEngulfTrail.DrawTrail(shader, FlameEngulfPoints.Points, 100, true);
+            if (FlameEngulfTrail != null && FlameEngulfTrail._disposed == false && FlameEngulfPoints != null)
+            {
+                ManagedShader shader = AssetRegistry.GetShader("FlameEngulfShader");
+                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TurbulentNoise), 1, SamplerState.AnisotropicWrap);
+                shader.TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly * 1.2f);
+                FlameEngulfTrail.DrawTrail(shader, FlameEngulfPoints.Points, 100, true);
+            }
         }
         PixelationSystem.QueuePrimitiveRenderAction(engulf, PixelationLayer.OverNPCs);
     }
@@ -543,6 +551,7 @@ public partial class Asterlin : ModNPC, IHasScreenShader
             UpdateShader();
         }
 
+        /*
         Texture2D atlas = AssetRegistry.GetTexture(AdditionsTexture.AsterlinAtlas);
         Texture2D glow = AssetRegistry.GetTexture(AdditionsTexture.AsterlinAtlasGlow);
         Texture2D vent = AssetRegistry.GetTexture(AdditionsTexture.AsterlinAtlasVentGlow);
@@ -578,8 +587,110 @@ public partial class Asterlin : ModNPC, IHasScreenShader
             TechnicBombBarrage_DrawReticle();
         if (CurrentState == AsterlinAIType.UnrelentingRush)
             UnrelentingRush_DrawTelegraph();
+        if (CurrentState == AsterlinAIType.AbsorbingEnergy)
+            AbsorbingEnergy_Draw();
         DrawFlameEngulf();
+        */
+        RenderFromTarget();
 
         return false;
+    }
+
+    public static void LoadTarget()
+    {
+        target = new();
+        Main.ContentThatNeedsRenderTargets.Add(target);
+    }
+
+    public static void RenderToTarget()
+    {
+        if (!FindNPC(out NPC npc, ModContent.NPCType<Asterlin>()))
+            return;
+        Asterlin asterlin = npc.As<Asterlin>();
+
+        Texture2D atlas = AssetRegistry.GetTexture(AdditionsTexture.AsterlinAtlas);
+        Texture2D glow = AssetRegistry.GetTexture(AdditionsTexture.AsterlinAtlasGlow);
+        Texture2D vent = AssetRegistry.GetTexture(AdditionsTexture.AsterlinAtlasVentGlow);
+
+        SpriteEffects flip = asterlin.LookingStraight ? SpriteEffects.None : (asterlin.Direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
+        Color color = Color.White.Lerp(Color.Gray, 1f - asterlin.ZPosition) * asterlin.NPC.Opacity;
+
+        if (!asterlin.LookingStraight)
+        {
+            asterlin.DrawLeftArm(atlas, glow, color, flip);
+            if (asterlin.CurrentState == AsterlinAIType.TechnicBombBarrage)
+                asterlin.TechnicBombBarrage_Draw();
+        }
+
+        asterlin.DrawBody(atlas, glow, vent, color, flip);
+        asterlin.DrawLegs(atlas, glow, color, flip);
+        asterlin.DrawHead(atlas, glow, color, flip);
+        if (asterlin.CurrentState == AsterlinAIType.TechnicBombBarrage)
+            asterlin.Gun?.DrawGun();
+
+        if (asterlin.LookingStraight)
+        {
+            asterlin.DrawLeftArm(atlas, glow, color, flip);
+            asterlin.DrawRightArm(atlas, glow, color, flip);
+        }
+        else
+        {
+            asterlin.DrawRightArm(atlas, glow, color, flip);
+        }
+        if (asterlin.CurrentState == AsterlinAIType.RotatedDicing)
+            asterlin.RotatedDicing_Draw();
+        if (asterlin.CurrentState == AsterlinAIType.TechnicBombBarrage)
+            asterlin.TechnicBombBarrage_DrawReticle();
+        if (asterlin.CurrentState == AsterlinAIType.UnrelentingRush)
+            asterlin.UnrelentingRush_DrawTelegraph();
+        if (asterlin.CurrentState == AsterlinAIType.AbsorbingEnergy)
+            asterlin.AbsorbingEnergy_Draw();
+        asterlin.DrawFlameEngulf();
+    }
+
+    public static void RenderFromTarget()
+    {
+        target.Request();
+
+        // Wait until the drawers ready
+        if (!target.IsReady)
+            return;
+
+        if (!FindNPC(out NPC npc, ModContent.NPCType<Asterlin>()))
+            return;
+        Asterlin asterlin = npc.As<Asterlin>();
+
+        if (asterlin.PowerInterpolant > 0f)
+        {
+            ManagedShader shader = AssetRegistry.GetShader("AsterlinPower");
+            shader.TrySetParameter("time", Main.GlobalTimeWrappedHourly * 3f);
+            shader.TrySetParameter("resolution", new Vector2(2000f));
+            shader.TrySetParameter("opacity", asterlin.PowerInterpolant);
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, Main.Rasterizer, shader.Effect, Main.GameViewMatrix.TransformationMatrix);
+        }
+        Main.spriteBatch.Draw(target.GetTarget(), Main.screenLastPosition - Main.screenPosition, Color.White);
+        if (asterlin.PowerInterpolant > 0f)
+            Main.spriteBatch.ResetToDefault();
+    }
+}
+
+public class AsterlinTarget : ARenderTargetContentByRequest
+{
+    public override void HandleUseReqest(GraphicsDevice device, SpriteBatch spriteBatch)
+    {
+        Vector2 size = new(device.Viewport.Width, device.Viewport.Height);
+        PrepareARenderTarget_WithoutListeningToEvents(ref _target, Main.instance.GraphicsDevice, (int)size.X, (int)size.Y, RenderTargetUsage.PreserveContents);
+
+        device.SetRenderTarget(_target);
+        device.Clear(Color.Transparent);
+
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, Main.Rasterizer, null, Matrix.Identity);
+        Asterlin.RenderToTarget();
+        Main.spriteBatch.End();
+
+        device.SetRenderTarget(null);
+
+        _wasPrepared = true;
     }
 }

@@ -1,18 +1,16 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.ID;
-using Terraria.ModLoader;
 using Terraria.UI;
 using Terraria.UI.Chat;
 using TheExtraordinaryAdditions.Content.Items.Tools;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
+using static TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.CrossCode.CrossDiscHoldout;
 using static TheExtraordinaryAdditions.UI.GodDummyUI.DummyUI;
 
 namespace TheExtraordinaryAdditions.UI.GodDummyUI;
@@ -26,25 +24,28 @@ public class DummyUI : SmartUIState
     public static readonly Texture2D BGTex = AssetRegistry.GetTexture(AdditionsTexture.GodDummyUIBackground);
     public static readonly Texture2D ButtonTextures = AssetRegistry.GetTexture(AdditionsTexture.GodDummyButtons);
     public static Player Owner => Main.LocalPlayer;
-    public static GlobalPlayer ModdedPlayer => Owner.Additions();
+    public Vector2 Position;
+
+    public static int MaxLife = GodDummy.LifeAmount;
+    public static int Defense = 0;
+    public static float Size = 1f;
+    public static bool Gravity = false;
+    public static float Rotation = 0f;
 
     [Flags]
     public enum ButtonType
     {
-        Life = 0,
-        Defense = 1,
-        Scale = 2,
-        MoveSpeed = 3,
-        Gravity = 4,
-        IsBoss = 5,
-        Rotation = 6,
-        Info = 7,
-        Reset = 8,
+        Life,
+        Defense,
+        Scale,
+        Gravity,
+        Rotation,
+        Info,
+        Reset,
     }
     public SmartUIElement[] Buttons = [new DummyButton(ButtonType.Life), new DummyButton(ButtonType.Defense),
         new DummyButton(ButtonType.Scale), new DummyButton(ButtonType.Rotation),
-        new DummyButton(ButtonType.Gravity), new DummyButton(ButtonType.MoveSpeed), new DummyButton(ButtonType.IsBoss),
-        new DummyButton(ButtonType.Info), new DummyButton(ButtonType.Reset)];
+        new DummyButton(ButtonType.Gravity), new DummyButton(ButtonType.Info), new DummyButton(ButtonType.Reset)];
 
     private bool BeingDragged;
     public const int ButtonSize = 32;
@@ -58,33 +59,27 @@ public class DummyUI : SmartUIState
         foreach (SmartUIElement button in Buttons)
         {
             Point pos = new();
-            switch ((int)(button as DummyButton).Type)
+            switch ((button as DummyButton).Type)
             {
-                case 0:
+                case ButtonType.Life:
                     pos = new(ButtonSize, ButtonSize);
                     break;
-                case 1:
+                case ButtonType.Defense:
                     pos = new(ButtonSize * 2, ButtonSize);
                     break;
-                case 2:
+                case ButtonType.Scale:
                     pos = new(ButtonSize * 3, ButtonSize);
                     break;
-                case 3:
+                case ButtonType.Gravity:
                     pos = new(ButtonSize * 4, ButtonSize);
                     break;
-                case 4:
+                case ButtonType.Rotation:
                     pos = new(ButtonSize, ButtonSize * 3);
                     break;
-                case 5:
+                case ButtonType.Reset:
                     pos = new(ButtonSize * 2, ButtonSize * 3);
                     break;
-                case 6:
-                    pos = new(ButtonSize * 3, ButtonSize * 3);
-                    break;
-                case 7:
-                    pos = new(244, 46);
-                    break;
-                case 8:
+                case ButtonType.Info:
                     pos = new(ButtonSize * 4, ButtonSize * 3);
                     break;
             }
@@ -95,7 +90,6 @@ public class DummyUI : SmartUIState
         Width = new(BGTex.Size().X, 0f);
     }
 
-    public Vector2 Position;
     public override void SafeUpdate(GameTime gameTime)
     {
         if (!Main.playerInventory)
@@ -110,33 +104,27 @@ public class DummyUI : SmartUIState
             foreach (UIElement element in Elements)
             {
                 Point pos = new();
-                switch ((int)(element as DummyButton).Type)
+                switch ((element as DummyButton).Type)
                 {
-                    case 0:
+                    case ButtonType.Life:
                         pos = new(ButtonSize, ButtonSize);
                         break;
-                    case 1:
+                    case ButtonType.Defense:
                         pos = new(ButtonSize * 2, ButtonSize);
                         break;
-                    case 2:
+                    case ButtonType.Scale:
                         pos = new(ButtonSize * 3, ButtonSize);
                         break;
-                    case 3:
+                    case ButtonType.Gravity:
                         pos = new(ButtonSize * 4, ButtonSize);
                         break;
-                    case 4:
+                    case ButtonType.Rotation:
                         pos = new(ButtonSize, ButtonSize * 3);
                         break;
-                    case 5:
+                    case ButtonType.Reset:
                         pos = new(ButtonSize * 2, ButtonSize * 3);
                         break;
-                    case 6:
-                        pos = new(ButtonSize * 3, ButtonSize * 3);
-                        break;
-                    case 7:
-                        pos = new(254, 56);
-                        break;
-                    case 8:
+                    case ButtonType.Info:
                         pos = new(ButtonSize * 4, ButtonSize * 3);
                         break;
                 }
@@ -147,6 +135,7 @@ public class DummyUI : SmartUIState
             }
         }
     }
+
     public override void Draw(SpriteBatch spriteBatch)
     {
         Vector2 backgroundScale = Vector2.One * Main.UIScale;
@@ -154,25 +143,22 @@ public class DummyUI : SmartUIState
         // Draw the background
         spriteBatch.Draw(BGTex, Position, null, Color.White, 0f, BGTex.Size() / 2, backgroundScale, 0, 0f);
 
-        Player p = Main.LocalPlayer;
-        GlobalPlayer m = p.Additions();
-
         const float textX = -5f;
         const float textY = -70f;
         const float textSpace = 25f;
-        ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.MouseText.Value, $"Life: {m.DummyMaxLife}", Position + new Vector2(textX, textY), Color.Orange, Color.Black, 0f, Vector2.Zero, backgroundScale * .75f);
-        ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.MouseText.Value, $"Defence: {m.DummyDefense}", Position + new Vector2(textX, textY + textSpace), Color.Orange, Color.Black, 0f, Vector2.Zero, backgroundScale * .75f);
-        ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.MouseText.Value, $"Scale: {m.DummyScale}", Position + new Vector2(textX, textY + textSpace * 2), Color.Orange, Color.Black, 0f, Vector2.Zero, backgroundScale * .75f);
-        ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.MouseText.Value, $"Affected by gravity?: {m.DummyGravity}", Position + new Vector2(textX, textY + textSpace * 3), Color.Orange, Color.Black, 0f, Vector2.Zero, backgroundScale * .75f);
-        ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.MouseText.Value, $"Counted as a boss?: {m.DummyBoss}", Position + new Vector2(textX, textY + textSpace * 4), Color.Orange, Color.Black, 0f, Vector2.Zero, backgroundScale * .75f);
-        ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.MouseText.Value, $"Movement speed: {m.DummyMoveSpeed}", Position + new Vector2(textX, textY + textSpace * 5), Color.Orange, Color.Black, 0f, Vector2.Zero, backgroundScale * .75f);
+        ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.MouseText.Value, $"{GetTextValue("UI.DummyLife")} {MaxLife}", Position + new Vector2(textX, textY), Color.Orange, Color.Black, 0f, Vector2.Zero, backgroundScale * .75f);
+        ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.MouseText.Value, $"{GetTextValue("UI.DummyDefense")} {Defense}", Position + new Vector2(textX, textY + textSpace), Color.Orange, Color.Black, 0f, Vector2.Zero, backgroundScale * .75f);
+        ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.MouseText.Value, $"{GetTextValue("UI.DummyScale")} {Size}", Position + new Vector2(textX, textY + textSpace * 2), Color.Orange, Color.Black, 0f, Vector2.Zero, backgroundScale * .75f);
+        ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.MouseText.Value, $"{GetTextValue("UI.DummyGravity")} {!Gravity}", Position + new Vector2(textX, textY + textSpace * 3), Color.Orange, Color.Black, 0f, Vector2.Zero, backgroundScale * .75f);
         base.Draw(spriteBatch);
     }
+
     public override void SafeMiddleMouseDown(UIMouseEvent evt)
     {
         if (IsMouseHovering)
             BeingDragged = true;
     }
+
     public override void SafeMiddleMouseUp(UIMouseEvent evt)
     {
         BeingDragged = false;
@@ -186,14 +172,12 @@ public class DummyButton(ButtonType type) : SmartUIElement
 
     public override void SafeClick(UIMouseEvent evt)
     {
-        Player p = Main.LocalPlayer;
-        GlobalPlayer m = p.Additions();
         switch (Type)
         {
             case ButtonType.Life:
-                if (m.DummyMaxLife.BetweenNum(GodDummy.LifeAmount - 1, GodDummy.MaxLifeAmount))
+                if (MaxLife.BetweenNum(GodDummy.LifeAmount - 1, GodDummy.MaxLifeAmount))
                 {
-                    m.DummyMaxLife += GodDummy.LifeAmount;
+                    MaxLife += GodDummy.LifeAmount;
                     Interpolant = 1f;
                 }
                 else
@@ -203,9 +187,9 @@ public class DummyButton(ButtonType type) : SmartUIElement
 
                 break;
             case ButtonType.Defense:
-                if (m.DummyDefense.BetweenNum(-GodDummy.MaxDefense - 1, GodDummy.MaxDefense))
+                if (Defense.BetweenNum(-GodDummy.MaxDefense - 1, GodDummy.MaxDefense))
                 {
-                    m.DummyDefense += 5;
+                    Defense += 5;
                     Interpolant = 1f;
                 }
                 else
@@ -215,9 +199,9 @@ public class DummyButton(ButtonType type) : SmartUIElement
 
                 break;
             case ButtonType.Scale:
-                if (m.DummyScale.BetweenNum(.75f - .1f, GodDummy.MaxScale))
+                if (Size.BetweenNum(.75f - .1f, GodDummy.MaxScale))
                 {
-                    m.DummyScale += .25f;
+                    Size += .25f;
                     Interpolant = 1f;
                 }
                 else
@@ -229,32 +213,14 @@ public class DummyButton(ButtonType type) : SmartUIElement
             case ButtonType.Rotation:
                 break;
             case ButtonType.Gravity:
-                m.DummyGravity = true;
-                Interpolant = 1f;
-                break;
-            case ButtonType.MoveSpeed:
-                if (m.DummyMoveSpeed.BetweenNum(0f - 1f, GodDummy.MaxSpeed))
-                {
-                    m.DummyMoveSpeed += 2f;
-                    Interpolant = 1f;
-                }
-                else
-                {
-                    Interpolant = -1f;
-                }
-
-                break;
-            case ButtonType.IsBoss:
-                m.DummyBoss = true;
+                Gravity = true;
                 Interpolant = 1f;
                 break;
             case ButtonType.Reset:
-                m.DummyScale = 1f;
-                m.DummyMoveSpeed = 0f;
-                m.DummyMaxLife = GodDummy.MaxLifeAmount;
-                m.DummyBoss = m.DummyGravity = false;
-                m.DummyRotation = 0f;
-                m.DummyDefense = 0;
+                Size = 1f;
+                MaxLife = GodDummy.MaxLifeAmount;
+                Rotation = 0f;
+                Defense = 0;
 
                 Interpolant = 1f;
                 break;
@@ -265,16 +231,15 @@ public class DummyButton(ButtonType type) : SmartUIElement
         else
             SoundEngine.PlaySound(SoundID.MenuTick with { Volume = 1.2f, Pitch = -.3f });
     }
+
     public override void SafeRightClick(UIMouseEvent evt)
     {
-        Player p = Main.LocalPlayer;
-        GlobalPlayer m = p.Additions();
         switch (Type)
         {
             case ButtonType.Life:
-                if (m.DummyMaxLife.BetweenNum(GodDummy.LifeAmount, GodDummy.MaxLifeAmount + 1))
+                if (MaxLife.BetweenNum(GodDummy.LifeAmount, GodDummy.MaxLifeAmount + 1))
                 {
-                    m.DummyMaxLife -= GodDummy.LifeAmount;
+                    MaxLife -= GodDummy.LifeAmount;
                     Interpolant = 1f;
                 }
                 else
@@ -284,9 +249,9 @@ public class DummyButton(ButtonType type) : SmartUIElement
 
                 break;
             case ButtonType.Defense:
-                if (m.DummyDefense.BetweenNum(-GodDummy.MaxDefense, GodDummy.MaxDefense + 1))
+                if (Defense.BetweenNum(-GodDummy.MaxDefense, GodDummy.MaxDefense + 1))
                 {
-                    m.DummyDefense -= 5;
+                    Defense -= 5;
                     Interpolant = 1f;
                 }
                 else
@@ -296,9 +261,9 @@ public class DummyButton(ButtonType type) : SmartUIElement
 
                 break;
             case ButtonType.Scale:
-                if (m.DummyScale.BetweenNum(.75f, GodDummy.MaxScale + .1f))
+                if (Size.BetweenNum(.75f, GodDummy.MaxScale + .1f))
                 {
-                    m.DummyScale -= .25f;
+                    Size -= .25f;
                     Interpolant = 1f;
                 }
                 else
@@ -310,23 +275,7 @@ public class DummyButton(ButtonType type) : SmartUIElement
             case ButtonType.Rotation:
                 break;
             case ButtonType.Gravity:
-                m.DummyGravity = false;
-                Interpolant = 1f;
-                break;
-            case ButtonType.MoveSpeed:
-                if (m.DummyMoveSpeed.BetweenNum(0f, GodDummy.MaxSpeed + 1f))
-                {
-                    m.DummyMoveSpeed -= 2f;
-                    Interpolant = 1f;
-                }
-                else
-                {
-                    Interpolant = -1f;
-                }
-
-                break;
-            case ButtonType.IsBoss:
-                m.DummyBoss = false;
+                Gravity = false;
                 Interpolant = 1f;
                 break;
         }
@@ -336,6 +285,7 @@ public class DummyButton(ButtonType type) : SmartUIElement
         else
             SoundEngine.PlaySound(SoundID.MenuTick with { Volume = 1.2f, Pitch = -.3f });
     }
+
     public override void SafeUpdate(GameTime gameTime)
     {
         Player p = Main.LocalPlayer;
@@ -344,9 +294,9 @@ public class DummyButton(ButtonType type) : SmartUIElement
         if (IsMouseHovering && Type == ButtonType.Rotation)
         {
             if (m.MouseRight.Current)
-                m.DummyRotation = MathHelper.Clamp(m.DummyRotation - .05f, 0f, MathHelper.Pi);
+                Rotation = MathHelper.Clamp(Rotation - .05f, 0f, MathHelper.Pi);
             if (m.MouseLeft.Current)
-                m.DummyRotation = MathHelper.Clamp(m.DummyRotation + .05f, 0f, MathHelper.Pi);
+                Rotation = MathHelper.Clamp(Rotation + .05f, 0f, MathHelper.Pi);
         }
 
         if (Interpolant < 0f)
@@ -363,13 +313,11 @@ public class DummyButton(ButtonType type) : SmartUIElement
             Main.LocalPlayer.mouseInterface = true;
         }
     }
+
     public override void Draw(SpriteBatch spriteBatch)
     {
-        Player p = Main.LocalPlayer;
-        GlobalPlayer m = p.Additions();
-
         Color col = Color.White;
-        Rectangle frame = ButtonTextures.Frame(9, 1, (int)Type);
+        Rectangle frame = ButtonTextures.Frame(7, 1, (int)Type);
         if (IsMouseHovering && Type != ButtonType.Info)
         {
             col = Color.Tan;
@@ -379,7 +327,7 @@ public class DummyButton(ButtonType type) : SmartUIElement
         float rot = 0f;
         if (Type == ButtonType.Rotation)
         {
-            rot = m.DummyRotation;
+            rot = Rotation;
         }
 
         Vector2 pos = GetDimensions().ToRectangle().Center();

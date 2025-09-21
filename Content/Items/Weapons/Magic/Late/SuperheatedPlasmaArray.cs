@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Items.Materials;
+using CalamityMod.Tiles.Furniture.CraftingStations;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Terraria;
@@ -52,25 +53,14 @@ public class SuperheatedPlasmaArray : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("CosmicAnvil", out ModTile CosmicAnvil) && calamityMod.TryFind("AscendantSpiritEssence", out ModItem AscendantSpiritEssence) && calamityMod.TryFind("MysteriousCircuitry", out ModItem MysteriousCircuitry) && calamityMod.TryFind("DubiousPlating", out ModItem DubiousPlating))
-        {
-            recipe.AddIngredient(ItemID.LastPrism, 1);
-            recipe.AddIngredient(ModContent.ItemType<PlasmaCore>(), 1);
-            recipe.AddIngredient(ItemID.MartianConduitPlating, 200);
-            recipe.AddIngredient(ItemID.Glass, 120);
-            recipe.AddIngredient(MysteriousCircuitry.Type, 12);
-            recipe.AddIngredient(DubiousPlating.Type, 15);
-            recipe.AddIngredient(AscendantSpiritEssence.Type, 7);
-            recipe.AddTile(CosmicAnvil.Type);
-        }
-        else
-        {
-            recipe.AddIngredient(ItemID.LastPrism, 1);
-            recipe.AddIngredient(ModContent.ItemType<PlasmaCore>(), 1);
-            recipe.AddIngredient(ItemID.MartianConduitPlating, 200);
-            recipe.AddIngredient(ItemID.Glass, 120);
-            recipe.AddTile(TileID.LunarCraftingStation);
-        }
+        recipe.AddIngredient(ItemID.LastPrism, 1);
+        recipe.AddIngredient(ModContent.ItemType<PlasmaCore>(), 1);
+        recipe.AddIngredient(ItemID.MartianConduitPlating, 200);
+        recipe.AddIngredient(ItemID.Glass, 120);
+        recipe.AddIngredient(ModContent.ItemType<MysteriousCircuitry>(), 12);
+        recipe.AddIngredient(ModContent.ItemType<DubiousPlating>(), 15);
+        recipe.AddIngredient(ModContent.ItemType<AscendantSpiritEssence>(), 7);
+        recipe.AddTile(ModContent.TileType<CosmicAnvil>());
         recipe.Register();
     }
 

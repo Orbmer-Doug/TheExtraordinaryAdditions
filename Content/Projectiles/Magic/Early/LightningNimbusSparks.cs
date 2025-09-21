@@ -86,10 +86,8 @@ public class LightningNimbusSparks : ModProjectile
     public override void OnKill(int timeLeft)
     {
         for (int i = 0; i < 8; i++)
-        {
             Dust.NewDustPerfect(Projectile.Center, DustID.WitherLightning, Main.rand.NextVector2Circular(4f, 4f), 0, default, Main.rand.NextFloat(.7f, 1.2f)).noGravity = true;
-        }
-
-        SoundEngine.PlaySound(SoundID.NPCHit53, Projectile.Center);
+        
+        SoundID.NPCHit53.Play(Projectile.Center, .6f);
     }
 }

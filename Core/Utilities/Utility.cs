@@ -1,4 +1,8 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using CalamityMod;
+using CalamityMod.Buffs.StatBuffs;
+using CalamityMod.CalPlayer;
+using CalamityMod.NPCs;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
@@ -39,13 +43,38 @@ namespace TheExtraordinaryAdditions.Core.Utilities;
 /// </summary>
 public static partial class Utility
 {
+    public static bool RunServer(this ModProjectile mod) => Main.netMode != NetmodeID.MultiplayerClient;
     public static bool RunLocal(this ModProjectile mod) => Main.myPlayer == mod.Projectile.owner;
     public static void Sync(this ModProjectile mod)
     {
         mod.Projectile.netUpdate = true;
         mod.Projectile.netSpam = 0;
     }
+
+    /// <summary>
+    /// Spawning projectiles or npcs, randomness (remember to sync under randoms)
+    /// </summary>
+    /// <param name="mod"></param>
+    /// <returns></returns>
     public static bool RunServer(this ModNPC mod) => Main.netMode != NetmodeID.MultiplayerClient;
+
+    /// <summary>
+    /// e.g. this npc dying, adding a buff to the player, making an achievement...
+    /// </summary>
+    /// <param name="mod"></param>
+    /// <returns></returns>
+    public static bool RunClient(this ModNPC mod) => Main.netMode != NetmodeID.Server;
+
+    /// <summary>
+    /// Sudden shifts in position, state changes/variable updates, persistent position movements (like a dash) <br></br>
+    /// <b>The server is in charge of NPCs, changes to NPC data should only happen on the server in multiplayer</b>
+    /// </summary>
+    /// <param name="mod"></param>
+    public static void Sync(this ModNPC mod)
+    {
+        mod.NPC.netUpdate = true;
+        mod.NPC.netSpam = 0;
+    }
 
     public static int EstimateLightRadius(Vector3 lightColor, LightMaskMode medium = LightMaskMode.None,
     float minIntensityThreshold = 0.0185f, int maxRadius = 15)
@@ -115,11 +144,11 @@ public static partial class Utility
     }
 
     public static SlotId Play(this AdditionsSound sound, Vector2 position, float volume = 1f, float pitch = 0f,
-        float pitchVariance = 0f, int maxInstances = 1, string? identifier = null, SoundUpdateCallback? callback = null)
-        => Play(AssetRegistry.GetSound(sound), position, volume, pitch, pitchVariance, null, maxInstances, identifier, callback);
+        float pitchVariance = 0f, int maxInstances = 1, string? identifier = null, PauseBehavior behavior = PauseBehavior.KeepPlaying)
+        => Play(AssetRegistry.GetSound(sound), position, volume, pitch, pitchVariance, null, maxInstances, identifier);
 
     public static SlotId Play(this SoundStyle style, Vector2 position, float volume = 1f, float pitch = 0f,
-        float pitchVariance = 0f, Tuple<float, float> pitchRange = null, int maxInstances = 1, string? identifier = null, SoundUpdateCallback? callback = null)
+        float pitchVariance = 0f, Tuple<float, float> pitchRange = null, int maxInstances = 1, string? identifier = null, PauseBehavior behavior = PauseBehavior.KeepPlaying)
     {
         SoundStyle sound = style;
         sound.Volume = volume;
@@ -129,17 +158,18 @@ public static partial class Utility
         sound.PitchVariance = pitchVariance;
         sound.MaxInstances = maxInstances;
         sound.Identifier = identifier;
+        sound.PauseBehavior = behavior;
 
-        return SoundEngine.PlaySound(sound, position, callback);
+        return SoundEngine.PlaySound(sound, position);
     }
 
     public static SlotId Play(this Dictionary<AdditionsSound, float> styles, Vector2 position, float volume = 1f, float pitch = 0f,
-    float pitchVariance = 0f, Tuple<float, float> pitchRange = null, int maxInstances = 1, string? identifier = null, SoundUpdateCallback? callback = null)
+    float pitchVariance = 0f, Tuple<float, float> pitchRange = null, int maxInstances = 1, string? identifier = null, PauseBehavior behavior = PauseBehavior.KeepPlaying)
     {
         float totalWeight = styles.Values.Sum();
         float randomValue = (float)(Main.rand.NextDouble() * totalWeight);
         float cumulative = 0f;
-        foreach (var kvp in styles)
+        foreach (KeyValuePair<AdditionsSound, float> kvp in styles)
         {
             cumulative += kvp.Value;
             if (randomValue < cumulative)
@@ -153,13 +183,14 @@ public static partial class Utility
                 sound.PitchVariance = pitchVariance;
                 sound.MaxInstances = maxInstances;
                 sound.Identifier = identifier;
+                sound.PauseBehavior = behavior;
 
-                return SoundEngine.PlaySound(sound, position, callback);
+                return SoundEngine.PlaySound(sound, position);
             }
         }
 
         // Fallback
-        return SoundEngine.PlaySound(AssetRegistry.GetSound(styles.Keys.First()), position, callback);
+        return SoundEngine.PlaySound(AssetRegistry.GetSound(styles.Keys.First()), position);
     }
 
     public static float UsedMinions(this Player player, int? ofType = null)
@@ -198,24 +229,6 @@ public static partial class Utility
 
     public static bool ShouldConsumeAmmo(this Player player, Item item) => player.IsAmmoFreeThisShot(item, player.ChooseAmmo(item), player.ChooseAmmo(item).type);
     public static bool Available(this Player player) => player != null && player.active && !player.dead && !player.ghost && !player.CCed && !player.noItems;
-
-    /// <summary>
-    /// Done manually for clients that aren't the Projectile owner since onhit methods are clientside
-    /// </summary>
-    public static void CheckHits(this ModProjectile proj, Player owner)
-    {
-        if (Main.myPlayer != owner.whoAmI)
-        {
-            foreach (NPC NPC in Main.npc.Where(n => n.active &&
-             !n.dontTakeDamage &&
-             !n.townNPC &&
-             n.immune[owner.whoAmI] <= 0 &&
-             proj.Colliding(new Rectangle(), n.Hitbox) == true))
-            {
-                proj.OnHitNPC(NPC, new NPC.HitInfo() { Damage = 0 }, 0);
-            }
-        }
-    }
 
     private class ExplosionProjectile : ModProjectile
     {
@@ -525,6 +538,15 @@ public static partial class Utility
 
     public static void DeleteTooltips(this List<TooltipLine> lines) => lines.RemoveAll(l => l.Name.Contains("Tooltip"));
 
+    public static void FindAndReplace(this List<TooltipLine> tooltips, string replacedKey, string newKey)
+    {
+        TooltipLine line = tooltips.FirstOrDefault((TooltipLine x) => x.Mod == "Terraria" && x.Text.Contains(replacedKey));
+        if (line != null)
+        {
+            line.Text = line.Text.Replace(replacedKey, newKey);
+        }
+    }
+
     public static string TooltipHotkeyString(this ModKeybind mhk)
     {
         if (Main.dedServ || mhk == null)
@@ -543,15 +565,6 @@ public static partial class Utility
             sb.Append(" / ").Append(keys[i]);
         }
         return sb.ToString();
-    }
-
-    public static void FindAndReplace(this List<TooltipLine> tooltips, string replacedKey, string newKey)
-    {
-        TooltipLine line = tooltips.FirstOrDefault((TooltipLine x) => x.Mod == "Terraria" && x.Text.Contains(replacedKey));
-        if (line != null)
-        {
-            line.Text = line.Text.Replace(replacedKey, newKey);
-        }
     }
 
     /// <summary>
@@ -615,49 +628,24 @@ public static partial class Utility
         NPCID.Sets.NPCBestiaryDrawOffset.Add(npc.Type, value);
     }
 
-    private static FieldInfo shouldCloseHPBarField;
-
     /// <summary>
-    /// Disables Calamity's special boss bar for a given <see cref="NPC"/>, such that it closes. This effect is temporary and must be used every frame to sustain the close.
+    /// This effect is temporary and must be used every frame to sustain the close
     /// </summary>
-    /// <param name="npc">The NPC to change.</param>
     public static void MakeCalamityBossBarClose(this NPC npc)
     {
-        if (ModReferences.BaseCalamity is null || Main.gameMenu)
+        if (Main.gameMenu)
             return;
-
-        foreach (var global in npc.Globals)
-        {
-            if (global.Name == "CalamityGlobalNPC")
-            {
-                shouldCloseHPBarField ??= global.GetType().GetField("ShouldCloseHPBar");
-                shouldCloseHPBarField?.SetValue(global, true);
-            }
-        }
+        npc.Calamity().ShouldCloseHPBar = true;
     }
 
-    /// <summary>
-    /// Gives a given <see cref="Player"/> the Boss Effects buff from Calamity, if it's enabled. This buff provides a variety of common effects, such as the near complete removal of natural enemy spawns.
-    /// </summary>
-    /// <param name="p">The player to apply the buff to.</param>
     public static void GrantBossEffectsBuff(this Player p)
     {
-        if (ModReferences.BaseCalamity is null)
-            return;
-
-        if (!ModReferences.BaseCalamity.TryFind("BossEffects", out ModBuff bossEffects))
-            return;
-
-        p.AddBuff(bossEffects.Type, 2);
+        p.AddBuff(ModContent.BuffType<BossEffects>(), 2);
     }
 
-    /// <summary>
-    /// Gives a given <see cref="Player"/> infinite flight in accordance with Calamity's system, if it's enabled.
-    /// </summary>
-    /// <param name="p">The player to apply infinite flight to.</param>
     public static void GrantInfiniteFlight(this Player p)
     {
-        ModReferences.BaseCalamity?.Call("ToggleInfiniteFlight", p, true);
+        p.Calamity().infiniteFlight = true;
     }
 
     #region Spawning
@@ -704,37 +692,25 @@ public static partial class Utility
     /// </summary>
     /// <typeparam name="T">The NPC this is spawning from</typeparam>
     /// <returns>The index within <see cref="Main.projectile"/></returns>
-    public static int NewNPCProj(this NPC npc, Vector2 position, Vector2 velocity, int type, int damage, float knockback,
-        int playerOwner = -1, float ai0 = 0f, float ai1 = 0f, float ai2 = 0f, float extra0 = 0f, float extra1 = 0f)
+    public static int NewNPCProj(this NPC npc, Vector2 position, Vector2 velocity, int type, int damage, float knockback
+        , float ai0 = 0f, float ai1 = 0f, float ai2 = 0f, float extra0 = 0f, float extra1 = 0f)
     {
-        if (playerOwner == -1)
-            playerOwner = Main.myPlayer;
-
-        float damageJankCorrectionFactor = 1f / 2f;
-        if (Main.expertMode)
-            damageJankCorrectionFactor = 1f / 4f;
-        if (Main.masterMode)
-            damageJankCorrectionFactor = 1f / 6f;
-
-        damage = (int)(damage * damageJankCorrectionFactor);
+        damage = FixDamageFromDifficulty(damage);
 
         int index = Projectile.NewProjectile(npc.GetSpawnSource_ForProjectile(), position.X, position.Y,
-            velocity.X, velocity.Y, type, damage, knockback, playerOwner, ai0, ai1, ai2);
+            velocity.X, velocity.Y, type, damage, knockback, Main.myPlayer, ai0, ai1, ai2);
         if (index >= 0 && index < Main.maxProjectiles)
         {
-            if (Main.myPlayer == playerOwner)
+            Projectile projectile = Main.projectile[index];
+            if (projectile.type >= ProjectileID.Count)
             {
-                Projectile projectile = Main.projectile[index];
-                if (projectile.type >= ProjectileID.Count)
-                {
-                    projectile.Additions().ExtraAI[0] = extra0;
-                    projectile.Additions().ExtraAI[1] = extra1;
-                }
-
-                projectile.localAI[0] = npc.whoAmI;
-                if (Main.netMode != NetmodeID.SinglePlayer)
-                    NetMessage.SendData(MessageID.SyncProjectile, -1, -1, null, index);
+                projectile.Additions().ExtraAI[0] = extra0;
+                projectile.Additions().ExtraAI[1] = extra1;
             }
+
+            projectile.localAI[0] = npc.whoAmI;
+            if (Main.netMode != NetmodeID.SinglePlayer)
+                NetMessage.SendData(MessageID.SyncProjectile, -1, -1, null, index);
         }
 
         return index;
@@ -767,7 +743,7 @@ public static partial class Utility
     public static int NewNPCBetter(this NPC npc, Vector2 pos, Vector2 vel, int type, int start = 0, float ai0 = 0f, float ai1 = 0f, float ai2 = 0f, float ai3 = 0f, int target = -1)
     {
         int index = NPC.NewNPC(npc.GetSpawnSourceForNPCFromNPCAI(), (int)pos.X, (int)pos.Y, type, start, ai0, ai1, ai2, ai3, target);
-        
+
         if (index >= 0 && index < Main.maxNPCs)
         {
             NPC n = Main.npc[index];
@@ -777,7 +753,7 @@ public static partial class Utility
                 NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, index);
             n.netUpdate = true;
         }
-        
+
         return index;
     }
 
@@ -830,17 +806,6 @@ public static partial class Utility
         }
         return 0;
     }
-
-    public static bool PillarZone(this Player player)
-    {
-        if (!player.ZoneTowerStardust && !player.ZoneTowerSolar && !player.ZoneTowerVortex)
-            return player.ZoneTowerNebula;
-
-        return true;
-    }
-
-    public static bool NoInvasion(Player p) =>
-         !p.PillarZone() || Main.invasionType != InvasionID.PirateInvasion || !NPC.LunarApocalypseIsUp || !DD2Event.Ongoing || Main.invasionType != InvasionID.MartianMadness || Main.invasionType != InvasionID.GoblinArmy;
 
     public static IBigProgressBar HideBossBar(NPC npc)
     {
@@ -938,12 +903,6 @@ public static partial class Utility
 
         return player.HeldItem;
     }
-
-    public static Referenced<T> GetValueRef<T>(this Player player, string key) where T : struct =>
-        player.GetModPlayer<GlobalPlayer>().valueRegistry.GetValueRef<T>(key);
-
-    public static Referenced<T> GetValueRef<T>(this GlobalPlayer player, string key) where T : struct =>
-        player.valueRegistry.GetValueRef<T>(key);
 
     public static void StartRain()
     {
@@ -1324,129 +1283,6 @@ public static partial class Utility
                     projectile.velocity.Y += pushForce;
             }
         }
-    }
-
-    // TODO: Create base class for floating AND grounded pets and add in the DOOHICKEY
-    public static void FloatingPetAI(this Projectile projectile, bool faceRight, float tiltFloat, bool lightPet = false)
-    {
-        Player player = Main.player[projectile.owner];
-        float SAImovement = 0.05f;
-        for (int i = 0; i < Main.maxProjectiles; i++)
-        {
-            Projectile otherProj = Main.projectile[i];
-            if (!otherProj.active || otherProj.owner != projectile.owner || !Main.projPet[otherProj.type] || i == projectile.whoAmI)
-            {
-                continue;
-            }
-            bool num = Main.projPet[otherProj.type];
-            float taxicabDist = Math.Abs(projectile.position.X - otherProj.position.X) + Math.Abs(projectile.position.Y - otherProj.position.Y);
-            if (num && taxicabDist < projectile.width)
-            {
-                if (projectile.position.X < otherProj.position.X)
-                {
-                    projectile.velocity.X -= SAImovement;
-                }
-                else
-                {
-                    projectile.velocity.X += SAImovement;
-                }
-                if (projectile.position.Y < otherProj.position.Y)
-                {
-                    projectile.velocity.Y -= SAImovement;
-                }
-                else
-                {
-                    projectile.velocity.Y += SAImovement;
-                }
-            }
-        }
-        float passiveMvtFloat = 0.5f;
-        projectile.tileCollide = false;
-        float range = 100f;
-        Vector2 projPos = projectile.Center;
-        float xDist = player.Center.X - projPos.X;
-        float yDist = player.Center.Y - projPos.Y;
-        yDist += Utils.NextFloat(Main.rand, -10f, 20f);
-        xDist += Utils.NextFloat(Main.rand, -10f, 20f);
-        xDist += 60f * (lightPet ? player.direction : (0f - player.direction));
-        yDist -= 60f;
-        Vector2 playerVector = new Vector2(xDist, yDist);
-        float playerDist = ((playerVector)).Length();
-        float returnSpeed = 18f;
-        if (playerDist < range && player.velocity.Y == 0f && projectile.Bottom.Y <= player.Bottom.Y && !Collision.SolidCollision(projectile.position, projectile.width, projectile.height) && projectile.velocity.Y < -6f)
-        {
-            projectile.velocity.Y = -6f;
-        }
-        if (playerDist > 2000f)
-        {
-            projectile.position.X = player.Center.X - projectile.width / 2;
-            projectile.position.Y = player.Center.Y - projectile.height / 2;
-            projectile.netUpdate = true;
-        }
-        if (playerDist < 50f)
-        {
-            if (Math.Abs(projectile.velocity.X) > 2f || Math.Abs(projectile.velocity.Y) > 2f)
-            {
-                projectile.velocity = projectile.velocity * 0.99f;
-            }
-            passiveMvtFloat = 0.01f;
-        }
-        else
-        {
-            if (playerDist < 100f)
-            {
-                passiveMvtFloat = 0.1f;
-            }
-            if (playerDist > 300f)
-            {
-                passiveMvtFloat = 1f;
-            }
-            playerDist = returnSpeed / playerDist;
-            playerVector.X *= playerDist;
-            playerVector.Y *= playerDist;
-        }
-        if (projectile.velocity.X < playerVector.X)
-        {
-            projectile.velocity.X += passiveMvtFloat;
-            if (passiveMvtFloat > 0.05f && projectile.velocity.X < 0f)
-            {
-                projectile.velocity.X += passiveMvtFloat;
-            }
-        }
-        if (projectile.velocity.X > playerVector.X)
-        {
-            projectile.velocity.X -= passiveMvtFloat;
-            if (passiveMvtFloat > 0.05f && projectile.velocity.X > 0f)
-            {
-                projectile.velocity.X -= passiveMvtFloat;
-            }
-        }
-        if (projectile.velocity.Y < playerVector.Y)
-        {
-            projectile.velocity.Y += passiveMvtFloat;
-            if (passiveMvtFloat > 0.05f && projectile.velocity.Y < 0f)
-            {
-                projectile.velocity.Y += passiveMvtFloat * 2f;
-            }
-        }
-        if (projectile.velocity.Y > playerVector.Y)
-        {
-            projectile.velocity.Y -= passiveMvtFloat;
-            if (passiveMvtFloat > 0.05f && projectile.velocity.Y > 0f)
-            {
-                projectile.velocity.Y -= passiveMvtFloat * 2f;
-            }
-        }
-        if (projectile.velocity.X >= 0.25f)
-        {
-            projectile.direction = (faceRight ? 1 : (-1));
-        }
-        else if (projectile.velocity.X < -0.25f)
-        {
-            projectile.direction = ((!faceRight) ? 1 : (-1));
-        }
-        projectile.spriteDirection = projectile.direction;
-        projectile.rotation = projectile.velocity.X * tiltFloat;
     }
 
     public static bool WithinBounds(this int index, int cap)

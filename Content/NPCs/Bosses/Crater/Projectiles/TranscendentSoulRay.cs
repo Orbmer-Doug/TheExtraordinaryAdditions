@@ -74,7 +74,7 @@ public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
     /// </summary>
     public const int BloomSubdivisions = 20;
 
-    public LoopedSound gamma;
+    public LoopedSoundInstance gamma;
 
     public override string Texture => AssetRegistry.Invis;
     public override void SetStaticDefaults() => ProjectileID.Sets.DrawScreenCheckFluff[Type] = 6000;
@@ -117,8 +117,8 @@ public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
     public override void SafeAI()
     {
         // Update the menacing sound
-        gamma ??= new(AssetRegistry.GetSound(AdditionsSound.sunAura) with { MaxInstances = 40 }, () => new ProjectileAudioTracker(Projectile).IsActiveAndInGame());
-        gamma.Update(() => Projectile.Center, () => MathHelper.Clamp(Projectile.scale, 0f, 1f), () => -.05f);
+        gamma ??= LoopedSoundManager.CreateNew(new(AdditionsSound.sunAura, () => MathHelper.Clamp(Projectile.scale, 0f, 1f), () => -.08f), () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
+        gamma.Update(Projectile.Center);
 
         // Angle it up and down
         Projectile.rotation = MathHelper.PiOver2;

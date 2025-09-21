@@ -19,7 +19,13 @@ public partial class Asterlin : ModNPC
         });
 
         // State transition checks happen after behavior, meaning by the time it reaches back to behaviors setup with the meltdown will already have been set
-        StateMachine.RegisterStateEntryCallback(AsterlinAIType.Cleave, () => { NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<TheTesselesticMeltdown>(), MediumAttackDamage, 0f); });
+        StateMachine.RegisterStateEntryCallback(AsterlinAIType.Cleave, () =>
+        {
+            if (this.RunServer())
+            {
+                NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<TheTesselesticMeltdown>(), MediumAttackDamage, 0f);
+            }
+        });
         StateMachine.RegisterStateBehavior(AsterlinAIType.Cleave, DoBehavior_Cleave);
     }
 
@@ -60,13 +66,16 @@ public partial class Asterlin : ModNPC
 
                 if (AITimer % Cleave_WaitTime == (Cleave_WaitTime - 1))
                 {
-                    for (int j = 0; j < Cleave_Extension; j++)
+                    if (this.RunServer())
                     {
-                        Vector2 center = NPC.Center;
-                        PillarFalling pillar =
-                            Main.projectile[NPC.NewNPCProj(center, new Vector2((Target.Center.X - center.X) * 0.02f + j * Utils.NextFloat(Main.rand, -10f, 10f), 0f), ModContent.ProjectileType<PillarFalling>(), MediumAttackDamage, 0f)]
-                            .As<PillarFalling>();
-                        pillar.Time = -20 - j - Main.rand.Next(0, 8);
+                        for (int j = 0; j < Cleave_Extension; j++)
+                        {
+                            Vector2 center = NPC.Center;
+                            PillarFalling pillar =
+                                Main.projectile[NPC.NewNPCProj(center, new Vector2((Target.Center.X - center.X) * 0.02f + j * Utils.NextFloat(Main.rand, -10f, 10f), 0f), ModContent.ProjectileType<PillarFalling>(), MediumAttackDamage, 0f)]
+                                .As<PillarFalling>();
+                            pillar.Time = -20 - j - Main.rand.Next(0, 8);
+                        }
                     }
                     Cleave_Cycle++;
                 }

@@ -1,63 +1,62 @@
-﻿using System.Collections.Generic;
+﻿using SubworldLibrary;
+using System.Collections.Generic;
+using System.IO;
+using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
+using TheExtraordinaryAdditions.Core.Netcode;
 
 namespace TheExtraordinaryAdditions.Core.Systems;
 
-public sealed class DownedBossSystem : ModSystem
+public class BossDownedSaveSystem : ModSystem
 {
-    public const string KeyPrefix = "downedBoss:";
+    internal static List<string> downedRegistry = [];
 
-    public const string StygainKey = "Stygain";
-    public const string AbysslonKey = "Abysslon";
-    public const string AsterlinKey = "Asterlin";
-
-    public static DownedBossSystem Instance => ModContent.GetInstance<DownedBossSystem>();
-
-    public bool StygainDowned
+    public override void OnWorldLoad()
     {
-        get => downedBoss[StygainKey];
-        set => downedBoss[StygainKey] = value;
-    }
-    public bool AbysslonDowned
-    {
-        get => downedBoss[AbysslonKey];
-        set => downedBoss[AbysslonKey] = value;
-    }
-    public bool AsterlinDowned
-    {
-        get => downedBoss[AsterlinKey];
-        set => downedBoss[AsterlinKey] = value;
+        if (!SubworldSystem.AnyActive())
+            downedRegistry?.Clear();
     }
 
-    private readonly Dictionary<string, bool> downedBoss = new()
+    public override void OnWorldUnload()
     {
-        {
-            StygainKey,
-            false
-        },
-        {
-            AbysslonKey,
-            false
-        },
-        {
-            AsterlinKey,
-            false
-        }
-    };
-
-    public override void SaveWorldData(TagCompound tag)
-    {
-        foreach (string entry in downedBoss.Keys)
-        {
-            tag[KeyPrefix + entry] = downedBoss[entry];
-        }
+        if (!SubworldSystem.AnyActive())
+            downedRegistry?.Clear();
     }
+
+    public override void SaveWorldData(TagCompound tag) => tag[nameof(downedRegistry)] = downedRegistry;
+
     public override void LoadWorldData(TagCompound tag)
     {
-        foreach (string entry in downedBoss.Keys)
+        downedRegistry.Clear();
+        downedRegistry.AddRange((List<string>)tag.GetList<string>(nameof(downedRegistry)));
+    }
+
+    public static void SetDefeatState<BossType>(bool isDefeated) where BossType : ModNPC
+    {
+        string bossName = ModContent.GetModNPC(ModContent.NPCType<BossType>()).Name;
+        if (isDefeated && !downedRegistry.Contains(bossName))
+            downedRegistry.Add(bossName);
+        if (!isDefeated)
+            downedRegistry.Remove(bossName);
+
+        AdditionsNetcode.SyncBossDefeats(Main.myPlayer);
+    }
+
+    public static bool HasDefeated<BossType>() where BossType : ModNPC =>
+        downedRegistry.Contains(ModContent.GetModNPC(ModContent.NPCType<BossType>()).Name);
+}
+public interface IBossDowned { }
+public class GlobalBossDefeatMarker : GlobalNPC
+{
+    public override void OnKill(NPC npc)
+    {
+        if (npc.ModNPC is not null and IBossDowned downed && !BossDownedSaveSystem.downedRegistry.Contains(npc.ModNPC.Name))
         {
-            downedBoss[entry] = tag.GetBool(KeyPrefix + entry);
+            string bossName = ModContent.GetModNPC(npc.type).Name;
+            BossDownedSaveSystem.downedRegistry.Add(bossName);
+            AdditionsNetcode.SyncBossDefeats(Main.myPlayer);
         }
     }
 }

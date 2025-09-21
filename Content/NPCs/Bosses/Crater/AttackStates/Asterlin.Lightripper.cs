@@ -64,7 +64,7 @@ public partial class Asterlin : ModNPC
                     float offsetAngle = MathHelper.Lerp(-Lightripper_FanOffset, Lightripper_FanOffset, fanInterpolant);
                     Vector2 shootVelocity = (Lightripper_InitialDirection + offsetAngle).ToRotationVector2();
 
-                    if (AITimer % Lightripper_ReleaseRate == Lightripper_ReleaseRate - 1f)
+                    if (AITimer % Lightripper_ReleaseRate == Lightripper_ReleaseRate - 1f && this.RunServer())
                     {
                         int type = ModContent.ProjectileType<LightrippingBeam>();
                         NPC.NewNPCProj(RightHandPosition + shootVelocity.SafeNormalize(Vector2.Zero) * 100f, shootVelocity, type, HeavyAttackDamage, 0f);
@@ -118,12 +118,15 @@ public partial class Asterlin : ModNPC
                 }
                 break;
             case LightripperState.Dash:
-                // Release some bombs
-                for (int i = 0; i < Lightripper_DartBombCount; i++)
+                if (this.RunServer())
                 {
-                    Vector2 pos = NPC.Center;
-                    Vector2 vel = NPC.SafeDirectionTo(Target.Center).RotatedByRandom(.85f) * Main.rand.NextFloat(11f, 99f);
-                    NPC.NewNPCProj(pos, vel, ModContent.ProjectileType<DartBomb>(), LightAttackDamage, 0f);
+                    // Release some bombs
+                    for (int i = 0; i < Lightripper_DartBombCount; i++)
+                    {
+                        Vector2 pos = NPC.Center;
+                        Vector2 vel = NPC.SafeDirectionTo(Target.Center).RotatedByRandom(.85f) * Main.rand.NextFloat(11f, 99f);
+                        NPC.NewNPCProj(pos, vel, ModContent.ProjectileType<DartBomb>(), LightAttackDamage, 0f);
+                    }
                 }
 
                 AdditionsSound.BlackHoleExplosion.Play(NPC.Center, 1.3f, -.3f);

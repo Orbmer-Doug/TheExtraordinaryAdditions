@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
+using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -6,6 +7,7 @@ using TheExtraordinaryAdditions.Content.Items.Summon;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Netcode;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -81,12 +83,23 @@ public class BeetleHoldout : ModProjectile
 
             if (Right)
             {
-                SuperBloodMoonSystem.SuperBloodMoon = !SuperBloodMoonSystem.SuperBloodMoon;
+                if (this.RunLocal())
+                {
+                    if (!SuperBloodMoonSystem.SuperBloodMoon)
+                    {
+                        SuperBloodMoonSystem.SuperBloodMoon = true;
+                        DisplayText(ModContent.GetModItem(ModContent.ItemType<CrimsonCarvedBeetle>()).GetLocalizedValue("TurnOn"), Color.Crimson);
+                    }
+                    else
+                    {
+                        SuperBloodMoonSystem.SuperBloodMoon = false;
+                        DisplayText(ModContent.GetModItem(ModContent.ItemType<CrimsonCarvedBeetle>()).GetLocalizedValue("TurnOff"), Color.DarkRed);
+                    }
 
-                if (SuperBloodMoonSystem.SuperBloodMoon)
-                    DisplayText(ModContent.GetModItem(ModContent.ItemType<CrimsonCarvedBeetle>()).GetLocalizedValue("TurnOn"), Color.Crimson);
-                else
-                    DisplayText(ModContent.GetModItem(ModContent.ItemType<CrimsonCarvedBeetle>()).GetLocalizedValue("TurnOff"), Color.DarkRed);
+                    AdditionsNetcode.SyncAdditionsBloodMoon(Main.myPlayer);
+                }
+                
+                AdditionsNetcode.SyncWorld();
             }
             else
             {

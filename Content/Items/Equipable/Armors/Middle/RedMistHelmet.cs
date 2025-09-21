@@ -5,6 +5,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Assets;
 using TheExtraordinaryAdditions.Common.Particles;
+using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
 using TheExtraordinaryAdditions.Core.Globals;
@@ -44,17 +45,11 @@ public class RedMistHelmet : ModItem
         player.setBonus = this.GetLocalization("SetBonus").Format(hotkey);
 
         int type = ModContent.ProjectileType<StygainAura>();
-        if (AdditionsKeybinds.SetBonusHotKey.JustPressed && player.ownedProjectileCounts[type] <= 0 && player.Additions().RedMistCounter <= 0 && player.whoAmI == Main.myPlayer)
+        if (AdditionsKeybinds.SetBonusHotKey.JustPressed && player.ownedProjectileCounts[type] <= 0 && !CalUtils.HasCooldown(player, RedMistCooldown.ID) && player.whoAmI == Main.myPlayer)
         {
             AdditionsSound.etherealThrow.Play(player.Center, 1f, 0f, .1f);
             player.NewPlayerProj(player.Center, Vector2.Zero, type, AuraDamage, 1f, player.whoAmI);
-        }
-        if (player.Additions().RedMistCounter > 0)
-        {
-            Vector2 pos = player.Center + new Vector2(-4f * player.direction, -20f);
-            float completion = InverseLerp(0f, StygainAura.CooldownTime, player.Additions().RedMistCounter);
-            ParticleRegistry.SpawnBloomPixelParticle(pos + Main.rand.NextVector2Circular(60f, 60f), Main.rand.NextVector2CircularEdge(2f, 2f),
-                30, Main.rand.NextFloat(.4f, .5f) * completion, Color.DarkRed, Color.Crimson, pos, 1f, 5);
+            CalUtils.AddCooldown(player, RedMistCooldown.ID, StygainAura.CooldownTime);
         }
 
         player.Additions().RedMist = true;

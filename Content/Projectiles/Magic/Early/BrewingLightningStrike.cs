@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -16,10 +17,16 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Early;
 
 public class BrewingLightningStrike : ModProjectile, ILocalizedModType, IModType
 {
-    public bool HasPlayedSound;
     public ref float InitialVelocityAngle => ref Projectile.ai[0];
     public ref float BaseTurnAngleRatio => ref Projectile.ai[1];
     public ref float AccumulatedXMovementSpeeds => ref Projectile.ai[2];
+    public ref float StoredY => ref Projectile.Additions().ExtraAI[0];
+    public bool Init
+    {
+        get => Projectile.Additions().ExtraAI[1] == 1;
+        set => Projectile.Additions().ExtraAI[1] = value.ToInt();
+    }
+    
     public override string Texture => AssetRegistry.Invis;
     public Player Owner => Main.player[Projectile.owner];
     public GlobalPlayer ModdedOwner => Owner.Additions();
@@ -30,8 +37,7 @@ public class BrewingLightningStrike : ModProjectile, ILocalizedModType, IModType
 
     public override void SetDefaults()
     {
-        Projectile.width =
-        Projectile.height = 22;
+        Projectile.Size = new(22);
         Projectile.penetrate = -1;
         Projectile.ignoreWater = true;
         Projectile.tileCollide = false;
@@ -50,22 +56,36 @@ public class BrewingLightningStrike : ModProjectile, ILocalizedModType, IModType
         return false;
     }
 
-    private float StoredY;
+    public override void SendExtraAI(BinaryWriter writer)
+    {
+        writer.Write(Projectile.tileCollide);
+    }
+    public override void ReceiveExtraAI(BinaryReader reader)
+    {
+        Projectile.tileCollide = reader.ReadBoolean();
+    }
+
     public override void AI()
     {
         if (trail == null || trail._disposed)
             trail = new(WidthFunction, ColorFunction, null, 50);
 
         Projectile.frameCounter++;
-        if (!HasPlayedSound)
+        if (!Init)
         {
-            StoredY = ModdedOwner.mouseWorld.Y;
-            HasPlayedSound = true;
+            if (this.RunLocal())
+            {
+                StoredY = ModdedOwner.mouseWorld.Y;
+            }
+            Init = true;
+            this.Sync();
         }
-        if (Projectile.Center.Y > StoredY)
+        if (Projectile.Center.Y > StoredY && !Projectile.tileCollide)
+        {
             Projectile.tileCollide = true;
+            this.Sync();
+        }
 
-        Projectile.oldPos[1] = Projectile.oldPos[0];
         float adjustedTimeLife = Projectile.timeLeft / Projectile.MaxUpdates;
         Projectile.Opacity = GetLerpBump(0f, 8f, 45f, 40f, adjustedTimeLife);
         Projectile.scale = Projectile.Opacity;
@@ -87,23 +107,16 @@ public class BrewingLightningStrike : ModProjectile, ILocalizedModType, IModType
                 BaseTurnAngleRatio = unifiedRandom.Next() % 100;
                 potentialBaseDirection = (BaseTurnAngleRatio / 100f * MathHelper.TwoPi).ToRotationVector2();
 
-                // Ensure that the new potential direction base is always moving upwards (this is supposed to be somewhat similar to a -UnitY + RotatedBy).
                 potentialBaseDirection.Y = -Math.Abs(potentialBaseDirection.Y);
 
                 bool canChangeLightningDirection = true;
 
-                // Potential directions with very little Y speed should not be considered, because this
-                // consequentially means that the X speed would be quite large.
                 if (potentialBaseDirection.Y > -0.02f)
                     canChangeLightningDirection = false;
 
-                // This mess of math basically encourages movement at the ends of an extraUpdate cycle,
-                // discourages super frequenent randomness as the accumulated X speed changes get larger,
-                // or if the original speed is quite large.
                 if (Math.Abs(potentialBaseDirection.X * (Projectile.extraUpdates + 1) * 2f * originalSpeed + AccumulatedXMovementSpeeds) > Projectile.MaxUpdates * lightningTurnRandomnessFactor)
                     canChangeLightningDirection = false;
 
-                // If the above checks were all passed, redefine the base direction of the lightning.
                 if (canChangeLightningDirection)
                     newBaseDirection = potentialBaseDirection;
 
@@ -119,7 +132,6 @@ public class BrewingLightningStrike : ModProjectile, ILocalizedModType, IModType
             }
         }
 
-        cache ??= new(50);
         cache.Update(Projectile.Center);
     }
 
@@ -145,7 +157,7 @@ public class BrewingLightningStrike : ModProjectile, ILocalizedModType, IModType
         modifiers.ScalingArmorPenetration += .25f;
     }
 
-    public TrailPoints cache;
+    public TrailPoints cache = new(50);
     public OptimizedPrimitiveTrail trail;
     public override bool PreDraw(ref Color lightColor)
     {

@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Items.Materials;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.Linq;
@@ -68,24 +68,13 @@ public class Sunspot : ModItem, ILocalizedModType, IModType
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("DivineGeode", out ModItem DivineGeode) && calamityMod.TryFind("UnholyEssence", out ModItem UnholyEssence) && calamityMod.TryFind("MysteriousCircuitry", out ModItem MysteriousCircuitry) && calamityMod.TryFind("DubiousPlating", out ModItem DubiousPlating))
-        {
-            recipe.AddIngredient(ModContent.ItemType<SolarBrand>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<PlasmaCore>(), 1);
-            recipe.AddIngredient(UnholyEssence.Type, 20);
-            recipe.AddIngredient(DivineGeode.Type, 14);
-            recipe.AddIngredient(MysteriousCircuitry.Type, 15);
-            recipe.AddIngredient(DubiousPlating.Type, 15);
-            recipe.AddTile(TileID.LunarCraftingStation);
-        }
-        else
-        {
-            recipe.AddIngredient(ModContent.ItemType<SolarBrand>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<PlasmaCore>(), 1);
-            recipe.AddIngredient(ItemID.LunarBar, 14);
-            recipe.AddIngredient(ItemID.Glass, 20);
-            recipe.AddTile(TileID.LunarCraftingStation);
-        }
+        recipe.AddIngredient(ModContent.ItemType<SolarBrand>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<PlasmaCore>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<UnholyEssence>(), 20);
+        recipe.AddIngredient(ModContent.ItemType<DivineGeode>(), 14);
+        recipe.AddIngredient(ModContent.ItemType<MysteriousCircuitry>(), 15);
+        recipe.AddIngredient(ModContent.ItemType<DubiousPlating>(), 15);
+        recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();
     }
 }

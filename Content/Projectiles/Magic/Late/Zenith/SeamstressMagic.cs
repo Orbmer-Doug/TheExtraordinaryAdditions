@@ -37,6 +37,7 @@ public class SeamstressMagic : BaseHoldoutProjectile
         Projectile.timeLeft = 90000;
     }
 
+    public LoopedSoundInstance slot;
     public SlotId InitializeSlot;
     public float Interpolant => Utils.GetLerpValue(0f, ChargeTime, Counter, true);
 
@@ -115,19 +116,12 @@ public class SeamstressMagic : BaseHoldoutProjectile
         }
 
         // Update pulse sound
-        SoundStyle style = SoundID.DD2_EtherianPortalIdleLoop;
-        slot ??= new LoopedSound(style, new ProjectileAudioTracker(Projectile).IsActiveAndInGame);
-        slot.Update(() => Projectile.Center, () => 10f, () => 0f);
+        slot ??= LoopedSoundManager.CreateNew(new(SoundID.DD2_EtherianPortalIdleLoop, () => 4f), () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
+        slot?.Update(Projectile.Center);
 
         Time++;
     }
 
-    public LoopedSound slot;
-    public override void OnKill(int timeLeft)
-    {
-        if (SoundEngine.TryGetActiveSound(InitializeSlot, out var sound))
-            sound.Stop();
-    }
 
     public void HandleChargeEffects()
     {

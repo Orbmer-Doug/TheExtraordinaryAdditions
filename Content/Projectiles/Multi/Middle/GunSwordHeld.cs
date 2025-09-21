@@ -4,6 +4,7 @@ using System.IO;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -308,7 +309,7 @@ public class GunGunSword : ModProjectile
                     Owner.velocity -= Projectile.velocity * Utils.Remap(Owner.Distance(pos), 0f, 500f, 10f, 0f);
                     Modded.LungingDown = true;
 
-                    Owner.GetModPlayer<GunSwordPlayer>().Cooldown = SecondsToFrames(3);
+                    CalUtils.AddCooldown(Owner, SkullKaboomCooldown.ID, SecondsToFrames(3));
                     AdditionsSound.SnakeRocket.Play(Projectile.Center, 1.4f);
                     Projectile.MaxUpdates = 2;
                     this.Sync();
@@ -433,23 +434,5 @@ public class GunGunSword : ModProjectile
         Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, null, lightColor * Projectile.Opacity, rotation + rotOff, tex.Size() / 2, Projectile.scale, fx, 0f);
 
         return false;
-    }
-}
-
-public class GunSwordPlayer : GlobalPlayer
-{
-    public int Cooldown;
-    public override void PostUpdateMiscEffects()
-    {
-        if (Cooldown == 1)
-        {
-            SoundID.MaxMana.Play(Player.Center, 1.5f, -.2f, .1f, null, 1, "BoneWait");
-            for (int i = 0; i < 20; i++)
-            {
-                ParticleRegistry.SpawnSparkParticle(Player.RandAreaInEntity(), -Vector2.UnitY * Main.rand.NextFloat(2f, 5f), Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .8f), Color.DarkGray);
-            }
-        }
-        if (Cooldown > 0)
-            Cooldown--;
     }
 }

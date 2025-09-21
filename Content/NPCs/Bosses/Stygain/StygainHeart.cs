@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Terraria;
-using Terraria.Audio;
-using Terraria.GameContent;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
@@ -21,8 +19,8 @@ using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Middle;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Middle;
+using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 using TheExtraordinaryAdditions.Content.NPCs.BossesBars;
-using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
@@ -33,7 +31,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain;
 
 [AutoloadBossHead]
-public sealed partial class StygainHeart : ModNPC
+public sealed partial class StygainHeart : ModNPC, IBossDowned
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.StygainHeart);
     public override string BossHeadTexture => AssetRegistry.GetTexturePath(AdditionsTexture.StygainHeart_Head_Boss);
@@ -66,11 +64,11 @@ public sealed partial class StygainHeart : ModNPC
     public override void SetDefaults()
     {
         NPC.npcSlots = 6f;
-        NPC.damage = DifficultyBasedValue(160, 250, 300, 370, 360, 400, true);
+        NPC.damage = DifficultyBasedValue(160, 250, 300, 370, 360, 400);
         NPC.width = 198;
         NPC.height = 162;
         NPC.defense = 12;
-        NPC.SetLifeMaxByMode(100000, 125000, 150000, 175000, 200000);//(Main.getGoodWorld ? 135000 : 100000);
+        NPC.SetLifeMaxByMode(100000, 125000, 150000, 175000, 200000);
         NPC.aiStyle = -1;
         AIType = -1;
         NPC.knockBackResist = 0f;
@@ -89,11 +87,6 @@ public sealed partial class StygainHeart : ModNPC
         {
             Music = MusicLoader.GetMusicSlot(Mod, AssetRegistry.GetMusicPath(AdditionsSound.Ladikerfos));
         }
-    }
-
-    public override void Load()
-    {
-        MusicBoxAutoloader.Create(Mod, AssetRegistry.AutoloadedPrefix + "Ladikerfos", AssetRegistry.GetMusicPath(AdditionsSound.Ladikerfos), out _, out _);
     }
 
     public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
@@ -172,18 +165,6 @@ public sealed partial class StygainHeart : ModNPC
         StygainAttackType.DieEffects,
     ];
 
-    public StygainAttackType CurrentState
-    {
-        get
-        {
-            return (StygainAttackType)NPC.ai[0];
-        }
-        set
-        {
-            NPC.ai[0] = (float)value;
-        }
-    }
-
     private static NPC myself;
     public static NPC Myself
     {
@@ -197,65 +178,112 @@ public sealed partial class StygainHeart : ModNPC
         internal set => myself = value;
     }
 
-    public static int BloodshotDamage => DifficultyBasedValue(110, 170, 190, 220, 240, 260, true);
-    public static int RadialEyesDamage => DifficultyBasedValue(125, 190, 200, 230, 260, 310, true);
-    public static int BulletTwirlDamage => DifficultyBasedValue(115, 200, 230, 260, 300, 355, true);
-    public static int BloodwavesDamage => DifficultyBasedValue(135, 190, 240, 270, 310, 380, true);
-    public static int BloodBeaconLanceDamage => DifficultyBasedValue(155, 190, 260, 280, 330, 400, true);
-    public static int BloodBeaconDamage => DifficultyBasedValue(350, 400, 430, 480, 560, 1000, true);
+    public static int BloodshotDamage => DifficultyBasedValue(110, 170, 190, 220, 240, 260);
+    public static int RadialEyesDamage => DifficultyBasedValue(125, 190, 200, 230, 260, 310);
+    public static int BulletTwirlDamage => DifficultyBasedValue(115, 200, 230, 260, 300, 355);
+    public static int BloodwavesDamage => DifficultyBasedValue(135, 190, 240, 270, 310, 380);
+    public static int BloodBeaconLanceDamage => DifficultyBasedValue(155, 190, 260, 280, 330, 400);
+    public static int BloodBeaconDamage => DifficultyBasedValue(350, 400, 430, 480, 560, 1000);
+    public static float Phase2LifeRatio => Main.getGoodWorld ? .75f : .5f;
 
-    public static readonly float Phase2LifeRatio = Main.getGoodWorld ? .75f : .5f;
-
-    public const int AttackTypeIndex = 0;
+    public const int CurrentStateIndex = 0;
     public const int AttackTimerIndex = 1;
     public const int AttackCycleIndex = 2;
-    // Every extra ai between this gets cleaned when choosing the next attack
-    public const int ChargeCounterIndex = 11;
-    public const int FogInterpolantIndex = 12;
-    public const int hasDoneBloodBeaconIndex = 13;
-    public const int hasDoneDramaticBurstIndex = 14;
-    public const int StartMakingMass = 15;
-    public const int hasDonePhase2Drama = 16;
+    public const int HasDoneBloodBeaconIndex = 3;
+    // Every extra ai above this gets cleared upon choosing the next attack
+    public const int HasDoneDramaticBurstIndex = 11;
+    public const int HasDonePhase2DramaIndex = 12;
+    public const int FogInterpolantIndex = 13;
+    public const int StartMakingMassIndex = 14;
+    public const int MassTimerIndex = 15;
+    public const int MassPositionXIndex = 16;
+    public const int MassPositionYIndex = 17;
+    public const int MassInitializeIndex = 18;
+    public const int MassSpinStartIndex = 19;
+    public const int MassSpinDirIndex = 20;
+
+    public StygainAttackType CurrentState
+    {
+        get => (StygainAttackType)NPC.ai[CurrentStateIndex];
+        set => NPC.ai[CurrentStateIndex] = (int)value;
+    }
+    public int AttackTimer
+    {
+        get => (int)NPC.ai[AttackTimerIndex];
+        set => NPC.ai[AttackTimerIndex] = value;
+    }
+    public int AttackCycle
+    {
+        get => (int)NPC.ai[AttackCycleIndex];
+        set => NPC.ai[AttackCycleIndex] = value;
+    }
     public bool HasDoneBloodBeacon
     {
-        get => NPC.AdditionsInfo().ExtraAI[hasDoneBloodBeaconIndex] == 1f;
-        set => NPC.AdditionsInfo().ExtraAI[hasDoneBloodBeaconIndex] = value.ToInt();
+        get => NPC.ai[HasDoneBloodBeaconIndex] == 1;
+        set => NPC.ai[HasDoneBloodBeaconIndex] = value.ToInt();
     }
     public bool HasDoneDramaticBurst
     {
-        get => NPC.AdditionsInfo().ExtraAI[hasDoneDramaticBurstIndex] == 1f;
-        set => NPC.AdditionsInfo().ExtraAI[hasDoneDramaticBurstIndex] = value.ToInt();
+        get => NPC.AdditionsInfo().ExtraAI[HasDoneDramaticBurstIndex] == 1;
+        set => NPC.AdditionsInfo().ExtraAI[HasDoneDramaticBurstIndex] = value.ToInt();
     }
     public bool HasDonePhase2Drama
     {
-        get => NPC.AdditionsInfo().ExtraAI[hasDonePhase2Drama] == 1f;
-        set => NPC.AdditionsInfo().ExtraAI[hasDonePhase2Drama] = value.ToInt();
+        get => NPC.AdditionsInfo().ExtraAI[HasDonePhase2DramaIndex] == 1;
+        set => NPC.AdditionsInfo().ExtraAI[HasDonePhase2DramaIndex] = value.ToInt();
     }
-    public bool MakingMass
+    public ref float FogInterpolant => ref NPC.AdditionsInfo().ExtraAI[FogInterpolantIndex];
+    public bool StartMakingMass
     {
-        get => NPC.AdditionsInfo().ExtraAI[StartMakingMass] == 1f;
-        set => NPC.AdditionsInfo().ExtraAI[StartMakingMass] = value.ToInt();
+        get => NPC.AdditionsInfo().ExtraAI[StartMakingMassIndex] == 1;
+        set => NPC.AdditionsInfo().ExtraAI[StartMakingMassIndex] = value.ToInt();
     }
-    public ref float AttackTimer => ref NPC.ai[AttackTimerIndex];
-    public ref float AttackCycle => ref NPC.ai[AttackCycleIndex];
+    public int MassTimer
+    {
+        get => (int)NPC.AdditionsInfo().ExtraAI[MassTimerIndex];
+        set => NPC.AdditionsInfo().ExtraAI[MassTimerIndex] = value;
+    }
+    public Vector2 MassPosition
+    {
+        get => new Vector2(NPC.AdditionsInfo().ExtraAI[MassPositionXIndex], NPC.AdditionsInfo().ExtraAI[MassPositionYIndex]);
+        set
+        {
+            NPC.AdditionsInfo().ExtraAI[MassPositionXIndex] = value.X;
+            NPC.AdditionsInfo().ExtraAI[MassPositionYIndex] = value.Y;
+        }
+    }
+    public bool MassInitialize
+    {
+        get => NPC.AdditionsInfo().ExtraAI[MassInitializeIndex] == 1;
+        set => NPC.AdditionsInfo().ExtraAI[MassInitializeIndex] = value.ToInt();
+    }
+    public ref float MassSpinStart => ref NPC.AdditionsInfo().ExtraAI[MassSpinStartIndex];
+    public int MassSpinDir
+    {
+        get => (int)NPC.AdditionsInfo().ExtraAI[MassSpinDirIndex];
+        set => NPC.AdditionsInfo().ExtraAI[MassSpinDirIndex] = value;
+    }
+
     public bool[] Directions = new bool[8];
 
     public override void SendExtraAI(BinaryWriter writer)
     {
-        writer.Write(canDespawn);
-        writer.Write(despawnTimer);
+        writer.Write((bool)canDespawn);
+        writer.Write((int)despawnTimer);
+        writer.Write((bool)NPC.dontTakeDamage);
 
         for (int i = 0; i < Directions.Length; i++)
-            writer.Write(Directions[i]);
+            writer.Write((bool)Directions[i]);
     }
 
     public override void ReceiveExtraAI(BinaryReader reader)
     {
-        canDespawn = reader.ReadBoolean();
-        despawnTimer = reader.ReadInt32();
+        canDespawn = (bool)reader.ReadBoolean();
+        despawnTimer = (int)reader.ReadInt32();
+        NPC.dontTakeDamage = (bool)reader.ReadBoolean();
 
         for (int i = 0; i < Directions.Length; i++)
-            Directions[i] = reader.ReadBoolean();
+            Directions[i] = (bool)reader.ReadBoolean();
     }
 
     public override void AI()
@@ -271,14 +299,13 @@ public sealed partial class StygainHeart : ModNPC
         DetermineTarget(NPC, target);
         float lifeRatio = NPC.life / (float)NPC.lifeMax;
         bool phase2 = lifeRatio < Phase2LifeRatio;
-        ref float chargeCounter = ref NPC.AdditionsInfo().ExtraAI[ChargeCounterIndex];
-        ref float fogInterpolant = ref NPC.AdditionsInfo().ExtraAI[FogInterpolantIndex];
 
-        if (NPC.life == 1000)
+        if (NPC.life == 1000 && !NPC.dontTakeDamage)
         {
             ClearAllProjectiles();
             NPC.dontTakeDamage = true;
-            NPC.ai[0] = (int)StygainAttackType.DieEffects;
+            CurrentState = StygainAttackType.DieEffects;
+            NPC.netUpdate = true;
         }
 
         // Give boss effects
@@ -297,52 +324,52 @@ public sealed partial class StygainHeart : ModNPC
         switch (CurrentState)
         {
             case StygainAttackType.SpawnEffects:
-                DoAttack_SpawnEffects(NPC, target, ref AttackTimer);
+                DoAttack_SpawnEffects(target);
                 break;
             case StygainAttackType.Charge:
-                Do_Attack_Charge(NPC, target, ref AttackTimer, phase2);
+                DoAttack_Charge(target, phase2);
                 break;
             case StygainAttackType.ChargeWait:
-                Do_Attack_ChargeWait(NPC, target, ref AttackTimer, phase2);
+                Do_Attack_ChargeWait(target, phase2);
                 break;
             case StygainAttackType.ShotgunBloodshot:
-                DoAttack_ShotgunBloodshot(NPC, target, phase2, ref AttackTimer);
+                DoAttack_ShotgunBloodshot(target, phase2);
                 break;
             case StygainAttackType.PortalSmash:
-                DoAttack_PortalSmash(target, ref AttackTimer);
+                DoAttack_PortalSmash(target);
                 break;
             case StygainAttackType.Bloodrain:
-                DoAttack_Bloodrain(NPC, target, ref AttackTimer, phase2);
+                DoAttack_Bloodrain(target, phase2);
                 break;
             case StygainAttackType.Assimilations:
-                DoAttack_Assimilations(NPC, target, phase2, ref AttackTimer);
+                DoAttack_Assimilations(target, phase2);
                 break;
             case StygainAttackType.Phase2Drama:
-                DoBehavior_Phase2Drama(NPC, target, ref AttackTimer);
+                DoBehavior_Phase2Drama(target);
                 break;
             case StygainAttackType.MoonBarrage:
-                DoAttack_MoonBarrage(NPC, target, ref AttackTimer, phase2);
+                DoAttack_MoonBarrage(target, phase2);
                 break;
             case StygainAttackType.BulletTwirl:
-                DoAttack_DartCyclone(NPC, target, ref AttackTimer);
+                DoAttack_DartCyclone(target);
                 break;
             case StygainAttackType.BloodBeacon:
                 DoAttack_BloodBeacon(target);
                 break;
             case StygainAttackType.DieEffects:
-                DoBehavior_DeathEffects(NPC, target, ref AttackTimer);
+                DoBehavior_DeathEffects(target);
                 break;
         }
 
         Afterimages?.UpdateFancyAfterimages(new(NPC.Center, NPC.scale * Vector2.One, NPC.Opacity, NPC.rotation,
             NPC.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 255, 0, 0f, NPC.frame, false));
 
-        if (MakingMass)
+        if (StartMakingMass)
             SummonMass();
 
         if (HasDonePhase2Drama)
         {
-            fogInterpolant = MathHelper.Clamp(fogInterpolant + 0.02f, 0f, .67f);
+            FogInterpolant = MathHelper.Clamp(FogInterpolant + 0.02f, 0f, .67f);
         }
 
         AttackTimer++;
@@ -359,7 +386,7 @@ public sealed partial class StygainHeart : ModNPC
 
         if (target.HasBuff(ModContent.BuffType<HemorrhageTransfer>()))
         {
-            NPC.NewNPCProj(target.Center, Vector2.Zero, ModContent.ProjectileType<BloodletRelay>(), 0, 0f, -1, hurtInfo.Damage * .25f);
+            NPC.NewNPCProj(target.Center, Vector2.Zero, ModContent.ProjectileType<BloodletRelay>(), 0, 0f, hurtInfo.Damage * .25f);
         }
 
         for (int i = 0; i <= 3; i++)
@@ -378,10 +405,8 @@ public sealed partial class StygainHeart : ModNPC
 
     public void SelectNextAttack()
     {
-        int attackCycleIndex = (int)AttackCycle;
-
         StygainAttackType[] patternToUse = SubphaseTable.First(table => table.Value(NPC)).Key;
-        StygainAttackType nextAttackType = patternToUse[attackCycleIndex % patternToUse.Length];
+        StygainAttackType nextAttackType = patternToUse[AttackCycle % patternToUse.Length];
 
         // Attack Cycle Index
         AttackCycle++;
@@ -390,7 +415,7 @@ public sealed partial class StygainHeart : ModNPC
         NPC.TargetClosest();
 
         CurrentState = nextAttackType;
-        AttackTimer = 0f;
+        AttackTimer = 0;
 
         // Misc slots
         for (int i = 0; i < 10; i++)
@@ -399,10 +424,12 @@ public sealed partial class StygainHeart : ModNPC
         // Make a mass after every 4 attacks
         if (Utility.CountNPCs(ModContent.NPCType<CoalescentMass>()) < 3 && AttackCycle % 4 == 3)
         {
-            MakingMass = true;
+            StartMakingMass = true;
         }
 
         NPC.netUpdate = true;
+        if (NPC.netSpam > 10)
+            NPC.netSpam = 10;
     }
 
     private static int despawnTimer = 120;
@@ -438,7 +465,6 @@ public sealed partial class StygainHeart : ModNPC
                 npc.ai[2] = 0f;
                 npc.netUpdate = true;
             }
-
             return;
         }
     }
@@ -522,7 +548,7 @@ public sealed partial class StygainHeart : ModNPC
             fade.Render();
         }
 
-        Main.spriteBatch.DrawBetter(texture, drawPosition, NPC.frame, NPC.GetAlpha(drawColor), NPC.rotation, origin, NPC.scale, direction);
+        Main.spriteBatch.DrawBetter(texture, drawPosition, NPC.frame, NPC.GetAlpha(Color.White), NPC.rotation, origin, NPC.scale, direction);
 
         if (die)
             sb.ExitShaderRegion();
@@ -535,11 +561,10 @@ public sealed partial class StygainHeart : ModNPC
 
     public override void OnKill()
     {
-        DownedBossSystem.Instance.StygainDowned = true;
         AdditionsNetcode.SyncWorld();
     }
 
-    public override void BossLoot(ref string name, ref int potionType)
+    public override void BossLoot(ref int potionType)
     {
         potionType = ItemID.GreaterHealingPotion;
     }
@@ -547,7 +572,7 @@ public sealed partial class StygainHeart : ModNPC
     public override void ModifyNPCLoot(NPCLoot npcLoot)
     {
         npcLoot.Add(ItemDropRule.BossBag(ModContent.ItemType<TreasureBagStygainHeart>()));
-        npcLoot.Add(ModContent.ItemType<StygianHeartTrophy>(), 1);
+        npcLoot.Add(ModContent.ItemType<StygainHeartTrophy>(), 1);
         npcLoot.Add(ModContent.ItemType<StygianEyeball>(), 1);
         npcLoot.Add(ItemDropRule.MasterModeDropOnAllPlayers(ModContent.ItemType<CrimsonCalamari>()));
 

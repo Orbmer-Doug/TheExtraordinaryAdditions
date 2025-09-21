@@ -1,9 +1,9 @@
 ﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora.TEST;
+using TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using static TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora.TEST.AuroraGuard;
+using static TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora.AuroraGuard;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 

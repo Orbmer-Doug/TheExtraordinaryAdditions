@@ -167,7 +167,7 @@ public class ForkStab : ModProjectile
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         hitNPCs.Add(target);
-        ScreenShakeSystem.New(new(.1f, .4f), Projectile.Center);
+        ScreenShakeSystem.New(new(.1f, .2f), Projectile.Center);
 
         Vector2 pos = Owner.Center - (Owner.Center - target.Center);
 

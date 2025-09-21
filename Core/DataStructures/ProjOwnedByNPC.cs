@@ -80,40 +80,27 @@ public abstract class ProjOwnedByNPC<T> : ModProjectile, ILocalizedModType, IMod
     /// Spawns a new projectile that inherits the owner of this projectile <br></br>
     /// </summary>
     /// <returns>The index within <see cref="Main.projectile"/></returns>
-    public int SpawnProjectile(Vector2 position, Vector2 velocity, int type, int damage, float knockback,
-        int playerOwner = -1, float ai0 = 0f, float ai1 = 0f, float ai2 = 0f, float extra0 = 0f, float extra1 = 0f)
+    public int SpawnProjectile(Vector2 position, Vector2 velocity, int type, int damage, float knockback, float ai0 = 0f, float ai1 = 0f, float ai2 = 0f, float extra0 = 0f, float extra1 = 0f)
     {
         if (Owner == null || !Owner.active || Projectile == null || !Projectile.active || BossIndex == 0)
             return 0;
 
-        if (playerOwner == -1)
-            playerOwner = Main.myPlayer;
-
-        float damageJankCorrectionFactor = 1f / 2f;
-        if (Main.expertMode)
-            damageJankCorrectionFactor = 1f / 4f;
-        if (Main.masterMode)
-            damageJankCorrectionFactor = 1f / 6f;
-
-        damage = (int)(damage * damageJankCorrectionFactor);
+        damage = FixDamageFromDifficulty(damage);
 
         int index = Projectile.NewProjectile(Projectile.GetSource_FromThis(), position.X, position.Y,
-            velocity.X, velocity.Y, type, damage, knockback, playerOwner, ai0, ai1, ai2);
+            velocity.X, velocity.Y, type, damage, knockback, Main.myPlayer, ai0, ai1, ai2);
         if (index >= 0 && index < Main.maxProjectiles)
         {
-            if (Main.myPlayer == playerOwner)
+            Projectile projectile = Main.projectile[index];
+            if (projectile.type >= ProjectileID.Count)
             {
-                Projectile projectile = Main.projectile[index];
-                if (projectile.type >= ProjectileID.Count)
-                {
-                    projectile.Additions().ExtraAI[0] = extra0;
-                    projectile.Additions().ExtraAI[1] = extra1;
-                }
-
-                projectile.localAI[0] = Owner.whoAmI;
-                if (Main.netMode != NetmodeID.SinglePlayer)
-                    NetMessage.SendData(MessageID.SyncProjectile, -1, -1, null, index);
+                projectile.Additions().ExtraAI[0] = extra0;
+                projectile.Additions().ExtraAI[1] = extra1;
             }
+
+            projectile.localAI[0] = Owner.whoAmI;
+            if (Main.netMode != NetmodeID.SinglePlayer)
+                NetMessage.SendData(MessageID.SyncProjectile, -1, -1, null, index);
         }
 
         return index;

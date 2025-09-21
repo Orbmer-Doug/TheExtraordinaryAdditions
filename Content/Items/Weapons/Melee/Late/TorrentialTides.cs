@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using CalamityMod.Items.Materials;
+using CalamityMod.Items.Placeables;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Items.Materials.Late;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
 using TheExtraordinaryAdditions.Core.Globals;
@@ -41,23 +42,10 @@ public class TorrentialTides : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("Voidstone", out ModItem Voidstone) && calamityMod.TryFind("ReaperTooth", out ModItem ReaperTooth) && calamityMod.TryFind("Lumenyl", out ModItem Lumenyl))
-        {
-            recipe.AddIngredient(ModContent.ItemType<FerrymansToken>(), 1);
-            recipe.AddIngredient(ItemID.Flairon, 1);
-            recipe.AddIngredient(ItemID.RazorbladeTyphoon, 1);
-            recipe.AddIngredient(Lumenyl.Type, 18);
-            recipe.AddIngredient(Voidstone.Type, 250);
-            recipe.AddIngredient(ReaperTooth.Type, 6);
-        }
-        else
-        {
-            recipe.AddIngredient(ModContent.ItemType<FerrymansToken>(), 1);
-            recipe.AddIngredient(ItemID.Flairon, 1);
-            recipe.AddIngredient(ItemID.RazorbladeTyphoon, 1);
-            recipe.AddIngredient(ItemID.LunarBar, 10);
-            recipe.AddIngredient(ItemID.SoulofFlight, 30);
-        }
+        recipe.AddIngredient(ItemID.Flairon, 1);
+        recipe.AddIngredient(ModContent.ItemType<Lumenyl>(), 18);
+        recipe.AddIngredient(ModContent.ItemType<Voidstone>(), 250);
+        recipe.AddIngredient(ModContent.ItemType<ReaperTooth>(), 6);
         recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();
     }

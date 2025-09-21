@@ -1,7 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Items.Materials;
+using CalamityMod.Tiles.Furniture.CraftingStations;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Early;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Late;
@@ -58,10 +60,10 @@ public class AbsoluteGreathelm : ModItem, ILocalizedModType, IModType
         string hotkey = AdditionsKeybinds.SetBonusHotKey.TooltipHotkeyString();
         player.setBonus = this.GetLocalization("SetBonus").Format(hotkey);
 
-        if (AdditionsKeybinds.SetBonusHotKey.JustPressed)
+        if (AdditionsKeybinds.SetBonusHotKey.JustPressed && !CalUtils.HasCooldown(player, AbsoluteCooldown.ID))
         {
             player.NewPlayerProj(player.Center, Vector2.Zero, ModContent.ProjectileType<WhiteVoid>(), (int)player.GetTotalDamage<GenericDamageClass>().ApplyTo(7000), 0f, Main.myPlayer);
-            player.Additions().AbsoluteCounter = SecondsToFrames(10);
+            CalUtils.AddCooldown(player, AbsoluteCooldown.ID, SecondsToFrames(15));
         }
     }
 
@@ -77,40 +79,19 @@ public class AbsoluteGreathelm : ModItem, ILocalizedModType, IModType
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("AuricBar", out ModItem AuricBar)
-            && calamityMod.TryFind("AscendantSpiritEssence", out ModItem AscendantSpiritEssence)
-            && calamityMod.TryFind("CoreofCalamity", out ModItem CoreofCalamity)
-            && calamityMod.TryFind("GalacticaSingularity", out ModItem GalacticaSingularity)
-            && calamityMod.TryFind("LifeAlloy", out ModItem LifeAlloy)
-            && calamityMod.TryFind("RuinousSoul", out ModItem RuinousSoul)
-            && calamityMod.TryFind("CosmicAnvil", out ModTile CosmicAnvil))
-        {
-            recipe.AddIngredient(ItemID.CrimsonHelmet, 1);
-            recipe.AddIngredient(ModContent.ItemType<VoltHelmet>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<SpecteriteMask>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<BlueTopHat>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<TremorGreathelm>(), 1);
-            recipe.AddIngredient(ItemID.SolarFlareHelmet, 1);
-            recipe.AddIngredient(CoreofCalamity.Type, 2);
-            recipe.AddIngredient(GalacticaSingularity.Type, 4);
-            recipe.AddIngredient(LifeAlloy.Type, 5);
-            recipe.AddIngredient(RuinousSoul.Type, 5);
-            recipe.AddIngredient(AscendantSpiritEssence.Type, 3);
-            recipe.AddIngredient(AuricBar.Type, 10);
-            recipe.AddTile(CosmicAnvil.Type);
-        }
-        else
-        {
-            recipe.AddIngredient(ItemID.CrimsonHelmet, 1);
-            recipe.AddIngredient(ModContent.ItemType<VoltHelmet>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<SpecteriteMask>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<BlueTopHat>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<TremorGreathelm>(), 1);
-            recipe.AddIngredient(ItemID.SolarFlareHelmet, 1);
-            recipe.AddTile(TileID.LunarCraftingStation);
-        }
-
+        recipe.AddIngredient(ItemID.CrimsonHelmet, 1);
+        recipe.AddIngredient(ModContent.ItemType<VoltHelmet>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<SpecteriteMask>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<BlueTopHat>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<TremorGreathelm>(), 1);
+        recipe.AddIngredient(ItemID.SolarFlareHelmet, 1);
+        recipe.AddIngredient(ModContent.ItemType<CoreofCalamity>(), 2);
+        recipe.AddIngredient(ModContent.ItemType<GalacticaSingularity>(), 4);
+        recipe.AddIngredient(ModContent.ItemType<LifeAlloy>(), 5);
+        recipe.AddIngredient(ModContent.ItemType<RuinousSoul>(), 5);
+        recipe.AddIngredient(ModContent.ItemType<AscendantSpiritEssence>(), 3);
+        recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 10);
+        recipe.AddTile(ModContent.TileType<CosmicAnvil>());
         recipe.Register();
     }
 }

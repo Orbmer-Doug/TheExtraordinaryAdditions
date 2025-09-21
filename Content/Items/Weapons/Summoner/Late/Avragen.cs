@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Items.Materials;
+using CalamityMod.Items.Weapons.Summon;
+using CalamityMod.Tiles.Furniture.CraftingStations;
 using System;
 using System.Collections.Generic;
 using Terraria;
@@ -56,19 +58,10 @@ public class Avragen : ModItem, ILocalizedModType, IModType
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("ShadowspecBar", out ModItem ShadowspecBar) && calamityMod.TryFind("YharonsKindleStaff", out ModItem YharonsKindleStaff) && calamityMod.TryFind("EndoHydraStaff", out ModItem EndoHydraStaff) && calamityMod.TryFind("DraedonsForge", out ModTile DraedonsForge))
-        {
-            recipe.AddIngredient(YharonsKindleStaff.Type, 1);
-            recipe.AddIngredient(EndoHydraStaff.Type, 1);
-            recipe.AddIngredient(ShadowspecBar.Type, 5);
-            recipe.AddTile(DraedonsForge.Type);
-        }
-        else
-        {
-            recipe.AddIngredient(ItemID.LunarBar, 25);
-            recipe.AddIngredient(ItemID.EmpressBlade, 1);
-            recipe.AddTile(TileID.LunarMonolith);
-        }
+        recipe.AddIngredient(ModContent.ItemType<YharonsKindleStaff>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<EndoHydraStaff>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<ShadowspecBar>(), 5);
+        recipe.AddTile(ModContent.TileType<DraedonsForge>());
         recipe.Register();
     }
 }

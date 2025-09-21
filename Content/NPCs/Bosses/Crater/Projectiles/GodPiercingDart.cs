@@ -14,7 +14,11 @@ public class GodPiercingDart : ProjOwnedByNPC<Asterlin>
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GodPiercingDart);
 
-    public ref float Time => ref Projectile.ai[0];
+    public int Time
+    {
+        get => (int)Projectile.ai[0];
+        set => Projectile.ai[0] = value;
+    }
     public bool ExtendedTelegraph
     {
         get => Projectile.ai[1] == 1f;

@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using CalamityMod.Items.Materials;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Early;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 using TheExtraordinaryAdditions.Core.Globals;
@@ -37,7 +39,7 @@ public class ImpureAstralKatanas : ModItem
     }
 
     public override bool CanShoot(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
-    public override bool AltFunctionUse(Player player) => player.GetModPlayer<AstralKatanaPlayer>().Cooldown <= 0;
+    public override bool AltFunctionUse(Player player) => !CalUtils.HasCooldown(player, AstralDashCooldown.ID);
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
         if (player.altFunctionUse == 2)
@@ -56,22 +58,12 @@ public class ImpureAstralKatanas : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("Stardust", out ModItem Stardust) && calamityMod.TryFind("TitanHeart", out ModItem TitanHeart))
-        {
-            recipe.AddIngredient(ModContent.ItemType<MeteorKatana>(), 1);
-            recipe.AddIngredient(TitanHeart.Type, 2);
-            recipe.AddIngredient(Stardust.Type, 35);
-            recipe.AddIngredient(ItemID.SoulofMight, 10);
-            recipe.AddIngredient(ItemID.SoulofSight, 10);
-            recipe.AddIngredient(ItemID.SoulofFright, 10);
-        }
-        else
-        {
-            recipe.AddIngredient(ModContent.ItemType<MeteorKatana>(), 1);
-            recipe.AddIngredient(ItemID.SoulofMight, 15);
-            recipe.AddIngredient(ItemID.SoulofSight, 15);
-            recipe.AddIngredient(ItemID.SoulofFright, 15);
-        }
+        recipe.AddIngredient(ModContent.ItemType<MeteorKatana>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<TitanHeart>(), 2);
+        recipe.AddIngredient(ModContent.ItemType<StarblightSoot>(), 35);
+        recipe.AddIngredient(ItemID.SoulofMight, 10);
+        recipe.AddIngredient(ItemID.SoulofSight, 10);
+        recipe.AddIngredient(ItemID.SoulofFright, 10);
         recipe.AddTile(TileID.MythrilAnvil);
         recipe.Register();
     }

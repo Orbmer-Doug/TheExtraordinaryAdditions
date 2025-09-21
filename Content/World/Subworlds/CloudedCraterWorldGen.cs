@@ -8,7 +8,7 @@ namespace TheExtraordinaryAdditions.Content.World.Subworlds;
 
 public static class CloudedCraterWorldGen
 {
-    internal static ushort MeteorTile = (ushort)ModContent.TileType<MeteorBlockTile>();
+    internal static ushort MeteorTile = (ushort)ModContent.TileType<MeteorBlockPlaced>();
 
     public const int DirtDepth = 100; // Minimum terrain thickness at center
     public const int CraterDepth = 200; // Height difference between center and edges

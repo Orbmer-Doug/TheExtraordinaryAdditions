@@ -1921,7 +1921,7 @@ public static class ParticleRegistry
                 Texture2D tex = custom.UseAltTexture ? AssetRegistry.GetTexture(AdditionsTexture.HollowCircleFancy) : TypeDefinitions[(byte)ParticleTypes.PulseRing].Texture;
                 sb.DrawBetterRect(tex, ToTarget(p.Position, p.Scale * custom.Squish), null, p.Color, p.Rotation, tex.Size() / 2f);
             },
-                drawType: DrawTypes.Manual
+                drawType: DrawTypes.Pixelize
                 ));
         }
     }

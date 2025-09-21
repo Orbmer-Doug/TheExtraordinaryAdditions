@@ -94,12 +94,6 @@ public class CyberneticSword : ProjOwnedByNPC<Asterlin>
         return InitialMouseAngle + SwingAngle * Animation() * (SwingDir != SwingDirection.Up).ToDirectionInt() * Direction;
     }
 
-    /// <summary>
-    /// The rotating hitbox of this sword. Likely need this to be tweaked for each sword.
-    /// <br></br>
-    /// Defaults to the one for <see cref="ExampleSwing"/>
-    /// </summary>
-    /// <returns></returns>
     public RotatedRectangle Rect()
     {
         float width = MathF.Min(Tex?.Height ?? 1, Tex?.Width ?? 1) / 3 * Projectile.scale;
@@ -220,8 +214,7 @@ public class CyberneticSword : ProjOwnedByNPC<Asterlin>
                 InitialMouseAngle = Projectile.velocity.ToRotation();
                 Time = 0f;
 
-                Projectile.netUpdate = true;
-                Projectile.netSpam = 0;
+                this.Sync();
                 Initialized = true;
             }
         }

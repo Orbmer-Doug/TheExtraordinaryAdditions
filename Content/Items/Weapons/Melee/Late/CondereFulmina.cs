@@ -1,13 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Items.Materials;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Terraria;
-using Terraria.Audio;
-using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Late.Fulmina;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Systems;
@@ -65,21 +62,11 @@ public class CondereFulmina : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind<ModItem>("ArmoredShell", out ModItem ArmoredShell) && calamityMod.TryFind<ModItem>("StormlionMandible", out ModItem StormlionMandible) && calamityMod.TryFind<ModItem>("CoreofCalamity", out ModItem CoreofCalamity))
-        {
-            recipe.AddIngredient(ItemID.MagnetSphere, 1);
-            recipe.AddIngredient(ItemID.FragmentVortex, 16);
-            recipe.AddIngredient(StormlionMandible.Type, 5);
-            recipe.AddIngredient(ArmoredShell.Type, 7);
-            recipe.AddTile(TileID.LunarCraftingStation);
-        }
-        else
-        {
-            recipe.AddIngredient(ItemID.MagnetSphere, 1);
-            recipe.AddIngredient(ItemID.FragmentVortex, 16);
-            recipe.AddIngredient(ItemID.LunarBar, 10);
-            recipe.AddTile(TileID.LunarCraftingStation);
-        }
+        recipe.AddIngredient(ItemID.MagnetSphere, 1);
+        recipe.AddIngredient(ItemID.FragmentVortex, 16);
+        recipe.AddIngredient(ModContent.ItemType<StormlionMandible>(), 5);
+        recipe.AddIngredient(ModContent.ItemType<ArmoredShell>(), 7);
+        recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();
     }
 }

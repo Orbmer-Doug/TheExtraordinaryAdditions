@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using CalamityMod.Items.Materials;
+using CalamityMod.Tiles.Furniture.CraftingStations;
+using System.Collections.Generic;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
@@ -29,23 +30,13 @@ public class AvatarLeggings : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("AuricBar", out ModItem AuricBar) && calamityMod.TryFind("CosmicAnvil", out ModTile CosmicAnvil) && calamityMod.TryFind("CoreofCalamity", out ModItem CoreofCalamity) && calamityMod.TryFind("AscendantSpiritEssence", out ModItem AscendantSpiritEssence) && calamityMod.TryFind("MysteriousCircuitry", out ModItem MysteriousCircuitry) && calamityMod.TryFind("DubiousPlating", out ModItem DubiousPlating))
-        {
-            recipe.AddIngredient(DubiousPlating.Type, 12);
-            recipe.AddIngredient(MysteriousCircuitry.Type, 12);
-            recipe.AddIngredient(ItemID.SoulofFlight, 20);
-            recipe.AddIngredient(CoreofCalamity.Type, 5);
-            recipe.AddIngredient(AscendantSpiritEssence.Type, 5);
-            recipe.AddIngredient(AuricBar.Type, 7);
-            recipe.AddTile(CosmicAnvil.Type);
-        }
-        else
-        {
-            recipe.AddIngredient(ItemID.LunarBar, 18);
-            recipe.AddIngredient(ItemID.RedDye, 4);
-            recipe.AddIngredient(ItemID.SilverDye, 4);
-            recipe.AddTile(TileID.LunarCraftingStation);
-        }
+        recipe.AddIngredient(ModContent.ItemType<DubiousPlating>(), 12);
+        recipe.AddIngredient(ModContent.ItemType<MysteriousCircuitry>(), 12);
+        recipe.AddIngredient(ItemID.SoulofFlight, 20);
+        recipe.AddIngredient(ModContent.ItemType<CoreofCalamity>(), 5);
+        recipe.AddIngredient(ModContent.ItemType<AscendantSpiritEssence>(), 5);
+        recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 7);
+        recipe.AddTile(ModContent.TileType<CosmicAnvil>());
         recipe.Register();
     }
 }

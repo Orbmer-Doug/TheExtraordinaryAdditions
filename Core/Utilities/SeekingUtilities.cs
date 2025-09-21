@@ -1,4 +1,8 @@
-﻿using System;
+﻿using CalamityMod;
+using CalamityMod.NPCs.AquaticScourge;
+using CalamityMod.NPCs.DevourerofGods;
+using CalamityMod.NPCs.ExoMechs.Thanatos;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -318,41 +322,19 @@ public static partial class Utility
 
     public static bool IsDestroyer(this NPC target) => target.type >= NPCID.TheDestroyer && target.type <= NPCID.TheDestroyerTail;
 
-    public static bool IsThanatos(this NPC target)
-    {
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod))
-        {
-            string t1 = "ThanatosBody1";
-            string t2 = "ThanatosBody2";
-            return target.type == calamityMod.Find<ModNPC>(t1).Type || target.type == calamityMod.Find<ModNPC>(t2).Type;
-        }
+    public static bool IsThanatos(this NPC target) => target.type == ModContent.NPCType<ThanatosBody1>() ||
+        target.type == ModContent.NPCType<ThanatosBody2>() ||
+        target.type == ModContent.NPCType<ThanatosTail>() ||
+        target.type == ModContent.NPCType<ThanatosHead>();
 
-        return false;
-    }
+    public static bool IsAquaticScoog(this NPC target) => target.type == ModContent.NPCType<AquaticScourgeBody>() ||
+        target.type == ModContent.NPCType<AquaticScourgeBodyAlt>() ||
+        target.type == ModContent.NPCType<AquaticScourgeTail>() ||
+        target.type == ModContent.NPCType<AquaticScourgeHead>();
 
-    public static bool IsAquaticScoog(this NPC target)
-    {
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod))
-        {
-            string t1 = "AquaticScourgeBody";
-            string t2 = "AquaticScourgeBodyAlt";
-            return target.type == calamityMod.Find<ModNPC>(t1).Type || target.type == calamityMod.Find<ModNPC>(t2).Type;
-        }
-
-        return false;
-    }
-
-    public static bool IsDevourer(this NPC target)
-    {
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod))
-        {
-            string t1 = "DevourerofGodsBody";
-            string t2 = "DevourerofGodsHead";
-            return target.type == calamityMod.Find<ModNPC>(t1).Type || target.type == calamityMod.Find<ModNPC>(t2).Type;
-        }
-
-        return false;
-    }
+    public static bool IsDevourer(this NPC target) => target.type == ModContent.NPCType<DevourerofGodsBody>() ||
+        target.type == ModContent.NPCType<DevourerofGodsTail>() ||
+        target.type == ModContent.NPCType<DevourerofGodsHead>();
 
     public static bool IsWormBoss(this NPC target) => target.IsThanatos() || target.IsDevourer() || target.IsAquaticScoog() || target.IsDestroyer() || target.IsEater();
 
@@ -1053,14 +1035,14 @@ public static class PlayerTargeting
     /// <returns>A player, if any</returns>
     public static Player FindNearestPlayer(Vector2 position)
     {
-        Player Player = null;
+        Player plr = null;
 
         for (int k = 0; k < Main.maxPlayers; k++)
         {
-            if (Main.player[k] != null && Main.player[k].active && (Player == null || Vector2.DistanceSquared(position, Main.player[k].Center) < Vector2.DistanceSquared(position, Player.Center)))
-                Player = Main.player[k];
+            if (Main.player[k] != null && Main.player[k].active && (plr == null || Vector2.DistanceSquared(position, Main.player[k].Center) < Vector2.DistanceSquared(position, plr.Center)))
+                plr = Main.player[k];
         }
-        return Player;
+        return plr;
     }
 
     public static bool TryFindClosestPlayer(PlayerSeekingData data, out Player target)
@@ -1111,6 +1093,32 @@ public static class PlayerTargeting
         // Check for players.
         npc.target = targetSearchResults.NearestTargetIndex;
         npc.targetRect = targetSearchResults.NearestTargetHitbox;
+    }
+
+    public static bool SearchForPlayerTarget(this NPC npc, out Player target, bool faceTarget = true)
+    {
+        if (npc.target < 0 || npc.target > Main.maxPlayers || !npc.HasValidTarget)
+        {
+            float distance = 0f;
+            float realDist = 0f;
+            bool t = false;
+            int tankTarget = -1;
+            foreach (Player player in Main.ActivePlayers)
+            {
+                if (!player.dead && !player.ghost)
+                    npc.TryTrackingTarget(ref distance, ref realDist, ref t, ref tankTarget, player.whoAmI);
+            }
+            npc.SetTargetTrackingValues(faceTarget, realDist, tankTarget);
+        }
+
+        if (npc.target >= 0 && npc.target < Main.maxPlayers && npc.HasValidTarget)
+        {
+            target = Main.player[npc.target];
+            return true;
+        }
+
+        target = null;
+        return false;
     }
 }
 #endregion

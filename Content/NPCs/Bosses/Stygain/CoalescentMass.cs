@@ -3,6 +3,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Debuff;
+using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -16,12 +17,12 @@ public class CoalescentMass : ModNPC
     public static readonly int Life = DifficultyBasedValue(15000, 30000, 43000, 56000, 65000, 80000);
     public override void SetStaticDefaults()
     {
-        NPCID.Sets.ImmuneToRegularBuffs[Type] = 
-            NPCID.Sets.DontDoHardmodeScaling[Type] = 
-            NPCID.Sets.CantTakeLunchMoney[Type] = 
-            NPCID.Sets.MPAllowedEnemies[Type] = 
-            NPCID.Sets.ProjectileNPC[Type] = 
-            NPCID.Sets.TeleportationImmune[Type] = 
+        NPCID.Sets.ImmuneToRegularBuffs[Type] =
+            NPCID.Sets.DontDoHardmodeScaling[Type] =
+            NPCID.Sets.CantTakeLunchMoney[Type] =
+            NPCID.Sets.MPAllowedEnemies[Type] =
+            NPCID.Sets.ProjectileNPC[Type] =
+            NPCID.Sets.TeleportationImmune[Type] =
             NPCID.Sets.DoesntDespawnToInactivityAndCountsNPCSlots[Type] = true;
 
         NPCID.Sets.NPCBestiaryDrawModifiers bestiaryData = new NPCID.Sets.NPCBestiaryDrawModifiers()
@@ -61,23 +62,15 @@ public class CoalescentMass : ModNPC
         NPC.lifeMax = (int)(NPC.lifeMax * 0.8f * balance);
     }
 
-    public NPC Owner => Main.npc[(int)NPC.ai[0]];
     public ref float Time => ref NPC.ai[1];
-
     public override void AI()
     {
-        /*
-        if (Owner == null)
-        {
-            NPC.Kill();
-            return;
-        }*/
         if (Time == 0f)
         {
             NPC.position.Y += NPC.height / 2;
         }
 
-        float start = Utils.GetLerpValue(0f, 90f, Time, true);
+        float start = InverseLerp(0f, 90f, Time);
         float life = InverseLerp(0f, Life, NPC.life) * .5f + .5f;
 
         HideBossBar(NPC);
@@ -95,9 +88,8 @@ public class CoalescentMass : ModNPC
         Time++;
     }
 
-    /*
     // Prevent complete annihilation by anything with piercing
-    private const int ImmuneTime = 14;
+    private const int ImmuneTime = 12;
     public override void OnHitByProjectile(Projectile projectile, NPC.HitInfo hit, int damageDone)
     {
         NPC.immune[projectile.owner] = ImmuneTime;
@@ -106,8 +98,7 @@ public class CoalescentMass : ModNPC
     {
         NPC.immune[player.whoAmI] = ImmuneTime;
     }
-    */
-
+    
     public override bool? CanFallThroughPlatforms() => true;
     public override bool CanHitPlayer(Player target, ref int cooldownSlot) => false;
     public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position) => false;
@@ -127,11 +118,10 @@ public class CoalescentMass : ModNPC
         Main.spriteBatch.PrepareForShaders();
         DrawField(NPC, NPC.Center - Main.screenPosition);
         Main.spriteBatch.ExitShaderRegion();
-
         return false;
     }
 
-    public static void DrawField(NPC NPC, Vector2 pos, float size = 1f)
+    public static void DrawField(NPC npc, Vector2 pos, float size = 1f)
     {
         float time = Main.GlobalTimeWrappedHourly;
 
@@ -145,13 +135,13 @@ public class CoalescentMass : ModNPC
         shader.Render();
 
         // Squish the shield in random direction to be almost fluid like and account for health
-        float scaleX = MathHelper.Lerp(0.5f, .68f, AperiodicSin(time * .2f) * .5f + .5f) * NPC.scale;
-        float scaleY = MathHelper.Lerp(0.5f, .68f, AperiodicSin(time * .35f) * .5f + .5f) * NPC.scale;
+        float scaleX = MathHelper.Lerp(0.5f, .68f, AperiodicSin(time * .2f) * .5f + .5f) * npc.scale;
+        float scaleY = MathHelper.Lerp(0.5f, .68f, AperiodicSin(time * .35f) * .5f + .5f) * npc.scale;
         Vector2 scale = new Vector2(scaleX, scaleY) * size;
-        float interpolant = Utils.GetLerpValue(0f, Life, NPC.life, true);
+        float interpolant = Utils.GetLerpValue(0f, Life, npc.life, true);
 
         Texture2D pixel = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
-        Main.spriteBatch.Draw(pixel, pos, null, Color.Crimson * NPC.Opacity, 0f, pixel.Size() / 2, NPC.Size * (scale * 3f), 0, 0f);
+        Main.spriteBatch.Draw(pixel, pos, null, Color.Crimson * npc.Opacity, 0f, pixel.Size() / 2, npc.Size * (scale * 3f), 0, 0f);
     }
 }
 

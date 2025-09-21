@@ -10,7 +10,7 @@ public class Polarity : ModItem
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Polarity);
     public override void SetDefaults()
     {
-        Item.DefaultToPlaceableTile(ModContent.TileType<PolarityTile>());
+        Item.DefaultToPlaceableTile(ModContent.TileType<PolarityPlaced>());
 
         Item.width = 120;
         Item.height = 90;

@@ -1,6 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Items.Materials;
 using System.Collections.Generic;
-using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -49,7 +48,7 @@ public class EverbladedHeaven : ModItem
     }
 
     public override bool CanShoot(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
-    
+
     public override bool AltFunctionUse(Player player) => true;
 
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
@@ -64,18 +63,9 @@ public class EverbladedHeaven : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("ShadowspecBar", out ModItem ShadowspecBar) && calamityMod.TryFind("DraedonsForge", out ModTile DraedonsForge))
-        {
-            recipe.AddIngredient(ModContent.ItemType<TripleKatanas>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<Mimicry>(), 1);
-            recipe.AddIngredient(ShadowspecBar.Type, 10);
-        }
-        else
-        {
-            recipe.AddIngredient(ModContent.ItemType<TripleKatanas>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<Mimicry>(), 1);
-            recipe.AddIngredient(ItemID.LunarBar, 10);
-        }
+        recipe.AddIngredient(ModContent.ItemType<TripleKatanas>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<Mimicry>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<ShadowspecBar>(), 10);
         recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();
     }

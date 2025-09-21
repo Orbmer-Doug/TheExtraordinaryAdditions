@@ -70,7 +70,7 @@ public class AssetRegistry : ModSystem
     {
         if (Main.dedServ)
             return;
-        LazyAsset<ManagedShader> shader = LazyAsset<ManagedShader>.FromPath("", AssetRequestMode.ImmediateLoad);
+
         Main.QueueMainThreadAction(() =>
         {
             foreach (ManagedShader shader in Shaders.Values)
@@ -258,13 +258,12 @@ public class AssetRegistry : ModSystem
 
 #region the wall
 
-// Please order this in relation to the folder tree
-// Note: literally just use ai to sort it for you no reason to spend all that time
 public enum AdditionsTexture
 {
     #region AsterlinBackgrounds
     Background_AstralInfection,
     Background_BEES,
+    Background_Blizzard,
     Background_BloodMoon,
     Background_Brimstone,
     Background_Cavern,
@@ -294,6 +293,8 @@ public enum AdditionsTexture
     Background_Purity,
     Background_Rain,
     Background_Sandstorm,
+    Background_Shimmer,
+    Background_Slime,
     Background_Snail,
     Background_Snow,
     Background_SolarEclipse,
@@ -303,6 +304,7 @@ public enum AdditionsTexture
     Background_StardustPillar,
     Background_Sulphur,
     Background_SunkenSea,
+    Background_Thunder,
     Background_Undergound,
     Background_Underworld,
     Background_VortexPillar,
@@ -573,21 +575,29 @@ public enum AdditionsTexture
     #endregion
     #region Placeable
     AngelsRage,
-    FlagPole,
     FierceBattle,
+    FlagPole,
+    FrigidGale,
+    GreenBlock,
+    Ladikerfos,
     LockedCyberneticSword,
+    MechanicalInNature,
+    MechanicalInNature2,
+    MenuMusic,
     MeteorBlock,
     Polarity,
+    RainDance,
     SereneSatellite,
+    SnailRoar,
     SpiderMusic,
-    StygianHeartTrophy,
+    StygainHeartTrophy,
+    TechnicTransmitter,
     WereYouFoolin,
     #endregion
     #region Summon
     CrimsonCarvedBeetle,
     TomeOfArchivalScripts,
     TVRemote,
-    WorldShatteredFragment,
     #endregion
     #region Tools
     BiomeFinder,
@@ -1057,21 +1067,27 @@ public enum AdditionsTexture
     #endregion
     #endregion
 
-    // TODO: Rename these to be more clear
     #region Tiles
-    ClassicGreenBlock,
-    FlagPolePlaced,
+    AngelsRagePlaced,
     FierceBattlePlaced,
-    GreenBlock,
-    InfiniteBlock,
-    JazzBlock,
+    FlagPolePlaced,
+    FrigidGalePlaced,
+    GreenBlockPlaced,
+    LadikerfosPlaced,
     LockedCyberneticPedestal,
-    MeteorBlockTile,
+    MechanicalInNature2Placed,
+    MechanicalInNaturePlaced,
+    MenuMusicPlaced,
+    MeteorBlockPlaced,
     MonsterBanner,
-    PolarityTile,
+    PolarityPlaced,
+    RainDancePlaced,
     SereneSatellitePlaced,
-    SpiderMusicTile,
-    StygianHeartTrophyTile,
+    SnailRoarPlaced,
+    SpiderMusicPlaced,
+    StygainHeartTrophyPlaced,
+    TechnicTransmitterPlaced,
+    WereYouFoolinPlaced,
     #endregion
 
     #region UI
@@ -1130,7 +1146,6 @@ public enum AdditionsTexture
     EternalRestCooldown,
     FulminationCooldown,
     HemorrhageTransfer,
-    MyceliumCooldown,
     Overheat,
     PlasmaIncineration,
     TheTiesCooldown,
@@ -1156,6 +1171,39 @@ public enum AdditionsTexture
     BuffTemplate,
     DebuffTemplate,
     WhipDebuff,
+    #endregion
+
+    #region Cooldowns
+    CooldownAbsolute,
+    CooldownAbsoluteOutline,
+    CooldownAbsoluteOverlay,
+    CooldownAstralDash,
+    CooldownAstralDashOutline,
+    CooldownAstralDashOverlay,
+    CooldownCyberneticParry,
+    CooldownCyberneticParryOutline,
+    CooldownCyberneticParryOverlay,
+    CooldownMimicry,
+    CooldownMimicryOutline,
+    CooldownMimicryOverlay,
+    CooldownMycelium,
+    CooldownMyceliumOutline,
+    CooldownMyceliumOverlay,
+    CooldownPumpkinDash,
+    CooldownPumpkinDashOutline,
+    CooldownPumpkinDashOverlay,
+    CooldownRedMist,
+    CooldownRedMistOutline,
+    CooldownRedMistOverlay,
+    CooldownSkullBomb,
+    CooldownSkullBombOutline,
+    CooldownSkullBombOverlay,
+    CooldownSkullKablooey,
+    CooldownKablooeyOutline,
+    CooldownKablooeyOverlay,
+    CooldownTremor,
+    CooldownTremorOutline,
+    CooldownTremorOverlay,
     #endregion
 
     #region Particles
@@ -1402,6 +1450,7 @@ public enum AdditionsSound
     MechanicalInNature,
     MechanicalInNature2,
     Perdition,
+    Protostar,
     RainDance,
     sickest_beat_ever,
     Spider,
@@ -1489,16 +1538,22 @@ public enum AdditionsSound
     BraveAttackAirN01,
     BraveAttackDash02,
     BraveAttackDash03,
+    BraveBigFireLoop,
     BraveSmashH01,
     BraveDashStart,
+    BraveEnergy,
+    BraveEnergy2,
+    BraveHeavyFireHit,
+    BraveIceSlash,
+    BraveMediumFireLoop,
     BraveShieldGuard,
+    BraveSmallFireLoop,
     BraveSmashS02,
     BraveSpecial1A,
     BraveSpecial1B,
     BraveSpecial1C,
     BraveSpecial2A,
     BraveSpecial2B,
-    BraveSpecialN03Loop,
     BraveSwingLarge,
     BraveSwingMedium,
     BraveThrow,

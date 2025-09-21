@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Items.Materials;
+using CalamityMod.Tiles.Furniture.CraftingStations;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -40,42 +41,23 @@ public class AbsoluteCoreplate : ModItem, ILocalizedModType, IModType
         player.lifeRegen += 1;
         player.GetModPlayer<GlobalPlayer>().AbsoluteArmor = true;
     }
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("AuricBar", out ModItem AuricBar)
-            && calamityMod.TryFind("AscendantSpiritEssence", out ModItem AscendantSpiritEssence)
-            && calamityMod.TryFind("CoreofCalamity", out ModItem CoreofCalamity)
-            && calamityMod.TryFind("GalacticaSingularity", out ModItem GalacticaSingularity)
-            && calamityMod.TryFind("LifeAlloy", out ModItem LifeAlloy)
-            && calamityMod.TryFind("RuinousSoul", out ModItem RuinousSoul)
-            && calamityMod.TryFind("CosmicAnvil", out ModTile CosmicAnvil))
-        {
-            recipe.AddIngredient(ItemID.CrimsonScalemail, 1);
-            recipe.AddIngredient(ModContent.ItemType<VoltChestplate>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<SpecteriteChestPiece>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<BlueTuxedo>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<TremorPlating>(), 1);
-            recipe.AddIngredient(ItemID.SolarFlareBreastplate, 1);
-            recipe.AddIngredient(CoreofCalamity.Type, 4);
-            recipe.AddIngredient(GalacticaSingularity.Type, 7);
-            recipe.AddIngredient(LifeAlloy.Type, 5);
-            recipe.AddIngredient(RuinousSoul.Type, 5);
-            recipe.AddIngredient(AscendantSpiritEssence.Type, 5);
-            recipe.AddIngredient(AuricBar.Type, 14);
-            recipe.AddTile(CosmicAnvil.Type);
-        }
-        else
-        {
-            recipe.AddIngredient(ItemID.CrimsonScalemail, 1);
-            recipe.AddIngredient(ModContent.ItemType<VoltChestplate>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<SpecteriteChestPiece>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<BlueTuxedo>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<TremorPlating>(), 1);
-            recipe.AddIngredient(ItemID.SolarFlareBreastplate, 1);
-            recipe.AddTile(TileID.LunarCraftingStation);
-        }
+        recipe.AddIngredient(ItemID.CrimsonScalemail, 1);
+        recipe.AddIngredient(ModContent.ItemType<VoltChestplate>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<SpecteriteChestPiece>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<BlueTuxedo>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<TremorPlating>(), 1);
+        recipe.AddIngredient(ItemID.SolarFlareBreastplate, 1);
+        recipe.AddIngredient(ModContent.ItemType<CoreofCalamity>(), 4);
+        recipe.AddIngredient(ModContent.ItemType<GalacticaSingularity>(), 7);
+        recipe.AddIngredient(ModContent.ItemType<LifeAlloy>(), 5);
+        recipe.AddIngredient(ModContent.ItemType<RuinousSoul>(), 5);
+        recipe.AddIngredient(ModContent.ItemType<AscendantSpiritEssence>(), 5);
+        recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 14);
+        recipe.AddTile(ModContent.TileType<CosmicAnvil>());
         recipe.Register();
     }
 }

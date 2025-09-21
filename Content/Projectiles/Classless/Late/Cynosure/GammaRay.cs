@@ -35,16 +35,11 @@ public class GammaRay : ModProjectile
     public ref float Time => ref Projectile.ai[1];
     public ref float RayLength => ref Projectile.ai[2];
     public ref float Fade => ref Projectile.Additions().ExtraAI[0];
-    public bool Opposite
-    {
-        get => Projectile.Additions().ExtraAI[1] == 1f;
-        set => Projectile.Additions().ExtraAI[1] = value.ToInt();
-    }
 
     public const int ExpandTime = 40;
     public Player Owner => Main.player[Projectile.owner];
     public override bool ShouldUpdatePosition() => false;
-    public LoopedSound sound;
+    public LoopedSoundInstance sound;
     public override void AI()
     {
         if (trail == null || trail._disposed)
@@ -53,9 +48,8 @@ public class GammaRay : ModProjectile
             trail2 = new(WidthFunct, ColorFunct, null, Amt);
 
         // Update the ominous hum
-        SoundStyle style = AssetRegistry.GetSound(AdditionsSound.sunAura) with { MaxInstances = 30 };
-        sound ??= new LoopedSound(style, new ProjectileAudioTracker(Projectile).IsActiveAndInGame);
-        sound.Update(() => Projectile.Center, () => Projectile.Opacity * .5f, () => -.5f);
+        sound ??= LoopedSoundManager.CreateNew(new(AdditionsSound.sunAura, () => Projectile.Opacity * .5f, () => -.5f), () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
+        sound?.Update(Projectile.Center);
 
         // Position and angle relative to genedies
         TheExingendies gen = ProjOwner.As<TheExingendies>();

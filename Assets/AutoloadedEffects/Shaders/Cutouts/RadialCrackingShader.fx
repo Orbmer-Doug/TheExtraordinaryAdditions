@@ -113,7 +113,7 @@ float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 coords : TEXCOORD
     // Ensure the output respects the original alpha threshold
     clip(outputColor.a - AlphaThreshold);
 
-    return outputColor * sampleColor.a;
+    return outputColor * sampleColor;
 }
 
 technique Technique1

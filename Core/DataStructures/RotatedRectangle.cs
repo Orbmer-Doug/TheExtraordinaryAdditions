@@ -380,7 +380,7 @@ public struct RotatedRectangle
     }
 
     /// <summary>
-    /// Is this <see cref="RotatedRectangle"/> intersecting an <see cref="Rectangle"/>?
+    /// Is this <see cref="RotatedRectangle"/> intersecting a <see cref="Rectangle"/>?
     /// </summary>
     /// <param name="other">The other rectangle</param>
     /// <returns>Whether or not they intersect</returns>

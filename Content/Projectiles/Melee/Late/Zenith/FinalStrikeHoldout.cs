@@ -160,11 +160,8 @@ public class FinalStrikeHoldout : ModProjectile
 
         Owner.heldProj = Projectile.whoAmI;
         Owner.SetDummyItemTime(2);
-
-        // Perform directioning.
         Projectile.spriteDirection = Owner.direction;
 
-        // Destroy the spear if the owner can no longer hold it.
         Item heldItem = Owner.HeldItem;
         if (this.RunLocal() && !Owner.Available() || heldItem is null)
         {
@@ -392,76 +389,6 @@ public class FinalStrikeHoldout : ModProjectile
         }
     }
 
-    public void DrawBackglow()
-    {
-        SpriteBatch sb = Main.spriteBatch;
-
-        float backglowWidth = DivineFormInterpolant * 2f;
-        if (backglowWidth <= 0.5f)
-            backglowWidth = 0f;
-
-        Color backglowColor = Color.AntiqueWhite;
-        backglowColor = Color.Lerp(backglowColor, Color.NavajoWhite, Utils.GetLerpValue(0.7f, 1f, DivineFormInterpolant, true) * 0.56f) * 0.4f;
-        backglowColor.A = (byte)(20 * Projectile.Opacity);
-
-        Texture2D glowmaskTexture = Projectile.ThisProjectileTexture();
-        Rectangle frame = glowmaskTexture.Frame(1, Main.projFrames[Type], 0, Projectile.frame);
-        Vector2 drawPosition = Projectile.Center - Main.screenPosition;
-        Vector2 origin = frame.Size() * 0.5f;
-        for (int i = 0; i < 10; i++)
-        {
-            Vector2 drawOffset = (TwoPi * i / 10f).ToRotationVector2() * backglowWidth;
-            sb.Draw(glowmaskTexture, drawPosition + drawOffset, frame, backglowColor * Projectile.Opacity, Projectile.rotation, origin, Projectile.scale, 0, 0f);
-        }
-
-        if (CurrentState != FinalStrikeState.Stab)
-        {
-            Vector2 offsets = new Vector2(0f, Projectile.gfxOffY) - Main.screenPosition;
-            float auraRotation = Projectile.velocity.ToRotation() + PiOver4;
-            Vector2 drawStartOuter = offsets + Projectile.Center + Projectile.velocity;
-            Vector2 spinPoint = -Vector2.UnitY * 6f * DivineFormInterpolant;
-            float time = Main.GlobalTimeWrappedHourly;
-            float rotation = TwoPi * time / 3f;
-            float opacity = .85f * DivineFormInterpolant;
-            for (int i = 0; i < 6; i++)
-            {
-                Vector2 spinStart = drawStartOuter + spinPoint.RotatedBy((double)(rotation - (float)Math.PI * i / 3f), default);
-                Color glowAlpha = Projectile.GetAlpha(backglowColor * Projectile.Opacity);
-                glowAlpha.A = (byte)Projectile.alpha;
-                sb.Draw(glowmaskTexture, spinStart, frame, glowAlpha * opacity, auraRotation, origin, Projectile.scale, 0, 0f);
-            }
-        }
-    }
-
-    public override bool PreDraw(ref Color lightColor)
-    {
-        Texture2D spearTexture = Projectile.ThisProjectileTexture();
-        Rectangle frame = spearTexture.Frame(1, Main.projFrames[Type], 0, Projectile.frame);
-        Vector2 drawPosition = Projectile.Center - Main.screenPosition;
-        Vector2 origin = frame.Size() * 0.5f;
-
-        DrawTele();
-        Main.spriteBatch.Draw(spearTexture, drawPosition, frame, Color.White * Projectile.Opacity, Projectile.rotation, origin, Projectile.scale, 0, 0f);
-        if (CurrentState != FinalStrikeState.Stab)
-            DrawBackglow();
-
-        Main.spriteBatch.SetBlendState(BlendState.Additive);
-        for (float i = 1f; i < 1.5f; i += .1f)
-        {
-            Texture2D flare = AssetRegistry.GetTexture(AdditionsTexture.LensStar);
-            Vector2 size = new(30f * i * DivineFormInterpolant);
-            size.Y += MathF.Sin(StateTime * .04f) * 10f * i;
-            if (CurrentState == FinalStrikeState.Stab)
-                size = new(60f * i * Bump);
-            Rectangle target = ToTarget(Projectile.RotHitbox().TopRight, size);
-            Vector2 orig = flare.Size() / 2f;
-            float rot = Projectile.rotation - PiOver4;
-            Main.spriteBatch.Draw(flare, target, null, Color.AntiqueWhite, rot, orig, 0, 0f);
-        }
-        Main.spriteBatch.ResetBlendState();
-
-        return false;
-    }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
@@ -546,5 +473,78 @@ public class FinalStrikeHoldout : ModProjectile
         if (CurrentState == FinalStrikeState.Stab)
             return Completion.BetweenNum(0f, .7f) ? null : false;
         return CurrentState == FinalStrikeState.Aim || CurrentState == FinalStrikeState.Wait ? false : null;
+    }
+    
+    public void DrawBackglow()
+    {
+        SpriteBatch sb = Main.spriteBatch;
+
+        float backglowWidth = DivineFormInterpolant * 2f;
+        if (backglowWidth <= 0.5f)
+            backglowWidth = 0f;
+
+        Color backglowColor = Color.AntiqueWhite;
+        backglowColor = Color.Lerp(backglowColor, Color.NavajoWhite, Utils.GetLerpValue(0.7f, 1f, DivineFormInterpolant, true) * 0.56f) * 0.4f;
+        backglowColor.A = (byte)(20 * Projectile.Opacity);
+
+        Texture2D glowmaskTexture = Projectile.ThisProjectileTexture();
+        Rectangle frame = glowmaskTexture.Frame(1, Main.projFrames[Type], 0, Projectile.frame);
+        Vector2 drawPosition = Projectile.Center - Main.screenPosition;
+        Vector2 origin = frame.Size() * 0.5f;
+        for (int i = 0; i < 10; i++)
+        {
+            Vector2 drawOffset = (TwoPi * i / 10f).ToRotationVector2() * backglowWidth;
+            sb.Draw(glowmaskTexture, drawPosition + drawOffset, frame, backglowColor * Projectile.Opacity, Projectile.rotation, origin, Projectile.scale, 0, 0f);
+        }
+
+        if (CurrentState != FinalStrikeState.Stab)
+        {
+            Vector2 offsets = new Vector2(0f, Projectile.gfxOffY) - Main.screenPosition;
+            float auraRotation = Projectile.velocity.ToRotation() + PiOver4;
+            Vector2 drawStartOuter = offsets + Projectile.Center + Projectile.velocity;
+            Vector2 spinPoint = -Vector2.UnitY * 6f * DivineFormInterpolant;
+            float time = Main.GlobalTimeWrappedHourly;
+            float rotation = TwoPi * time / 3f;
+            float opacity = .85f * DivineFormInterpolant;
+            for (int i = 0; i < 6; i++)
+            {
+                Vector2 spinStart = drawStartOuter + spinPoint.RotatedBy((double)(rotation - (float)Math.PI * i / 3f), default);
+                Color glowAlpha = Projectile.GetAlpha(backglowColor * Projectile.Opacity);
+                glowAlpha.A = (byte)Projectile.alpha;
+                sb.Draw(glowmaskTexture, spinStart, frame, glowAlpha * opacity, auraRotation, origin, Projectile.scale, 0, 0f);
+            }
+        }
+    }
+
+    public override bool PreDraw(ref Color lightColor)
+    {
+        Texture2D spearTexture = Projectile.ThisProjectileTexture();
+        Rectangle frame = spearTexture.Frame(1, Main.projFrames[Type], 0, Projectile.frame);
+        Vector2 drawPosition = Projectile.Center - Main.screenPosition;
+        Vector2 origin = frame.Size() * 0.5f;
+
+        DrawTele();
+        Main.spriteBatch.Draw(spearTexture, drawPosition, frame, Color.White * Projectile.Opacity, Projectile.rotation, origin, Projectile.scale, 0, 0f);
+        if (CurrentState != FinalStrikeState.Stab)
+            DrawBackglow();
+
+        void draw()
+        {
+            for (float i = 1f; i < 1.5f; i += .1f)
+            {
+                Texture2D flare = AssetRegistry.GetTexture(AdditionsTexture.LensStar);
+                Vector2 size = new(30f * i * DivineFormInterpolant);
+                size.Y += MathF.Sin(StateTime * .04f) * 10f * i;
+                if (CurrentState == FinalStrikeState.Stab)
+                    size = new(60f * i * Bump);
+                Rectangle target = ToTarget(Projectile.RotHitbox().TopRight, size);
+                Vector2 orig = flare.Size() / 2f;
+                float rot = Projectile.rotation - PiOver4;
+                Main.spriteBatch.Draw(flare, target, null, Color.AntiqueWhite, rot, orig, 0, 0f);
+            }
+        }
+        PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.OverProjectiles, BlendState.Additive);
+
+        return false;
     }
 }

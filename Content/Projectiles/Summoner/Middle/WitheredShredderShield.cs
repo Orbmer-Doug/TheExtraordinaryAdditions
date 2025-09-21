@@ -116,7 +116,7 @@ public class WitheredShredderShield : ModProjectile
         return true;
     }
 
-    public LoopedSound SawSlot;
+    public LoopedSoundInstance SawSlot;
     public override void AI()
     {
         after ??= new(8, () => Projectile.Center);
@@ -147,9 +147,9 @@ public class WitheredShredderShield : ModProjectile
             Hover();
         }
 
-        SawSlot ??= new LoopedSound(AssetRegistry.GetSound(AdditionsSound.chainsawThrown) with { MaxInstances = 40 },
-            () => new ProjectileAudioTracker(Projectile).IsActiveAndInGame() && State == CurrentState.Charge && subState == SubState.Shred);
-        SawSlot.Update(() => Projectile.Center, () => Utils.Remap(ShredTimer, SecondsToFrames(4.3f), SecondsToFrames(5), .3f, 0f), () => 0f);
+        SawSlot ??= LoopedSoundManager.CreateNew(new(AdditionsSound.chainsawThrown, () => Utils.Remap(ShredTimer, SecondsToFrames(4.3f), SecondsToFrames(5), .3f, 0f)),
+            () => AdditionsLoopedSound.ProjectileNotActive(Projectile), () => State == CurrentState.Charge && subState == SubState.Shred);
+        SawSlot?.Update(Projectile.Center);
 
         bool ramming = subState == SubState.Ram && HasHitTarget == false;
         after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0,

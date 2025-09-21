@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Items.Materials;
+using CalamityMod.Items.Placeables;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
@@ -11,15 +12,14 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
 
-// Sonoluminescence
 /// <summary>
 /// Farewell, abysslon
 /// </summary>
 public class AbyssalCurrents : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AbyssalCurrent);
-    
-    public static readonly Color[] WaterPalette = (Color[])(object)new Color[]
+
+    public static readonly Color[] WaterPalette = new Color[]
     {
         Color.Turquoise,
         Color.DeepSkyBlue,
@@ -29,7 +29,7 @@ public class AbyssalCurrents : ModItem
         Color.CornflowerBlue,
     };
 
-    public static readonly Color[] BrackishPalette = (Color[])(object)new Color[]
+    public static readonly Color[] BrackishPalette = new Color[]
     {
         new(0, 99, 219),
         new(0, 82, 181),
@@ -64,9 +64,30 @@ public class AbyssalCurrents : ModItem
         Item.shoot = ModContent.ProjectileType<AbyssalCurrentsHoldout>();
         Item.channel = true;
     }
+
+    public override bool CanShoot(Player player) => true;
+    public override bool AltFunctionUse(Player player) => true;
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
-        Projectile.NewProjectile(source, position, velocity, Item.shoot, damage, knockback, player.whoAmI);
+        AbyssalCurrentsHoldout hold = Main.projectile[Projectile.NewProjectile(source, position, velocity, Item.shoot, damage, knockback, player.whoAmI)].As<AbyssalCurrentsHoldout>();
+        if (player.altFunctionUse == ItemAlternativeFunctionID.ActivatedAndUsed)
+        {
+            hold.State = AbyssalCurrentsHoldout.AbyssalState.Spin;
+            hold.Projectile.localNPCHitCooldown = 12;
+        }
+        else
+            hold.Projectile.localNPCHitCooldown = -1;
         return false;
+    }
+
+    public override void AddRecipes()
+    {
+        Recipe recipe = CreateRecipe();
+        recipe.AddIngredient(ItemID.RazorbladeTyphoon, 1);
+        recipe.AddIngredient(ModContent.ItemType<Lumenyl>(), 18);
+        recipe.AddIngredient(ModContent.ItemType<Voidstone>(), 150);
+        recipe.AddIngredient(ItemID.LunarBar, 10);
+        recipe.AddTile(TileID.LunarCraftingStation);
+        recipe.Register();
     }
 }

@@ -4,8 +4,6 @@ namespace TheExtraordinaryAdditions.Core.Graphics.Shaders;
 
 /// <summary>
 /// Simple access to all shaders present in the autoloaded effects folder
-/// <br></br>
-/// <i>All shaders and filters should added here</i>
 /// </summary>
 /// TODO: summaries that describe params in shader file?
 public static class ShaderRegistry

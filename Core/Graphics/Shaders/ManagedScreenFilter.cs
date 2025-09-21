@@ -4,12 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 using Terraria;
 using Terraria.Graphics.Effects;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Config;
 using static TheExtraordinaryAdditions.Common.Particles.ParticleRegistry;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
@@ -524,6 +522,15 @@ public sealed class ScreenShaderUpdates : ModSystem
         }
     }
 
+    public override void ClearWorld()
+    {
+        for (int i = ShaderEntities.Count - 1; i >= 0; i--)
+        {
+            IHasScreenShader entity = ShaderEntities[i];
+            entity.ReleaseShader();
+        }
+    }
+
     private static readonly HashSet<ManagedScreenShader> ActiveShaders = [];
     public static readonly List<IHasScreenShader> ShaderEntities = [];
 
@@ -684,7 +691,7 @@ public interface IHasScreenShader
     /// The shader itself
     /// </summary>
     ManagedScreenShader Shader { get; }
-    
+
     /// <summary>
     /// Should be used to dictate when to activate/deactivate the shader
     /// </summary>
@@ -700,7 +707,7 @@ public interface IHasScreenShader
     /// Register the shader into <see cref="ScreenShaderPool"/>
     /// </summary>
     void InitializeShader();
-    
+
     /// <summary>
     /// Unregister the shader
     /// </summary>

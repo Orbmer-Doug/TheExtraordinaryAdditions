@@ -22,18 +22,20 @@ public class BeanFire : ModProjectile
         Projectile.aiStyle = 0;
     }
 
+    public ref float Speed => ref Projectile.ai[0];
     public override void AI()
     {
         after ??= new(5, () => Projectile.Center);
-        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 255));
 
-        Lighting.AddLight(Projectile.Center, Color.OrangeRed.ToVector3() * 3f);
-        Projectile.rotation += Projectile.direction * .19f;
+        if (Projectile.FinalExtraUpdate())
+        {
+            after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 255));
 
-        int dust = Dust.NewDust(Projectile.Center, 1, 1, DustID.WoodFurniture, 0f, 0f, 100, default, 1.4f);
-        Main.dust[dust].noGravity = true;
-        Main.dust[dust].velocity *= 1.9f;
-        Main.dust[dust].scale *= 0.54f;
+            Lighting.AddLight(Projectile.Center, Color.OrangeRed.ToVector3() * 3f);
+            Projectile.rotation += Projectile.direction * .19f;
+
+            Dust.NewDustPerfect(Projectile.RotHitbox().RandomPoint(), DustID.WoodFurniture, -Projectile.velocity * .01f, 100, default, .7f).noGravity = true;
+        }
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
@@ -50,13 +52,26 @@ public class BeanFire : ModProjectile
         Projectile.damage = (int)(Projectile.damage * 0.9f);
     }
 
+    public override void OnKill(int timeLeft)
+    {
+        for (int i = 0; i < 12; i++)
+            Dust.NewDustPerfect(Projectile.RotHitbox().RandomPoint(), DustID.WoodFurniture, Main.rand.NextVector2Circular(2f, 2f), 0, default, .7f).noGravity = true;
+    }
+
     public override bool OnTileCollide(Vector2 velocityChange)
     {
-        Projectile.penetrate++;
+        if (Projectile.MaxUpdates < 30)
+        {
+            Projectile.penetrate++;
+            Projectile.MaxUpdates += 1;
+        }
+
         if (Projectile.velocity.X != velocityChange.X)
-            Projectile.velocity.X = -velocityChange.X * 1.1f;
+            Projectile.velocity.X = -velocityChange.X * 1.05f;
         if (Projectile.velocity.Y != velocityChange.Y)
-            Projectile.velocity.Y = -velocityChange.Y * 1.1f;
+            Projectile.velocity.Y = -velocityChange.Y * 1.05f;
+        Projectile.velocity.X = MathHelper.Clamp(Projectile.velocity.X, -16f, 16f);
+        Projectile.velocity.Y = MathHelper.Clamp(Projectile.velocity.Y, -16f, 16f);
 
         return false;
     }
@@ -64,7 +79,8 @@ public class BeanFire : ModProjectile
     public FancyAfterimages after;
     public override bool PreDraw(ref Color lightColor)
     {
-        after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [lightColor], Projectile.Opacity);
+        if (after.afterimages != null)
+            after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [lightColor], Projectile.Opacity);
         Projectile.DrawProjectileBackglow(Color.SaddleBrown, 3f);
         return base.PreDraw(ref lightColor);
     }

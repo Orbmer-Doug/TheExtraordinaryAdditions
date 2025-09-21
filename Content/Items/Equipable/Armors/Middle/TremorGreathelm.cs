@@ -4,6 +4,7 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 using TheExtraordinaryAdditions.Core.Globals;
@@ -43,7 +44,7 @@ public class TremorGreathelm : ModItem
         string hotkey = AdditionsKeybinds.SetBonusHotKey.TooltipHotkeyString();
         player.setBonus = this.GetLocalization("SetBonus").Format(hotkey);
 
-        if (AdditionsKeybinds.SetBonusHotKey.JustPressed && player.whoAmI == Main.myPlayer && player.Additions().TremorWait <= 0)
+        if (AdditionsKeybinds.SetBonusHotKey.JustPressed && player.whoAmI == Main.myPlayer && !CalUtils.HasCooldown(player, TremorCooldown.ID))
         {
             for (int i = 0; i < 3; i++)
             {
@@ -52,7 +53,7 @@ public class TremorGreathelm : ModItem
 
                 SoundID.NPCHit42.Play(player.Center, 1f, 0f, .1f);
             }
-            player.Additions().TremorWait = SecondsToFrames(5);
+            CalUtils.AddCooldown(player, TremorCooldown.ID, SecondsToFrames(5));
         }
 
         player.aggro += 400;

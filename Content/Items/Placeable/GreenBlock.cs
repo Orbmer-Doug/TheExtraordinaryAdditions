@@ -25,7 +25,7 @@ public class GreenBlock : ModItem
     public override void SetDefaults()
     {
         Item.value = 100;
-        Item.DefaultToPlaceableTile(ModContent.TileType<ClassicGreenBlock>());
+        Item.DefaultToPlaceableTile(ModContent.TileType<GreenBlockPlaced>());
     }
 
     public override void AddRecipes()

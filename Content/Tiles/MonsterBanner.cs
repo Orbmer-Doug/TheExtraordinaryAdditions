@@ -7,7 +7,7 @@ using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 using TheExtraordinaryAdditions.Content.NPCs.Hostile.Arid;
-using TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora.TEST;
+using TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 using TheExtraordinaryAdditions.Content.NPCs.Hostile.AuroraTurret;
 using TheExtraordinaryAdditions.Content.NPCs.Hostile.Lightning;
 using TheExtraordinaryAdditions.Content.NPCs.Hostile.SolarGuardian;
@@ -69,10 +69,10 @@ public class MonsterBanner : ModTile
         switch (style)
         {
             case 0:
-                npc = ModContent.NPCType<DuneProwlerSniper>();
+                npc = ModContent.NPCType<GlassPiercer>();
                 break;
             case 1:
-                npc = ModContent.NPCType<DuneProwlerAssault>();
+                npc = ModContent.NPCType<DuneProwler>();
                 break;
             case 2:
                 npc = ModContent.NPCType<FulminationSpirit>();

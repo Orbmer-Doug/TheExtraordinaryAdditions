@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Items.Materials;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Terraria;
@@ -52,31 +52,17 @@ public class GaussBallisticWarheadLauncher : ModItem
         Item.useStyle = ItemUseStyleID.Shoot;
 
     }
-    public override bool CanShoot(Player player) => false;
-    public override void HoldItem(Player player)
-    {
 
-    }
+    public override bool CanShoot(Player player) => false;
 
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("ExoPrism", out ModItem ExoPrism) && calamityMod.TryFind("MysteriousCircuitry", out ModItem MysteriousCircuitry) && calamityMod.TryFind("DubiousPlating", out ModItem DubiousPlating))
-        {
-            recipe.AddIngredient(ExoPrism.Type, 14);
-            recipe.AddIngredient(ModContent.ItemType<PlasmaCore>(), 1);
-            recipe.AddIngredient(DubiousPlating.Type, 25);
-            recipe.AddIngredient(MysteriousCircuitry.Type, 30);
-            recipe.AddTile(TileID.LunarCraftingStation);
-        }
-        else
-        {
-            recipe.AddIngredient(ItemID.RocketLauncher, 1);
-            recipe.AddIngredient(ModContent.ItemType<PlasmaCore>(), 1);
-            recipe.AddIngredient(ItemID.FragmentVortex, 16);
-            recipe.AddIngredient(ItemID.LunarBar, 20);
-            recipe.AddTile(TileID.LunarCraftingStation);
-        }
+        recipe.AddIngredient(ModContent.ItemType<ExoPrism>(), 14);
+        recipe.AddIngredient(ModContent.ItemType<PlasmaCore>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<DubiousPlating>(), 25);
+        recipe.AddIngredient(ModContent.ItemType<MysteriousCircuitry>(), 30);
+        recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();
     }
 }

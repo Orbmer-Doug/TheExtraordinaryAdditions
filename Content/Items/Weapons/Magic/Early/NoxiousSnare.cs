@@ -40,15 +40,11 @@ public class NoxiousSnare : ModItem
         Item.noUseGraphic = true;
     }
 
-    public override void HoldItem(Player player)
-    {
-        player.Additions().SyncMouse = true;
-    }
-
     public override bool CanUseItem(Player player)
     {
-        return !Main.projectile.Any((n) => n.active && n.owner == player.whoAmI && n.type == ModContent.ProjectileType<SnareHoldout>());
+        return player.ownedProjectileCounts[Item.shoot] <= 0;
     }
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
+using System.IO;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -12,12 +13,23 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
 public partial class Asterlin
 {
-    private ManagedRenderTarget crtTarget;
-    private ManagedShader crtShader;
+    private static ManagedRenderTarget crtTarget;
+    private static ManagedShader crtShader;
     private static readonly RenderTargetInitializationAction TargetInitializer = (width, height) => new RenderTarget2D(Main.instance.GraphicsDevice, width, height);
     public DialogueManager Dialogue_Manager;
     public float Dialogue_ScreenInterpolant;
     public bool Dialogue_FindingChannel;
+
+    public void Dialouge_SendExtraAI(BinaryWriter wr)
+    {
+        wr.Write((float)Dialogue_ScreenInterpolant);
+        wr.Write((bool)Dialogue_FindingChannel);
+    }
+    public void Dialogue_RecieveExtraAI(BinaryReader re)
+    {
+        Dialogue_ScreenInterpolant = re.ReadSingle();
+        Dialogue_FindingChannel = re.ReadBoolean();
+    }
 
     public static readonly Color Dialogue_InfoColor = Color.Goldenrod;
     public static readonly Color Dialogue_WarningColor = Color.Red;

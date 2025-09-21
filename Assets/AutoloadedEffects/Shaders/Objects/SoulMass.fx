@@ -1,4 +1,5 @@
 float time : register(c0);
+float scale : register(c1);
 
 // Quality Settings
 static const float MarchSteps = 8;
@@ -69,7 +70,7 @@ float Turbulence(float3 position, float minFreq, float maxFreq, float qWidth)
     }
     fade = clamp(2 * (cutoff - fOut) / cutoff, 0, 1);
     value += fade * abs(simplexNoise(position * fOut)) / fOut;
-    return 2.0 - value; // lerp(-6, 2, sin(time) * .5 + .5) RIGHT HERE, make smaller for fade out animation (reduces 'mountain' height)
+    return 2.0 - value * lerp(-6, 1, scale);
 }
 
 float SphereDist(float3 position)
@@ -145,7 +146,7 @@ float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 coords : TEXCOORD
     // Apply color quantization
     col = floor(col * 16.0) / 16.0;
     
-    return col;
+    return col * sampleColor.a;
 }
 
 technique Technique1

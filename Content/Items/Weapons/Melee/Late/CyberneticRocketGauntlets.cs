@@ -119,7 +119,6 @@ public class CyberneticPlayer : ModPlayer
     public const int COMBO_WINDOW = 30;
     public int clickTimer = 0;
     public const int CLICK_WAIT = 10;
-    public int parryWait;
 
     public override void PostUpdateMiscEffects()
     {
@@ -129,10 +128,5 @@ public class CyberneticPlayer : ModPlayer
             comboTimer--;
         if (comboTimer <= 0)
             inputSequence.Clear();
-
-        if (parryWait > 0)
-        {
-            parryWait--;
-        }
     }
 }

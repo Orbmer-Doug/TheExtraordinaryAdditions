@@ -1,7 +1,9 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using SubworldLibrary;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
@@ -9,10 +11,7 @@ using Terraria.GameContent.Achievements;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
-using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain;
-using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Terraria.Main;
@@ -21,31 +20,25 @@ namespace TheExtraordinaryAdditions.Core.Systems;
 
 public class SuperBloodMoonSystem : ModSystem
 {
-    internal static bool _superBloodMoon;
-    public static bool SuperBloodMoon
+    public static bool SuperBloodMoon = false;
+    public static bool IsSuperBloodMoon => SuperBloodMoon == true && bloodMoon == true;
+    public override void ClearWorld()
     {
-        get => _superBloodMoon;
-        set
-        {
-            if (!value)
-                _superBloodMoon = false;
-            else
-                NPC.SetEventFlagCleared(ref _superBloodMoon, -1);
-        }
+        SuperBloodMoon = false;
     }
 
-    public static bool IsSuperbloodMoon => SuperBloodMoon && bloodMoon;
-    public override void OnWorldLoad() => SuperBloodMoon = false;
-    public override void OnWorldUnload() => SuperBloodMoon = false;
     public override void SaveWorldData(TagCompound tag)
     {
+        List<string> list = new List<string>();
         if (SuperBloodMoon)
-            tag["SuperBloodMoonFlag"] = "SuperBloodMoon";
+            list.Add(nameof(SuperBloodMoon));
+        tag[nameof(SuperBloodMoonSystem)] = list;
     }
 
     public override void LoadWorldData(TagCompound tag)
     {
-        SuperBloodMoon = tag.Get<string>("SuperBloodMoonFlag").Contains("SuperBloodMoon");
+        IList<string> list = tag.GetList<string>(nameof(SuperBloodMoonSystem));
+        SuperBloodMoon = list.Contains(nameof(SuperBloodMoon));
     }
 }
 
@@ -93,7 +86,7 @@ public class IncreaseBloodMoonSpawnRate : ModSystem
 
     public static void ModifyMoon(On_Main.orig_DrawSunAndMoon orig, Main self, SceneArea sceneArea, Color moonColor, Color sunColor, float tempMushroomInfluence)
     {
-        if (SuperBloodMoonSystem.IsSuperbloodMoon && !gameMenu)
+        if (SuperBloodMoonSystem.IsSuperBloodMoon && !gameMenu)
         {
             // Get drawing information
             int moonType = Main.moonType;
@@ -153,44 +146,11 @@ public class IncreaseBloodMoonSpawnRate : ModSystem
     }
 }
 
-/*
- * Note: release...?
- * Im a fool. IL Edits require the mod to reload to take effect, which is not ideal for when the modifications should only take place when super blood moons are allowed.
- * Was some neat learning material though!
-public class ModifyBloodMoonSpawnRate : ILEditProvider
-{
-    public override void Subscribe(ManagedILEdit edit)
-    {
-        IL_Main.UpdateTime_StartNight += edit.SubscriptionWrapper;
-    }
-    public override void Unsubscribe(ManagedILEdit edit)
-    {
-        IL_Main.UpdateTime_StartNight -= edit.SubscriptionWrapper;
-    }
-    public override void PerformEdit(ILContext il, ManagedILEdit edit)
-    {
-        if (!SuperBloodMoonSystem.SuperBloodMoon)
-            return;
-
-        ILCursor cursor = new(il);
-
-        // Go to the last occurence of the number 9 (which is the local variable maxValue)
-        while (cursor.TryGotoNext(MoveType.After, i => i.MatchLdcI4(9))) { }
-
-        // Remove it
-        cursor.Emit(OpCodes.Pop);
-
-        // Replace with 5, increasing the ocurrence of bloodmoons
-        cursor.Emit(OpCodes.Ldc_I4, 5);
-    }
-}
-*/
-
 public class SuperBloodMoonGlobalNPC : GlobalNPC
 {
     public override void EditSpawnRate(Player player, ref int spawnRate, ref int maxSpawns)
     {
-        if (SuperBloodMoonSystem.IsSuperbloodMoon)
+        if (SuperBloodMoonSystem.IsSuperBloodMoon)
         {
             spawnRate = (int)((double)spawnRate * 0.13f);
             maxSpawns = (int)(maxSpawns * 3f);
@@ -200,7 +160,7 @@ public class SuperBloodMoonGlobalNPC : GlobalNPC
     public override bool InstancePerEntity => true;
     public override void SetDefaults(NPC npc)
     {
-        if (SuperBloodMoonSystem.IsSuperbloodMoon)
+        if (SuperBloodMoonSystem.IsSuperBloodMoon)
         {
             switch (npc.type)
             {
@@ -223,7 +183,7 @@ public class SuperBloodMoonGlobalNPC : GlobalNPC
 
     public override void AI(NPC npc)
     {
-        if (!SuperBloodMoonSystem.IsSuperbloodMoon)
+        if (!SuperBloodMoonSystem.IsSuperBloodMoon)
             return;
 
         // Periodic tears erupt from all demon eyes as long as a player is in their sight
@@ -422,7 +382,7 @@ public class SuperBloodMoonGlobalNPC : GlobalNPC
 
     public override void OnKill(NPC npc)
     {
-        if (SuperBloodMoonSystem.IsSuperbloodMoon)
+        if (SuperBloodMoonSystem.IsSuperBloodMoon)
         {
             switch (npc.type)
             {
@@ -457,7 +417,7 @@ public class JumpingFighterAI : GlobalNPC
 
     public override void AI(NPC npc)
     {
-        if (!SuperBloodMoonSystem.IsSuperbloodMoon)
+        if (!SuperBloodMoonSystem.IsSuperBloodMoon)
             return;
 
         if (!npc.HasValidTarget)

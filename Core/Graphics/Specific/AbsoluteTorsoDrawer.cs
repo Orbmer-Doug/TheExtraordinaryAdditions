@@ -1,7 +1,4 @@
-﻿// The overall goal of this armor set is to turn the player into a white void that emits a vicous yet stale
-// image over them. Perhaps this effect could also be achieved by stiching metaballs to the player
-
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;

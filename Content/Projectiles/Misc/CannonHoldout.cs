@@ -50,15 +50,15 @@ public class CannonHoldout : ModProjectile, ILocalizedModType, IModType
     }
 
     public override bool ShouldUpdatePosition() => false;
-    public LoopedSound LaserSoundSlot;
+    public LoopedSoundInstance LaserSoundSlot;
     public Vector2 Center => Owner.RotatedRelativePoint(Owner.MountedCenter);
     public override void AI()
     {
         Timer += 1f;
         SpeenBeams += Timer > 140f ? Owner.Additions().MouseRight.Current ? 2f : 1f : 1f + 2f * Animators.MakePoly(2f).InFunction(1f - Timer / 140f);
 
-        LaserSoundSlot ??= new(AssetRegistry.GetSound(AdditionsSound.LaserHum) with { MaxInstances = 50 }, () => new ProjectileAudioTracker(Projectile).IsActiveAndInGame());
-        LaserSoundSlot.Update(() => Projectile.Center, () => 1.2f, () => 0f);
+        LaserSoundSlot ??= LoopedSoundManager.CreateNew(new(AdditionsSound.LaserHum, () => 1.2f), () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
+        LaserSoundSlot.Update(Projectile.Center);
 
         if (MoveInIntervals > 0f)
             MoveInIntervals -= 1f;

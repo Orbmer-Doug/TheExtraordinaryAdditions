@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Globals;
 
@@ -11,9 +13,9 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
 public partial class Asterlin : ModNPC
 {
-    private RandomPushdownAutomata2<EntityAIState<AsterlinAIType>, AsterlinAIType> stateMachine;
+    private RandomPushdownAutomata<EntityAIState<AsterlinAIType>, AsterlinAIType> stateMachine;
 
-    public RandomPushdownAutomata2<EntityAIState<AsterlinAIType>, AsterlinAIType> StateMachine
+    public RandomPushdownAutomata<EntityAIState<AsterlinAIType>, AsterlinAIType> StateMachine
     {
         get
         {
@@ -25,6 +27,16 @@ public partial class Asterlin : ModNPC
     }
 
     public ref int AITimer => ref StateMachine.CurrentState.Time;
+
+    public void States_SendExtraAI(BinaryWriter wr)
+    {
+        wr.Write((int)AITimer);
+    }
+
+    public void States_RecieveExtraAI(BinaryReader re)
+    {
+        AITimer = re.ReadInt32();
+    }
 
     public void LoadStates()
     {

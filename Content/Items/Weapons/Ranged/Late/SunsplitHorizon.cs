@@ -1,4 +1,5 @@
-﻿using Terraria;
+﻿using CalamityMod.Items.Materials;
+using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
@@ -47,21 +48,11 @@ public class SunsplitHorizon : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("UnholyCore", out ModItem UnholyCore) && calamityMod.TryFind("CoreOfHavoc", out ModItem CoreOfHavoc))
-        {
-            recipe.AddIngredient(ItemID.Flamethrower, 1);
-            recipe.AddIngredient(ModContent.ItemType<PlasmaCore>(), 1);
-            recipe.AddIngredient(UnholyCore.Type, 10);
-            recipe.AddIngredient(CoreOfHavoc.Type, 12);
-            recipe.AddTile(TileID.LunarCraftingStation);
-        }
-        else
-        {
-            recipe.AddIngredient(ItemID.Flamethrower, 1);
-            recipe.AddIngredient(ModContent.ItemType<PlasmaCore>(), 1);
-            recipe.AddIngredient(ItemID.LunarBar, 8);
-            recipe.AddTile(TileID.LunarCraftingStation);
-        }
+        recipe.AddIngredient(ItemID.Flamethrower, 1);
+        recipe.AddIngredient(ModContent.ItemType<PlasmaCore>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<UnholyCore>(), 10);
+        recipe.AddIngredient(ModContent.ItemType<CoreofHavoc>(), 12);
+        recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();
     }
 }

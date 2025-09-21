@@ -1,5 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using System;
+﻿using CalamityMod.Items.Materials;
+using CalamityMod.Tiles.Furniture.CraftingStations;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
@@ -38,23 +38,13 @@ public class AvatarHorns : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("AuricBar", out ModItem AuricBar) && calamityMod.TryFind("CosmicAnvil", out ModTile CosmicAnvil) && calamityMod.TryFind("CoreofCalamity", out ModItem CoreofCalamity) && calamityMod.TryFind("AscendantSpiritEssence", out ModItem AscendantSpiritEssence) && calamityMod.TryFind("MysteriousCircuitry", out ModItem MysteriousCircuitry) && calamityMod.TryFind("DubiousPlating", out ModItem DubiousPlating))
-        {
-            recipe.AddIngredient(DubiousPlating.Type, 10);
-            recipe.AddIngredient(MysteriousCircuitry.Type, 10);
-            recipe.AddIngredient(ItemID.SoulofFlight, 20);
-            recipe.AddIngredient(CoreofCalamity.Type, 4);
-            recipe.AddIngredient(AscendantSpiritEssence.Type, 5);
-            recipe.AddIngredient(AuricBar.Type, 5);
-            recipe.AddTile(CosmicAnvil.Type);
-        }
-        else
-        {
-            recipe.AddIngredient(ItemID.LunarBar, 18);
-            recipe.AddIngredient(ItemID.RedDye, 4);
-            recipe.AddIngredient(ItemID.SilverDye, 4);
-            recipe.AddTile(TileID.LunarCraftingStation);
-        }
+        recipe.AddIngredient(ModContent.ItemType<DubiousPlating>(), 10);
+        recipe.AddIngredient(ModContent.ItemType<MysteriousCircuitry>(), 10);
+        recipe.AddIngredient(ItemID.SoulofFlight, 20);
+        recipe.AddIngredient(ModContent.ItemType<CoreofCalamity>(), 4);
+        recipe.AddIngredient(ModContent.ItemType<AscendantSpiritEssence>(), 5);
+        recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 5);
+        recipe.AddTile(ModContent.TileType<CosmicAnvil>());
         recipe.Register();
     }
 }

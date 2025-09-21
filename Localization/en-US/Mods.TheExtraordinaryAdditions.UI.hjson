@@ -21,3 +21,7 @@ DummyInfo:
 	Right-Click to do just the opposite
 	Hold Middle-Click on the background to re-position
 	'''
+DummyLife: Life:
+DummyDefense: Defense:
+DummyScale: Scale:
+DummyGravity: Affected by gravity?

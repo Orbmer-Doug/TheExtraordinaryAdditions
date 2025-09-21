@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Items.Materials;
+using CalamityMod.Tiles.Furniture.CraftingStations;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Terraria;
@@ -6,11 +7,9 @@ using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Assets;
 using TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -100,19 +99,10 @@ public class HollowPurple : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("ShadowspecBar", out ModItem ShadowspecBar) && calamityMod.TryFind("CoreofCalamity", out ModItem CoreofCalamity) && calamityMod.TryFind("DraedonsForge", out ModTile DraedonsForge))
-        {
-            recipe.AddIngredient(ItemID.NebulaArcanum, 1);
-            recipe.AddIngredient(CoreofCalamity.Type, 7);
-            recipe.AddIngredient(ShadowspecBar.Type, 10);
-            recipe.AddTile(DraedonsForge.Type);
-        }
-        else
-        {
-            recipe.AddIngredient(ItemID.NebulaArcanum, 1);
-            recipe.AddIngredient(ItemID.LunarBar, 50);
-            recipe.AddTile(TileID.LunarCraftingStation);
-        }
+        recipe.AddIngredient(ItemID.NebulaArcanum, 1);
+        recipe.AddIngredient(ModContent.ItemType<CoreofCalamity>(), 7);
+        recipe.AddIngredient(ModContent.ItemType<ShadowspecBar>(), 10);
+        recipe.AddTile(ModContent.TileType<DraedonsForge>());
         recipe.Register();
     }
 }

@@ -1,6 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Items.Materials;
+using CalamityMod.Items.Placeables;
 using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
@@ -76,26 +76,14 @@ public class StarlessSea : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("Lumenyl", out ModItem Lumenyl) && calamityMod.TryFind("AbyssGravel", out ModItem AbyssGravel) && calamityMod.TryFind("AscendantSpiritEssence", out ModItem AscendantSpiritEssence))
-        {
-            recipe.AddIngredient(ItemID.WaterBolt, 1);
-            recipe.AddIngredient(ItemID.AquaScepter, 1);
-            recipe.AddIngredient(ItemID.Ectoplasm, 12);
-            recipe.AddIngredient(ItemID.LihzahrdBrick, 25);
-            recipe.AddIngredient(ItemID.RainCloud, 100);
-            recipe.AddIngredient(Lumenyl.Type, 14);
-            recipe.AddIngredient(AbyssGravel.Type, 150);
-            recipe.AddTile(TileID.MythrilAnvil);
-        }
-        else
-        {
-            recipe.AddIngredient(ItemID.WaterBolt, 1);
-            recipe.AddIngredient(ItemID.AquaScepter, 1);
-            recipe.AddIngredient(ItemID.Ectoplasm, 12);
-            recipe.AddIngredient(ItemID.LihzahrdBrick, 25);
-            recipe.AddIngredient(ItemID.RainCloud, 100);
-            recipe.AddTile(TileID.MythrilAnvil);
-        }
+        recipe.AddIngredient(ItemID.WaterBolt, 1);
+        recipe.AddIngredient(ItemID.AquaScepter, 1);
+        recipe.AddIngredient(ItemID.Ectoplasm, 12);
+        recipe.AddIngredient(ItemID.LihzahrdBrick, 25);
+        recipe.AddIngredient(ItemID.RainCloud, 100);
+        recipe.AddIngredient(ModContent.ItemType<Lumenyl>(), 14);
+        recipe.AddIngredient(ModContent.ItemType<AbyssGravel>(), 150);
+        recipe.AddTile(TileID.MythrilAnvil);
         recipe.Register();
     }
 }

@@ -5,6 +5,7 @@ using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Common.Particles;
+using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
 using TheExtraordinaryAdditions.Core.Globals;
@@ -43,11 +44,10 @@ public class NothingThereHelmet : ModItem
         player.setBonus = this.GetLocalization("SetBonus").Format(AdditionsKeybinds.SetBonusHotKey.TooltipHotkeyString());
         player.moveSpeed += 0.3f;
         ref int counter = ref player.Additions().NothingThereCounter;
-        ref int wait = ref player.Additions().NothingThereWait;
         int time = SecondsToFrames(4);
 
         // Start knashing
-        if (AdditionsKeybinds.SetBonusHotKey.JustPressed && counter <= 0 && wait <= 0 && player.whoAmI == Main.myPlayer)
+        if (AdditionsKeybinds.SetBonusHotKey.JustPressed && counter <= 0 && !CalUtils.HasCooldown(player, MimicryCooldown.ID) && player.whoAmI == Main.myPlayer)
         {
             Vector2 pos = player.Center + new Vector2(0f, -20f);
             for (float i = .1f; i < .3f; i += .1f)
@@ -64,12 +64,7 @@ public class NothingThereHelmet : ModItem
 
             SoundEngine.PlaySound(SoundID.ForceRoarPitched with { Pitch = -.3f, Volume = 1.2f }, pos);
             counter = time;
-        }
-
-        // Start cooldown right before finishing
-        if (counter == 1)
-        {
-            wait = time * 3;
+            CalUtils.AddCooldown(player, MimicryCooldown.ID, time * 3);
         }
 
         // Summon the teeth while counting down
@@ -86,12 +81,6 @@ public class NothingThereHelmet : ModItem
             float turnY = Main.rand.NextFloat(-.02f, .02f);
             player.NewPlayerProj(pos, vel, type, dmg, kb, player.whoAmI, 0f, turnX, turnY);
             SoundEngine.PlaySound(SoundID.DD2_JavelinThrowersAttack with { MaxInstances = 0, PitchVariance = .3f, Volume = 1.2f }, pos, null);
-        }
-
-        // Cooldown effects
-        if (wait > 0 && Main.rand.NextBool(6))
-        {
-            ParticleRegistry.SpawnPulseRingParticle(player.RandAreaInEntity(), player.velocity, 20, RandomRotation(), new(Main.rand.NextFloat(.4f, .8f), 1f), 0f, 60f, Color.Crimson, true);
         }
 
         player.Additions().NothingThere = true;

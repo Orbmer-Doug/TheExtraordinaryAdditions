@@ -22,8 +22,33 @@ public static class Animators
     #endregion Dark Evil Wizard Numbers
 
     #region Easing/Curve Definitions and Functions
+    public static Vector2 CatmullRomSpline(List<Vector2> points, float t)
+    {
+        if (points == null || points.Count < 2)
+            return Vector2.Zero;
+
+        int segmentCount = points.Count - 1;
+        if (segmentCount == 0)
+            return points[0];
+
+        // Scale t to select the correct segment
+        float scaledT = t * segmentCount;
+        int segmentIndex = Math.Min((int)scaledT, segmentCount - 1);
+        float localT = scaledT - segmentIndex;
+
+        Vector2 p0 = segmentIndex == 0 ? points[0] : points[segmentIndex - 1]; // First point (or previous)
+        Vector2 p1 = points[segmentIndex]; // Current point
+        Vector2 p2 = points[segmentIndex + 1]; // Next point
+        Vector2 p3 = segmentIndex == segmentCount - 1 ? points[segmentIndex + 1] : points[segmentIndex + 2]; // Next (or next-next)
+
+        return Vector2.CatmullRom(p0, p1, p2, p3, localT);
+    }
+
     public static List<Vector2> CatmullRomSpline(List<Vector2> points, int segments)
     {
+        if (points == null || points.Count < 2)
+            return [];
+
         List<Vector2> splinePoints = [];
 
         for (int i = 0; i < points.Count - 1; i++)
@@ -400,7 +425,7 @@ public static class Animators
         if (isFlipped)
             yaw = -yaw;
 
-        // Create hitbox centered on the sprite’s position
+        // Create hitbox centered on the sprite's position
         Vector2 size = new(projectedWidth, projectedHeight);
         Vector2 topLeft = center - size / 2;
         return new RotatedRectangle(topLeft, size, yaw);

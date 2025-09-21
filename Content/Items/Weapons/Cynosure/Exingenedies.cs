@@ -1,4 +1,5 @@
-﻿using Humanizer;
+﻿using CalamityMod.Items.Materials;
+using CalamityMod.Tiles;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -158,18 +159,9 @@ public class Exingenedies : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("ShadowspecBar", out ModItem ShadowspecBar) && calamityMod.TryFind("PlacedRock", out ModTile PlacedRock))
-        {
-            recipe.AddIngredient(ModContent.ItemType<DivineSpiritCatalyst>(), 1);
-            recipe.AddIngredient(ShadowspecBar.Type, 10);
-            recipe.AddTile(PlacedRock.Type);
-        }
-        else
-        {
-            recipe.AddIngredient(ModContent.ItemType<DivineSpiritCatalyst>(), 1);
-            recipe.AddIngredient(ItemID.SpellTome, 1);
-            recipe.AddTile(TileID.LunarCraftingStation);
-        }
+        recipe.AddIngredient(ModContent.ItemType<DivineSpiritCatalyst>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<ShadowspecBar>(), 10);
+        recipe.AddTile(ModContent.TileType<PlacedRock>());
         recipe.Register();
     }
 }

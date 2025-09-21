@@ -2,7 +2,7 @@
 using System.IO;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora.TEST;
+using TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -62,12 +62,15 @@ public class GlacialSpike : ProjOwnedByNPC<AuroraGuard>
                 ParticleRegistry.SpawnBloomPixelParticle(pos, vel, Main.rand.Next(30, 60), Main.rand.NextFloat(.5f, .9f), Color.DeepSkyBlue, Color.LightSkyBlue, null, 1.5f, 5, true);
             }
 
-            for (int i = 0; i < SnowflakeCount; i++)
+            if (this.RunServer())
             {
-                Vector2 pos = GroundPos + Vector2.UnitX * Main.rand.NextFloat(-Projectile.width / 2, Projectile.width / 2) - Vector2.UnitY * 8f;
-                Vector2 vel = -Vector2.UnitY.RotatedBy(Convert01To101(InverseLerp(GroundPos.X - Projectile.width / 2, GroundPos.X + Projectile.width / 2, pos.X)) 
-                    * Utils.Remap(pos.X, GroundPos.X - Projectile.width / 2, GroundPos.X + Projectile.width / 2, -.3f, .3f)) * Main.rand.NextFloat(16f, 21f);
-                SpawnProjectile(pos, vel, ModContent.ProjectileType<Razorflake>(), AuroraGuard.IcicleDamage, 0f);
+                for (int i = 0; i < SnowflakeCount; i++)
+                {
+                    Vector2 pos = GroundPos + Vector2.UnitX * Main.rand.NextFloat(-Projectile.width / 2, Projectile.width / 2) - Vector2.UnitY * 8f;
+                    Vector2 vel = -Vector2.UnitY.RotatedBy(Convert01To101(InverseLerp(GroundPos.X - Projectile.width / 2, GroundPos.X + Projectile.width / 2, pos.X))
+                        * Utils.Remap(pos.X, GroundPos.X - Projectile.width / 2, GroundPos.X + Projectile.width / 2, -.3f, .3f)) * Main.rand.NextFloat(16f, 21f);
+                    SpawnProjectile(pos, vel, ModContent.ProjectileType<Razorflake>(), AuroraGuard.IcicleDamage, 0f);
+                }
             }
         }
         else if (Time > AuroraGuard.TimeToRise)

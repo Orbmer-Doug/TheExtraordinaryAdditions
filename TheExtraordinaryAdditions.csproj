@@ -14,8 +14,6 @@
 	  <PublicizerClearCacheOnClean>true</PublicizerClearCacheOnClean>
 	</PropertyGroup>
 	<ItemGroup>
-	  <Reference Remove="Libraries\NetEasy_v0.1.8.dll" />
-	  <Reference Remove="Libraries\NetSerializer.dll" />
 	  <Reference Remove="Libraries\SubworldLibrary.dll" />
 	</ItemGroup>
 
@@ -29,6 +27,7 @@
 	  <Folder Include="Assets\Audio\Ambient\" />
 	  <Folder Include="Assets\Audio\RoR\" />
 	  <Folder Include="Assets\Audio\Ultrakill\" />
+	  <Folder Include="Assets\AutoloadedContent\" />
 	  <Folder Include="Assets\Textures\Grayscale\" />
 	  <Folder Include="Assets\Textures\Items\Weapons\Multi\Late\" />
 	  <Folder Include="Assets\Textures\AsterlinBackgrounds\" />
@@ -39,6 +38,7 @@
 	  <Folder Include="Assets\Textures\Projectiles\Vanilla\Early\" />
 	  <Folder Include="Assets\Textures\Projectiles\Vanilla\Late\" />
 	  <Folder Include="Content\Items\Equipable\Dyes\" />
+	  <Folder Include="Content\Items\Materials\Late\" />
 	  <Folder Include="Content\Items\Weapons\Multi\Late\" />
 	  <Folder Include="Content\Projectiles\Multi\Late\" />
 	  <Folder Include="Content\Projectiles\Multi\Zenith\" />
@@ -54,11 +54,8 @@
 	  <Publicize Include="tModLoader" IncludeCompilerGeneratedMembers="false" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Reference Include="NetEasy">
-	    <HintPath>Libraries\NetEasy_v0.1.8.dll</HintPath>
-	  </Reference>
-	  <Reference Include="NetSerializer">
-	    <HintPath>Libraries\NetSerializer.dll</HintPath>
+	  <Reference Include="CalamityMod">
+	    <HintPath>..\ModAssemblies\CalamityMod_v2.0.5.dll</HintPath>
 	  </Reference>
 	  <Reference Include="SubworldLibrary">
 	    <HintPath>..\TheExtraordinaryAdditions\Libraries\SubworldLibrary.dll</HintPath>

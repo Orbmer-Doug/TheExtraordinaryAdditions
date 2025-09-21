@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using CalamityMod;
+using CalamityMod.CalPlayer;
+using Microsoft.Xna.Framework.Graphics;
 using SubworldLibrary;
 using System;
 using System.Reflection;
@@ -102,9 +104,9 @@ public class FloatingScreenManager : ModSystem
     // LUCILLE WHERE IS   THE   MOD   CALLS
     private bool InEternalGarden()
     {
-        if (ModLoader.TryGetMod("NoxusBoss", out Mod knocksus))
+        if (ModReferences.WotG != null)
         {
-            Type eternalGardenUpdateSystem = knocksus.Code?.GetType("NoxusBoss.Core.World.Subworlds.EternalGardenUpdateSystem");
+            Type eternalGardenUpdateSystem = ModReferences.WotG.Code?.GetType("NoxusBoss.Core.World.Subworlds.EternalGardenUpdateSystem");
             if (eternalGardenUpdateSystem == null)
                 return false;
             PropertyInfo eternalProperty = eternalGardenUpdateSystem.GetProperty("WasInSubworldLastUpdateFrame", BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
@@ -115,9 +117,10 @@ public class FloatingScreenManager : ModSystem
         }
         return false;
     }
+
     private bool HiAvatar()
     {
-        if (ModLoader.TryGetMod("NoxusBoss", out Mod knocksus) && knocksus.TryFind<ModNPC>("AvatarOfEmptiness", out ModNPC npc))
+        if (ModReferences.WotG != null && ModReferences.WotG.TryFind<ModNPC>("AvatarOfEmptiness", out ModNPC npc))
         {
             return NPC.AnyNPCs(npc.Type);
         }
@@ -143,19 +146,11 @@ public class FloatingScreenManager : ModSystem
                 continue;
             FloatingScreen screen = projectile.As<FloatingScreen>();
             Player player = screen.Owner;
-            bool inSulphur = false;
-            bool inAstral = false; // Astral Infection credit: https://www.deviantart.com/mp-24/art/The-Astral-Infection-873382367
-            bool inCrags = false;
-            bool inSunkenSea = false;
-            bool inAbyss = false;
-            if (ModReferences.BaseCalamity != null)
-            {
-                inSulphur = (bool)ModReferences.BaseCalamity.Call("GetInZone", player, "sulfur");
-                inAstral = (bool)ModReferences.BaseCalamity.Call("GetInZone", player, "astral");
-                inCrags = (bool)ModReferences.BaseCalamity.Call("GetInZone", player, "crag");
-                inSunkenSea = (bool)ModReferences.BaseCalamity.Call("GetInZone", player, "sunkensea");
-                inAbyss = (bool)ModReferences.BaseCalamity.Call("GetInZone", player, "abyss");
-            }
+            bool inSulphur = player.GetModPlayer<CalamityPlayer>().ZoneSulphur;
+            bool inAstral = player.GetModPlayer<CalamityPlayer>().ZoneAstral; // Astral Infection credit: https://www.deviantart.com/mp-24/art/The-Astral-Infection-873382367
+            bool inCrags = player.GetModPlayer<CalamityPlayer>().ZoneCalamity;
+            bool inSunkenSea = player.GetModPlayer<CalamityPlayer>().ZoneSunkenSea;
+            bool inAbyss = player.GetModPlayer<CalamityPlayer>().ZoneAbyss;
             bool inCrater = SubworldSystem.IsActive<CloudedCrater>();
             bool avatar = HiAvatar();
             bool garden = InEternalGarden();
@@ -191,7 +186,7 @@ public class FloatingScreenManager : ModSystem
                 else if (wall == WallID.LihzahrdBrickUnsafe)
                     background = AssetRegistry.GetTexture(AdditionsTexture.Background_JungleTemple);
                 else if (player.ZoneShimmer)
-                    background = AssetRegistry.GetTexture(AdditionsTexture.Background_Space);
+                    background = AssetRegistry.GetTexture(AdditionsTexture.Background_Shimmer);
                 else if ((double)Main.screenPosition.Y > Main.worldSurface * 16.0)
                 {
                     switch (wall)
@@ -248,6 +243,8 @@ public class FloatingScreenManager : ModSystem
                     background = AssetRegistry.GetTexture(AdditionsTexture.Background_FrostMoon);
                 else if (Main.pumpkinMoon)
                     background = AssetRegistry.GetTexture(AdditionsTexture.Background_PumpkinMoon);
+                else if (Main.slimeRain && player.ZoneOverworldHeight)
+                    background = AssetRegistry.GetTexture(AdditionsTexture.Background_Slime);
 
                 else if (player.ZoneGlowshroom)
                     background = AssetRegistry.GetTexture(AdditionsTexture.Background_GlowingShrooms);
@@ -266,6 +263,8 @@ public class FloatingScreenManager : ModSystem
                         background = AssetRegistry.GetTexture(AdditionsTexture.Background_Sulphur);
                     else if ((double)(Main.screenPosition.Y / 16f) < Main.worldSurface + 10.0 && (centerTile < 380 || centerTile > Main.maxTilesX - 380))
                         background = AssetRegistry.GetTexture(AdditionsTexture.Background_Ocean);
+                    else if (player.ZoneSnow && player.ZoneRain)
+                        background = AssetRegistry.GetTexture(AdditionsTexture.Background_Blizzard);
                     else if (player.ZoneSnow)
                         background = AssetRegistry.GetTexture(AdditionsTexture.Background_Snow);
                     else if (player.ZoneJungle)
@@ -282,6 +281,8 @@ public class FloatingScreenManager : ModSystem
                         background = AssetRegistry.GetTexture(AdditionsTexture.Background_Graveyard);
                     else if (player.ZoneMeteor)
                         background = AssetRegistry.GetTexture(AdditionsTexture.Background_Meteor);
+                    else if (player.ZoneRain && Main.IsItStorming)
+                        background = AssetRegistry.GetTexture(AdditionsTexture.Background_Thunder);
                     else if (player.ZoneRain)
                         background = AssetRegistry.GetTexture(AdditionsTexture.Background_Rain);
                 }

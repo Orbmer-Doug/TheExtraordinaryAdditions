@@ -54,16 +54,8 @@ public class SuperheatedPlasmaArrayHoldout : ModProjectile, ILocalizedModType, I
         }
         if (Time > ChargeUpTime)
         {
-            SoundStyle style = AssetRegistry.GetSound(AdditionsSound.FireBeamLoop);
-            slot ??= new LoopedSound(style, new ProjectileAudioTracker(Projectile).IsActiveAndInGame);
-            slot.Update(() => Projectile.Center, () => 1.2f, () => 0f);
-
-            if (Main.rand.NextBool())
-            {
-                Vector2 vel = Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.48f) * Main.rand.NextFloat(4.3f, 18.7f);
-                float size = Main.rand.NextFloat(.5f, .8f);
-                ParticleRegistry.SpawnGlowParticle(tipOfGun, vel * 1.2f, Main.rand.Next(10, 20), size * .9f, Color.OrangeRed);
-            }
+            slot ??= LoopedSoundManager.CreateNew(new(AdditionsSound.FireBeamLoop, () => 1.2f), () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
+            slot.Update(Projectile.Center);
             Lighting.AddLight(tipOfGun, Color.OrangeRed.ToVector3() * 2f);
         }
 
@@ -71,7 +63,7 @@ public class SuperheatedPlasmaArrayHoldout : ModProjectile, ILocalizedModType, I
         Time++;
     }
 
-    public LoopedSound slot;
+    public LoopedSoundInstance slot;
     public override void OnKill(int timeLeft)
     {
         if (Time > ChargeUpTime)

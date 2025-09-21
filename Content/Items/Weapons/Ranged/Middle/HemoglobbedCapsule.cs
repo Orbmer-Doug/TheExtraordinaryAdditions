@@ -48,5 +48,13 @@ public class HemoglobbedCapsule : ModItem
         tooltips.ColorLocalization(new Color(235, 64, 52));
     }
 
-    public override bool CanUseItem(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
+    public override bool CanUseItem(Player player)
+    {
+        if (Utility.FindProjectile(out Projectile p, Item.shoot, player.whoAmI))
+        {
+            if (p.ai[0] == (int)HemoglobbedCapsuleThrown.BehaviorState.Aim)
+                return false;
+        }
+        return true;
+    }
 }

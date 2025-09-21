@@ -57,10 +57,7 @@ public class BrewingStormsHoldout : BaseIdleHoldoutProjectile
         {
             Vector2 pos = Modded.mouseWorld - new Vector2(Main.rand.NextFloat(-200f, 200f), Main.screenHeight);
             Vector2 vel = (Modded.mouseWorld - pos + Projectile.velocity * 7.5f).SafeNormalize(Vector2.UnitY) * 28f;
-            BrewingLightningStrike lightning = Main.projectile[Projectile.NewProj(pos, vel, ModContent.ProjectileType<BrewingLightningStrike>(),
-                (int)(item.damage * 3f), 0f, Projectile.owner, 0f, 0f, 0f)].As<BrewingLightningStrike>();
-            lightning.InitialVelocityAngle = vel.ToRotation();
-            lightning.BaseTurnAngleRatio = Main.rand.Next(150);
+            Projectile.NewProj(pos, vel, ModContent.ProjectileType<BrewingLightningStrike>(), (int)(item.damage * 3f), 0f, Projectile.owner, vel.ToRotation(), Main.rand.Next(150), 0f);
 
             AdditionsSound.LightningStrike.Play(Owner.Center, 1f);
             Charge = 0;

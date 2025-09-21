@@ -90,7 +90,8 @@ public partial class Asterlin : ModNPC
                             Vector2 dir = spawnPos.SafeDirectionTo(Target.Center);
                             if (!Main.masterMode && !Main.getGoodWorld)
                                 UnrelentingRush_SavedRotation = dir.ToRotation();
-                            NPC.NewNPCProj(spawnPos, Main.masterMode ? home : dir, ModContent.ProjectileType<TechnicPortal>(), 0, 0f);
+                            if (this.RunServer())
+                                NPC.NewNPCProj(spawnPos, Main.masterMode ? home : dir, ModContent.ProjectileType<TechnicPortal>(), 0, 0f);
                             NPC.netUpdate = true;
                         }
 
@@ -152,7 +153,7 @@ public partial class Asterlin : ModNPC
                             float comp = InverseLerp(0, cnt - 1, i);
                             float speed = MathHelper.Lerp(16f, 28f, Convert01To010(comp));
                             Vector2 vel = NPC.velocity.SafeNormalize(Vector2.Zero).RotatedBy(MathHelper.Lerp(-1.2f, 1.2f, comp)) * speed;
-                            NPC.NewNPCProj(NPC.Center, vel, ModContent.ProjectileType<OverchargedLaser>(), LightAttackDamage, 0f, -1, 0f, ai1: 1f);
+                            NPC.NewNPCProj(NPC.Center, vel, ModContent.ProjectileType<OverchargedLaser>(), LightAttackDamage, 0f, -1, 1f);
                         }
 
                         UnrelentingRush_DashCounter++;

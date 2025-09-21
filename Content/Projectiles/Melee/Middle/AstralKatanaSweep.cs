@@ -5,6 +5,7 @@ using System.IO;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
+using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -452,7 +453,7 @@ public class AstralKatanaThrow : ModProjectile
             if (this.RunLocal() && Modded.MouseRight.JustReleased)
             {
                 AdditionsSound.BraveDashStart.Play(center, 1f, .1f);
-                Owner.GetModPlayer<AstralKatanaPlayer>().Cooldown = SecondsToFrames(LungeWait);
+                CalUtils.AddCooldown(Owner, AstralDashCooldown.ID, SecondsToFrames(LungeWait));
                 SavedAngle = center.AngleTo(dest);
                 State = CurrentState.Lunging;
                 Time = 0;
@@ -546,7 +547,7 @@ public class AstralKatanaThrow : ModProjectile
     public override void OnKill(int timeLeft)
     {
         if (State != CurrentState.Lunging)
-            Owner.GetModPlayer<AstralKatanaPlayer>().Cooldown = SecondsToFrames(NonLungeWait);
+            CalUtils.AddCooldown(Owner, AstralDashCooldown.ID, SecondsToFrames(NonLungeWait));
     }
 
     private void SetCollided(bool stick)
@@ -680,29 +681,5 @@ public class AstralKatanaThrow : ModProjectile
 
         Main.spriteBatch.DrawBetter(texture, pos, null, lightColor * Projectile.Opacity, Projectile.rotation + off, origin, Projectile.scale, fx);
         return false;
-    }
-}
-
-public class AstralKatanaPlayer : ModPlayer
-{
-    public int Cooldown;
-    public override void PostUpdateMiscEffects()
-    {
-        if (Cooldown > 0)
-        {
-            if (Main.rand.NextBool(4))
-            {
-                Vector2 center = Player.RotatedRelativePoint(Player.MountedCenter, true, true);
-                Vector2 pos = center + Main.rand.NextVector2CircularLimited(200f, 200f, .7f, 1f);
-                Vector2 vel = RandomVelocity(1f, 1f, 4f);
-                int life = Main.rand.Next(40, 100);
-                float scale = Main.rand.NextFloat(.3f, .5f);
-                Color col = MulticolorLerp(Sin01(Main.GlobalTimeWrappedHourly * 1.4f), AstralKatanaSweep.AstralBluePalette);
-                Color col2 = MulticolorLerp(Cos01(Main.GlobalTimeWrappedHourly * 1.4f), AstralKatanaSweep.AstralOrangePalette);
-                Color color = Main.rand.NextBool() ? col : col2;
-                ParticleRegistry.SpawnBloomPixelParticle(pos, vel, life, scale, color, color, center, 1.1f);
-            }
-            Cooldown--;
-        }
     }
 }

@@ -11,21 +11,13 @@ using static TheExtraordinaryAdditions.Core.Graphics.Primitives.OptimizedPrimiti
 
 namespace TheExtraordinaryAdditions.Core.Graphics.Primitives;
 
-// A prime design, is the best possible trailing system I can create.
-// Over months I would come back to this system and try to make it better, ending up failing in the end.
-// Now, I musn't hide the true creation of this system.
-// With numerous long hours of comprehending code I finally gave in to asking many types of AI.
-// It ended with Grok, in which I then fixed up the rest of the system.
-
-// Original was the primitive trail system present in the You Boss, which was likely copied from Infernum's.
-
-// Thereotically, the amount of trail points can be up to 3.5x the amount of pixels likely on your screen (2,073,600), but the games unplayable at that point (but it doesn't crash!)
-// Up to 172,000 trail points (double the max) in my experience were enough to make the game stutter (thats ~61,919,940 indices or ~20,640,000 vertices being rendered per second!)
-
-// Either way it's absurd how fast it is despite the possible optimizations of:
-// Dynamic Vertex/Index buffers (though this gets real complex real fast, and it is particulary annoying to deal with)
+// An extremely optimized system for rendering primis, easily handling millions of veritices a second.
+// Could potentially benefit from added usage of:
+// Dynamic vertex/index buffers
 // Trail batching
-// Actually combining the tip and trail points (without creating artifacts)
+// Vectorization
+
+// Original design based off the primitive trail system present in the You Boss, which was likely carried from Infernum.
 
 /// <summary>
 /// A readonly struct representing a 2D vertex optimized for trail rendering, containing position, color, and texture coordinates.
@@ -105,9 +97,6 @@ public class TrailPoints
     /// <returns>A Span representing the updated trail points.</returns>
     public static Span<Vector2> CreateTrail(Span<Vector2> trailBuffer, Vector2 samplePos, int max, ref int currentCount)
     {
-        //if (samplePos == Vector2.Zero)
-        //  throw new ArgumentException("samplePos cannot be zero!");
-
         if (trailBuffer.Length < max)
             throw new ArgumentException("trailBuffer must be at least as large as max!");
 
@@ -230,14 +219,14 @@ public class ManualTrailPoints
     }
 }
 
+// TODO: Evaluate if tips are necessary and if they can be remedied with sufficient width calculations in the trail itself.
 /// <summary>
 /// Defines the contract for a trail tip implementation, which provides additional geometry at the end of a trail.
 /// Tips are responsible for calculating their own vertex and index counts, as well as generating mesh data.
 /// </summary>
 /// <remarks>
 /// Implementations should ensure that <see cref="ExtraVertices"/> and <see cref="ExtraIndices"/> are consistent with
-/// the geometry generated in <see cref="GenerateMesh"/>. The method operates on pre-allocated spans to avoid
-/// unnecessary allocations, and buffer overflow checks are recommended.
+/// the geometry generated in <see cref="GenerateMesh"/>.
 /// </remarks>
 public interface ITrailTip
 {
@@ -296,7 +285,6 @@ public class TriangularTip(float length) : ITrailTip
     }
 }
 
-// TODO: Is there a way to make this more seamless for non-uniform shaders?
 public class RoundedTip : ITrailTip
 {
     private readonly int triCount;
@@ -396,7 +384,7 @@ public class RoundedTip : ITrailTip
 /// ensure a trail sometime somewhere is removed to prevent memory leak when whatever object that needed it is gone <br></br>
 /// So in this case we are just gonna do a little SLR
 /// </summary>
-public class TrailManager : ModSystem
+public sealed class TrailManager : ModSystem
 {
     public static TrailManager Instance => ModContent.GetInstance<TrailManager>();
     public List<OptimizedPrimitiveTrail> trails = [];
@@ -412,12 +400,12 @@ public class TrailManager : ModSystem
             return;
         cleanCounter = 0;
 
-        var toRemove = new List<int>();
+        List<int> toRemove = new List<int>();
 
-        var span = (ReadOnlySpan<OptimizedPrimitiveTrail>)CollectionsMarshal.AsSpan(trails);
+        ReadOnlySpan<OptimizedPrimitiveTrail> span = (ReadOnlySpan<OptimizedPrimitiveTrail>)CollectionsMarshal.AsSpan(trails);
         for (int i = 0; i < span.Length; i++)
         {
-            var trail = span[i];
+            OptimizedPrimitiveTrail trail = span[i];
             if (trail == null || trail._disposed)
             {
                 toRemove.Add(i);
@@ -443,7 +431,7 @@ public class TrailManager : ModSystem
 /// <summary>
 /// A highly optimized class for rendering trails with optional tips
 /// </summary>
-public class OptimizedPrimitiveTrail : IDisposable
+public sealed class OptimizedPrimitiveTrail : IDisposable
 {
     /// <summary>
     /// Delegate for a function that returns the trail width based on a completion ratio.
@@ -977,7 +965,6 @@ public class OptimizedPrimitiveTrail : IDisposable
     {
         if (!_disposed)
         {
-            "An OptimizedPrimitiveTrail was not disposed properly, performing cleanup in finalizer".Warn();
             _indicesBuffer = null;
             _verticesBuffer = null;
             _tipVerticesBuffer = null;

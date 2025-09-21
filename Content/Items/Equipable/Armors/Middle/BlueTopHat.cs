@@ -6,6 +6,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Content.Buffs.Debuff;
+using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Systems;
@@ -44,8 +45,7 @@ public class BlueTopHat : ModItem
         player.moveSpeed += 0.25f;
         player.statLifeMax2 += 40;
 
-        int buff = ModContent.BuffType<MyceliumCooldown>();
-        if (AdditionsKeybinds.SetBonusHotKey.JustPressed && !player.HasBuff(buff) && player.whoAmI == Main.myPlayer)
+        if (AdditionsKeybinds.SetBonusHotKey.JustPressed && !CalUtils.HasCooldown(player, MyceliumiteCooldown.ID) && player.whoAmI == Main.myPlayer)
         {
             bool onGround = player.CheckSolidGround();
             int amt = onGround ? 30 : 10;
@@ -77,7 +77,7 @@ public class BlueTopHat : ModItem
             }
 
             SoundEngine.PlaySound(SoundID.Item167 with { Pitch = -.2f, Volume = 1.4f }, player.Center);
-            player.AddBuff(buff, SecondsToFrames(15));
+            CalUtils.AddCooldown(player, MyceliumiteCooldown.ID, SecondsToFrames(15));
         }
     }
 

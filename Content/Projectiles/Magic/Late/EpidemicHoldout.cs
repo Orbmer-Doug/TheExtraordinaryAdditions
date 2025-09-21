@@ -49,11 +49,11 @@ public class EpidemicHoldout : BaseIdleHoldoutProjectile
                 this.Sync();
         }
 
+        Owner.ChangeDir(Projectile.velocity.X.NonZeroSign());
         Projectile.Center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true) + Projectile.velocity * Projectile.width * .4f;
         Projectile.damage = Owner.GetWeaponDamage(Owner.HeldItem);
         Projectile.rotation = Projectile.velocity.ToRotation();
         Owner.SetFrontHandBetter(0, Projectile.rotation);
-        Owner.ChangeDir(Projectile.velocity.X.NonZeroSign());
 
         Vector2 velocity = Projectile.SafeDirectionTo(Modded.mouseWorld) * 15f;
 

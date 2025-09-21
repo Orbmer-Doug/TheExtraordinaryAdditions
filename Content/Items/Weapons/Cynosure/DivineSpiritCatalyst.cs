@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Tiles.Furniture.CraftingStations;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -85,28 +85,15 @@ public class DivineSpiritCatalyst : ModItem
         Item.maxStack = Item.CommonMaxStack;
         Item.value = Item.buyPrice(platinum: 5);
     }
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("DraedonsForge", out ModTile DraedonsForge))
-        {
-            recipe.AddIngredient(ModContent.ItemType<FinalStrike>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<UnparalleledCoalescence>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<RealitySeamstressesGlove>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<DeepestNadir>(), 1);
-            recipe.AddTile(DraedonsForge.Type);
-        }
-        else
-        {
-            recipe.AddIngredient(ModContent.ItemType<FinalStrike>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<UnparalleledCoalescence>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<RealitySeamstressesGlove>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<DeepestNadir>(), 1);
-            recipe.AddTile(TileID.LunarCraftingStation);
-        }
+        recipe.AddIngredient(ModContent.ItemType<FinalStrike>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<UnparalleledCoalescence>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<RealitySeamstressesGlove>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<DeepestNadir>(), 1);
+        recipe.AddTile(ModContent.TileType<DraedonsForge>());
         recipe.Register();
-
     }
-
-
 }

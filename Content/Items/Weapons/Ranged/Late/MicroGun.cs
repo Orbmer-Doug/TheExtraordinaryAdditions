@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Items.Materials;
+using CalamityMod.Items.Weapons.Ranged;
+using CalamityMod.Tiles.Furniture.CraftingStations;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Terraria;
@@ -31,6 +33,7 @@ public class MicroGun : ModItem
     {
         tooltips.ColorLocalization(new Color(181, 62, 33));
     }
+
     public override void SetDefaults()
     {
         Item.damage = 490;
@@ -52,7 +55,9 @@ public class MicroGun : ModItem
         Item.noMelee = true;
         Item.noUseGraphic = true;
     }
+
     public override bool CanUseItem(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
+
     public override bool CanConsumeAmmo(Item ammo, Player player)
     {
         if (Utils.NextFloat(Main.rand) > 0.95f)
@@ -61,35 +66,20 @@ public class MicroGun : ModItem
         }
         return false;
     }
+
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
         Projectile.NewProjectile((IEntitySource)(object)source, position, velocity, ModContent.ProjectileType<MicroGunHoldout>(), damage, knockback, player.whoAmI, 0f, 0f, 0f);
-        return false; // Return false because we don't want tModLoader to shoot projectile
+        return false;
     }
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("ShadowspecBar", out ModItem ShadowspecBar) && calamityMod.TryFind("Minigun", out ModItem Minigun) && calamityMod.TryFind("SDFMG", out ModItem SDFMG) && calamityMod.TryFind("DraedonsForge", out ModTile DraedonsForge))
-        {
-            recipe.AddIngredient(Minigun.Type, 1);
-            recipe.AddIngredient(SDFMG.Type, 1);
-            recipe.AddIngredient(ShadowspecBar.Type, 5);
-            recipe.AddTile(DraedonsForge.Type);
-        }
-        else
-        {
-            recipe.AddIngredient(ItemID.FlintlockPistol, 1);
-            recipe.AddIngredient(ItemID.PhoenixBlaster, 1);
-            recipe.AddIngredient(ItemID.ClockworkAssaultRifle, 1);
-            recipe.AddIngredient(ItemID.Shotgun, 1);
-            recipe.AddIngredient(ItemID.Megashark, 1);
-            recipe.AddIngredient(ItemID.TacticalShotgun, 1);
-            recipe.AddIngredient(ItemID.SniperRifle, 1);
-            recipe.AddIngredient(ItemID.ChainGun, 1);
-            recipe.AddIngredient(ItemID.VortexBeater, 1);
-            recipe.AddIngredient(ItemID.SDMG, 1);
-            recipe.AddTile(TileID.LunarMonolith);
-        }
+        recipe.AddIngredient(ModContent.ItemType<Kingsbane>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<SDFMG>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<ShadowspecBar>(), 5);
+        recipe.AddTile(ModContent.TileType<DraedonsForge>());
         recipe.Register();
     }
 }

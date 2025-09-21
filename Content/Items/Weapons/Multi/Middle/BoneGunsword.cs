@@ -3,6 +3,7 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Early;
 using TheExtraordinaryAdditions.Content.Projectiles.Multi.Middle;
 using TheExtraordinaryAdditions.Core.Globals;
@@ -43,7 +44,7 @@ public class BoneGunsword : ModItem
         Item.shootSpeed = 12f;
     }
 
-    public override bool AltFunctionUse(Player player) => player.GetModPlayer<GunSwordPlayer>().Cooldown == 0;
+    public override bool AltFunctionUse(Player player) => !CalUtils.HasCooldown(player, SkullKaboomCooldown.ID);
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
         if (player.altFunctionUse == 2)

@@ -34,7 +34,6 @@ public class HemoglobbedCapsuleThrown : ModProjectile
 
     public ref float CrimsonFormInterpolant => ref Projectile.ai[2];
 
-
     public override void SetStaticDefaults()
     {
         Main.projFrames[Type] = 13;
@@ -58,7 +57,7 @@ public class HemoglobbedCapsuleThrown : ModProjectile
 
     public override void AI()
     {
-        after ??= new(4, () => Projectile.Center);
+        after ??= new(7, () => Projectile.Center);
 
         switch (CurrentState)
         {
@@ -72,33 +71,60 @@ public class HemoglobbedCapsuleThrown : ModProjectile
 
         Projectile.SetAnimation(13, 6);
         after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 120, 4, 1f,
-            AssetRegistry.GetTexture(AdditionsTexture.HemoglobbedCapsule).Frame(1, Main.projFrames[Type], 0, Projectile.frame), false, .45f));
+            AssetRegistry.GetTexture(AdditionsTexture.HemoglobbedCapsule).Frame(1, Main.projFrames[Type], 0, Projectile.frame), false, .15f));
         Time++;
     }
 
     public void DoBehavior_Aim()
     {
+        Item heldItem = Owner.HeldItem;
+        if (this.RunLocal() && (Owner.dead || !Owner.active || Owner.noItems || Owner.CCed || heldItem is null))
+        {
+            Projectile.Kill();
+            return;
+        }
+
         const int shootDelay = 90;
         float animationCompletion = InverseLerp(0f, shootDelay, Time);
-        float interpolant = MathF.Sin(MathHelper.Pi * animationCompletion * 2.5f);
-        CrimsonFormInterpolant = Animators.MakePoly(5f).InFunction(interpolant);
 
-        if (animationCompletion < 0.99f && CrimsonFormInterpolant >= 0.97f)
+        if (this.RunLocal())
         {
-            for (int t = 0; t < 20; t++)
+            float aimInterpolant = Utils.GetLerpValue(5f, 25f, Owner.Distance(Modded.mouseWorld), true);
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Owner.SafeDirectionTo(Modded.mouseWorld), aimInterpolant);
+            if (Projectile.velocity != Projectile.oldVelocity)
+                this.Sync();
+        }
+
+        Projectile.rotation = Projectile.velocity.ToRotation() - MathHelper.PiOver2;
+        Owner.ChangeDir((Projectile.velocity.X > 0f).ToDirectionInt());
+        float frontArmRotation = Projectile.rotation + MathHelper.PiOver2 - animationCompletion * Owner.direction * 0.64f;
+        if (Owner.direction == 1)
+            frontArmRotation += MathHelper.Pi;
+
+        Owner.SetFrontHandBetter(0, frontArmRotation + MathHelper.PiOver2);
+        Projectile.Center = Owner.Center + (frontArmRotation + MathHelper.PiOver2).ToRotationVector2() * 37f;
+        Owner.heldProj = Projectile.whoAmI;
+        Owner.SetDummyItemTime(2);
+
+        float interpolant = MathF.Sin(MathHelper.Pi * animationCompletion * 2.5f);
+        CrimsonFormInterpolant = Animators.MakePoly(6f).InFunction(interpolant);
+
+        if (animationCompletion < 0.99f && CrimsonFormInterpolant >= 0.99f)
+        {
+            for (int t = 0; t < 80; t++)
             {
                 Vector2 pos = Projectile.Center + Main.rand.NextVector2CircularEdge(40f, 40f);
                 Vector2 vel = pos.SafeDirectionTo(Projectile.Center);
                 Dust.NewDustPerfect(pos, DustID.CrimsonTorch, vel * Main.rand.NextFloat(5f, 7f), 0, default, Main.rand.NextFloat(2f, 3f)).noGravity = true;
             }
 
-            SoundEngine.PlaySound(SoundID.DD2_BetsyFireballShot with { Pitch = -.4f, Volume = .9f }, Projectile.Center);
+            SoundID.DD2_BetsyFireballShot.Play(Projectile.Center, .87f, -.38f);
         }
 
         // Create magic stuff when ready to fire
         if (Time == shootDelay)
         {
-            SoundEngine.PlaySound(SoundID.Item4 with { Pitch = -.3f, Volume = 1.1f }, Owner.Center);
+            SoundID.Item4.Play(Owner.Center, 1f, -.3f);
 
             int dustCount = 20;
             float angularOffset = Projectile.velocity.ToRotation();
@@ -129,46 +155,23 @@ public class HemoglobbedCapsuleThrown : ModProjectile
             }
         }
 
-        // Aim the orb.
-        if (this.RunLocal())
-        {
-            float aimInterpolant = Utils.GetLerpValue(5f, 25f, Owner.Distance(Modded.mouseWorld), true);
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Owner.SafeDirectionTo(Modded.mouseWorld), aimInterpolant);
-            if (Projectile.velocity != Projectile.oldVelocity)
-                this.Sync();
-        }
-
-        // Stick to the player.
-        Projectile.rotation = Projectile.velocity.ToRotation() - MathHelper.PiOver2;
-        Owner.ChangeDir((Projectile.velocity.X > 0f).ToDirectionInt());
-        float frontArmRotation = Projectile.rotation + MathHelper.PiOver2 - animationCompletion * Owner.direction * 0.64f;
-        if (Owner.direction == 1)
-            frontArmRotation += MathHelper.Pi;
-
-        Owner.SetFrontHandBetter(0, frontArmRotation + MathHelper.PiOver2);
-        Projectile.Center = Owner.Center + (frontArmRotation + MathHelper.PiOver2).ToRotationVector2() * 37f;
-        Owner.heldProj = Projectile.whoAmI;
-        Owner.SetDummyItemTime(2);
-
-        // Destroy the orb if the owner can no longer hold it.
-        Item heldItem = Owner.HeldItem;
-        if (this.RunLocal() && (Owner.dead || !Owner.active || Owner.noItems || Owner.CCed || heldItem is null))
-        {
-            Projectile.Kill();
-            return;
-        }
-
         if (!Owner.channel)
         {
             Owner.SetCompositeArmFront(false, Player.CompositeArmStretchAmount.Full, 0f);
             if (Time >= shootDelay)
             {
+                Projectile.velocity *= heldItem.shootSpeed;
+                for (int i = 0; i < 30; i++)
+                {
+                    Vector2 pos = Projectile.Center + Main.rand.NextVector2CircularEdge(40f, 40f);
+                    Vector2 vel = Projectile.velocity * Main.rand.NextFloat(.1f, .5f);
+                    Dust.NewDustPerfect(pos, DustID.Blood, vel * Main.rand.NextFloat(1f, 1.2f), 0, default, Main.rand.NextFloat(2f, 3f)).noGravity = true;
+                }
                 SoundEngine.PlaySound(SoundID.DD2_BetsyFireballImpact with { Pitch = -.3f, Volume = 1.1f }, Projectile.Center);
                 CurrentState = BehaviorState.Fire;
                 Time = 0f;
                 Projectile.netUpdate = true;
 
-                Projectile.velocity *= heldItem.shootSpeed;
                 return;
             }
 

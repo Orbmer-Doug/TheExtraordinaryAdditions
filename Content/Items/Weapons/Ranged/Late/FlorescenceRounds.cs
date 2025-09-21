@@ -1,4 +1,5 @@
-﻿using Terraria;
+﻿using CalamityMod.Items.Materials;
+using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
@@ -33,21 +34,11 @@ public class FlorescenceRounds : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe(120);
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("UelibloomBar", out ModItem UelibloomBar) && calamityMod.TryFind("LivingShard", out ModItem LivingShard))
-        {
-            recipe.AddIngredient(UelibloomBar.Type, 1);
-            recipe.AddIngredient(LivingShard.Type, 1);
-            recipe.AddIngredient(ItemID.GrassSeeds, 5);
-            recipe.AddIngredient(ItemID.ChlorophyteBullet, 60);
-            recipe.AddCondition(Condition.NearWater);
-        }
-        else
-        {
-            recipe.AddIngredient(ItemID.FragmentVortex, 1);
-            recipe.AddIngredient(ItemID.GrassSeeds, 1);
-            recipe.AddIngredient(ItemID.ChlorophyteBullet, 60);
-            recipe.AddCondition(Condition.NearWater);
-        }
+        recipe.AddIngredient(ModContent.ItemType<UelibloomBar>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<LivingShard>(), 1);
+        recipe.AddIngredient(ItemID.GrassSeeds, 5);
+        recipe.AddIngredient(ItemID.ChlorophyteBullet, 60);
+        recipe.AddCondition(Condition.NearWater);
         recipe.Register();
     }
 }

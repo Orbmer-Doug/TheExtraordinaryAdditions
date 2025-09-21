@@ -66,7 +66,8 @@ public class GaussBallisticWarheadRocket : ModProjectile
         Fuel -= Projectile.velocity.Length() / 2;
         if (OwnerProj != null && OwnerProj.active && Fuel > 0f)
         {
-            Target = OwnerProj.As<GaussBallisticWarheadHoldout>().Target;
+            if (OwnerProj.As<GaussBallisticWarheadHoldout>().Target != null)
+                Target = OwnerProj.As<GaussBallisticWarheadHoldout>().Target;
             if (Target.CanHomeInto() && Time > 20f
                 && Target.GetGlobalNPC<GaussGlobalNPC>().LockIn >= GaussBallisticWarheadHoldout.LockInTime)
             {
@@ -142,7 +143,7 @@ public class GaussBallisticWarheadRocket : ModProjectile
         else
             AdditionsSound.BlackHoleExplosion.Play(Projectile.Center, 1.4f, -.3f);
 
-            Vector2 pos = Projectile.Center;
+        Vector2 pos = Projectile.Center;
         if (Maxxed)
         {
             ScreenShakeSystem.New(new(18f, 1.5f, 2400), pos);
@@ -170,8 +171,8 @@ public class GaussBallisticWarheadRocket : ModProjectile
                     ParticleRegistry.SpawnBloomLineParticle(pos, vel.RotatedByRandom(.8f) * 2.5f, life / 2, scale * Main.rand.NextFloat(.6f, 1f), color * 1.2f);
             }
 
-                Projectile.NewProj(pos, Vector2.Zero, ModContent.ProjectileType<GaussShockwave>(),
-                    Projectile.damage * 2, Projectile.knockBack * 2, Projectile.owner);
+            Projectile.NewProj(pos, Vector2.Zero, ModContent.ProjectileType<GaussShockwave>(),
+                Projectile.damage * 2, Projectile.knockBack * 2, Projectile.owner);
         }
         else
         {
@@ -183,8 +184,8 @@ public class GaussBallisticWarheadRocket : ModProjectile
                 Projectile.NewProj(pos, vel, ModContent.ProjectileType<VolatilePlasmaGlobule>(), Projectile.damage / 5, 2f, Owner.whoAmI);
             }
 
-                Projectile.NewProj(pos, Vector2.Zero, ModContent.ProjectileType<GaussBoom>(),
-                    Projectile.damage, 0f, Projectile.owner);
+            Projectile.NewProj(pos, Vector2.Zero, ModContent.ProjectileType<GaussBoom>(),
+                Projectile.damage, 0f, Projectile.owner);
         }
 
         if (Main.netMode != NetmodeID.Server)

@@ -10,6 +10,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
+// enchanced darts near impact, making it so that you have to get near unless you get sniped
 public partial class Asterlin : ModNPC
 {
     [AutomatedMethodInvoke]
@@ -99,7 +100,8 @@ public partial class Asterlin : ModNPC
             if (wrappedTimer == 1)
             {
                 Judgement_StopGravity = false;
-                NPC.NewNPCProj(RightHandPosition, Vector2.Zero, ModContent.ProjectileType<JudgementHammer>(), Asterlin.HeavyAttackDamage, 0f);
+                if (this.RunServer())
+                    NPC.NewNPCProj(RightHandPosition, Vector2.Zero, ModContent.ProjectileType<JudgementHammer>(), Asterlin.HeavyAttackDamage, 0f);
                 Judgement_Cycle++;
                 NPC.netUpdate = true;
             }

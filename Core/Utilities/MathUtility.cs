@@ -1,17 +1,14 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using CalamityMod.World;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Terraria;
 using Terraria.GameContent.RGB;
-using Terraria.Graphics.Renderers;
-using Terraria.ID;
 using Terraria.Utilities;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Utilities;
-using TheExtraordinaryAdditions.Extraordinary.CrossCompatibility;
 using static Terraria.Player;
 
 namespace TheExtraordinaryAdditions.Core.Utilities;
@@ -186,7 +183,7 @@ public static partial class Utility
 
     public static Vector2 ClampInCircle(this Vector2 point, Vector2 center, float radius)
     {
-        if (radius < 0) 
+        if (radius < 0)
             return point;
 
         Vector2 direction = point - center;
@@ -636,15 +633,6 @@ public static partial class Utility
     public static int AngleToXDirection(float angle) => MathF.Cos(angle).NonZeroSign();
     public static int AngleToYDirection(float angle) => MathF.Sin(angle).NonZeroSign();
 
-    public static Vector2 ClampMagnitude(this Vector2 v, float min, float max)
-    {
-        Vector2 result = Utils.SafeNormalize(v, Vector2.UnitY) * MathHelper.Clamp(v.Length(), min, max);
-        if (Utils.HasNaNs(result))
-            return Vector2.UnitY * (0f - min);
-
-        return result;
-    }
-
     public static Vector2 ClampLength(this Vector2 v, float min, float max) =>
          v.SafeNormalize(Vector2.UnitY) * MathHelper.Clamp(v.Length(), min, max);
 
@@ -696,23 +684,27 @@ public static partial class Utility
     public static void SetBackHandBetter(this Player player, Player.CompositeArmStretchAmount stretch, float rotation) =>
         player.SetCompositeArmBack(true, stretch, (rotation - MathHelper.PiOver2) * player.gravDir + (player.gravDir == -1 ? MathHelper.Pi : 0f));
 
-    public static Vector2 GetFrontHandPositionImproved(this Player player)
+    public static Vector2 GetFrontHandPositionImproved(this Player player, bool addGfXOffY = true)
     {
         CompositeArmData arm = player.compositeFrontArm;
         Vector2 position = Utils.Floor(player.GetFrontHandPosition(arm.stretch, (arm.rotation + player.fullRotation) * player.gravDir));
         if (player.gravDir == -1f)
             position.Y = player.position.Y + player.height + (player.position.Y - position.Y);
 
+        if (addGfXOffY)
+            position += Vector2.UnitY * player.gfxOffY;
         return position;
     }
 
-    public static Vector2 GetBackHandPositionImproved(this Player player)
+    public static Vector2 GetBackHandPositionImproved(this Player player, bool addGfXOffY = true)
     {
         CompositeArmData arm = player.compositeBackArm;
         Vector2 position = Utils.Floor(player.GetBackHandPosition(arm.stretch, (arm.rotation + player.fullRotation) * player.gravDir));
         if (player.gravDir == -1f)
             position.Y = player.position.Y + player.height + (player.position.Y - position.Y);
 
+        if (addGfXOffY)
+            position += Vector2.UnitY * player.gfxOffY;
         return position;
     }
 
@@ -1367,7 +1359,7 @@ public static partial class Utility
     public static float FacingDown(this Projectile p) => p.rotation = p.velocity.ToRotation() - MathHelper.PiOver2;
     public static float FacingRight(this Projectile p) => p.rotation = p.velocity.ToRotation();
     public static float FacingLeft(this Projectile p) => p.rotation = p.velocity.ToRotation() + (3f * MathHelper.Pi / 2f);
-    
+
     public static float FacingDirectionLiteral(this Projectile p, bool flip = false)
     {
         float dir1 = -p.velocity.ToRotation();
@@ -1417,66 +1409,46 @@ public static partial class Utility
         return CompositeArmStretchAmount.None;
     }
 
-    // TODO: apply actual difficulty shenanigans from the better proj method, but first inspect if these methods are only used with SpawnProjectile so as to not divide twice
-    /// <summary>
-    /// Use to easily set a value across multiple difficulties
-    /// </summary>
-    /// <param name="applyDifficultyReduction">Automatically divides the value by 4 thanks to vanilla upscaling</param>
-    /// <param name="normal">Applies to base game</param>
-    /// <param name="expert">Applies to expert mode worlds</param>
-    /// <param name="master">Applies to master mode worlds and Revengeance mode</param>
-    /// <param name="ftw">Applies to FTW and Death mode</param>
-    /// <param name="legendary">Applies to FTW worlds in master</param>
-    /// <param name="gfb">Applies to the funny world</param>
-    /// <returns></returns>
-    public static float DifficultyBasedValue(float? normal = null, float? expert = null, float? master = null, float? ftw = null, float? legendary = null, float? gfb = null, bool applyDifficultyReduction = false)
+    public static int FixDamageFromDifficulty(int damage)
     {
-        if (Main.zenithWorld && gfb.HasValue)
-        {
-            return applyDifficultyReduction ? (gfb.Value / 4f) : gfb.Value;
-        }
-        if (Main.getGoodWorld && Main.masterMode && legendary.HasValue)
-        {
-            return applyDifficultyReduction ? (legendary.Value / 4f) : legendary.Value;
-        }
-        if ((Main.getGoodWorld || CommonCalamityVariables.DeathModeActive) && ftw.HasValue)
-        {
-            return applyDifficultyReduction ? (ftw.Value / 4f) : ftw.Value;
-        }
-        if ((Main.masterMode || CommonCalamityVariables.RevengeanceModeActive) && master.HasValue)
-        {
-            return applyDifficultyReduction ? (master.Value / 4f) : master.Value;
-        }
-        if (Main.expertMode && expert.HasValue)
-        {
-            return applyDifficultyReduction ? (expert.Value / 4f) : expert.Value;
-        }
-        return applyDifficultyReduction ? (normal.Value / 4) : normal.Value;
+        float damageJankCorrectionFactor = 1f / 2f;
+        if (Main.expertMode)
+            damageJankCorrectionFactor = 1f / 4f;
+        if (Main.masterMode)
+            damageJankCorrectionFactor = 1f / 6f;
+        return (int)(damage * damageJankCorrectionFactor);
     }
 
-    public static int DifficultyBasedValue(int? normal = null, int? expert = null, int? master = null, int? ftw = null, int? legendary = null, int? gfb = null, bool applyDifficultyReduction = false)
+    public static int DifficultyBasedValue(int normal, int? expert = null, int? master = null, int? ftw = null, int? legendary = null, int? gfb = null)
     {
-        if (Main.zenithWorld && gfb.HasValue)
-        {
-            return applyDifficultyReduction ? (gfb.Value / 4) : gfb.Value;
-        }
-        if (Main.getGoodWorld && Main.masterMode && legendary.HasValue)
-        {
-            return applyDifficultyReduction ? (legendary.Value / 4) : legendary.Value;
-        }
-        if ((Main.getGoodWorld || CommonCalamityVariables.DeathModeActive) && ftw.HasValue)
-        {
-            return applyDifficultyReduction ? (ftw.Value / 4) : ftw.Value;
-        }
-        if ((Main.masterMode || CommonCalamityVariables.RevengeanceModeActive) && master.HasValue)
-        {
-            return applyDifficultyReduction ? (master.Value / 4) : master.Value;
-        }
-        if (Main.expertMode && expert.HasValue)
-        {
-            return applyDifficultyReduction ? (expert.Value / 4) : expert.Value;
-        }
-        return applyDifficultyReduction ? (normal.Value / 4) : normal.Value;
+        int val = normal;
+        if (expert.HasValue && Main.expertMode)
+            val = expert.Value;
+        if (master.HasValue && Main.masterMode || CalamityWorld.revenge)
+            val = master.Value;
+        if (ftw.HasValue && Main.getGoodWorld || CalamityWorld.death)
+            val = ftw.Value;
+        if (legendary.HasValue && Main.getGoodWorld && Main.masterMode)
+            val = legendary.Value;
+        if (gfb.HasValue && Main.zenithWorld)
+            val = gfb.Value;
+        return val;
+    }
+
+    public static float DifficultyBasedValue(float normal, float? expert = null, float? master = null, float? ftw = null, float? legendary = null, float? gfb = null)
+    {
+        float val = normal;
+        if (expert.HasValue && Main.expertMode)
+            val = expert.Value;
+        if (master.HasValue && Main.masterMode || CalamityWorld.revenge)
+            val = master.Value;
+        if (ftw.HasValue && Main.getGoodWorld || CalamityWorld.death)
+            val = ftw.Value;
+        if (legendary.HasValue && Main.getGoodWorld && Main.masterMode)
+            val = legendary.Value;
+        if (gfb.HasValue && Main.zenithWorld)
+            val = gfb.Value;
+        return val;
     }
 
     /// <summary>
@@ -1492,9 +1464,9 @@ public static partial class Utility
         npc.lifeMax = normalModeHP;
         if (Main.expertMode)
             npc.lifeMax = expertModeHP;
-        if (CommonCalamityVariables.RevengeanceModeActive || Main.masterMode)
+        if (CalamityWorld.revenge || Main.masterMode)
             npc.lifeMax = revengeanceModeHP;
-        if (deathModeHP.HasValue && CommonCalamityVariables.DeathModeActive)
+        if (deathModeHP.HasValue && CalamityWorld.death)
             npc.lifeMax = deathModeHP.Value;
         if (gfbModeHP.HasValue && Main.zenithWorld)
             npc.lifeMax = gfbModeHP.Value;

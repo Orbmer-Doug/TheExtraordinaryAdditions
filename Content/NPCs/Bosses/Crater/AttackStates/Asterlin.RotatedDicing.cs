@@ -48,7 +48,8 @@ public partial class Asterlin : ModNPC
     {
         if (AITimer == 1)
         {
-            NPC.NewNPCProj(RightHandPosition, Vector2.Zero, ModContent.ProjectileType<RadiantPulser>(), Asterlin.HeavyAttackDamage, 0f);
+            if (this.RunServer())
+                NPC.NewNPCProj(RightHandPosition, Vector2.Zero, ModContent.ProjectileType<RadiantPulser>(), Asterlin.HeavyAttackDamage, 0f);
         }
 
         if (RotatedDicing_Cycle >= RotatedDicing_Cycles && !Utility.AnyProjectile(ModContent.ProjectileType<RadiantPulser>()))

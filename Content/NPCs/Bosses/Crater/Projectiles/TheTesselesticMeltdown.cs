@@ -50,7 +50,7 @@ public class TheTesselesticMeltdown : ProjOwnedByNPC<Asterlin>
         get => (BeamState)Projectile.Additions().ExtraAI[0];
         set => Projectile.Additions().ExtraAI[0] = (float)value;
     }
-    public LoopedSound slot;
+    public LoopedSoundInstance slot;
 
     public override void SafeAI()
     {
@@ -78,9 +78,8 @@ public class TheTesselesticMeltdown : ProjOwnedByNPC<Asterlin>
                 break;
         }
 
-        SoundStyle style = AssetRegistry.GetSound(AdditionsSound.ElectricityContinuous);
-        slot ??= new LoopedSound(style, () => CurrentState == State.Barrage && new ProjectileAudioTracker(Projectile).IsActiveAndInGame());
-        slot.Update(() => Projectile.Center, () => .67f, () => 0f);
+        slot ??= LoopedSoundManager.CreateNew(new(AdditionsSound.ElectricityContinuous, () => .67f), () => AdditionsLoopedSound.ProjectileNotActive(Projectile), () => CurrentState == State.Barrage);
+        slot?.Update(Projectile.Center);
 
         Projectile.timeLeft = 2;
         OverallTime++;

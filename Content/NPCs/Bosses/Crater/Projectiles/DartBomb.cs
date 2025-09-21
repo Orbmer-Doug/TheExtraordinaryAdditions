@@ -65,11 +65,14 @@ public class DartBomb : ProjOwnedByNPC<Asterlin>
             AdditionsSound.banditShot2A.Play(Projectile.Center, .9f, 0f, .1f, 40, Name);
             ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 30, 0f, Vector2.One, 0f, 212f, Color.Cyan);
             ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 35, 0f, Vector2.One, 0f, 262f, Color.Cyan * .3f);
-            for (int i = 0; i < DartList.Count; i++)
+            if (this.RunServer())
             {
-                VisualDart dart = DartList[i];
-                Main.projectile[SpawnProjectile(dart.Center, dart.Rotation.ToRotationVector2() * 2.5f,
-                    ModContent.ProjectileType<GodPiercingDart>(), Asterlin.LightAttackDamage, 0f)].As<GodPiercingDart>().ExtendedTelegraph = true;
+                for (int i = 0; i < DartList.Count; i++)
+                {
+                    VisualDart dart = DartList[i];
+                    Main.projectile[SpawnProjectile(dart.Center, dart.Rotation.ToRotationVector2() * 2.5f,
+                        ModContent.ProjectileType<GodPiercingDart>(), Asterlin.LightAttackDamage, 0f)].As<GodPiercingDart>().ExtendedTelegraph = true;
+                }
             }
 
             Projectile.Kill();

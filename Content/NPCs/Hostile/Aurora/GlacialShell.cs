@@ -3,14 +3,14 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Common.Particles;
-using TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora.TEST;
+using TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.AuroraTurret;
 
-public class GlacialShell : ProjOwnedByNPC<Aurora.TEST.AuroraGuard>
+public class GlacialShell : ProjOwnedByNPC<AuroraGuard>
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GlacialShell);
     public override void SetDefaults()

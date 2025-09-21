@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Items.Materials;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
@@ -146,18 +146,9 @@ public class TungstenTie : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("AuricBar", out ModItem AuricBar))
-        {
-            recipe.AddIngredient(AuricBar.Type, 10);
-            recipe.AddIngredient(ModContent.ItemType<AshersWhiteTie>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<TungstenCube>(), 1);
-        }
-        else
-        {
-            recipe.AddIngredient(ItemID.LunarBar, 10);
-            recipe.AddIngredient(ModContent.ItemType<AshersWhiteTie>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<TungstenCube>(), 1);
-        }
+        recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 10);
+        recipe.AddIngredient(ModContent.ItemType<AshersWhiteTie>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<TungstenCube>(), 1);
         recipe.AddTile(TileID.ClayBlock);
         recipe.AddTile(TileID.Loom);
         recipe.AddTile(TileID.LunarMonolith);

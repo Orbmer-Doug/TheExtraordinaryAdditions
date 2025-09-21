@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
+using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -26,8 +27,8 @@ public class VRP : ModProjectile
     {
         Projectile.timeLeft = 1200;
         Projectile.DamageType = DamageClass.Generic;
-        Projectile.friendly = Projectile.ignoreWater = Projectile.noEnchantmentVisuals = Projectile.usesLocalNPCImmunity = true;
-        Projectile.hostile = Projectile.tileCollide = false;
+        Projectile.friendly = Projectile.ignoreWater = Projectile.noEnchantmentVisuals = Projectile.usesLocalNPCImmunity = Projectile.tileCollide = true;
+        Projectile.hostile = false;
         Projectile.aiStyle = 0;
         Projectile.CritChance = 0;
         Projectile.MaxUpdates = 4;
@@ -63,6 +64,13 @@ public class VRP : ModProjectile
     public GlobalPlayer Modded => Owner.Additions();
     public override void AI()
     {
+        if (State == Element.Neutral)
+        {
+            Texture2D bigNeutral = AssetRegistry.GetTexture(AdditionsTexture.VRPNeutral);
+            after ??= new(5, () => Projectile.Center);
+            after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 0, 0, 0, bigNeutral.Frame(1, 4, 0, Projectile.frame), false, 0f));
+        }
+
         Projectile.FacingUp();
 
         if (Charged && Projectile.FinalExtraUpdate())
@@ -75,48 +83,31 @@ public class VRP : ModProjectile
             }
         }
 
-        // Check for tile collision
-        Vector2 nextPosition = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero) * 20f;
-        if (CheckTileCollision(Projectile.Center, nextPosition, out Vector2 collisionPoint, out Vector2 normal))
-        {
-            HandleBounce(collisionPoint, normal);
-        }
-
         Time++;
     }
 
-    private bool CheckTileCollision(Vector2 start, Vector2 end, out Vector2 collisionPoint, out Vector2 normal)
+    public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
     {
-        collisionPoint = Vector2.Zero;
-        normal = Vector2.Zero;
-
-        Vector2? potentialCollision = RaytraceTiles(start, end);
-        if (potentialCollision.HasValue)
-        {
-            collisionPoint = potentialCollision.Value;
-            normal = BouncePrediction.GetFallbackNormal(collisionPoint, Projectile.velocity.SafeNormalize(Vector2.Zero)); // Normal based on incoming direction
-            return true;
-        }
-        return false;
+        fallThrough = true;
+        return true;
     }
 
-    private void HandleBounce(Vector2 collisionPoint, Vector2 normal)
+    public override bool OnTileCollide(Vector2 oldVelocity)
     {
-        // Limit bounces
         if (Bounces >= MaxBounces || !Charged)
         {
-            ParticleRegistry.SpawnCrossCodeBoll(Projectile.Center, ClampToCardinalDirection(Projectile.velocity).ToRotation() + MathHelper.PiOver2, ParticleRegistry.CrosscodeBollType.DieWallBig, State);
+            ParticleRegistry.SpawnCrossCodeBoll(Projectile.Center, ClampToCardinalDirection(oldVelocity).ToRotation() + MathHelper.PiOver2, ParticleRegistry.CrosscodeBollType.DieWallBig, State);
             TileDeath = true;
             Projectile.Kill();
-            return;
+            return false;
         }
-        ParticleRegistry.SpawnCrossCodeBoll(Projectile.Center, ClampToCardinalDirection(Projectile.velocity).ToRotation() + MathHelper.PiOver2, ParticleRegistry.CrosscodeBollType.DieWallSmall, State);
 
-        // Reflect velocity
-        Projectile.velocity = Vector2.Reflect(Projectile.velocity, normal).SafeNormalize(Vector2.Zero) * Projectile.velocity.Length();
-
-        Projectile.Center = collisionPoint; // Snap to collision point
         Bounces++;
+        ParticleRegistry.SpawnCrossCodeBoll(Projectile.Center, ClampToCardinalDirection(oldVelocity).ToRotation() + MathHelper.PiOver2, ParticleRegistry.CrosscodeBollType.DieWallSmall, State);
+        if (Math.Abs(Projectile.velocity.X - oldVelocity.X) > float.Epsilon)
+            Projectile.velocity.X = -oldVelocity.X;
+        if (Math.Abs(Projectile.velocity.Y - oldVelocity.Y) > float.Epsilon)
+            Projectile.velocity.Y = -oldVelocity.Y;
 
         Projectile.damage += (int)(Projectile.damage * .25);
         Projectile.CritChance = (int)(InverseLerp(0f, Bounces, MaxBounces) * 100);
@@ -124,9 +115,6 @@ public class VRP : ModProjectile
         switch (State)
         {
             case Element.Neutral:
-                after ??= new(5, () => Projectile.Center);
-                after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 255));
-
                 AdditionsSound.NeutralBounce.Play(Projectile.Center, 1f, 0f, .1f, 20, Name);
                 break;
             case Element.Cold:
@@ -142,15 +130,9 @@ public class VRP : ModProjectile
                 AdditionsSound.WaveBounce.Play(Projectile.Center, 1f, 0f, .1f, 20, Name);
                 break;
         }
-    }
 
-    public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
-    {
-        fallThrough = true;
         return false;
     }
-
-    public override bool OnTileCollide(Vector2 oldVelocity) => false;
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {

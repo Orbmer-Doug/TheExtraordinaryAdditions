@@ -1,10 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Items.Materials;
+using CalamityMod.Tiles.Furniture.CraftingStations;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
-using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.CrossCode;
@@ -111,24 +110,13 @@ public class CrossDisc : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("AuricBar", out ModItem AuricBar) && calamityMod.TryFind("CosmicAnvil", out ModTile CosmicAnvil) && calamityMod.TryFind("AscendantSpiritEssence", out ModItem AscendantSpiritEssence) && calamityMod.TryFind("MysteriousCircuitry", out ModItem MysteriousCircuitry))
-        {
-            recipe.AddIngredient(ItemID.LightDisc, 1);
-            recipe.AddIngredient(ItemID.RedDye, 1);
-            recipe.AddIngredient(ItemID.Silk, 3);
-            recipe.AddIngredient(MysteriousCircuitry.Type, 15);
-            recipe.AddIngredient(AscendantSpiritEssence.Type, 4);
-            recipe.AddIngredient(AuricBar.Type, 5);
-            recipe.AddTile(CosmicAnvil.Type);
-        }
-        else
-        {
-            recipe.AddIngredient(ItemID.LightDisc, 1);
-            recipe.AddIngredient(ItemID.RedDye, 2);
-            recipe.AddIngredient(ItemID.Silk, 10);
-            recipe.AddIngredient(ItemID.LunarOre, 120);
-            recipe.AddTile(TileID.LunarCraftingStation);
-        }
+        recipe.AddIngredient(ItemID.LightDisc, 1);
+        recipe.AddIngredient(ItemID.RedDye, 1);
+        recipe.AddIngredient(ItemID.Silk, 3);
+        recipe.AddIngredient(ModContent.ItemType<MysteriousCircuitry>(), 15);
+        recipe.AddIngredient(ModContent.ItemType<AscendantSpiritEssence>(), 4);
+        recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 5);
+        recipe.AddTile(ModContent.TileType<CosmicAnvil>());
         recipe.Register();
     }
 }

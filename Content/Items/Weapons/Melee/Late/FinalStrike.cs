@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Items.Materials;
+using CalamityMod.Tiles.Furniture.CraftingStations;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
@@ -59,36 +60,19 @@ public class FinalStrike : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("AuricBar", out ModItem AuricBar) && calamityMod.TryFind("CosmicAnvil", out ModTile CosmicAnvil) && calamityMod.TryFind("AscendantSpiritEssence", out ModItem AscendantSpiritEssence) && calamityMod.TryFind("CosmiliteBar", out ModItem CosmiliteBar) && calamityMod.TryFind("DubiousPlating", out ModItem DubiousPlating))
-        {
-            recipe.AddIngredient(ItemID.Spear, 1);
-            recipe.AddIngredient(ItemID.DarkLance, 1);
-            recipe.AddIngredient(ModContent.ItemType<DecayingCutlery>(), 1);
-            recipe.AddIngredient(ItemID.Gungnir, 1);
-            recipe.AddIngredient(ItemID.NorthPole, 1);
-            recipe.AddIngredient(ItemID.PiercingStarlight, 1);
-            recipe.AddIngredient(ModContent.ItemType<Sangue>(), 1);
-            recipe.AddIngredient(ItemID.DayBreak, 1);
-            recipe.AddIngredient(ModContent.ItemType<AbyssalCurrents>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<CondereFulmina>(), 1);
-            recipe.AddIngredient(AscendantSpiritEssence.Type, 10);
-            recipe.AddIngredient(AuricBar.Type, 7);
-            recipe.AddTile(CosmicAnvil.Type);
-        }
-        else
-        {
-            recipe.AddIngredient(ItemID.Spear, 1);
-            recipe.AddIngredient(ItemID.DarkLance, 1);
-            recipe.AddIngredient(ItemID.Gungnir, 1);
-            recipe.AddIngredient(ItemID.NorthPole, 1);
-            recipe.AddIngredient(ItemID.PiercingStarlight, 1);
-            recipe.AddIngredient(ModContent.ItemType<Sangue>(), 1);
-            recipe.AddIngredient(ItemID.DayBreak, 1);
-            recipe.AddIngredient(ModContent.ItemType<AbyssalCurrents>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<CondereFulmina>(), 1);
-            recipe.AddTile(TileID.LunarCraftingStation);
-        }
+        recipe.AddIngredient(ItemID.Spear, 1);
+        recipe.AddIngredient(ItemID.DarkLance, 1);
+        recipe.AddIngredient(ModContent.ItemType<DecayingCutlery>(), 1);
+        recipe.AddIngredient(ItemID.Gungnir, 1);
+        recipe.AddIngredient(ItemID.NorthPole, 1);
+        recipe.AddIngredient(ItemID.PiercingStarlight, 1);
+        recipe.AddIngredient(ModContent.ItemType<Sangue>(), 1);
+        recipe.AddIngredient(ItemID.DayBreak, 1);
+        recipe.AddIngredient(ModContent.ItemType<AbyssalCurrents>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<CondereFulmina>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<AscendantSpiritEssence>(), 10);
+        recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 7);
+        recipe.AddTile(ModContent.TileType<CosmicAnvil>());
         recipe.Register();
     }
-
 }

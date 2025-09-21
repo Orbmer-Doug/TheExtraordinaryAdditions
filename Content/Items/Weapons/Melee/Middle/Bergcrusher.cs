@@ -20,8 +20,8 @@ public class Bergcrusher : ModItem
 
     public override void SetDefaults()
     {
-        Item.width = 50;
-        Item.height = 78;
+        Item.width = 118;
+        Item.height = 108;
         Item.value = AdditionsGlobalItem.RarityLightRedBuyPrice;
         Item.rare = ItemRarityID.LightRed;
         Item.useTime = 50;
@@ -29,23 +29,16 @@ public class Bergcrusher : ModItem
         Item.useStyle = ItemUseStyleID.Shoot;
         Item.knockBack = 12;
         Item.autoReuse = true;
-        Item.damage = 83;
+        Item.damage = 153;
         Item.DamageType = DamageClass.Melee;
         Item.noMelee = true;
         Item.noUseGraphic = true;
         Item.shoot = ModContent.ProjectileType<BergcrusherSwing>();
     }
     
-    public override bool AltFunctionUse(Player player)
-    {
-        return player.ownedProjectileCounts[ModContent.ProjectileType<Glacier>()] <= 0;
-    }
-
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
-        BergcrusherSwing swing = Main.projectile[player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI)].As<BergcrusherSwing>();
-        swing.Right = player.Additions().MouseRight.Current;
-
+        player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI);
         return false;
     }
 

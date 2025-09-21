@@ -14,6 +14,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Core.DataStructures;
 
+// resulted from a 5 minute coding adventure
 // Adapted from: https://pikuma.com/blog/verlet-integration-2d-cloth-physics-simulation
 // Rebuilds vertices in a way that allows for tearing, though im unsure how to make an interesting application for it
 // Especially given I cant seem to find a way to give it tile, slope, water, and entity collision effectively
@@ -211,10 +212,10 @@ public class ClothSimulation : IDisposable
             }
         }
 
-        // Update mouse input in world coordinates
+        // Update mouse input
         MouseState mouseState = Mouse.GetState();
         _previousMousePosition = _mousePosition;
-        _mousePosition = new Vector2(mouseState.X, mouseState.Y) + Main.screenPosition; // Convert to world coordinates
+        _mousePosition = new Vector2(mouseState.X, mouseState.Y) + Main.screenPosition;
         _leftButtonDown = mouseState.LeftButton == ButtonState.Pressed;
         _rightButtonDown = mouseState.RightButton == ButtonState.Pressed;
 
@@ -246,7 +247,7 @@ public class ClothSimulation : IDisposable
             float threshold = point.IsSelected ? _cursorSize * _cursorSize * _hysteresisFactor : _cursorSize * _cursorSize;
             point.IsSelected = distSquared < threshold;
 
-            // Update sticks' selection state if either point is selected
+            // Update sticks selection state if either point is selected
             foreach (int stickIndex in point.StickIndices)
             {
                 if (_sticks[stickIndex].IsActive)
@@ -584,13 +585,15 @@ public class ClothSimulationTiles : IDisposable
             if (point.IsPinned)
                 return;
 
-            Player p = Main.LocalPlayer;
-            if (p.Hitbox.Intersects((point.Position + entityPos).ToRectangle((int)Spacing, (int)Spacing)))
+            foreach (Player p in Main.ActivePlayers)
             {
-                Vector2 difference = p.position - p.oldPosition;
-                difference.X = MathHelper.Clamp(difference.X, -2f, 2f);
-                difference.Y = MathHelper.Clamp(difference.Y, -2f, 2f);
-                point.PreviousPosition = point.Position - difference;
+                if (p.Hitbox.Intersects((point.Position + entityPos).ToRectangle((int)Spacing, (int)Spacing)))
+                {
+                    Vector2 difference = p.position - p.oldPosition;
+                    difference.X = MathHelper.Clamp(difference.X, -2f, 2f);
+                    difference.Y = MathHelper.Clamp(difference.Y, -2f, 2f);
+                    point.PreviousPosition = point.Position - difference;
+                }
             }
 
             float interpol = 120f * MathHelper.Clamp(MathF.Abs(Main.windSpeedCurrent), 0f, 1f);

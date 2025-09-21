@@ -3,6 +3,7 @@ using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Early;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -26,7 +27,6 @@ public class BoneFlintlockHeld : BaseIdleHoldoutProjectile
     }
 
     public ref float Wait => ref Projectile.ai[0];
-    public ref int ThrowWait => ref Owner.GetModPlayer<BoneFlintlockPlayer>().ThrowWait;
     public int Dir => Projectile.velocity.X.NonZeroSign();
     public override void SafeAI()
     {
@@ -66,12 +66,12 @@ public class BoneFlintlockHeld : BaseIdleHoldoutProjectile
         }
 
         int bomb = ModContent.ProjectileType<CalciumBomb>();
-        if ((this.RunLocal() && Modded.SafeMouseRight.Current) && ThrowWait <= 0 && Owner.ownedProjectileCounts[bomb] <= 0 && Wait <= 0)
+        if ((this.RunLocal() && Modded.SafeMouseRight.Current) && !CalUtils.HasCooldown(Owner, SkullBombCooldown.ID) && Owner.ownedProjectileCounts[bomb] <= 0 && Wait <= 0)
         {
             Projectile.NewProj(Projectile.Center, Center.SafeDirectionTo(Modded.mouseWorld) * 10f, bomb, Projectile.damage * 2, Projectile.knockBack * 2f, Owner.whoAmI);
             SoundID.Item1.Play(Projectile.Center);
             Wait = time;
-            ThrowWait = SecondsToFrames(1.5f);
+            CalUtils.AddCooldown(Owner, SkullBombCooldown.ID, SecondsToFrames(1.5f));
         }
         if (Wait > 0f)
             Wait--;
@@ -85,28 +85,5 @@ public class BoneFlintlockHeld : BaseIdleHoldoutProjectile
         Vector2 origin = texture.Size() * .5f;
         Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), rotation, origin, Projectile.scale, FixedDirection(), 0f);
         return false;
-    }
-}
-
-public class BoneFlintlockPlayer : ModPlayer
-{
-    public int ThrowWait;
-    public override void UpdateDead()
-    {
-        ThrowWait = 0;
-    }
-    public override void PostUpdateMiscEffects()
-    {
-        if (ThrowWait == 1)
-        {
-            SoundID.MaxMana.Play(Player.Center, 1.5f, -.2f, .1f, null, 1, "BoneWait");
-            for (int i = 0; i < 20; i++)
-            {
-                ParticleRegistry.SpawnSparkParticle(Player.RotHitbox().RandomPoint(), -Vector2.UnitY * Main.rand.NextFloat(2f, 4f), Main.rand.Next(20, 30), Main.rand.NextFloat(.3f, .5f), Color.Gray);
-            }
-        }
-
-        if (ThrowWait > 0f && Player.ownedProjectileCounts[ModContent.ProjectileType<CalciumBomb>()] <= 0)
-            ThrowWait--;
     }
 }

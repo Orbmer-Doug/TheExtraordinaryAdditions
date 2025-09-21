@@ -79,13 +79,15 @@ public class LockedCyberneticPedestal : ModTile
         effect.TrySetParameter("edgeBlendLength", 0.09f);
         effect.TrySetParameter("edgeBlendStrength", 13f);
 
-        spriteBatch.EnterShaderRegion(BlendState.Additive, effect.Effect);
+        Main.spriteBatch.End();
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, effect.Effect, Matrix.Identity);
 
         Texture2D invis = AssetRegistry.InvisTex;
         Vector2 origin = new(invis.Width / 2f, invis.Height / 2f);
         Main.EntitySpriteDraw(invis, drawPosition + Vector2.UnitX * 32f, null, Color.White, -MathHelper.PiOver2, origin, 900f, 0, 0f);
 
-        spriteBatch.ExitShaderRegion();
+        Main.spriteBatch.End();
+        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Matrix.Identity);
 
         Texture2D swordtex = AssetRegistry.GetTexture(AdditionsTexture.LockedCyberneticSword);
         Main.EntitySpriteDraw(swordtex, drawPosition + Vector2.UnitX * 28f - Vector2.UnitY * (125f + (float)Math.Sin(Main.GameUpdateCount * 0.06f) * 30f), null, Color.White, -MathHelper.PiOver4, swordtex.Size() * .5f, 1f, 0, 0f);

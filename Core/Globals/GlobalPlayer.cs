@@ -27,8 +27,6 @@ namespace TheExtraordinaryAdditions.Core.Globals;
 
 public class GlobalPlayer : ModPlayer
 {
-    internal readonly ReferencedValueRegistry valueRegistry = new();
-
     public delegate void PlayerActionDelegate(GlobalPlayer p);
 
     public static event PlayerActionDelegate ResetEffectsEvent;
@@ -111,11 +109,6 @@ public class GlobalPlayer : ModPlayer
     public bool CanUseMouseButton => !Main.mapFullscreen
         && !Player.mouseInterface && !PlayerInput.WritingText && Main.hasFocus;
 
-    /// <summary>
-    /// Syncs the position and right click of the mouse of this player to the server
-    /// </summary>
-    public bool SyncMouse;
-
     #endregion Mouse
 
     #region Buffs
@@ -125,7 +118,8 @@ public class GlobalPlayer : ModPlayer
         Loki,
         SuperLoki,
         Avragen,
-        peter,
+        Flare,
+        tyson,
     }
     internal Dictionary<AdditionsMinion, bool> Minion = [];
 
@@ -136,7 +130,6 @@ public class GlobalPlayer : ModPlayer
     public bool aridFlask;
     public bool frigidTonic;
     public bool DentedBySpoon;
-    public bool ashy = false;
     public bool overheat = false;
     public bool BigOxygen = false;
     #endregion Buffs
@@ -172,17 +165,13 @@ public class GlobalPlayer : ModPlayer
     public int TieCooldown;
     public int GarciaOverload;
     public float TesselesticHeat;
-    public int TremorWait;
-    public int NothingThereWait;
     public int BrewingStormsCounter;
     public int EclipsedDuoCounter;
     public int RipperCounter;
     public int MeteorCounter;
     public int LightningRodCount;
     public int CryogenicCounter;
-    public int RedMistCounter;
     public int NothingThereCounter;
-    public int AbsoluteCounter;
     public int FinalStrikeCounter;
     #endregion Counters
 
@@ -206,25 +195,7 @@ public class GlobalPlayer : ModPlayer
     public bool crossWave = false;
     public bool overload;
 
-    public int DummyMaxLife;
-    public int DummyDefense;
-    public float DummyScale;
-    public float DummyRotation;
-    public bool DummyGravity;
-    public float DummyMoveSpeed;
-    public bool DummyBoss;
-
     #endregion Misc
-
-    public override void OnEnterWorld()
-    {
-        DummyScale = 1f;
-        DummyMoveSpeed = 0f;
-        DummyMaxLife = GodDummy.MaxLifeAmount;
-        DummyBoss = DummyGravity = false;
-        DummyRotation = 0f;
-        DummyDefense = 0;
-    }
 
     public override void UpdateDead()
     {
@@ -242,15 +213,11 @@ public class GlobalPlayer : ModPlayer
         EclipsedDuoCounter = 0;
         RipperCounter = 0;
         MeteorCounter = 0;
-        AbsoluteCounter = 0;
         LightningRodCount = 0;
         LooseSawbladeCounter = 0;
         CryogenicCounter = 0;
         GarciaOverload = 0;
-        RedMistCounter = 0;
         NothingThereCounter = 0;
-        NothingThereWait = 0;
-        TremorWait = 0;
         FinalStrikeCounter = 0;
         TesselesticHeat = 0f;
     }
@@ -280,7 +247,6 @@ public class GlobalPlayer : ModPlayer
         overload = false;
         flameInsignia = false;
         overheat = false;
-        ashy = false;
         AshersTie = false;
         TungstenTie = false;
         aridFlask = false;
@@ -641,18 +607,10 @@ public class GlobalPlayer : ModPlayer
 
         GlobalTimer++;
 
-        if (RedMist && RedMistCounter > 0)
-            RedMistCounter--;
-
-        if (AbsoluteCounter > 0)
-            AbsoluteCounter--;
-
         if (NothingThere)
         {
             if (NothingThereCounter > 0)
                 NothingThereCounter--;
-            if (NothingThereWait > 0)
-                NothingThereWait--;
         }
 
         if (AtMaxLimit)
@@ -680,24 +638,7 @@ public class GlobalPlayer : ModPlayer
             else
                 PlayedLimitSound = false;
         }
-
-        if (TremorArmor)
-        {
-            if (TremorWait > 0)
-            {
-                Vector2 top = Player.Center + Vector2.UnitY * -10f;
-                if (TremorWait % 2f == 1f)
-                {
-                    float size = 20f + Player.Size.Length();
-                    Vector2 stonePos = top + Main.rand.NextVector2CircularLimited(size, size, .5f, 1f);
-                    Vector2 stonevel = stonePos.SafeDirectionTo(top) * Main.rand.NextFloat(2f, 4f);
-                    Dust.NewDustPerfect(stonePos, DustID.Stone, stonevel, Main.rand.Next(60, 110), default, Main.rand.NextFloat(1f, 1.4f)).noGravity = true;
-                }
-                Lighting.AddLight(top, Color.Gray.ToVector3() * InverseLerp(0f, SecondsToFrames(5), TremorWait));
-                TremorWait--;
-            }
-        }
-
+        
         if (Cryogenic)
             CryogenicCounter++;
         else
@@ -824,22 +765,6 @@ public class GlobalPlayer : ModPlayer
                     Dust.NewDustPerfect(Player.Center + randPos, DustID.Blood, (Vector2?)(Player.DirectionFrom(Player.Center + Player.velocity + randPos) * Main.rand.NextFloat(7f, 9f)), 0, default, 2f).noGravity = true;
                 }
             }
-        }
-
-        if (ashy)
-        {
-            if (Main.rand.NextBool(4) && noShadow)
-            {
-                int dust12 = Dust.NewDust(drawInfo.Position - new Vector2(2f), Player.width + 4, Player.height + 4, DustID.Ash, Player.velocity.X * 0.4f, Player.velocity.Y * 0.4f, 100, default, 3f);
-                Main.dust[dust12].noGravity = true;
-                Dust obj14 = Main.dust[dust12];
-                obj14.velocity *= 1f;
-                Main.dust[dust12].velocity.Y -= 0.5f;
-                drawInfo.DustCache.Add(dust12);
-            }
-            g *= 0.3f;
-            r *= 0.52f;
-            b *= 0.2f;
         }
 
         if (overheat && !Player.dead)

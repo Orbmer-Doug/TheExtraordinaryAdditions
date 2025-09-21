@@ -112,7 +112,7 @@ public class KnifeStab : ModProjectile
                 {
                     if (!PlayedSound)
                     {
-                        AdditionsSound.SwordSliceShort.Play(Owner.Center, 1f, .3f, .2f);
+                        AdditionsSound.SwordSliceShort.Play(Owner.Center, .7f, .3f, .2f);
                         PlayedSound = true;
                     }
 
@@ -216,7 +216,14 @@ public class KnifeStab : ModProjectile
         if (Projectile.timeLeft <= 5 && Fading)
             fade = Projectile.timeLeft / 5f;
 
-        Main.spriteBatch.Draw(tex, pos + off, null, Lighting.GetColor(Projectile.Center.ToTileCoordinates()) * fade, rot, tex.Size() / 2, scale, 0, 0);
+        SpriteEffects fx = SpriteEffects.None;
+        if (int.IsNegative(Projectile.velocity.X.NonZeroSign()))
+        {
+            fx = SpriteEffects.FlipHorizontally;
+            rot += MathHelper.PiOver2;
+        }
+
+        Main.spriteBatch.Draw(tex, pos + off, null, Lighting.GetColor(Projectile.Center.ToTileCoordinates()) * fade, rot, tex.Size() / 2, scale, fx, 0);
         return false;
     }
 }

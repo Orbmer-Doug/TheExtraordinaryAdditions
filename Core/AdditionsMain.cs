@@ -2,6 +2,7 @@ global using TheExtraordinaryAdditions.Assets;
 global using static TheExtraordinaryAdditions.Core.Utilities.Utility;
 global using TheExtraordinaryAdditions.Common.Particles;
 global using Microsoft.Xna.Framework;
+global using CalUtils = CalamityMod.CalamityUtils; 
 
 // System.Numerics vectors use SIMD, or Single Instruction, Multiple Data. They are more performant because of this.
 global using SystemVector2 = System.Numerics.Vector2;
@@ -30,6 +31,7 @@ using TheExtraordinaryAdditions.Core.Interfaces;
 using TheExtraordinaryAdditions.Core.Netcode;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
+using TheExtraordinaryAdditions.Content.Autoloaders;
 
 namespace TheExtraordinaryAdditions.Core;
 
@@ -59,6 +61,21 @@ public class AdditionsMain : Mod
         DoneLoading = false;
         bossChecklist = null;
         ModLoader.TryGetMod("BossChecklist", out bossChecklist);
+
+        #region Music Boxes
+        MusicBoxAutoloader.Create(this, AssetRegistry.GetTexturePath(AdditionsTexture.AngelsRage), AssetRegistry.GetTexturePath(AdditionsTexture.AngelsRagePlaced), AssetRegistry.GetMusicPath(AdditionsSound.Infinite));
+        MusicBoxAutoloader.Create(this, AssetRegistry.GetTexturePath(AdditionsTexture.FierceBattle), AssetRegistry.GetTexturePath(AdditionsTexture.FierceBattlePlaced), AssetRegistry.GetMusicPath(AdditionsSound.SRank));
+        MusicBoxAutoloader.Create(this, AssetRegistry.GetTexturePath(AdditionsTexture.FrigidGale), AssetRegistry.GetTexturePath(AdditionsTexture.FrigidGalePlaced), AssetRegistry.GetMusicPath(AdditionsSound.FrigidGale));
+        MusicBoxAutoloader.Create(this, AssetRegistry.GetTexturePath(AdditionsTexture.Ladikerfos), AssetRegistry.GetTexturePath(AdditionsTexture.LadikerfosPlaced), AssetRegistry.GetMusicPath(AdditionsSound.Ladikerfos));
+        MusicBoxAutoloader.Create(this, AssetRegistry.GetTexturePath(AdditionsTexture.MechanicalInNature), AssetRegistry.GetTexturePath(AdditionsTexture.MechanicalInNaturePlaced), AssetRegistry.GetMusicPath(AdditionsSound.MechanicalInNature));
+        MusicBoxAutoloader.Create(this, AssetRegistry.GetTexturePath(AdditionsTexture.MechanicalInNature2), AssetRegistry.GetTexturePath(AdditionsTexture.MechanicalInNature2Placed), AssetRegistry.GetMusicPath(AdditionsSound.MechanicalInNature2));
+        MusicBoxAutoloader.Create(this, AssetRegistry.GetTexturePath(AdditionsTexture.MenuMusic), AssetRegistry.GetTexturePath(AdditionsTexture.MenuMusicPlaced), AssetRegistry.GetMusicPath(AdditionsSound.Protostar));
+        MusicBoxAutoloader.Create(this, AssetRegistry.GetTexturePath(AdditionsTexture.RainDance), AssetRegistry.GetTexturePath(AdditionsTexture.RainDancePlaced), AssetRegistry.GetMusicPath(AdditionsSound.RainDance));
+        MusicBoxAutoloader.Create(this, AssetRegistry.GetTexturePath(AdditionsTexture.SereneSatellite), AssetRegistry.GetTexturePath(AdditionsTexture.SereneSatellitePlaced), AssetRegistry.GetMusicPath(AdditionsSound.clairdelune));
+        MusicBoxAutoloader.Create(this, AssetRegistry.GetTexturePath(AdditionsTexture.SnailRoar), AssetRegistry.GetTexturePath(AdditionsTexture.SnailRoarPlaced), AssetRegistry.GetMusicPath(AdditionsSound.sickest_beat_ever));
+        MusicBoxAutoloader.Create(this, AssetRegistry.GetTexturePath(AdditionsTexture.SpiderMusic), AssetRegistry.GetTexturePath(AdditionsTexture.SpiderMusicPlaced), AssetRegistry.GetMusicPath(AdditionsSound.Spider));
+        MusicBoxAutoloader.Create(this, AssetRegistry.GetTexturePath(AdditionsTexture.WereYouFoolin), AssetRegistry.GetTexturePath(AdditionsTexture.WereYouFoolinPlaced), AssetRegistry.GetMusicPath(AdditionsSound.wereyoufoolin));
+        #endregion
 
         SetLoadingText("Loading shaders...");
         AssetRegistry.LoadShaders(this);
@@ -121,29 +138,8 @@ public class AdditionsMain : Mod
         HookHelper.LoadHookInterfaces(this);
     }
 
-    /// <summary>
-    /// TODO: Install EasyNet, the one SLR uses, and go on from there rather than making a big ass switch statement file
-    /// </summary>
-    /// <param name="reader"></param>
-    /// <param name="whoAmI"></param>
     public override void HandlePacket(BinaryReader reader, int whoAmI)
     {
-        //AdditionsNetcode.HandlePacket(this, reader, whoAmI);
-
-        if (reader.ReadByte() != 1 || Main.netMode != NetmodeID.Server)
-        {
-            return;
-        }
-        for (int i = 0; i < Main.maxNPCs; i++)
-        {
-            if (Main.npc[i].active && Main.npc[i].type == ModContent.NPCType<GodDummyNPC>())
-            {
-                NPC obj = Main.npc[i];
-                obj.life = 0;
-                obj.HitEffect(0, 10.0, null);
-                obj.SimpleStrikeNPC(int.MaxValue, 0, false, 0f, null, false, 0f, false);
-                NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, i, 0f, 0f, 0f, 0, 0, 0);
-            }
-        }
+        AdditionsNetcode.HandlePackets(this, reader, whoAmI);
     }
 }

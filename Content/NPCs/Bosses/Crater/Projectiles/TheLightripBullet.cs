@@ -85,7 +85,7 @@ public class TheLightripBullet : ProjOwnedByNPC<Asterlin>
     {
         if (!Main.dedServ)
             AdditionsSound.FireImpact.Play(Projectile.Center, .8f, 0f, .1f, 40, Name);
-        SpawnProjectile(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<LightripBlast>(), Projectile.damage / 2, 0f, Main.myPlayer);
+        SpawnProjectile(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<LightripBlast>(), Projectile.damage / 2, 0f);
         Time = 0;
         Wait = true;
         Projectile.velocity *= 0f;

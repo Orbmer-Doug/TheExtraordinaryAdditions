@@ -69,7 +69,7 @@ public class SoulForgedRift : ProjOwnedByNPC<Asterlin>
             Vector2 vel = Vector2.Zero;
             int type = ModContent.ProjectileType<TranscendentSoulRay>();
             int damage = Asterlin.SuperHeavyAttackDamage;
-            Ray = Main.projectile[SpawnProjectile(pos, vel, type, damage, 0f, -1)].As<TranscendentSoulRay>();
+            Ray = Main.projectile[SpawnProjectile(pos, vel, type, damage, 0f)].As<TranscendentSoulRay>();
             Ray.ProjOwner = Projectile;
         }
         if (Ray != null)

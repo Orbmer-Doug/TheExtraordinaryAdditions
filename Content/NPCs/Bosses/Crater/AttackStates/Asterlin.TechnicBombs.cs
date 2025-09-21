@@ -47,8 +47,12 @@ public partial class Asterlin : ModNPC
     {
         if (AITimer <= 1)
         {
-            TechnicBombBarrage_RotationStart = RandomRotation();
-            TechnicBombBarrage_RotationDir = Main.rand.NextFromList(1, -1);
+            if (this.RunServer())
+            {
+                TechnicBombBarrage_RotationStart = RandomRotation();
+                TechnicBombBarrage_RotationDir = Main.rand.NextFromList(1, -1);
+                NPC.netUpdate = true;
+            }
         }
 
         if (AITimer < TechnicBombBarrage_FireTime)
@@ -76,7 +80,7 @@ public partial class Asterlin : ModNPC
 
                         ReticlePosition = Vector2.SmoothStep(ReticlePosition, CurrentBombTarget.Center, Utils.Remap(ReticlePosition.Distance(CurrentBombTarget.Center), 0f, 400f, .24f, .14f));
                         if (ReticlePosition.WithinRange(CurrentBombTarget.Center, 100f))
-                            Gun.Shoot();
+                            Gun?.Shoot();
                     }
 
                     // If the reticle gets too close everything freaks out
@@ -89,7 +93,8 @@ public partial class Asterlin : ModNPC
                 if (AITimer % TechnicBombBarrage_BombReleaseRate == (TechnicBombBarrage_BombReleaseRate - 1))
                 {
                     Vector2 home = Utility.GetHomingVelocity(LeftHandPosition, Target.Center, Target.Velocity, Main.rand.NextFloat(22f, 34f));
-                    NPC.NewNPCProj(LeftHandPosition, home, ModContent.ProjectileType<TechnicBomb>(), Asterlin.MediumAttackDamage, 0f);
+                    if (this.RunServer())
+                        NPC.NewNPCProj(LeftHandPosition, home, ModContent.ProjectileType<TechnicBomb>(), Asterlin.MediumAttackDamage, 0f);
 
                     for (int i = 0; i < 18; i++)
                     {

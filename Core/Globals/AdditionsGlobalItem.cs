@@ -6,6 +6,7 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Early;
 using TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
@@ -348,7 +349,7 @@ public class AdditionsGlobalItem : GlobalItem
                 if (player.altFunctionUse == ItemAlternativeFunctionID.ActivatedAndUsed)
                 {
                     NewProj(ModContent.ProjectileType<HorsemenDive>(), damage * 2, default, velocity);
-                    player.GetModPlayer<HorsemenPlayer>().Wait = SecondsToFrames(3);
+                    CalUtils.AddCooldown(player, PumpkinDashCooldown.ID, SecondsToFrames(3));
                     return false;
                 }
 
@@ -427,7 +428,7 @@ public class AdditionsGlobalItem : GlobalItem
             ItemID.PhoenixBlaster => true,
             ItemID.CursedFlames => true,
             ItemID.BreakerBlade => true,
-            ItemID.TheHorsemansBlade => player.ownedProjectileCounts[ModContent.ProjectileType<HorsemenDive>()] <= 0 && player.GetModPlayer<HorsemenPlayer>().Wait <= 0,
+            ItemID.TheHorsemansBlade => player.ownedProjectileCounts[ModContent.ProjectileType<HorsemenDive>()] <= 0 && !CalUtils.HasCooldown(player, PumpkinDashCooldown.ID),
             _ => base.AltFunctionUse(item, player),
         };
     }
@@ -451,19 +452,16 @@ public class AdditionsGlobalItem : GlobalItem
                 break;
             case ItemID.BreakerBlade:
                 NoVisual();
-                item.noMelee = true;
                 item.shoot = ModContent.ProjectileType<BreakerBladeCrush>();
                 item.autoReuse = true;
                 break;
             case ItemID.InfluxWaver:
                 NoVisual();
-                item.noMelee = true;
                 item.shoot = ModContent.ProjectileType<InfluxWaverSwing>();
                 item.autoReuse = true;
                 break;
             case ItemID.TheHorsemansBlade:
                 NoVisual();
-                item.noMelee = true;
                 item.shoot = ModContent.ProjectileType<HorsemenSwing>();
                 item.autoReuse = true;
                 break;
@@ -473,6 +471,7 @@ public class AdditionsGlobalItem : GlobalItem
         {
             item.noUseGraphic = true;
             item.UseSound = null;
+            item.noMelee = true;
         }
     }
 
@@ -487,17 +486,20 @@ public class AdditionsGlobalItem : GlobalItem
 
     public override void UseItemFrame(Item item, Player player)
     {
-        switch (item.type)
+        if (Main.myPlayer == player.whoAmI)
         {
-            case ItemID.PhoenixBlaster:
-                DoShotAnimation(.45f);
-                break;
-            case ItemID.SpaceGun:
-                AimArms();
-                break;
-            case ItemID.LaserRifle:
-                AimArms();
-                break;
+            switch (item.type)
+            {
+                case ItemID.PhoenixBlaster:
+                    DoShotAnimation(.45f);
+                    break;
+                case ItemID.SpaceGun:
+                    AimArms();
+                    break;
+                case ItemID.LaserRifle:
+                    AimArms();
+                    break;
+            }
         }
 
         void DoShotAnimation(float amount)
@@ -522,17 +524,20 @@ public class AdditionsGlobalItem : GlobalItem
 
     public override void UseStyle(Item item, Player player, Rectangle heldItemFrame)
     {
-        switch (item.type)
+        if (Main.myPlayer == player.whoAmI)
         {
-            case ItemID.PhoenixBlaster:
-                HoldOut(42f, new(42f, 30f), new(7f, 3f));
-                break;
-            case ItemID.SpaceGun:
-                HoldOut(28f, new(36f, 24f), new(4f, 2f));
-                break;
-            case ItemID.LaserRifle:
-                HoldOut(38f, new(40f, 24f), new(0f, 0f));
-                break;
+            switch (item.type)
+            {
+                case ItemID.PhoenixBlaster:
+                    HoldOut(42f, new(42f, 30f), new(7f, 3f));
+                    break;
+                case ItemID.SpaceGun:
+                    HoldOut(28f, new(36f, 24f), new(4f, 2f));
+                    break;
+                case ItemID.LaserRifle:
+                    HoldOut(38f, new(40f, 24f), new(0f, 0f));
+                    break;
+            }
         }
 
         void HoldOut(float dist, Vector2 itemSize, Vector2 itemOrigin, float rot = MathHelper.PiOver2)
@@ -549,7 +554,6 @@ public class AdditionsGlobalItem : GlobalItem
         switch (item.type)
         {
             case ItemID.PhoenixBlaster:
-                player.Additions().SyncMouse = true;
                 break;
             case ItemID.BreakerBlade:
                 LimitBreakerUI.CurrentlyViewing = true;

@@ -209,7 +209,7 @@ public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
         float stretchFactor = MathHelper.Clamp(Segments.Last().position.Distance(Owner.Center) / MouseWorld.Distance(Owner.Center), .5f, 1f);
         float centrifugalForce = Math.Clamp(val.Length() * 2f - 10f, 0f, 130f) / 150f;
         Vector2 centrifugalSquish = new(1f + centrifugalForce * 0.66f, 1f - centrifugalForce);
-        centrifugalSquish.ClampMagnitude(.4f, 1f);
+        centrifugalSquish.ClampLength(.4f, 1f);
         Vector2 scale = new(1f, 1f * stretchFactor);
         scale *= centrifugalSquish;
 

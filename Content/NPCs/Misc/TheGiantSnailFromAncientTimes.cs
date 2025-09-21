@@ -7,7 +7,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Novelty;
 using TheExtraordinaryAdditions.Content.Items.Placeable;
-using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain;
+using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle.AZ;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -18,6 +18,11 @@ public class TheGiantSnailFromAncientTimes : ModNPC
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TheGiantSnailFromAncientTimes);
     public override string BossHeadTexture => AssetRegistry.GetTexturePath(AdditionsTexture.TheGiantSnailFromAncientTimes);
+
+    public override void SetStaticDefaults()
+    {
+        NPCID.Sets.MPAllowedEnemies[Type] = true;
+    }
 
     public override void SetDefaults()
     {
@@ -36,6 +41,7 @@ public class TheGiantSnailFromAncientTimes : ModNPC
         NPC.rarity = 5;
         NPC.noGravity = true;
         NPC.noTileCollide = true;
+        NPC.netAlways = true;
         if (!Main.dedServ)
         {
             Music = MusicLoader.GetMusicSlot(Mod, AssetRegistry.GetMusicPath(AdditionsSound.sickest_beat_ever));
@@ -64,8 +70,9 @@ public class TheGiantSnailFromAncientTimes : ModNPC
     {
         if (NPC.ai[1] == 0f)
         {
-            DisplayText(this.GetLocalizedValue("Awaken"), Color.Red);
+            Utility.DisplayText(this.GetLocalizedValue("Awaken"), Color.Red);
             NPC.ai[1] = 1f;
+            NPC.netUpdate = true;
         }
 
         Player target = Main.player[NPC.target];
@@ -81,7 +88,6 @@ public class TheGiantSnailFromAncientTimes : ModNPC
         if (interpolant >= .5f)
             dest = target.Center + PolarVector(MathF.Sin(Timer * MathHelper.Lerp(.002f, .05f, interpolant / 2 + .5f)) * 600f, Timer * .02f);
 
-        dest.SuperQuickDust();
         NPC.velocity = Vector2.SmoothStep(NPC.velocity, NPC.SafeDirectionTo(dest) * MathHelper.Lerp(10f, 30f, interpolant), MathHelper.Lerp(.1f, .2f, interpolant));
         if (NPC.Distance(dest) < 20f)
             NPC.velocity += Main.rand.NextVector2CircularEdge(2f, 2f);
@@ -92,7 +98,8 @@ public class TheGiantSnailFromAncientTimes : ModNPC
             Vector2 direction = (target.Center - NPC.Center).SafeNormalize(Vector2.UnitX);
             int damage = DifficultyBasedValue(30, 50, 65, 69, 80);
             float speed = 10f;
-            NPC.Shoot(NPC.Center, direction.RotatedByRandom(.5f) * speed, ModContent.ProjectileType<ParmaJawn>(), damage, 1f, Main.myPlayer);
+            if (this.RunServer())
+                NPC.Shoot(NPC.Center, direction.RotatedByRandom(.5f) * speed, ModContent.ProjectileType<ParmaJawn>(), damage, 1f, Main.myPlayer);
             NPC.netUpdate = true;
         }
 
@@ -128,8 +135,9 @@ public class TheGiantSnailFromAncientTimes : ModNPC
             ParticleRegistry.SpawnBlurParticle(NPC.Center, 120, 2f, 5000f);
             ParticleRegistry.SpawnChromaticAberration(NPC.Center, 50, 1f, 5000f);
             ScreenShakeSystem.New(new(40f, 3f, 50000f), NPC.Center);
-            AdditionsSound.WibtorNUKE.Play(NPC.Center, 1f, 0f, 0f, 1, Name, null);
-            NPC.Shoot(NPC.Center, Vector2.UnitY, ModContent.ProjectileType<BloodBeacon>(), 1000000, 0f);
+            AdditionsSound.WibtorNUKE.Play(NPC.Center, 1f, 0f, 0f, 1, Name, Terraria.Audio.PauseBehavior.PauseWithGame);
+            if (this.RunServer())
+                NPC.Shoot(NPC.Center, Vector2.UnitY, ModContent.ProjectileType<BloodBeacon>(), 1000000, 0f);
             for (int j = 0; j < 100; j++)
             {
                 ParticleRegistry.SpawnBloomLineParticle(NPC.Center, Main.rand.NextVector2Circular(40f, 40f), Main.rand.Next(30, 80), Main.rand.NextFloat(.8f, 1.6f), Color.Crimson);

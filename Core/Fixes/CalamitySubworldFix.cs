@@ -1,4 +1,5 @@
-﻿using SubworldLibrary;
+﻿using CalamityMod.Systems;
+using SubworldLibrary;
 using System.Reflection;
 using Terraria;
 using Terraria.ModLoader;
@@ -6,15 +7,14 @@ using TheExtraordinaryAdditions.Content.World.Subworlds;
 
 namespace TheExtraordinaryAdditions.Core.Fixes;
 
-/* CONTEXT:
-     * Calamity executes its hardcoded index code for random tile growth (such as lumenyl on voidstone) and abyss checks for the sulphurous sea in a way that does not
-     * respect subworlds. As such, when Calamity is on such behaviors should be disabled in subworlds.
-     */
+/// <summary>
+/// Calamity runs hardcoded indexes for things like abyss checks in a fashion which doesn't respect subworlds, so this disables it for compatibility when only in subworlds (not like the crater has anything to grow on)
+/// </summary>
 public class CalamitySubworldFix : ModSystem
 {
-    public delegate bool orig_IsSulphSeaActiveMethod(object instance, Player player);
+    public delegate void orig_HandleTileGrowth();
 
-    public delegate bool hook_IsSulphSeaActiveMethod(orig_IsSulphSeaActiveMethod orig, object instance, Player player);
+    public delegate void hook_HandleTileGrowth(orig_HandleTileGrowth orig);
 
     public override void OnModLoad()
     {
@@ -24,25 +24,19 @@ public class CalamitySubworldFix : ModSystem
         MethodInfo tileGrowMethod = cal.Code.GetType("CalamityMod.Systems.WorldMiscUpdateSystem")?.GetMethod("HandleTileGrowth", BindingFlags.Public | BindingFlags.Static) ?? null;
         if (tileGrowMethod is null)
         {
-            Mod.Logger.Warn("Calamity's 'WorldMiscUpdateSystem' type could not be found! The sulphurous sea subworld interaction fix could not be applied!");
+            Mod.Logger.Warn("Calamitys 'WorldMiscUpdateSystem' type could not be found! The tile growth interaction fix could not be applied!");
             return;
         }
 
-        MethodInfo sulphSeaActiveMethod = cal.Code.GetType("CalamityMod.BiomeManagers.SulphurousSeaBiome")?.GetMethod("IsBiomeActive", BindingFlags.Public | BindingFlags.Instance) ?? null;
-        if (sulphSeaActiveMethod is null)
-        {
-            Mod.Logger.Warn("Calamity's 'SulphurousSeaBiome' type could not be found! The sulphurous sea subworld interaction fix could not be applied!");
-            return;
-        }
-
-        MonoModHooks.Add(sulphSeaActiveMethod, (hook_IsSulphSeaActiveMethod)DisableSulphSeaInSubworlds);
+        MonoModHooks.Add(tileGrowMethod, (hook_HandleTileGrowth)DisableGrowth);
     }
-    public static bool DisableSulphSeaInSubworlds(orig_IsSulphSeaActiveMethod orig, object instance, Player player)
-    {
-        // Hardcoded proximity checks don't work in subworlds.
-        if (SubworldSystem.IsActive<CloudedCrater>())
-            return false;
 
-        return orig(instance, player);
+    public static void DisableGrowth(orig_HandleTileGrowth orig)
+    {
+        // Hardcoded proximity checks dont work in subworlds
+        if (SubworldSystem.IsActive<CloudedCrater>())
+            return;
+
+        orig();
     }
 }

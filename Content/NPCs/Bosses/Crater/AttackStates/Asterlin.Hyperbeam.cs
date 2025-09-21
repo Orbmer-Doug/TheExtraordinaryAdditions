@@ -64,7 +64,8 @@ public partial class Asterlin : ModNPC
 
                 if (AITimer >= Hyperbeam_HoverTime)
                 {
-                    NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<SoulForgedRift>(), 0, 0f);
+                    if (this.RunServer())
+                        NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<SoulForgedRift>(), 0, 0f);
                     Hyperbeam_CurrentState = Hyperbeam_States.SummonPortal;
                     AITimer = 0;
                     NPC.netUpdate = true;

@@ -80,13 +80,11 @@ public class BlackHole : ModProjectile, ILocalizedModType, IModType, IHasScreenS
         Projectile.rotation += .15f;
     }
 
-    public LoopedSound slot;
+    public LoopedSoundInstance slot;
     public void LoopSounds()
     {
-        Vector2 position = Projectile.Center;
-        SoundStyle style = AssetRegistry.GetSound(AdditionsSound.blackHoleSuck) with { MaxInstances = 50 };
-        slot ??= new LoopedSound(style, new ProjectileAudioTracker(Projectile).IsActiveAndInGame);
-        slot.Update(() => Projectile.Center, () => 4f * Projectile.scale, () => 0f);
+        slot ??= LoopedSoundManager.CreateNew(new(AdditionsSound.blackHoleSuck, () => 4f * Projectile.scale), () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
+        slot?.Update(Projectile.Center);
     }
 
     public void Succ()

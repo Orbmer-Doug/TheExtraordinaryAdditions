@@ -1,10 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Items.Materials;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Assets;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Early;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
@@ -55,22 +54,12 @@ public class PyroclasticVeil : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("UnholyCore", out ModItem UnholyCore) && calamityMod.TryFind("CoreOfHavoc", out ModItem CoreOfHavoc) && calamityMod.TryFind("SDFMG", out ModItem SDFMG) && calamityMod.TryFind("DraedonsForge", out ModTile DraedonsForge))
-        {
-            recipe.AddIngredient(UnholyCore.Type, 10);
-            recipe.AddIngredient(CoreOfHavoc.Type, 12);
-            recipe.AddIngredient(ModContent.ItemType<TomeOfHellfire>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<Fireball>(), 1);
-            recipe.AddIngredient(ItemID.LunarBar, 8);
-            recipe.AddTile(TileID.LunarCraftingStation);
-        }
-        else
-        {
-            recipe.AddIngredient(ModContent.ItemType<TomeOfHellfire>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<Fireball>(), 1);
-            recipe.AddIngredient(ItemID.LunarBar, 8);
-            recipe.AddTile(TileID.LunarCraftingStation);
-        }
+        recipe.AddIngredient(ModContent.ItemType<UnholyCore>(), 10);
+        recipe.AddIngredient(ModContent.ItemType<CoreofHavoc>(), 12);
+        recipe.AddIngredient(ModContent.ItemType<TomeOfHellfire>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<Fireball>(), 1);
+        recipe.AddIngredient(ItemID.LunarBar, 8);
+        recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();
     }
 }

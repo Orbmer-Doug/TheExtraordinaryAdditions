@@ -1,12 +1,11 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Items.Materials;
+using CalamityMod.Items.Placeables;
 using System.Collections.Generic;
-using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
-using TheExtraordinaryAdditions.Content.Projectiles.Summoner.Early;
 using TheExtraordinaryAdditions.Content.Projectiles.Summoner.Late;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
 using TheExtraordinaryAdditions.Core.Globals;
@@ -50,4 +49,15 @@ public class TidalDeluge : ModItem
     }
 
     public override bool MeleePrefix() => true;
+
+    public override void AddRecipes()
+    {
+        Recipe recipe = CreateRecipe();
+        recipe.AddIngredient(ItemID.RainbowWhip, 1);
+        recipe.AddIngredient(ModContent.ItemType<Lumenyl>(), 18);
+        recipe.AddIngredient(ModContent.ItemType<Voidstone>(), 250);
+        recipe.AddIngredient(ItemID.LunarBar, 8);
+        recipe.AddTile(TileID.LunarCraftingStation);
+        recipe.Register();
+    }
 }

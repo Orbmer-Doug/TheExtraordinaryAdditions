@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Items.Materials;
+using CalamityMod.Tiles.Furniture.CraftingStations;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -45,40 +46,19 @@ public class AbsoluteGreaves : ModItem, ILocalizedModType, IModType
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-
-        if (ModLoader.TryGetMod("calamityMod", out Mod calamityMod) && calamityMod.TryFind("AuricBar", out ModItem AuricBar)
-            && calamityMod.TryFind("AscendantSpiritEssence", out ModItem AscendantSpiritEssence)
-            && calamityMod.TryFind("CoreofCalamity", out ModItem CoreofCalamity)
-            && calamityMod.TryFind("GalacticaSingularity", out ModItem GalacticaSingularity)
-            && calamityMod.TryFind("LifeAlloy", out ModItem LifeAlloy)
-            && calamityMod.TryFind("RuinousSoul", out ModItem RuinousSoul)
-            && calamityMod.TryFind("CosmicAnvil", out ModTile CosmicAnvil))
-        {
-            recipe.AddIngredient(ItemID.CrimsonGreaves, 1);
-            recipe.AddIngredient(ModContent.ItemType<VoltGrieves>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<SpecteriteGreaves>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<BlueLeggings>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<TremorSheathe>(), 1);
-            recipe.AddIngredient(ItemID.SolarFlareLeggings, 1);
-            recipe.AddIngredient(CoreofCalamity.Type, 3);
-            recipe.AddIngredient(GalacticaSingularity.Type, 6);
-            recipe.AddIngredient(LifeAlloy.Type, 5);
-            recipe.AddIngredient(RuinousSoul.Type, 5);
-            recipe.AddIngredient(AscendantSpiritEssence.Type, 4);
-            recipe.AddIngredient(AuricBar.Type, 12);
-            recipe.AddTile(CosmicAnvil.Type);
-        }
-        else
-        {
-            recipe.AddIngredient(ItemID.CrimsonGreaves, 1);
-            recipe.AddIngredient(ModContent.ItemType<VoltGrieves>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<SpecteriteGreaves>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<BlueLeggings>(), 1);
-            recipe.AddIngredient(ModContent.ItemType<TremorSheathe>(), 1);
-            recipe.AddIngredient(ItemID.SolarFlareLeggings, 1);
-            recipe.AddTile(TileID.LunarCraftingStation);
-        }
-
+        recipe.AddIngredient(ItemID.CrimsonGreaves, 1);
+        recipe.AddIngredient(ModContent.ItemType<VoltGrieves>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<SpecteriteGreaves>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<BlueLeggings>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<TremorSheathe>(), 1);
+        recipe.AddIngredient(ItemID.SolarFlareLeggings, 1);
+        recipe.AddIngredient(ModContent.ItemType<CoreofCalamity>(), 3);
+        recipe.AddIngredient(ModContent.ItemType<GalacticaSingularity>(), 6);
+        recipe.AddIngredient(ModContent.ItemType<LifeAlloy>(), 5);
+        recipe.AddIngredient(ModContent.ItemType<RuinousSoul>(), 5);
+        recipe.AddIngredient(ModContent.ItemType<AscendantSpiritEssence>(), 4);
+        recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 12);
+        recipe.AddTile(ModContent.TileType<CosmicAnvil>());
         recipe.Register();
     }
 }

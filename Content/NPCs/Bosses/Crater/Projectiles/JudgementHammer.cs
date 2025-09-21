@@ -145,6 +145,23 @@ public class JudgementHammer : ProjOwnedByNPC<Asterlin>
                 initial += build;
             }
 
+            float maxRad = MathHelper.Pi;
+            float initDir = -MathHelper.PiOver2;
+            float angleOffset = 0f;
+            speed = 3f;
+            for (int i = 0; i < Asterlin.Swings_DartWaves; i++)
+            {
+                for (int j = 0; j < Asterlin.Swings_DartAmount; j++)
+                {
+                    float completion = InverseLerp(0f, Asterlin.Swings_DartAmount - 1, j);
+                    float angle = initDir + MathHelper.Lerp(-maxRad / 2, maxRad / 2, completion) + angleOffset;
+                    Vector2 vel = PolarVector(10f, angle);
+                    SpawnProjectile(ground, vel * speed, ModContent.ProjectileType<OverloadedLightDart>(), Asterlin.LightAttackDamage, 0f);
+                }
+                angleOffset = maxRad / (2 * (Asterlin.Swings_DartAmount - 1));
+                speed /= 2;
+            }
+
             SpawnProjectile(ground, -Vector2.UnitY, ModContent.ProjectileType<LightPillar>(), Asterlin.HeavyAttackDamage, 0f);
 
             Projectile.Kill();

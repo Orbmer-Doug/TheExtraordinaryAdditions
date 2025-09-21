@@ -68,7 +68,8 @@ public class MartianCapsule : ModProjectile
             Vector2 shootVelocity = (MathHelper.TwoPi * i / 4f + offsetAngle).ToRotationVector2() * Main.rand.NextFloat(4f, 7f);
             int dmg = (int)(Projectile.damage * .25);
             int type = ModContent.ProjectileType<MartianLaser>();
-            Projectile.NewProj(Projectile.Center, shootVelocity, type, dmg, 0f);
+            if (this.RunLocal())
+                Projectile.NewProj(Projectile.Center, shootVelocity, type, dmg, 0f);
 
             for (int j = 0; j < 4; j++)
             {

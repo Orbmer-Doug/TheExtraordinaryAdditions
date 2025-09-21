@@ -1,9 +1,9 @@
 displayName = The Extraordinary Additions
 author = Orbmer Doug, SRMP, Ashes Plus
 version = 2.0.0
-modReferences = SubworldLibrary
+modReferences = SubworldLibrary, CalamityMod@2.0.5
 sortAfter = CalamityMod, SubworldLibrary
 hideCode = false
 hideResources = false
-includeSource = true
+includeSource = false
 includePDB = true

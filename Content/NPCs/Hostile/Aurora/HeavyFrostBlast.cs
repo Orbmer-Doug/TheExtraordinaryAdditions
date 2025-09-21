@@ -1,10 +1,10 @@
 ﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora.TEST;
+using TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
-using static TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora.TEST.AuroraGuard;
+using static TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora.AuroraGuard;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 
@@ -47,26 +47,6 @@ public class HeavyFrostBlast : ProjOwnedByNPC<AuroraGuard>
                 player.velocity += Projectile.velocity * .82f / Projectile.MaxUpdates;
             }
         }
-
-        for (int dx = -2; dx < 2; dx++)
-        {
-            for (int dy = -2; dy < 2; dy++)
-            {
-                Point p = new((int)Projectile.Center.X / 16 + dx, (int)Projectile.Center.Y / 16 + dy);
-                Tile tile = ParanoidTileRetrieval(p.X, p.Y);
-                if (tile.LiquidAmount > (byte.MaxValue / 2) && !tile.HasTile)
-                {
-                    tile.LiquidAmount = 0;
-                    WorldGen.PlaceTile(p.X, p.Y, TileID.IceBlock, false, false, -1);
-                    WorldGen.SquareTileFrame(p.X, p.Y);
-                    if (Main.netMode == NetmodeID.MultiplayerClient)
-                    {
-                        NetMessage.sendWater(p.X, p.Y);
-                    }
-                }
-            }
-        }
-
         Time++;
     }
 

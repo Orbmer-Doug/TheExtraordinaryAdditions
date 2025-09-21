@@ -28,10 +28,16 @@ public sealed class ShaderRecompilationMonitor : ModSystem
     private static readonly List<ShaderWatcher> ShaderWatchers = [];
     private static readonly Dictionary<string, DateTime> DebounceTimestamps = [];
 
+    // I'm unsure what causes it, if either tmod or git operations, but sometimes a grillion files get triggered and cause a mass reload
+    private static readonly Queue<DateTime> QueueTimestamps = [];
+    private static bool BurstDetected = false;
+
     /// <summary>
     /// A 500ms delay between queuing to prevent rapid-fire events
     /// </summary>
     private const double DebounceDelaySeconds = 0.5;
+    private const double BurstDetectionWindowSeconds = 1.0;
+    private const int BurstThreshold = 50;
 
     public static string CompilerDirectory => Path.Combine(Main.SavePath, "FXC");
 
@@ -40,6 +46,21 @@ public sealed class ShaderRecompilationMonitor : ModSystem
 
     public override void PostUpdateEverything()
     {
+        if (BurstDetected)
+        {
+            // Skip processing if a burst was detected
+            lock (CompilingFiles)
+            {
+                if (CompilingFiles.Count > 0)
+                {
+                    Main.NewText("Skipping shader compilation due to excessive file changes.", Color.OrangeRed);
+                    CompilingFiles.Clear();
+                    BurstDetected = false; // Reset burst detection after clearing
+                }
+            }
+            return;
+        }
+
         foreach (ShaderWatcher watcher in ShaderWatchers)
             ProcessCompilationsForWatcher(watcher);
     }
@@ -50,6 +71,11 @@ public sealed class ShaderRecompilationMonitor : ModSystem
         {
             CompilingFiles.Clear();
         }
+        lock (QueueTimestamps)
+        {
+            QueueTimestamps.Clear();
+        }
+        BurstDetected = false;
     }
 
     public override void OnModLoad()
@@ -67,6 +93,11 @@ public sealed class ShaderRecompilationMonitor : ModSystem
             watcher.FileWatcher?.Dispose();
         ShaderWatchers.Clear();
         DebounceTimestamps.Clear();
+        lock (QueueTimestamps)
+        {
+            QueueTimestamps.Clear();
+        }
+        BurstDetected = false;
     }
 
     internal void CreateCompilerDirectory()
@@ -206,11 +237,11 @@ public sealed class ShaderRecompilationMonitor : ModSystem
 
         try
         {
-            if (File.Exists(originalFxcPath)) 
+            if (File.Exists(originalFxcPath))
                 File.Delete(originalFxcPath);
             File.Move(compiledFxcPath, originalFxcPath);
             string oldXnbPath = shaderPath.Replace(".fx", ".xnb");
-            if (File.Exists(oldXnbPath)) 
+            if (File.Exists(oldXnbPath))
                 File.Delete(oldXnbPath);
         }
         catch (Exception ex)
@@ -276,6 +307,25 @@ public sealed class ShaderRecompilationMonitor : ModSystem
             DebounceTimestamps[filePath] = DateTime.Now;
         }
 
+        lock (QueueTimestamps)
+        {
+            QueueTimestamps.Enqueue(DateTime.Now);
+
+            while (QueueTimestamps.Count > 0 && (DateTime.Now - QueueTimestamps.Peek()).TotalSeconds > BurstDetectionWindowSeconds)
+                QueueTimestamps.Dequeue();
+
+            if (QueueTimestamps.Count > BurstThreshold)
+            {
+                BurstDetected = true;
+                Main.NewText("Detected excessive shader file changes. Compilation queue cleared to prevent overload.", Color.OrangeRed);
+                lock (CompilingFiles)
+                {
+                    CompilingFiles.Clear();
+                }
+                return;
+            }
+        }
+
         lock (CompilingFiles)
         {
             if (CompilingFiles.Count >= MaxCompilingFiles)
@@ -288,5 +338,4 @@ public sealed class ShaderRecompilationMonitor : ModSystem
         }
     }
 }
-
 #endif

@@ -97,7 +97,6 @@ public class StygainAura : ModProjectile
             }
             AdditionsSound.VirtueAttack.Play(pos, .8f, -.3f);
         }
-        Owner.Additions().RedMistCounter = CooldownTime;
     }
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => CircularHitboxCollision(Projectile.Center, Radius + 75, targetHitbox);

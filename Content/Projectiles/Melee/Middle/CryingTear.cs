@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
+using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
@@ -45,10 +46,14 @@ public class CryingTear : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        Texture2D texture = Projectile.ThisProjectileTexture();
-        Color color = Color.DarkBlue;
-        float squish = MathHelper.Clamp(Projectile.velocity.Length() / 10f * 3f, 1f, 5f);
-        Main.spriteBatch.DrawBetter(texture, Projectile.Center, null, color, Projectile.rotation, texture.Size() * 0.5f, new Vector2(1f, 1f * squish) * .08f);
+        void draw()
+        {
+            Texture2D texture = Projectile.ThisProjectileTexture();
+            Color color = Color.DarkBlue;
+            float squish = MathHelper.Clamp(Projectile.velocity.Length() / 10f * 3f, 1f, 5f);
+            Main.spriteBatch.DrawBetter(texture, Projectile.Center, null, color, Projectile.rotation, texture.Size() * 0.5f, new Vector2(1f, 1f * squish) * .08f);
+        }
+        PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;
     }
 }
