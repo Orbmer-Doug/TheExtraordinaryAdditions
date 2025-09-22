@@ -70,7 +70,7 @@ public class LightPillar : ModProjectile
                 float maxDist = MaxWidth / 1.2f;
                 float dist = Main.rand.NextFloat(-maxDist, maxDist);
                 float size = Main.rand.NextFloat(60f, 100f) * InverseLerp(maxDist, 0f, MathF.Abs(dist));
-                MoltenBall.Spawn(Projectile.Center - Vector2.UnitX * dist + Vector2.UnitY, size);
+                ShaderParticleRegistry.SpawnMoltenParticle(Projectile.Center - Vector2.UnitX * dist + Vector2.UnitY, size);
             }
         }
         else if (FadeCompletion < 1f)

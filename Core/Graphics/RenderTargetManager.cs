@@ -1,7 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
+using MonoMod.Cil;
+using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.ModLoader;
+using TheExtraordinaryAdditions.Core.ILEditing;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Core.Graphics;
@@ -9,27 +14,27 @@ namespace TheExtraordinaryAdditions.Core.Graphics;
 public class RenderTargetManager : ModSystem
 {
     /// <summary>
-    /// The set of all managed render targets.
+    /// The set of all managed render targets
     /// </summary>
     internal static List<ManagedRenderTarget> ManagedTargets = [];
 
     /// <summary>
-    /// The event responsible for updating all render targets.
+    /// The event responsible for updating all render targets
     /// </summary>
     /// <remarks>
-    ///     Should be subscribed for the purpose of rendering into render targets, to ensure that their contents are defined in a way that does not interfere with other parts of the game's rendering loop.
+    /// Should be subscribed for the purpose of rendering into render targets, to ensure that their contents are defined in a way that does not interfere with other parts of the game's rendering loop
     /// </remarks>
     public static event RenderTargetUpdateDelegate RenderTargetUpdateLoopEvent;
 
     /// <summary>
-    /// How long standard render targets can go, in frames, before they are subject to automatic disposal.
+    /// How long standard render targets can go, in frames, before they are subject to automatic disposal
     /// </summary>
     public static readonly int TimeUntilUntilUnusedTargetsAreDisposed = SecondsToFrames(10f);
 
     public delegate void RenderTargetUpdateDelegate();
 
     /// <summary>
-    /// Causes all managed render targets to become disposed, freeing their unmanaged resources.
+    /// Causes all managed render targets to become disposed, freeing their unmanaged resources
     /// </summary>
     internal static void DisposeOfTargets()
     {
@@ -53,20 +58,20 @@ public class RenderTargetManager : ModSystem
 
     public override void OnModUnload()
     {
-        // Clear any lingering GPU resources.
+        // Clear any lingering GPU resources
         DisposeOfTargets();
 
-        // Unsubscribe from the OnPreDraw event.
+        // Unsubscribe from the OnPreDraw event
         Terraria.Main.OnPreDraw -= HandleTargetUpdateLoop;
-
-        // Reset the update loop event.
+        
+        // Reset the update loop event
         RenderTargetUpdateLoopEvent = null;
     }
 
     /// <summary>
-    /// Evaluates all active render targets, checking if they need to be reset or disposed of.
+    /// Evaluates all active render targets, checking if they need to be reset or disposed of
     /// </summary>
-    private void HandleTargetUpdateLoop(GameTime obj)
+    private static void HandleTargetUpdateLoop(GameTime obj)
     {
         RenderTargetUpdateLoopEvent?.Invoke();
 

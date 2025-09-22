@@ -293,7 +293,6 @@ public class CyberneticSword : ProjOwnedByNPC<Asterlin>
                 int life = Main.rand.Next(19, 25);
                 float scale = Main.rand.NextFloat(.4f, .8f);
                 Color color = ColorFunct(new(0f, Main.rand.NextFloat()), Vector2.Zero);
-
                 ParticleRegistry.SpawnTechyHolosquareParticle(pos, vel, life, scale, color, 1f);
             }
         }

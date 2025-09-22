@@ -58,7 +58,7 @@ public class KnashingTeeth : ModProjectile
         if (Projectile.scale < 1f)
         {
             Vector2 vel = Projectile.velocity * (1.3f - Projectile.scale) * .1f;
-            StygainEnergy.Spawn(Projectile.Center, vel, Projectile.scale * 150f);
+            ShaderParticleRegistry.SpawnStygainParticle(Projectile.Center, vel, Projectile.scale * 150f);
         }
     }
 

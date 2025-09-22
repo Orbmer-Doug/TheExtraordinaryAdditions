@@ -61,7 +61,7 @@ public class EpidemicLob : ModProjectile
         float inter = InverseLerp(0f, Charge, Counter, true);
         Projectile.scale = fadeInter * (1f - inter);
 
-        EpidemicPlague.Spawn(Projectile.Center, Main.rand.NextVector2Circular(1f, 1f) * Projectile.scale, Projectile.scale * 50f);
+        ShaderParticleRegistry.SpawnEpidemicParticle(Projectile.Center, Main.rand.NextVector2Circular(1f, 1f) * Projectile.scale, Projectile.scale * 50f);
 
         if (Timer % FadeIn == FadeIn - 1f)
         {
@@ -76,7 +76,7 @@ public class EpidemicLob : ModProjectile
                 Vector2 pos = Projectile.Center + dustRotate;
                 Vector2 vel = -Projectile.velocity.SafeNormalize(Vector2.Zero) * 5f + dustRotate.SafeNormalize(Vector2.UnitY) * 3f;
 
-                EpidemicPlague.Spawn(pos, vel * Projectile.scale, Projectile.scale * 60f);
+                ShaderParticleRegistry.SpawnEpidemicParticle(pos, vel * Projectile.scale, Projectile.scale * 60f);
 
                 increment++;
             }
@@ -170,7 +170,7 @@ public class EpidemicLob : ModProjectile
             float angle = MathHelper.TwoPi * i / dustCount;
             Vector2 vel = angle.ToRotationVector2() * Main.rand.NextFloat(6f, 10f);
 
-            EpidemicPlague.Spawn(Projectile.Center, vel, 50f);
+            ShaderParticleRegistry.SpawnEpidemicParticle(Projectile.Center, vel, 50f);
         }
 
         // Create spikes
@@ -186,7 +186,7 @@ public class EpidemicLob : ModProjectile
                 Vector2 pos = Vector2.Lerp(Projectile.Center, Projectile.Center + vel * 350f, interpolant);
 
                 float scale = (1f - interpolant) * 50f;
-                EpidemicPlague.Spawn(pos, vel, scale);
+                ShaderParticleRegistry.SpawnEpidemicParticle(pos, vel, scale);
             }
         }
 

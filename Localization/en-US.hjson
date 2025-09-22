@@ -42,20 +42,6 @@ Mods: {
 			StygainRoar.DisplayName: Stygain Roar
 			TaintedStar.DisplayName: Tainted Star
 			WrithingEyeball.DisplayName: Writhing Eyeball
-			CavitationBubble.DisplayName: Cavitation Bubble
-			ControlledTornado.DisplayName: Controlled Tornado
-			MysteriousPortal.DisplayName: Mysterious Portal
-			TerminusDeathray.DisplayName: Terminus Deathray
-			LargeRipCurrent.DisplayName: Large Rip Current
-			MassiveWhirlpool.DisplayName: Massive Whirlpool
-			OceanColumn.DisplayName: Ocean Column
-			PressuredWatorBeam.DisplayName: Pressured Wator Beam
-			TheAbyssalCurrents.DisplayName: The Abyssal Currents
-			TideBolt.DisplayName: Tide Bolt
-			TideSlice.DisplayName: Tide Slice
-			TorrentialRain.DisplayName: Torrential Rain
-			Tsunami.DisplayName: Tsunami
-			Whirlpool.DisplayName: Whirlpool
 			EmptyRound.DisplayName: Empty Round
 			GlassShell.DisplayName: Glass Shell
 			RifleBullet.DisplayName: Rifle Bullet
@@ -465,6 +451,7 @@ Mods: {
 			Bergwave.DisplayName: Bergwave
 			EvenFancierPickaxe.DisplayName: Even Fancier Pickaxe
 			FancyTool.DisplayName: Fancy Tool
+			ConvergentFireball.DisplayName: Convergent Fireball
 		}
 
 		Keybinds: {
@@ -1472,7 +1459,11 @@ Mods: {
 
 			AbyssalCurrents: {
 				DisplayName: Abyssal Currents
-				Tooltip: Throw a powerful spear that infinitely pierces
+				Tooltip:
+					'''
+					Throw a powerful spear that infinitely pierces
+					Hold <right> to twirl the spear and make a whirlpool which sucks in non-boss enemies
+					'''
 			}
 
 			CallerOfBirds: {

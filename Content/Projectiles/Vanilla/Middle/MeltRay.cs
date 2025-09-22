@@ -48,7 +48,7 @@ public class MeltRay : ModProjectile
         if (End != expected && !HitSomething)
         {
             for (int i = 0; i < 4; i++)
-                MoltenBall.Spawn(End + Main.rand.NextVector2Circular(10f, 10f), Main.rand.NextFloat(50f, 80f));
+                ShaderParticleRegistry.SpawnMoltenParticle(End + Main.rand.NextVector2Circular(10f, 10f), Main.rand.NextFloat(50f, 80f));
             
             for (int i = 0; i < 2; i++)
                 Projectile.NewProj(End, Main.rand.NextVector2CircularEdge(5f, 5f) + Vector2.UnitY * -6f, ModContent.ProjectileType<MeltGlobule>(), 

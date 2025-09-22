@@ -1,12 +1,9 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
+using TheExtraordinaryAdditions.Common.Particles.Shader;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Systems;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace TheExtraordinaryAdditions.Core.Utilities;
 
@@ -14,7 +11,6 @@ namespace TheExtraordinaryAdditions.Core.Utilities;
 // Note: DONT LEAVE THIS IN FINAL RELEASE
 public class DebugSystem : ModSystem
 {
-    public int time = 0;
     public override void PostUpdateEverything()
     {
     }
@@ -79,7 +75,7 @@ public static class AdditionsDebug
     }
 
     public static void SuperQuickDust(this Vector2 pos, Color? color = null, int scale = 5, int life = 10, Vector2? velocity = null) => ParticleRegistry.SpawnDebugParticle(pos, color, scale, life, velocity);
-    public static void SuperQuickDust(this Point pos, Color? color = null, int scale = 5, int life = 10, Vector2? velocity = null) => ParticleRegistry.SpawnDebugParticle(pos, color, scale, life, velocity);
+    public static void SuperQuickDust(this Point pos, Color? color = null, int scale = 5, int life = 10, Vector2? velocity = null) => ParticleRegistry.SpawnDebugParticle(pos.ToVector2(), color, scale, life, velocity);
 
     public static void TileDataAtMouse()
     {

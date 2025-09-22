@@ -17,7 +17,7 @@ public partial class Asterlin : ModNPC
     {
         StateMachine.RegisterTransition(AsterlinAIType.UnveilingZenith, new Dictionary<AsterlinAIType, float> { { AsterlinAIType.GabrielLeave, 1f } }, false, () =>
         {
-            return UnveilingZenith_WaitTimer >= UnveilingZenith_WaitTime;
+            return AITimer >= UnveilingZenith_TotalTime;
         });
         StateMachine.RegisterStateEntryCallback(AsterlinAIType.UnveilingZenith, () => 
         {
@@ -28,6 +28,7 @@ public partial class Asterlin : ModNPC
 
     public static int UnveilingZenith_StarCollapseTime => SecondsToFrames(.3f);
     public static int UnveilingZenith_BeamReleaseRate => DifficultyBasedValue(SecondsToFrames(1f), SecondsToFrames(1f), SecondsToFrames(1f), SecondsToFrames(1f), SecondsToFrames(1f), SecondsToFrames(1f));
+    public static int UnveilingZenith_TotalTime => SecondsToFrames(20.8f);
 
     public int UnveilingZenith_WaitTimer
     {
@@ -78,8 +79,8 @@ public partial class Asterlin : ModNPC
             }
         }
 
-        float velocity = Utils.Remap(AITimer, 0f, UnveilingZenith_StarBuildTime / 2, 30f, 3f);
-        float amt = Utils.Remap(AITimer, 0f, UnveilingZenith_StarBuildTime / 2, .32f, .04f);
+        float velocity = 6f;
+        float amt = .1f;
         Vector2 target = Target.Position + new Vector2(400f * (NPC.Center.X > Target.Center.X).ToDirectionInt(), Target.Velocity.Y * 15f);
         NPC.velocity = Vector2.SmoothStep(NPC.velocity, NPC.SafeDirectionTo(target) * MathF.Min(NPC.Center.Distance(target), velocity), amt);
 

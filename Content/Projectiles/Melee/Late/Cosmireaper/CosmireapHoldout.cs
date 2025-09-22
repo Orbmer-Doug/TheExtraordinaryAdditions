@@ -580,7 +580,7 @@ public class CosmireapHoldout : ModProjectile
                         if (Main.netMode != NetmodeID.Server)
                         {
                             // Create the center
-                            CosmicLacerationParticle.Spawn(target.Center + Utils.NextVector2Circular(Main.rand, 30f, 30f), Utils.NextVector2Circular(Main.rand, 3f, 3f), 60f);
+                            ShaderParticleRegistry.SpawnCosmicParticle(target.Center + Utils.NextVector2Circular(Main.rand, 30f, 30f), Utils.NextVector2Circular(Main.rand, 3f, 3f), 60f);
 
                             // Creates a seam
                             float scale = MathHelper.Lerp(24f, 84f, Convert01To010(i / 70f));
@@ -589,7 +589,7 @@ public class CosmireapHoldout : ModProjectile
                             Vector2 position = target.Center + Projectile.velocity.SafeNormalize(Vector2.UnitY) * MathHelper.Lerp(-40f, 90f, i / 19f);
 
                             // Create the spike
-                            CosmicLacerationParticle.Spawn(position, sparkVelocity, scale);
+                            ShaderParticleRegistry.SpawnCosmicParticle(position, sparkVelocity, scale);
                         }
                     }
 
@@ -615,13 +615,13 @@ public class CosmireapHoldout : ModProjectile
                             if (Main.netMode != NetmodeID.Server)
                             {
                                 // Create the center
-                                CosmicLacerationParticle.Spawn(target.Center + Utils.NextVector2Circular(Main.rand, 30f, 30f), Utils.NextVector2Circular(Main.rand, 9f, 9f), 60f);
+                                ShaderParticleRegistry.SpawnCosmicParticle(target.Center + Utils.NextVector2Circular(Main.rand, 30f, 30f), Utils.NextVector2Circular(Main.rand, 9f, 9f), 60f);
 
                                 // Creates a seam
                                 float scale = MathHelper.Lerp(25f, 95f, i / amount);
 
                                 // Create the spike
-                                CosmicLacerationParticle.Spawn(target.Center, veloc, scale * 3);
+                                ShaderParticleRegistry.SpawnCosmicParticle(target.Center, veloc, scale * 3);
                             }
                         }
                     }
@@ -643,7 +643,7 @@ public class CosmireapHoldout : ModProjectile
                     {
                         for (int i = 0; i < 60; i++)
                         {
-                            CosmicLacerationParticle.Spawn(target.Center + Utils.NextVector2Circular(Main.rand, 40f, 40f), Utils.NextVector2Circular(Main.rand, 3f, 3f), 70f);
+                            ShaderParticleRegistry.SpawnCosmicParticle(target.Center + Utils.NextVector2Circular(Main.rand, 40f, 40f), Utils.NextVector2Circular(Main.rand, 3f, 3f), 70f);
                         }
                     }
                     break;

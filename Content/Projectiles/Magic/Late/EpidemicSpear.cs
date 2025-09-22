@@ -88,7 +88,7 @@ public class EpidemicSpear : ModProjectile
                 if (x == -1)
                     vel = (MathHelper.TwoPi * i / arms - Offset).ToRotationVector2() * Main.rand.NextFloat(4f, 8f) * Projectile.scale;
 
-                EpidemicPlague.Spawn(Projectile.Center, vel, x == -1 ? 45f : 40f * Projectile.scale);
+                ShaderParticleRegistry.SpawnEpidemicParticle(Projectile.Center, vel, x == -1 ? 45f : 40f * Projectile.scale);
             }
         }
 
@@ -104,7 +104,7 @@ public class EpidemicSpear : ModProjectile
                 Vector2 pos = Vector2.Lerp(Projectile.Center, Projectile.Center + vel * 150f, interpolant);
 
                 float scale = (1f - interpolant) * 40f;
-                EpidemicPlague.Spawn(pos, vel, scale * Projectile.scale);
+                ShaderParticleRegistry.SpawnEpidemicParticle(pos, vel, scale * Projectile.scale);
             }
         }
 

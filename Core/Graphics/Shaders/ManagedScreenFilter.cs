@@ -2,13 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using System.Runtime.InteropServices;
 using Terraria;
 using Terraria.Graphics.Effects;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Config;
+using TheExtraordinaryAdditions.Core.Utilities;
 using static TheExtraordinaryAdditions.Common.Particles.ParticleRegistry;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
@@ -219,7 +219,7 @@ public class ManagedScreenShader : IDisposable
 
     private void SupplyDeferredTextures()
     {
-        var gd = Main.instance.GraphicsDevice;
+        GraphicsDevice gd = Main.instance.GraphicsDevice;
 
         foreach (DeferredTexture textureWrapper in DeferredTextures.Values)
         {
@@ -271,15 +271,22 @@ public sealed class ScreenShaderUpdates : ModSystem
     {
         ArgumentNullException.ThrowIfNull(renderAction);
         BlendState blend = blendState ?? BlendState.AlphaBlend;
-        var action = DrawActionPool.Rent(renderAction, blend, isTexture: true, effect, groupId); // Treat as texture for consistency
+        DrawAction action = DrawActionPool.Rent(renderAction, blend, isTexture: true, effect, groupId); // Treat as texture for consistency
         DrawActions.Add(action);
     }
 
-    private struct ParticleShaderHandler
+    private readonly struct ParticleShaderHandler
     {
-        public ParticleTypes ParticleType;
-        public string ShaderName;
-        public List<ManagedScreenShader> ShaderList;
+        public readonly ParticleTypes ParticleType;
+        public readonly string ShaderName;
+        public readonly List<ManagedScreenShader> ShaderList;
+
+        public ParticleShaderHandler(ParticleTypes type, string shaderName, List<ManagedScreenShader> shaderList)
+        {
+            ParticleType = type;
+            ShaderName = shaderName;
+            ShaderList = shaderList;
+        }
 
         public readonly void ProcessParticle(ref ParticleData particle)
         {
@@ -330,30 +337,10 @@ public sealed class ScreenShaderUpdates : ModSystem
 
     private static readonly ParticleShaderHandler[] ParticleHandlers = new[]
     {
-        new ParticleShaderHandler
-        {
-            ParticleType = ParticleTypes.Blur,
-            ShaderName = "BlurFilter",
-            ShaderList = blurParticles
-        },
-        new ParticleShaderHandler
-        {
-            ParticleType = ParticleTypes.ChromaticAberration,
-            ShaderName = "ChromaticAberration",
-            ShaderList = chromaticAberrationParticles
-        },
-        new ParticleShaderHandler
-        {
-            ParticleType = ParticleTypes.Flash,
-            ShaderName = "FlashFilter",
-            ShaderList = flashParticles
-        },
-         new ParticleShaderHandler
-        {
-            ParticleType = ParticleTypes.Shockwave,
-            ShaderName = "ShockwaveShader",
-            ShaderList = shockwaveParticles
-        }
+        new ParticleShaderHandler(ParticleTypes.Blur,  "BlurFilter", blurParticles),
+        new ParticleShaderHandler(ParticleTypes.ChromaticAberration,"ChromaticAberration",chromaticAberrationParticles),
+        new ParticleShaderHandler(ParticleTypes.Flash,"FlashFilter",flashParticles),
+        new ParticleShaderHandler(ParticleTypes.Shockwave,"ShockwaveShader",shockwaveParticles)
     };
 
     public override void OnModLoad()
@@ -388,22 +375,14 @@ public sealed class ScreenShaderUpdates : ModSystem
 
         // Process particles
         ParticleSystem particleSystem = ModContent.GetInstance<ParticleSystem>();
-        var particles = particleSystem.GetParticles();
-        var presenceMask = particleSystem.GetPresenceMask();
+        ParticleData[] particles = particleSystem.GetParticles();
+        ulong[] presenceMask = particleSystem.GetPresenceMask();
 
-        for (int maskIndex = 0, baseIndex = 0; maskIndex < presenceMask.Length; maskIndex++, baseIndex += ParticleSystem.BitsPerMask)
+        foreach (int index in new BitmaskUtils.BitmaskEnumerator(presenceMask, (uint)presenceMask.Length))
         {
-            ulong maskCopy = presenceMask[maskIndex];
-            while (maskCopy != 0)
-            {
-                int bitIndex = BitOperations.TrailingZeroCount(maskCopy);
-                maskCopy &= ~(1ul << bitIndex);
-                int index = baseIndex + bitIndex;
-                ref ParticleData particle = ref particles[index];
-
-                foreach (var handler in ParticleHandlers)
-                    handler.ProcessParticle(ref particle);
-            }
+            ref ParticleData particle = ref particles[index];
+            foreach (ParticleShaderHandler handler in ParticleHandlers)
+                handler.ProcessParticle(ref particle);
         }
 
         // Collect all active filters
@@ -414,7 +393,7 @@ public sealed class ScreenShaderUpdates : ModSystem
                 activeFilters.Add(filter);
         }
         activeFilters.AddRange(ActiveShaders);
-        foreach (var handler in ParticleHandlers)
+        foreach (ParticleShaderHandler handler in ParticleHandlers)
             activeFilters.AddRange(handler.ShaderList);
 
         // Apply filters
@@ -447,7 +426,7 @@ public sealed class ScreenShaderUpdates : ModSystem
             Span<DrawAction> actionSpan = CollectionsMarshal.AsSpan(actions);
             DrawActionGrouper.GroupByBlendAndGroupId(actionSpan, [], (blend, groupGroups) =>
             {
-                foreach (var groupEntry in groupGroups)
+                foreach (KeyValuePair<object, List<DrawAction>> groupEntry in groupGroups)
                 {
                     object groupId = groupEntry.Key;
                     List<DrawAction> groupActions = groupEntry.Value;
@@ -455,7 +434,7 @@ public sealed class ScreenShaderUpdates : ModSystem
                     if (groupId == DrawActionGrouper.UngroupedKey)
                     {
                         // Ungrouped: each action gets its own batch to respect shader parameters
-                        foreach (var action in groupActions)
+                        foreach (DrawAction action in groupActions)
                         {
                             if (action.RenderAction == null)
                                 continue;
@@ -469,7 +448,7 @@ public sealed class ScreenShaderUpdates : ModSystem
                     else if (groupActions.Count == 1)
                     {
                         // Single grouped action: treat like ungrouped for safety
-                        var action = groupActions[0];
+                        DrawAction action = groupActions[0];
                         if (action.RenderAction == null)
                             continue;
 
@@ -483,7 +462,7 @@ public sealed class ScreenShaderUpdates : ModSystem
                         // Grouped: batch actions with same GroupId, assuming shared shader parameters
                         ManagedShader sharedShader = groupActions[0].Shader;
                         sb.Begin(SpriteSortMode.Deferred, blend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, sharedShader?.Effect, Main.GameViewMatrix.TransformationMatrix);
-                        foreach (var action in groupActions)
+                        foreach (DrawAction action in groupActions)
                         {
                             if (action.RenderAction == null)
                                 continue;
@@ -499,7 +478,7 @@ public sealed class ScreenShaderUpdates : ModSystem
             });
 
             // Clear actions and return to pool
-            foreach (var action in actionSpan)
+            foreach (DrawAction action in actionSpan)
                 DrawActionPool.Return();
             actions.Clear();
         }
@@ -581,7 +560,7 @@ public class ScreenModifierManager : ModSystem
     private static List<ScreenModifierInfo> screenModifiers;
 
     /// <summary>
-    /// The layer of screen filters in the modifiers.
+    /// The layer of screen filters in the modifiers
     /// </summary>
     public const byte FilterLayer = 200;
 
@@ -599,7 +578,7 @@ public class ScreenModifierManager : ModSystem
     }
 
     /// <summary>
-    /// Call to register a screen modifier delegate at the provided layer. Each registered modifier is ran in ascending layer order.
+    /// Call to register a screen modifier delegate at the provided layer. Each registered modifier is ran in ascending layer order
     /// </summary>
     public static void RegisterScreenModifier(ScreenTargetModifierDelegate screenTargetModifierDelegate, byte layer)
     {

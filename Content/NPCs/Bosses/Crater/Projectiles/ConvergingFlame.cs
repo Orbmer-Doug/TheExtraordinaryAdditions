@@ -33,7 +33,7 @@ public class ConvergingFlame : ModProjectile
 
     public override void AI()
     {
-
+        /*
         if (trail == null || trail._disposed)
             trail = new(c => 200f * Projectile.scale, (c, pos) => Color.White, null, 25);
         Vector2 target = star.Center;
@@ -61,6 +61,7 @@ public class ConvergingFlame : ModProjectile
         {
             Projectile.velocity *= .94f;
         }
+        */
         Projectile.velocity = Projectile.velocity.ClampLength(5f, 2000f);
 
         points.Update(Projectile.Center);

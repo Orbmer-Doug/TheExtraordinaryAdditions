@@ -50,7 +50,7 @@ public class ConvergentFireball : ProjOwnedByNPC<Asterlin>
 
     public override void SetDefaults()
     {
-        Projectile.width = Projectile.height = 200;
+        Projectile.width = Projectile.height = MaxScale;
         Projectile.hostile = true;
         Projectile.scale = 0f;
         Projectile.penetrate = -1;
@@ -72,38 +72,37 @@ public class ConvergentFireball : ProjOwnedByNPC<Asterlin>
             Projectile.scale = Animators.MakePoly(3f).OutFunction.Evaluate(Time, 0f, 60f, 0f, MaxScale);
         }
 
-        if (HitCount < 0f || HitCount == 1f)
+        if (!Stolen)
         {
-            Projectile.velocity = Projectile.DirectionTo(Target.Center).SafeNormalize(Vector2.Zero) * 36f;
-            Cooldown = 0;
+            if (HitCount < 0f || HitCount == 1f)
+            {
+                Projectile.velocity = Projectile.DirectionTo(Target.Center).SafeNormalize(Vector2.Zero) * 36f;
+                Cooldown = 0;
+            }
+            else
+            {
+                if (Main.rand.NextBool(5))
+                {
+                    Projectile.velocity += Main.rand.NextVector2Circular(3f, 3f);
+                }
+                Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.DirectionTo(Owner.Center).SafeNormalize(Vector2.Zero) * 3f, 0.03f) * InverseLerp(500f, 470f, Time);
+                Projectile.velocity += Projectile.DirectionTo(Owner.Center).SafeNormalize(Vector2.Zero) * (0.3f + InverseLerp(500f, 800f, Projectile.Distance(Owner.Center)));
+            }
         }
         else
         {
-            if (Main.rand.NextBool(5))
-            {
-                Projectile.velocity += Main.rand.NextVector2Circular(3f, 3f);
-            }
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.DirectionTo(Owner.Center).SafeNormalize(Vector2.Zero) * 3f, 0.03f) * InverseLerp(500f, 470f, Time);
-            Projectile.velocity += Projectile.DirectionTo(Owner.Center).SafeNormalize(Vector2.Zero) * (0.3f + InverseLerp(500f, 800f, Projectile.Distance(Owner.Center)));
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.DirectionTo(Owner.Center).SafeNormalize(Vector2.Zero) * MathHelper.Min(Projectile.Distance(Owner.Center), 10f), 0.7f);
         }
 
-        if (Cooldown <= 0f)
-        {
-            if (Projectile.Distance(Owner.Center) < 84f && Time > 60f)
-            {
-                /*
-                HitCount += 1f;
-                Owner.localAI[1] += 1f;
-                Projectile.velocity = Projectile.DirectionTo(Owner.GetTargetData().Center).SafeNormalize(Vector2.Zero) * (Owner.GetTargetData().Velocity.Length() * 0.2f + Projectile.velocity.Length());
-                Cooldown = 15;
-                for (int i = 0; i < 40; i++)
-                {
-                    Color glowColor = Main.hslToRgb(Projectile.localAI[0] * 0.01f % 1f, 1f, 0.5f, 0);
-                    glowColor.A /= 2;
-                    Dust.NewDustPerfect(Projectile.Center + Main.rand.NextVector2Circular(36f, 36f), 261, Main.rand.NextVector2Circular(15f, 15f) + Projectile.velocity, 0, glowColor, 1f + Main.rand.NextFloat(2f)).noGravity = true;
-                }
-                */
+        Projectile.ProjAntiClump(.05f, false);
 
+        if (Cooldown <= 0f && !Stolen)
+        {
+            if (Projectile.Distance(Owner.Center) < 84f && Time > 60f )
+            {
+                Stolen = true;
+                Boss.UnveilingZenith_CurrentAmount++;
+                this.Sync();
             }
 
             using IEnumerator<Player> enumerator = Main.player.Where((Player n) => n.active && !n.dead && n.Distance(Projectile.Center) < 64f).GetEnumerator();
@@ -141,6 +140,7 @@ public class ConvergentFireball : ProjOwnedByNPC<Asterlin>
             Cooldown--;
         }
 
+        Projectile.timeLeft = 7000;
         Time++;
     }
 

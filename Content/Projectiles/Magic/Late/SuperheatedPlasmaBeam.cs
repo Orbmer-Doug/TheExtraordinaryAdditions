@@ -96,7 +96,7 @@ public class SuperheatedPlasmaBeam : ModProjectile, ILocalizedModType, IModType
             }
 
             Vector2 pos = endOfLaser + Utils.NextVector2Circular(Main.rand, 10f, 10f);
-            MoltenBall.Spawn(pos, WidthFunction(1f - Main.rand.NextFloat(.1f)) + 20f);
+            ShaderParticleRegistry.SpawnMoltenParticle(pos, (int)(WidthFunction(1f - Main.rand.NextFloat(.1f)) + 20f));
         }
 
         Time++;

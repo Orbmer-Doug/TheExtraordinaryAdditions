@@ -26,7 +26,7 @@ public class MeltGlobule : ModProjectile, ILocalizedModType, IModType
 
     public override void AI()
     {
-        MoltenBall.Spawn(Projectile.Center, Main.rand.NextFloat(40f, 65f));
+        ShaderParticleRegistry.SpawnMoltenParticle(Projectile.Center, Main.rand.NextFloat(40f, 65f));
 
         Projectile.StickyProjAI(15);
 

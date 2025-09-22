@@ -318,7 +318,7 @@ public class AdditionsGlobalNPC : GlobalNPC
                         Vector2 pos = npc.RotHitbox().RandomPoint();
                         Vector2 vel = -Vector2.UnitY * Main.rand.NextFloat(2f, 5f);
                         float scale = Main.rand.NextFloat(120f, 180f);
-                        StygainEnergy.Spawn(pos, vel, scale);
+                        ShaderParticleRegistry.SpawnStygainParticle(pos, vel, scale);
                     }
 
                     DisplayText(GetText(Name + ".SuperBloodMoonBegin").Value, Color.Crimson);

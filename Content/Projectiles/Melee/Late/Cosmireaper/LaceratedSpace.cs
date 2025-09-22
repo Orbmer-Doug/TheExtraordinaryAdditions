@@ -65,7 +65,7 @@ public class LaceratedSpace : ModProjectile, ILocalizedModType, IModType
                 float completion = Convert01To010(InverseLerp(0, Points.Count, i));
 
                 Vector2 vel = Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.367f * completion) * Main.rand.NextFloat(15.5f, 20f) * completion;
-                CosmicLacerationParticle.Spawn(Points[i], vel, interpolant * 20f * completion);
+                ShaderParticleRegistry.SpawnCosmicParticle(Points[i], vel, interpolant * 20f * completion);
             }
         }
     }

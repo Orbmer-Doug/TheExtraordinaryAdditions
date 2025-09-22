@@ -219,7 +219,7 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
         {
             AdditionsSound.etherealHit1.Play(target.Center, 1.2f, 0f, .16f);
             for (int i = 0; i < 12; i++)
-                MoltenBall.Spawn(target.RotHitbox().RandomPoint(), 90f * AngularDamageFactor);
+                ShaderParticleRegistry.SpawnMoltenParticle(target.RotHitbox().RandomPoint(), 90f * AngularDamageFactor);
         }
     }
 

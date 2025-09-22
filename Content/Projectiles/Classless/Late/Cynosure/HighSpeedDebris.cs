@@ -27,7 +27,7 @@ public class HighSpeedDebris : ModProjectile
 
         // Make the plasma trail as if its colliding with air
         ParticleRegistry.SpawnGlowParticle(Projectile.Center, Vector2.Zero, 90, Main.rand.NextFloat(90f, 135f), Color.OrangeRed, 2f);
-        //MetaballRegistry.SpawnPlasmaMetaball(Projectile.Center, Vector2.Zero, 90, Main.rand.Next(120, 130), .7f);
+
         Time++;
     }
 

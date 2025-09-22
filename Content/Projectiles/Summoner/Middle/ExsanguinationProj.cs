@@ -92,7 +92,10 @@ public class ExsanguinationProj : BaseWhip
             if (Completion.BetweenNum(.2f, .8f))
             {
                 for (int i = 0; i < 2; i++)
-                    StygainEnergy.Spawn(Tip, OutwardVel.RotatedBy(MathHelper.PiOver2 * Owner.direction * Owner.gravDir).RotatedByRandom(.1f) * Main.rand.NextFloat(1f, 6f), Main.rand.NextFloat(40f, 55f));
+                {
+                    ShaderParticleRegistry.SpawnStygainParticle(Tip,
+                        OutwardVel.RotatedBy(MathHelper.PiOver2 * Owner.direction * Owner.gravDir).RotatedByRandom(.1f) * Main.rand.NextFloat(1f, 6f), Main.rand.Next(40, 55));
+                }
             }
         }
     }

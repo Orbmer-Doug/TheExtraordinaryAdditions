@@ -1,11 +1,11 @@
-sampler targetContents : register(s0);
-sampler overlayTexture : register(s1);
+sampler targetContents : register(s1);
+sampler overlayTexture : register(s2);
 
-float2 screenSize;
-float2 layerSize;
-float2 layerOffset;
-float4 edgeColor;
-float2 singleFrameScreenOffset;
+float2 screenSize : register(c0);
+float2 layerSize : register(c1);
+float2 layerOffset : register(c2);
+float4 edgeColor : register(c3);
+float2 singleFrameScreenOffset : register(c4);
 
 // The usage of these two methods seemingly prevents imprecision problems for some reason.
 float2 convertToScreenCoords(float2 coords)
