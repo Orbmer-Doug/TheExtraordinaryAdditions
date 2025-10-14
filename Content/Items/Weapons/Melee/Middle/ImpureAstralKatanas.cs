@@ -7,7 +7,7 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Early;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
@@ -15,10 +15,6 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 public class ImpureAstralKatanas : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ImpureAstralKatanas);
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(new Color(108, 54, 115));
-    }
 
     public override void SetDefaults()
     {
@@ -38,8 +34,15 @@ public class ImpureAstralKatanas : ModItem
         Item.autoReuse = true;
     }
 
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(new Color(108, 54, 115));
+    }
+
     public override bool CanShoot(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
+
     public override bool AltFunctionUse(Player player) => !CalUtils.HasCooldown(player, AstralDashCooldown.ID);
+
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
         if (player.altFunctionUse == 2)

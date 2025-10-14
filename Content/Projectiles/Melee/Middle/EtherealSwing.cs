@@ -22,7 +22,7 @@ public class EtherealSwing : ModProjectile
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.EtherealClaymore);
     public ref float Rotation => ref Projectile.ai[0];
     public ref float Spinup => ref Projectile.ai[1];
-    public ref float FadeTimer => ref Projectile.Additions().ExtraAI[0];
+    public ref float FadeTimer => ref Projectile.AdditionsInfo().ExtraAI[0];
 
     public override void SetStaticDefaults()
     {
@@ -84,8 +84,8 @@ public class EtherealSwing : ModProjectile
 
     public override void AI()
     {
-        if (trail == null || trail._disposed)
-            trail = new(tip, WidthFunct, ColorFunct, null, 50);
+        if (trail == null || trail.Disposed)
+            trail = new(WidthFunct, ColorFunct, null, 50);
 
         float attackSpeedMult = Owner.GetAttackSpeed<MeleeDamageClass>();
         float maxSpinup = 300f * attackSpeedMult;
@@ -189,7 +189,7 @@ public class EtherealSwing : ModProjectile
     }
 
     public override bool ShouldUpdatePosition() => false;
-    private float WidthFunct(float c) => MathHelper.SmoothStep(1f, 0f, c) * 40f * ZInfluence;
+    private float WidthFunct(float c) => OptimizedPrimitiveTrail.HemisphereWidthFunct(c, MathHelper.SmoothStep(1f, 0f, c) * 40f * ZInfluence);
     private Color ColorFunct(SystemVector2 c, Vector2 position)
     {
         if (c.X == 0f)
@@ -198,7 +198,6 @@ public class EtherealSwing : ModProjectile
         return new Color(140, 90 + (int)(100 * (1f - c.X)), 255) * (1f - c.X) * FadeCompletion;
     }
 
-    public static readonly ITrailTip tip = new RoundedTip(20);
     public OptimizedPrimitiveTrail trail;
     public TrailPoints cache;
     public override bool PreDraw(ref Color lightColor)
@@ -211,7 +210,7 @@ public class EtherealSwing : ModProjectile
             ManagedShader effect = ShaderRegistry.EnlightenedBeam;
             effect.TrySetParameter("repeats", 4f);
             effect.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.StreakMagma), 1);
-            trail.DrawTippedTrail(effect, cache.Points, tip, true, 350, true, cache.Points[1] + cache.Points[1].SafeDirectionTo(cache.Points[0]) * 2f, cache.Points[0]);
+            trail.DrawTrail(effect, cache.Points, 350, true);
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 

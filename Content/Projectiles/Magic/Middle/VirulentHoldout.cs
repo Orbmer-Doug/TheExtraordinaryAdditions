@@ -1,12 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
-using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -22,6 +19,7 @@ public class VirulentHoldout : BaseHoldoutProjectile
     {
         Main.projFrames[Projectile.type] = 9;
     }
+
     public override void Defaults()
     {
         Projectile.width = 42;
@@ -45,7 +43,7 @@ public class VirulentHoldout : BaseHoldoutProjectile
         Owner.ChangeDir((Mouse.X > Owner.Center.X).ToDirectionInt());
         float armPointingDirection = (Mouse - Owner.Center).SafeNormalize(Vector2.UnitX).ToRotation();
         Owner.SetFrontHandBetter(0, armPointingDirection);
-        Owner.SetBackHandBetter(0, armPointingDirection );
+        Owner.SetBackHandBetter(0, armPointingDirection);
 
         if (this.RunLocal())
         {
@@ -115,19 +113,16 @@ public class VirulentHoldout : BaseHoldoutProjectile
         Vector2 pos = Projectile.Center + Main.rand.NextVector2Circular(Radius, Radius);
 
         if (Time % 3f == 2f)
-        {
-            ParticleRegistry.SpawnDustParticle(pos, Main.rand.NextVector2Circular(1f, 1f), Main.rand.Next(50, 90), Main.rand.NextFloat(.5f, .9f), Color.Olive, Main.rand.NextFloat(-.1f, .1f), false, true, true, false);
-        }
+            ParticleRegistry.SpawnDustParticle(pos, Main.rand.NextVector2Circular(1f, 1f), Main.rand.Next(50, 90), Main.rand.NextFloat(.5f, .9f),
+                Color.Olive, Main.rand.NextFloat(-.1f, .1f), false, true, true, false);
 
         if (Time % 5f == 4f)
-        {
             ParticleRegistry.SpawnCloudParticle(pos, Main.rand.NextVector2Circular(3f, 3f), Color.LimeGreen, Color.DarkOliveGreen,
                 Main.rand.Next(40, 65), Main.rand.NextFloat(.45f, .75f), Main.rand.NextFloat(.7f, .9f), Main.rand.NextByte(0, 3));
-        }
 
-        if (Time % 30f == 29f)
+        if (Time % 30f == 29f && this.RunLocal())
             Projectile.NewProj(pos, Vector2.Zero, ModContent.ProjectileType<VirulentFlower>(), Projectile.damage, 0f, Owner.whoAmI);
-        
+
         Time++;
     }
 

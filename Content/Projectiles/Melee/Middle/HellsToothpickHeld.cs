@@ -1,15 +1,11 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.Enums;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Assets;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
@@ -96,7 +92,7 @@ public class HellsToothpickHeld : ModProjectile
 
         if (Held == WaitUntilMax && Projectile.localAI[1] == 0f)
         {
-            SoundEngine.PlaySound(SoundID.Item73, Projectile.position);
+            SoundID.Item73.Play(Projectile.Center, .95f, .05f);
 
             float offsetAngle = RandomRotation();
             int amount = 16;
@@ -111,9 +107,7 @@ public class HellsToothpickHeld : ModProjectile
         {
             Vector2 vel = Vector2.UnitY.RotatedByRandom(.15) * -Main.rand.NextFloat(1f, 3f);
             if (Main.rand.NextBool())
-            {
                 ParticleRegistry.SpawnGlowParticle(pos, vel, 25, 30.8f, Color.OrangeRed);
-            }
             ParticleRegistry.SpawnGlowParticle(pos, vel, 40, Main.rand.NextFloat(24.2f, 32.4f), Color.OrangeRed, .5f);
         }
 
@@ -142,9 +136,9 @@ public class HellsToothpickHeld : ModProjectile
 
     private void BehaviorStab()
     {
-        const float StabDuration = 60f; // Defining the duration the projectile will exist in frames
+        const float StabDuration = 60f;
 
-        Projectile.velocity = Projectile.velocity.SafeNormalize(Vector2.Zero); // Store attack direction
+        Projectile.velocity = Projectile.velocity.SafeNormalize(Vector2.Zero);
         float progress = GetLerpBump(0f, .4f, 1f, .6f, Projectile.timeLeft / StabDuration);
 
         // Move the projectile from the min to the max and back, using SmoothStep for easing the movement

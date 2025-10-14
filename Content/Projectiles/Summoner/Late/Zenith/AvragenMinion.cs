@@ -1,11 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Content.Buffs.Summon;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -56,13 +54,13 @@ public class AvragenMinion : ModProjectile
     public ref float PhaseTimer => ref Projectile.ai[2];
     public bool Idling
     {
-        get => Projectile.Additions().ExtraAI[0] == 1f;
-        set => Projectile.Additions().ExtraAI[0] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[0] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
     public bool Cycling
     {
-        get => Projectile.Additions().ExtraAI[1] == 1f;
-        set => Projectile.Additions().ExtraAI[1] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[1] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[1] = value.ToInt();
     }
 
     public NPCTargeting.NPCSeekingData data => new(Projectile.Center, Sight, false, false);
@@ -96,13 +94,9 @@ public class AvragenMinion : ModProjectile
                 if (targets.Count >= 3)
                 {
                     if (Phase == AvraPhases.ConsumingVortexes && PhaseTimer >= SecondsToFrames(3f))
-                    {
                         ChangeState(AvraPhases.DaggerBarrage);
-                    }
                     else if (Phase == AvraPhases.DaggerBarrage && PhaseTimer >= SecondsToFrames(6f))
-                    {
                         ChangeState(AvraPhases.ConsumingVortexes);
-                    }
                 }
                 else
                 {
@@ -176,12 +170,12 @@ public class AvragenMinion : ModProjectile
         if (target == null)
             return;
 
-        if (PhaseTimer == 0)
+        if (PhaseTimer == 0 && this.RunLocal())
         {
             AdditionsSound.HeavyLaserBlast.Play(Projectile.Center, .8f, -.2f, .1f);
-            VoidBeam laser = Main.projectile[Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<VoidBeam>(),
-                Projectile.damage, Projectile.knockBack, Owner.whoAmI, 0f, Projectile.whoAmI)].As<VoidBeam>();
-            laser.Projectile.netUpdate = true;
+            int laser = Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<VoidBeam>(),
+                Projectile.damage, Projectile.knockBack, Owner.whoAmI, 0f, Projectile.whoAmI);
+            Main.projectile[laser].netUpdate = true;
         }
 
         Projectile.rotation = Projectile.rotation.AngleLerp(Projectile.SafeDirectionTo(target.Center).ToRotation(), .2f);
@@ -201,7 +195,8 @@ public class AvragenMinion : ModProjectile
             {
                 Utils.ChaseResults chase = Utils.GetChaseResults(Projectile.Center, Main.rand.NextFloat(18f, 26f), target.Center, target.velocity);
                 Vector2 vel = chase.ChaserVelocity.RotatedByRandom(.3f);
-                Projectile.NewProj(Projectile.Center, vel, ModContent.ProjectileType<FleetDaggers>(), Projectile.damage / 4, Projectile.knockBack, Owner.whoAmI);
+                if (this.RunLocal())
+                    Projectile.NewProj(Projectile.Center, vel, ModContent.ProjectileType<FleetDaggers>(), Projectile.damage / 4, Projectile.knockBack, Owner.whoAmI);
 
                 for (int j = 0; j < 4; j++)
                 {
@@ -223,7 +218,8 @@ public class AvragenMinion : ModProjectile
         {
             AdditionsSound.BraveSpecial1B.Play(Projectile.Center, 1.5f, -.1f, .2f, 0);
             Utils.ChaseResults chase = Utils.GetChaseResults(Projectile.Center, 20f, target.Center, target.velocity);
-            Projectile.NewProj(Projectile.Center, chase.ChaserVelocity, ModContent.ProjectileType<ConsumingVoid>(), Projectile.damage, Projectile.knockBack, Owner.whoAmI);
+            if (this.RunLocal())
+                Projectile.NewProj(Projectile.Center, chase.ChaserVelocity, ModContent.ProjectileType<ConsumingVoid>(), Projectile.damage, Projectile.knockBack, Owner.whoAmI);
 
             for (int i = 0; i < 20; i++)
             {

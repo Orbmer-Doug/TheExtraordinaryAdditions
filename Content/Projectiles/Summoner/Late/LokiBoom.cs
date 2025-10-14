@@ -1,10 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using System;
+﻿using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Late;
@@ -36,7 +34,7 @@ public class LokiBoom : ModProjectile, ILocalizedModType, IModType
         Lighting.AddLight(Projectile.Center, Color.OrangeRed.ToVector3() * 2f);
         if (Projectile.localAI[0] == 0f)
         {
-            SoundEngine.PlaySound(SoundID.DD2_FlameburstTowerShot, (Vector2?)Projectile.position, null);
+            SoundID.DD2_FlameburstTowerShot.Play(Projectile.Center);
             Projectile.localAI[0] += 1f;
         }
         for (int i = 0; i < 10; i++)

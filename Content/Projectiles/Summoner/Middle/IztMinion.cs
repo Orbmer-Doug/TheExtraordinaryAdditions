@@ -1,8 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Content.Buffs.Summon;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -55,7 +53,7 @@ public class IztMinion : ModProjectile
         {
             return;
         }
-        
+
         after ??= new(5, () => Projectile.Center);
         after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 255));
 
@@ -71,7 +69,15 @@ public class IztMinion : ModProjectile
                 Projectile.velocity = Projectile.velocity.RotatedBy((double)((Projectile.identity % 2f == 0f).ToDirectionInt() * 0.06f), default) * 0.93f;
             }
             else
-                TargetPosition(target.Center);
+            {
+                // Attack in some wierd collective way
+                // Its funny when there is a bunch of enemies because they start to run down the chain individually
+                if (HitTime <= 0)
+                {
+                    Projectile.velocity = Vector2.Lerp(Projectile.velocity, Utility.SafeDirectionTo(Projectile.Center, target.Center) * 32f, 0.02f);
+                    ParticleRegistry.SpawnGlowParticle(Projectile.RandAreaInEntity(), -Projectile.velocity * Main.rand.NextFloat(.4f, .6f), 16, Main.rand.NextFloat(.09f, .2f), Color.Gold);
+                }
+            }
         }
         else
         {
@@ -120,7 +126,7 @@ public class IztMinion : ModProjectile
             Projectile.velocity *= 0.3f;
         }
     }
-    
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         if (!HasHitTarget)
@@ -129,19 +135,6 @@ public class IztMinion : ModProjectile
             Projectile.velocity *= 2f;
             HasHitTarget = true;
             Projectile.netUpdate = true;
-        }
-
-    }
-
-    public void TargetPosition(Vector2 target)
-    {
-        // Attack in some wierd collective way
-        // Its funny when there is a bunch of enemies because they start to run down the chain individually
-        if (HitTime <= 0)
-        {
-            float flySpeed = 30f;
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(target) * flySpeed, 0.02f);
-            ParticleRegistry.SpawnGlowParticle(Projectile.RandAreaInEntity(), -Projectile.velocity * Main.rand.NextFloat(.4f, .6f), 16, Main.rand.NextFloat(.09f, .2f), Color.Gold);
         }
     }
 

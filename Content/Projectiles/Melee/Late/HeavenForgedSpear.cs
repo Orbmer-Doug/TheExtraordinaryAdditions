@@ -1,10 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Terraria;
+﻿using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
@@ -15,7 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
 public class HeavenForgedSpear : ModProjectile, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.HeavenForgedSpear);
-    
+
     public Player Owner => Main.player[Projectile.owner];
 
     private const int Lifetime = 360;
@@ -37,8 +34,8 @@ public class HeavenForgedSpear : ModProjectile, ILocalizedModType, IModType
     public ref float Fade => ref Projectile.ai[1];
     public override void AI()
     {
-        if (trail == null || trail._disposed)
-            trail = new(tip, WidthFunction, ColorFunction, null, 40);
+        if (trail == null || trail.Disposed)
+            trail = new(WidthFunction, ColorFunction, null, 40);
         cache ??= new(20);
         cache.Update(Projectile.RotHitbox().Right);
 
@@ -70,7 +67,7 @@ public class HeavenForgedSpear : ModProjectile, ILocalizedModType, IModType
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
-    {       
+    {
         Projectile.friendly = false;
     }
 
@@ -93,7 +90,7 @@ public class HeavenForgedSpear : ModProjectile, ILocalizedModType, IModType
 
     private float WidthFunction(float c)
     {
-        return MathHelper.SmoothStep(Projectile.height * 3f, 0f, c) * Projectile.Opacity;
+        return OptimizedPrimitiveTrail.HemisphereWidthFunct(c, MathHelper.SmoothStep(Projectile.height * 3f, 0f, c) * Projectile.Opacity);
     }
 
     private Color ColorFunction(SystemVector2 c, Vector2 position)
@@ -103,13 +100,12 @@ public class HeavenForgedSpear : ModProjectile, ILocalizedModType, IModType
 
     public TrailPoints cache;
     public OptimizedPrimitiveTrail trail;
-    public readonly ITrailTip tip = new RoundedTip(12);
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
         {
             ManagedShader prim = ShaderRegistry.PierceTrailShader;
-            trail.DrawTippedTrail(prim, cache.Points, tip, true);
+            trail.DrawTrail(prim, cache.Points);
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;

@@ -1,7 +1,5 @@
 ﻿using System;
 using Terraria;
-using Terraria.GameContent.Events;
-using Terraria.Graphics.Effects;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
@@ -11,7 +9,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
-/// Utilities that help with positioning, networking, and other misc.
+/// Utilities that help with positioning, fields, etc.
 public partial class Asterlin : ModNPC
 {
     public const int AngledWidth = 128;
@@ -27,6 +25,7 @@ public partial class Asterlin : ModNPC
         Sword = null;
         Gun = null;
         Staff = null;
+        Hammer = null;
         foreach (Projectile projectile in Main.ActiveProjectiles)
         {
             // Wittle down to projectiles from the mod
@@ -41,12 +40,33 @@ public partial class Asterlin : ModNPC
                 continue;
 
             // Search through the types
-            if (projectile.type == ModContent.ProjectileType<CyberneticSword>())
-                Sword = projectile.As<CyberneticSword>();
-            if (projectile.type == ModContent.ProjectileType<TheTechnicBlitzripper>())
-                Gun = projectile.As<TheTechnicBlitzripper>();
-            if (projectile.type == ModContent.ProjectileType<TheTesselesticMeltdown>())
-                Staff = projectile.As<TheTesselesticMeltdown>();
+            if (Sword == null && projectile.type == ModContent.ProjectileType<CyberneticSword>())
+            {
+                SwordIndex = projectile.whoAmI;
+                Sword = Main.projectile[SwordIndex].As<CyberneticSword>();
+                this.Sync();
+            }
+
+            if (Gun == null && projectile.type == ModContent.ProjectileType<TheTechnicBlitzripper>())
+            {
+                GunIndex = projectile.whoAmI;
+                Gun = Main.projectile[GunIndex].As<TheTechnicBlitzripper>();
+                this.Sync();
+            }
+
+            if (Staff == null && projectile.type == ModContent.ProjectileType<TheTesselesticMeltdown>())
+            {
+                StaffIndex = projectile.whoAmI;
+                Staff = Main.projectile[StaffIndex].As<TheTesselesticMeltdown>();
+                this.Sync();
+            }
+
+            if (Hammer == null && projectile.type == ModContent.ProjectileType<JudgementHammer>())
+            {
+                HammerIndex = projectile.whoAmI;
+                Hammer = Main.projectile[HammerIndex].As<JudgementHammer>();
+                this.Sync();
+            }
         }
     }
 

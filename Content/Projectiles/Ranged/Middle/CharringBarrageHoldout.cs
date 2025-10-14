@@ -1,7 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using System;
 using Terraria;
-using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
@@ -43,9 +41,8 @@ public class CharringBarrageHoldout : BaseIdleHoldoutProjectile
         Owner.ChangeDir(Dir);
         Owner.itemRotation = Projectile.rotation;
         Owner.SetFrontHandBetter(0, Projectile.rotation);
-        if (Wait <= 0 && Owner.HasAmmo(Item) && (this.RunLocal() && Modded.SafeMouseLeft.Current))
+        if (Wait <= 0 && (this.RunLocal() && Modded.SafeMouseLeft.Current) && TryUseAmmo(out int type, out float speed, out int dmg, out float kb, out int ammo))
         {
-            Owner.PickAmmo(Item, out int type, out float speed, out int dmg, out float kb, out int ammoID, Owner.IsAmmoFreeThisShot(Item, Owner.ChooseAmmo(Item), Owner.ChooseAmmo(Item).type));
             Vector2 pos = Projectile.RotHitbox().Right + PolarVector(8f * Dir, Projectile.rotation - MathHelper.PiOver2);
             Vector2 vel = Center.SafeDirectionTo(Modded.mouseWorld) * MathHelper.Clamp(speed, Item.shootSpeed, Item.shootSpeed * 2);
             if (this.RunLocal())
@@ -60,7 +57,7 @@ public class CharringBarrageHoldout : BaseIdleHoldoutProjectile
                 ParticleRegistry.SpawnGlowParticle(pos, Vector2.Zero, 8, Main.rand.NextFloat(.2f, .35f), Color.OrangeRed, 1f);
             }
             SoundID.Item11.Play(pos, Main.rand.NextFloat(.8f, 1.1f), 0f, .15f);
-            
+
             Wait = time;
             this.Sync();
         }

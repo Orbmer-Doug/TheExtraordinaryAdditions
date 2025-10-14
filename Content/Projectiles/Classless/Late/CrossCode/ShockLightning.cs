@@ -9,6 +9,7 @@ public class ShockLightning : ModProjectile
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ShockLightning);
 
     public const int Lifetime = 20;
+
     public override void SetStaticDefaults()
     {
         Main.projFrames[Type] = 5;
@@ -31,7 +32,16 @@ public class ShockLightning : ModProjectile
     public override bool ShouldUpdatePosition() => false;
 
     public ref float Time => ref Projectile.ai[0];
-    public Vector2 End;
+    public Vector2 End
+    {
+        get => new(Projectile.ai[1], Projectile.ai[2]);
+        set
+        {
+            Projectile.ai[1] = value.X;
+            Projectile.ai[2] = value.Y;
+        }
+    }
+
     public override void AI()
     {
         if (Time == 0f)
@@ -64,10 +74,8 @@ public class ShockLightning : ModProjectile
 
         while (lengthRemainingToDraw > 0f)
         {
-            // Here, we draw the chain texture at the coordinates
             Main.spriteBatch.Draw(shock, drawPos - Main.screenPosition, frame, Color.White, rot, frame.Size() / 2, 1f, Projectile.direction.ToSpriteDirection(), 0f);
 
-            // chainDrawPosition is advanced along the vector back to the player by the chainSegmentLength
             drawPos += normalized * segmentLength;
             lengthRemainingToDraw -= segmentLength;
         }

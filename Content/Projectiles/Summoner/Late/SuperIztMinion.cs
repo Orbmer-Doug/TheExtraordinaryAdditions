@@ -63,9 +63,7 @@ public class SuperIztMinion : ModProjectile
         if (target != null)
         {
             if (HasHitTarget)
-            {
                 Projectile.velocity = Utils.RotatedBy(Projectile.velocity, (double)((Projectile.identity % 2f == 0f).ToDirectionInt() * 0.06f), default(Vector2)) * 0.93f;
-            }
             else
                 TargetPosition(target.Center);
         }
@@ -121,7 +119,8 @@ public class SuperIztMinion : ModProjectile
     {
         if (!HasHitTarget)
         {
-            Projectile.NewProj(target.RandAreaInEntity(), Vector2.Zero, ModContent.ProjectileType<LokiBoom>(), Projectile.damage, 0f, Projectile.owner);
+            if (this.RunLocal())
+                Projectile.NewProj(target.RandAreaInEntity(), Vector2.Zero, ModContent.ProjectileType<LokiBoom>(), Projectile.damage, 0f, Projectile.owner);
             HitTime = 50;
             Projectile.velocity *= 2f;
             HasHitTarget = true;

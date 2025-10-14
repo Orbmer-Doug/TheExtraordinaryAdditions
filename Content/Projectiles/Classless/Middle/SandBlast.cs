@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
@@ -49,22 +48,23 @@ public class SandBlast : ModProjectile
         }
         Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver2;
     }
+
     public override void OnKill(int timeLeft)
     {
-        SoundEngine.PlaySound(SoundID.Item14, (Vector2?)Projectile.position, null);
-        Projectile.position = Projectile.Center;
-        Projectile.width = Projectile.height = 32;
-        Projectile.position.X = Projectile.position.X - Projectile.width / 2;
-        Projectile.position.Y = Projectile.position.Y - Projectile.height / 2;
+        SoundID.Item14.Play(Projectile.Center, .9f, -.1f);
+        Projectile.ExpandHitboxBy(32);
+
         int amount = 36;
         for (int i = 0; i < amount; i++)
         {
-            Vector2 val = (Vector2.Normalize(Projectile.velocity) * new Vector2(Projectile.width / 2f, Projectile.height) * 0.75f).RotatedBy((double)((i - (amount / 2 - 1)) * MathHelper.TwoPi / amount), default) + Projectile.Center;
-            Vector2 vector7 = val - Projectile.Center;
-            int num228 = Dust.NewDust(val + vector7, 0, 0, DustID.UnusedBrown, vector7.X * 1.5f, vector7.Y * 1.5f, 100, default, 1.2f);
-            Main.dust[num228].noGravity = true;
-            Main.dust[num228].noLight = true;
-            Main.dust[num228].velocity = vector7;
+            Vector2 pos = (Vector2.Normalize(Projectile.velocity) * new Vector2(Projectile.width / 2f, Projectile.height) * 0.75f)
+                .RotatedBy((double)((i - (amount / 2 - 1)) * MathHelper.TwoPi / amount), default) + Projectile.Center;
+
+            Vector2 vel = pos - Projectile.Center;
+            int dust = Dust.NewDust(pos + vel, 0, 0, DustID.UnusedBrown, vel.X * 1.5f, vel.Y * 1.5f, 100, default, 1.2f);
+            Main.dust[dust].noGravity = true;
+            Main.dust[dust].noLight = true;
+            Main.dust[dust].velocity = vel;
         }
         Projectile.maxPenetrate = -1;
         Projectile.penetrate = -1;
@@ -72,6 +72,7 @@ public class SandBlast : ModProjectile
         Projectile.localNPCHitCooldown = 10;
         Projectile.Damage();
     }
+
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D texture = TextureAssets.Projectile[Projectile.type].Value;

@@ -89,9 +89,9 @@ public class LocalPlayerDrawManager : ModSystem
         Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, samplerState, DepthStencilState.None, camera.Rasterizer, null, Matrix.Identity);
     }
 
-    private void DrawWithTargetIfNecessary(On_LegacyPlayerRenderer.orig_DrawPlayerFull orig, LegacyPlayerRenderer self, Camera camera, Player drawPlayer)
+    private static void DrawWithTargetIfNecessary(On_LegacyPlayerRenderer.orig_DrawPlayerFull orig, LegacyPlayerRenderer self, Camera camera, Player drawPlayer)
     {
-        // Use the player render target instead of manual drawing if a draw action is necessary.
+        // Use the player render target instead of manual drawing if a draw action is necessary
         bool stopEffect = StopCondition?.Invoke() ?? true;
         if (stopEffect && drawPlayer.whoAmI == Main.myPlayer)
         {
@@ -103,7 +103,7 @@ public class LocalPlayerDrawManager : ModSystem
         {
             PrepareSpritebatchForPlayers(camera, drawPlayer);
 
-            // Prepare the shader draw action and reset it.
+            // Prepare the shader draw action and reset it
             ShaderDrawAction.Invoke();
             ShaderDrawAction = null;
 

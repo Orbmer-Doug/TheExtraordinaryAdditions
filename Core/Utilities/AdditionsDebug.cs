@@ -2,8 +2,10 @@
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles.Shader;
+using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
+using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Graphics;
 
 namespace TheExtraordinaryAdditions.Core.Utilities;
 

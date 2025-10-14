@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.IO;
 using Terraria;
 using Terraria.ModLoader;
@@ -32,8 +31,8 @@ public class CosmicImplosionHoldout : BaseIdleHoldoutProjectile
     public ref float ReleaseTime => ref Projectile.ai[2];
     public bool Released
     {
-        get => Projectile.Additions().ExtraAI[0] == 1f;
-        set => Projectile.Additions().ExtraAI[0] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[0] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
 
     public static readonly int PullbackTime = SecondsToFrames(1.4f);
@@ -57,7 +56,7 @@ public class CosmicImplosionHoldout : BaseIdleHoldoutProjectile
         Owner.ChangeDir(Dir);
         Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, Projectile.rotation);
 
-        if (String == null || String._disposed)
+        if (String == null || String.Disposed)
             String = new(c => 3f, (c, pos) => Color.Cyan.Lerp(Color.Fuchsia, c.X), null, 40);
 
         Vector2 cyanCenter = Projectile.Center + PolarVector(11f * Projectile.scale, Projectile.rotation) + PolarVector(16f * Projectile.scale * Dir * Owner.gravDir, Projectile.rotation - PiOver2);
@@ -111,7 +110,7 @@ public class CosmicImplosionHoldout : BaseIdleHoldoutProjectile
     }
 
     public OptimizedPrimitiveTrail String;
-    public ManualTrailPoints Points = new(40);
+    public TrailPoints Points = new(40);
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D texture = Projectile.ThisProjectileTexture();

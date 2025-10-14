@@ -79,7 +79,7 @@ public class BergcrusherSwing : BaseSwordSwing
             PlayedSound = true;
         }
 
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, (c) => Center.ToNumerics(), 15 * MaxUpdates);
 
         // Update trails
@@ -162,7 +162,7 @@ public class BergcrusherSwing : BaseSwordSwing
         }
 
         if (SwingDir == SwingDirection.Down)
-            npc.velocity += Vector2.UnitY * 20f * npc.knockBackResist;
+            npc.velocity += Vector2.UnitY * 13f * npc.knockBackResist;
         else
             npc.velocity += SwordDir * Item.knockBack * npc.knockBackResist;
 
@@ -243,7 +243,6 @@ public class BergcrusherSwing : BaseSwordSwing
         Main.spriteBatch.Draw(Tex, Projectile.Center - Main.screenPosition, null, lightColor,
             Projectile.rotation + RotationOffset, origin, Projectile.scale, Effects, 0f);
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.OverProjectiles);
-
         return false;
     }
 }

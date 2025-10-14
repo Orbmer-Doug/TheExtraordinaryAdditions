@@ -19,11 +19,41 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Cynosure;
 public class DivineSpiritCatalyst : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.DivineSpiritCatalyst);
-    public override void Update(ref float gravity, ref float maxFallSpeed)
+
+    public override string LocalizationCategory => "Content.Items.Weapons.Cynosure";
+
+
+    public override void SetStaticDefaults()
+    {
+        Item.ResearchUnlockCount = 1;
+        Main.RegisterItemAnimation(this.Item.type, new DrawAnimationVertical(10, 6, false));
+        ItemID.Sets.SortingPriorityMaterials[this.Type] = 122;
+        ItemID.Sets.ItemNoGravity[this.Item.type] = true;
+
+        ItemID.Sets.AnimatesAsSoul[Type] = true;
+    }
+
+    public override void SetDefaults()
+    {
+        Item.width = 31;
+        Item.height = 35;
+        Item.rare = ModContent.RarityType<PrimordialRarity>();
+
+        Item.maxStack = Item.CommonMaxStack;
+        Item.value = Item.buyPrice(platinum: 5);
+    }
+
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(Color.Lerp(Color.DarkSlateBlue * 1.15f, Color.DarkSlateGray * 1.1f, (float)Math.Sin(Main.GlobalTimeWrappedHourly)));
+    }
+
+    public override void PostUpdate()
     {
         float brightness = Main.essScale * Utils.NextFloat(Main.rand, 0.9f, 1.1f);
         Lighting.AddLight(Item.Center, 0.94f * brightness, 0.95f * brightness, 0.56f * brightness);
     }
+
     public void DrawBackAfterimage(SpriteBatch spriteBatch, Vector2 baseDrawPosition, Rectangle frame, float baseScale)
     {
         if (Item.velocity.X == 0f)
@@ -57,33 +87,6 @@ public class DivineSpiritCatalyst : ModItem
         Item.velocity.X = 0f;
         DrawBackAfterimage(spriteBatch, position - Utils.Size(frame) * 0.5f, frame, scale);
         return true;
-    }
-
-    public override string LocalizationCategory => "Content.Items.Weapons.Cynosure";
-
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(Color.Lerp(Color.DarkSlateBlue * 1.15f, Color.DarkSlateGray * 1.1f, (float)Math.Sin(Main.GlobalTimeWrappedHourly)));
-    }
-
-    public override void SetStaticDefaults()
-    {
-        Item.ResearchUnlockCount = 1;
-        Main.RegisterItemAnimation(this.Item.type, new DrawAnimationVertical(10, 6, false));
-        ItemID.Sets.SortingPriorityMaterials[this.Type] = 122;
-        ItemID.Sets.ItemNoGravity[this.Item.type] = true;
-
-        ItemID.Sets.AnimatesAsSoul[Type] = true;
-    }
-
-    public override void SetDefaults()
-    {
-        Item.width = 31;
-        Item.height = 35;
-        Item.rare = ModContent.RarityType<PrimordialRarity>();
-
-        Item.maxStack = Item.CommonMaxStack;
-        Item.value = Item.buyPrice(platinum: 5);
     }
 
     public override void AddRecipes()

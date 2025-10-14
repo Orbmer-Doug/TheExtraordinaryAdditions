@@ -1,8 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Systems;
@@ -123,9 +121,7 @@ public class FunnyRock : ModProjectile
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
     {
         if (!target.IsFleshy())
-        {
             modifiers.FinalDamage *= 2;
-        }
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
@@ -144,7 +140,8 @@ public class FunnyRock : ModProjectile
         {
             AdditionsSound.LightningStrike.Play(Projectile.Center, .7f, 0f, 0f, 1, Name);
             AdditionsSound.ElectricalPowBoom.Play(Projectile.Center, 1.2f, .2f, 0f, 0, Name);
-            Projectile.NewProj(target.Center, Vector2.Zero, ModContent.ProjectileType<RockLightning>(), Projectile.damage, Projectile.knockBack, Owner.whoAmI);
+            if (this.RunLocal())
+                Projectile.NewProj(target.Center, Vector2.Zero, ModContent.ProjectileType<RockLightning>(), Projectile.damage, Projectile.knockBack, Owner.whoAmI);
 
             for (int i = 0; i < 50; i++)
             {

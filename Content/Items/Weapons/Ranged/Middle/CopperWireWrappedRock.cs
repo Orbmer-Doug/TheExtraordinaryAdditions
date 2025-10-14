@@ -2,13 +2,14 @@
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 
 public class CopperWireWrappedRock : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CopperWireWrappedRock);
+
     public override void SetDefaults()
     {
         Item.damage = 145;
@@ -29,6 +30,7 @@ public class CopperWireWrappedRock : ModItem
         Item.shootSpeed = 1f;
         Item.autoReuse = true;
     }
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();

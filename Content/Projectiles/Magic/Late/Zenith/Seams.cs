@@ -79,7 +79,6 @@ public class Seams : ModProjectile, ILocalizedModType, IModType
                 Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Size.ToVector2() * i * .4f * Projectile.Opacity), null, Color.White * Projectile.Opacity, Projectile.rotation, origin);
                 Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Size.ToVector2() * i), null, col, Projectile.rotation, origin);
                 Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Size.ToVector2() * i * 1.3f), null, new Color(77, 0, 110) * Projectile.Opacity * .4f, Projectile.rotation, origin);
-
             }
         }
         PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.Dusts, BlendState.Additive);

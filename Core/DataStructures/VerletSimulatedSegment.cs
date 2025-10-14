@@ -101,14 +101,6 @@ public class VerletSimulatedSegment(Vector2 _position, bool _locked = false, Vec
         }
     }
 
-    public static void PushAwayFromOthers(List<VerletSimulatedSegment> _segment)
-    {
-        for (int i = 1; i < _segment.Count - 1; i++)
-        {
-            VerletSimulatedSegment segment = _segment[i];
-        }
-    }
-
     public static float GetSegmentDistance(List<VerletSimulatedSegment> list)
     {
         Vector2 start = list[0].position;

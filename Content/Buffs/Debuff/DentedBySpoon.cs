@@ -1,7 +1,7 @@
 ﻿using Terraria;
-using Terraria.Localization;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.NPCGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Buffs.Debuff;
 
@@ -18,9 +18,10 @@ public class DentedBySpoon : ModBuff
     {
         npc.GetGlobalNPC<AdditionsGlobalNPC>().DentedBySpoon = true;
     }
+
     public override void Update(Player player, ref int buffIndex)
     {
-        player.GetModPlayer<GlobalPlayer>().DentedBySpoon = true;
+        player.GetModPlayer<GlobalPlayer>().Buffs[GlobalPlayer.AdditionsBuff.DentedBySpoon] = true;
         player.statDefense *= .75f;
     }
 }

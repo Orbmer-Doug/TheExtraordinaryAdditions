@@ -45,40 +45,47 @@ public class RadiantPulser : ProjOwnedByNPC<Asterlin>
     }
     public State CurrentState
     {
-        get => (State)Projectile.Additions().ExtraAI[0];
-        set => Projectile.Additions().ExtraAI[0] = (int)value;
+        get => (State)Projectile.AdditionsInfo().ExtraAI[0];
+        set => Projectile.AdditionsInfo().ExtraAI[0] = (int)value;
     }
-    public ref float TargetAngle => ref Projectile.Additions().ExtraAI[1];
-    public ref float SavedRotation => ref Projectile.Additions().ExtraAI[2];
+    public ref float TargetAngle => ref Projectile.AdditionsInfo().ExtraAI[1];
+    public ref float SavedRotation => ref Projectile.AdditionsInfo().ExtraAI[2];
     public int FireCount
     {
-        get => (int)Projectile.Additions().ExtraAI[3];
-        set => Projectile.Additions().ExtraAI[3] = value;
+        get => (int)Projectile.AdditionsInfo().ExtraAI[3];
+        set => Projectile.AdditionsInfo().ExtraAI[3] = value;
     }
     public int StateTime
     {
-        get => (int)Projectile.Additions().ExtraAI[4];
-        set => Projectile.Additions().ExtraAI[4] = value;
+        get => (int)Projectile.AdditionsInfo().ExtraAI[4];
+        set => Projectile.AdditionsInfo().ExtraAI[4] = value;
     }
-    public ref float PreviousTargetAngle => ref Projectile.Additions().ExtraAI[5];
+    public ref float PreviousTargetAngle => ref Projectile.AdditionsInfo().ExtraAI[5];
     public bool NotMain
     {
-        get => Projectile.Additions().ExtraAI[6] == 1f;
-        set => Projectile.Additions().ExtraAI[6] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[6] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[6] = value.ToInt();
     }
 
-    public Vector2 TargetPosition;
+    public Vector2 TargetPosition
+    {
+        get => new Vector2(Projectile.AdditionsInfo().ExtraAI[7], Projectile.AdditionsInfo().ExtraAI[8]);
+        set
+        {
+            Projectile.AdditionsInfo().ExtraAI[7] = value.X;
+            Projectile.AdditionsInfo().ExtraAI[8] = value.Y;
+        }
+    }
+
     public override void SafeAI()
     {
-        if (Time == 0 && !NotMain)
+        if (Time == 0 && !NotMain && this.RunServer())
         {
             for (int i = 0; i < 2; i++)
-            {
-                Main.projectile[SpawnProjectile(Projectile.Center, Vector2.Zero, Type, Projectile.damage, 0f)].As<RadiantPulser>().NotMain = true;
-            }
+                Main.projectile[SpawnProjectile(Projectile.Center, Vector2.Zero, Type, Projectile.damage, 0f)].AdditionsInfo().ExtraAI[6] = 1;
         }
-        Player Target = Main.LocalPlayer;
-        if (light == null || light._disposed)
+
+        if (light == null || light.Disposed)
             light = new(WidthFunct, ColorFunct, null, 40);
 
         if (CurrentState != State.Fade)
@@ -124,7 +131,7 @@ public class RadiantPulser : ProjOwnedByNPC<Asterlin>
                         }
                     }
                     SavedRotation = Projectile.rotation;
-                    Projectile.netUpdate = true;
+                    this.Sync();
                 }
 
                 TargetPosition = Target.Center;
@@ -144,15 +151,18 @@ public class RadiantPulser : ProjOwnedByNPC<Asterlin>
             case State.Firing:
                 if (StateTime % Asterlin.RotatedDicing_Wait == (Asterlin.RotatedDicing_Wait - 1))
                 {
-                    for (int i = (int)(-Length / 2f); i < (int)(Length / 2f); i += Asterlin.RotatedDicing_Spacing)
+                    if (this.RunServer())
                     {
-                        Vector2 pos = Projectile.Center + dir * i;
-                        Vector2 vel = new(-dir.Y, dir.X);
-                        SpawnProjectile(pos, vel, ModContent.ProjectileType<BurstingLight>(), Asterlin.MediumAttackDamage, 0f);
+                        for (int i = (int)(-Length / 2f); i < (int)(Length / 2f); i += Asterlin.RotatedDicing_Spacing)
+                        {
+                            Vector2 pos = Projectile.Center + dir * i;
+                            Vector2 vel = new(-dir.Y, dir.X);
+                            SpawnProjectile(pos, vel, ModContent.ProjectileType<BurstingLight>(), Asterlin.MediumAttackDamage, 0f);
+                        }
                     }
 
                     AdditionsSound.etherealSharpImpactB.Play(Projectile.Center, .8f, .1f, 0f, 10, Name);
-                    ParticleRegistry.SpawnPulseRingParticle(Boss.RightHandPosition, Vector2.Zero, 24, RandomRotation(), Vector2.One, 0f, 250f, Color.Gold, true);
+                    ParticleRegistry.SpawnPulseRingParticle(ModOwner.RightHandPosition, Vector2.Zero, 24, RandomRotation(), Vector2.One, 0f, 250f, Color.Gold, true);
                     Offset = Main.rand.NextFloat(-.32f, .32f);
                     FireCount++;
                 }
@@ -163,10 +173,10 @@ public class RadiantPulser : ProjOwnedByNPC<Asterlin>
                 if (FireCount >= Asterlin.RotatedDicing_FireCount)
                 {
                     StateTime = FireCount = 0;
-                    
+
                     if (!NotMain)
-                        Boss.RotatedDicing_Cycle++;
-                    if (Boss.RotatedDicing_Cycle >= Asterlin.RotatedDicing_Cycles)
+                        ModOwner.RotatedDicing_Cycle++;
+                    if (ModOwner.RotatedDicing_Cycle >= Asterlin.RotatedDicing_Cycles)
                         CurrentState = State.Fade;
                     else
                         CurrentState = State.Positioning;
@@ -201,7 +211,7 @@ public class RadiantPulser : ProjOwnedByNPC<Asterlin>
     }
 
     public OptimizedPrimitiveTrail light;
-    public ManualTrailPoints points = new(40);
+    public TrailPoints points = new(40);
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()

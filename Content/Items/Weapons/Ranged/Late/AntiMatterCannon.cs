@@ -7,7 +7,7 @@ using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
@@ -18,6 +18,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
 public class AntiMatterCannon : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AntiMatterCannon);
+
     public override void SetStaticDefaults()
     {
         // DisplayName.SetDefault("Anti Matter Sniper Rifle");
@@ -26,10 +27,23 @@ public class AntiMatterCannon : ModItem
         CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1;
     }
 
-    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+    public override void SetDefaults()
     {
-        DrawInventoryCustomScale(spriteBatch, TextureAssets.Item[Type].Value, position, frame, drawColor, itemColor, origin, scale, 0.145f, new Vector2(0f, 0f));
-        return false;
+        Item.width = Item.height = 50;
+        Item.scale = 1f;
+        Item.rare = ItemRarityID.Purple;
+        Item.value = AdditionsGlobalItem.RarityPurpleBuyPrice;
+        Item.useTime = Item.useAnimation = 4;
+        Item.autoReuse = true;
+        Item.UseSound = null;
+        Item.useStyle = ItemUseStyleID.Shoot;
+        Item.noUseGraphic = true;
+        Item.DamageType = DamageClass.Ranged;
+        Item.damage = 1500;
+        Item.knockBack = 10f;
+        Item.noMelee = true;
+        Item.shoot = ModContent.ProjectileType<AntiMatterCannonHoldout>();
+        Item.shootSpeed = 10f;
     }
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
@@ -37,32 +51,13 @@ public class AntiMatterCannon : ModItem
         tooltips.ColorLocalization(Color.Chocolate);
     }
 
-    public override void SetDefaults()
-    {
-        // Common Properties
-        Item.width = Item.height = 50;
-        Item.scale = 1f;
-        Item.rare = ItemRarityID.Purple;
-        Item.value = AdditionsGlobalItem.RarityPurpleBuyPrice;
-
-        // Use Properties
-        Item.useTime = Item.useAnimation = 4;
-        Item.autoReuse = true;
-
-        Item.UseSound = null;
-        Item.useStyle = ItemUseStyleID.Shoot;
-        Item.noUseGraphic = true;
-
-        // Weapon Properties
-        Item.DamageType = DamageClass.Ranged;
-        Item.damage = 4000;
-        Item.knockBack = 10f;
-        Item.noMelee = true;
-        Item.shoot = ModContent.ProjectileType<AntiMatterCannonHoldout>();
-        Item.shootSpeed = 10f;
-    }
-
     public override bool CanShoot(Player player) => false;
+
+    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+    {
+        DrawInventoryCustomScale(spriteBatch, TextureAssets.Item[Type].Value, position, frame, drawColor, itemColor, origin, scale, 0.145f, new Vector2(0f, 0f));
+        return false;
+    }
 
     public override void AddRecipes()
     {

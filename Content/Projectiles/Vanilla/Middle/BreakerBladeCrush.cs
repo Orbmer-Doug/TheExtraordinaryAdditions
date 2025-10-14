@@ -1,10 +1,9 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Utilities;
 using Terraria;
 using Terraria.Audio;
-using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TheExtraordinaryAdditions.Assets.Audio;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -30,15 +29,15 @@ public class BreakerBladeCrush : BaseSwordSwing
 
     public BladeState State
     {
-        get => (BladeState)Projectile.Additions().ExtraAI[7];
-        set => Projectile.Additions().ExtraAI[7] = (int)value;
+        get => (BladeState)Projectile.AdditionsInfo().ExtraAI[7];
+        set => Projectile.AdditionsInfo().ExtraAI[7] = (int)value;
     }
 
     public bool SpecialAttack => Modded.AtMaxLimit;
     public bool Beam
     {
-        get => Projectile.Additions().ExtraAI[9] == 1f;
-        set => Projectile.Additions().ExtraAI[9] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[9] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[9] = value.ToInt();
     }
 
     public override int SwingTime => Beam ? SecondsToFrames(.8f) : SpecialAttack ? SecondsToFrames(.4f) : SecondsToFrames(.6f);
@@ -47,9 +46,7 @@ public class BreakerBladeCrush : BaseSwordSwing
     public Color Bright => SpecialAttack ? new(163, 222, 250) : new(85, 237, 71);
     public Color Mid => SpecialAttack ? new(24, 136, 217) : new(70, 186, 60);
     public Color Dark => SpecialAttack ? new(23, 94, 144) : new(41, 122, 34);
-
-    public SlotId ChargeIntro;
-    public SlotId Charge;
+    public LoopedSoundInstance charge;
 
     public override void SafeInitialize()
     {
@@ -58,7 +55,7 @@ public class BreakerBladeCrush : BaseSwordSwing
 
     public override void SafeAI()
     {
-        if (Beam) 
+        if (Beam)
             InitialMouseAngle = Direction == 1 ? 0f : MathHelper.Pi;
 
         Projectile.Center = Owner.GetFrontHandPositionImproved();
@@ -71,7 +68,7 @@ public class BreakerBladeCrush : BaseSwordSwing
         switch (State)
         {
             case BladeState.Swinging:
-                if (trail == null || trail._disposed)
+                if (trail == null || trail.Disposed)
                     trail = new(WidthFunct, ColorFunct, (c) => Center.ToNumerics(), 20);
                 points?.Update(Rect().Center + PolarVector(20f, Projectile.rotation - SwordRotation) - Center);
 
@@ -127,23 +124,17 @@ public class BreakerBladeCrush : BaseSwordSwing
             case BladeState.Charging:
                 if (Time == 0f)
                 {
-                    ChargeIntro = AssetRegistry.GetSound(AdditionsSound.BreakerChargeFull).Play(Projectile.Center, .85f, 0f, 0f, null, 50, Name);
                     Projectile.rotation = MathHelper.Pi * 3f / 2f;
                     this.Sync();
                 }
 
                 Owner.ChangeDir(Direction);
 
-                bool startSoundBeingPlayed = SoundEngine.TryGetActiveSound(ChargeIntro, out var startSound) && startSound.IsPlaying;
-                if (startSoundBeingPlayed)
-                    startSound.Position = Projectile.Center;
-                else
-                {
-                    if (SoundEngine.TryGetActiveSound(Charge, out var t) && t.IsPlaying)
-                        t.Position = Projectile.Center;
-                    else
-                        Charge = AdditionsSound.BreakerCharge.Play(Projectile.Center, 1.2f, 0f, 0f, 50, Name);
-                }
+                charge ??= LoopedSoundManager.CreateNew(
+                    new AdditionsLoopedSound(AdditionsSound.BreakerChargeFull, () => .85f),
+                    new AdditionsLoopedSound(AdditionsSound.BreakerCharge, () => 1.2f),
+                    () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
+                charge.Update(Projectile.Center);
 
                 Projectile.rotation = Projectile.rotation.AngleLerp(Direction == 1 ? SwordRotation : MathHelper.Pi + SwordRotation, .2f);
                 Owner.velocity.X = 0f;
@@ -203,14 +194,6 @@ public class BreakerBladeCrush : BaseSwordSwing
             modifiers.Knockback += .4f;
             modifiers.FinalDamage *= 2.5f;
         }
-    }
-
-    public override void OnKill(int timeLeft)
-    {
-        if (SoundEngine.TryGetActiveSound(Charge, out var t) && t.IsPlaying)
-            t.Stop();
-        if (SoundEngine.TryGetActiveSound(ChargeIntro, out t) && t.IsPlaying)
-            t.Stop();
     }
 
     public float WidthFunct(float c) => 80f;

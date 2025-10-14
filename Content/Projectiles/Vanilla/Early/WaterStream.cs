@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -29,6 +28,7 @@ public class WaterStream : ModProjectile
         Projectile.localNPCHitCooldown = 20;
         Projectile.aiStyle = 12;
     }
+
     public ref float Time => ref Projectile.ai[0];
     public override void AI()
     {
@@ -106,12 +106,7 @@ public class WaterStream : ModProjectile
         if (this.RunLocal())
         {
             Projectile.penetrate = -1;
-            Projectile.position.X += Projectile.width / 2;
-            Projectile.position.Y += Projectile.height / 2;
-            Projectile.width = 24;
-            Projectile.height = 24;
-            Projectile.position.X -= Projectile.width / 2;
-            Projectile.position.Y -= Projectile.height / 2;
+            Projectile.ExpandHitboxBy(24);
             Projectile.Damage();
         }
     }

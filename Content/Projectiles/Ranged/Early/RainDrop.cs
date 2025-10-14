@@ -1,10 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Early;
@@ -26,7 +24,6 @@ public class RainDrop : ModProjectile
         Projectile.ignoreWater = true;
         Projectile.DamageType = DamageClass.Ranged;
     }
-    
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
     {
@@ -49,9 +46,7 @@ public class RainDrop : ModProjectile
     public override void OnKill(int timeLeft)
     {
         for (int i = 0; i < 14; i++)
-        {
             Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Water, 0f, 0f, 0, default, 1f);
-        }
     }
 
     public FancyAfterimages after;

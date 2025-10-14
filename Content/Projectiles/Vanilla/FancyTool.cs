@@ -11,6 +11,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ProjectileGlobal;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
@@ -27,7 +28,7 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
     public Player Owner => Main.player[Projectile.owner];
     public GlobalPlayer Modded => Owner.Additions();
     public Item Item => Owner.HeldItem;
-    public AdditionsGlobalProjectile ModdedProj => Projectile.Additions();
+    public AdditionsProjectileInfo ProjInfo => Projectile.AdditionsInfo();
     public Texture2D Tex => Item.ThisItemTexture();
     public ref float Time => ref Projectile.ai[0];
     public ref float OverallTime => ref Projectile.ai[1];
@@ -36,19 +37,19 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
         get => Projectile.ai[2] == 1f;
         set => Projectile.ai[2] = value.ToInt();
     }
-    public ref float VanishTime => ref ModdedProj.ExtraAI[0];
-    public ref float RotationOffset => ref ModdedProj.ExtraAI[2];
+    public ref float VanishTime => ref ProjInfo.ExtraAI[0];
+    public ref float RotationOffset => ref ProjInfo.ExtraAI[2];
     public bool Initialized
     {
-        get => ModdedProj.ExtraAI[3] == 1f;
-        set => ModdedProj.ExtraAI[3] = value.ToInt();
+        get => ProjInfo.ExtraAI[3] == 1f;
+        set => ProjInfo.ExtraAI[3] = value.ToInt();
     }
-    public ref float InitialMouseAngle => ref ModdedProj.ExtraAI[4];
-    public ref float InitialAngle => ref ModdedProj.ExtraAI[5];
+    public ref float InitialMouseAngle => ref ProjInfo.ExtraAI[4];
+    public ref float InitialAngle => ref ProjInfo.ExtraAI[5];
     public SwingDirection SwingDir
     {
-        get => (SwingDirection)ModdedProj.ExtraAI[6];
-        set => ModdedProj.ExtraAI[6] = (int)value;
+        get => (SwingDirection)ProjInfo.ExtraAI[6];
+        set => ProjInfo.ExtraAI[6] = (int)value;
     }
     public SpriteEffects Effects
     {
@@ -336,7 +337,7 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
     public void ItemSpecificLogic()
     {
         // Allows for continuous breaking of herbs
-        if (Item.type == ItemID.StaffofRegrowth || Item.type == ItemID.AcornAxe)
+        if ((Item.type == ItemID.StaffofRegrowth || Item.type == ItemID.AcornAxe) && Owner.whoAmI == Main.myPlayer)
         {
             Point target = ToolModifierUtils.GetTileTarget(Owner);
             if (Main.tile[target].HasTile)

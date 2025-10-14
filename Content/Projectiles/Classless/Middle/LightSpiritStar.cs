@@ -1,9 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
-using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -14,7 +11,8 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 public class LightSpiritStar : ModProjectile, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.Invis;
-    public static Color CurrentColor => MulticolorLerp(MathF.Pow(Sin01(Main.GlobalTimeWrappedHourly * MathHelper.Pi), 3), Color.Gold, Color.Goldenrod, Color.LightGoldenrodYellow, Color.PaleGoldenrod);
+    public static Color CurrentColor => MulticolorLerp(MathF.Pow(Sin01(Main.GlobalTimeWrappedHourly * MathHelper.Pi), 3), Color.Gold, Color.Goldenrod,
+        Color.LightGoldenrodYellow, Color.PaleGoldenrod);
 
     public override void SetDefaults()
     {
@@ -64,22 +62,6 @@ public class LightSpiritStar : ModProjectile, ILocalizedModType, IModType
         Projectile.VelocityBasedRotation(.01f);
     }
 
-    public override bool PreDraw(ref Color lightColor)
-    {
-        void star()
-        {
-            Texture2D starTexture = AssetRegistry.GetTexture(AdditionsTexture.Sparkle);
-            Texture2D bloomTexture = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
-            float rotation = Main.GlobalTimeWrappedHourly * 14f;
-
-            Main.spriteBatch.DrawBetterRect(bloomTexture, ToTarget(Projectile.Center, Vector2.One * Projectile.width * 1.6f), null, CurrentColor * .6f, 0f, bloomTexture.Size() / 2);
-            Main.spriteBatch.DrawBetterRect(starTexture, ToTarget(Projectile.Center, Vector2.One * Projectile.width * .5f), null, CurrentColor, rotation + MathHelper.PiOver4, starTexture.Size() / 2);
-            Main.spriteBatch.DrawBetterRect(starTexture, ToTarget(Projectile.Center, Vector2.One * Projectile.width * 1.1f), null, Color.White, rotation, starTexture.Size() / 2);
-        }
-        LayeredDrawSystem.QueueDrawAction(star, PixelationLayer.UnderProjectiles, BlendState.Additive);
-
-        return false;
-    }
 
     public override void OnKill(int timeLeft)
     {
@@ -104,5 +86,22 @@ public class LightSpiritStar : ModProjectile, ILocalizedModType, IModType
                 Gore.NewGore(Projectile.GetSource_Death(null), Projectile.position, new Vector2(Projectile.velocity.X * 0.05f, Projectile.velocity.Y * 0.05f), Main.rand.Next(16, 18), 1f);
             }
         }
+    }
+    
+    public override bool PreDraw(ref Color lightColor)
+    {
+        void star()
+        {
+            Texture2D starTexture = AssetRegistry.GetTexture(AdditionsTexture.Sparkle);
+            Texture2D bloomTexture = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
+            float rotation = Main.GlobalTimeWrappedHourly * 14f;
+
+            Main.spriteBatch.DrawBetterRect(bloomTexture, ToTarget(Projectile.Center, Vector2.One * Projectile.width * 1.6f), null, CurrentColor * .6f, 0f, bloomTexture.Size() / 2);
+            Main.spriteBatch.DrawBetterRect(starTexture, ToTarget(Projectile.Center, Vector2.One * Projectile.width * .5f), null, CurrentColor, rotation + MathHelper.PiOver4, starTexture.Size() / 2);
+            Main.spriteBatch.DrawBetterRect(starTexture, ToTarget(Projectile.Center, Vector2.One * Projectile.width * 1.1f), null, Color.White, rotation, starTexture.Size() / 2);
+        }
+        LayeredDrawSystem.QueueDrawAction(star, PixelationLayer.UnderProjectiles, BlendState.Additive);
+
+        return false;
     }
 }

@@ -5,13 +5,14 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
 
 public class Lanikea : ModItem, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Lanikea);
+
     public override void SetStaticDefaults()
     {
         Main.RegisterItemAnimation(Item.type, new DrawAnimationVertical(10, 9, false));
@@ -20,7 +21,7 @@ public class Lanikea : ModItem, ILocalizedModType, IModType
 
     public override void SetDefaults()
     {
-        Item.damage = 348;
+        Item.damage = 248;
         Item.DamageType = DamageClass.Ranged;
         Item.width = 104;
         Item.height = 32;
@@ -38,10 +39,12 @@ public class Lanikea : ModItem, ILocalizedModType, IModType
         Item.crit = 8;
         Item.noUseGraphic = true;
     }
+
     public override bool CanShoot(Player player)
     {
         return false;
     }
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();

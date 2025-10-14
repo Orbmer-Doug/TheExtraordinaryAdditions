@@ -1,15 +1,11 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
-using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
-using TheExtraordinaryAdditions.Core.Interfaces;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
@@ -34,11 +30,11 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
         set => Projectile.ai[1] = value.ToInt();
     }
     public ref float Time => ref Projectile.ai[2];
-    public ref float Rot => ref Projectile.Additions().ExtraAI[0];
-    public ref float SavedDistance => ref Projectile.Additions().ExtraAI[1];
-    public ref float BeamTimer => ref Projectile.Additions().ExtraAI[2];
-    public ref float Dir => ref Projectile.Additions().ExtraAI[3];
-    public ref float SpinSpeed => ref Projectile.Additions().ExtraAI[4];
+    public ref float Rot => ref Projectile.AdditionsInfo().ExtraAI[0];
+    public ref float SavedDistance => ref Projectile.AdditionsInfo().ExtraAI[1];
+    public ref float BeamTimer => ref Projectile.AdditionsInfo().ExtraAI[2];
+    public ref float Dir => ref Projectile.AdditionsInfo().ExtraAI[3];
+    public ref float SpinSpeed => ref Projectile.AdditionsInfo().ExtraAI[4];
 
     public override bool? CanDamage()
     {
@@ -64,11 +60,16 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
 
     public override void SafeAI()
     {
-        if (Owner == null || Owner.active == false)
+        if (Target == null)
         {
             Projectile.Kill();
             return;
         }
+
+        if (beam == null || beam.Disposed)
+            beam = new(WidthFunction, ColorFunction, null, 5);
+        if (tele == null || tele.Disposed)
+            tele = new(TeleWidthFunction, TeleColorFunction, null, 5);
 
         if (Time == 0f)
         {
@@ -100,7 +101,7 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
             Projectile.velocity = Projectile.SafeDirectionTo(Target.Center);
 
             Vector2 start2 = Projectile.Center;
-            Vector2 end2 = start + Projectile.SafeDirectionTo(Target.Center).SafeNormalize(Vector2.Zero) * (1200f * InverseLerp(0f, TimeForBeam / 2, Time));
+            Vector2 end2 = start + Projectile.SafeDirectionTo(Target.Center).SafeNormalize(Vector2.Zero) * (1800f * InverseLerp(0f, TimeForBeam / 2, Time));
 
             basePoints.SetPoints(start2.GetLaserControlPoints(end2, 40));
         }
@@ -155,7 +156,9 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
         return targetHitbox.CollisionFromPoints(basePoints.Points, WidthFunction);
     }
 
-    public ManualTrailPoints basePoints;
+    public OptimizedPrimitiveTrail beam;
+    public OptimizedPrimitiveTrail tele;
+    public TrailPoints basePoints;
     public override bool PreDraw(ref Color lightColor)
     {
         if (Owner == null || Owner.active == false)
@@ -165,17 +168,21 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
         {
             if (BeamTimer > 0f)
             {
-                ManagedShader shader = ShaderRegistry.BloodBeacon;
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.CrackedNoise), 1);
-                OptimizedPrimitiveTrail trail = new(WidthFunction, ColorFunction, null, 5);
-                trail.DrawTrail(shader, basePoints.Points, 30);
+                if (beam != null && !beam.Disposed && basePoints != null)
+                {
+                    ManagedShader shader = ShaderRegistry.BloodBeacon;
+                    shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.CrackedNoise), 1);
+                    beam.DrawTrail(shader, basePoints.Points, 30);
+                }
             }
             else if (!NotFree)
             {
-                ManagedShader shader = ShaderRegistry.SideStreakTrail;
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.HarshNoise), 1);
-                OptimizedPrimitiveTrail trail = new(TeleWidthFunction, TeleColorFunction, null, 5);
-                trail.DrawTrail(shader, basePoints.Points, 30);
+                if (tele != null && !tele.Disposed && basePoints != null)
+                {
+                    ManagedShader shader = ShaderRegistry.SideStreakTrail;
+                    shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.HarshNoise), 1);
+                    tele.DrawTrail(shader, basePoints.Points, 30);
+                }
             }
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);

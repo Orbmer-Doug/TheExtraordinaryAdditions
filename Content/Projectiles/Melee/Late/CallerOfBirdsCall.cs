@@ -1,17 +1,10 @@
-﻿using Mono.Cecil;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
 
@@ -20,12 +13,13 @@ public class CallerOfBirdsCall : BaseHoldoutProjectile
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CallerOfBirds);
     public override void Defaults()
     {
-        Projectile.Size = new(52, 42);
+        Projectile.Size = new(46, 56);
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = 30;
         Projectile.ownerHitCheck = true;
         Projectile.DamageType = DamageClass.Melee;
     }
+
     public ref float Time => ref Projectile.ai[0];
     public override void SafeAI()
     {
@@ -52,17 +46,19 @@ public class CallerOfBirdsCall : BaseHoldoutProjectile
 
                 if (vel.Y < 0f)
                     vel.Y *= -1f;
-                
+
                 vel *= Item.shootSpeed;
                 Projectile.NewProj(position, vel, ModContent.ProjectileType<Pigeon>(), Projectile.damage / 3, 0f, Owner.whoAmI);
             }
-            
+
         }
         if (Time % 16 == 15)
             SoundID.Zombie11.Play(Projectile.Center + Main.rand.NextVector2Circular(40f, 40f), .5f, 0f, .4f, null, 50, Name);
 
         Time++;
     }
+
+    public override bool? CanDamage() => null;
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {

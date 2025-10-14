@@ -1,9 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
+﻿using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
@@ -35,9 +33,7 @@ public class ThePropane : ModProjectile
         if (Main.expertMode)
         {
             if (target.type >= NPCID.EaterofWorldsHead && target.type <= NPCID.EaterofWorldsTail)
-            {
                 modifiers.FinalDamage /= 5;
-            }
         }
 
         if (Big)
@@ -58,7 +54,6 @@ public class ThePropane : ModProjectile
 
     public override void AI()
     {
-        // The projectile is in the midst of exploding during the last 3 updates.
         if (Projectile.timeLeft <= 3)
         {
             Projectile.tileCollide = false;
@@ -87,7 +82,7 @@ public class ThePropane : ModProjectile
         Time++;
         if (Time > 10f)
         {
-            // Roll speed dampening. 
+            // Roll speed dampening.
             if (Projectile.velocity.Y == 0f && Projectile.velocity.X != 0f)
             {
                 Projectile.velocity.X *= 0.96f;
@@ -103,7 +98,7 @@ public class ThePropane : ModProjectile
             Projectile.velocity.Y = MathHelper.Clamp(Projectile.velocity.Y + .16f, -50f, 40f);
         }
 
-        Projectile.rotation += Projectile.velocity.X * .04f;//.VelocityBasedRotation();
+        Projectile.rotation += Projectile.velocity.X * .04f;
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
@@ -114,10 +109,8 @@ public class ThePropane : ModProjectile
 
     public override void OnKill(int timeLeft)
     {
-        //Particle.Spawn(new TileHeatParticle(Projectile.Center, 4f, Big ? ExplosionWidthHeight / 32 : ExplosionWidthHeight / 64, Color.White, Color.OrangeRed, Color.DarkGray));
-
         // Play explosion sound
-        SoundEngine.PlaySound(SoundID.DD2_ExplosiveTrapExplode with { Volume = 1.1f, PitchVariance = .2f }, Projectile.Center);
+        SoundID.DD2_ExplosiveTrapExplode.Play(Projectile.Center, 1.1f, 0f, .2f);
 
         for (int i = 0; i < 180; i++)
         {

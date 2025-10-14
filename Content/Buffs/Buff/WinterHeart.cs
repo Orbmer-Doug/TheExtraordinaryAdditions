@@ -1,6 +1,5 @@
 ﻿using Terraria;
 using Terraria.ID;
-using Terraria.Localization;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
 
@@ -17,7 +16,7 @@ public class WinterHeart : ModBuff
 
     public override void Update(Player player, ref int buffIndex)
     {
-        player.GetModPlayer<GlobalPlayer>().frigidTonic = true;
+        player.GetModPlayer<GlobalPlayer>().Buffs[GlobalPlayer.AdditionsBuff.FrigidTonic] = true;
         player.buffImmune[BuffID.Chilled] = true;
         player.endurance += 0.05f;
     }

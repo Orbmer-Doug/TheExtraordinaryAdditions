@@ -28,7 +28,7 @@ public class BookOfSkullsHoldout : BaseIdleHoldoutProjectile
         Item item = Owner.HeldItem;
         Vector2 pos = Projectile.Center + PolarVector(10f, Projectile.rotation);
 
-        if (Time % item.useAnimation == item.useAnimation - 1 && Modded.SafeMouseLeft.Current && this.RunLocal())
+        if (this.RunLocal() && Time % item.useAnimation == item.useAnimation - 1 && Modded.SafeMouseLeft.Current)
         {
             Vector2 vel = Projectile.velocity * item.shootSpeed;
             SoundEngine.PlaySound(SoundID.Item8, pos);
@@ -46,8 +46,8 @@ public class BookOfSkullsHoldout : BaseIdleHoldoutProjectile
             this.Sync();
         }
 
-        ref float indic = ref Projectile.localAI[0];
-        if (indic == 0f && Charge == ChargeTime)
+        ref float indicator = ref Projectile.localAI[0];
+        if (indicator == 0f && Charge == ChargeTime)
         {
             float offsetAngle = RandomRotation();
             int amount = 6;
@@ -56,7 +56,8 @@ public class BookOfSkullsHoldout : BaseIdleHoldoutProjectile
                 Vector2 velo = (MathHelper.TwoPi * i / amount + offsetAngle).ToRotationVector2() * Main.rand.NextFloat(4f, 7f);
                 ParticleRegistry.SpawnSparkParticle(pos, velo, Main.rand.Next(16, 22), Main.rand.NextFloat(.6f, .7f), Color.Chocolate);
             }
-            indic = 1f;
+            indicator = 1f;
+            Projectile.netUpdate = true;
         }
 
         if (!Modded.MouseLeft.Current && Charge == ChargeTime && Owner.HeldItem.CheckManaBetter(Owner, item.mana * 2, true) && this.RunLocal())
@@ -67,9 +68,10 @@ public class BookOfSkullsHoldout : BaseIdleHoldoutProjectile
                 Vector2 rotVel = Projectile.velocity.RotatedBy(MathHelper.ToRadians(i)) * item.shootSpeed * 2;
                 Projectile.NewProj(pos, rotVel, ModContent.ProjectileType<BlastSkull>(), item.damage, item.knockBack, Owner.whoAmI, 0f, 1f);
             }
-            SoundEngine.PlaySound(SoundID.Item8 with { Volume = 1.4f, Pitch = -.2f }, Projectile.Center);
-            indic = 0f;
+            SoundID.Item8.Play(Projectile.Center, 1.4f, -.2f);
+            indicator = 0f;
             Charge = 0f;
+            Projectile.netUpdate = true;
         }
 
         if (this.RunLocal())

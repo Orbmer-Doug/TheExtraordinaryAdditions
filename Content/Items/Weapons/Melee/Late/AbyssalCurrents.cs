@@ -7,7 +7,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
@@ -38,11 +38,6 @@ public class AbyssalCurrents : ModItem
         new(26, 103, 196)
     };
 
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(WaterPalette[2]);
-    }
-
     public override void SetDefaults()
     {
         Item.rare = ModContent.RarityType<BrackishRarity>();
@@ -65,15 +60,22 @@ public class AbyssalCurrents : ModItem
         Item.channel = true;
     }
 
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(WaterPalette[2]);
+    }
+
     public override bool CanShoot(Player player) => true;
+
     public override bool AltFunctionUse(Player player) => true;
+
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
         AbyssalCurrentsHoldout hold = Main.projectile[Projectile.NewProjectile(source, position, velocity, Item.shoot, damage, knockback, player.whoAmI)].As<AbyssalCurrentsHoldout>();
         if (player.altFunctionUse == ItemAlternativeFunctionID.ActivatedAndUsed)
         {
             hold.State = AbyssalCurrentsHoldout.AbyssalState.Spin;
-            hold.Projectile.localNPCHitCooldown = 12;
+            hold.Projectile.localNPCHitCooldown = 22;
         }
         else
             hold.Projectile.localNPCHitCooldown = -1;

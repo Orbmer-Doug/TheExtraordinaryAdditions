@@ -1,8 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 
 namespace TheExtraordinaryAdditions.Content.Rarities.Sparkles;
 

@@ -10,10 +10,8 @@ using TheExtraordinaryAdditions.Core.Graphics;
 
 namespace TheExtraordinaryAdditions.Core.Systems;
 
+// Primarily from Calamity Fables
 // TODO: Shaders? Opacity delegate?
-public delegate Vector2 CharacterDisplacementDelegate(int character);
-public delegate Vector2 CharacterAppearDelegate(int character, float progress);
-public delegate Color LetterColorDelegate(int character, float globalProgress);
 
 /// <summary>
 /// An individual segment of text that can have a variety of different effects applied to it, but the effects are all consistent throughout the text displayed <br/>
@@ -21,6 +19,10 @@ public delegate Color LetterColorDelegate(int character, float globalProgress);
 /// </summary>
 public struct TextSnippet
 {
+    public delegate Vector2 CharacterDisplacementDelegate(int character);
+    public delegate Vector2 CharacterAppearDelegate(int character, float progress);
+    public delegate Color LetterColorDelegate(int character, float globalProgress);
+
     public static Vector2 NoDisplacement(int character) => Vector2.Zero;
     public static Vector2 SmallRandomDisplacement(int character) => Main.rand.NextVector2Circular(1.1f, 1.1f);
     public static Vector2 RandomDisplacement(int character) => Main.rand.NextVector2Circular(2f, 2f);
@@ -165,7 +167,7 @@ public struct TextSnippet
 /// Text that can be scrolled one letter at a time, made up of multiple different <see cref="TextSnippet"/>s, allowing the text to have pauses, different font sizes, moving text, etc.
 /// </summary>
 // ...paragraph?
-public class AwesomeSentence
+public sealed class AwesomeSentence
 {
     public List<TextSnippet> Snippets;
     public float MaxProgress;
@@ -173,9 +175,6 @@ public class AwesomeSentence
 
     public AwesomeSentence(float textboxWidth, params TextSnippet[] textSnippets)
     {
-        if (Main.dedServ)
-            return;
-
         Snippets = new List<TextSnippet>();
         for (int i = 0; i < textSnippets.Length; i++)
         {

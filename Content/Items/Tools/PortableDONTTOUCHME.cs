@@ -1,16 +1,9 @@
-﻿using log4net;
-using Microsoft.Xna.Framework;
-using Steamworks;
-using System.Collections.Generic;
-using System.Threading;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
-using Terraria.IO;
 using Terraria.ModLoader;
-using Terraria.Social;
 using TheExtraordinaryAdditions.Core.Utilities;
-
 
 namespace TheExtraordinaryAdditions.Content.Items.Tools;
 

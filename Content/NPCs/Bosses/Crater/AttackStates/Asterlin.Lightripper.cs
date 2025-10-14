@@ -3,17 +3,18 @@ using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Systems;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
 public partial class Asterlin : ModNPC
 {
+    public static readonly Dictionary<AsterlinAIType, float> Lightripper_PossibleStates =
+        new Dictionary<AsterlinAIType, float> { { AsterlinAIType.Tesselestic, 1f }, { AsterlinAIType.Disintegration, .6f } };
     [AutomatedMethodInvoke]
     public void LoadStateTransitions_Lightripper()
     {
-        StateMachine.RegisterTransition(AsterlinAIType.Lightripper, new Dictionary<AsterlinAIType, float> { { AsterlinAIType.Disintegration, 1f }, { AsterlinAIType.Cleave, 1f } }, false, () =>
+        StateMachine.RegisterTransition(AsterlinAIType.Lightripper, Lightripper_PossibleStates, false, () =>
         {
             return Lightripper_Cycles >= Lightripper_TotalCycles;
         });
@@ -32,18 +33,18 @@ public partial class Asterlin : ModNPC
         Wait,
     }
 
-    public ref float Lightripper_Cycles => ref NPC.AdditionsInfo().ExtraAI[0];
+    public ref float Lightripper_Cycles => ref ExtraAI[0];
     public LightripperState Lightripper_State
     {
-        get => (LightripperState)NPC.AdditionsInfo().ExtraAI[1];
-        set => NPC.AdditionsInfo().ExtraAI[1] = (int)value;
+        get => (LightripperState)ExtraAI[1];
+        set => ExtraAI[1] = (int)value;
     }
-    public ref float Lightripper_InitialDirection => ref NPC.AdditionsInfo().ExtraAI[2];
+    public ref float Lightripper_InitialDirection => ref ExtraAI[2];
 
     public static float Lightripper_BeamDelay => 11f;
     public static float Lightripper_FanOffset => 1.45f;
     public static int Lightripper_ReleaseRate => 2;
-    public static int Lightripper_TotalBeams => 11;
+    public static int Lightripper_TotalBeams => DifficultyBasedValue(7, 8, 10, 11, 12, 14);
 
     public static int Lightripper_HoverTime => SecondsToFrames(1.1f);
     public static int Lightripper_ReelbackTime => SecondsToFrames(.6f);
@@ -64,20 +65,20 @@ public partial class Asterlin : ModNPC
                     float offsetAngle = MathHelper.Lerp(-Lightripper_FanOffset, Lightripper_FanOffset, fanInterpolant);
                     Vector2 shootVelocity = (Lightripper_InitialDirection + offsetAngle).ToRotationVector2();
 
-                    if (AITimer % Lightripper_ReleaseRate == Lightripper_ReleaseRate - 1f && this.RunServer())
+                    if (this.RunServer() && AITimer % Lightripper_ReleaseRate == Lightripper_ReleaseRate - 1f)
                     {
                         int type = ModContent.ProjectileType<LightrippingBeam>();
                         NPC.NewNPCProj(RightHandPosition + shootVelocity.SafeNormalize(Vector2.Zero) * 100f, shootVelocity, type, HeavyAttackDamage, 0f);
                     }
 
-                    SetRightHandTarget(rightArm.RootPosition + shootVelocity * 400f);
+                    SetRightHandTarget(RightArm.RootPosition + shootVelocity * 400f);
 
                     if (AITimer >= Lightripper_BeamDelay + Lightripper_ReleaseRate * Lightripper_TotalBeams)
                     {
                         // Reset timers and proceed to next stage of the attack
                         Lightripper_State = LightripperState.Hover;
                         AITimer = 0;
-                        NPC.netUpdate = true;
+                        this.Sync();
                     }
                 }
 
@@ -94,7 +95,7 @@ public partial class Asterlin : ModNPC
                     AdditionsSound.spearLaser.Play(NPC.Center, 2f, .12f);
                     Lightripper_State = LightripperState.Reel;
                     AITimer = 0;
-                    NPC.netUpdate = true;
+                    this.Sync();
                 }
                 break;
             case LightripperState.Reel:
@@ -114,7 +115,7 @@ public partial class Asterlin : ModNPC
                 {
                     Lightripper_State = LightripperState.Dash;
                     AITimer = 0;
-                    NPC.netUpdate = true;
+                    this.Sync();
                 }
                 break;
             case LightripperState.Dash:
@@ -134,16 +135,18 @@ public partial class Asterlin : ModNPC
                 NPC.velocity = NPC.rotation.ToRotationVector2() * 275f;
                 Lightripper_State = LightripperState.Wait;
                 AITimer = 0;
-                NPC.netUpdate = true;
+                this.Sync();
                 break;
             case LightripperState.Wait:
                 NPC.velocity *= .915f;
+                NPC.damage = NPC.defDamage;
+
                 if (AITimer >= Lightripper_SlowdownTime)
                 {
                     Lightripper_Cycles++;
                     Lightripper_State = LightripperState.BeamRelease;
                     AITimer = 0;
-                    NPC.netUpdate = true;
+                    this.Sync();
                 }
                 break;
         }

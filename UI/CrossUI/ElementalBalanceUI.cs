@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
-using TheExtraordinaryAdditions.Content.Buffs.Debuff;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.CrossCode;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -57,7 +56,7 @@ public class ElementalBalanceUI : SmartUIState
         Element element = holdout.State;
         int mode = (int)element;
 
-        bool button = AdditionsKeybinds.OpenCrossDiscUI.Current;
+        bool button = AdditionsKeybinds.OpenCrossDiscUI.Current && balance.CircuitOverload <= 0;
 
         Vector2 rightPos = new(Main.screenWidth / 2 + (300 * (2f - uiScale)), Main.screenHeight / 2 - (350 * (2f - uiScale)));
         Vector2 centerPos = new(Main.screenWidth / 2, Main.screenHeight / 2);
@@ -261,7 +260,7 @@ public class ElementalBalanceUI : SmartUIState
     {
         Vector2 screenPos = Main.screenPosition;
 
-        float flicker = Sin01(Main.GlobalTimeWrappedHourly * (player.Additions().CircuitOverload > 0 ? 15f : 5f)) + .5f;
+        float flicker = Sin01(Main.GlobalTimeWrappedHourly * (player.GetModPlayer<ElementalBalance>().CircuitOverload > 0 ? 15f : 5f)) + .5f;
         float opacity = element.ElementCompletion * flicker;
         if (element.ElementCompletion >= .5f)
             opacity *= 2f;
@@ -275,7 +274,7 @@ public class ElementalBalanceUI : SmartUIState
             SpriteEffects fx = SpriteEffects.None;
             float width = Main.screenWidth;
             float height = Main.screenHeight;
-            Rectangle frame = Overload.Frame(2, 1, player.Additions().CircuitOverload > 0 ? 1 : 0, 0);
+            Rectangle frame = Overload.Frame(2, 1, player.GetModPlayer<ElementalBalance>().CircuitOverload > 0 ? 1 : 0, 0);
             float overWidth = frame.Width * .5f;
             float overHeight = frame.Height * .5f;
             switch (i)
@@ -301,7 +300,7 @@ public class ElementalBalanceUI : SmartUIState
                     fx = SpriteEffects.None;
                     break;
             }
-            
+
             Main.EntitySpriteDraw(Overload, new Vector2(Main.screenWidth / 2, Main.screenHeight / 2) + pos, frame, Color.White * opacity, rotation, frame.Size() * .5f, 1f, fx);
         }
         Main.spriteBatch.End();

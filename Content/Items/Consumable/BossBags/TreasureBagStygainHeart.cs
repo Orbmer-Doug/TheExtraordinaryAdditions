@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod;
+using CalamityMod.Items.Materials;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent.ItemDropRules;
@@ -10,7 +11,6 @@ using TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Middle;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain;
-using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Consumable.BossBags;
 
@@ -27,33 +27,18 @@ public class TreasureBagStygainHeart : ModItem
     {
         Item.maxStack = 999;
         Item.consumable = true;
-        Item.width = 32;
-        Item.height = 32;
-        Item.expert = true;
+        Item.width = Item.height = 32;
         Item.rare = ItemRarityID.Expert;
+        Item.expert = true;
     }
 
-    public override void ModifyResearchSorting(ref ContentSamples.CreativeHelper.ItemGroup itemGroup)
-    {
+    public override void ModifyResearchSorting(ref ContentSamples.CreativeHelper.ItemGroup itemGroup) =>
         itemGroup = ContentSamples.CreativeHelper.ItemGroup.BossBags;
-    }
-
-    public override bool CanRightClick()
-    {
-        return true;
-    }
-
-    public override Color? GetAlpha(Color lightColor)
-    {
-        return Color.Lerp(lightColor, Color.White, 0.4f);
-    }
-
+    public override bool CanRightClick() => true;
+    public override Color? GetAlpha(Color lightColor) => Color.Lerp(lightColor, Color.White, 0.4f);
     public override void PostUpdate() => Item.TreasureBagLightAndDust();
-
-    public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
-    {
-        return DrawTreasureBagInWorld(Item, spriteBatch, rotation, scale, whoAmI);
-    }
+    public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI) =>
+        DrawTreasureBagInWorld(Item, spriteBatch, rotation, scale, whoAmI);
 
     public override void ModifyItemLoot(ItemLoot itemLoot)
     {
@@ -66,7 +51,9 @@ public class TreasureBagStygainHeart : ModItem
         itemLoot.Add(ModContent.ItemType<HemoglobbedCapsule>());
         itemLoot.Add(ModContent.ItemType<LanceOfSanguineSteels>());
         itemLoot.Add(ModContent.ItemType<Exsanguination>());
+        itemLoot.AddRevBagAccessories();
 
-        itemLoot.Add(ItemDropRule.CoinsBasedOnNPCValue(ModContent.NPCType<StygainHeart>() / 2));
+        itemLoot.Add(ItemDropRule.CoinsBasedOnNPCValue(ModContent.NPCType<StygainHeart>()));
+        itemLoot.Add(ModContent.ItemType<BloodOrb>(), 1, 200, 250);
     }
 }

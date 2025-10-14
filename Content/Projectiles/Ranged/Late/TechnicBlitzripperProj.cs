@@ -18,8 +18,8 @@ public class TechnicBlitzripperProj : BaseIdleHoldoutProjectile, ILocalizedModTy
     public ref float Timer => ref Projectile.ai[0];
     public ref float ShootDelay => ref Projectile.ai[1];
     public ref float SniperTimer => ref Projectile.ai[2];
-    public ref float Recoil => ref Projectile.Additions().ExtraAI[0];
-    public ref float Heat => ref Projectile.Additions().ExtraAI[1];
+    public ref float Recoil => ref Projectile.AdditionsInfo().ExtraAI[0];
+    public ref float Heat => ref Projectile.AdditionsInfo().ExtraAI[1];
 
     public ref bool Overheating => ref Owner.GetModPlayer<RipperPlayer>().Overheating;
     public ref int OverheatTimer => ref Owner.GetModPlayer<RipperPlayer>().OverheatTimer;
@@ -123,9 +123,7 @@ public class TechnicBlitzripperProj : BaseIdleHoldoutProjectile, ILocalizedModTy
                     ParticleRegistry.SpawnGlowParticle(Tip, Main.rand.NextVector2Circular(2f, 2f), Main.rand.Next(6, 12), Main.rand.NextFloat(40f, 60f), Color.LightCyan, 1.4f);
 
                 for (int i = 0; i < 30; i++)
-                {
                     ParticleRegistry.SpawnTechyHolosquareParticle(Tip, Projectile.velocity.RotatedByRandom(.4f).RotatedByRandom(.1f) * Main.rand.NextFloat(11f, 22f), Main.rand.Next(20, 30), Main.rand.NextFloat(1f, 2f), Color.Cyan);
-                }
 
                 ParticleRegistry.SpawnBlurParticle(Tip, 50, .8f, 200f);
                 ScreenShakeSystem.New(new(.5f, .4f), Tip);

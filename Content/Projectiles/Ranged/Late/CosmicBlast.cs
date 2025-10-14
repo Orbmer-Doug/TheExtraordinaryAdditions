@@ -44,7 +44,7 @@ public class CosmicBlast : ModProjectile, IHasScreenShader
         Shader.TrySetParameter("intensity", anim);
         Shader.TrySetParameter("screenPos", GetTransformedScreenCoords(Projectile.Center));
         Shader.TrySetParameter("screenSize", Main.ScreenSize.ToVector2());
-        Shader.TrySetParameter("radius", (Radius * Projectile.scale) / Main.screenWidth);
+        Shader.TrySetParameter("radius", (Radius * Projectile.scale) / Main.screenWidth * Main.GameViewMatrix.Zoom.X);
         Shader.TrySetParameter("falloffSigma", .6f);
         Shader.Activate();
     }
@@ -61,6 +61,7 @@ public class CosmicBlast : ModProjectile, IHasScreenShader
             ScreenShaderUpdates.UnregisterEntity(this);
         }
     }
+
     public bool IsEntityActive() => Projectile.active;
 
     public NPC Target;
@@ -115,11 +116,11 @@ public class CosmicBlast : ModProjectile, IHasScreenShader
             ParticleRegistry.SpawnMistParticle(pos, vel * .1f + Main.rand.NextVector2Circular(9f, 9f), scale, col, Color.DarkViolet, Main.rand.NextFloat(190f, 230f));
             ParticleRegistry.SpawnSparkleParticle(pos, vel * .4f + Main.rand.NextVector2Circular(3f, 3f), life + 10, scale, col, col == Color.Fuchsia ? Color.Cyan : Color.Fuchsia, 1.4f);
         }
-        Projectile.NewProj(Projectile.Center, Projectile.velocity, ModContent.ProjectileType<CosmicBlastHidden>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
+        if (this.RunLocal())
+            Projectile.NewProj(Projectile.Center, Projectile.velocity, ModContent.ProjectileType<CosmicBlastHidden>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
         ParticleRegistry.SpawnPulseRingParticle(pos, Vector2.Zero, 20, 0f, Vector2.One, 0f, 400f, Color.DarkViolet, true);
         AdditionsSound.CeaselessVoidDeath.Play(Projectile.Center, 1, .4f, 0f, 10, Name);
         ParticleRegistry.SpawnChromaticAberration(pos, 130, 1f, 500f);
-
         ReleaseShader();
     }
 }

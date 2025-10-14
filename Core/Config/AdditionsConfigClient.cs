@@ -1,8 +1,6 @@
 ﻿using System.ComponentModel;
-using Terraria;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 
 namespace TheExtraordinaryAdditions.Core.Config;
 

@@ -37,7 +37,6 @@ public class BatSummon : ModProjectile
     }
 
     public override bool? CanCutTiles() => false;
-
     public override bool MinionContactDamage() => true;
 
     public override void AI()
@@ -70,7 +69,7 @@ public class BatSummon : ModProjectile
 
         Projectile.SetAnimation(Main.projFrames[Type], 7, true);
     }
-    
+
     private void Charging(Vector2 t)
     {
         Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(t) * 60f, 0.02f);
@@ -87,7 +86,7 @@ public class BatSummon : ModProjectile
         float distance = 2000f;
         if (Projectile.WithinRange(idlePosition, distance) && !Projectile.WithinRange(idlePosition, 500f))
             Projectile.velocity = (idlePosition - Projectile.Center) / 30f;
-        
+
         else if (!Projectile.WithinRange(idlePosition, 160f))
             Projectile.velocity = (Projectile.velocity * 37f + Projectile.SafeDirectionTo(idlePosition) * 17f) / 40f;
 
@@ -107,21 +106,16 @@ public class BatSummon : ModProjectile
         }
     }
 
-    // This is the "active check", makes sure the minion is alive while the player is alive, and despawns if not
     private bool CheckActive(Player owner)
     {
         if (owner.dead || !owner.active)
         {
             owner.ClearBuff(ModContent.BuffType<MidnightBats>());
-
             return false;
         }
 
         if (owner.HasBuff(ModContent.BuffType<MidnightBats>()))
-        {
             Projectile.timeLeft = 2;
-        }
-
         return true;
     }
 }

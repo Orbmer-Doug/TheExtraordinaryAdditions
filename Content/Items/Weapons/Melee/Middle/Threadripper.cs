@@ -2,13 +2,14 @@
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 
 public class Threadripper : ModItem, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Threadripper);
+
     public override void SetStaticDefaults()
     {
         ItemID.Sets.Yoyo[Item.type] = true;
@@ -21,8 +22,8 @@ public class Threadripper : ModItem, ILocalizedModType, IModType
         Item.width = 42;
         Item.height = 40;
         Item.DamageType = DamageClass.MeleeNoSpeed;
-        Item.damage = 110;
-        Item.knockBack = 2.5f;
+        Item.damage = 80;
+        Item.knockBack = 1.5f;
         Item.useTime = 20;
         Item.useAnimation = 20;
         Item.autoReuse = true;

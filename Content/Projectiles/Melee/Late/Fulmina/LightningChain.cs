@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
@@ -37,21 +38,31 @@ public class LightningChain : ModProjectile
     }
     public int Current
     {
-        get => (int)Projectile.Additions().ExtraAI[0];
-        set => Projectile.Additions().ExtraAI[0] = value;
+        get => (int)Projectile.AdditionsInfo().ExtraAI[0];
+        set => Projectile.AdditionsInfo().ExtraAI[0] = value;
     }
 
     public int MaxChains => (int)MathF.Ceiling(Utils.Remap(Power, CondereFulminaHoldout.TotalReelTime / 2, CondereFulminaHoldout.TotalReelTime, 2, 8));
     public float Width => Utils.Remap(Power, CondereFulminaHoldout.TotalReelTime / 2, CondereFulminaHoldout.TotalReelTime, 8f, 50f);
     public Vector2 Start { get; set; }
     public Vector2 End { get; set; }
+    public override void SendExtraAI(BinaryWriter writer)
+    {
+        writer.WriteVector2(Start);
+        writer.WriteVector2(End);
+    }
+    public override void ReceiveExtraAI(BinaryReader reader)
+    {
+        Start = reader.ReadVector2();
+        End = reader.ReadVector2();
+    }
     public float Completion => Animators.MakePoly(6f).OutFunction(InverseLerp(0f, Life, Time));
     public override bool ShouldUpdatePosition() => false;
 
-    public List<NPC> PreviousNPCs = [null];
+    public HashSet<NPC> PreviousNPCs = [null];
     public override void AI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, null);
 
         if (Time == 0f)
@@ -100,7 +111,8 @@ public class LightningChain : ModProjectile
                 chain.End = end;
                 chain.Current = Current + 1;
                 chain.Power = Power;
-                chain.PreviousNPCs = new List<NPC>(PreviousNPCs) { close };
+                chain.PreviousNPCs = new HashSet<NPC>(PreviousNPCs) { close };
+                chain.Sync();
                 for (float i = .2f; i < 1f; i += .1f)
                     ParticleRegistry.SpawnGlowParticle(end, Vector2.Zero, 30, Width * i, ColorFunct(SystemVector2.Zero, Vector2.Zero));
             }
@@ -114,7 +126,7 @@ public class LightningChain : ModProjectile
 
     public float WidthFunct(float c) => Width * Projectile.Opacity;
     public Color ColorFunct(SystemVector2 c, Vector2 pos) => MulticolorLerp(Completion, Color.White, Color.LightCyan, Color.Cyan, Color.DarkCyan) * Projectile.Opacity;
-    public ManualTrailPoints points;
+    public TrailPoints points;
     public OptimizedPrimitiveTrail trail;
     public override bool PreDraw(ref Color lightColor)
     {

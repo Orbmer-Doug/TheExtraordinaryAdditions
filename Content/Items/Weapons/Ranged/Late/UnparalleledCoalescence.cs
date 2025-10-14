@@ -9,7 +9,7 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late.Zenith;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
@@ -17,10 +17,6 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
 public class UnparalleledCoalescence : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.UnparalleledCoalescence);
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(new Color(192, 255, 173));
-    }
 
     public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
     {
@@ -48,7 +44,13 @@ public class UnparalleledCoalescence : ModItem
         Item.noUseGraphic = true;
     }
 
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(new Color(192, 255, 173));
+    }
+
     public override bool CanShoot(Player player) => false;
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();

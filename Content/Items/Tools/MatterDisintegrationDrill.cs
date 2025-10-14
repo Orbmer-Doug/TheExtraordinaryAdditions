@@ -7,7 +7,7 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Misc;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Tools;

@@ -1,15 +1,12 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.IO;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.ScreenEffects;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -29,6 +26,7 @@ public class FinalStrikeHoldout : ModProjectile
         DivinePierce,
         Stab
     }
+
     public Player Owner => Main.player[Projectile.owner];
     public GlobalPlayer Modded => Owner.Additions();
     public Vector2 TipOfSpear => Projectile.RotHitbox().TopRight;
@@ -43,16 +41,22 @@ public class FinalStrikeHoldout : ModProjectile
 
     public bool Init
     {
-        get => Projectile.Additions().ExtraAI[0] == 1f;
-        set => Projectile.Additions().ExtraAI[0] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[0] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
-    public ref float Time => ref Projectile.Additions().ExtraAI[1];
-    public ref float VanishTime => ref Projectile.Additions().ExtraAI[2];
+    public ref float Time => ref Projectile.AdditionsInfo().ExtraAI[1];
+    public ref float VanishTime => ref Projectile.AdditionsInfo().ExtraAI[2];
     public bool Vanish
     {
-        get => Projectile.Additions().ExtraAI[3] == 1f;
-        set => Projectile.Additions().ExtraAI[3] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[3] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[3] = value.ToInt();
     }
+    public int PortalIndex
+    {
+        get => (int)Projectile.AdditionsInfo().ExtraAI[4];
+        set => Projectile.AdditionsInfo().ExtraAI[4] = value;
+    }
+
     public ref float DivineFormInterpolant => ref Projectile.localAI[0];
     public ref float OldArmRot => ref Projectile.localAI[1];
     public int Dir => Projectile.velocity.X.NonZeroSign();
@@ -106,6 +110,7 @@ public class FinalStrikeHoldout : ModProjectile
     {
         float animationCompletion = InverseLerp(0f, shootDelay, StateTime);
         DivineFormInterpolant = MakePoly(3).InFunction(animationCompletion);
+        Projectile.Opacity = Animators.MakePoly(3f).InFunction(InverseLerp(0f, 12f, Time));
 
         int frequency = 5;
         if (animationCompletion.BetweenNum(.33f, .66f, true))
@@ -121,13 +126,11 @@ public class FinalStrikeHoldout : ModProjectile
             ParticleRegistry.SpawnBloomPixelParticle(pos, Vector2.Zero, life, size, Color.Wheat, Color.AntiqueWhite, TipOfSpear, 1f, 7, false);
         }
 
-        // Play a magic sound when the spear is ready to fire.
+        // Play a magic sound when the spear is ready to fire
         if (StateTime == shootDelay)
         {
             for (int i = 0; i < 40; i++)
-            {
                 ParticleRegistry.SpawnSquishyPixelParticle(TipOfSpear, Main.rand.NextVector2CircularLimited(10f, 10f, .5f, 1f), Main.rand.Next(90, 150), Main.rand.NextFloat(.9f, 1.6f), Color.AntiqueWhite, Color.Wheat, 9, false, false, Main.rand.NextFloat(-.1f, .1f));
-            }
             AdditionsSound.spearCharge.Play(Owner.Center, 1f, 0f, .1f, 1, Name);
         }
 
@@ -140,7 +143,7 @@ public class FinalStrikeHoldout : ModProjectile
         }
         Lighting.AddLight(TipOfSpear, Color.AntiqueWhite.ToVector3() * animationCompletion * 1.4f);
 
-        // Aim the spear.
+        // Aim the spear
         if (this.RunLocal())
         {
             float aimInterpolant = Utils.GetLerpValue(5f, 25f, Center.Distance(Modded.mouseWorld), true);
@@ -172,8 +175,6 @@ public class FinalStrikeHoldout : ModProjectile
         Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, frontArmRotation);
         OldArmRot = frontArmRotation;
 
-        // Check if the spear can be fired if the player has stopped channeling.
-        // If it can, fire it. Otherwise, destroy the speaar.
         if (this.RunLocal() && !Owner.channel)
         {
             if (StateTime >= shootDelay)
@@ -238,7 +239,6 @@ public class FinalStrikeHoldout : ModProjectile
         Projectile.spriteDirection = 1;
     }
 
-    public DeicidePortal portal;
     public const float waitTime = 180f;
     public float WaitCompletion => InverseLerp(0f, waitTime, StateTime);
     public void DoBehavior_Wait()
@@ -255,12 +255,12 @@ public class FinalStrikeHoldout : ModProjectile
         }
         cache.SetPoints(Projectile.RotHitbox().BottomLeft.GetLaserControlPoints(Projectile.RotHitbox().BottomLeft + Projectile.velocity.SafeNormalize(Vector2.Zero) * WaitCompletion * 2500f, 40));
 
-        float displace = new PiecewiseCurve()
-            .Add(0f, 70f,  .8f, MakePoly(4).InFunction)
-            .Add(70f, 0f, 1f, Exp().OutFunction)
-            .Evaluate(InverseLerp(waitTime / 2, waitTime, StateTime));
-        Projectile.Center = Vector2.Lerp(Projectile.Center, portal.Projectile.Center, .5f);
-        portal.Projectile.timeLeft = 20;
+        Projectile portal = Main.projectile?[PortalIndex] ?? null;
+        if (portal != null)
+        {
+            Projectile.Center = Vector2.Lerp(Projectile.Center, portal.Center, .5f);
+            portal.timeLeft = 20;
+        }
         Projectile.timeLeft = 300;
         Projectile.extraUpdates = 3;
 
@@ -291,15 +291,9 @@ public class FinalStrikeHoldout : ModProjectile
     }
 
     public Vector2 offset;
-    public override void SendExtraAI(BinaryWriter writer)
-    {
-        writer.WriteVector2(offset);
-    }
-    public override void ReceiveExtraAI(BinaryReader reader)
-    {
-        offset = reader.ReadVector2();
-    }
-
+    public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(offset);
+    public override void ReceiveExtraAI(BinaryReader reader) => offset = reader.ReadVector2();
+    
     public float Completion => InverseLerp(0f, 18f, StateTime);
     public float Bump => GetLerpBump(.1f, .55f, 1f, .85f, Completion);
     public void DoBehavior_Stab()
@@ -373,7 +367,7 @@ public class FinalStrikeHoldout : ModProjectile
         return Color.White * SmoothStep(1f, 0f, c.X) * InverseLerp(waitTime, waitTime - 24f, StateTime);
     }
 
-    public ManualTrailPoints cache;
+    public TrailPoints cache;
     public void DrawTele()
     {
         if (CurrentState == FinalStrikeState.Wait)
@@ -388,7 +382,6 @@ public class FinalStrikeHoldout : ModProjectile
             PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         }
     }
-
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
@@ -417,16 +410,12 @@ public class FinalStrikeHoldout : ModProjectile
                 ParticleRegistry.SpawnSparkParticle(pos, vel, life, scale, col);
                 ParticleRegistry.SpawnSparkParticle(pos, vel * 1.5f, 80, scale * .7f, Color.AntiqueWhite);
                 if (i % 4 == 3)
-                {
                     ParticleRegistry.SpawnLightningArcParticle(pos, vel.SafeNormalize(Vector2.Zero) * Main.rand.NextFloat(90f, 300f), Main.rand.Next(20, 40), 1.5f, Color.White);
-                }
             }
         }
         else
         {
-            Projectile.damage = Owner.HeldItem.damage * 10;
-            Projectile.knockBack = 30f;
-            target.velocity *= Projectile.velocity.SafeNormalize(Vector2.Zero) * Projectile.knockBack * target.knockBackResist;
+            target.velocity += Projectile.velocity.SafeNormalize(Vector2.Zero) * 40f * target.knockBackResist;
 
             for (int i = 0; i < 180; i++)
             {
@@ -443,28 +432,39 @@ public class FinalStrikeHoldout : ModProjectile
             float off = RandomRotation();
             for (int i = 0; i < 6; i++)
             {
-                DivineLightning light = Main.projectile[Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<DivineLightning>(),
-                    Projectile.damage / 4, 0f, Owner.whoAmI)].As<DivineLightning>();
-                light.Start = TipOfSpear;
-                light.End = TipOfSpear + (TwoPi * InverseLerp(0f, 6f, i) + off).ToRotationVector2() * Main.rand.NextFloat(1000f, 2000f);
+                Vector2 end = TipOfSpear + (TwoPi * InverseLerp(0f, 6f, i) + off).ToRotationVector2() * Main.rand.NextFloat(1000f, 2000f);
+                Projectile.NewProj(TipOfSpear, Vector2.Zero, ModContent.ProjectileType<DivineLightning>(),
+                    Projectile.damage / 4, 0f, Owner.whoAmI, ai1: end.X, ai2: end.Y);
             }
 
             Projectile.CreateFriendlyExplosion(TipOfSpear, new(600f), Projectile.damage / 3, 0f, 10, 9);
             AdditionsSound.LightningExplosion.Play(TipOfSpear, 1.4f, 0f, .2f, 1, Name);
             ScreenShakeSystem.New(new(2f, 2f, 1700f), Projectile.Center);
             ParticleRegistry.SpawnFlash(Projectile.Center, 30, .4f, 6000f);
+            ParticleRegistry.SpawnBlurParticle(Projectile.Center, 30, .2f, 4000f);
             Projectile.Kill();
         }
 
         if (CurrentState == FinalStrikeState.Stab && Projectile.numHits <= 0)
         {
-            if (Modded.FinalStrikeCounter >= 10)
+            ref int counter = ref Owner.GetModPlayer<FinalStrikePlayer>().Counter;
+            if (this.RunLocal() && counter >= 10)
             {
-                portal = Main.projectile[Projectile.NewProj(TipOfSpear, Vector2.Zero, ModContent.ProjectileType<DeicidePortal>(), 0, 0f, Projectile.owner)].As<DeicidePortal>();
-                Modded.FinalStrikeCounter = 0;
+                PortalIndex = Projectile.NewProj(TipOfSpear, Vector2.Zero, ModContent.ProjectileType<DeicidePortal>(), 0, 0f, Projectile.owner);
+                counter = 0;
             }
+            counter++;
+        }
+    }
 
-            Modded.FinalStrikeCounter++;
+    public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
+    {
+        if (CurrentState == FinalStrikeState.DivinePierce)
+        {
+            modifiers.FinalDamage *= 60;
+            modifiers.Knockback *= 30;
+            modifiers.SetCrit();
+            modifiers.ScalingArmorPenetration += 1;
         }
     }
 
@@ -474,7 +474,7 @@ public class FinalStrikeHoldout : ModProjectile
             return Completion.BetweenNum(0f, .7f) ? null : false;
         return CurrentState == FinalStrikeState.Aim || CurrentState == FinalStrikeState.Wait ? false : null;
     }
-    
+
     public void DrawBackglow()
     {
         SpriteBatch sb = Main.spriteBatch;
@@ -547,4 +547,10 @@ public class FinalStrikeHoldout : ModProjectile
 
         return false;
     }
+}
+
+public sealed class FinalStrikePlayer : ModPlayer
+{
+    public int Counter;
+    public override void UpdateDead() => Counter = 0;
 }

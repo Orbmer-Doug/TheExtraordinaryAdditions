@@ -1,9 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Core.DataStructures;
@@ -18,6 +14,7 @@ public class BurstingLight : ProjOwnedByNPC<Asterlin>
     {
         ProjectileID.Sets.DrawScreenCheckFluff[Projectile.type] = 2500;
     }
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 32;
@@ -39,16 +36,8 @@ public class BurstingLight : ProjOwnedByNPC<Asterlin>
     }
 
     public Vector2 Size;
-
-    public override void SendAI(BinaryWriter writer)
-    {
-        writer.WriteVector2(Size);
-    }
-    public override void ReceiveAI(BinaryReader reader)
-    {
-        Size = reader.ReadVector2();
-    }
-
+    public override void SendAI(BinaryWriter writer) => writer.WriteVector2(Size);
+    public override void ReceiveAI(BinaryReader reader) => Size = reader.ReadVector2();
     public override void SafeAI()
     {
         if (Time > TotalTime)

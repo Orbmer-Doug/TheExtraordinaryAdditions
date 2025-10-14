@@ -1,11 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Magic.Early;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Early;
@@ -13,6 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Early;
 public class NoxiousSnare : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.NoxiousSnare);
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(new Color(23, 244, 23));

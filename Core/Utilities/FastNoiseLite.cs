@@ -2,7 +2,7 @@
 
 #pragma warning disable IDE0011 // Add braces
 
-// Taken from
+// Source:
 // https://github.com/Auburn/FastNoiseLite/blob/master/CSharp/FastNoiseLite.cs?ts=4
 
 // MIT License

@@ -1,10 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -51,6 +49,30 @@ public class VolatileStar : ModProjectile, ILocalizedModType, IModType
     public Color CurrentColor => Color.Lerp(Color.White, MulticolorLerp(Cos01(Main.GlobalTimeWrappedHourly * 2f + Projectile.identity * .2f),
         Color.Violet, Color.DarkViolet, Color.BlueViolet, Color.SlateBlue, Color.DarkSlateBlue), .7f) * Projectile.Opacity * 1.1f;
 
+    public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+    {
+        for (int i = 0; i < 14; i++)
+        {
+            Vector2 vel = -Projectile.velocity.RotatedByRandom(.2f).SafeNormalize(Vector2.Zero) * Main.rand.NextFloat(2f, 7f);
+            ParticleRegistry.SpawnGlowParticle(Projectile.Center, vel, Main.rand.Next(54, 90), Main.rand.NextFloat(.2f, .4f), CurrentColor);
+
+            Dust.NewDustPerfect(Projectile.Center, DustID.AncientLight, vel.RotatedByRandom(.4f) * Main.rand.NextFloat(2.2f, 3f), Main.rand.Next(0, 200), CurrentColor, Main.rand.NextFloat(.8f, 1.1f)).noGravity = true;
+        }
+    }
+
+    public override void OnKill(int timeLeft)
+    {
+        SoundID.Item4.Play(Projectile.Center, Main.rand.NextFloat(.3f, .4f), 0f, .2f, null, 30);
+
+        ParticleRegistry.SpawnDetailedBlastParticle(Projectile.Center, Vector2.Zero, Projectile.Size * 1.8f, Vector2.Zero, 20, CurrentColor);
+        Projectile.CreateFriendlyExplosion(Projectile.Center, Projectile.Size * 1.8f, Projectile.damage / 2, Projectile.knockBack / 2f, 20, 20);
+
+        for (int i = 0; i < 12; i++)
+        {
+            ParticleRegistry.SpawnSparkleParticle(Projectile.Center, Main.rand.NextVector2Circular(10f, 10f), Main.rand.Next(20, 40), Main.rand.NextFloat(.4f, .8f), CurrentColor, Color.Violet, .8f);
+        }
+    }
+    
     public FancyAfterimages after;
     public override bool PreDraw(ref Color lightColor)
     {
@@ -75,31 +97,6 @@ public class VolatileStar : ModProjectile, ILocalizedModType, IModType
             Main.spriteBatch.Draw(bloomTexture, ToTarget(center, Projectile.Size * 1.5f), null, CurrentColor * .7f, Projectile.rotation, origBloom, 0, 0f);
         }
         PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.UnderPlayers, BlendState.Additive);
-
         return false;
-    }
-
-    public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
-    {
-        for (int i = 0; i < 14; i++)
-        {
-            Vector2 vel = -Projectile.velocity.RotatedByRandom(.2f).SafeNormalize(Vector2.Zero) * Main.rand.NextFloat(2f, 7f);
-            ParticleRegistry.SpawnGlowParticle(Projectile.Center, vel, Main.rand.Next(54, 90), Main.rand.NextFloat(.2f, .4f), CurrentColor);
-
-            Dust.NewDustPerfect(Projectile.Center, DustID.AncientLight, vel.RotatedByRandom(.4f) * Main.rand.NextFloat(2.2f, 3f), Main.rand.Next(0, 200), CurrentColor, Main.rand.NextFloat(.8f, 1.1f)).noGravity = true;
-        }
-    }
-
-    public override void OnKill(int timeLeft)
-    {
-        SoundID.Item4.Play(Projectile.Center, Main.rand.NextFloat(.3f, .4f), 0f, .2f, null, 30);
-
-        ParticleRegistry.SpawnDetailedBlastParticle(Projectile.Center, Vector2.Zero, Projectile.Size * 1.8f, Vector2.Zero, 20, CurrentColor);
-        Projectile.CreateFriendlyExplosion(Projectile.Center, Projectile.Size * 1.8f, Projectile.damage / 2, Projectile.knockBack / 2f, 20, 20);
-
-        for (int i = 0; i < 12; i++)
-        {
-            ParticleRegistry.SpawnSparkleParticle(Projectile.Center, Main.rand.NextVector2Circular(10f, 10f), Main.rand.Next(20, 40), Main.rand.NextFloat(.4f, .8f), CurrentColor, Color.Violet, .8f);
-        }
     }
 }

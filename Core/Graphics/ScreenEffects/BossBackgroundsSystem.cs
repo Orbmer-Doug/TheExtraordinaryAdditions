@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain;
@@ -13,10 +12,21 @@ public class BossBackgroundsSystem : ModSystem
 {
     public override void OnModLoad()
     {
-        On_Main.DrawSurfaceBG += DrawFog;
+        Main.QueueMainThreadAction(static () =>
+        {
+            On_Main.DrawSurfaceBG += DrawFog;
+        });
     }
 
-    private void DrawFog(On_Main.orig_DrawSurfaceBG orig, Main self)
+    public override void OnModUnload()
+    {
+        Main.QueueMainThreadAction(static () =>
+        {
+            On_Main.DrawSurfaceBG -= DrawFog;
+        });
+    }
+
+    private static void DrawFog(On_Main.orig_DrawSurfaceBG orig, Main self)
     {
         orig(self);
 

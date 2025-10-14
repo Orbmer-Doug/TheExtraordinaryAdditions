@@ -10,7 +10,7 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
@@ -18,22 +18,14 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
 public class GaussBallisticWarheadLauncher : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GaussBallisticWarheadLauncher);
+
     public override void SetStaticDefaults()
     {
         ItemID.Sets.AnimatesAsSoul[Type] = true;
         Main.RegisterItemAnimation(Item.type, new DrawAnimationVertical(12, 4, false));
         CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1;
     }
-    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
-    {
-        DrawInventoryCustomScale(spriteBatch, TextureAssets.Item[Type].Value, position, frame, drawColor, itemColor, origin, scale, .29f, new Vector2(0f, 0f));
-        return false;
-    }
 
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(new Color(179, 230, 122));
-    }
     public override void SetDefaults()
     {
         Item.damage = 2100;
@@ -53,7 +45,18 @@ public class GaussBallisticWarheadLauncher : ModItem
 
     }
 
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(new Color(179, 230, 122));
+    }
+
     public override bool CanShoot(Player player) => false;
+
+    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+    {
+        DrawInventoryCustomScale(spriteBatch, TextureAssets.Item[Type].Value, position, frame, drawColor, itemColor, origin, scale, .29f, new Vector2(0f, 0f));
+        return false;
+    }
 
     public override void AddRecipes()
     {

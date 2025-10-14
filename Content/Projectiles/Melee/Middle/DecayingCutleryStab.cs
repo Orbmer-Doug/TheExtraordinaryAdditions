@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using Terraria;
@@ -7,8 +6,6 @@ using Terraria.Audio;
 using Terraria.Enums;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Assets;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -41,16 +38,16 @@ public class DecayingCutleryStab : ModProjectile
 
     public bool Hit
     {
-        get => Projectile.Additions().ExtraAI[0] == 1f;
-        set => Projectile.Additions().ExtraAI[0] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[0] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
 
     public bool Vanishing
     {
-        get => Projectile.Additions().ExtraAI[1] == 1f;
-        set => Projectile.Additions().ExtraAI[1] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[1] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[1] = value.ToInt();
     }
-    public ref float VanishTimer => ref Projectile.Additions().ExtraAI[2];
+    public ref float VanishTimer => ref Projectile.AdditionsInfo().ExtraAI[2];
 
     public int StabTime
     {
@@ -178,7 +175,7 @@ public class DecayingCutleryStab : ModProjectile
             SoundEngine.PlaySound(SoundID.Item7 with { Identifier = Name, PitchVariance = .2f, Volume = Main.rand.NextFloat(1f, 1.5f) }, Rect.Right);
 
         float pierce = new PiecewiseCurve()
-            .Add(-20f, 70f,  .7f, MakePoly(7).OutFunction)
+            .Add(-20f, 70f, .7f, MakePoly(7).OutFunction)
             .Add(70f, -20f, 1f, MakePoly(3).OutFunction)
             .Evaluate(Completion);
 

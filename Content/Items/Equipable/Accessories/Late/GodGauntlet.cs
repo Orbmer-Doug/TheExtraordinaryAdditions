@@ -1,12 +1,10 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.GameInput;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Late;
@@ -21,19 +19,21 @@ public class GodGauntlet : ModItem
 
         CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 125;
     }
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         var line = new TooltipLine(Mod, "GodGauntlet", "\'You know what silas its not too bad of a idea\'\n" +
             "Counts as wings\n" +
             "Hiding this accessory causes you to be immortal, give infinite flight time, and have 30+ minion slots\n" +
             "Press the throw button to remove every entity in the world...\n" +
-            "Press quick mana to get the coords of your mouse!" +
+            "Press quick mana to get the coords of your mouse!\n" +
             "-Developer Tool-".ColoredText(Color.Pink))
         {
             OverrideColor = Color.Lerp(Color.Ivory, Color.AntiqueWhite, .5f)
         };
         tooltips.Add(line);
     }
+
     public override void SetDefaults()
     {
         Item.width = 40;
@@ -44,6 +44,7 @@ public class GodGauntlet : ModItem
         Item.value = 1;
         Item.maxStack = 1;
     }
+
     public override void VerticalWingSpeeds(Player player, ref float ascentWhenFalling, ref float ascentWhenRising, ref float maxCanAscendMultiplier, ref float maxAscentMultiplier, ref float constantAscend)
     {
         ascentWhenFalling = 1f;
@@ -52,6 +53,7 @@ public class GodGauntlet : ModItem
         maxAscentMultiplier = 3.9f;
         constantAscend = 0.15f;
     }
+
     public override void UpdateAccessory(Player player, bool hideVisual)
     {
         if (PlayerInput.Triggers.Current.Throw)
@@ -62,16 +64,12 @@ public class GodGauntlet : ModItem
                 p.active = false;
             foreach (Item item in Main.item)
                 item.active = false;
-            foreach (Item item in player.inventory)
-                item.TurnToAir();
             foreach (Dust dust in Main.dust)
                 dust.active = false;
             foreach (Gore gore in Main.gore)
                 gore.active = false;
 
             player.itemTime = player.itemAnimation = 0;
-
-            //player.KillMe(PlayerDeathReason.ByCustomReason(GetText("Status.Death.Chicken").Format(player.name)), int.MaxValue, 1, false);
         }
 
         if (PlayerInput.Triggers.Current.QuickMana && Main.GameUpdateCount % 20f == 19f)
@@ -83,8 +81,6 @@ public class GodGauntlet : ModItem
         {
             player.manaCost *= 0f;
             player.wingTimeMax = 200;
-
-            // Cheat the flight bar in calamity
             player.wingTime = player.wingTimeMax / 2;
 
             player.GiveIFrames(10);

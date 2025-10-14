@@ -14,6 +14,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Early;
 public class MeteorSpawn : ModProjectile, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.MeteorSpawn);
+
     public override void SetStaticDefaults()
     {
         Main.projFrames[Projectile.type] = 3;
@@ -47,8 +48,8 @@ public class MeteorSpawn : ModProjectile, ILocalizedModType, IModType
     public ref float FireTimer => ref Projectile.ai[2];
     public bool Fire
     {
-        get => Projectile.Additions().ExtraAI[0] == 1f;
-        set => Projectile.Additions().ExtraAI[0] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[0] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
 
     public override void AI()
@@ -70,7 +71,7 @@ public class MeteorSpawn : ModProjectile, ILocalizedModType, IModType
         }
 
         points ??= new(5);
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunction, ColorFunction, null, 5);
 
         if (FireTimer == 0f && Modded.SafeMouseRight.Current)
@@ -165,7 +166,7 @@ public class MeteorSpawn : ModProjectile, ILocalizedModType, IModType
     {
         void draw()
         {
-            if (trail != null && !trail._disposed && points != null)
+            if (trail != null && !trail.Disposed && points != null)
             {
                 ManagedShader shader = ShaderRegistry.StandardPrimitiveShader;
                 trail.DrawTrail(shader, points.Points);

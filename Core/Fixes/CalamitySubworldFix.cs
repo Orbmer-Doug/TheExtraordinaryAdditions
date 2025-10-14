@@ -1,14 +1,13 @@
-﻿using CalamityMod.Systems;
-using SubworldLibrary;
+﻿using SubworldLibrary;
 using System.Reflection;
-using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.World.Subworlds;
 
 namespace TheExtraordinaryAdditions.Core.Fixes;
 
 /// <summary>
-/// Calamity runs hardcoded indexes for things like abyss checks in a fashion which doesn't respect subworlds, so this disables it for compatibility when only in subworlds (not like the crater has anything to grow on)
+/// Calamity runs hardcoded indexes for things like abyss checks in a fashion which doesn't respect subworlds,
+/// so this disables it for compatibility when only in subworlds (not like the crater has anything to grow on)
 /// </summary>
 public class CalamitySubworldFix : ModSystem
 {

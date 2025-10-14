@@ -31,6 +31,7 @@ public static partial class Utility
     public const float GoldenRatio = 1.618033989f;
     public const float InverseGoldenRatio = 0.618033989f;
     public const float PiOver3 = MathF.PI / 3f;
+    public const float ThreePIOver4 = MathHelper.Pi * 3 / 4;
 
     /// <summary>
     /// Calculates an radially symmetric Gaussian falloff
@@ -137,6 +138,9 @@ public static partial class Utility
     /// </summary>
     public static Vector2 GetTransformedScreenCoords(Vector2 position, bool invert = false, Player player = null)
     {
+        if (Main.dedServ)
+            return Vector2.Zero;
+
         Vector2 pos = Vector2.Transform(position - Main.screenPosition, invert ? Matrix.Invert(Main.GameViewMatrix.ZoomMatrix) : (Main.GameViewMatrix.ZoomMatrix));
         if ((player ?? Main.LocalPlayer).gravDir == -1f)
             pos.Y = Main.screenPosition.Y + Main.screenHeight - position.Y;
@@ -216,6 +220,16 @@ public static partial class Utility
         (int)Math.Abs(topLeft.X - bottomRight.X),
         (int)Math.Abs(topLeft.Y - bottomRight.Y));
 
+    public static bool ContainsZeroedPoint(this ReadOnlySpan<Vector2> points)
+    {
+        for (int i = 0; i < points.Length; i++)
+        {
+            if (points[i] == Vector2.Zero)
+                return true;
+        }
+        return false;
+    }
+
     public static bool ContainsInvalidPoint(this ReadOnlySpan<Vector2> points)
     {
         for (int i = 0; i < points.Length; i++)
@@ -264,7 +278,7 @@ public static partial class Utility
 
         // pick a bunch of random points between 0 and 1 and sort them
         float[] branchPoints = [.. Enumerable.Range(0, numBranches)
-            .Select(x => Rand(0, 1f))
+            .Select(x => Main.rand.NextFloat(0, 1f))
             .OrderBy(x => x)];
 
         List<Vector2> pos = [];
@@ -310,7 +324,7 @@ public static partial class Utility
         positions.Add(0);
 
         for (int i = 0; i < length / segmentDensity; i++)
-            positions.Add(Rand(0f, 1f));
+            positions.Add(Main.rand.NextFloat(0f, 1f));
 
         positions.Sort();
 
@@ -330,7 +344,7 @@ public static partial class Utility
             // Defines an envelope. Points near the middle of the bolt can be further from the central line.
             float envelope = pos > 0.95f ? 20f * (1f - pos) : 1f;
 
-            float displacement = Rand(-sway, sway);
+            float displacement = Main.rand.NextFloat(-sway, sway);
 
             displacement -= (displacement - prevDisplacement) * (1f - scale);
 
@@ -368,7 +382,7 @@ public static partial class Utility
         float currentPos = 0f;
         while (currentPos < 1f)
         {
-            currentPos += Rand(0.5f * step, 1.5f * step);
+            currentPos += Main.rand.NextFloat(0.5f * step, 1.5f * step);
             if (currentPos < 1f)
                 positions.Add(currentPos);
         }
@@ -386,7 +400,7 @@ public static partial class Utility
             float scale = (length * jaggedness) * (pos - positions[i - 1]);
             float envelope = pos > EnvelopeThreshold ? EnvelopeScale * (1f - pos) : 1f;
 
-            float displacement = Rand(-sway, sway);
+            float displacement = Main.rand.NextFloat(-sway, sway);
             displacement = MathHelper.Lerp(prevDisplacement, displacement, scale);
             displacement *= envelope;
 
@@ -410,14 +424,14 @@ public static partial class Utility
         Vector2 diff = end - start;
         float[] branchPoints = new float[numBranches];
         for (int i = 0; i < numBranches; i++)
-            branchPoints[i] = Rand(0, 1f);
+            branchPoints[i] = Main.rand.NextFloat(0, 1f);
         Array.Sort(branchPoints);
 
         for (int i = 0; i < branchPoints.Length; i++)
         {
             float t = MathHelper.Clamp(branchPoints[i], 0.01f, 0.99f);
             Vector2 boltStart = Vector2.Lerp(start, end, t);
-            Vector2 boltEnd = (diff * (1 - t)).RotatedBy(Rand(-maxRot, maxRot)) + boltStart;
+            Vector2 boltEnd = (diff * (1 - t)).RotatedBy(Main.rand.NextFloat(-maxRot, maxRot)) + boltStart;
             Vector2 dir = boltStart.SafeDirectionTo(boltEnd);
             boltEnd += dir * branchExtraDist;
 
@@ -427,22 +441,13 @@ public static partial class Utility
         return bolts;
     }
 
-    static float Rand(float min, float max)
+    public readonly struct Line(Vector2 a, Vector2 b, float thickness = 1f)
     {
-        return (float)Main.rand.NextDouble() * (max - min) + min;
-    }
+        public readonly Vector2 a = a;
+        public readonly Vector2 b = b;
+        public readonly float thickness = thickness;
 
-    public sealed class Line(Vector2 a, Vector2 b, float thickness = 1f)
-    {
-        public Vector2 a = a;
-        public Vector2 b = b;
-        public float thickness = thickness;
-
-        /// <summary>
-        /// A default drawing method for a line
-        /// </summary>
-        /// <param name="color">The color of this line</param>
-        public void Draw(Color color)
+        public void Draw(Color color, float widthInterpol = 1f)
         {
             Texture2D cap = AssetRegistry.GetTexture(AdditionsTexture.BloomLineCap);
             Texture2D horiz = AssetRegistry.GetTexture(AdditionsTexture.BloomLineHoriz);
@@ -452,7 +457,7 @@ public static partial class Utility
 
             const float ImageThickness = 8;
 
-            float thicknessScale = thickness / ImageThickness;
+            float thicknessScale = (thickness * widthInterpol) / ImageThickness;
 
             Vector2 capOrigin = new(cap.Width, cap.Height / 2f);
 
@@ -468,11 +473,9 @@ public static partial class Utility
         }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static RotatedRectangle ToRotated(this Rectangle rect, float rot)
         => new(rect.X, rect.Y, rect.Width, rect.Height, rot);
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Rectangle FromRotated(this RotatedRectangle rect)
         => new(rect.X, rect.Y, rect.Width, rect.Height);
     public static Vector2[] Corners(this RotatedRectangle rect) => [rect.Position, rect.TopRight, rect.BottomRight, rect.BottomLeft];
@@ -772,12 +775,27 @@ public static partial class Utility
         // Project point onto the line
         Vector2 toPoint = point - lineStart;
         float t = Vector2.Dot(toPoint, lineDir) / lineLengthSquared;
-
-        // Clamp t to stay within the line segment
         t = MathHelper.Clamp(t, 0f, 1f);
 
-        // Return the closest point on the line segment
         return lineStart + t * lineDir;
+    }
+
+    /// <summary>
+    /// Finds the closest point on a circle to a given point
+    /// </summary>
+    /// <param name="point">The point ot check</param>
+    /// <param name="circlePoint">Center of the circle</param>
+    /// <param name="radius">Radius of the circle</param>
+    /// <param name="clampToEdges">Whether or not to allow the point to be in the circle</param>
+    /// <returns>The closest on/within the circle to the point</returns>
+    public static Vector2 ClosestPointOnCircle(Vector2 point, Vector2 circlePoint, float radius, bool clampToEdges = true)
+    {
+        Vector2 dir = point - circlePoint;
+        float distanceSqr = dir.LengthSquared();
+        if (!clampToEdges && distanceSqr <= radius.Squared())
+            return point;
+
+        return circlePoint + dir.SafeNormalize(Vector2.UnitX) * radius;
     }
 
     /// <remarks>Due to terraria's updating, this should only be used in a update method</remarks>
@@ -962,51 +980,9 @@ public static partial class Utility
 
         return MathHelper.Clamp(inverse, 0f, 1f);
     }
-
-    public static Vector2 InverseLerp(Vector2 from, Vector2 to, float x)
-    {
-        Vector2 pos;
-        pos.X = InverseLerp(from.X, to.X, x);
-        pos.Y = InverseLerp(from.Y, to.Y, x);
-        return pos;
-    }
-
     public static float GetLerpBump(float from1, float to1, float from2, float to2, float x, bool clamp = true) =>
          Utils.GetLerpValue(from1, to1, x, clamp) * Utils.GetLerpValue(from2, to2, x, clamp);
     public static int NonZeroSign(this float x) => x >= 0f ? 1 : -1;
-
-    public static Vector2[] ResetTrail(this Vector2[] array, Vector2 samplePos, int? newLength = null)
-    {
-        if (newLength.HasValue)
-        {
-            int num = newLength.Value;
-
-            if (num != array.Length)
-                Array.Resize(ref array, num);
-        }
-
-        for (int i = 0; i < array.Length; i++)
-            array[i] = samplePos;
-
-        return array;
-    }
-
-    public static Vector2[] CreateTrail(this Vector2[] array, Vector2 samplePos)
-    {
-        // Initialize the array
-        if (array == null || array.Any(point => point == Vector2.Zero))
-        {
-            for (int i = 0; i < array.Length; i++)
-                array[i] = samplePos;
-        }
-
-        // Update the array
-        for (int j = array.Length - 1; j > 0; j--)
-            array[j] = array[j - 1];
-        array[0] = samplePos;
-
-        return array;
-    }
 
     public static List<Vector2> GetLaserControlPoints(this Vector2 start, Vector2 end, int samplesCount)
     {
@@ -1108,8 +1084,10 @@ public static partial class Utility
         return velocity;
     }
 
-    public static Vector2 NextVector2FromRectangleLimited(this UnifiedRandom r, Rectangle rect, float min, float max) => new(rect.X + r.NextFloat(min, max) * rect.Width, rect.Y + r.NextFloat(min, max) * rect.Height);
-    public static Vector2 NextVector2CircularLimited(this UnifiedRandom r, float circleHalfWidth, float circleHalfHeight, float min, float max) => r.NextVector2Unit() * new Vector2(circleHalfWidth, circleHalfHeight) * r.NextFloat(min, max);
+    public static Vector2 NextVector2FromRectangleLimited(this UnifiedRandom r, Rectangle rect, float min, float max)
+        => new(rect.X + r.NextFloat(min, max) * rect.Width, rect.Y + r.NextFloat(min, max) * rect.Height);
+    public static Vector2 NextVector2CircularLimited(this UnifiedRandom r, float circleHalfWidth, float circleHalfHeight, float min, float max)
+        => r.NextVector2Unit() * new Vector2(circleHalfWidth, circleHalfHeight) * r.NextFloat(min, max);
     public static byte NextByte(this UnifiedRandom r, byte min, byte max) => (byte)r.Next(min, max);
     public static T NextEnum<T>(this UnifiedRandom r) where T : Enum
     {
@@ -1117,6 +1095,15 @@ public static partial class Utility
         return values[r.Next(values.Length)];
     }
     public static T NextFromSet<T>(this UnifiedRandom random, HashSet<T> objs) => objs.ToArray()[random.Next(objs.Count)];
+
+    public static float GaussianDistribution(float x, float standardDeviation, float mean = 0f)
+    {
+        const float sqrt2Pi = 2.5066283f;
+
+        float correctionCoefficient = 1f / (standardDeviation * sqrt2Pi);
+        float exponent = ((x - mean) / standardDeviation).Squared() * -0.5f;
+        return correctionCoefficient * MathF.Exp(exponent);
+    }
 
     /// <summary>
     /// Samples a random value from a Gaussian distribution.
@@ -1139,12 +1126,8 @@ public static partial class Utility
         return MathF.Sqrt(MathF.Log(distributionInterpolant) * -2f) * MathF.Cos(randomAngle) * standardDeviation + mean;
     }
 
-    // When two periodic functions are summed, the resulting function is periodic if the ratio of the b/a is rational, given periodic functions f and g:
-    // f(a * x) + g(b * x). However, if the ratio is irrational, then the result has no period.
-    // This is desirable for somewhat random wavy fluctuations.
-    // In this case, pi and e used, which are indeed irrational numbers.
     /// <summary>
-    /// Calculates an aperiodic sine. This function only achieves this if <paramref name="a"/> and <paramref name="b"/> are irrational numbers.
+    /// Calculates an aperiodic sine
     /// </summary>
     /// <param name="x">The input value.</param>
     /// <param name="a">The first irrational coefficient.</param>
@@ -1153,6 +1136,18 @@ public static partial class Utility
     {
         return (MathF.Sin(x * a + dx) + MathF.Sin(x * b + dx)) * 0.5f;
     }
+
+    /// <summary>
+    /// Easy shorthand for (sin(x) + 1) / 2, which has the useful property of having a range of 0 to 1 rather than -1 to 1.
+    /// </summary>
+    /// <param name="x">The input number.</param>
+    public static float Sin01(float x) => MathF.Sin(x) * 0.5f + 0.5f;
+
+    /// <summary>
+    /// Easy shorthand for (cos(x) + 1) / 2, which has the useful property of having a range of 0 to 1 rather than -1 to 1.
+    /// </summary>
+    /// <param name="x">The input number.</param>
+    public static float Cos01(float x) => MathF.Cos(x) * 0.5f + 0.5f;
 
     public static float RandomRotation() => Main.rand.NextFloat(MathHelper.TwoPi);
     public static Vector2 RandomRectangle(this Rectangle rect) => Main.rand.NextVector2FromRectangle(rect);
@@ -1188,48 +1183,6 @@ public static partial class Utility
             frequency *= lacunarity;
         }
         return result;
-    }
-
-    public static void DrawStar(Vector2 position, int dustType, float pointAmount = 5f, float mainSize = 1f, float dustDensity = 1f, float dustSize = 1f, float pointDepthMult = 1f, float pointDepthMultOffset = 0.5f, bool noGravity = false, float randomAmount = 0f, float rotationAmount = -1f)
-    {
-        float rot = (!(rotationAmount < 0f)) ? rotationAmount : RandomRotation();
-        float density = 1f / dustDensity * 0.1f;
-        for (float i = 0f; i < MathHelper.TwoPi; i += density)
-        {
-            float rand = 0f;
-            if (randomAmount > 0f)
-                rand = Utils.NextFloat(Main.rand, -0.01f, 0.01f) * randomAmount;
-
-            float x = (float)Math.Cos(i + rand);
-            float y = (float)Math.Sin(i + rand);
-            float mult = Math.Abs(i * (pointAmount / 2f) % MathHelper.Pi - MathHelper.PiOver2) * pointDepthMult + pointDepthMultOffset;
-            Vector2 vel = Utils.RotatedBy(new Vector2(x, y), (double)rot, default) * mult * mainSize;
-            Dust.NewDustPerfect(position, dustType, vel, 0, default, dustSize).noGravity = noGravity;
-        }
-    }
-
-    public static void DrawCircle(Vector2 position, int dustType, float mainSize = 1f, float RatioX = 1f, float RatioY = 1f, float dustDensity = 1f, float dustSize = 1f, float randomAmount = 0f, float rotationAmount = 0f, bool nogravity = false)
-    {
-        float rot = ((!(rotationAmount < 0f)) ? rotationAmount : Utils.NextFloat(Main.rand, 0f, MathHelper.Pi * 2f));
-        float density = 1f / dustDensity * 0.1f;
-        for (float i = 0f; i < MathHelper.TwoPi; i += density)
-        {
-            float rand = 0f;
-            if (randomAmount > 0f)
-            {
-                rand = Utils.NextFloat(Main.rand, -0.01f, 0.01f) * randomAmount;
-            }
-            float x = (float)Math.Cos(i + rand) * RatioX;
-            float y = (float)Math.Sin(i + rand) * RatioY;
-            if (dustType == 222 || dustType == 130 || nogravity)
-            {
-                Dust.NewDustPerfect(position, dustType, (Vector2?)(Utils.RotatedBy(new Vector2(x, y), (double)rot, default) * mainSize), 0, default(Color), dustSize).noGravity = true;
-            }
-            else
-            {
-                Dust.NewDustPerfect(position, dustType, (Vector2?)(Utils.RotatedBy(new Vector2(x, y), (double)rot, default) * mainSize), 0, default(Color), dustSize);
-            }
-        }
     }
 
     public static float Modulo(this float dividend, float divisor)
@@ -1273,17 +1226,6 @@ public static partial class Utility
         return result;
     }
 
-    /// <summary>
-    /// Easy shorthand for (sin(x) + 1) / 2, which has the useful property of having a range of 0 to 1 rather than -1 to 1.
-    /// </summary>
-    /// <param name="x">The input number.</param>
-    public static float Sin01(float x) => MathF.Sin(x) * 0.5f + 0.5f;
-
-    /// <summary>
-    /// Easy shorthand for (cos(x) + 1) / 2, which has the useful property of having a range of 0 to 1 rather than -1 to 1.
-    /// </summary>
-    /// <param name="x">The input number.</param>
-    public static float Cos01(float x) => MathF.Cos(x) * 0.5f + 0.5f;
     public static float QuadraticBump(float input) => input * (4 - input * 4);
     public static float InverseQuadraticBump(float input) => -input * (4 + input * 4);
 
@@ -1304,12 +1246,9 @@ public static partial class Utility
     }
 
     public static int SecondsToFrames(int seconds) => seconds * 60;
-    public static uint SecondsToFrames(uint seconds) => seconds * 60;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static int SecondsToFrames(float seconds) => (int)MathF.Round(seconds * 60f);
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public static int DistanceToTiles(float distance) => (int)MathF.Round(distance * 16f);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static float Cubed(this int input)
@@ -1365,13 +1304,9 @@ public static partial class Utility
         float dir1 = -p.velocity.ToRotation();
         float dir2 = p.velocity.ToRotation();
         if (p.direction < 0)
-        {
             return p.rotation = flip ? dir2 : dir1;
-        }
         else
-        {
             return p.rotation = flip ? dir1 : dir2;
-        }
     }
 
     public static void ExpandHitboxBy(this Projectile projectile, int width, int height)
@@ -1409,7 +1344,7 @@ public static partial class Utility
         return CompositeArmStretchAmount.None;
     }
 
-    public static int FixDamageFromDifficulty(int damage)
+    public static int FixDamageFromDifficulty(int damage, bool opposite = false)
     {
         float damageJankCorrectionFactor = 1f / 2f;
         if (Main.expertMode)
@@ -1475,28 +1410,10 @@ public static partial class Utility
     public static int DamageSoftCap(double dmgInput, int cap)
     {
         if (dmgInput < cap)
-        {
             return (int)dmgInput;
-        }
+
         double cappedRatio = Math.Pow(dmgInput / cap, 0.5) / 1.25 + 0.2;
         return (int)(cap * cappedRatio);
-    }
-
-    public static float WrapAngle90Degrees(float theta)
-    {
-        if (theta > MathHelper.Pi)
-        {
-            theta -= MathHelper.Pi;
-        }
-        if (theta > MathHelper.PiOver2)
-        {
-            theta -= MathHelper.Pi;
-        }
-        if (theta < -MathHelper.PiOver2)
-        {
-            theta += MathHelper.Pi;
-        }
-        return theta;
     }
 
     public static float WrapAngle360(float theta)
@@ -1506,50 +1423,6 @@ public static partial class Utility
             theta += MathHelper.TwoPi;
 
         return theta;
-    }
-
-    /// <summary>
-    /// Calculates matrices for usage by vertex shaders, notably in the context of primitive meshes.
-    /// </summary>
-    /// <param name="width">The width of the overall view.</param>
-    /// <param name="height">The height of the overall view.</param>
-    /// <param name="viewMatrix">The view matrix.</param>
-    /// <param name="projectionMatrix">The projection matrix.</param>
-    /// <param name="ui">Whether this is for UI. Controls whether gravity screen flipping is taken into account.</param>
-    public static void CalculatePrimitiveMatrices(int width, int height, out Matrix viewMatrix, out Matrix projectionMatrix, bool ui = false)
-    {
-        Vector2 zoom = Main.GameViewMatrix.Zoom;
-        if (ui)
-            zoom = Vector2.One;
-
-        Matrix zoomScaleMatrix = Matrix.CreateScale(zoom.X, zoom.Y, 1f);
-
-        // Get a matrix that aims towards the Z axis (these calculations are relative to a 2D world).
-        viewMatrix = Matrix.CreateLookAt(Vector3.Zero, Vector3.UnitZ, Vector3.Up);
-
-        // Offset the matrix to the appropriate position.
-        viewMatrix *= Matrix.CreateTranslation(0f, -height, 0f);
-
-        // Flip the matrix around 180 degrees.
-        viewMatrix *= Matrix.CreateRotationZ(MathHelper.Pi);
-
-        // Account for the inverted gravity effect.
-        if (Main.LocalPlayer.gravDir == -1f && !ui)
-            viewMatrix *= Matrix.CreateScale(1f, -1f, 1f) * Matrix.CreateTranslation(0f, height, 0f);
-
-        // And account for the current zoom.
-        viewMatrix *= zoomScaleMatrix;
-
-        projectionMatrix = Matrix.CreateOrthographicOffCenter(0f, width * zoom.X, 0f, height * zoom.Y, 0f, 1f) * zoomScaleMatrix;
-    }
-
-    public static Matrix GetCustomSkyBackgroundMatrix()
-    {
-        Matrix transformationMatrix = Main.BackgroundViewMatrix.TransformationMatrix;
-        Vector3 translationDirection = new(1f, Main.BackgroundViewMatrix.Effects.HasFlag(SpriteEffects.FlipVertically) ? -1f : 1f, 1f);
-
-        transformationMatrix.Translation -= Main.BackgroundViewMatrix.ZoomMatrix.Translation * translationDirection;
-        return transformationMatrix;
     }
 
     /// <summary>

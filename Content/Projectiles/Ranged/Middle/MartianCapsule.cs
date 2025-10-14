@@ -1,10 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using System;
+﻿using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -53,7 +51,7 @@ public class MartianCapsule : ModProjectile
             Projectile.velocity.X = -oldVelocity.X;
         if (Math.Abs(Projectile.velocity.Y - oldVelocity.Y) > float.Epsilon)
             Projectile.velocity.Y = -oldVelocity.Y;
-        
+
         return false;
     }
 

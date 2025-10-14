@@ -27,6 +27,8 @@ public class CalciumShot : ModProjectile
         if (Projectile.velocity != Vector2.Zero)
             Lighting.AddLight(Projectile.Center, Color.OrangeRed.ToVector3() * Projectile.Opacity);
 
+        if (trail == null || trail.Disposed)
+            trail = new(WidthFunction, ColorFunction, null, 5);
         cache ??= new(5);
         cache.Update(Projectile.Center);
 
@@ -55,13 +57,15 @@ public class CalciumShot : ModProjectile
         Projectile.damage /= 2;
     }
 
+    public OptimizedPrimitiveTrail trail;
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
         {
+            if (trail == null || trail.Disposed || cache == null)
+                return;
             ManagedShader shader = ShaderRegistry.FlameTrail;
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Pixel), 1);
-            OptimizedPrimitiveTrail trail = new(WidthFunction, ColorFunction, null, 5);
             trail.DrawTrail(shader, cache.Points, 30);
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);

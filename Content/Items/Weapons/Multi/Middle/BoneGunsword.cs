@@ -6,7 +6,7 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Early;
 using TheExtraordinaryAdditions.Content.Projectiles.Multi.Middle;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Multi.Middle;
@@ -14,14 +14,12 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Multi.Middle;
 public class BoneGunsword : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BoneGunsword);
+
     public override void SetStaticDefaults()
     {
         ItemID.Sets.ItemsThatAllowRepeatedRightClick[Item.type] = true;
     }
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(new Color(166, 166, 166));
-    }
+
     public override void SetDefaults()
     {
         Item.damage = 50;
@@ -44,7 +42,13 @@ public class BoneGunsword : ModItem
         Item.shootSpeed = 12f;
     }
 
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(new Color(166, 166, 166));
+    }
+
     public override bool AltFunctionUse(Player player) => !CalUtils.HasCooldown(player, SkullKaboomCooldown.ID);
+
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
         if (player.altFunctionUse == 2)
@@ -56,6 +60,7 @@ public class BoneGunsword : ModItem
     }
 
     public override bool MeleePrefix() => true;
+
     public override bool RangedPrefix() => true;
 
     public override void AddRecipes()

@@ -4,7 +4,7 @@ using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
@@ -12,11 +12,6 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 public class Bergcrusher : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Bergcrusher);
-
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(new Color(52, 183, 235));
-    }
 
     public override void SetDefaults()
     {
@@ -27,7 +22,7 @@ public class Bergcrusher : ModItem
         Item.useTime = 50;
         Item.useAnimation = 50;
         Item.useStyle = ItemUseStyleID.Shoot;
-        Item.knockBack = 12;
+        Item.knockBack = 7;
         Item.autoReuse = true;
         Item.damage = 153;
         Item.DamageType = DamageClass.Melee;
@@ -35,7 +30,12 @@ public class Bergcrusher : ModItem
         Item.noUseGraphic = true;
         Item.shoot = ModContent.ProjectileType<BergcrusherSwing>();
     }
-    
+
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(new Color(52, 183, 235));
+    }
+
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
         player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI);

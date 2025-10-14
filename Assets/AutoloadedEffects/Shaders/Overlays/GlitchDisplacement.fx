@@ -38,7 +38,7 @@ float4 PixelShaderFunction(VertexShaderInput input) : COLOR
     
     float time = globalTime * 4;
     float2 center = float2(smoothNoise(coords + float2(time, 0)) * 1.3, smoothNoise(coords + float2(time, 0)) * 1.3) * 2;
-    float splitDistance = 0.01056 / (distance(coords, center) + 1);
+    float splitDistance = 0.01056 / (distance(coords, center) + .8);
     main.r = tex2D(tex, coords + float2(-0.707, -0.707) * splitDistance).r;
     main.g = tex2D(tex, coords + float2(0.707, -0.707) * splitDistance).g;
     main.b = tex2D(tex, coords + float2(0, 1) * splitDistance).b;
@@ -47,7 +47,7 @@ float4 PixelShaderFunction(VertexShaderInput input) : COLOR
     {
         main.rgb /= 3 - layeredNoise(coords * .1 + float2(time, 0)) * layeredNoise(coords * .1 + float2(0, -time));
     }
-    main = pow(main, 2.2);
+    main = pow(main, 2.7);
     
     return main;
 }

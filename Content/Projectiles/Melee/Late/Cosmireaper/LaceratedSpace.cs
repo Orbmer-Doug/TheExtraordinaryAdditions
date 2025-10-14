@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using Terraria;
 using Terraria.ModLoader;
@@ -24,6 +23,7 @@ public class LaceratedSpace : ModProjectile, ILocalizedModType, IModType
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = 10;
     }
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         Projectile.damage = (int)(Projectile.damage * 0.945);
@@ -48,6 +48,7 @@ public class LaceratedSpace : ModProjectile, ILocalizedModType, IModType
         Start = reader.ReadVector2();
         End = reader.ReadVector2();
     }
+
     public override void AI()
     {
         Lighting.AddLight(Projectile.Center, Color.BlueViolet.ToVector3() * 2f);
@@ -69,7 +70,9 @@ public class LaceratedSpace : ModProjectile, ILocalizedModType, IModType
             }
         }
     }
+
     public override bool ShouldUpdatePosition() => false;
+
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
         return targetHitbox.CollisionFromPoints(Points, Projectile.width);

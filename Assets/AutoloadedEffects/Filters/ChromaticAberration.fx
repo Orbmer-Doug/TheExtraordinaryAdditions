@@ -14,7 +14,7 @@ float4 PixelShaderFunction(float2 coords : TEXCOORD0) : COLOR0
     // Calculate distance from center in UV space, adjusted for aspect ratio
     float2 adjustedDelta = coords - effectPos;
     adjustedDelta.x *= screenSize.x / screenSize.y; // Correct for aspect ratio
-    float dist = length(adjustedDelta) / radius; // Normalized distance from center
+    float dist = length(adjustedDelta) / radius / zoom; // Normalized distance from center
     
     // Original color
     float4 originalColor = tex2D(screenTexture, coords);

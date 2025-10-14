@@ -79,8 +79,7 @@ public class BeanFire : ModProjectile
     public FancyAfterimages after;
     public override bool PreDraw(ref Color lightColor)
     {
-        if (after.afterimages != null)
-            after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [lightColor], Projectile.Opacity);
+        after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [lightColor], Projectile.Opacity);
         Projectile.DrawProjectileBackglow(Color.SaddleBrown, 3f);
         return base.PreDraw(ref lightColor);
     }

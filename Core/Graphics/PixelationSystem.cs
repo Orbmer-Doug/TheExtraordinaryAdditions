@@ -25,59 +25,35 @@ public enum PixelationLayer : byte
     Dusts = 1 << 7
 }
 
-public static class DrawActionPool
+public readonly struct DrawAction
 {
-    public static readonly Stack<DrawAction> Pool = new();
-    public static readonly int InitialCapacity = Main.maxProjectiles + Main.maxNPCs + Main.maxPlayers + 15000;
+    public readonly Action RenderAction { get; init; } // TODO: consider interface based system?
+    public readonly BlendState Blend { get; init; }
+    public readonly ManagedShader Shader { get; init; }
+    public readonly string GroupID { get; init; }
+    public readonly bool IsTexture { get; init; }
 
-    static DrawActionPool()
-    {
-        for (int i = 0; i < InitialCapacity; i++)
-            Pool.Push(default);
-    }
-
-    public static DrawAction Rent(Action renderAction, BlendState blend, bool isTexture, ManagedShader effect = null, object groupId = null)
-    {
-        DrawAction action = Pool.Count > 0 ? Pool.Pop() : default;
-        return new DrawAction(renderAction, blend, isTexture, effect, groupId);
-    }
-
-    public static void Return()
-    {
-        Pool.Push(default);
-    }
-}
-
-public readonly record struct DrawAction
-{
-    public Action RenderAction { get; init; }
-    public BlendState Blend { get; init; }
-    public ManagedShader Shader { get; init; }
-    public object GroupId { get; init; }
-    public bool IsTexture { get; init; }
-
-    public DrawAction(Action renderAction, BlendState blend, bool isTexture, ManagedShader effect = null, object groupId = null)
+    public DrawAction(Action renderAction, BlendState blend, bool isTexture, ManagedShader effect = null, string groupID = null)
     {
         RenderAction = renderAction;
         Blend = blend;
         Shader = effect;
-        GroupId = groupId;
+        GroupID = groupID != null ? string.Intern(groupID) : null;
         IsTexture = isTexture;
     }
 }
 
 public static class DrawActionGrouper
 {
-    private static readonly Dictionary<BlendState, Dictionary<object, List<DrawAction>>> BlendGroupGroups = [];
+    private static readonly string UngroupedSentinel = nameof(DrawActionGrouper);
+    private static readonly Dictionary<BlendState, Dictionary<string, List<DrawAction>>> BlendGroupGroups = [];
     private static readonly Dictionary<BlendState, List<DrawAction>> BlendFallback = [];
-    private static readonly object UngroupedSentinel = new();
     private static readonly List<DrawAction>[] GroupListPool = new List<DrawAction>[32];
     private static int groupListPoolIndex = 0;
 
     static DrawActionGrouper()
     {
-        var supportedBlendStates = new[] { BlendState.AlphaBlend, BlendState.Additive, BlendState.NonPremultiplied };
-        foreach (var blend in supportedBlendStates)
+        foreach (BlendState blend in PixelationSystem.SupportedBlendStates)
         {
             BlendGroupGroups[blend] = [];
             BlendFallback[blend] = [];
@@ -90,7 +66,7 @@ public static class DrawActionGrouper
     {
         if (groupListPoolIndex < GroupListPool.Length)
         {
-            var list = GroupListPool[groupListPoolIndex++];
+            List<DrawAction> list = GroupListPool[groupListPoolIndex++];
             list.Clear();
             return list;
         }
@@ -102,49 +78,36 @@ public static class DrawActionGrouper
         groupListPoolIndex = 0;
     }
 
-    public static void GroupByBlendAndGroupId(ReadOnlySpan<DrawAction> primitiveActions, ReadOnlySpan<DrawAction> textureActions, Action<BlendState, Dictionary<object, List<DrawAction>>> processBlendGroup)
+    public static void GroupByBlendAndGroupId(ReadOnlySpan<DrawAction> primitiveActions, ReadOnlySpan<DrawAction> textureActions, Action<BlendState, Dictionary<string, List<DrawAction>>> processBlendGroup)
     {
         ResetGroupListPool();
 
         // Clear previous frame's data
-        foreach (var blendDict in BlendGroupGroups.Values)
+        foreach (Dictionary<string, List<DrawAction>> blendDict in BlendGroupGroups.Values)
         {
-            foreach (var groupList in blendDict.Values)
+            foreach (List<DrawAction> groupList in blendDict.Values)
                 groupList.Clear();
             blendDict.Clear();
         }
-        foreach (var blendList in BlendFallback.Values)
+        foreach (List<DrawAction> blendList in BlendFallback.Values)
             blendList.Clear();
 
         // Group primitive actions
-        foreach (var action in primitiveActions)
+        foreach (DrawAction action in primitiveActions)
         {
-            var blendDict = BlendGroupGroups[action.Blend];
-            if (action.GroupId != null)
-            {
-                if (!blendDict.TryGetValue(action.GroupId, out var groupList))
-                {
-                    groupList = RentGroupList();
-                    blendDict[action.GroupId] = groupList;
-                }
-                groupList.Add(action);
-            }
-            else
-            {
-                BlendFallback[action.Blend].Add(action);
-            }
+            BlendFallback[action.Blend].Add(action);
         }
 
         // Group texture actions
-        foreach (var action in textureActions)
+        foreach (DrawAction action in textureActions)
         {
-            var blendDict = BlendGroupGroups[action.Blend];
-            if (action.GroupId != null)
+            Dictionary<string, List<DrawAction>> blendDict = BlendGroupGroups[action.Blend];
+            if (action.GroupID != null)
             {
-                if (!blendDict.TryGetValue(action.GroupId, out var groupList))
+                if (!blendDict.TryGetValue(action.GroupID, out List<DrawAction> groupList))
                 {
                     groupList = RentGroupList();
-                    blendDict[action.GroupId] = groupList;
+                    blendDict[action.GroupID] = groupList;
                 }
                 groupList.Add(action);
             }
@@ -155,21 +118,27 @@ public static class DrawActionGrouper
         }
 
         // Process grouped actions
-        foreach (var blendEntry in BlendGroupGroups)
+        foreach (KeyValuePair<BlendState, Dictionary<string, List<DrawAction>>> blendEntry in BlendGroupGroups)
         {
             if (blendEntry.Value.Count > 0)
                 processBlendGroup(blendEntry.Key, blendEntry.Value);
         }
 
-        // Process ungrouped actions
-        foreach (var blendEntry in BlendFallback)
+        // Process grouped and ungrouped actions
+        foreach (KeyValuePair<BlendState, Dictionary<string, List<DrawAction>>> blendEntry in BlendGroupGroups)
         {
-            if (blendEntry.Value.Count > 0)
-                processBlendGroup(blendEntry.Key, new Dictionary<object, List<DrawAction>> { [UngroupedSentinel] = blendEntry.Value });
+            Dictionary<string, List<DrawAction>> groupDict = blendEntry.Value;
+            List<DrawAction> fallbackList = BlendFallback[blendEntry.Key];
+            if (fallbackList.Count > 0)
+            {
+                groupDict[UngroupedSentinel] = fallbackList;
+            }
+            if (groupDict.Count > 0)
+                processBlendGroup(blendEntry.Key, groupDict);
         }
     }
 
-    public static object UngroupedKey => UngroupedSentinel;
+    public static string UngroupedKey => UngroupedSentinel;
 }
 
 /// <summary>
@@ -179,10 +148,11 @@ public static class DrawActionGrouper
 [Autoload(Side = ModSide.Client)]
 public class PixelationSystem : ModSystem
 {
+    internal static readonly BlendState[] SupportedBlendStates = [BlendState.AlphaBlend, BlendState.Additive, BlendState.NonPremultiplied];
+    public static readonly int InitialCapacity = Main.maxProjectiles + Main.maxNPCs + (int)ParticleSystem.MaxParticles;
     private static readonly Dictionary<PixelationLayer, Dictionary<BlendState, ManagedRenderTarget>> RenderTargetsByLayer = [];
     private static readonly Dictionary<PixelationLayer, List<DrawAction>> PrimitiveDrawActionsByLayer = [];
     private static readonly Dictionary<PixelationLayer, List<DrawAction>> TextureDrawActionsByLayer = [];
-    private static readonly BlendState[] SupportedBlendStates = [BlendState.AlphaBlend, BlendState.Additive, BlendState.NonPremultiplied];
     private static readonly RenderTargetInitializationAction PixelTargetInitializer = (width, height) => new RenderTarget2D(Main.instance.GraphicsDevice, width / 2, height / 2);
     public static bool CurrentlyRendering { get; private set; }
     private static PixelationLayer ActiveLayers;
@@ -201,8 +171,8 @@ public class PixelationSystem : ModSystem
             foreach (PixelationLayer layer in Enum.GetValues(typeof(PixelationLayer)))
             {
                 RenderTargetsByLayer[layer] = [];
-                PrimitiveDrawActionsByLayer[layer] = new List<DrawAction>(DrawActionPool.InitialCapacity);
-                TextureDrawActionsByLayer[layer] = new List<DrawAction>(DrawActionPool.InitialCapacity);
+                PrimitiveDrawActionsByLayer[layer] = new List<DrawAction>(InitialCapacity);
+                TextureDrawActionsByLayer[layer] = new List<DrawAction>(InitialCapacity);
             }
         });
     }
@@ -218,14 +188,14 @@ public class PixelationSystem : ModSystem
             On_Main.DrawPlayers_AfterProjectiles -= DrawTarget_Players;
             On_Main.DrawDust -= DrawTarget_Dusts;
 
-            foreach (var layerTargets in RenderTargetsByLayer.Values)
-                foreach (var target in layerTargets.Values)
+            foreach (Dictionary<BlendState, ManagedRenderTarget> layerTargets in RenderTargetsByLayer.Values)
+                foreach (ManagedRenderTarget target in layerTargets.Values)
                     target.Dispose();
             RenderTargetsByLayer.Clear();
         });
     }
 
-    private void DrawToTargets(On_Main.orig_CheckMonoliths orig)
+    private static void DrawToTargets(On_Main.orig_CheckMonoliths orig)
     {
         if (Main.gameMenu)
         {
@@ -248,18 +218,12 @@ public class PixelationSystem : ModSystem
         if (layers == 0)
         {
             // Clear all actions if no layers are active
-            foreach (var layer in PrimitiveDrawActionsByLayer.Keys)
+            foreach (PixelationLayer layer in PrimitiveDrawActionsByLayer.Keys)
             {
-                var primitives = PrimitiveDrawActionsByLayer[layer];
-                for (int i = 0; i < primitives.Count; i++)
-                    DrawActionPool.Return();
-                
+                List<DrawAction> primitives = PrimitiveDrawActionsByLayer[layer];
                 primitives.Clear();
 
-                var textures = TextureDrawActionsByLayer[layer];
-                for (int i = 0; i < textures.Count; i++)
-                    DrawActionPool.Return();
-                
+                List<DrawAction> textures = TextureDrawActionsByLayer[layer];
                 textures.Clear();
             }
         }
@@ -301,24 +265,24 @@ public class PixelationSystem : ModSystem
             DepthStencilState prevDepthStencil = device.DepthStencilState;
             Rectangle prevScissor = device.ScissorRectangle;
             Viewport prevViewport = device.Viewport;
-            
+
             device.RasterizerState = RasterizerState.CullNone;
             device.DepthStencilState = DepthStencilState.None;
             device.ScissorRectangle = new Rectangle(0, 0, target.Target.Width, target.Target.Height);
             device.Viewport = new Viewport(0, 0, target.Target.Width, target.Target.Height);
             device.BlendState = blend;
 
-            foreach (var groupEntry in groupGroups)
+            foreach (KeyValuePair<string, List<DrawAction>> groupEntry in groupGroups)
             {
                 List<DrawAction> actions = groupEntry.Value;
                 bool isSpriteBatchActive = false;
 
-                foreach (var action in actions)
+                foreach (DrawAction action in actions)
                 {
                     bool isTextureAction = action.IsTexture || action.Shader != null;
                     if (isTextureAction)
                     {
-                        // Start a new batch for each texture action to respect GroupId
+                        // Start a new batch for each texture action to respect GroupID
                         if (isSpriteBatchActive)
                             sb.End();
                         sb.Begin(SpriteSortMode.Deferred, blend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, action.Shader?.Effect, Matrix.CreateScale(0.5f));
@@ -349,17 +313,13 @@ public class PixelationSystem : ModSystem
         });
 
         // Clear actions
-        foreach (var action in primitiveSpan)
-            DrawActionPool.Return();
         primitiveDrawActions.Clear();
-        foreach (var action in textureSpan)
-            DrawActionPool.Return();
         textureDrawActions.Clear();
     }
 
     private static ManagedRenderTarget GetOrCreateRenderTarget(PixelationLayer layer, BlendState blend)
     {
-        var layerTargets = RenderTargetsByLayer[layer];
+        Dictionary<BlendState, ManagedRenderTarget> layerTargets = RenderTargetsByLayer[layer];
         if (!layerTargets.TryGetValue(blend, out ManagedRenderTarget target))
         {
             target = new ManagedRenderTarget(true, PixelTargetInitializer, subjectToGarbageCollection: true);
@@ -369,7 +329,7 @@ public class PixelationSystem : ModSystem
     }
 
     private static bool IsSupportedBlendState(BlendState blend) => blend == BlendState.AlphaBlend || blend == BlendState.Additive || blend == BlendState.NonPremultiplied;
-    
+
     /// <summary>
     /// Renders a primitive (e.g. a trail) in half-resolution on a specified draw layer.
     /// </summary>
@@ -383,7 +343,7 @@ public class PixelationSystem : ModSystem
         BlendState blend = blendState ?? BlendState.AlphaBlend;
         if (!IsSupportedBlendState(blend))
             throw new ArgumentException($"BlendState {blend} is not supported.");
-        var action = DrawActionPool.Rent(renderAction, blend, isTexture: false);
+        DrawAction action = new DrawAction(renderAction, blend, isTexture: false);
         PrimitiveDrawActionsByLayer[layer].Add(action);
         ActiveLayers |= layer;
     }
@@ -399,16 +359,21 @@ public class PixelationSystem : ModSystem
     /// <param name="layer">What layer to be drawn at.</param>
     /// <param name="blendState">The desired blend state. Defaults to <see cref="BlendState.AlphaBlend"/>.</param>
     /// <param name="effect">The effect to apply to the spritebatch.</param>
-    /// <param name="groupId">If a group is specified, then all of this group will be drawn together under one spritebatch. 
+    /// <param name="groupID">If a group is specified, then all of this group will be drawn together under one spritebatch. 
     /// <br></br>Leave null if you want logic like variables (e.g. a timer) specific to a projectile being passed into shader parameters to not effect all projectiles of that shader.</param>
     /// <exception cref="ArgumentException">If a invalid <paramref name="blendState"/> was inputted.</exception>
-    public static void QueueTextureRenderAction(Action renderAction, PixelationLayer layer, BlendState blendState = null, ManagedShader effect = null, object groupId = null)
+    public static void QueueTextureRenderAction(Action renderAction, PixelationLayer layer, BlendState blendState = null, ManagedShader effect = null, string groupID = null)
     {
         ArgumentNullException.ThrowIfNull(renderAction);
         BlendState blend = blendState ?? BlendState.AlphaBlend;
         if (!IsSupportedBlendState(blend))
             throw new ArgumentException($"BlendState {blend} is not supported.");
-        var action = DrawActionPool.Rent(renderAction, blend, isTexture: true, effect, groupId);
+
+        // Texture actions not needing an effect will get automatically grouped, unless specified
+        if (groupID == null && effect == null)
+            groupID = $"__Sentinel_{layer}_{blend}";
+
+        DrawAction action = new DrawAction(renderAction, blend, isTexture: true, effect, groupID);
         TextureDrawActionsByLayer[layer].Add(action);
         ActiveLayers |= layer;
     }
@@ -450,7 +415,7 @@ public class PixelationSystem : ModSystem
     private static void DrawTargetScaled(PixelationLayer layer, bool endSB = false)
     {
         SpriteBatch sb = Main.spriteBatch;
-        var targets = RenderTargetsByLayer[layer];
+        Dictionary<BlendState, ManagedRenderTarget> targets = RenderTargetsByLayer[layer];
 
         foreach (BlendState blend in SupportedBlendStates)
         {

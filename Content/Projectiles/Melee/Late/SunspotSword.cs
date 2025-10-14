@@ -28,7 +28,7 @@ public class SunspotSword : BaseIdleHoldoutProjectile, IHasScreenShader
     public List<Vector2> cache;
     public TrailPoints trailPoints = new(10);
     public OptimizedPrimitiveTrail trail;
-    public ManualTrailPoints points = new(Points);
+    public TrailPoints points = new(Points);
     public OptimizedPrimitiveTrail sword;
 
     public ref float Time => ref Projectile.ai[0];
@@ -45,7 +45,7 @@ public class SunspotSword : BaseIdleHoldoutProjectile, IHasScreenShader
         }
     }
 
-    public ref float FadeTimer => ref Projectile.Additions().ExtraAI[1];
+    public ref float FadeTimer => ref Projectile.AdditionsInfo().ExtraAI[1];
     internal const int FadeTime = 40;
     public float FadeInterpolant => InverseLerp(0f, FadeTime, FadeTimer);
 
@@ -92,9 +92,9 @@ public class SunspotSword : BaseIdleHoldoutProjectile, IHasScreenShader
             InitializeShader();
         UpdateShader();
 
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(TrailWidthFunct, TrailColorFunct, TrailOffsetFunct, Points);
-        if (sword == null || sword._disposed)
+        if (sword == null || sword.Disposed)
             sword = new(c => 22f, (c, pos) => Color.OrangeRed, null, Points);
 
         if (base.ShouldDie())

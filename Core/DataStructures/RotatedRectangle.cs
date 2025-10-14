@@ -1,5 +1,4 @@
-﻿global using RotatedRectangle = TheExtraordinaryAdditions.Core.DataStructures.RotatedRectangle;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Terraria;
@@ -33,9 +32,9 @@ public struct RotatedRectangle
 
     /// <param name="start">Will be <see cref="Bottom"/></param>
     /// <param name="end">Will be <see cref="Top"/></param>
-    public RotatedRectangle(float height, Vector2 start, Vector2 end)
+    public RotatedRectangle(float width, Vector2 start, Vector2 end)
     {
-        Width = (int)height;
+        Width = (int)width;
         Height = (int)start.Distance(end);
         Rotation = start.AngleTo(end) + MathHelper.PiOver2;
         Vector2 rot = PolarVector(Height / 2f, Rotation - MathHelper.PiOver2);
@@ -61,7 +60,7 @@ public struct RotatedRectangle
         }
     }
 
-    public Vector2 Center
+    public readonly Vector2 Center
     {
         get
         {
@@ -69,7 +68,7 @@ public struct RotatedRectangle
         }
     }
 
-    public Vector2 Position
+    public readonly Vector2 Position
     {
         get
         {
@@ -77,7 +76,7 @@ public struct RotatedRectangle
         }
     }
 
-    public Vector2 Top
+    public readonly Vector2 Top
     {
         get
         {
@@ -85,7 +84,7 @@ public struct RotatedRectangle
         }
     }
 
-    public Vector2 TopRight
+    public readonly Vector2 TopRight
     {
         get
         {
@@ -93,7 +92,7 @@ public struct RotatedRectangle
         }
     }
 
-    public Vector2 Bottom
+    public readonly Vector2 Bottom
     {
         get
         {
@@ -101,7 +100,7 @@ public struct RotatedRectangle
         }
     }
 
-    public Vector2 BottomLeft
+    public readonly Vector2 BottomLeft
     {
         get
         {
@@ -109,7 +108,7 @@ public struct RotatedRectangle
         }
     }
 
-    public Vector2 BottomRight
+    public readonly Vector2 BottomRight
     {
         get
         {
@@ -117,7 +116,7 @@ public struct RotatedRectangle
         }
     }
 
-    public Vector2 Left
+    public readonly Vector2 Left
     {
         get
         {
@@ -125,7 +124,7 @@ public struct RotatedRectangle
         }
     }
 
-    public Vector2 Right
+    public readonly Vector2 Right
     {
         get
         {
@@ -272,7 +271,7 @@ public struct RotatedRectangle
         }
         else // DLocal.X == 0
         {
-            if (ALocal.X < minX || ALocal.X > maxX) 
+            if (ALocal.X < minX || ALocal.X > maxX)
                 return null;
         }
 
@@ -289,7 +288,7 @@ public struct RotatedRectangle
         }
         else // DLocal.Y == 0
         {
-            if (ALocal.Y < minY || ALocal.Y > maxY) 
+            if (ALocal.Y < minY || ALocal.Y > maxY)
                 return null;
         }
 
@@ -519,15 +518,6 @@ public struct RotatedRectangle
         return false;
     }
 
-    public override readonly bool Equals(object obj)
-    {
-        return (obj is RotatedRectangle rectangle) && this == rectangle;
-    }
-
-    public override readonly int GetHashCode()
-    {
-        return (X ^ Y ^ Width ^ Height);
-    }
 
     /// <summary>
     /// Gets a random point from this <see cref="RotatedRectangle"/>
@@ -551,11 +541,6 @@ public struct RotatedRectangle
             Vector2 randRight = Vector2.Lerp(TopRight, BottomRight, Main.rand.NextFloat());
             return Vector2.Lerp(randLeft, randRight, Main.rand.NextFloat());
         }
-    }
-
-    public override readonly string ToString()
-    {
-        return $"Position: {new Vector2(X, Y)}, Width: {Width}, Height: {Height}, Size: {new Vector2(Width, Height)}, Current Rotation: {Rotation}";
     }
     #endregion Public Methods
 
@@ -605,4 +590,21 @@ public struct RotatedRectangle
         return !(a == b);
     }
     #endregion Public Static Methods
+
+    #region Overrides
+    public override readonly bool Equals(object obj)
+    {
+        return (obj is RotatedRectangle rectangle) && this == rectangle;
+    }
+
+    public override readonly int GetHashCode()
+    {
+        return HashCode.Combine(X, Y, Width, Height);
+    }
+
+    public override readonly string ToString()
+    {
+        return $"[Position: {Position}, Width: {Width}, Height: {Height}, Current Rotation: {Rotation}]";
+    }
+    #endregion
 }

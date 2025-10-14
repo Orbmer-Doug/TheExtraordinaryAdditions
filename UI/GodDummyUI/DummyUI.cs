@@ -10,7 +10,6 @@ using Terraria.UI.Chat;
 using TheExtraordinaryAdditions.Content.Items.Tools;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
-using static TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.CrossCode.CrossDiscHoldout;
 using static TheExtraordinaryAdditions.UI.GodDummyUI.DummyUI;
 
 namespace TheExtraordinaryAdditions.UI.GodDummyUI;

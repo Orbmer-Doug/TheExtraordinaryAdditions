@@ -34,21 +34,21 @@ public class ObsidianMaceProj : ModProjectile
         set => Projectile.ai[1] = (int)value;
     }
     public float Speed => Owner.GetTotalAttackSpeed(DamageClass.Melee);
-    public ref float Spin => ref Projectile.Additions().ExtraAI[0];
+    public ref float Spin => ref Projectile.AdditionsInfo().ExtraAI[0];
     public int InitDir
     {
-        get => (int)Projectile.Additions().ExtraAI[1];
-        set => Projectile.Additions().ExtraAI[1] = value;
+        get => (int)Projectile.AdditionsInfo().ExtraAI[1];
+        set => Projectile.AdditionsInfo().ExtraAI[1] = value;
     }
     public bool Init
     {
-        get => Projectile.Additions().ExtraAI[2] == 1f;
-        set => Projectile.Additions().ExtraAI[2] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[2] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[2] = value.ToInt();
     }
     public int CollisionCounter
     {
-        get => (int)Projectile.Additions().ExtraAI[3];
-        set => Projectile.Additions().ExtraAI[3] = value;
+        get => (int)Projectile.AdditionsInfo().ExtraAI[3];
+        set => Projectile.AdditionsInfo().ExtraAI[3] = value;
     }
 
     public const int LaunchTimeLimit = 15;
@@ -134,7 +134,7 @@ public class ObsidianMaceProj : ModProjectile
                         }
                     }
 
-                    Spin = (Spin + (Utils.Remap(Time, 0f, TotalSpeedUpTime / Speed, 1f, 4f * Speed))) % TotalSpeedUpTime;
+                    Spin = (Spin + (Utils.Remap(Time, 0f, TotalSpeedUpTime / Speed, 1f, 4.8f * Speed))) % TotalSpeedUpTime;
                     float theta = Utils.Remap(Spin, InitDir < 0f ? TotalSpeedUpTime : 0f, InitDir < 0f ? 0f : TotalSpeedUpTime, 0f, MathHelper.TwoPi);
                     Projectile.Center = Owner.GetFrontHandPositionImproved() + Utility.GetPointOnRotatedEllipse(150f, 80f, InitDir == -1 ? MathHelper.Pi : 0f, theta);
 

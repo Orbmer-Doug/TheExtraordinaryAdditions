@@ -1,5 +1,6 @@
-﻿using CalamityMod.Items.Materials;
-using CalamityMod.Tiles;
+﻿using CalamityMod.Items;
+using CalamityMod.Items.Materials;
+using CalamityMod.Tiles.Furniture.CraftingStations;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using Terraria.ModLoader;
 using Terraria.UI.Chat;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.Cynosure;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -19,6 +20,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Cynosure;
 public class Exingenedies : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Invisible);
+
     public override string LocalizationCategory => "Content.Items.Weapons.Cynosure";
 
     public override void SetStaticDefaults()
@@ -73,7 +75,7 @@ public class Exingenedies : ModItem
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.SamplerStateForCursor, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
 
-            // Apply glitch effects to a sentence about similar themes of the garden
+            // Apply glitch effects to a sentence
             ManagedShader displace = ShaderRegistry.NoiseDisplacement;
             displace.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Perlin), 1);
             displace.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.noise), 2);
@@ -161,7 +163,8 @@ public class Exingenedies : ModItem
         Recipe recipe = CreateRecipe();
         recipe.AddIngredient(ModContent.ItemType<DivineSpiritCatalyst>(), 1);
         recipe.AddIngredient(ModContent.ItemType<ShadowspecBar>(), 10);
-        recipe.AddTile(ModContent.TileType<PlacedRock>());
+        recipe.AddIngredient(ModContent.ItemType<Rock>());
+        recipe.AddTile(ModContent.TileType<DraedonsForge>());
         recipe.Register();
     }
 }

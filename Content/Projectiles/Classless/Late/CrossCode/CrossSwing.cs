@@ -17,14 +17,14 @@ public class CrossSwing : BaseSwordSwing
     public ElementalBalance ElementPlayer => Owner.GetModPlayer<ElementalBalance>();
     public Element State
     {
-        get => (Element)Projectile.Additions().ExtraAI[7];
-        set => Projectile.Additions().ExtraAI[7] = (float)value;
+        get => (Element)Projectile.AdditionsInfo().ExtraAI[7];
+        set => Projectile.AdditionsInfo().ExtraAI[7] = (float)value;
     }
 
     public int SwingCounter
     {
-        get => (int)Projectile.Additions().ExtraAI[8];
-        set => Projectile.Additions().ExtraAI[8] = value;
+        get => (int)Projectile.AdditionsInfo().ExtraAI[8];
+        set => Projectile.AdditionsInfo().ExtraAI[8] = value;
     }
     public bool Spin => SwingCounter >= 3;
 
@@ -63,7 +63,7 @@ public class CrossSwing : BaseSwordSwing
 
                         newVelocity *= 1f - Main.rand.NextFloat(0.3f);
 
-                        Projectile.NewProj(Center, newVelocity, ModContent.ProjectileType<BouncyIcicle>(), Projectile.damage / 5, Projectile.knockBack / 9, Projectile.owner);
+                        Projectile.NewProj(Center, newVelocity, ModContent.ProjectileType<BouncyIcicle>(), Projectile.damage / 3, Projectile.knockBack / 9, Projectile.owner);
                     }
                     break;
                 case Element.Heat:
@@ -73,9 +73,8 @@ public class CrossSwing : BaseSwordSwing
                     {
                         pos = target - new Vector2(Main.rand.NextFloat(-300f, 300f), 800f);
                         pos.Y -= 200 * i;
-
                         Vector2 vel = Vector2.UnitY.RotatedByRandom(.3f) * Main.rand.NextFloat(4f, 10f);
-                        Projectile.NewProj(pos, vel, ModContent.ProjectileType<ScarletMeteor>(), Projectile.damage / 3, Projectile.knockBack / 2, Owner.whoAmI);
+                        Projectile.NewProj(pos, vel, ModContent.ProjectileType<ScarletMeteor>(), Projectile.damage, Projectile.knockBack / 2, Owner.whoAmI);
                     }
                     break;
                 case Element.Shock:
@@ -96,7 +95,7 @@ public class CrossSwing : BaseSwordSwing
 
     public override void SafeAI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, (c) => Center.ToNumerics(), 20);
 
         Owner.ChangeDir(Direction);
@@ -200,6 +199,7 @@ public class CrossSwing : BaseSwordSwing
                     ShockLightning shock = Main.projectile[Projectile.NewProj(npc.Center - Vector2.UnitY * 800f, Vector2.Zero,
                         ModContent.ProjectileType<ShockLightning>(), Projectile.damage / 2, 0f, Projectile.owner)].As<ShockLightning>();
                     shock.End = npc.Center;
+                    shock.Sync();
                 }
                 break;
             case Element.Wave:

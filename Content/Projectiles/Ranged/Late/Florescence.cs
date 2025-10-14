@@ -1,11 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Interfaces;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
@@ -35,29 +32,6 @@ public class Florescence : ModProjectile
         Projectile.aiStyle = 0;
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = 2;
-    }
-
-    public FancyAfterimages after;
-    public override bool PreDraw(ref Color lightColor)
-    {
-        Texture2D tex = Projectile.ThisProjectileTexture();
-        Vector2 orig = tex.Size() * .5f;
-        
-        after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [Color.DeepPink, Color.Pink], Projectile.Opacity);
-        Main.spriteBatch.DrawBetter(tex, Projectile.Center, null, Color.White, Projectile.rotation, orig, Projectile.scale, 0);
-        void star()
-        {
-            Texture2D star = AssetRegistry.GetTexture(AdditionsTexture.LensStar);
-            Vector2 starOrig = star.Size() * .5f;
-            Vector2 pos = Projectile.Center - Main.screenPosition;
-            float interpolant = InverseLerp(0f, 8f, Timer);
-            Color col = Color.Lerp(Color.Pink, Color.LightPink * 1.2f, interpolant) * interpolant;
-            Vector2 scale = new(interpolant * .28f);
-            Main.EntitySpriteDraw(star, pos, null, col, Projectile.rotation, starOrig, scale, 0);
-        }
-        PixelationSystem.QueueTextureRenderAction(star, PixelationLayer.OverProjectiles, BlendState.Additive);
-
-        return false;
     }
 
     public override void AI()
@@ -119,5 +93,27 @@ public class Florescence : ModProjectile
 
             Dust.NewDustPerfect(Projectile.RandAreaInEntity(), DustID.Plantera_Pink, Main.rand.NextVector2Circular(4f, 4f), 0, default, Main.rand.NextFloat(.4f, .9f)).noGravity = true;
         }
+    }
+    
+    public FancyAfterimages after;
+    public override bool PreDraw(ref Color lightColor)
+    {
+        Texture2D tex = Projectile.ThisProjectileTexture();
+        Vector2 orig = tex.Size() * .5f;
+
+        after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [Color.DeepPink, Color.Pink], Projectile.Opacity);
+        Main.spriteBatch.DrawBetter(tex, Projectile.Center, null, Color.White, Projectile.rotation, orig, Projectile.scale, 0);
+        void star()
+        {
+            Texture2D star = AssetRegistry.GetTexture(AdditionsTexture.LensStar);
+            Vector2 starOrig = star.Size() * .5f;
+            Vector2 pos = Projectile.Center - Main.screenPosition;
+            float interpolant = InverseLerp(0f, 8f, Timer);
+            Color col = Color.Lerp(Color.Pink, Color.LightPink * 1.2f, interpolant) * interpolant;
+            Vector2 scale = new(interpolant * .28f);
+            Main.EntitySpriteDraw(star, pos, null, col, Projectile.rotation, starOrig, scale, 0);
+        }
+        PixelationSystem.QueueTextureRenderAction(star, PixelationLayer.OverProjectiles, BlendState.Additive);
+        return false;
     }
 }

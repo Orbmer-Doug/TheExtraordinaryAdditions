@@ -1,10 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
+﻿using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
-using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -50,7 +47,7 @@ public class TheAnvil : ModProjectile
         // Crash
         if (oldVelocity.Y >= CrashSpeed)
         {
-            SoundEngine.PlaySound(SoundID.DD2_OgreGroundPound with { Pitch = -.2f, PitchVariance = .1f, Volume = Main.rand.NextFloat(1.2f, 1.6f), MaxInstances = 10 }, Projectile.Center);
+            SoundID.DD2_OgreGroundPound.Play(Projectile.Center, Main.rand.NextFloat(1.2f, 1.6f), -.2f, .1f, null, 10);
             Projectile.CreateFriendlyExplosion(Projectile.Center.Lerp(Projectile.Bottom, .25f), new(Projectile.width * 4, Projectile.height), Projectile.damage / 2, Projectile.knockBack, 7, 8);
 
             for (int i = 0; i < 70; i++)
@@ -86,10 +83,11 @@ public class TheAnvil : ModProjectile
             SoundEngine.PlaySound(impactSound, Projectile.Center);
 
             Crashed = true;
+            Projectile.netUpdate = true;
         }
-
         return false;
     }
+
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
     {
         if (Projectile.velocity.Length() > CrashSpeed)
@@ -99,6 +97,7 @@ public class TheAnvil : ModProjectile
             modifiers.SetCrit();
         }
     }
+
     public override void AI()
     {
         after ??= new(10, () => Projectile.Center);
@@ -107,12 +106,9 @@ public class TheAnvil : ModProjectile
         if (Time == 20f)
         {
             for (int i = 0; i < 3; i++)
-            {
                 ParticleRegistry.SpawnMenacingParticle(Projectile.RandAreaInEntity(), Vector2.UnitY * -Main.rand.NextFloat(3f, 6f), 30, .5f, Color.Fuchsia);
-            }
         }
 
-        // 0.1f for arrow gravity, 0.4f for knife gravity
         if (Time > 20f && !Crashed)
             Projectile.velocity.Y = MathHelper.Clamp(Projectile.velocity.Y + .9f, -CrashSpeed, CrashSpeed);
 

@@ -1,12 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 using Terraria.ID;
-using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
@@ -39,7 +33,7 @@ public class OverchargedLaser : ProjOwnedByNPC<Asterlin>
     }
     public override void SafeAI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, null, 10);
         points.Update(Projectile.Center);
 
@@ -52,20 +46,15 @@ public class OverchargedLaser : ProjOwnedByNPC<Asterlin>
                 Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.Center.SafeDirectionTo(Target.Center) * speed, amt);
             }
         }
-        else if (Time > 130f)
-        {
-            if (Projectile.velocity.Length() < 60f)
-                Projectile.velocity *= 1.05f;
-        }
+        if (Projectile.velocity.Length() < 60f)
+            Projectile.velocity *= 1.03f;
 
         Time++;
     }
 
     public float WidthFunct(float c)
     {
-        float tipInterpolant = MathF.Sqrt(1f - Animators.MakePoly(2f).InFunction(InverseLerp(0.3f, 0f, c)));
-        float width = InverseLerp(1f, 0.4f, c) * tipInterpolant * Projectile.scale;
-        return width * Projectile.width;
+        return OptimizedPrimitiveTrail.PyriformWidthFunct(c, Projectile.width * Projectile.scale, 2f);
     }
 
     public Color ColorFunct(SystemVector2 c, Vector2 pos)
@@ -79,7 +68,7 @@ public class OverchargedLaser : ProjOwnedByNPC<Asterlin>
     {
         void draw()
         {
-            if (trail == null || points == null || trail._disposed)
+            if (trail == null || points == null || trail.Disposed)
                 return;
 
             ManagedShader shader = AssetRegistry.GetShader("OverchargedLaserShader");

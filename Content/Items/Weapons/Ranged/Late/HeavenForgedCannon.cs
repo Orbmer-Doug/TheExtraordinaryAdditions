@@ -1,11 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
@@ -13,9 +11,10 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
 public class HeavenForgedCannon : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.HeavenForgedCannon);
+
     public override void SetDefaults()
     {
-        Item.damage = 1450;
+        Item.damage = 825;
         Item.DamageType = DamageClass.Ranged;
         Item.shoot = ModContent.ProjectileType<HeavenForgedHoldout>();
         Item.useTime = Item.useAnimation = 100;
@@ -32,16 +31,16 @@ public class HeavenForgedCannon : ModItem
         Item.useStyle = ItemUseStyleID.Shoot;
     }
 
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(new Color(33, 170, 191));
+    }
+
     public override bool CanShoot(Player player) => false;
 
     public override bool CanUseItem(Player player)
     {
         return player.ownedProjectileCounts[Item.shoot] <= 0;
-    }
-
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(new Color(33, 170, 191));
     }
 
     public override void AddRecipes()
@@ -54,6 +53,5 @@ public class HeavenForgedCannon : ModItem
         recipe.AddIngredient(ItemID.SoulofSight, 10);
         recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();
-
     }
 }

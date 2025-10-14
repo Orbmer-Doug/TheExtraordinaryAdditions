@@ -1,23 +1,23 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
+
+// gurt
 public class ThreadripperYo : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Threadripper);
     public Player Owner => Main.player[Projectile.owner];
     public GlobalPlayer Modded => Owner.Additions();
-    public ref float Timer => ref Projectile.Additions().ExtraAI[4];
-    public ref float Shred => ref Projectile.Additions().ExtraAI[5];
-    public ref float Wait => ref Projectile.Additions().ExtraAI[6];
-    public ref int Counter => ref Modded.RipperCounter;
+    public ref float Timer => ref Projectile.AdditionsInfo().ExtraAI[4];
+    public ref float Shred => ref Projectile.AdditionsInfo().ExtraAI[5];
+    public ref float Wait => ref Projectile.AdditionsInfo().ExtraAI[6];
+    public ref int Counter => ref Owner.GetModPlayer<ThreadripperPlayer>().Counter;
     public const int Max = 25;
     public static readonly int ShredTime = SecondsToFrames(6.5f);
     public float Interpol => Shred > 0 ? InverseLerp(0f, ShredTime, Shred) : InverseLerp(0f, Max, Counter);
@@ -97,31 +97,8 @@ public class ThreadripperYo : ModProjectile
         if (Shred > 0)
         {
             modifiers.ScalingArmorPenetration += .5f;
-            modifiers.FinalDamage *= 2;
+            modifiers.FinalDamage *= 1.8f;
         }
-    }
-
-    public FancyAfterimages after;
-    public override bool PreDraw(ref Color lightColor)
-    {
-        void glow()
-        {
-            Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
-            Vector2 orig = tex.Size() / 2f;
-            Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Vector2.One * Projectile.height * 4f), null, Color.DarkRed * .6f * Interpol, 0f, orig);
-            Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Vector2.One * Projectile.height * 3.5f), null, Color.Red * .85f * Interpol, 0f, orig);
-            Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Vector2.One * Projectile.height * 3f), null, Color.Crimson * Interpol, 0f, orig);
-        }
-
-        Texture2D tex = Projectile.ThisProjectileTexture();
-        Point p = Projectile.Center.ToTileCoordinates();
-        float light = Lighting.Brightness(p.X, p.Y);
-        Color col = Color.LightGray.Lerp(Color.DarkRed, Interpol);
-        after.DrawFancyAfterimages(tex, [col * .76f], light, 1f, 0f, false, true);
-        Projectile.DrawBaseProjectile(col * light);
-        PixelationSystem.QueueTextureRenderAction(glow, PixelationLayer.UnderProjectiles, BlendState.Additive);
-
-        return false;
     }
 
     public override bool OnTileCollide(Vector2 oldVelocity)
@@ -150,13 +127,13 @@ public class ThreadripperYo : ModProjectile
     {
         if (Wait <= 0 && Shred <= 0)
         {
-            Owner.Additions().RipperCounter += 1;
+            Counter += 1;
             Wait = 30;
         }
-        if (Owner.Additions().RipperCounter >= Max)
+        if (Counter >= Max)
         {
             Shred = ShredTime;
-            Owner.Additions().RipperCounter = 0;
+            Counter = 0;
         }
 
         Vector2 splatterDirection = Projectile.velocity * .8f;
@@ -169,4 +146,32 @@ public class ThreadripperYo : ModProjectile
             ParticleRegistry.SpawnBloodParticle(target.Center, vel, life, scale, color);
         }
     }
+    
+    public FancyAfterimages after;
+    public override bool PreDraw(ref Color lightColor)
+    {
+        void glow()
+        {
+            Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
+            Vector2 orig = tex.Size() / 2f;
+            Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Vector2.One * Projectile.height * 4f), null, Color.DarkRed * .6f * Interpol, 0f, orig);
+            Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Vector2.One * Projectile.height * 3.5f), null, Color.Red * .85f * Interpol, 0f, orig);
+            Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Vector2.One * Projectile.height * 3f), null, Color.Crimson * Interpol, 0f, orig);
+        }
+
+        Texture2D tex = Projectile.ThisProjectileTexture();
+        Point p = Projectile.Center.ToTileCoordinates();
+        float light = Lighting.Brightness(p.X, p.Y);
+        Color col = Color.LightGray.Lerp(Color.DarkRed, Interpol);
+        after.DrawFancyAfterimages(tex, [col * .76f], light, 1f, 0f, false, true);
+        Projectile.DrawBaseProjectile(col * light);
+        PixelationSystem.QueueTextureRenderAction(glow, PixelationLayer.UnderProjectiles, BlendState.Additive);
+        return false;
+    }
+}
+
+public sealed class ThreadripperPlayer : ModPlayer
+{
+    public int Counter;
+    public override void UpdateDead() => Counter = 0;
 }

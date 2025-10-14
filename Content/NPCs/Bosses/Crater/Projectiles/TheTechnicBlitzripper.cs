@@ -30,8 +30,8 @@ public class TheTechnicBlitzripper : ProjOwnedByNPC<Asterlin>
         set => Projectile.ai[0] = value;
     }
     public ref float Recoil => ref Projectile.ai[2];
-    public ref float Heat => ref Projectile.Additions().ExtraAI[0];
-    public ref float ShootDelay => ref Projectile.Additions().ExtraAI[1];
+    public ref float Heat => ref Projectile.AdditionsInfo().ExtraAI[0];
+    public ref float ShootDelay => ref Projectile.AdditionsInfo().ExtraAI[1];
 
     public int Dir => Projectile.velocity.X.NonZeroSign();
     public Vector2 Tip => Projectile.Center + PolarVector(105f, Projectile.rotation) + PolarVector(3f * Dir, Projectile.rotation - MathHelper.PiOver2);
@@ -40,9 +40,9 @@ public class TheTechnicBlitzripper : ProjOwnedByNPC<Asterlin>
     public override bool ShouldUpdatePosition() => false;
     public override void SafeAI()
     {
-        if (Boss.TechnicBombBarrage_FadeTimer > 0)
+        if (ModOwner.TechnicBombBarrage_FadeTimer > 0)
         {
-            Projectile.Opacity = InverseLerp(30f, 0f, Boss.TechnicBombBarrage_FadeTimer);
+            Projectile.Opacity = InverseLerp(30f, 0f, ModOwner.TechnicBombBarrage_FadeTimer);
             if (Projectile.Opacity <= 0f)
                 Projectile.Kill();
         }
@@ -50,8 +50,8 @@ public class TheTechnicBlitzripper : ProjOwnedByNPC<Asterlin>
             Projectile.Opacity = Animators.MakePoly(2f).OutFunction(InverseLerp(0f, 30f, Time));
 
         Vector2 offset = PolarVector(30f - (Recoil * 4), Projectile.rotation) + PolarVector(10f * Dir, Projectile.rotation - MathHelper.PiOver2);
-        Projectile.Center = Boss.RightHandPosition + offset;
-        Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.Center.SafeDirectionTo(Boss.ReticlePosition), .2f);
+        Projectile.Center = ModOwner.RightHandPosition + offset;
+        Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.Center.SafeDirectionTo(ModOwner.ReticlePosition), .2f);
         Projectile.rotation = Projectile.velocity.ToRotation();
 
         Heat = MathHelper.Clamp(Animators.MakePoly(3f).OutFunction.Evaluate(Heat, -.11f, .04f), 0f, TechnicBlitzripperProj.MaxHeat);
@@ -61,13 +61,16 @@ public class TheTechnicBlitzripper : ProjOwnedByNPC<Asterlin>
             ShootDelay--;
 
         Time++;
+
+        Projectile.Center = Projectile.Center.ClampInWorld();
     }
 
     public void Shoot()
     {
         if (ShootDelay <= 0f)
         {
-            SpawnProjectile(Tip, Projectile.velocity.SafeNormalize(Vector2.Zero) * 12f, ModContent.ProjectileType<TheLightripBullet>(), Asterlin.LightAttackDamage, 0f);
+            if (this.RunServer())
+                SpawnProjectile(Tip, Projectile.velocity.SafeNormalize(Vector2.Zero) * 12f, ModContent.ProjectileType<TheLightripBullet>(), Asterlin.LightAttackDamage, 0f);
 
             for (int i = 0; i < 12; i++)
                 ParticleRegistry.SpawnGlowParticle(Tip, Main.rand.NextVector2Circular(2f, 2f), Main.rand.Next(6, 12), Main.rand.NextFloat(30f, 60f), Color.LightCyan, 1.4f);
@@ -87,6 +90,7 @@ public class TheTechnicBlitzripper : ProjOwnedByNPC<Asterlin>
             Heat = MathHelper.Clamp(Heat + 1, 0f, TechnicBlitzripperProj.MaxHeat);
             Recoil = 4f;
             ShootDelay = 4f;
+            Projectile.netUpdate = true;
         }
     }
 

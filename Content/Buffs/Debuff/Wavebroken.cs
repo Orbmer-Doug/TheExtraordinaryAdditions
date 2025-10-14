@@ -1,8 +1,7 @@
 ﻿using Terraria;
 using Terraria.ID;
-using Terraria.Localization;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.NPCGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Buffs.Debuff;
 
@@ -22,7 +21,7 @@ public class Wavebroken : ModBuff
     {
         if (npc.GetGlobalNPC<AdditionsGlobalNPC>().Wavebreaked < npc.buffTime[buffIndex])
             npc.GetGlobalNPC<AdditionsGlobalNPC>().Wavebreaked = npc.buffTime[buffIndex];
-        
+
         npc.DelBuff(buffIndex);
         buffIndex--;
     }

@@ -6,7 +6,7 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Early;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Late;
 

@@ -1,6 +1,4 @@
-﻿
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -13,87 +11,68 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
 public class HeatRayHoldout : BaseIdleHoldoutProjectile
 {
-    public override string Texture => "Terraria/Images/Item_" + ItemID.HeatRay;
+    public override string Texture => ItemID.HeatRay.GetTerrariaItem();
     public override int AssociatedItemID => ItemID.HeatRay;
     public override int IntendedProjectileType => ModContent.ProjectileType<HeatRayHoldout>();
+
     public override void Defaults()
     {
         Projectile.width = 36;
         Projectile.height = 24;
         Projectile.DamageType = DamageClass.Magic;
     }
+
     public ref float Time => ref Projectile.ai[0];
     public override void SafeAI()
     {
         LaserResource.ApplyLaserOverheating(Owner);
 
-        Projectile.extraUpdates = 0;
-        Time++;
-        UpdatePlayerVisuals();
-        Item item = Owner.HeldItem;
-
-        Vector2 vel = Projectile.velocity * item.shootSpeed;
-        Vector2 pos = Projectile.Center + PolarVector(Projectile.width * .5f * Projectile.direction, Projectile.rotation);
-        var laser = Owner.GetModPlayer<LaserResource>();
-        if (Modded.SafeMouseLeft.Current && Time % item.useTime == item.useTime - 1 && LaserResource.CanFire(Owner))
-        {
-            laser.HeatCurrent++;
-
-            SoundEngine.PlaySound(SoundID.Item12, Projectile.Center);
-            Projectile.NewProj(pos, vel, ModContent.ProjectileType<ScorchRay>(), item.damage, item.knockBack / 5, Owner.whoAmI);
-        }
-
-        int wait = item.useTime * 2;
-        if (Modded.SafeMouseRight.Current && Time % wait == wait - 1 && LaserResource.CanFire(Owner))
-        {
-            if (item.CheckManaBetter(Owner, item.mana, true))
-            {
-                laser.HeatCurrent += 2;
-
-                SoundEngine.PlaySound(SoundID.Item12 with { Pitch = -.1f, Volume = 1.2f }, Projectile.Center);
-                Projectile.NewProj(pos, vel, ModContent.ProjectileType<MeltRay>(), item.damage, item.knockBack, Owner.whoAmI);
-            }
-        }
-    }
-    private void UpdatePlayerVisuals()
-    {
         if (this.RunLocal())
         {
-            float interpolant = Utils.GetLerpValue(5f, 20f, Projectile.Distance(Main.MouseWorld), true);
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Main.MouseWorld), interpolant);
+            Projectile.velocity = Center.SafeDirectionTo(Modded.mouseWorld);
+            if (Projectile.velocity != Projectile.oldVelocity)
+                this.Sync();
         }
+        Projectile.rotation = Projectile.velocity.ToRotation();
+        Owner.ChangeDir(Projectile.velocity.X.NonZeroSign());
+        Owner.SetFrontHandBetter(0, Projectile.rotation);
+        Projectile.Center = Owner.GetFrontHandPositionImproved() + PolarVector(15f, Projectile.rotation) + PolarVector(5f * Owner.direction * Owner.gravDir, Projectile.rotation - MathHelper.PiOver2);
 
-        // Tie projectile to player
-        Projectile.Center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true) + Projectile.velocity * Projectile.width * .5f;
+        Vector2 vel = Projectile.velocity * Item.shootSpeed;
+        Vector2 pos = Projectile.Center + PolarVector(Projectile.width * .5f, Projectile.rotation);
+        LaserResource laser = Owner.GetModPlayer<LaserResource>();
 
-        // Update damage dynamically, in case item stats change during the projectile's lifetime.
-        Projectile.damage = Owner.GetWeaponDamage(Owner.HeldItem);
-
-        Projectile.rotation = Projectile.AngleTo(Main.MouseWorld);
-        if (Projectile.direction == -1)
-            Projectile.rotation += MathHelper.Pi;
-
-        Owner.ChangeDir(Projectile.direction);
-        Owner.heldProj = Projectile.whoAmI;
-        Projectile.timeLeft = 2;
-        Owner.itemRotation = WrapAngle90Degrees(Projectile.rotation);
-
-        float armPointingDirection = Owner.itemRotation;
-        if (Owner.direction < 0)
+        if (this.RunLocal() && Modded.SafeMouseLeft.Current && Time % Item.useTime == Item.useTime - 1 && LaserResource.CanFire(Owner) && TryUseMana(false))
         {
-            armPointingDirection += MathHelper.Pi;
+            laser.HeatCurrent++;
+            SoundEngine.PlaySound(SoundID.Item12, Projectile.Center);
+            Projectile.NewProj(pos, vel, ModContent.ProjectileType<ScorchRay>(), Item.damage, Item.knockBack / 5, Owner.whoAmI);
+            for (int i = 0; i < 8; i++)
+                ParticleRegistry.SpawnSparkParticle(pos, vel.RotatedByRandom(.4f) * Main.rand.NextFloat(.1f, .6f), Main.rand.Next(30, 40), Main.rand.NextFloat(.4f, .5f), Color.Yellow);
         }
-        Owner.SetCompositeArmFront(true, 0, armPointingDirection - MathHelper.PiOver2);
-        Owner.SetCompositeArmBack(true, 0, armPointingDirection - MathHelper.PiOver2);
+
+        int wait = Item.useTime * 2;
+        if (this.RunLocal() && Modded.SafeMouseRight.Current && Time % wait == wait - 1 && LaserResource.CanFire(Owner))
+        {
+            if (TryUseMana())
+            {
+                laser.HeatCurrent += 2;
+                SoundEngine.PlaySound(SoundID.Item12 with { Pitch = -.1f, Volume = 1.2f }, Projectile.Center);
+                Projectile.NewProj(pos, vel, ModContent.ProjectileType<MeltRay>(), Item.damage, Item.knockBack, Owner.whoAmI);
+                for (int i = 0; i < 15; i++)
+                    ParticleRegistry.SpawnSparkParticle(pos, vel.RotatedByRandom(.4f) * Main.rand.NextFloat(.1f, .6f), Main.rand.Next(30, 40), Main.rand.NextFloat(.5f, .6f), Color.OrangeRed);
+            }
+        }
+
+        Time++;
     }
 
     public override bool PreDraw(ref Color lightColor)
     {
-        Texture2D tex = Projectile.ThisProjectileTexture();
-        Rectangle frame = tex.Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame);
-        Vector2 drawPos = Projectile.Center - Main.screenPosition;
-        Main.EntitySpriteDraw(tex, drawPos, frame, Projectile.GetAlpha(lightColor), Projectile.rotation, tex.Size() * .5f, 1, Projectile.direction.ToSpriteDirection());
-
+        Texture2D texture = Projectile.ThisProjectileTexture();
+        Vector2 drawPosition = Projectile.Center - Main.screenPosition;
+        SpriteEffects effects = FixedDirection();
+        Main.EntitySpriteDraw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), Projectile.rotation, texture.Size() * 0.5f, Projectile.scale, effects, 0);
         return false;
     }
 }

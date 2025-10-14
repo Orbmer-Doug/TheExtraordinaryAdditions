@@ -1,8 +1,8 @@
 ﻿using System;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Tiles;
-using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.World.Subworlds;
 
@@ -23,6 +23,7 @@ public static class CloudedCraterWorldGen
     {
         GenerateCraterTerrain();
         SetInitialPlayerSpawnPoint();
+        PlaceTransmitter();
         SmoothenWorld();
     }
 
@@ -86,6 +87,30 @@ public static class CloudedCraterWorldGen
 
         Main.spawnTileX = spawnX;
         Main.spawnTileY = spawnY;
+    }
+
+    public static void PlaceTransmitter()
+    {
+        Point pos = new(Main.spawnTileX, Main.spawnTileY);
+
+        for (int dx = -TechnicTransmitterPlaced.Width / 2 - 1; dx <= TechnicTransmitterPlaced.Width / 2 + 1; dx++)
+        {
+            Tile tile = ParanoidTileRetrieval(pos.X + dx, pos.Y + 1);
+            tile.TileType = MeteorTile;
+            tile.Get<TileWallWireStateData>().HasTile = true;
+
+            for (int dy = 0; dy <= TechnicTransmitterPlaced.Height; dy++)
+            {
+                tile = ParanoidTileRetrieval(pos.X + dx, pos.Y - dy);
+                tile.Get<TileWallWireStateData>().HasTile = false;
+
+                tile = ParanoidTileRetrieval(pos.X + dx, pos.Y + dy + 1);
+                tile.TileType = MeteorTile;
+                tile.Get<TileWallWireStateData>().HasTile = true;
+            }
+        }
+
+        WorldGen.PlaceTile(pos.X, pos.Y, ModContent.TileType<TechnicTransmitterPlaced>(), true, false, -1);
     }
 
     public static void SmoothenWorld()

@@ -9,7 +9,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -18,18 +18,12 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Late;
 public class HollowPurple : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.HollowPurple);
+
     public override void SetStaticDefaults()
     {
-        Main.RegisterItemAnimation(Item.type, new DrawAnimationVertical(5, 15, false));
-
-        ItemID.Sets.AnimatesAsSoul[Type] = true;
-
         CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1;
     }
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(Color.Purple);
-    }
+
     public override void SetDefaults()
     {
         Item.damage = 19500;
@@ -51,6 +45,12 @@ public class HollowPurple : ModItem
         Item.noMelee = true;
         Item.noUseGraphic = true;
     }
+    
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(Color.Purple);
+    }
+
     public override bool CanUseItem(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
@@ -87,6 +87,7 @@ public class HollowPurple : ModItem
         Main.spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, Main.UIScaleMatrix);
         return false;
     }
+
     public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
     {
         Main.spriteBatch.PrepareForShaders();

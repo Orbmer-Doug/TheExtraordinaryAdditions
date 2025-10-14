@@ -1,14 +1,10 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.IO;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Assets;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
 
@@ -21,13 +17,13 @@ public class KnifeStab : ModProjectile
     public ref float MaxTimeLeft => ref Projectile.ai[2];
     public bool Fading
     {
-        get => Projectile.Additions().ExtraAI[0] == 1f;
-        set => Projectile.Additions().ExtraAI[0] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[0] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
     public bool PlayedSound
     {
-        get => Projectile.Additions().ExtraAI[1] == 1f;
-        set => Projectile.Additions().ExtraAI[1] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[1] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[1] = value.ToInt();
     }
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ComicallyLargeKnife);
     private Player Owner => Main.player[Projectile.owner];
@@ -178,7 +174,7 @@ public class KnifeStab : ModProjectile
             return;
 
         hitNPCs.Add(target);
-        
+
         CheckLinearCollision(Owner.Center, target.Center, target.Hitbox, out Vector2 start, out Vector2 end);
 
         for (int i = 0; i < 14; i++)

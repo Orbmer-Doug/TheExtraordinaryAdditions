@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Terraria;
 using Terraria.GameContent.Bestiary;
@@ -8,9 +7,6 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.Utilities;
-using TheExtraordinaryAdditions.Common.Particles;
-using TheExtraordinaryAdditions.Content.Items.Consumable;
-using TheExtraordinaryAdditions.Content.Items.Novelty;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Classless;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -109,7 +105,7 @@ public class CreepyOldMan : ModNPC
     {
         if (spawnInfo.Player.ZoneDirtLayerHeight && spawnInfo.Player.inventory.Any(item => item.type >= ItemRarityID.Yellow) && NPC.downedPlantBoss)
             return 0.11f;
-        
+
         return 0f;
     }
 

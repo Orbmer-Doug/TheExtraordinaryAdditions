@@ -1,15 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Assets;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Late;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
-using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -17,9 +11,9 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
 
 public class EpidemicHoldout : BaseIdleHoldoutProjectile
 {
+    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Epidemic);
     public override int IntendedProjectileType => ModContent.ProjectileType<EpidemicHoldout>();
     public override int AssociatedItemID => ModContent.ItemType<Epidemic>();
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Epidemic);
 
     public ref float Time => ref Projectile.ai[0];
 
@@ -55,8 +49,6 @@ public class EpidemicHoldout : BaseIdleHoldoutProjectile
         Projectile.rotation = Projectile.velocity.ToRotation();
         Owner.SetFrontHandBetter(0, Projectile.rotation);
 
-        Vector2 velocity = Projectile.SafeDirectionTo(Modded.mouseWorld) * 15f;
-
         if (this.RunLocal() && Modded.MouseRight.Current)
         {
             int spear = ModContent.ProjectileType<EpidemicSpear>();
@@ -86,7 +78,7 @@ public class EpidemicHoldout : BaseIdleHoldoutProjectile
             if (this.RunLocal() && LeftCounter % wait == wait - 1f && Owner.HeldItem.CheckManaBetter(Owner, 8, true))
             {
                 AdditionsSound.WaterSpell.Play(Projectile.Center, 1f, 0f, 0f, 0);
-                Projectile.NewProj(Projectile.Center, velocity, ModContent.ProjectileType<EpidemicLob>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
+                Projectile.NewProj(Projectile.Center, Projectile.SafeDirectionTo(Modded.mouseWorld) * 15f, ModContent.ProjectileType<EpidemicLob>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
             }
             LeftCounter++;
         }

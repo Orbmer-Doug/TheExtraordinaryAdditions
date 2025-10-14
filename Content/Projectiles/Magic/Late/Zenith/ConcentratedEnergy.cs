@@ -14,6 +14,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Late.Zenith;
 public class ConcentratedEnergy : ModProjectile, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ConcentratedEnergy);
+
     public override void SetDefaults()
     {
         Projectile.width = 74;
@@ -43,19 +44,17 @@ public class ConcentratedEnergy : ModProjectile, ILocalizedModType, IModType
     public ref float Time => ref Projectile.ai[1];
     public override void AI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunction, ColorFunction, null, 10);
 
         Lighting.AddLight(Projectile.Center, Color.Fuchsia.ToVector3() * 1.2f * Projectile.scale);
-        Projectile.FacingRight();
 
         if (Time > SecondsToFrames(.5f) && HasHitTarget == false)
         {
-            if (NPCTargeting.TryGetClosestNPC(new(Projectile.Center, 900, false, true), out NPC target))
-            {
-                Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.SafeDirectionTo(target.Center) * 30f, .1f);
-            }
+            if (NPCTargeting.TryGetClosestNPC(new(Projectile.Center, 800, false, true), out NPC target))
+                Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.SafeDirectionTo(target.Center) * 30f, .22f);
         }
+
         if (HasHitTarget == true)
         {
             int type = (Projectile.identity % 2f == 0f).ToDirectionInt();
@@ -67,6 +66,7 @@ public class ConcentratedEnergy : ModProjectile, ILocalizedModType, IModType
         {
             Projectile.Opacity = Projectile.scale = InverseLerp(0f, 20f, Projectile.timeLeft);
         }
+        Projectile.FacingRight();
 
         cache ??= new(10);
         cache.Update(Projectile.RotHitbox().Left);
@@ -97,7 +97,7 @@ public class ConcentratedEnergy : ModProjectile, ILocalizedModType, IModType
             {
                 ManagedShader shader = ShaderRegistry.FadedStreak;
                 shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.ShadowTrail), 1);
-                trail.DrawTrail(shader, cache.Points, 120);
+                trail.DrawTrail(shader, cache.Points, 40, true);
             }
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
@@ -111,7 +111,7 @@ public class ConcentratedEnergy : ModProjectile, ILocalizedModType, IModType
 
     public override void OnKill(int timeLeft)
     {
-        SoundEngine.PlaySound(SoundID.DD2_WitherBeastDeath with { Volume = 1.1f, PitchVariance = .1f }, (Vector2?)Projectile.Center, null);
+        SoundID.DD2_WitherBeastDeath.Play(Projectile.Center, 1.1f, 0f, .1f);
 
         if (NPCTargeting.TryGetClosestNPC(new(Projectile.Center, 900, false, true), out NPC target))
         {

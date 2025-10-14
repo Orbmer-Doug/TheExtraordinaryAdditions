@@ -1,13 +1,14 @@
 ﻿using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Early;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Early;
 
 public class ObsidianFlail : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ObsidianFlail);
+
     public override void SetStaticDefaults()
     {
         ItemID.Sets.ToolTipDamageMultiplier[Type] = 2f;

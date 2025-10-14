@@ -191,6 +191,23 @@ public class HemoglobbedCapsuleThrown : ModProjectile
         Projectile.Opacity = InverseLerp(0f, 20f, Projectile.timeLeft);
     }
 
+    public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+    {
+        for (int i = 0; i < 50; i++)
+        {
+            ParticleRegistry.SpawnDustParticle(Projectile.Center + Main.rand.NextVector2Circular(Projectile.width / 2, Projectile.width / 2),
+                Main.rand.NextVector2Circular(4f, 4f), Main.rand.Next(30, 40), Main.rand.NextFloat(.7f, 1.1f), Color.Crimson, Main.rand.NextFloat(-.1f, .1f), false, true, true);
+            ParticleRegistry.SpawnBloodParticle(Projectile.RandAreaInEntity(), Main.rand.NextVector2Circular(10f, 10f), Main.rand.Next(30, 50), Main.rand.NextFloat(.7f, 1.2f), Color.DarkRed);
+        }
+
+        AdditionsSound.Rapture.Play(Projectile.Center, 1.2f, -.1f);
+        ScreenShakeSystem.New(new(.6f, .6f, 3000f), Projectile.Center);
+        if (this.RunLocal())
+            Projectile.NewProj(Projectile.Center, Vector2.UnitY, ModContent.ProjectileType<LesserBloodBeacon>(), Projectile.damage / 2, 0f);
+    }
+
+    public override bool? CanDamage() => CurrentState == BehaviorState.Aim ? false : null;
+    
     public FancyAfterimages after;
     public override bool PreDraw(ref Color lightColor)
     {
@@ -221,21 +238,4 @@ public class HemoglobbedCapsuleThrown : ModProjectile
         Main.spriteBatch.Draw(orbTexture, drawPosition, frame, baseColor, Projectile.rotation, origin, Projectile.scale, direction, 0f);
         return false;
     }
-
-    public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
-    {
-        for (int i = 0; i < 50; i++)
-        {
-            ParticleRegistry.SpawnDustParticle(Projectile.Center + Main.rand.NextVector2Circular(Projectile.width / 2, Projectile.width / 2),
-                Main.rand.NextVector2Circular(4f, 4f), Main.rand.Next(30, 40), Main.rand.NextFloat(.7f, 1.1f), Color.Crimson, Main.rand.NextFloat(-.1f, .1f), false, true, true);
-            ParticleRegistry.SpawnBloodParticle(Projectile.RandAreaInEntity(), Main.rand.NextVector2Circular(10f, 10f), Main.rand.Next(30, 50), Main.rand.NextFloat(.7f, 1.2f), Color.DarkRed);
-        }
-
-        AdditionsSound.Rapture.Play(Projectile.Center, 1.2f, -.1f);
-        ScreenShakeSystem.New(new(.6f, .6f, 3000f), Projectile.Center);
-        if (this.RunLocal())
-            Projectile.NewProj(Projectile.Center, Vector2.UnitY, ModContent.ProjectileType<LesserBloodBeacon>(), Projectile.damage / 2, 0f);
-    }
-
-    public override bool? CanDamage() => CurrentState == BehaviorState.Aim ? false : null;
 }

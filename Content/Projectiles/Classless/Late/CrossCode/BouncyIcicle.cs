@@ -11,11 +11,6 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.CrossCode
 public class BouncyIcicle : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.DiscIceProjectile);
-    public override void SetStaticDefaults()
-    {
-        ProjectileID.Sets.TrailCacheLength[Projectile.type] = 5;
-        ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
-    }
 
     public override void SetDefaults()
     {
@@ -38,18 +33,6 @@ public class BouncyIcicle : ModProjectile
         Projectile.aiStyle = 0;
     }
 
-    public FancyAfterimages after;
-    public override bool PreDraw(ref Color lightColor)
-    {
-        Texture2D texture = Projectile.ThisProjectileTexture();
-        after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [Color.LightCyan], Projectile.Opacity);
-
-        Vector2 drawPosition = Projectile.Center - Main.screenPosition;
-        SpriteEffects direction = Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
-        Main.EntitySpriteDraw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), Projectile.rotation, texture.Size() * 0.5f, Projectile.scale, direction, 0);
-        return false;
-    }
-
     public override void AI()
     {
         after ??= new(5, () => Projectile.Center);
@@ -58,9 +41,8 @@ public class BouncyIcicle : ModProjectile
         Lighting.AddLight(Projectile.Center, Color.DarkBlue.ToVector3() * .6f);
 
         if (Projectile.velocity.Length() < 30f)
-        {
             Projectile.velocity *= 1.015f;
-        }
+        
         if (Projectile.ai[0]++ % 2 == 1)
             ParticleRegistry.SpawnMistParticle(Projectile.Center, Projectile.velocity * Main.rand.NextFloat(.2f, .5f), Main.rand.NextFloat(.4f, .8f), Color.DarkBlue, Color.DarkSlateBlue, 190);
 
@@ -85,17 +67,11 @@ public class BouncyIcicle : ModProjectile
             dust.velocity *= 3f;
         }
 
-        // If the projectile hits the left or right side of the tile, reverse the X velocity
+        // Bouncy
         if (Math.Abs(Projectile.velocity.X - oldVelocity.X) > float.Epsilon)
-        {
             Projectile.velocity.X = -oldVelocity.X;
-        }
-
-        // If the projectile hits the top or bottom side of the tile, reverse the Y velocity
         if (Math.Abs(Projectile.velocity.Y - oldVelocity.Y) > float.Epsilon)
-        {
             Projectile.velocity.Y = -oldVelocity.Y;
-        }
         return false;
     }
 
@@ -107,5 +83,17 @@ public class BouncyIcicle : ModProjectile
         for (int i = 0; i < 20; i++)
             ParticleRegistry.SpawnDustParticle(Projectile.BaseRotHitbox().Right, -Projectile.velocity.RotatedByRandom(.4f) * Main.rand.NextFloat(.2f, .3f),
                 Main.rand.Next(30, 40), Main.rand.NextFloat(.4f, .8f), Color.DarkSlateBlue, .1f, false, true);
+    }
+    
+    public FancyAfterimages after;
+    public override bool PreDraw(ref Color lightColor)
+    {
+        Texture2D texture = Projectile.ThisProjectileTexture();
+        after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [Color.LightCyan], Projectile.Opacity);
+
+        Vector2 drawPosition = Projectile.Center - Main.screenPosition;
+        SpriteEffects direction = Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
+        Main.EntitySpriteDraw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), Projectile.rotation, texture.Size() * 0.5f, Projectile.scale, direction, 0);
+        return false;
     }
 }

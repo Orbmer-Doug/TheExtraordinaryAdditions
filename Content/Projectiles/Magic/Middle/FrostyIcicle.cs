@@ -1,9 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -86,7 +82,7 @@ public class FrostyIcicle : ModProjectile
         for (int i = 0; i < iciclePoints.Count; i++)
             iciclePoints.SetPoint(i, iciclePoints.Points[i] + Projectile.velocity);
 
-        if (icicle == null || icicle._disposed)
+        if (icicle == null || icicle.Disposed)
             icicle = new(c => Projectile.width * (1f - c), (c, pos) => Color.White, null, 50);
 
         Time++;
@@ -102,18 +98,16 @@ public class FrostyIcicle : ModProjectile
     }
 
     public OptimizedPrimitiveTrail icicle;
-    public ManualTrailPoints iciclePoints = new(50);
+    public TrailPoints iciclePoints = new(50);
     public override bool PreDraw(ref Color lightColor)
     {
-        if (icicle == null || icicle._disposed || iciclePoints == null)
+        if (icicle == null || icicle.Disposed || iciclePoints == null)
             return false;
 
         ManagedShader shader = AssetRegistry.GetShader("TextureStretch");
         shader.TrySetParameter("completion", 1f - InverseLerp(0f, Wait, Time));
         shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DiscIceProjectile), 0, SamplerState.PointClamp);
-
         icicle.DrawTrail(shader, iciclePoints.Points, 100, true, false);
-
         return false;
     }
 }

@@ -24,11 +24,11 @@ public class AntiMatterCannonHoldout : BaseIdleHoldoutProjectile
     public ref float Wait => ref Projectile.ai[0];
     public ref float Time => ref Projectile.ai[1];
     public ref float Recoil => ref Projectile.ai[2];
-    public ref float ReloadTimer => ref Projectile.Additions().ExtraAI[0];
+    public ref float ReloadTimer => ref Projectile.AdditionsInfo().ExtraAI[0];
     public bool Reloading
     {
-        get => Projectile.Additions().ExtraAI[1] == 1f;
-        set => Projectile.Additions().ExtraAI[1] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[1] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[1] = value.ToInt();
     }
     public ref int Shots => ref Owner.GetModPlayer<AntiMatterPlayer>().Shots;
 

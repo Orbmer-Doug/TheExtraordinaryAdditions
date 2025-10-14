@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
-using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Assets.Audio;
@@ -34,7 +33,7 @@ public class GammaRay : ModProjectile
     public Projectile ProjOwner => Main.projectile[(int)Projectile.ai[0]];
     public ref float Time => ref Projectile.ai[1];
     public ref float RayLength => ref Projectile.ai[2];
-    public ref float Fade => ref Projectile.Additions().ExtraAI[0];
+    public ref float Fade => ref Projectile.AdditionsInfo().ExtraAI[0];
 
     public const int ExpandTime = 40;
     public Player Owner => Main.player[Projectile.owner];
@@ -42,9 +41,9 @@ public class GammaRay : ModProjectile
     public LoopedSoundInstance sound;
     public override void AI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, null, Amt);
-        if (trail2 == null || trail2._disposed)
+        if (trail2 == null || trail2.Disposed)
             trail2 = new(WidthFunct, ColorFunct, null, Amt);
 
         // Update the ominous hum
@@ -63,7 +62,7 @@ public class GammaRay : ModProjectile
         }
 
         // Fade away if necessary
-        if (gen == null || !Owner.Available() || ProjOwner == null || 
+        if (gen == null || !Owner.Available() || ProjOwner == null ||
             (ProjOwner.owner == Owner.whoAmI && (ProjOwner.active == false || gen.Phase != TheExingendies.States.ActiveGalacticNucleus || gen.RayWait == true || gen.Completion != 1f)))
         {
             Fade++;
@@ -88,9 +87,9 @@ public class GammaRay : ModProjectile
     }
 
     public const int Amt = 400;
-    public ManualTrailPoints points = new(Amt);
+    public TrailPoints points = new(Amt);
     public OptimizedPrimitiveTrail trail;
-    public ManualTrailPoints points2 = new(Amt);
+    public TrailPoints points2 = new(Amt);
     public OptimizedPrimitiveTrail trail2;
 
     public float WidthFunct(float c) => Animators.MakePoly(1.6f).OutFunction.Evaluate(2f, 1000f, c);

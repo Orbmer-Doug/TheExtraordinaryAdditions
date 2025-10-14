@@ -17,16 +17,11 @@ public class TheStarsAreAfraid : ModProjectile
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TheStarsAreAfraid);
     public Player Owner => Main.player[Projectile.owner];
     public GlobalPlayer ModdedOwner => Owner.Additions();
-    public Vector2 Offset;
-    public override void SendExtraAI(BinaryWriter writer)
-    {
-        writer.WriteVector2(Offset);
-    }
-    public override void ReceiveExtraAI(BinaryReader reader)
-    {
-        Offset = reader.ReadVector2();
-    }
 
+    public Vector2 Offset;
+    public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(Offset);
+    public override void ReceiveExtraAI(BinaryReader reader) => Offset = reader.ReadVector2();
+    
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.DrawScreenCheckFluff[Projectile.type] = 1200;
@@ -54,11 +49,11 @@ public class TheStarsAreAfraid : ModProjectile
         get => Projectile.ai[2] == 1f;
         set => Projectile.ai[2] = value.ToInt();
     }
-    public ref float ReleaseTime => ref Projectile.Additions().ExtraAI[0];
+    public ref float ReleaseTime => ref Projectile.AdditionsInfo().ExtraAI[0];
     public int ProjIndex
     {
-        get => (int)Projectile.Additions().ExtraAI[1];
-        set => Projectile.Additions().ExtraAI[1] = value;
+        get => (int)Projectile.AdditionsInfo().ExtraAI[1];
+        set => Projectile.AdditionsInfo().ExtraAI[1] = value;
     }
 
     public static readonly float ChargeTime = SecondsToFrames(1.5f);
@@ -74,9 +69,9 @@ public class TheStarsAreAfraid : ModProjectile
             return;
         }
 
-        if (tele == null || tele._disposed)
+        if (tele == null || tele.Disposed)
             tele = new((c) => Projectile.height / 4 * ChargeCompletion, (c, pos) => Color.Crimson * MathHelper.SmoothStep(1f, 0f, c.X) * ChargeCompletion, null, 20);
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunction, ColorFunction, null, 30);
 
         Projectile.FacingRight();
@@ -142,7 +137,7 @@ public class TheStarsAreAfraid : ModProjectile
             Projectile.rotation = Projectile.velocity.ToRotation();
 
             Projectile.Center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true)
-                + PolarVector(300f * ChargeCompletion, (MathHelper.TwoPi * AmtCompletion) + ownerProj.Additions().ExtraAI[0]);
+                + PolarVector(300f * ChargeCompletion, (MathHelper.TwoPi * AmtCompletion) + ownerProj.AdditionsInfo().ExtraAI[0]);
 
             teleCache ??= new(20);
             teleCache.SetPoints(Projectile.Center.GetLaserControlPoints(Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero) * 500f * ChargeCompletion, 20));
@@ -169,6 +164,7 @@ public class TheStarsAreAfraid : ModProjectile
             return false;
         return null;
     }
+
     public override bool ShouldUpdatePosition() => Released;
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
     {
@@ -177,7 +173,8 @@ public class TheStarsAreAfraid : ModProjectile
             modifiers.FinalDamage *= 1.7895f;
         }
     }
-    public ref float NPCType => ref Projectile.Additions().ExtraAI[2];
+
+    public ref float NPCType => ref Projectile.AdditionsInfo().ExtraAI[2];
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         AdditionsSound.MimicryLand.Play(target.Center, 1.2f, .1f);
@@ -207,24 +204,28 @@ public class TheStarsAreAfraid : ModProjectile
         target.AddBuff(BuffID.Slow, 500);
         target.AddBuff(BuffID.Darkness, 500);
         target.AddBuff(BuffID.Blackout, 500);
+        this.Sync();
     }
+
     internal Color ColorFunction(SystemVector2 completionRatio, Vector2 position)
     {
         return Color.Crimson * MathHelper.SmoothStep(1f, 0f, completionRatio.X) * FadeOut;
     }
+
     internal float WidthFunction(float completionRatio)
     {
         return Projectile.height * MathHelper.SmoothStep(0.6f, 1f, Utils.GetLerpValue(0f, 0.3f, completionRatio, true)) * FadeOut;
     }
+
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return Projectile.RotatingHitboxCollision(targetHitbox.TopLeft(), targetHitbox.Size(), null, Projectile.scale, 10f);
+        return targetHitbox.LineCollision(Projectile.BaseRotHitbox().Left, Projectile.BaseRotHitbox().Right, 10f * Projectile.scale);
     }
 
     public OptimizedPrimitiveTrail trail;
     public OptimizedPrimitiveTrail tele;
     public TrailPoints cache;
-    public ManualTrailPoints teleCache;
+    public TrailPoints teleCache;
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()

@@ -1,7 +1,7 @@
 ﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Vanity;
 
@@ -9,6 +9,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Vanity;
 public class EclipsedOnesHat : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.EclipsedOnesHat);
+
     public override void SetStaticDefaults()
     {
         ArmorIDs.Head.Sets.DrawHead[Item.headSlot] = true; // Don't draw the head at all. Used by Space Creature Mask
@@ -16,6 +17,7 @@ public class EclipsedOnesHat : ModItem
         ArmorIDs.Head.Sets.DrawFullHair[Item.headSlot] = false; // Draw all hair as normal. Used by Mime Mask, Sunglasses
         ArmorIDs.Head.Sets.DrawsBackHairWithoutHeadgear[Item.headSlot] = true;
     }
+
     public override void SetDefaults()
     {
         Item.width = 40;
@@ -24,6 +26,7 @@ public class EclipsedOnesHat : ModItem
         Item.rare = ItemRarityID.Pink;
         Item.vanity = true;
     }
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();

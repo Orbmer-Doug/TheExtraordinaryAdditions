@@ -12,6 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Late.Zenith;
 public class NeedleStar : ModProjectile, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 25;
@@ -24,12 +25,13 @@ public class NeedleStar : ModProjectile, ILocalizedModType, IModType
         Projectile.localNPCHitCooldown = 20;
         Projectile.usesLocalNPCImmunity = true;
     }
+
     public ref float Time => ref Projectile.ai[0];
 
     public override void AI()
     {
-        if (trail == null || trail._disposed)
-            trail = new(tip, WidthFunction, ColorFunction, null, 30);
+        if (trail == null || trail.Disposed)
+            trail = new(WidthFunction, ColorFunction, null, 30);
 
         cache ??= new(20);
         cache.Update(Projectile.Center);
@@ -54,14 +56,13 @@ public class NeedleStar : ModProjectile, ILocalizedModType, IModType
         return Color.Lerp(Color.White, endColor, fadeToEnd) * fadeOpacity;
     }
 
-    internal float WidthFunction(float completionRatio)
+    internal float WidthFunction(float c)
     {
-        return MathHelper.SmoothStep(Projectile.height * .75f, 0f, completionRatio);
+        return OptimizedPrimitiveTrail.HemisphereWidthFunct(c, MathHelper.SmoothStep(Projectile.height * .75f, 0f, c));
     }
 
     public TrailPoints cache;
     public OptimizedPrimitiveTrail trail;
-    public static readonly ITrailTip tip = new RoundedTip(12);
     public override bool? CanHitNPC(NPC target) => Projectile.numHits <= 0 ? null : false;
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
@@ -77,7 +78,7 @@ public class NeedleStar : ModProjectile, ILocalizedModType, IModType
                 ManagedShader shader = ShaderRegistry.FadedStreak;
                 shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.StreakMagma), 1);
                 shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WavyBlotchNoise), 2);
-                trail.DrawTippedTrail(shader, cache.Points, tip, true, 100);
+                trail.DrawTrail(shader, cache.Points, 100);
             }
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);

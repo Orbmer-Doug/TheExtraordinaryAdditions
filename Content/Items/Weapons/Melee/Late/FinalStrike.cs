@@ -8,7 +8,7 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Late.Zenith;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
@@ -16,11 +16,12 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
 public class FinalStrike : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.FinalStrike);
+
     public override void SetDefaults()
     {
         Item.width = 138;
         Item.height = 140;
-        Item.damage = 720;
+        Item.damage = 400;
         Item.noMelee = true;
         Item.noUseGraphic = true;
         Item.channel = true;
@@ -42,8 +43,19 @@ public class FinalStrike : ModItem
     {
         tooltips.ColorLocalization(new Color(235, 64, 52));
     }
-    public override bool CanUseItem(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
+
+    public override bool CanUseItem(Player player)
+    {
+        if (Utility.FindProjectile(out Projectile spear, Item.shoot, player.whoAmI))
+        {
+            if ((int)spear.ai[0] == (int)FinalStrikeHoldout.FinalStrikeState.Aim)
+                return false;
+        }
+        return true;
+    }
+
     public override bool AltFunctionUse(Player player) => true;
+
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
         if (player.altFunctionUse != 2)

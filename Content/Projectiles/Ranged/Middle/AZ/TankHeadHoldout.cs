@@ -1,12 +1,9 @@
-﻿
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.Audio;
 using Terraria.Enums;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
@@ -23,13 +20,14 @@ public class TankHeadHoldout : BaseIdleHoldoutProjectile
     public ref float Counter => ref Projectile.ai[0];
     public ref float Time => ref Projectile.ai[1];
     public ref float State => ref Projectile.ai[2];
-    public ref float Cooldown => ref Projectile.Additions().ExtraAI[0];
-    public ref float Firing => ref Projectile.Additions().ExtraAI[1];
+    public ref float Cooldown => ref Projectile.AdditionsInfo().ExtraAI[0];
+    public ref float Firing => ref Projectile.AdditionsInfo().ExtraAI[1];
 
     public override void SetStaticDefaults()
     {
         Main.projFrames[Projectile.type] = 8;
     }
+
     public override void Defaults()
     {
         Projectile.width = 34;
@@ -37,6 +35,23 @@ public class TankHeadHoldout : BaseIdleHoldoutProjectile
         Projectile.DamageType = DamageClass.Ranged;
     }
 
+    public static Color GetTeamColor(Player player)
+    {
+        Color col = Color.Transparent;
+        if (player.team == (int)Team.None)
+            col = Color.Green;
+        if (player.team == (int)Team.Red)
+            col = Color.Red;
+        if (player.team == (int)Team.Green || Main.netMode == NetmodeID.SinglePlayer)
+            col = Color.LimeGreen;
+        if (player.team == (int)Team.Blue)
+            col = Color.Blue;
+        if (player.team == (int)Team.Yellow)
+            col = Color.Gold;
+        if (player.team == (int)Team.Pink)
+            col = Color.Pink;
+        return col;
+    }
 
     public const float SightDistance = 900f;
     public const float TimeForLock = 60f;
@@ -51,8 +66,6 @@ public class TankHeadHoldout : BaseIdleHoldoutProjectile
         if (Owner.dead || !Owner.active)
             Projectile.Kill();
 
-
-        // These types of interpolations sometimes lead to odd occurences but are otherwise fancy and neat
         if (this.RunLocal())
         {
             float interpolant = Utils.GetLerpValue(5f, 40f, Projectile.Distance(Modded.mouseWorld), true);
@@ -65,7 +78,6 @@ public class TankHeadHoldout : BaseIdleHoldoutProjectile
         Owner.SetBackHandBetter(0, Projectile.velocity.ToRotation());
         Projectile.FacingUp();
 
-        // Tie projectile to player
         float dist = 30f;
         Projectile.Center = Owner.RotatedRelativePoint(Owner.MountedCenter) + Projectile.velocity * MathHelper.Clamp(dist - Recoil * 2, 0f, dist);
         Vector2 tipOfGun = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.UnitY) * Owner.HeldItem.width * .5f;
@@ -112,17 +124,11 @@ public class TankHeadHoldout : BaseIdleHoldoutProjectile
                 Projectile.frame = 4;
             }
             else if (State == MaggotState)
-            {
                 Projectile.frame = 5;
-            }
             else if (State == BeeState)
-            {
                 Projectile.frame = 6;
-            }
             else
-            {
                 Projectile.frame = 0;
-            }
         }
 
         bool overheatedGrubber = State == GrubState && Cooldown > 0;
@@ -147,7 +153,7 @@ public class TankHeadHoldout : BaseIdleHoldoutProjectile
                     // congnito hazard
                     SoundEngine.PlaySound(SoundID.Item11, tipOfGun);
                     type = ModContent.ProjectileType<Slug>();
-                    damage = (int)(Projectile.damage * 1.5f);
+                    damage = (int)(Projectile.damage * 1.1f);
                 }
                 if (State == GrubState)
                 {
@@ -194,13 +200,9 @@ public class TankHeadHoldout : BaseIdleHoldoutProjectile
                 Projectile.SetAnimation(4, 7, true);
             }
             if (State == MaggotState)
-            {
                 Projectile.frame = 0;
-            }
             if (State == BeeState)
-            {
                 Projectile.frame = 6;
-            }
             if (Counter > 60f)
             {
                 if (State == BeeState)
@@ -215,43 +217,11 @@ public class TankHeadHoldout : BaseIdleHoldoutProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        DrawGun();
-        return false;
-    }
-
-    private void DrawGun()
-    {
-        Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
+        Texture2D texture = Projectile.ThisProjectileTexture();
         Rectangle frame = texture.Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame);
         Vector2 drawPosition = Projectile.Center - Main.screenPosition;
         SpriteEffects effects = 0;
-
-        Color col = Color.Transparent;
-        if (Owner.team == (int)Team.None)
-        {
-            col = Color.Green;
-        }
-        if (Owner.team == (int)Team.Red)
-        {
-            col = Color.Red;
-        }
-        if (Owner.team == (int)Team.Green || Main.netMode == NetmodeID.SinglePlayer)
-        {
-            col = Color.LimeGreen;
-        }
-        if (Owner.team == (int)Team.Blue)
-        {
-            col = Color.Blue;
-        }
-        if (Owner.team == (int)Team.Yellow)
-        {
-            col = Color.Gold;
-        }
-        if (Owner.team == (int)Team.Pink)
-        {
-            col = Color.Pink;
-        }
-
-        Main.EntitySpriteDraw(texture, drawPosition, frame, Projectile.GetAlpha(col), Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, effects, 0);
+        Main.EntitySpriteDraw(texture, drawPosition, frame, Projectile.GetAlpha(GetTeamColor(Owner)), Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, effects, 0);
+        return false;
     }
 }

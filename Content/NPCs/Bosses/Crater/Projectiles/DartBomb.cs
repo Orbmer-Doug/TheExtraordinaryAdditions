@@ -1,14 +1,8 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Collections.Generic;
-using System.Threading;
 using Terraria;
-using Terraria.Audio;
-using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Projectiles.Melee.Early;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -17,6 +11,7 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 public class DartBomb : ProjOwnedByNPC<Asterlin>
 {
     public override string Texture => AssetRegistry.Invis;
+
     // To help with easing the dart animations
     public struct VisualDart(Vector2 center, float rotation, float opacity, int time)
     {

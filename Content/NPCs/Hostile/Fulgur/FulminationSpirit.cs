@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using CalamityMod;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
 using Terraria.Audio;
@@ -14,14 +15,10 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Lightning;
 
-/// <summary>
-/// Phase 1 - release bolts
-/// Phase 2 - slo down and charge up a lightning strike and attempt to hit player
-/// Remember to smoothen rotation
-/// </summary>
 public class FulminationSpirit : ModNPC
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.FulminationSpirit);
+
     public override void SetStaticDefaults()
     {
         Main.npcFrameCount[NPC.type] = 6;
@@ -44,19 +41,19 @@ public class FulminationSpirit : ModNPC
         {
             NPC.damage = 40;
             NPC.defense = 4;
-            NPC.lifeMax = 800;
+            NPC.lifeMax = 600;
         }
         if (Main.hardMode)
         {
             NPC.damage = 50;
             NPC.defense = 8;
-            NPC.lifeMax = 1500;
+            NPC.lifeMax = 1200;
         }
         if (NPC.downedPlantBoss)
         {
             NPC.damage = 60;
             NPC.defense = 16;
-            NPC.lifeMax = 2000;
+            NPC.lifeMax = 1700;
         }
         NPC.knockBackResist = 0f;
         NPC.value = Item.buyPrice(0, 0, 80, 50);
@@ -94,18 +91,17 @@ public class FulminationSpirit : ModNPC
     {
         NPC.frameCounter += 0.15f;
         NPC.frameCounter %= Main.npcFrameCount[NPC.type];
-        int frame = (int)NPC.frameCounter;
-        NPC.frame.Y = frame * frameHeight;
+        NPC.frame.Y = (int)NPC.frameCounter * frameHeight;
     }
 
-    public static int VoltDamage => Main.hardMode ? DifficultyBasedValue(26, 52, 78) : DifficultyBasedValue(70, 140, 210);
+    public static int VoltDamage => !Main.hardMode ? DifficultyBasedValue(26, 52, 78) : DifficultyBasedValue(70, 140, 210);
     public static int FireWait => DifficultyBasedValue(90, 70, 60);
-    public static int startFindingTarget => SecondsToFrames(3);
-    public static int maxFindingTargetTime => SecondsToFrames(6);
-    public static int findingTargetWait => SecondsToFrames(4);
-    public static float maxSpeed => 7f;
-    public static float bounceFactor => 0.7f;
-    public static float maxDistanceForSpeedBoost => 600f;
+    public static int StartFindingTarget => SecondsToFrames(3);
+    public static int MaxFindingTargetTime => SecondsToFrames(6);
+    public static int FindingTargetWait => SecondsToFrames(4);
+    public static float MaxSpeed => 7f;
+    public static float BounceFactor => 0.7f;
+    public static float MaxDistanceForSpeedBoost => 600f;
 
     public int Time
     {
@@ -129,7 +125,7 @@ public class FulminationSpirit : ModNPC
 
         float acceleration = .17f;
         bool canHit = Collision.CanHitLine(NPC.Center, 4, 4, target.position, target.width, target.height);
-        bool finding = CantHitTimer >= startFindingTarget;
+        bool finding = CantHitTimer >= StartFindingTarget;
 
         Vector2 destination = target.Center - Vector2.UnitY * NPC.height;
         Vector2 snappedTargetPos = new Vector2(
@@ -144,17 +140,17 @@ public class FulminationSpirit : ModNPC
         // Calculate direction vector from NPC to target
         Vector2 dir = snappedTargetPos - snappedNpcPos;
         float distanceToTarget = dir.Length();
-        bool isFarFromTarget = distanceToTarget > maxDistanceForSpeedBoost;
+        bool isFarFromTarget = distanceToTarget > MaxDistanceForSpeedBoost;
 
         // Handle zero distance to avoid division by zero
         if (distanceToTarget == 0f)
             dir = NPC.velocity; // Maintain current velocity direction
         else
             // Normalize direction and scale by max speed
-            dir = dir / distanceToTarget * maxSpeed;
+            dir = dir / distanceToTarget * MaxSpeed;
 
         if (target.dead)
-            dir = new Vector2(NPC.direction * maxSpeed / 2f, -maxSpeed / 2f);
+            dir = new Vector2(NPC.direction * MaxSpeed / 2f, -MaxSpeed / 2f);
 
         // Fly around if it cant hit the player
         if (!canHit)
@@ -169,8 +165,8 @@ public class FulminationSpirit : ModNPC
                 int realDir = float.IsNegative(MathF.Cos(NPC.AngleTo(target.Center + target.velocity))) ? -1 : 1;
                 dir = dir.RotatedBy(.95f * (NPC.Center.Y > target.Center.Y).ToDirectionInt() * realDir);
             }
-            if (CantHitTimer > (startFindingTarget + maxFindingTargetTime))
-                CantHitTimer = -findingTargetWait; // Give some time to fly back to try again
+            if (CantHitTimer > (StartFindingTarget + MaxFindingTargetTime))
+                CantHitTimer = -FindingTargetWait; // Give some time to fly back to try again
         }
         else
             CantHitTimer = 0;
@@ -239,7 +235,7 @@ public class FulminationSpirit : ModNPC
         if (NPC.collideX)
         {
             NPC.netUpdate = true;
-            NPC.velocity.X = -NPC.oldVelocity.X * bounceFactor;
+            NPC.velocity.X = -NPC.oldVelocity.X * BounceFactor;
 
             if (NPC.direction == -1 && NPC.velocity.X > 0f && NPC.velocity.X < 2f)
                 NPC.velocity.X = 2f;
@@ -250,7 +246,7 @@ public class FulminationSpirit : ModNPC
         if (NPC.collideY)
         {
             NPC.netUpdate = true;
-            NPC.velocity.Y = -NPC.oldVelocity.Y * bounceFactor;
+            NPC.velocity.Y = -NPC.oldVelocity.Y * BounceFactor;
 
             if (NPC.velocity.Y > 0f && NPC.velocity.Y < 1.5f)
                 NPC.velocity.Y = 2f;
@@ -282,9 +278,7 @@ public class FulminationSpirit : ModNPC
     {
         npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<ShockCatalyst>(), 1, 4, 10));
         npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<FulminicEye>(), 8, 1, 1));
-
-        LeadingConditionRule rule = npcLoot.DefineConditionalDropSet(DropHelper.PostSkele());
-        rule.Add(ItemDropRule.Common(ModContent.ItemType<BrewingStorms>(), 9, 1, 1));
+        npcLoot.DefineConditionalDropSet(DropHelper.PostSkele(true)).Add(ItemDropRule.Common(ModContent.ItemType<BrewingStorms>(), 9));
     }
 
     public override void OnHitPlayer(Player target, Player.HurtInfo hurtInfo)

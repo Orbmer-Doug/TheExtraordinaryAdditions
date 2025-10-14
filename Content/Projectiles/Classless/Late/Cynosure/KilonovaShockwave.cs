@@ -44,17 +44,19 @@ public class KilonovaShockwave : ModProjectile
     }
 
     public const int MaxRadius = 9200;
+
     public override void AI()
     {
-        // Cause the wave to expand outward, along with its hitbox.
         Radius = Animators.Circ.OutFunction(1f - InverseLerp(0f, Lifetime, Projectile.timeLeft)) * MaxRadius;
         Projectile.scale = MathHelper.Lerp(.6f, 2.4f, InverseLerp(Lifetime, 0f, Projectile.timeLeft));
         Projectile.Opacity = InverseLerp(0f, 15f, Projectile.timeLeft);
     }
+
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
         return CircularHitboxCollision(Projectile.Center, Radius * 0.5f, targetHitbox);
     }
+
     public override bool PreDraw(ref Color lightColor)
     {
         Main.spriteBatch.End();

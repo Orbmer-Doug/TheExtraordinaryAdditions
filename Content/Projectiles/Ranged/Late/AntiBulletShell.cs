@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using System;
+﻿using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -24,10 +23,9 @@ public class AntiBulletShell : ModProjectile
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = -1;
     }
+
     public int Time;
-
     public bool TouchedGrass;
-
     public override void AI()
     {
         Time++;
@@ -59,17 +57,14 @@ public class AntiBulletShell : ModProjectile
             SoundEngine.PlaySound(SoundID.NPCHit4 with { Pitch = .4f, Volume = .5f }, Projectile.Center);
 
         if (Math.Abs(Projectile.velocity.X - oldVelocity.X) > float.Epsilon)
-        {
             Projectile.velocity.X = -oldVelocity.X * .45f;
-        }
         if (Math.Abs(Projectile.velocity.Y - oldVelocity.Y) > float.Epsilon)
-        {
             Projectile.velocity.Y = -oldVelocity.Y * .45f;
-        }
         Projectile.velocity *= 0.98f;
 
         return false;
     }
+
     public override bool PreDraw(ref Color lightColor)
     {
         float interpolant = Utils.GetLerpValue(Lifetime - 240f, Lifetime, Projectile.timeLeft, true);

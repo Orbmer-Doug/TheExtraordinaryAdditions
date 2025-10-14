@@ -1,9 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
@@ -30,7 +27,7 @@ public class HeavyLaserRifleHold : BaseIdleHoldoutProjectile, ILocalizedModType,
         get => Projectile.ai[2] == 1f;
         set => Projectile.ai[2] = value.ToInt();
     }
-    public ref float Timer => ref Projectile.Additions().ExtraAI[0];
+    public ref float Timer => ref Projectile.AdditionsInfo().ExtraAI[0];
 
     public const int PlasmaFireTimer = 120;
     public int DrainResource;

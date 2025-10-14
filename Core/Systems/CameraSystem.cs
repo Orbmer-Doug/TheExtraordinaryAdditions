@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.Graphics;
@@ -7,17 +6,18 @@ using Terraria.ModLoader;
 
 namespace TheExtraordinaryAdditions.Core.Systems;
 
-/// <summary>
-/// Primarily made by Mirsario in Terraria Overhaul
-/// </summary>
+// Main source and copyright belongs to Mirsario & Contributors in Terraria Overhaul
+// https://github.com/Mirsario/TerrariaOverhaul/blob/dev/Common/Camera/
+
 [Autoload(Side = ModSide.Client)]
 public sealed class CameraSystem : ModSystem
 {
     /// <summary>
-    /// Where the <see cref="Main.screenPosition"/> would be without modifications.
+    /// Where the <see cref="Main.screenPosition"/> would be without modifications
     /// </summary>
     public static Vector2 UnmodifiedCameraPosition =>
         Main.LocalPlayer.TopLeft + new Vector2(Main.LocalPlayer.width * 0.5f, Main.LocalPlayer.height - 21f) - Main.ScreenSize.ToVector2() * 0.5f + Vector2.UnitY * Main.LocalPlayer.gfxOffY;
+    
     public static Rectangle CameraRect => new((int)Main.Camera.ScaledPosition.X, (int)Main.Camera.ScaledPosition.Y, (int)Main.Camera.ScaledSize.X, (int)Main.Camera.ScaledSize.Y);
 
     public delegate void CameraModifierDelegate(Action innerAction);
@@ -31,7 +31,6 @@ public sealed class CameraSystem : ModSystem
     public static Vector2 ScreenSize { get; private set; }
     public static Vector2 ScreenHalf { get; private set; }
     public static Rectangle ScreenRect { get; private set; }
-    public static Vector2 MouseWorld { get; private set; }
     public static Vector2 ScreenCenter
     {
         get => screenCenter;
@@ -41,12 +40,12 @@ public sealed class CameraSystem : ModSystem
             UpdateCache();
         }
     }
+
     public static bool LimitCameraUpdateRate => limitCameraUpdateRateOverride;
 
     public override void Load()
     {
-        // Floor camera position, restoring previous remainders before the next camera update.
-        // Maximum priority.
+        // Floor camera position, restoring previous remainders before the next camera update
         RegisterCameraModifier(int.MaxValue, innerAction =>
         {
             Main.screenPosition += lastPositionRemainder;
@@ -128,7 +127,6 @@ public sealed class CameraSystem : ModSystem
 
     private static void UpdateCache()
     {
-        MouseWorld = Main.MouseWorld;
         ScreenSize = new(Main.screenWidth, Main.screenHeight);
         ScreenHalf = new(Main.screenWidth * 0.5f, Main.screenHeight * 0.5f);
         ScreenRect = new((int)Main.screenPosition.X, (int)Main.screenPosition.Y, Main.screenWidth, Main.screenHeight);
@@ -140,16 +138,19 @@ public sealed class CameraSystem : ModSystem
         get;
         set;
     }
+
     public static float Interpolant
     {
         get;
         set;
     }
+
     public static float Zoom
     {
         get;
         set;
     }
+
     public static bool ManualPause
     {
         get;
@@ -165,14 +166,14 @@ public sealed class CameraSystem : ModSystem
             return;
         }
 
-        // Handle camera focus effects.
+        // Handle camera focus effects
         if (Interpolant > 0f)
         {
             Vector2 idealScreenPosition = Position - Main.ScreenSize.ToVector2() * 0.5f;
             Main.screenPosition = Vector2.Lerp(Main.screenPosition, idealScreenPosition, Interpolant);
         }
 
-        // Make interpolants gradually return to their original values.
+        // Make interpolants gradually return to their original values
         if (!Main.gamePaused && ManualPause == false)
         {
             Interpolant = MathHelper.Clamp(Interpolant - 0.06f, 0f, 1f);

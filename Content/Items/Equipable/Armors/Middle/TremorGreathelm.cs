@@ -1,13 +1,11 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
-using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -17,6 +15,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
 public class TremorGreathelm : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TremorGreathelm);
+
     public override void SetStaticDefaults()
     {
         ArmorIDs.Head.Sets.DrawHead[Item.headSlot] = false;
@@ -57,13 +56,14 @@ public class TremorGreathelm : ModItem
         }
 
         player.aggro += 400;
-        player.GetModPlayer<GlobalPlayer>().TremorArmor = true;
     }
 
     public override bool IsArmorSet(Item head, Item body, Item legs)
     {
-        if (body.type == Mod.Find<ModItem>("TremorPlating").Type)
-            return legs.type == Mod.Find<ModItem>("TremorSheathe").Type;
+        if (body.type == ModContent.ItemType<TremorPlating>())
+        {
+            return legs.type == ModContent.ItemType<TremorSheathe>();
+        }
         return false;
     }
 

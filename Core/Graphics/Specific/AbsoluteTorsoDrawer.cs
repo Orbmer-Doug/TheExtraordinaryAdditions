@@ -33,31 +33,36 @@ public class AbsoluteTorsoDrawer : ModSystem
             ArmorOutlineTexture = AssetRegistry.GetTexture(AdditionsTexture.AbsoluteCoreplate_Body);
         }
 
-        RenderTargetManager.RenderTargetUpdateLoopEvent += PrepareAfterimageTarget;
-        Main.QueueMainThreadAction(() =>
+        Main.QueueMainThreadAction(static () =>
         {
             AfterimageTarget = new(true, CreateScreenSizedTarget);
             AfterimageTargetPrevious = new(true, CreateScreenSizedTarget);
             BaseTorsoTarget = new(true, CreateScreenSizedTarget);
             BrokenGlassTarget = new(true, CreateScreenSizedTarget);
         });
+        
+        RenderTargetManager.RenderTargetUpdateLoopEvent += PrepareAfterimageTarget;
         On_LegacyPlayerRenderer.DrawPlayers += DrawTorsoTarget;
         On_PlayerDrawLayers.DrawPlayer_17_TorsoComposite += DisallowTorsoDrawingIfNecessary;
     }
 
     public override void OnModUnload()
     {
-        RenderTargetManager.RenderTargetUpdateLoopEvent -= PrepareAfterimageTarget;
-        On_LegacyPlayerRenderer.DrawPlayers -= DrawTorsoTarget;
-        On_PlayerDrawLayers.DrawPlayer_17_TorsoComposite -= DisallowTorsoDrawingIfNecessary;
-
-        Main.QueueMainThreadAction(() =>
+        Main.QueueMainThreadAction(static () =>
         {
+            AfterimageTarget?.Dispose();
+            AfterimageTarget = null;
+            AfterimageTargetPrevious?.Dispose();
+            AfterimageTargetPrevious = null;
             BaseTorsoTarget?.Dispose();
             BaseTorsoTarget = null;
             BrokenGlassTarget?.Dispose();
             BrokenGlassTarget = null;
         });
+
+        RenderTargetManager.RenderTargetUpdateLoopEvent -= PrepareAfterimageTarget;
+        On_LegacyPlayerRenderer.DrawPlayers -= DrawTorsoTarget;
+        On_PlayerDrawLayers.DrawPlayer_17_TorsoComposite -= DisallowTorsoDrawingIfNecessary;
     }
 
     private void DrawTorsoTarget(On_LegacyPlayerRenderer.orig_DrawPlayers orig, LegacyPlayerRenderer self, Camera camera, IEnumerable<Player> players)

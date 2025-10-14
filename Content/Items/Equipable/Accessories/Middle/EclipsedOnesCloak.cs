@@ -1,9 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
@@ -33,7 +32,7 @@ public class EclipsedOnesCloak : ModItem
             Main.projectile[p].DamageType = player.GetBestClass();
         }
 
-        player.GetModPlayer<GlobalPlayer>().EclipsedOne = true;
+        player.GetModPlayer<EclipsedOnesCloakPlayer>().Equipped = true;
     }
 
     public override void AddRecipes()
@@ -45,5 +44,24 @@ public class EclipsedOnesCloak : ModItem
         recipe.AddIngredient(ItemID.Bone, 16);
         recipe.AddTile(TileID.MythrilAnvil);
         recipe.Register();
+    }
+}
+
+public sealed class EclipsedOnesCloakPlayer : ModPlayer
+{
+    public bool Equipped;
+    public override void ResetEffects() => Equipped = false;
+    public override void PostUpdate()
+    {
+        if (!Equipped)
+            return;
+
+        bool active = Player.active && !Player.DeadOrGhost;
+        if (active && Player.velocity.Length() != 0 && !Player.mount.Active)
+        {
+            Vector2 randPos = Player.RotatedRelativePoint(Player.MountedCenter) + PolarVector(Player.height / 2 * Player.gravDir, Player.fullRotation + MathHelper.PiOver2) + PolarVector(Main.rand.NextFloat(-Player.width / 2, Player.width / 2), Player.fullRotation);
+            Vector2 vel = -Player.velocity.RotatedByRandom(.12f) * Main.rand.NextFloat(.1f, .4f);
+            ParticleRegistry.SpawnDustParticle(randPos, vel, Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .7f), Color.LightCyan);
+        }
     }
 }

@@ -9,7 +9,6 @@ using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
-
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
 
 public class LazerDrone : ModProjectile
@@ -65,7 +64,8 @@ public class LazerDrone : ModProjectile
         }
 
         after ??= new(3, () => Projectile.Center);
-        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 90, 3, 2f, Projectile.ThisProjectileTexture().Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame)));
+        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation,
+            0, 90, 3, 2f, Projectile.ThisProjectileTexture().Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame)));
 
         Owner.AddBuff(ModContent.BuffType<LaserDrones>(), 3600);
         if (Modded.Minion[GlobalPlayer.AdditionsMinion.LaserDrones])
@@ -124,11 +124,11 @@ public class LazerDrone : ModProjectile
 
             if (ChargeCompletion >= 1f)
             {
-                AdditionsSound.LaserTwo.Play(tip, 1.5f, -.1f, .2f);
+                AdditionsSound.LaserTwo.Play(tip, 1f, -.1f, .2f);
                 Projectile.Kill();
             }
             else
-                AdditionsSound.Laser4.Play(tip, 1f, 0f, .3f);
+                AdditionsSound.Laser4.Play(tip, .6f, 0f, .3f);
 
             Wait = FireWait;
             Charge = 0f;
@@ -151,6 +151,43 @@ public class LazerDrone : ModProjectile
             Wait--;
 
         Time++;
+    }
+
+    public override void OnKill(int timeLeft)
+    {
+        if (ChargeCompletion >= 1f)
+        {
+            for (int i = 0; i < 30; i++)
+            {
+                Vector2 vel = Main.rand.NextVector2Circular(20f, 20f);
+                ParticleRegistry.SpawnSparkParticle(Projectile.Center, vel, Main.rand.Next(34, 46), Main.rand.NextFloat(.5f, 1.1f), Color.Cyan, true, true);
+                ParticleRegistry.SpawnGlowParticle(Projectile.Center, vel, Main.rand.Next(24, 30), Main.rand.NextFloat(.2f, .7f), Color.DarkCyan, 1f, true);
+            }
+
+            if (!Main.dedServ)
+            {
+                // Blast off pieces
+                int barrel = Mod.Find<ModGore>($"LaserDroneGore{1}").Type;
+                int rotar = Mod.Find<ModGore>($"LaserDroneGore{2}").Type;
+                int metal = Mod.Find<ModGore>($"LaserDroneGore{3}").Type;
+
+                float offsetAngle = Main.rand.NextFloat(MathHelper.TwoPi);
+
+                Vector2 shootVelocity = (MathHelper.TwoPi * .1f + offsetAngle).ToRotationVector2() * 9f;
+                Gore.NewGore(Projectile.GetSource_Death(null), Projectile.Center, shootVelocity, barrel);
+
+                for (int i = 0; i < 4; i++)
+                {
+                    shootVelocity = (MathHelper.TwoPi * i / 10f + offsetAngle).ToRotationVector2() * 9f;
+                    Gore.NewGore(Projectile.GetSource_Death(null), Projectile.Center, shootVelocity, rotar);
+                }
+                for (int i = 0; i < 2; i++)
+                {
+                    shootVelocity = (MathHelper.TwoPi * i / 10f + offsetAngle).ToRotationVector2() * 9f;
+                    Gore.NewGore(Projectile.GetSource_Death(null), Projectile.Center, shootVelocity, metal);
+                }
+            }
+        }
     }
 
     public FancyAfterimages after;
@@ -181,40 +218,5 @@ public class LazerDrone : ModProjectile
         Main.spriteBatch.Draw(bloom, target, null, Color.White * ChargeCompletion * .7f, 1.55f, orig, 0, 0f);
         Main.spriteBatch.SetBlendState(BlendState.AlphaBlend);
         return false;
-    }
-
-
-    public override void OnKill(int timeLeft)
-    {
-        if (ChargeCompletion >= 1f)
-        {
-            for (int i = 0; i < 30; i++)
-            {
-                Vector2 vel = Main.rand.NextVector2Circular(20f, 20f);
-                ParticleRegistry.SpawnSparkParticle(Projectile.Center, vel, Main.rand.Next(34, 46), Main.rand.NextFloat(.5f, 1.1f), Color.Cyan, true, true);
-                ParticleRegistry.SpawnGlowParticle(Projectile.Center, vel, Main.rand.Next(24, 30), Main.rand.NextFloat(.2f, .7f), Color.DarkCyan, 1f, true);
-            }
-
-            // Blast off pieces
-            int Barrel = Mod.Find<ModGore>($"LaserDroneGore{1}").Type;
-            int Rotar = Mod.Find<ModGore>($"LaserDroneGore{2}").Type;
-            int Metal = Mod.Find<ModGore>($"LaserDroneGore{3}").Type;
-
-            float offsetAngle = Main.rand.NextFloat(MathHelper.TwoPi);
-
-            Vector2 shootVelocity = (MathHelper.TwoPi * .1f + offsetAngle).ToRotationVector2() * 9f;
-            Gore.NewGore(Projectile.GetSource_Death(null), Projectile.Center, shootVelocity, Barrel);
-
-            for (int i = 0; i < 4; i++)
-            {
-                shootVelocity = (MathHelper.TwoPi * i / 10f + offsetAngle).ToRotationVector2() * 9f;
-                Gore.NewGore(Projectile.GetSource_Death(null), Projectile.Center, shootVelocity, Rotar);
-            }
-            for (int i = 0; i < 2; i++)
-            {
-                shootVelocity = (MathHelper.TwoPi * i / 10f + offsetAngle).ToRotationVector2() * 9f;
-                Gore.NewGore(Projectile.GetSource_Death(null), Projectile.Center, shootVelocity, Metal);
-            }
-        }
     }
 }

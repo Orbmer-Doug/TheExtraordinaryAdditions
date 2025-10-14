@@ -1,9 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using System;
+﻿using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
@@ -24,11 +22,13 @@ public class CharringBlastBlast : ModProjectile, ILocalizedModType, IModType
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = 15;
     }
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         target.AddBuff(BuffID.OnFire3, 50);
         Projectile.damage = (int)(Projectile.damage * 0.9);
     }
+
     public override void AI()
     {
         if (Projectile.localAI[0] == 0f)

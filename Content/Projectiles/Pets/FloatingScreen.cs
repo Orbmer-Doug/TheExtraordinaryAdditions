@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using CalamityMod.CalPlayer;
+﻿using CalamityMod.CalPlayer;
 using Microsoft.Xna.Framework.Graphics;
 using SubworldLibrary;
 using System;
@@ -83,10 +82,10 @@ public class FloatingScreenManager : ModSystem
             device.SetRenderTarget(crtTarget);
             device.Clear(Color.Transparent);
             device.SetRenderTarget(null);
+            On_Main.DrawProjectiles += DrawTheTarget;
         });
 
         RenderTargetManager.RenderTargetUpdateLoopEvent += DrawToTarget;
-        On_Main.DrawProjectiles += DrawTheTarget;
     }
 
     public override void Unload()
@@ -95,10 +94,10 @@ public class FloatingScreenManager : ModSystem
         {
             crtTarget?.Dispose();
             crtTarget = null;
+            On_Main.DrawProjectiles -= DrawTheTarget;
         });
 
         RenderTargetManager.RenderTargetUpdateLoopEvent -= DrawToTarget;
-        On_Main.DrawProjectiles -= DrawTheTarget;
     }
 
     // LUCILLE WHERE IS   THE   MOD   CALLS

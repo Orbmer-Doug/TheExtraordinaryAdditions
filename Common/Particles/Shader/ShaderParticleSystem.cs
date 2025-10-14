@@ -1,12 +1,7 @@
-﻿using CalamityMod.Particles;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Threading;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Terraria;
-using Terraria.Graphics.Renderers;
-using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
@@ -72,7 +67,7 @@ public class ShaderParticleSystem : ModSystem
     public const uint MaxShaderParticles = 16384;
     private static ShaderParticle[] particles = new ShaderParticle[MaxShaderParticles];
     private static ulong[] presenceMask = BitmaskUtils.CreateMask(MaxShaderParticles);
-    public static BitmaskUtils.BitmaskEnumerator ActiveShaderParticles => new BitmaskUtils.BitmaskEnumerator(presenceMask, MaxShaderParticles);
+    public static BitmaskUtils.BitmaskEnumerable ActiveShaderParticles => new BitmaskUtils.BitmaskEnumerable(presenceMask.AsSpan(0, presenceMask.Length), MaxShaderParticles);
     private static Dictionary<ShaderParticleTypes, ManagedRenderTarget> typeRenderTargets = new();
 
     public override void OnModLoad()
@@ -85,7 +80,7 @@ public class ShaderParticleSystem : ModSystem
                     Main.graphics.GraphicsDevice, w / 2, h / 2));
             ShaderParticleRegistry.Initialize();
             RenderTargetManager.RenderTargetUpdateLoopEvent += PrepareShaderParticleTargets;
-            On_Main.DrawProjectiles += DrawParticlesAfterProjectiles;
+            On_Main.DrawProjectiles += DrawParticlesWithProjectiles;
             On_Main.DrawNPCs += DrawParticlesBeforeNPCs;
             On_Main.DrawPlayers_AfterProjectiles += DrawParticlesOverPlayers;
         });
@@ -99,7 +94,7 @@ public class ShaderParticleSystem : ModSystem
             foreach (ManagedRenderTarget target in typeRenderTargets.Values)
                 target?.Dispose();
             RenderTargetManager.RenderTargetUpdateLoopEvent -= PrepareShaderParticleTargets;
-            On_Main.DrawProjectiles -= DrawParticlesAfterProjectiles;
+            On_Main.DrawProjectiles -= DrawParticlesWithProjectiles;
             On_Main.DrawNPCs -= DrawParticlesBeforeNPCs;
             On_Main.DrawPlayers_AfterProjectiles -= DrawParticlesOverPlayers;
         });
@@ -119,7 +114,6 @@ public class ShaderParticleSystem : ModSystem
         if (index != -1)
         {
             particles[index] = metaball;
-            //metaballs[index].Init = new(metaball.Velocity, metaball.Scale, metaball.Opacity, metaball.Color, metaball.Size, metaball.Rotation);
         }
     }
 
@@ -186,8 +180,9 @@ public class ShaderParticleSystem : ModSystem
         gd.SetRenderTarget(null);
     }
 
-    private static void DrawParticlesAfterProjectiles(On_Main.orig_DrawProjectiles orig, Main self)
+    private static void DrawParticlesWithProjectiles(On_Main.orig_DrawProjectiles orig, Main self)
     {
+        DrawShaderParticle(ShaderParticleDrawLayers.BeforeProjectiles);
         orig(self);
         DrawShaderParticle(ShaderParticleDrawLayers.AfterProjectiles);
     }
@@ -371,7 +366,7 @@ public static class ShaderParticleRegistry
                 float brightnessInterpolant = InverseLerp(10f, 2f, s.Time) * 0.67f;
                 s.Color = Color.Lerp(s.Color, Color.Wheat, brightnessInterpolant);
             },
-            ShouldKill: static (ref ShaderParticle s) => s.Size.Length() <= 3,
+            ShouldKill: static (ref ShaderParticle s) => s.Size.Length() <= 1,
             Draw: null,
             DrawLayer: ShaderParticleDrawLayers.OverPlayers,
             PrepareSB: static () =>
@@ -420,22 +415,12 @@ public static class ShaderParticleRegistry
             Update: static (ref ShaderParticle s) =>
             {
                 s.Size = Vector2.Clamp(s.Size - new Vector2(0.31f), Vector2.Zero, Vector2.One * 200f) * 0.9956f;
-                if (s.Size.Length() < 15f)
-                    s.Size *= 0.95f - 0.9f;
                 s.Velocity *= .97f;
                 s.Rotation += s.Velocity.Length() * .1f;
             },
-            ShouldKill: static (ref ShaderParticle s) => s.Size.Length() <= 1f,
-            Draw: static (ref ShaderParticle s, SpriteBatch sb) =>
-            {
-                ShaderParticleTypeDefinition def = TypeDefinitions[(byte)s.Type];
-                Vector2 origin = def.Texture.Size() * 0.5f;
-                float squish = MathHelper.Clamp(s.Velocity.Length() / 5f, 1f, 2f);
-                Vector2 scale = new Vector2(s.Size.X - s.Size.X * squish * 0.3f, s.Size.Y * squish) * .6f;
-
-                Main.spriteBatch.PixelDraw(def.Texture, s.Position, null, s.Color, s.Rotation, origin, scale / def.Texture.Size(), SpriteEffects.None);
-            },
-            DrawLayer: ShaderParticleDrawLayers.AfterProjectiles,
+            ShouldKill: static (ref ShaderParticle s) => s.Size.Length() <= .2f,
+            Draw: null,
+            DrawLayer: ShaderParticleDrawLayers.BeforeProjectiles,
             PrepareSB: null,
             PrepareShader: null,
             LayerOffset: static () => (Vector2.One * (float)Math.Cos(Main.GlobalTimeWrappedHourly * 0.041f) * 2f).RotatedBy((float)Math.Cos(Main.GlobalTimeWrappedHourly * 0.08f) * 0.97f),
@@ -454,7 +439,7 @@ public static class ShaderParticleRegistry
             Opacity = 1f,
             Color = Color.DarkOliveGreen,
             Type = ShaderParticleTypes.Epidemic,
-            Size = new Vector2(Main.rand.NextFloat(.75f, 1f), Main.rand.NextFloat(.75f, 1f)) * size,
+            Size = Vector2.One * size,
             Rotation = RandomRotation()
         };
 
@@ -476,7 +461,7 @@ public static class ShaderParticleRegistry
             },
             ShouldKill: static (ref ShaderParticle s) => s.Size.Length() <= 0.5f,
             Draw: null,
-            DrawLayer: ShaderParticleDrawLayers.AfterProjectiles,
+            DrawLayer: ShaderParticleDrawLayers.BeforeProjectiles,
             PrepareSB: null,
             PrepareShader: null,
             LayerOffset: static () => Vector2.UnitX * Main.GlobalTimeWrappedHourly * 0.03f,

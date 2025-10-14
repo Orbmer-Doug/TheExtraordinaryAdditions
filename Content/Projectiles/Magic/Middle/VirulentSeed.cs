@@ -1,9 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using System;
+﻿using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -55,11 +53,11 @@ public class VirulentSeed : ModProjectile, ILocalizedModType, IModType
 
         if (Time.BetweenNum(30f, 120f))
         {
-            NPC target = NPCTargeting.GetWeakestNPC(new(Projectile.Center, 400, true));
+            NPC target = NPCTargeting.GetWeakestNPC(new(Projectile.Center, 450, false, true));
             if (target.CanHomeInto())
             {
                 Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.Center.SafeDirectionTo(target.Center) * 10f, .3f);
-                Projectile.velocity += Utility.VelEqualTrig(Projectile.velocity.SafeNormalize(Vector2.Zero), MathF.Sin, 20f, 1.5f, ref Projectile.Additions().ExtraAI[0], ref Projectile.Additions().ExtraAI[1]);
+                Projectile.velocity += Utility.VelEqualTrig(Projectile.velocity.SafeNormalize(Vector2.Zero), MathF.Sin, 20f, 1.5f, ref Projectile.AdditionsInfo().ExtraAI[0], ref Projectile.AdditionsInfo().ExtraAI[1]);
             }
         }
     }

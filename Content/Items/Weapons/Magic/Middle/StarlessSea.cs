@@ -6,21 +6,13 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Middle;
 
 public class StarlessSea : ModItem
 {
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        TooltipLine t1 = new(Mod, Name, this.GetLocalization("Tooltip").Value) { OverrideColor = new Color(64, 105, 247) };
-        TooltipLine t2 = new(Mod, Name, this.GetLocalization("Tooltip2").Value) { OverrideColor = new Color(227, 57, 48) };
-
-        tooltips.ModifyTooltip(Main.bloodMoon ? [t2] : [t1], true);
-    }
-
     public override void SetDefaults()
     {
         Item.width = 38;
@@ -32,14 +24,23 @@ public class StarlessSea : ModItem
         Item.noUseGraphic = true;
         Item.UseSound = null;
         Item.DamageType = DamageClass.Magic;
-        Item.damage = 115;
+        Item.damage = 102;
         Item.knockBack = 2f;
         Item.noMelee = true;
         Item.value = AdditionsGlobalItem.RarityCyanBuyPrice;
         Item.shoot = ModContent.ProjectileType<StarlessHoldout>();
         Item.shootSpeed = 4f;
-        Item.mana = 20;
+        Item.mana = 3;
     }
+    
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        TooltipLine t1 = new(Mod, Name, this.GetLocalization("Tooltip").Value) { OverrideColor = new Color(64, 105, 247) };
+        TooltipLine t2 = new(Mod, Name, this.GetLocalization("Tooltip2").Value) { OverrideColor = new Color(227, 57, 48) };
+
+        tooltips.ModifyTooltip(Main.bloodMoon ? [t2] : [t1], true);
+    }
+
     public override bool CanShoot(Player player) => false;
 
     public static readonly Texture2D Fracture = AssetRegistry.GetTexture(AdditionsTexture.BloodFracture);
@@ -66,6 +67,7 @@ public class StarlessSea : ModItem
 
         return false;
     }
+
     public override void UpdateInventory(Player player)
     {
         if (Main.bloodMoon)
@@ -73,6 +75,7 @@ public class StarlessSea : ModItem
         else
             Item.SetNameOverride("Starless Sea");
     }
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();

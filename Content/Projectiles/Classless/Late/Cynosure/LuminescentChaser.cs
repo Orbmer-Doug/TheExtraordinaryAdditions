@@ -1,10 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using Terraria;
-using Terraria.ID;
+﻿using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -40,9 +35,9 @@ public class LuminescentChaser : ModProjectile
 
     public override void AI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, null, 20);
-        points.Update(GetTransformedScreenCoords(Projectile.Center) + Main.screenPosition);;
+        points.Update(GetTransformedScreenCoords(Projectile.Center) + Main.screenPosition); ;
 
         if (HasHitTarget)
         {
@@ -54,7 +49,7 @@ public class LuminescentChaser : ModProjectile
         else if (Time >= 29f)
         {
             NPC target = NPCTargeting.GetClosestNPC(new(Projectile.Center, 4000));
-            if (target.TargetValid())
+            if (target.CanHomeInto())
                 Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(target.Center + target.velocity * 10f) * 24f, .2f);
             else
                 Projectile.velocity *= .98f;
@@ -103,9 +98,9 @@ public class LuminescentChaser : ModProjectile
     public TrailPoints points = new(20);
     public void DrawToTarget()
     {
-        if (trail == null || points == null) 
+        if (trail == null || points == null)
             return;
-        
+
         ManagedShader slashShader = ShaderRegistry.FadedStreak;
         slashShader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FractalNoise), 1);
         trail.DrawTrail(slashShader, points.Points, 200, true);

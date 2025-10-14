@@ -1,7 +1,7 @@
 ﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Vanity;
 
@@ -9,6 +9,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Vanity;
 public class EclipsedOnesLeggings : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.EclipsedOnesLeggings);
+
     public override void SetDefaults()
     {
         Item.width = 29;
@@ -17,6 +18,7 @@ public class EclipsedOnesLeggings : ModItem
         Item.rare = ItemRarityID.Pink;
         Item.vanity = true;
     }
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();

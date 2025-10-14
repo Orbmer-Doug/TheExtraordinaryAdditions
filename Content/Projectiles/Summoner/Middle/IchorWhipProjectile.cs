@@ -35,8 +35,8 @@ public class IchorWhipProjectile : BaseWhip
                 Main.rand.Next(70, 90), Main.rand.NextFloat(.8f, 1.5f), Color.Gold, Color.Yellow, 3, true, true);
         }
 
-        target.AddBuff(BuffID.Ichor, (int)(SecondsToFrames(4) * Convert01To010(GetCompletion())));
-        Projectile.damage = (int)(Projectile.damage * .8f);
+        target.AddBuff(BuffID.Ichor, (int)(SecondsToFrames(5) * Convert01To010(GetCompletion())));
+        Projectile.damage = (int)(Projectile.damage * .75f);
     }
 
     public override Color LineColor(SystemVector2 completion, Vector2 position)

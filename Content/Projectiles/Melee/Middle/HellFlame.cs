@@ -1,8 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
+﻿using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
-using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
@@ -24,7 +21,7 @@ public class HellFlame : ModProjectile
     {
         Projectile.velocity *= .975f;
 
-        float timeInterpolant = Utils.GetLerpValue(0f, 200f, Projectile.timeLeft, true);
+        float timeInterpolant = InverseLerp(0f, 200f, Projectile.timeLeft);
         // I put blue here to clearly see where the colors were changing and it turned out prettier than the original
         // whatever
         float val = Cos01(timeInterpolant);
@@ -48,8 +45,6 @@ public class HellFlame : ModProjectile
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         for (int i = 0; i < 7; i++)
-        {
-            ParticleRegistry.SpawnSparkParticle(Projectile.Center, Projectile.velocity.RotatedByRandom(.4f) * Main.rand.NextFloat(-1f, -4f), 40, Main.rand.NextFloat(.9f, 1.5f), Color.OrangeRed);
-        }
+            ParticleRegistry.SpawnSparkParticle(Projectile.Center, Projectile.velocity.RotatedByRandom(.4f) * Main.rand.NextFloat(-1f, -2f), 40, Main.rand.NextFloat(.9f, 1.5f), Color.OrangeRed);
     }
 }

@@ -1,10 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
-using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -23,7 +20,7 @@ public class BloodDroplet : ProjOwnedByNPC<StygainHeart>
         Projectile.tileCollide = false;
         Projectile.extraUpdates = 0;
         Projectile.ignoreWater = true;
-        Projectile.timeLeft = 210;
+        Projectile.timeLeft = 510;
         CooldownSlot = ImmunityCooldownID.Bosses;
     }
 
@@ -33,7 +30,7 @@ public class BloodDroplet : ProjOwnedByNPC<StygainHeart>
             Lighting.AddLight(Projectile.Center, Color.DarkRed.ToVector3() * .5f);
 
         Projectile.FacingUp();
-        Projectile.velocity.Y = MathHelper.Clamp(Projectile.velocity.Y + .2f, 0f, 18f);
+        Projectile.velocity.Y = MathHelper.Clamp(Projectile.velocity.Y + .2f, 0f, 14f);
         if (Projectile.ai[0]++ > 30 && Projectile.velocity.Length() < .05f)
             Projectile.Kill();
     }
@@ -60,9 +57,9 @@ public class BloodDroplet : ProjOwnedByNPC<StygainHeart>
         Rectangle frame = texture.Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame);
         Vector2 drawPosition = Projectile.Center - Main.screenPosition;
         Color color = Projectile.GetAlpha(Color.Red);
-        float squish = MathHelper.Clamp(Projectile.velocity.Length() / 10f * 3f, .1f, 5f);
+        float squish = MathHelper.Clamp(Projectile.velocity.Length() / 10f * 3f, .1f, 3f);
 
-        Main.EntitySpriteDraw(texture, drawPosition, frame, color, Projectile.rotation, frame.Size() / 2, new Vector2(1f, 1f * squish) * .1f, 0, 0);
+        Main.EntitySpriteDraw(texture, drawPosition, frame, color, Projectile.rotation, new(frame.X / 2f, frame.Y), new Vector2(1f, 1f * squish) * .1f, 0, 0);
         return false;
     }
 }

@@ -1,15 +1,13 @@
-﻿using Microsoft.Xna.Framework;
-using System;
+﻿using System;
 using System.Diagnostics;
 using Terraria;
 using Terraria.ModLoader;
 
 namespace TheExtraordinaryAdditions.Core.Systems;
 
-/// <summary>
-/// Primarily made by Mirsario in Terraria Overhaul
-/// https://github.com/Mirsario/TerrariaOverhaul/blob/46e6f6bd8eebfdac0eee65affb132990194eb660/Core/Time/TimeSystem.cs
-/// </summary>
+// Main source and copyright belongs to Mirsario & Contributors in Terraria Overhaul
+// https://github.com/Mirsario/TerrariaOverhaul/blob/46e6f6bd8eebfdac0eee65affb132990194eb660/Core/Time/TimeSystem.cs
+
 public sealed class TimeSystem : ModSystem
 {
     public static readonly DateTime FirstLoadDate = DateTime.Now;
@@ -21,14 +19,12 @@ public sealed class TimeSystem : ModSystem
     // Logic time
     public static float LogicTime { get; private set; }
     public static float LogicDeltaTime { get; } = 1f / 60f;
-    public static int LogicFramerate { get; } = 60;
 
     // Render time
     public static float RenderTime { get; private set; }
     public static float RenderDeltaTime { get; private set; } = 1f / 60f;
 
     // Etc
-    public static TimeSpan CurrentTimeSpan => GlobalStopwatch?.Elapsed ?? TimeSpan.Zero;
     public static Stopwatch GlobalStopwatch { get; } = new();
     public static ulong UpdateCount { get; private set; }
     public static bool RenderOnlyFrame { get; private set; }
@@ -52,18 +48,18 @@ public sealed class TimeSystem : ModSystem
         // 13th or 12th September
         ProgrammersDay = Date.DayOfYear == 256;
 
-        // From October 25th to November 5th, inclusively.
+        // From October 25th to November 5th, inclusively
         Halloween = (Date.Month == 10 && Date.Day >= 25) || (Date.Month == 11 && Date.Day < 3);
 
-        // From 24th December to 26th, inclusively.
+        // From 24th December to 26th, inclusively
         Christmas = Date.Month == 12 && Date.Day >= 24 && Date.Day <= 26;
 
-        // From 27th December to 5th January, inclusively.
+        // From 27th December to 5th January, inclusively
         NewYear = (Date.Month == 12 && Date.Day >= 27) || (Date.Month == 1 && Date.Day <= 5);
 
         GlobalStopwatch.Start();
 
-        // Hooking of potentially executing draw methods has to be done on the main thread.
+        // Hooking of potentially executing draw methods has to be done on the main thread
         Main.QueueMainThreadAction(static () =>
         {
             On_Main.DoUpdate += OnDoUpdate;

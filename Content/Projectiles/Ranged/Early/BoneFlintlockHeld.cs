@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -46,9 +45,8 @@ public class BoneFlintlockHeld : BaseIdleHoldoutProjectile
         Owner.itemRotation = Projectile.rotation;
         Owner.SetFrontHandBetter(0, Projectile.rotation);
 
-        if (this.RunLocal() && Modded.SafeMouseLeft.Current && Wait <= 0 && Owner.HasAmmo(Item))
+        if (this.RunLocal() && Modded.SafeMouseLeft.Current && Wait <= 0 && TryUseAmmo(out int type, out float speed, out int dmg, out float kb, out int ammo))
         {
-            Owner.PickAmmo(Item, out int type, out float speed, out int dmg, out float kb, out int ammoID, Owner.IsAmmoFreeThisShot(Item, Owner.ChooseAmmo(Item), Owner.ChooseAmmo(Item).type));
             Vector2 pos = Projectile.RotHitbox().Right + PolarVector(8f * Dir, Projectile.rotation - MathHelper.PiOver2);
             Vector2 vel = Projectile.velocity * MathHelper.Clamp(speed, Item.shootSpeed, Item.shootSpeed * 2);
             if (this.RunLocal())

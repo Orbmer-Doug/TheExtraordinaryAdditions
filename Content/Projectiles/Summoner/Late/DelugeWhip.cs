@@ -6,10 +6,7 @@ using TheExtraordinaryAdditions.Common.Particles.Metaball;
 using TheExtraordinaryAdditions.Content.Buffs.Debuff;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
-using TheExtraordinaryAdditions.Content.Projectiles.Magic.Late.Zenith;
-using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
-using static Terraria.ModLoader.BackupIO;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Late;
 
@@ -51,11 +48,6 @@ public class DelugeWhip : BaseWhip
         return;
     }
 
-    public override void ModifyNPCEffects(NPC target, ref NPC.HitModifiers modifiers, in Vector2 pos, in int index)
-    {
-
-    }
-
     public void Visuals()
     {
         Projectile.scale = MathHelper.Lerp(.9f, 1.2f, GetLerpBump(0f, .4f, 1f, .6f, Completion)) * GetThin(GetCompletion());
@@ -73,7 +65,7 @@ public class DelugeWhip : BaseWhip
 
     public override void DrawLine()
     {
-        if (Line != null && !Line._disposed)
+        if (Line != null && !Line.Disposed)
         {
             ManagedShader shader = ShaderRegistry.WaterCurrent;
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DarkTurbulentNoise), 1, SamplerState.LinearWrap);

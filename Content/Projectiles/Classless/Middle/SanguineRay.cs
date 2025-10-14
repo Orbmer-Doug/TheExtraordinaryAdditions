@@ -40,7 +40,7 @@ public class SanguineRay : ModProjectile
 
     public override void AI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, null, 40);
 
         Time++;
@@ -107,7 +107,7 @@ public class SanguineRay : ModProjectile
         return Color.Lerp(val, Color.Red, 0.5f) * trailOpacity;
     }
 
-    public ManualTrailPoints cache;
+    public TrailPoints cache;
     public OptimizedPrimitiveTrail trail;
     public override bool PreDraw(ref Color lightColor)
     {

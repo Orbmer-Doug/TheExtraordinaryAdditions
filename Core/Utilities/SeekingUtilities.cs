@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using CalamityMod.NPCs.AquaticScourge;
+﻿using CalamityMod.NPCs.AquaticScourge;
 using CalamityMod.NPCs.DevourerofGods;
 using CalamityMod.NPCs.ExoMechs.Thanatos;
 using System;
@@ -15,9 +14,6 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Core.Utilities;
 
-/// <summary>
-/// Find a specific entity
-/// </summary>
 public static partial class Utility
 {
     /// <summary>
@@ -62,20 +58,6 @@ public static partial class Utility
         return fallbackDirection * chaserSpeed;
     }
 
-    /// <summary>
-    /// A simple way to check if this target is a active hostile NPC
-    /// <br></br>
-    /// Does not account for regular seeking data
-    /// </summary>
-    /// <param name="target"></param>
-    /// <returns></returns>
-    public static bool TargetValid(this NPC target)
-    {
-        if (target is null || !target.active || target.friendly || !target.CanBeChasedBy())
-            return false;
-        return true;
-    }
-
     /// <param name="proj">The projectile in question</param>
     /// <param name="dist">Distance to check for other projectiles</param>
     /// <param name="limit">Makes a limit for how many to grab (should probably be kept to lower numbers)</param>
@@ -84,11 +66,9 @@ public static partial class Utility
     public static List<Projectile> GetOtherProjs(this Projectile proj, float dist, int limit = 50, bool sort = false)
     {
         List<Projectile> otherProjs = [];
-        for (int i = 0; i < Main.maxProjectiles; i++)
+        foreach (Projectile other in Main.ActiveProjectiles)
         {
-            Projectile other = Main.projectile[i];
-            if (other == null || other.active == false || otherProjs.Count >= limit ||
-                other.whoAmI == proj.whoAmI || other.type != proj.type || !proj.WithinRange(other.Center, dist))
+            if (otherProjs.Count >= limit || other.whoAmI == proj.whoAmI || other.type != proj.type || !proj.WithinRange(other.Center, dist))
                 continue;
 
             otherProjs.Add(other);
@@ -103,82 +83,33 @@ public static partial class Utility
         return otherProjs;
     }
 
-    public static void KillAllHostileProjectiles()
+    public static void DeleteAllProjectiles(bool setToInactive, int[] projectileIDs)
     {
         foreach (Projectile proj in Main.ActiveProjectiles)
         {
-            if (proj.active && proj.hostile && !proj.friendly && proj.damage > 0)
-                proj.Kill();
-        }
-    }
-
-    public static void KillShootProjectiles(bool shouldBreak, int projType, Player player)
-    {
-        foreach (Projectile proj in Main.ActiveProjectiles)
-        {
-            if (proj.active && proj.owner == player.whoAmI && proj.type == projType)
+            if (projectileIDs.Contains(proj.type))
             {
-                proj.Kill();
-                if (shouldBreak)
-                    break;
+                if (setToInactive)
+                {
+                    proj.active = false;
+                    proj.netUpdate = true;
+                }
+                else
+                    proj.Kill();
             }
         }
     }
 
-    public static void DeleteAllProjectiles(bool setToInactive, params int[] projectileIDs)
+    public static int CountNPCs(int type)
     {
-        for (int i = 0; i < Main.maxProjectiles; i++)
-        {
-            if (!Main.projectile[i].active || !projectileIDs.Contains(Main.projectile[i].type))
-                continue;
-
-            Projectile p = Main.projectile[i];
-            if (setToInactive)
-            {
-                p.active = false;
-                p.netUpdate = true;
-            }
-            else
-                p.Kill();
-        }
-    }
-
-    public static void DeleteAllOwnerProjectiles(this Player owner, bool setToInactive, params int[] projectileIDs)
-    {
-        for (int i = 0; i < Main.maxProjectiles; i++)
-        {
-            if (!Main.projectile[i].active || !projectileIDs.Contains(Main.projectile[i].type))
-                continue;
-
-            Projectile p = Main.projectile[i];
-            if (p.owner != owner.whoAmI)
-                continue;
-
-            if (setToInactive)
-            {
-                p.active = false;
-                p.netUpdate = true;
-            }
-            else
-                p.Kill();
-        }
-    }
-
-    public static int CountNPCs(params int[] typesToCheck)
-    {
-        // Don't waste time if the type check list is empty for some reason.
-        if (typesToCheck.Length <= 0)
-            return 0;
-
         int count = 0;
         foreach (NPC n in Main.ActiveNPCs)
         {
-            if (!typesToCheck.Contains(n.type))
+            if (n.type != type)
                 continue;
 
             count++;
         }
-
         return count;
     }
 
@@ -186,59 +117,32 @@ public static partial class Utility
     {
         foreach (Projectile p in Main.ActiveProjectiles)
         {
-            if (p != null && p.active && p.type == type)
+            if (p.type == type)
                 return true;
         }
-
         return false;
     }
 
-    public static Span<Projectile> AllProjectilesByID(int type)
+    public static List<Projectile> AllProjectilesByID(int type)
     {
-        int count = 0;
+        List<Projectile> projs = [];
         foreach (Projectile projectile in Main.ActiveProjectiles)
         {
-            if (projectile != null && projectile.active)
-                count++;
+            if (projectile.type == type)
+                projs.Add(projectile);
         }
-
-        Projectile[] projs = new Projectile[count];
-
-        int index = 0;
-        foreach (Projectile projectile in Main.ActiveProjectiles)
-        {
-            if (projectile != null && projectile.active)
-            {
-                projs[index] = projectile;
-                index++;
-            }
-        }
-
-        return projs.AsSpan();
+        return projs;
     }
 
-    public static Span<Projectile> AllProjectilesFromOwner(int type, Player player)
+    public static List<Projectile> AllProjectilesFromOwner(int type, Player player)
     {
-        int count = 0;
+        List<Projectile> projs = [];
         foreach (Projectile projectile in Main.ActiveProjectiles)
         {
-            if (projectile != null && projectile.active && projectile.owner == player.whoAmI)
-                count++;
+            if (projectile.type == type && projectile.owner == player.whoAmI)
+                projs.Add(projectile);
         }
-
-        Projectile[] projs = new Projectile[count];
-
-        int index = 0;
-        foreach (Projectile projectile in Main.ActiveProjectiles)
-        {
-            if (projectile != null && projectile.active && projectile.owner == player.whoAmI)
-            {
-                projs[index] = projectile;
-                index++;
-            }
-        }
-
-        return projs.AsSpan();
+        return projs;
     }
 
     public static int CountProjectiles(int type)
@@ -246,7 +150,7 @@ public static partial class Utility
         int count = 0;
         foreach (Projectile projectile in Main.ActiveProjectiles)
         {
-            if (projectile != null && projectile.active && projectile.type == type)
+            if (projectile.type == type)
                 count++;
         }
         return count;
@@ -257,7 +161,7 @@ public static partial class Utility
         int count = 0;
         foreach (Projectile projectile in Main.ActiveProjectiles)
         {
-            if (projectile != null && projectile.active && projectile.type == type && projectile.owner == player.whoAmI)
+            if (projectile.type == type && projectile.owner == player.whoAmI)
                 count++;
         }
         return count;
@@ -290,18 +194,10 @@ public static partial class Utility
         foreach (Player player in Main.ActivePlayers)
         {
             total++;
-            if (player.dead || player.ghost)
+            if (player.DeadOrGhost)
                 continue;
             alive++;
         }
-    }
-
-    public static bool IsOffscreen(this Projectile p)
-    {
-        // Check whether the projectile's hitbox intersects the screen, accounting for the screen fluff setting.
-        int fluff = ProjectileID.Sets.DrawScreenCheckFluff[p.type];
-        Rectangle screenArea = new((int)Main.Camera.ScaledPosition.X - fluff, (int)Main.Camera.ScaledPosition.Y - fluff, (int)Main.Camera.ScaledSize.X + fluff * 2, (int)Main.Camera.ScaledSize.Y + fluff * 2);
-        return !screenArea.Intersects(p.Hitbox);
     }
 
     public static bool IsAnEnemy(this NPC npc, bool allowStatues = true)
@@ -406,16 +302,10 @@ public static class NPCTargeting
     /// <param name="Origin">Where to start at</param>
     /// <param name="Radius">Maximum radius to account for</param>
     /// <param name="LOS">Check for line of sight?</param>
-    /// <param name="BossPriority">Whether to priortize NPC's classified as bosses</param>
-    /// <param name="ExemptTargets">Blacklist certain npcs</param>
+    /// <param name="BossPriority">Whether to prioritize NPC's classified as a boss</param>
+    /// <param name="ExemptTargets">Blacklist certain NPC's</param>
     [StructLayout(LayoutKind.Auto)]
-    public readonly record struct NPCSeekingData(Vector2 Origin, int Radius, bool LOS = false, bool BossPriority = false, List<NPC> ExemptTargets = null)
-    {
-        public override readonly string ToString()
-        {
-            return $"Origin={Origin}, Radius={Radius}, Line of Sight? {LOS}, BossPriority? {BossPriority}, Exemptions={(ExemptTargets != null ? string.Join(", ", ExemptTargets) : "null")}";
-        }
-    }
+    public readonly record struct NPCSeekingData(Vector2 Origin, int Radius, bool LOS = false, bool BossPriority = false, HashSet<NPC> ExemptTargets = null);
 
     private static bool IsValidTarget(NPC npc, Vector2 origin, float radiusSquared, NPCSeekingData data)
     {
@@ -532,10 +422,7 @@ public static class NPCTargeting
     {
         target = GetClosestNPC(data);
         if (!target.CanHomeInto())
-        {
             return false;
-        }
-
         return true;
     }
 
@@ -807,15 +694,9 @@ public static class ProjectileTargeting
     /// <param name="Radius">Maximum radius to account for</param>
     /// <param name="LOS">Check for line of sight?</param>
     /// <param name="Type">When a type is specified, the method will only look for this projectile</param>
-    /// <param name="ExemptTargets">Blacklist certain projectiles</param>
+    /// <param name="ExemptTargets">Blacklist certain Projectiles</param>
     [StructLayout(LayoutKind.Auto)]
-    public readonly record struct ProjectileSeekingData(Vector2 Origin, int Radius, bool LOS = false, int Type = int.MinValue, List<Projectile> ExemptTargets = null)
-    {
-        public override readonly string ToString()
-        {
-            return $"Origin={Origin}, Radius={Radius}, Line of Sight? {LOS}, Type={Type}, Exemptions={(ExemptTargets != null ? string.Join(", ", ExemptTargets) : "null")}";
-        }
-    }
+    public readonly record struct ProjectileSeekingData(Vector2 Origin, int Radius, bool LOS = false, int Type = int.MinValue, HashSet<Projectile> ExemptTargets = null);
 
     private static bool IsValidTarget(Projectile proj, Vector2 origin, float radiusSquared, ProjectileSeekingData data)
     {
@@ -983,19 +864,13 @@ public static class PlayerTargeting
     /// <param name="Origin">Where to start at</param>
     /// <param name="Radius">Maximum radius to account for</param>
     /// <param name="LOS">Check for line of sight?</param>
-    /// <param name="ExemptTargets">Blacklist certain players</param>
+    /// <param name="ExemptTargets">Blacklist certain Players</param>
     [StructLayout(LayoutKind.Auto)]
-    public readonly record struct PlayerSeekingData(Vector2 Origin, int Radius, bool LOS = false, List<Player> ExemptTargets = null)
-    {
-        public override readonly string ToString()
-        {
-            return $"Origin={Origin}, Radius={Radius}, Line of Sight? {LOS},  Exemptions={(ExemptTargets != null ? string.Join(", ", ExemptTargets) : "null")}";
-        }
-    }
+    public readonly record struct PlayerSeekingData(Vector2 Origin, int Radius, bool LOS = false, HashSet<Player> ExemptTargets = null);
 
     private static bool IsValidTarget(Player player, Vector2 origin, float radiusSquared, PlayerSeekingData data)
     {
-        return player != null && player.active && !player.dead &&
+        return player != null && player.active && !player.DeadOrGhost &&
                Vector2.DistanceSquared(origin, player.Center) <= radiusSquared &&
                (data.ExemptTargets == null || !data.ExemptTargets.Contains(player)) &&
                (!data.LOS || Collision.CanHit(origin, 1, 1, player.Center, 1, 1));
@@ -1033,16 +908,28 @@ public static class PlayerTargeting
     /// </summary>
     /// <param name="position">The position to start at</param>
     /// <returns>A player, if any</returns>
-    public static Player FindNearestPlayer(Vector2 position)
+    public static bool FindNearestPlayer(Vector2 position, out Player player)
     {
-        Player plr = null;
-
-        for (int k = 0; k < Main.maxPlayers; k++)
+        Player closest = null;
+        float minDist = float.MaxValue;
+        foreach (Player p in Main.ActivePlayers)
         {
-            if (Main.player[k] != null && Main.player[k].active && (plr == null || Vector2.DistanceSquared(position, Main.player[k].Center) < Vector2.DistanceSquared(position, plr.Center)))
-                plr = Main.player[k];
+            float dist = p.Center.DistanceSQ(position);
+            if (dist < minDist || dist == minDist && p.whoAmI < closest?.whoAmI)
+            {
+                minDist = dist;
+                closest = p;
+            }
         }
-        return plr;
+
+        if (closest == null)
+        {
+            player = null;
+            return false;
+        }
+
+        player = closest;
+        return true;
     }
 
     public static bool TryFindClosestPlayer(PlayerSeekingData data, out Player target)
@@ -1105,7 +992,7 @@ public static class PlayerTargeting
             int tankTarget = -1;
             foreach (Player player in Main.ActivePlayers)
             {
-                if (!player.dead && !player.ghost)
+                if (player.DeadOrGhost)
                     npc.TryTrackingTarget(ref distance, ref realDist, ref t, ref tankTarget, player.whoAmI);
             }
             npc.SetTargetTrackingValues(faceTarget, realDist, tankTarget);

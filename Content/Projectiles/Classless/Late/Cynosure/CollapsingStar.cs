@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Terraria;
-using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Assets.Audio;
@@ -58,14 +57,14 @@ public class CollapsingStar : ModProjectile, ILocalizedModType, IModType, IHasSc
     public ref float GrowTimer => ref Projectile.ai[0];
     public const int FadeTime = 55;
     public ref float FadeTimer => ref Projectile.ai[1];
-    public ref float OverallTimer => ref Projectile.Additions().ExtraAI[0];
+    public ref float OverallTimer => ref Projectile.AdditionsInfo().ExtraAI[0];
     private bool IsCollapsing
     {
-        get => Projectile.Additions().ExtraAI[1] == 1f;
-        set => Projectile.Additions().ExtraAI[1] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[1] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[1] = value.ToInt();
     }
-    public ref float OldScale => ref Projectile.Additions().ExtraAI[2];
-    public Projectile Genedies => Main.projectile[(int)Projectile.Additions().ExtraAI[3]];
+    public ref float OldScale => ref Projectile.AdditionsInfo().ExtraAI[2];
+    public Projectile Genedies => Main.projectile[(int)Projectile.AdditionsInfo().ExtraAI[3]];
 
     public LoopedSoundInstance slot;
     public override void AI()
@@ -155,7 +154,8 @@ public class CollapsingStar : ModProjectile, ILocalizedModType, IModType, IHasSc
             float kb = 0f;
             int type = ModContent.ProjectileType<BlackHole>();
             int owner = Projectile.owner;
-            Projectile.NewProj(pos, Vector2.Zero, type, dmg, kb, owner);
+            if (this.RunLocal())
+                Projectile.NewProj(pos, Vector2.Zero, type, dmg, kb, owner);
 
             const int amt = 500;
             const int blastAmt = 30;
@@ -191,8 +191,11 @@ public class CollapsingStar : ModProjectile, ILocalizedModType, IModType, IHasSc
             }
             ParticleRegistry.SpawnShockwaveParticle(pos, 50, .8f, maxRad * 1.4f, 80f, .7f);
 
-            Projectile.NewProj(pos, Vector2.Zero, ModContent.ProjectileType<KilonovaShockwave>(), (int)Owner.GetTotalDamage(DamageClass.Generic).ApplyTo(150000), 50f, Projectile.owner);
-            Projectile.NewProj(pos, Vector2.Zero, ModContent.ProjectileType<Kilonova>(), 0, 0f, owner);
+            if (this.RunLocal())
+            {
+                Projectile.NewProj(pos, Vector2.Zero, ModContent.ProjectileType<KilonovaShockwave>(), (int)Owner.GetTotalDamage(DamageClass.Generic).ApplyTo(150000), 50f, Projectile.owner);
+                Projectile.NewProj(pos, Vector2.Zero, ModContent.ProjectileType<Kilonova>(), 0, 0f, owner);
+            }
         }
     }
 
@@ -205,7 +208,7 @@ public class CollapsingStar : ModProjectile, ILocalizedModType, IModType, IHasSc
             if (flare == null || flare.Points == null || flare.Trail == null)
                 continue;
 
-            if (Utility.CollisionFromPoints(targetHitbox, flare.Points.Points, c => flare.Trail._widthFunction(c)))
+            if (Utility.CollisionFromPoints(targetHitbox, flare.Points.Points, c => flare.Trail.widthFunction(c)))
                 return null;
         }
         return base.Colliding(projHitbox, targetHitbox);
@@ -353,7 +356,7 @@ public class CollapsingStar : ModProjectile, ILocalizedModType, IModType, IHasSc
         /// <summary>
         /// The points for drawing
         /// </summary>
-        public ManualTrailPoints Points;
+        public TrailPoints Points;
 
         /// <summary>
         /// Created once during updates to optimize not having to create one every frame in drawing
@@ -371,7 +374,8 @@ public class CollapsingStar : ModProjectile, ILocalizedModType, IModType, IHasSc
                 {
                     ManagedShader prim = ShaderRegistry.FlameTrail;
                     prim.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.StreakMagma), 1);
-                    flare.Trail.DrawTrail(prim, flare.Points.Points, 100, true);
+                    if (flare.Trail != null && flare.Points != null)
+                        flare.Trail.DrawTrail(prim, flare.Points.Points, 100, true);
                 }
                 PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.OverProjectiles);
             }
@@ -408,7 +412,7 @@ public class CollapsingStar : ModProjectile, ILocalizedModType, IModType, IHasSc
                 float interpolant = InverseLerp(0f, flare.Lifetime, flare.Time);
 
                 flare.Points ??= new(50);
-                if (flare.Trail == null || flare.Trail._disposed)
+                if (flare.Trail == null || flare.Trail.Disposed)
                 {
                     flare.Trail = new(c =>
                     {

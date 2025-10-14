@@ -5,7 +5,6 @@ using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.ModLoader.Utilities;
 using TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 using TheExtraordinaryAdditions.Content.Items.Placeable.Banners;
 using TheExtraordinaryAdditions.Core.Globals;
@@ -14,10 +13,6 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.SolarGuardian;
 
-/// <summary>
-/// Phase 1 - Hovers around the player and does 2-3-2-3 blast of sunrays
-/// Phase 2 - Reels back and does a big dash, leaving behind a quickly dying plasma
-/// </summary>
 public class SolarGuardian : ModNPC
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SolarGuardian);
@@ -84,7 +79,7 @@ public class SolarGuardian : ModNPC
         get => (int)NPC.ai[3];
         set => NPC.ai[3] = value;
     }
-    
+
     public int RotateDir
     {
         get => (int)NPC.AdditionsInfo().ExtraAI[0];

@@ -1,9 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
-using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
-using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
 
@@ -88,7 +85,7 @@ public class Razorflake : ProjOwnedByNPC<AuroraGuard>
             after.DrawFancyAfterimages(AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall), [AuroraGuard.DeepBlue, Color.DeepSkyBlue, Color.SkyBlue], Projectile.Opacity, 1f, 0f, true);
         }
         PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.UnderProjectiles, BlendState.Additive);
-        
+
         Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Vector2.One * Projectile.width), frame, Color.White * Projectile.Opacity, Projectile.rotation, frame.Size() / 2);
 
         return false;

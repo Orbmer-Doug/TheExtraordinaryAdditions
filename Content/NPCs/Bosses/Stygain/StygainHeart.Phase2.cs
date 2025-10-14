@@ -3,9 +3,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
-using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain;
@@ -26,7 +24,7 @@ public sealed partial class StygainHeart : ModNPC
         int moonCount = Main.getGoodWorld ? 5 : 3;
         float moonSpeed = DifficultyBasedValue(10.5f, 10.2f, 10f, 9.6f, 9.2f, 8.5f);
         int wrappedTime = AttackTimer % shootCycleTime;
-        ref float count = ref NPC.AdditionsInfo().ExtraAI[2];
+        ref float count = ref ExtraAI[2];
 
         if (inPhase2 && HasDoneBloodBeacon == true)
         {
@@ -62,20 +60,45 @@ public sealed partial class StygainHeart : ModNPC
             SelectNextAttack();
     }
 
-    public static float BarrierSize => DifficultyBasedValue(700f, 600f, 500f, 480f, 470f, 460f);
+    public static float BarrierSize => DifficultyBasedValue(800f, 700f, 600f, 580f, 570f, 560f);
     public void DoAttack_DartCyclone(Player target)
     {
         int dartShootTime = SecondsToFrames(6);
         int dartShootDelay = SecondsToFrames(1f);
-        int dartBurstReleaseRate = DifficultyBasedValue(12, 10, 8, 7, 7, 7);
-        int dartShootCount = DifficultyBasedValue(8, 10, 11, 12, 12, 12);
+        int dartBurstReleaseRate = DifficultyBasedValue(14, 10, 12, 10, 10, 10);
+        int dartShootCount = DifficultyBasedValue(7, 9, 10, 11, 11, 11);
         float dartShootSpeed = DifficultyBasedValue(2.5f, 3f, 3.2f, 3.5f, 3.8f, 3.9f);
         int totalTime = dartShootTime + dartShootDelay + HemoglobTelegraph.TeleTime;
 
-        // Hover near the target.
+        NPC.damage = 0;
+
+        // Hover near the target
         if (AttackTimer < dartShootDelay)
         {
-            Vector2 hoverDestination = target.Center + new Vector2((NPC.Center.X > target.Center.X).ToDirectionInt() * 400f, -70f);
+            Vector2 hoverDestination = target.Center + new Vector2((NPC.Center.X > target.Center.X).ToDirectionInt() * 200f, 70f);
+
+            // Never allow tiles into the barrier
+            if (Collision.SolidCollision(hoverDestination, 1, (int)BarrierSize))
+            {
+                Vector2? ground = FindNearestSurface(hoverDestination - Vector2.UnitY * BarrierSize, true, BarrierSize * 2f, 16, true);
+                if (ground.HasValue)
+                {
+                    hoverDestination = ground.Value - Vector2.UnitY * BarrierSize;
+
+                    Vector2? left = RaytraceTiles(hoverDestination, hoverDestination - Vector2.UnitX * BarrierSize);
+                    if (left.HasValue)
+                        hoverDestination = left.Value + Vector2.UnitX * BarrierSize;
+
+                    Vector2? right = RaytraceTiles(hoverDestination, hoverDestination + Vector2.UnitX * BarrierSize);
+                    if (right.HasValue)
+                        hoverDestination = right.Value - Vector2.UnitX * BarrierSize;
+
+                    Vector2? up = RaytraceTiles(hoverDestination, hoverDestination - Vector2.UnitY * BarrierSize);
+                    if (up.HasValue)
+                        hoverDestination = up.Value + Vector2.UnitY * BarrierSize;
+                }
+            }
+
             float distanceToDestination = NPC.Distance(hoverDestination);
             Vector2 idealVelocity = NPC.SafeDirectionTo(hoverDestination) * MathHelper.Min(distanceToDestination, 30f);
             NPC.SimpleFlyMovement(Vector2.Lerp(idealVelocity, (hoverDestination - NPC.Center) * 0.15f, Utils.GetLerpValue(280f, 540f, distanceToDestination, true)), 0.5f);
@@ -93,10 +116,7 @@ public sealed partial class StygainHeart : ModNPC
         if (AttackTimer == dartShootDelay)
         {
             if (this.RunServer())
-            {
-                NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<BloodMoonlet>(), BloodBeaconDamage, 10f, -1, 0f, 1f);
                 NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<HemoglobTelegraph>(), 0, 0f, -1);
-            }
             NPC.netUpdate = true;
         }
 
@@ -141,8 +161,8 @@ public sealed partial class StygainHeart : ModNPC
 
     public void DoAttack_BloodBeacon(Player target)
     {
-        ref float releaseCounter = ref NPC.AdditionsInfo().ExtraAI[1];
-        ref float beaconLengthInterpolant = ref NPC.AdditionsInfo().ExtraAI[2];
+        ref float releaseCounter = ref ExtraAI[1];
+        ref float beaconLengthInterpolant = ref ExtraAI[2];
 
         NPC.damage = 0;
         NPC.defense = NPC.defDefense + 55;
@@ -187,7 +207,9 @@ public sealed partial class StygainHeart : ModNPC
         }
         else if (attacking)
         {
-            float speed = Utils.Remap(NPC.Distance(target.Center), 100f, 1300f, 0f, 15f);
+            // Speed up to player too far from the beam and slow if near
+            Vector2 closest = ClosestPointOnLineSegment(target.Center, NPC.Center - Vector2.UnitY * BloodBeacon.MaxLaserLength, NPC.Center + Vector2.UnitY * BloodBeacon.MaxLaserLength);
+            float speed = Utils.Remap(closest.Distance(target.Center), 100f, 1300f, 0f, 15f);
             NPC.velocity.X = Animators.MakePoly(3f).OutFunction.Evaluate(NPC.velocity.X, speed * -side, .04f);
         }
         else if (settling)
@@ -241,7 +263,7 @@ public sealed partial class StygainHeart : ModNPC
         if (AttackTimer == (riseTime + waitTime))
         {
             AdditionsSound.Rapture.Play(target.Center, 1.2f, -.1f);
-            
+
             if (this.RunServer())
             {
                 NPC.NewNPCProj(NPC.Center - Vector2.UnitY * 2000f, Vector2.Zero, ModContent.ProjectileType<StygainRoar>(), 0, 0f);
@@ -319,6 +341,7 @@ public sealed partial class StygainHeart : ModNPC
         if (finished)
         {
             HasDoneBloodBeacon = true;
+            this.Sync();
             SelectNextAttack();
         }
     }

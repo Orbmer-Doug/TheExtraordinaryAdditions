@@ -39,7 +39,7 @@ public class Birch : BaseSwordSwing
     public override void SafeInitialize()
     {
         after ??= new(10, () => Projectile.Center);
-        after.afterimages = null;
+        after.Clear();
     }
 
     public override void SafeAI()
@@ -105,7 +105,7 @@ public class Birch : BaseSwordSwing
         {
             Dust d = Dust.NewDustPerfect(BushRect().RandomPoint(), 196, -SwordDir * 4f, 0, default, Main.rand.NextFloat(1.1f, 1.9f));
             d.noGravity = true;
-        } 
+        }
     }
 
     public override void NPCHitEffects(in Vector2 start, in Vector2 end, NPC npc, NPC.HitInfo hit)
@@ -169,7 +169,6 @@ public class Birch : BaseSwordSwing
 
         Main.spriteBatch.Draw(Tex, Projectile.Center - Main.screenPosition, null, lightColor,
             Projectile.rotation + RotationOffset, origin, Projectile.scale, Effects, 0f);
-
         return false;
     }
 }

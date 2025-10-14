@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -12,6 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 public class EmblazenedEmber : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.EmblazenedEmber);
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(new Color(171, 78, 12));
@@ -24,7 +24,8 @@ public class EmblazenedEmber : ModItem
 
         ItemID.Sets.AnimatesAsSoul[Type] = true;
     }
-    public override void Update(ref float gravity, ref float maxFallSpeed)
+
+    public override void PostUpdate()
     {
         float brightness = Main.essScale * Main.rand.NextFloat(0.9f, 1.1f);
         Lighting.AddLight(Item.Center, 1.2f * brightness, .66f * brightness, .02f * brightness);

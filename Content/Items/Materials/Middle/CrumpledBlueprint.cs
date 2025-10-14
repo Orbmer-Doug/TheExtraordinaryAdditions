@@ -7,6 +7,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 public class CrumpledBlueprint : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CrumpledBlueprint);
+
     public override void SetStaticDefaults()
     {
         Item.ResearchUnlockCount = 2;

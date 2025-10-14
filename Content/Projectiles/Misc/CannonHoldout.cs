@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
-using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.GameContent.Achievements;
 using Terraria.ID;
@@ -27,8 +26,8 @@ public class CannonHoldout : ModProjectile, ILocalizedModType, IModType
 
     public bool PlayedSound
     {
-        get => Projectile.Additions().ExtraAI[0] == 1f;
-        set => Projectile.Additions().ExtraAI[0] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[0] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
 
     public float DrillLength = 90f;
@@ -64,9 +63,7 @@ public class CannonHoldout : ModProjectile, ILocalizedModType, IModType
             MoveInIntervals -= 1f;
 
         if (!Owner.channel || !Owner.Available())
-        {
             Projectile.Kill();
-        }
 
         else if (MoveInIntervals <= 0f && this.RunLocal())
         {

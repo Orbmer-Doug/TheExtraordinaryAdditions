@@ -2,9 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Terraria;
-using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -68,15 +66,14 @@ public class SanguineLance : ModProjectile, ILocalizedModType, IModType
 
     public override void AI()
     {
-        if (trail == null || trail._disposed)
-            trail = new(tip, WidthFunct, ColorFunct, null, 50);
+        if (trail == null || trail.Disposed)
+            trail = new(WidthFunct, ColorFunct, null, 50);
+
         cache ??= new(50);
         cache.Update(Projectile.Center);
 
         if (State == CurrentState.Thrown)
         {
-            Projectile.rotation = Projectile.velocity.ToRotation();
-
             const int Slow = 30;
             if (Timer > (StartingLife - Slow))
             {
@@ -91,6 +88,7 @@ public class SanguineLance : ModProjectile, ILocalizedModType, IModType
                 AccumulatedVel += Projectile.velocity.Length() * 0.05f;
                 Projectile.velocity *= .995f;
             }
+            Projectile.rotation = Projectile.velocity.ToRotation();
 
             Timer++;
             return;
@@ -101,7 +99,7 @@ public class SanguineLance : ModProjectile, ILocalizedModType, IModType
         {
             // Stick to the target
             NPC target = Main.npc[(int)EnemyID];
-            
+
             if (!target.active)
             {
                 if (Projectile.timeLeft > 5)
@@ -149,9 +147,7 @@ public class SanguineLance : ModProjectile, ILocalizedModType, IModType
     public override bool OnTileCollide(Vector2 oldVelocity)
     {
         if (State == 0f)
-        {
             SetCollided(true);
-        }
 
         Projectile.velocity *= 0.01f;
         Projectile.Center += oldVelocity * 3f;
@@ -164,9 +160,10 @@ public class SanguineLance : ModProjectile, ILocalizedModType, IModType
         for (int i = 0; i < 20; i++)
         {
             if (i < 4)
-                ParticleRegistry.SpawnBloodStreakParticle(pos, Projectile.velocity.SafeNormalize(Vector2.Zero), Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .5f), Color.DarkRed);
-
-            ParticleRegistry.SpawnGlowParticle(pos, Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.3f) * Main.rand.NextFloat(4f, 9f), Main.rand.Next(30, 50), Main.rand.NextFloat(20f, 30f), Color.DarkRed, .8f);
+                ParticleRegistry.SpawnBloodStreakParticle(pos, Projectile.velocity.SafeNormalize(Vector2.Zero),
+                    Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .5f), Color.DarkRed);
+            ParticleRegistry.SpawnGlowParticle(pos, Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.3f) * Main.rand.NextFloat(4f, 9f),
+                Main.rand.Next(30, 50), Main.rand.NextFloat(20f, 30f), Color.DarkRed, .8f);
         }
 
         // Stick to the target
@@ -197,9 +194,10 @@ public class SanguineLance : ModProjectile, ILocalizedModType, IModType
             Projectile.hide = false;
         }
     }
+
     public float WidthFunct(float c)
     {
-        return MathHelper.SmoothStep(Projectile.height * .9f, 0f, c) * Projectile.scale * 1.5f;
+        return OptimizedPrimitiveTrail.HemisphereWidthFunct(c, MathHelper.SmoothStep(Projectile.height * .9f, 0f, c) * Projectile.scale * 1.5f);
     }
 
     public Color ColorFunct(SystemVector2 c, Vector2 position)
@@ -211,7 +209,6 @@ public class SanguineLance : ModProjectile, ILocalizedModType, IModType
 
     public TrailPoints cache;
     public OptimizedPrimitiveTrail trail;
-    public static readonly ITrailTip tip = new RoundedTip(20);
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -224,7 +221,7 @@ public class SanguineLance : ModProjectile, ILocalizedModType, IModType
                 ManagedShader shader = ShaderRegistry.FlameTrail;
 
                 shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DarkRidgeNoise), 1);
-                trail.DrawTippedTrail(shader, cache.Points, tip, true, 200, true);
+                trail.DrawTrail(shader, cache.Points, 200, true);
             }
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);

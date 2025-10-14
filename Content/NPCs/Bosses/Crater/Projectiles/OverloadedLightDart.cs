@@ -3,7 +3,6 @@ using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
@@ -19,15 +18,6 @@ public class OverloadedLightDart : ModProjectile
     {
         get => (int)Projectile.ai[0];
         set => Projectile.ai[0] = value;
-    }
-    public Vector2 TargetDir
-    {
-        get => new(Projectile.ai[1], Projectile.ai[2]);
-        set
-        {
-            Projectile.ai[1] = value.X;
-            Projectile.ai[2] = value.Y;
-        }
     }
 
     public override void SetStaticDefaults()
@@ -49,15 +39,12 @@ public class OverloadedLightDart : ModProjectile
     }
 
     public const float Supersonic = 28f;
-    public float HomeSpeed => DifficultyBasedValue(4f, 7f, 10f);
-    public float HomeAmt => DifficultyBasedValue(.01f, .015f, .03f) / Projectile.MaxUpdates;
-
     public override void AI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(TrailWidthFunction, TrailColorFunction, null, 20);
 
-        if (tele == null || tele._disposed)
+        if (tele == null || tele.Disposed)
             tele = new(TelegraphWidthFunction, TelegraphColorFunction, null, 30);
 
         Projectile.velocity *= 1.016f;
@@ -81,15 +68,13 @@ public class OverloadedLightDart : ModProjectile
                 ParticleRegistry.SpawnHeavySmokeParticle(start, vel, Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .6f), Color.Gold.Lerp(Color.DarkGoldenrod, Main.rand.NextFloat(0f, .4f)));
                 ParticleRegistry.SpawnBloomLineParticle(start, vel, Main.rand.Next(40, 50), Main.rand.NextFloat(.3f, .4f), Color.Gold);
             }
-            TargetDir = Projectile.Center.SafeDirectionTo(Main.LocalPlayer.Center);
             AdditionsSound.explo04.Play(start, .7f, -.2f);
             Projectile.timeLeft = 800;
             this.Sync();
         }
         else if (Time > Supersonic)
         {
-            Projectile.extraUpdates = 8;
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, TargetDir * HomeSpeed, HomeAmt);
+            Projectile.extraUpdates = 12;
             points.Update(Projectile.RotHitbox().Top);
         }
         Time++;
@@ -135,7 +120,7 @@ public class OverloadedLightDart : ModProjectile
     public OptimizedPrimitiveTrail trail;
     public OptimizedPrimitiveTrail tele;
     public TrailPoints points = new(20);
-    public ManualTrailPoints telePoints = new(30);
+    public TrailPoints telePoints = new(30);
 
     public override bool PreDraw(ref Color lightColor)
     {

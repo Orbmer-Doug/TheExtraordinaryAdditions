@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.IO;
-using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.Enums;
@@ -10,6 +9,8 @@ using Terraria.Graphics.Effects;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
+using TheExtraordinaryAdditions.Core.Globals.ProjectileGlobal;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
@@ -36,7 +37,7 @@ public abstract class BaseSwordSwing : ModProjectile, ILocalizedModType, IModTyp
         Up = -1,
     }
 
-    public AdditionsGlobalProjectile ModdedProj => Projectile.Additions();
+    public AdditionsProjectileInfo ProjInfo => Projectile.AdditionsInfo();
     public Texture2D Tex => Projectile.ThisProjectileTexture();
     public ref float Time => ref Projectile.ai[0];
 
@@ -49,20 +50,20 @@ public abstract class BaseSwordSwing : ModProjectile, ILocalizedModType, IModTyp
         get => Projectile.ai[2] == 1f;
         set => Projectile.ai[2] = value.ToInt();
     }
-    public ref float VanishTime => ref ModdedProj.ExtraAI[0];
-    public ref float OverallTime => ref ModdedProj.ExtraAI[1];
-    public ref float RotationOffset => ref ModdedProj.ExtraAI[2];
+    public ref float VanishTime => ref ProjInfo.ExtraAI[0];
+    public ref float OverallTime => ref ProjInfo.ExtraAI[1];
+    public ref float RotationOffset => ref ProjInfo.ExtraAI[2];
     public bool Initialized
     {
-        get => ModdedProj.ExtraAI[3] == 1f;
-        set => ModdedProj.ExtraAI[3] = value.ToInt();
+        get => ProjInfo.ExtraAI[3] == 1f;
+        set => ProjInfo.ExtraAI[3] = value.ToInt();
     }
-    public ref float InitialMouseAngle => ref ModdedProj.ExtraAI[4];
-    public ref float InitialAngle => ref ModdedProj.ExtraAI[5];
+    public ref float InitialMouseAngle => ref ProjInfo.ExtraAI[4];
+    public ref float InitialAngle => ref ProjInfo.ExtraAI[5];
     public SwingDirection SwingDir
     {
-        get => (SwingDirection)ModdedProj.ExtraAI[6];
-        set => ModdedProj.ExtraAI[6] = (int)value;
+        get => (SwingDirection)ProjInfo.ExtraAI[6];
+        set => ProjInfo.ExtraAI[6] = (int)value;
     }
     public float[] OldRotations = new float[5];
     public SpriteEffects Effects
@@ -414,7 +415,7 @@ public class ExampleSwingItem : ModItem
 public class ExampleSwing : BaseSwordSwing
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ImpureAstralKatanas);
-    public ref float HitRatio => ref ModdedProj.ExtraAI[7];
+    public ref float HitRatio => ref ProjInfo.ExtraAI[7];
 
     public override void Defaults()
     {
@@ -427,7 +428,7 @@ public class ExampleSwing : BaseSwordSwing
         after ??= new(8, () => Projectile.Center);
 
         // Reset arrays
-        after.afterimages = null;
+        after.Clear();
         old.Clear();
     }
 
@@ -451,8 +452,8 @@ public class ExampleSwing : BaseSwordSwing
         }
 
         // Create the trail if needed
-        if (trail == null || trail._disposed)
-            trail = new(Tip, WidthFunct, ColorFunct, (c) => Center.ToNumerics(), 15 * MaxUpdates);
+        if (trail == null || trail.Disposed)
+            trail = new(WidthFunct, ColorFunct, (c) => Center.ToNumerics(), 15 * MaxUpdates);
 
         // Update trails
         if (TimeStop <= 0f)
@@ -576,13 +577,12 @@ public class ExampleSwing : BaseSwordSwing
     }
 
     public OptimizedPrimitiveTrail trail;
-    public static readonly ITrailTip Tip = new RoundedTip(25);
     public FancyAfterimages after;
     public TrailPoints old = new(25);
 
     public static float WidthFunct(float c)
     {
-        return SmoothStep(1f, 0f, c) * 20f;
+        return OptimizedPrimitiveTrail.HemisphereWidthFunct(c, SmoothStep(1f, 0f, c) * 20f);
     }
 
     public Color ColorFunct(SystemVector2 c, Vector2 position)
@@ -625,7 +625,7 @@ public class ExampleSwing : BaseSwordSwing
             ManagedShader shader = ShaderRegistry.EnlightenedBeam;
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FlameMap2), 1);
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Cosmos), 2);
-            trail.DrawTippedTrail(shader, old.Points, Tip, true, 150, true);
+            trail.DrawTrail(shader, old.Points, 150, true);
         }
 
         // Do a little strike glow

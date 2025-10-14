@@ -1,9 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using System.IO;
+﻿using System.IO;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -35,7 +33,7 @@ public class GreekNapalm : ModProjectile, ILocalizedModType, IModType
         set => Projectile.ai[1] = value.ToInt();
     }
     public ref float Timer => ref Projectile.ai[2];
-    public ref float NPCID => ref Projectile.Additions().ExtraAI[0];
+    public ref float NPCID => ref Projectile.AdditionsInfo().ExtraAI[0];
     public Vector2 Offset;
     public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(Offset);
     public override void ReceiveExtraAI(BinaryReader reader) => Offset = reader.ReadVector2();
@@ -44,7 +42,6 @@ public class GreekNapalm : ModProjectile, ILocalizedModType, IModType
     {
         if (Timer == 0)
             NPCID = -1;
-
 
         float speed = Main.rand.NextFloat(1f, 12f) * completion;
         Vector2 vel = HitGround ? -Vector2.UnitY.RotatedByRandom(.45f) * speed : -Projectile.velocity.RotatedByRandom(.4f).SafeNormalize(Vector2.Zero) * speed;
@@ -82,16 +79,19 @@ public class GreekNapalm : ModProjectile, ILocalizedModType, IModType
         }
         Timer++;
     }
+
     public override bool OnTileCollide(Vector2 oldVelocity)
     {
         if (!HitGround)
             HitGround = true;
         return false;
     }
+
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
     {
         modifiers.FinalDamage *= completion;
     }
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         Projectile.tileCollide = false;

@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
-using Terraria.Audio;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
@@ -132,10 +131,10 @@ public class DuneProwler : ModNPC
             NPC.directionY = -1;
         }
 
-        bool forceJump = false; // Was 'flag' - seems to force a jump in some conditions, but unused in provided code except as or condition for ground checks
+        bool forceJump = false;
         Rectangle playerHitbox;
-        bool onGround = false; // Was 'flag5' - indicates if NPC is on solid ground
-        bool wasVelocityXZero = false; // Was 'flag6' - tracks if velocity.X was zero before justHit check
+        bool onGround = false;
+        bool wasVelocityXZero = false;
         if (NPC.velocity.X == 0f)
         {
             wasVelocityXZero = true;
@@ -145,18 +144,11 @@ public class DuneProwler : ModNPC
             wasVelocityXZero = false;
         }
 
-        int stuckTimerMax = 60; // Was 'num56' - maximum before considering stuck
-        bool shouldTurnAround = false; // Was 'flag7' - condition for turning direction
-        bool canOpenDoors = true; // Was 'flag8' - true if NPC can open doors; comment out and set to true for general use
-                                  // The following check sets canOpenDoors to false for many specific NPC types. Commenting out for a general NPC.
-                                  // if (NPC.type == 343 || NPC.type == 47 || ... || NPC.type == 631) { canOpenDoors = false; }
-
-        bool isSpecialTypeForStuckLogic = false; // Was 'flag9' - for types like 425, 471
-                                                 // if (NPC.type == 425 || NPC.type == 471) { isSpecialTypeForStuckLogic = true; }
-
-        bool useStuckDetection = true; // Was 'flag10' - enables stuck detection logic
-                                       // For general use, keep as true; comment if needed for specific types
-
+        int stuckTimerMax = 60;
+        bool shouldTurnAround = false;
+        bool canOpenDoors = true;
+        bool isSpecialTypeForStuckLogic = false;
+        bool useStuckDetection = true;
         if (!isSpecialTypeForStuckLogic && useStuckDetection)
         {
             if (NPC.velocity.Y == 0f && ((NPC.velocity.X > 0f && NPC.direction < 0) || (NPC.velocity.X < 0f && NPC.direction > 0)))
@@ -228,7 +220,7 @@ public class DuneProwler : ModNPC
                 NPC.direction = 1;
             }
         }
-        
+
         if (NPC.velocity.X < -MaxSpeed || NPC.velocity.X > MaxSpeed)
         {
             if (NPC.velocity.Y == 0f)

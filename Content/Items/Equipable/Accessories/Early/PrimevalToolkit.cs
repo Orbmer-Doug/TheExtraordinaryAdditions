@@ -1,7 +1,7 @@
 ﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Early;
 
@@ -15,8 +15,8 @@ public class PrimevalToolkit : ModItem
         Item.value = AdditionsGlobalItem.RarityLimeBuyPrice;
         Item.rare = ItemRarityID.Orange;
         Item.accessory = true;
-
     }
+
     public override void UpdateAccessory(Player player, bool hideVisual)
     {
         player.tileSpeed += 4;
@@ -48,6 +48,7 @@ public class PrimevalToolkit : ModItem
             player.runAcceleration *= .9f;
         }
     }
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();

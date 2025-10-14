@@ -1,5 +1,4 @@
 ﻿using Terraria;
-using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -30,7 +29,7 @@ public class PhoenixRound : ModProjectile
     {
         Projectile.FacingRight();
 
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunction, ColorFunction, null, 5);
 
         if (Main.rand.NextBool(7))
@@ -48,8 +47,9 @@ public class PhoenixRound : ModProjectile
 
     private float WidthFunction(float c)
     {
-        return Projectile.width * MathHelper.SmoothStep(2f, 0f, c) * Projectile.Opacity;
+        return OptimizedPrimitiveTrail.PyriformWidthFunct(c, Projectile.width * 2);
     }
+
     private Color ColorFunction(SystemVector2 c, Vector2 position)
     {
         return Color.OrangeRed * GetLerpBump(0f, .1f, .8f, .27f, c.X) * Projectile.Opacity;
@@ -61,7 +61,7 @@ public class PhoenixRound : ModProjectile
     {
         void draw()
         {
-            if (trail != null && !trail._disposed)
+            if (trail != null && !trail.Disposed && cache != null)
             {
                 ManagedShader shader = ShaderRegistry.FlameTrail;
                 shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FireNoise), 1);
@@ -75,7 +75,6 @@ public class PhoenixRound : ModProjectile
     public override void OnKill(int timeLeft)
     {
         Projectile.Opacity = 0f;
-        IEntitySource source = Projectile.GetSource_FromAI();
 
         SoundID.Item14.Play(Projectile.Center);
 

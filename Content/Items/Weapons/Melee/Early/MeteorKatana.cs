@@ -3,7 +3,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Early;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Early;
@@ -11,10 +11,6 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Early;
 public class MeteorKatana : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.MeteorKatana);
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(new Color(163, 133, 114));
-    }
 
     public override void SetDefaults()
     {
@@ -36,15 +32,18 @@ public class MeteorKatana : ModItem
         Item.crit = 15;
     }
 
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(new Color(163, 133, 114));
+    }
+
     public override bool CanShoot(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
 
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        {
-            recipe.AddIngredient(ItemID.Katana, 1);
-            recipe.AddIngredient(ItemID.MeteoriteBar, 16);
-        }
+        recipe.AddIngredient(ItemID.Katana, 1);
+        recipe.AddIngredient(ItemID.MeteoriteBar, 16);
         recipe.AddTile(TileID.Anvils);
         recipe.Register();
     }

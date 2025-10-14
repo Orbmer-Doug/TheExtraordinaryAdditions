@@ -23,14 +23,14 @@ public class CloudedCrater : Subworld
 
         public override void ApplyPass(GenerationProgress progress, GameConfiguration configuration)
         {
-            // Set the progress text.
+            // Set the progress text
             progress.Message = "Blasting a part of the world.";
 
-            // Define the position of the world lines.
+            // Define the position of the world lines
             Main.worldSurface = Main.maxTilesY - 8;
             Main.rockLayer = Main.maxTilesY - 9;
 
-            // Generate the crater.
+            // Generate the crater
             CloudedCraterWorldGen.Generate();
         }
     }
@@ -70,8 +70,6 @@ public class CloudedCrater : Subworld
     public override void DrawMenu(GameTime gameTime)
     {
         Texture2D pixel = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
-        if (!SubworldSystem.IsActive<CloudedCrater>())
-            pixel = AssetRegistry.GetTexture(AdditionsTexture.CloudedCraterBackground);
         Rectangle target = ToScreenTarget(Vector2.Zero, Main.ScreenSize.ToVector2());
         Main.spriteBatch.Draw(pixel, target, Color.White);
     }

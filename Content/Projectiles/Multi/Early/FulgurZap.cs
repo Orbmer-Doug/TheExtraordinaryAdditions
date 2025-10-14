@@ -1,4 +1,5 @@
-﻿using Terraria;
+﻿using System.IO;
+using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
@@ -24,13 +25,16 @@ public class FulgurZap : ModProjectile
         Projectile.localNPCHitCooldown = -1;
         Projectile.width = Projectile.height = 16;
     }
+
     public ref float Time => ref Projectile.ai[0];
     public Vector2 End { get; set; }
+    public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(End);
+    public override void ReceiveExtraAI(BinaryReader reader) => End = reader.ReadVector2();
     public float Completion => Animators.MakePoly(6f).OutFunction(InverseLerp(0f, Life, Time));
     public override bool ShouldUpdatePosition() => false;
     public override void AI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, null);
 
         if (Time == 0f)
@@ -53,7 +57,7 @@ public class FulgurZap : ModProjectile
 
     public float WidthFunct(float c) => 10f * Convert01To010(c) * Projectile.Opacity;
     public Color ColorFunct(SystemVector2 c, Vector2 pos) => MulticolorLerp(Completion, Color.White, Color.LightCyan, Color.Cyan, Color.DarkCyan) * Projectile.Opacity;
-    public ManualTrailPoints points;
+    public TrailPoints points;
     public OptimizedPrimitiveTrail trail;
     public override bool PreDraw(ref Color lightColor)
     {
@@ -67,7 +71,6 @@ public class FulgurZap : ModProjectile
             }
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
-
         return false;
     }
 }

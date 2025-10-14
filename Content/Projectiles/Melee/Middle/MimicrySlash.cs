@@ -56,7 +56,7 @@ public class MimicrySlash : BaseSwordSwing
             PlayedSound = true;
         }
 
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, (c) => Center.ToNumerics(), 15 * MaxUpdates);
 
         // Update trails

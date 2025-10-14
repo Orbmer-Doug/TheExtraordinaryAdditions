@@ -25,19 +25,19 @@ public class ExsanguinationProj : BaseWhip
         get => Projectile.ai[2] == 1f;
         set => Projectile.ai[2] = value.ToInt();
     }
-    public ref float ClickTimer => ref Projectile.Additions().ExtraAI[0];
+    public ref float ClickTimer => ref Projectile.AdditionsInfo().ExtraAI[0];
     public bool Embedded
     {
-        get => Projectile.Additions().ExtraAI[1] == 1f;
-        set => Projectile.Additions().ExtraAI[1] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[1] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[1] = value.ToInt();
     }
 
     public OptimizedPrimitiveTrail Line2;
     public NPC target;
-    public ref float SavedCompletion => ref Projectile.Additions().ExtraAI[2];
-    public ref float EmbedTime => ref Projectile.Additions().ExtraAI[3];
+    public ref float SavedCompletion => ref Projectile.AdditionsInfo().ExtraAI[2];
+    public ref float EmbedTime => ref Projectile.AdditionsInfo().ExtraAI[3];
 
-    public ref float LineBrightness => ref Projectile.Additions().ExtraAI[4];
+    public ref float LineBrightness => ref Projectile.AdditionsInfo().ExtraAI[4];
 
     public override bool? CanHitNPC(NPC target)
     {
@@ -49,7 +49,7 @@ public class ExsanguinationProj : BaseWhip
 
     public override void SafeAI()
     {
-        if (Line2 == null || Line2._disposed)
+        if (Line2 == null || Line2.Disposed)
             Line2 = new(LineWidth2, LineColor2, null, Samples);
 
         if (Time == 0f)
@@ -66,7 +66,7 @@ public class ExsanguinationProj : BaseWhip
             OverrideWhipPoints = true;
             PauseTimer = true;
 
-            if (ClickTimer <= 0 && Modded.MouseLeft.JustPressed)
+            if (ClickTimer <= 0 && Modded.MouseLeft.JustPressed && this.RunLocal())
             {
                 Projectile.ResetLocalNPCHitImmunity();
                 AbleToHit = true;
@@ -89,7 +89,7 @@ public class ExsanguinationProj : BaseWhip
         }
         else
         {
-            if (Completion.BetweenNum(.2f, .8f))
+            if (Completion.BetweenNum(.2f, .8f) && Projectile.numUpdates < 4)
             {
                 for (int i = 0; i < 2; i++)
                 {
@@ -123,9 +123,7 @@ public class ExsanguinationProj : BaseWhip
                 {
                     Vector2 cir = Main.rand.NextVector2Circular(12f, 12f);
                     if (i % 2f == 0f)
-                    {
                         ParticleRegistry.SpawnGlowParticle(pos, cir, Main.rand.Next(15, 25), Main.rand.NextFloat(20f, 50f), Color.Crimson);
-                    }
                     ParticleRegistry.SpawnBloodParticle(pos, cir, Main.rand.Next(30, 50), Main.rand.NextFloat(.7f, 1f), Color.Crimson);
                 }
             }

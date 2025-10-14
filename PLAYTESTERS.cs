@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Items.Tools;
 using TheExtraordinaryAdditions.Content.NPCs.Misc;
 
 namespace TheExtraordinaryAdditions;
@@ -104,5 +104,16 @@ public class BossTimes : GlobalNPC
 
         watch?.Restart();
         watch = null;
+    }
+
+    public override bool PreDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
+    {
+        if (watch != null)
+        {
+            string content = $"{watch.Elapsed.Minutes}:{watch.Elapsed.Seconds}:{watch.Elapsed.Milliseconds}";
+            //Utility.DrawText(spriteBatch, content, 2, Main.LocalPlayer.Center - Vector2.UnitY * 200f - Main.screenPosition,
+            //  Color.White, Color.Black, new(ChatManager.GetStringSize(FontAssets.MouseText.Value, content, Vector2.One).X / 2, 0f), 1f);
+        }
+        return base.PreDraw(npc, spriteBatch, screenPos, drawColor);
     }
 }

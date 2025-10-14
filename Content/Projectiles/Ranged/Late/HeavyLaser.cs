@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.IO;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -43,18 +43,20 @@ public class HeavyLaser : ModProjectile
         get => Projectile.ai[2] == 1f;
         set => Projectile.ai[2] = value.ToInt();
     }
-    public ref float LaserExpansion => ref Projectile.Additions().ExtraAI[0];
+    public ref float LaserExpansion => ref Projectile.AdditionsInfo().ExtraAI[0];
     public Vector2 Start => Projectile.Center;
     public Vector2 End;
+    public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(End);
+    public override void ReceiveExtraAI(BinaryReader reader) => End = reader.ReadVector2();
     public override void AI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, null, 90);
 
         Projectile.scale = Convert01To010(Utils.GetLerpValue(0f, Lifetime, Time, true));
         Projectile.velocity = Projectile.velocity.SafeNormalize(Vector2.Zero);
 
-            Vector2 expected = Start + Projectile.velocity * LaserLength;
+        Vector2 expected = Start + Projectile.velocity * LaserLength;
 
         if (!HitSomething)
         {
@@ -81,9 +83,11 @@ public class HeavyLaser : ModProjectile
 
             ScreenShakeSystem.New(new(.4f, .2f), End);
             AdditionsSound.etherealSlam.Play(End, .8f, -.35f, .1f, 8);
-            Projectile.CreateFriendlyExplosion(End, new(150), Projectile.damage, Projectile.knockBack, 10, 10);
+            if (this.RunLocal())
+                Projectile.CreateFriendlyExplosion(End, new(150), Projectile.damage, Projectile.knockBack, 10, 10);
 
             HitSomething = true;
+            Projectile.netUpdate = true;
         }
 
         trailPoints.SetPoints(Start.GetLaserControlPoints(End, 90));
@@ -99,11 +103,10 @@ public class HeavyLaser : ModProjectile
     }
 
     public OptimizedPrimitiveTrail trail;
-    public ManualTrailPoints trailPoints = new(90);
+    public TrailPoints trailPoints = new(90);
     public float WidthFunct(float c)
     {
-        float tipInterpolant = MathF.Sqrt(1f - Animators.MakePoly(4f).InFunction(InverseLerp(0.2f, 0f, 1f - c)));
-        return tipInterpolant * Projectile.scale * Projectile.width;
+        return OptimizedPrimitiveTrail.HemisphereWidthFunct(1f - c, Projectile.scale * Projectile.width, 4f, .2f);
     }
     public Color ColorFunct(SystemVector2 c, Vector2 position)
     {

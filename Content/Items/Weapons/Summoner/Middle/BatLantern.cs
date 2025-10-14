@@ -1,12 +1,11 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Summon;
 using TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Middle;
@@ -14,16 +13,14 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Middle;
 public class BatLantern : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BatLantern);
+
     public override void SetStaticDefaults()
     {
         // DisplayName.SetDefault("Midnight Bat Caller");
         // Tooltip.SetDefault("Calls in Midnight Bats. Effected by mage and summon damage");
         ItemID.Sets.LockOnIgnoresCollision[Item.type] = true;
     }
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(new Color(102, 37, 11));
-    }
+
     public override void SetDefaults()
     {
         Item.damage = 45;
@@ -44,6 +41,11 @@ public class BatLantern : ModItem
         Item.autoReuse = true;
     }
 
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(new Color(102, 37, 11));
+    }
+
     public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
     {
         position = Main.MouseWorld;
@@ -52,12 +54,11 @@ public class BatLantern : ModItem
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
         player.AddBuff(Item.buffType, 2);
-
         var projectile = Projectile.NewProjectileDirect(source, position, velocity, type, damage, knockback, Main.myPlayer);
         projectile.originalDamage = Item.damage;
-
         return false;
     }
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();

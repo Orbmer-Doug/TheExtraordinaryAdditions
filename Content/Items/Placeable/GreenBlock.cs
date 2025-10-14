@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -11,6 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Placeable;
 public class GreenBlock : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GreenBlock);
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(new Color(32, 117, 29));
@@ -37,10 +37,10 @@ public class GreenBlock : ModItem
     }
 
     public override void ExtractinatorUse(int extractinatorBlockType, ref int resultType, ref int resultStack)
-    { 
+    {
         if (Main.rand.NextBool(3))
         {
-            resultType = ItemID.GrassSeeds; 
+            resultType = ItemID.GrassSeeds;
             if (Main.rand.NextBool(5))
             {
                 resultStack += Main.rand.Next(2);

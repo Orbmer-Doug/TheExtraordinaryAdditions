@@ -1,23 +1,16 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
-using Terraria.ID;
+﻿using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Assets;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Content.Buffs.Debuff;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
+// p
 public class AntiBulletp : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AntiBulletp);
-    public override void SetStaticDefaults()
-    {
 
-    }
     public override void SetDefaults()
     {
         Projectile.width = 38;
@@ -33,13 +26,6 @@ public class AntiBulletp : ModProjectile
     }
 
     public ref float Time => ref Projectile.ai[0];
-    public FancyAfterimages after;
-    public override bool PreDraw(ref Color lightColor)
-    {
-        after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [Color.White, Color.OrangeRed, Color.Chocolate], Projectile.Opacity);
-        Projectile.DrawBaseProjectile(Color.White);
-        return false;
-    }
 
     public override void AI()
     {
@@ -74,7 +60,7 @@ public class AntiBulletp : ModProjectile
             ParticleRegistry.SpawnSparkParticle(pos, vel, life, scale, col);
 
             // Fly off shrapnel
-            if (Main.rand.NextBool(2))
+            if (Main.rand.NextBool(2) && this.RunLocal())
             {
                 Projectile.NewProj(pos, vel, ModContent.ProjectileType<AntiBulletShrapnel>(), (int)(Projectile.damage * .33f), 0f, Projectile.owner);
             }
@@ -85,5 +71,13 @@ public class AntiBulletp : ModProjectile
         // be balanced
         if (Projectile.damage > 500)
             Projectile.damage = (int)(Projectile.damage * 0.8f);
+    }
+    
+    public FancyAfterimages after;
+    public override bool PreDraw(ref Color lightColor)
+    {
+        after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [Color.White, Color.OrangeRed, Color.Chocolate], Projectile.Opacity);
+        Projectile.DrawBaseProjectile(Color.White);
+        return false;
     }
 }

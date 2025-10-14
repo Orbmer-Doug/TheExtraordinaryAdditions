@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.IO;
 using Terraria;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Core.DataStructures;
@@ -19,6 +20,7 @@ public class GodPiercingDart : ProjOwnedByNPC<Asterlin>
         get => (int)Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
+
     public bool ExtendedTelegraph
     {
         get => Projectile.ai[1] == 1f;
@@ -43,13 +45,17 @@ public class GodPiercingDart : ProjOwnedByNPC<Asterlin>
         CooldownSlot = ImmunityCooldownID.Bosses;
     }
 
+    public override void SendAI(BinaryWriter writer) => writer.Write((int)Projectile.extraUpdates);
+
+    public override void ReceiveAI(BinaryReader reader) => Projectile.extraUpdates = (int)reader.ReadInt32();
+
     public const float Supersonic = 34f;
     public override void SafeAI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(TrailWidthFunction, TrailColorFunction, null, 20);
 
-        if (tele == null || tele._disposed)
+        if (tele == null || tele.Disposed)
             tele = new(TelegraphWidthFunction, TelegraphColorFunction, null, 30);
 
         Projectile.velocity *= 1.016f;
@@ -73,30 +79,18 @@ public class GodPiercingDart : ProjOwnedByNPC<Asterlin>
                 ParticleRegistry.SpawnHeavySmokeParticle(start, vel, Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .6f), Color.Cyan.Lerp(Color.DarkCyan, Main.rand.NextFloat(0f, .4f)));
                 ParticleRegistry.SpawnBloomLineParticle(start, vel, Main.rand.Next(40, 50), Main.rand.NextFloat(.2f, .4f), Color.Cyan);
             }
-            //vec = Projectile.Center.SafeDirectionTo(Target.Center);
+
             AdditionsSound.explo04.Play(start, .7f, .2f);
             Projectile.timeLeft = 800;
         }
         else if (Time > Supersonic)
         {
-            Projectile.extraUpdates = 8;
+            if (Projectile.extraUpdates != 8)
+            {
+                Projectile.extraUpdates = 8;
+                this.Sync();
+            }
 
-            /* if enchanted ones are staying in, give them the homing property
-            float speed = 10f;
-            float amt = .03f;
-            if (Main.expertMode)
-            {
-                amt = .015f;
-                speed = 7f;
-            }
-            if (Main.masterMode)
-            {
-                amt = .01f;
-                speed = 4f;
-            }
-            amt /= Projectile.MaxUpdates;
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, vec * speed, amt);
-            */
             points.Update(Projectile.RotHitbox().Top);
         }
         Time++;
@@ -142,7 +136,7 @@ public class GodPiercingDart : ProjOwnedByNPC<Asterlin>
     public OptimizedPrimitiveTrail trail;
     public OptimizedPrimitiveTrail tele;
     public TrailPoints points = new(20);
-    public ManualTrailPoints telePoints = new(30);
+    public TrailPoints telePoints = new(30);
 
     public override bool PreDraw(ref Color lightColor)
     {

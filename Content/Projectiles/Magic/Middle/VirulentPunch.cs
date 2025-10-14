@@ -1,10 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using System;
-using Terraria;
+﻿using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
 
@@ -40,7 +35,7 @@ public class VirulentPunch : ModProjectile, ILocalizedModType, IModType
             for (int i = 0; i < 12; i++)
             {
                 ParticleRegistry.SpawnMistParticle(Projectile.Center, Main.rand.NextVector2Circular(10f, 10f), Main.rand.NextFloat(0.85f, 1.3f), Color.LimeGreen, Color.DarkGreen, Main.rand.NextFloat(120f, 190f));
-                
+
                 for (int j = 0; j < 4; j++)
                     ParticleRegistry.SpawnDustParticle(Projectile.Center, Main.rand.NextVector2Circular(30f, 30f), Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .9f), Color.LawnGreen, Main.rand.NextFloat(-.1f, .1f), false, true, true, false);
             }

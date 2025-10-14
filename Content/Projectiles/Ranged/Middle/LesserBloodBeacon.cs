@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.IO;
 using Terraria;
@@ -8,7 +7,6 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
-using TheExtraordinaryAdditions.Core.Interfaces;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
@@ -16,14 +14,9 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 public class LesserBloodBeacon : ModProjectile
 {
     public Vector2 Start;
-    public override void SendExtraAI(BinaryWriter writer)
-    {
-        writer.WriteVector2(Start);
-    }
-    public override void ReceiveExtraAI(BinaryReader reader)
-    {
-        Start = reader.ReadVector2();
-    }
+    public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(Start);
+    public override void ReceiveExtraAI(BinaryReader reader) => Start = reader.ReadVector2();
+    
     public const int Lifetime = 60;
     public ref float Time => ref Projectile.ai[0];
 
@@ -48,9 +41,9 @@ public class LesserBloodBeacon : ModProjectile
 
     public override void AI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunction, ColorFunction, null, 24);
-        if (trail2 == null || trail2._disposed)
+        if (trail2 == null || trail2.Disposed)
             trail2 = new(AltWidthFunction, AltColorFunction, null, 24);
 
         if (Time == 0f)
@@ -86,7 +79,7 @@ public class LesserBloodBeacon : ModProjectile
     {
         void draw()
         {
-            if (trail == null || trail2 == null || trail._disposed || trail2._disposed || cache == null)
+            if (trail == null || trail2 == null || trail.Disposed || trail2.Disposed || cache == null)
                 return;
 
             ManagedShader shader = ShaderRegistry.BloodBeacon;

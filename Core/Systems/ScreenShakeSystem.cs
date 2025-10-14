@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Terraria;
@@ -13,26 +12,25 @@ namespace TheExtraordinaryAdditions.Core.Systems;
 
 // Main source and copyright belongs to Mirsario & Contributors in Terraria Overhaul
 // https://github.com/Mirsario/TerrariaOverhaul/blob/dev/Common/Camera/
-public struct ScreenShake
+
+public readonly struct ScreenShake
 {
     public delegate float PowerDelegate(float progress);
-
     public const float DefaultRange = 1024f;
 
-    public float Power = 0.5f;
-    public PowerDelegate? PowerFunction;
-    public float LengthInSeconds = 0.5f;
-    public float Range = DefaultRange;
-    public string? UniqueId;
+    public readonly float Power;
+    public readonly PowerDelegate? PowerFunction;
+    public readonly float LengthInSeconds;
+    public readonly float Range;
 
-    public ScreenShake(PowerDelegate powerFunction, float lengthInSeconds, float range = DefaultRange) : this()
+    public ScreenShake(PowerDelegate powerFunction, float lengthInSeconds = .5f, float range = DefaultRange) : this()
     {
         PowerFunction = powerFunction;
         LengthInSeconds = lengthInSeconds;
         Range = range;
     }
 
-    public ScreenShake(float power, float lengthInSeconds, float range = DefaultRange) : this()
+    public ScreenShake(float power, float lengthInSeconds = .5f, float range = DefaultRange) : this()
     {
         Power = power;
         LengthInSeconds = lengthInSeconds;
@@ -43,12 +41,20 @@ public struct ScreenShake
 [Autoload(Side = ModSide.Client)]
 public sealed class ScreenShakeSystem : ModSystem
 {
-    private struct ScreenShakeInstance
+    public readonly struct ScreenShakeInstance
     {
-        public float StartTime;
-        public float EndTime;
-        public Vector2? Position;
-        public ScreenShake Style;
+        public readonly ScreenShake Style;
+        public readonly Vector2? Position;
+        public readonly float StartTime;
+        public readonly float EndTime;
+
+        public ScreenShakeInstance(ScreenShake style, Vector2? position)
+        {
+            Style = style;
+            Position = position;
+            StartTime = TimeSystem.RenderTime;
+            EndTime = StartTime + style.LengthInSeconds;
+        }
 
         public readonly float TimeLeft => MathF.Max(0f, EndTime - TimeSystem.RenderTime);
         public readonly float Progress => Style.LengthInSeconds > 0f ? MathHelper.Clamp((TimeSystem.RenderTime - StartTime) / Style.LengthInSeconds, 0f, 1f) : 1f;
@@ -66,9 +72,6 @@ public sealed class ScreenShakeSystem : ModSystem
 
         CameraSystem.RegisterCameraModifier(1, innerAction =>
         {
-            // Because this modifier runs very early (to not get smoothed out), it has to undo its previous frame's offset
-            // For the camera smoothing system to also not pick it up.
-
             innerAction();
 
             if (Main.gameMenu)
@@ -96,7 +99,6 @@ public sealed class ScreenShakeSystem : ModSystem
         static float GetValueWithSeed(int seed, float x)
         {
             noise!.SetSeed(seed);
-
             return noise!.GetNoise(x, 0f);
         }
 
@@ -108,14 +110,14 @@ public sealed class ScreenShakeSystem : ModSystem
         noise.SetFrequency(FrequencyScale);
         noise.SetNoiseType(FastNoiseLite.NoiseType.Perlin);
 
-        var result = new Vector2(
+        Vector2 result = new(
             GetValueWithSeed(420, time),
             GetValueWithSeed(1337, time)
         );
 
         float length = result.Length();
 
-        result = length <= 1f ? result : result / length;
+        result = length <= 1f ? result : result / length; // Normalize
 
         return result;
     }
@@ -135,9 +137,7 @@ public sealed class ScreenShakeSystem : ModSystem
             float intensity;
 
             if (style.PowerFunction != null)
-            {
                 intensity = MathHelper.Clamp(style.PowerFunction(progress), 0f, 1f);
-            }
             else
             {
                 intensity = MathHelper.Clamp(style.Power, 0f, 1f);
@@ -149,10 +149,9 @@ public sealed class ScreenShakeSystem : ModSystem
                 float distance = Vector2.Distance(instance.Position.Value, point);
                 float distanceFactor = 1f - Math.Min(1f, distance / style.Range);
 
-                intensity *= MathF.Pow(distanceFactor, 2f); // Exponential 
+                intensity *= MathF.Pow(distanceFactor, 2f);
             }
 
-            //power += maxPower * (1f - progress);
             power = MathF.Max(power, intensity);
         }
 
@@ -162,24 +161,8 @@ public sealed class ScreenShakeSystem : ModSystem
     public static void New(ScreenShake style, Vector2? position)
     {
         if (Main.dedServ)
-        {
             return;
-        }
-
-        ScreenShakeInstance instance;
-        instance.Style = style;
-        instance.Position = position;
-        instance.StartTime = TimeSystem.RenderTime;
-        instance.EndTime = instance.StartTime + style.LengthInSeconds;
-        string? uniqueId = style.UniqueId;
-
-        if (uniqueId != null && screenShakes.FindIndex(i => i.Style.UniqueId == uniqueId) is (>= 0 and int index))
-        {
-            screenShakes[index] = instance;
-            return;
-        }
-
-        screenShakes.Add(instance);
+        screenShakes.Add(new(style, position));
     }
 
     private static Span<ScreenShakeInstance> EnumerateScreenShakes()

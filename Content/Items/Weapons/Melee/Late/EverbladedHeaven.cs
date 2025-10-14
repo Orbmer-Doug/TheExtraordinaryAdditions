@@ -8,6 +8,7 @@ using TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Late.Everbladed;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
@@ -23,16 +24,11 @@ public class EverbladedHeaven : ModItem
         Main.RegisterItemAnimation(Item.type, new DrawAnimationVertical(5, 6, false));
     }
 
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(Color.Crimson);
-    }
-
     public override void SetDefaults()
     {
         Item.useStyle = ItemUseStyleID.Swing;
         Item.useTime = Item.useAnimation = 60;
-        Item.damage = 7740;
+        Item.damage = 3340;
         Item.knockBack = 4.5f;
         Item.width = 214;
         Item.height = 200;
@@ -45,6 +41,11 @@ public class EverbladedHeaven : ModItem
         Item.noMelee = true;
         Item.noUseGraphic = true;
         Item.autoReuse = true;
+    }
+
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(Color.Crimson);
     }
 
     public override bool CanShoot(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;

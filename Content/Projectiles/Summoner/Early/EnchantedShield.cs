@@ -1,11 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System.IO;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Content.Buffs.Summon;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -52,49 +49,34 @@ public class EnchantedShield : ModProjectile
     public override bool? CanCutTiles() => false;
 
     public ref float Timer => ref Projectile.ai[0];
-    public ref float Counter => ref Projectile.ai[1];
-    public ref float State => ref Projectile.ai[2];
+    public ref float State => ref Projectile.ai[1];
     public bool HasHitTarget
     {
-        get => Projectile.Additions().ExtraAI[0] == 1f;
-        set => Projectile.Additions().ExtraAI[0] = value.ToInt();
+        get => Projectile.ai[2] == 1f;
+        set => Projectile.ai[2] = value.ToInt();
     }
-
-    public ref float AltCounter => ref Projectile.Additions().ExtraAI[1];
-
-    private bool sound;
-    private bool Init;
+    public ref float Counter => ref Projectile.AdditionsInfo().ExtraAI[0];
+    public bool PlayedSound
+    {
+        get => Projectile.AdditionsInfo().ExtraAI[1] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[1] = value.ToInt();
+    }
+    public bool Init
+    {
+        get => Projectile.AdditionsInfo().ExtraAI[2] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[2] = value.ToInt();
+    }
 
     private bool CheckActive()
     {
         if (Owner.dead || !Owner.active)
         {
             Owner.ClearBuff(ModContent.BuffType<FlockOfShields>());
-
             return false;
         }
-
         if (Owner.HasBuff(ModContent.BuffType<FlockOfShields>()))
-        {
             Projectile.timeLeft = 2;
-        }
-
         return true;
-    }
-
-    public override void SendExtraAI(BinaryWriter writer)
-    {
-        writer.Write(Init);
-        writer.Write(sound);
-        writer.Write(HasHitTarget);
-        writer.Write(AltCounter);
-    }
-    public override void ReceiveExtraAI(BinaryReader reader)
-    {
-        Init = reader.ReadBoolean();
-        sound = reader.ReadBoolean();
-        HasHitTarget = reader.ReadBoolean();
-        AltCounter = reader.ReadSingle();
     }
 
     public override void AI()
@@ -106,6 +88,7 @@ public class EnchantedShield : ModProjectile
             Projectile.damage = Owner.HeldItem.damage;
             Projectile.netUpdate = true;
             Init = true;
+            this.Sync();
         }
 
         if (!CheckActive())
@@ -115,17 +98,13 @@ public class EnchantedShield : ModProjectile
         after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 255));
 
         if (Target != null)
-        {
             Charge();
-        }
         else
-        {
             Hover();
-        }
 
-        Projectile.active = true;
         Projectile.ProjAntiClump(.19f);
     }
+
     private void Hover()
     {
         // Keep everything at zero assuming there is no enemy to attack
@@ -145,7 +124,7 @@ public class EnchantedShield : ModProjectile
         }
         else if (!Projectile.WithinRange(origin, 160f))
         {
-            Projectile.velocity = (Projectile.velocity * 37f + ((Entity)(object)this.Projectile).SafeDirectionTo(origin) * 17f) / 40f;
+            Projectile.velocity = (Projectile.velocity * 37f + Projectile.SafeDirectionTo(origin) * 17f) / 40f;
         }
         if (!Projectile.WithinRange(origin, 1200f))
         {
@@ -155,27 +134,22 @@ public class EnchantedShield : ModProjectile
 
         Projectile.rotation = Projectile.velocity.ToRotation();
     }
+
     private void Charge()
     {
         // Make it not fly into oblivion if it didn't manage to hit something
         float dist = Projectile.Distance(Owner.Center);
-
-        // Slow down
-        if (dist > Main.screenWidth)
-        {
-            Projectile.velocity *= .985f;
-        }
-        // Got too far and reset
         if (dist > 1600f)
         {
             State = 0f;
             HasHitTarget = false;
             Projectile.Center = Owner.Center;
+            this.Sync();
         }
 
         // Variables
         float speed = 28f;
-        float distance = DistanceToTiles(40);
+        float distance = Target.Size.Length() + 100;
         float rot = .97f;
         rot = MathHelper.Pi;
         Vector2 spawnOffset = Vector2.UnitY.RotatedBy(MathHelper.Lerp(-rot, rot, Projectile.whoAmI % 16f / 16f)) * distance;
@@ -191,7 +165,7 @@ public class EnchantedShield : ModProjectile
         // Hover to the target
         if (State == 0f)
         {
-            sound = false;
+            PlayedSound = false;
             Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(destination) * speed, 0.11f);
             if (Projectile.WithinRange(destination, Projectile.velocity.Length() * 1.35f))
             {
@@ -229,20 +203,20 @@ public class EnchantedShield : ModProjectile
             if (HasHitTarget == true)
             {
                 Projectile.velocity *= .95f;
-                AltCounter++;
-                if (AltCounter > ReelBackTime * 2f)
+                Counter++;
+                if (Counter > ReelBackTime)
                 {
                     HasHitTarget = false;
-                    AltCounter = 0f;
+                    Counter = 0f;
                     State = 0f;
                 }
             }
 
             // Play the sound once
-            if (sound == false)
+            if (PlayedSound == false)
             {
                 SoundID.DD2_WyvernDiveDown.Play(Projectile.Center, 1.2f, 0f, .1f, null, 10, Name);
-                sound = true;
+                PlayedSound = true;
             }
         }
     }
@@ -287,12 +261,10 @@ public class EnchantedShield : ModProjectile
             float interpol = Convert01To010(Timer / ReelBackTime);
             Projectile.DrawProjectileBackglow(Color.Tan, interpol * 10f, 90, 12);
         }
+
         Main.EntitySpriteDraw(texture, drawPosition, frame, Projectile.GetAlpha(Color.White), Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, 0, 0);
         if (State == 2f && HasHitTarget == false)
-        {
-            // Afterimage charge
             after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [lightColor], Projectile.Opacity);
-        }
         return false;
     }
 }

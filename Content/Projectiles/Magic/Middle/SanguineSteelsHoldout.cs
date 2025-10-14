@@ -17,7 +17,7 @@ public class SanguineSteelsHoldout : BaseHoldoutProjectile
     public ref float Time => ref Projectile.ai[0];
     public ref float Wait => ref Projectile.ai[1];
     public ref float PortalDist => ref Projectile.ai[2];
-    public ref float Fade => ref Projectile.Additions().ExtraAI[0];
+    public ref float Fade => ref Projectile.AdditionsInfo().ExtraAI[0];
 
     public const int WaitTime = 8;
     public const float Length = 99f;
@@ -70,17 +70,20 @@ public class SanguineSteelsHoldout : BaseHoldoutProjectile
 
             if (!Collision.SolidCollision(pos, 20, 20))
             {
-                Vector2 vel = pos.SafeDirectionTo((Center + Projectile.velocity * 100f) + rand);
-                Projectile.NewProj(pos, vel * 10f, ModContent.ProjectileType<SanguineLance>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
-
-                for (int i = 0; i < 20; i++)
+                if (TryUseMana())
                 {
-                    ParticleRegistry.SpawnHeavySmokeParticle(pos, vel.RotatedByRandom(.2f) * Main.rand.NextFloat(4f, 8f),
-                        Main.rand.Next(30, 50), Main.rand.NextFloat(.4f, .7f), Color.DarkRed, Main.rand.NextFloat(.2f, .3f));
-                }
-                SoundID.Item60.Play(pos, .6f, -.1f, 0f, null, 20, Name);
+                    Vector2 vel = pos.SafeDirectionTo((Center + Projectile.velocity * 100f) + rand);
+                    Projectile.NewProj(pos, vel * 10f, ModContent.ProjectileType<SanguineLance>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
 
-                Wait = WaitTime;
+                    for (int i = 0; i < 20; i++)
+                    {
+                        ParticleRegistry.SpawnHeavySmokeParticle(pos, vel.RotatedByRandom(.2f) * Main.rand.NextFloat(4f, 8f),
+                            Main.rand.Next(30, 50), Main.rand.NextFloat(.4f, .7f), Color.DarkRed, Main.rand.NextFloat(.2f, .3f));
+                    }
+                    SoundID.Item60.Play(pos, .6f, -.1f, 0f, null, 20, Name);
+
+                    Wait = WaitTime;
+                }
             }
         }
 
@@ -108,7 +111,7 @@ public class SanguineSteelsHoldout : BaseHoldoutProjectile
             null, Color.Crimson * .18f * Projectile.Opacity, Projectile.rotation - MathHelper.PiOver4, portal.Size() / 2);
 
         portal = AssetRegistry.GetTexture(AdditionsTexture.UnfathomablePortal);
-        
+
         Main.spriteBatch.DrawBetterRect(portal, ToTarget(Projectile.Center - PolarVector(PortalDist, Projectile.rotation - MathHelper.PiOver4), new Vector2(100f, 200f)),
             null, Color.DarkRed * Projectile.Opacity, Projectile.rotation - MathHelper.PiOver4, portal.Size() / 2);
 

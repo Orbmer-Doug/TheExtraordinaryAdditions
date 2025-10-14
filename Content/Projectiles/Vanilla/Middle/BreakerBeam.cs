@@ -16,7 +16,7 @@ public class BreakerBeam : ModProjectile
 
     public override void SetDefaults()
     {
-        Projectile.width = 50;
+        Projectile.width = 40;
         Projectile.height = 100;
         Projectile.tileCollide = Projectile.friendly = Projectile.noEnchantmentVisuals = Projectile.ignoreWater = true;
         Projectile.hostile = false;
@@ -39,24 +39,18 @@ public class BreakerBeam : ModProjectile
     }
     public bool Special
     {
-        get => Projectile.Additions().ExtraAI[0] == 1f;
-        set => Projectile.Additions().ExtraAI[0] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[0] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
     public float Direction => Projectile.rotation + MathHelper.PiOver2;
     public Color Color => Special ? new Color(163, 222, 250) : new Color(85, 237, 71);
-    private Vector2 savedPos;
     private const float TotalDist = 1100f;
+
+    private Vector2 savedPos;
     public float CurrentDist => Projectile.Center.Distance(savedPos);
 
-    public override void SendExtraAI(BinaryWriter writer)
-    {
-        writer.WriteVector2(savedPos);
-    }
-
-    public override void ReceiveExtraAI(BinaryReader reader)
-    {
-        savedPos = reader.ReadVector2();
-    }
+    public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(savedPos);
+    public override void ReceiveExtraAI(BinaryReader reader) => savedPos = reader.ReadVector2();
 
     public override void AI()
     {
@@ -69,7 +63,7 @@ public class BreakerBeam : ModProjectile
         if (Grounded)
             Projectile.tileCollide = false;
 
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, null, MaxPoints);
 
         Vector2 samplePos = Projectile.direction == -1 ? Projectile.RotHitbox().Right : Projectile.RotHitbox().Left;
@@ -141,7 +135,7 @@ public class BreakerBeam : ModProjectile
         }
         ParticleRegistry.SpawnTwinkleParticle(Projectile.Center + norm * 20f, Vector2.Zero, 20, new(Main.rand.NextFloat(.9f, 1.4f)), Color * 1.5f, 8, default, RandomRotation());
 
-        if (Special)
+        if (Special && this.RunLocal())
             Projectile.NewProj(Projectile.Center + norm * 10f, Vector2.Zero, ModContent.ProjectileType<BreakerStorm>(), Projectile.damage, Projectile.knockBack * 2, Projectile.owner);
 
         AdditionsSound.BreakerStorm.Play(Projectile.Center, .5f, -.2f);
@@ -151,8 +145,8 @@ public class BreakerBeam : ModProjectile
 
     public const int MaxPoints = 20;
     public OptimizedPrimitiveTrail trail;
-    public ManualTrailPoints slashPoints = new(MaxPoints);
-    public float WidthFunct(float c) => Convert01To010(c) * Projectile.scale * Projectile.Opacity * Projectile.width;
+    public TrailPoints slashPoints = new(MaxPoints);
+    public float WidthFunct(float c) => Convert01To010(c) * Projectile.scale * Projectile.Opacity * Projectile.width / 2;
     public Color ColorFunct(SystemVector2 c, Vector2 pos) => Color * Projectile.Opacity;
     public override bool PreDrawExtras()
     {
@@ -161,7 +155,7 @@ public class BreakerBeam : ModProjectile
             if (trail == null || slashPoints == null)
                 return;
 
-            ManagedShader shader = ShaderRegistry.SpecialLightningTrail;
+            ManagedShader shader = ShaderRegistry.FireTrail;
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.SuperWavyPerlin), 1, SamplerState.LinearWrap);
             trail.DrawTrail(shader, slashPoints.Points, -1, true);
         }

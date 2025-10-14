@@ -2,11 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 using Terraria.ID;
-using TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -167,7 +164,7 @@ public class AuroraGuardLeg : Entity
             StepEffectForce = 0f;
             FallTime = 0f;
 
-            // Tick down the step timer (Controls the small ground stab motion when it finishes a new step)
+            // Tick down the step timer (controls the small ground stab motion when it finishes a new step)
             StepTimer -= 1 / (60f * 0.3f);
             if (StepTimer < 0)
                 StepTimer = 0;

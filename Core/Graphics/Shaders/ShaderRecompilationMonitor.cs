@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -46,6 +45,9 @@ public sealed class ShaderRecompilationMonitor : ModSystem
 
     public override void PostUpdateEverything()
     {
+        if (Main.netMode != NetmodeID.SinglePlayer)
+            return;
+
         if (BurstDetected)
         {
             // Skip processing if a burst was detected

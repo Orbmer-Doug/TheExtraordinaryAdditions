@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Terraria;
 using Terraria.DataStructures;
@@ -9,6 +8,19 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 
 namespace TheExtraordinaryAdditions.Core.Graphics;
+
+public enum DrawLayer
+{
+    BeforeTiles,
+    AfterTiles,
+    BeforeNPCs,
+    AfterNPCs,
+    BeforeProjectiles,
+    AfterProjectiles,
+    BeforePlayers,
+    AfterPlayers,
+    Dusts,
+}
 
 [Autoload(Side = ModSide.Client)]
 public class LayeredDrawSystem : ModSystem
@@ -26,9 +38,7 @@ public class LayeredDrawSystem : ModSystem
             On_PlayerDrawLayers.DrawHeldProj += DrawLayer_HeldProj;
 
             foreach (PixelationLayer layer in Enum.GetValues(typeof(PixelationLayer)))
-            {
-                DrawActionsByLayer[layer] = new List<DrawAction>(DrawActionPool.InitialCapacity / 2);
-            }
+                DrawActionsByLayer[layer] = new List<DrawAction>(PixelationSystem.InitialCapacity / 2);
         });
     }
 
@@ -42,12 +52,8 @@ public class LayeredDrawSystem : ModSystem
             On_Main.DrawDust -= DrawLayer_Dusts;
             On_PlayerDrawLayers.DrawHeldProj -= DrawLayer_HeldProj;
 
-            foreach (var actions in DrawActionsByLayer.Values)
-            {
-                foreach (var action in actions)
-                    DrawActionPool.Return();
+            foreach (List<DrawAction> actions in DrawActionsByLayer.Values)
                 actions.Clear();
-            }
             DrawActionsByLayer.Clear();
         });
     }
@@ -87,7 +93,7 @@ public class LayeredDrawSystem : ModSystem
 
     private static void DrawLayer(PixelationLayer layer, bool endSB = false)
     {
-        var actions = DrawActionsByLayer[layer];
+        List<DrawAction> actions = DrawActionsByLayer[layer];
         if (actions.Count == 0)
             return;
 
@@ -96,15 +102,15 @@ public class LayeredDrawSystem : ModSystem
 
         DrawActionGrouper.GroupByBlendAndGroupId(actionSpan, [], (blend, groupGroups) =>
         {
-            foreach (var groupEntry in groupGroups)
+            foreach (KeyValuePair<string, List<DrawAction>> groupEntry in groupGroups)
             {
-                object groupId = groupEntry.Key;
+                string groupId = groupEntry.Key;
                 List<DrawAction> groupActions = groupEntry.Value;
 
                 if (groupId == DrawActionGrouper.UngroupedKey)
                 {
                     // Ungrouped: each action gets its own batch to respect shader parameters
-                    foreach (var action in groupActions)
+                    foreach (DrawAction action in groupActions)
                     {
                         if (action.RenderAction == null)
                             continue;
@@ -124,7 +130,7 @@ public class LayeredDrawSystem : ModSystem
                 else if (groupActions.Count == 1)
                 {
                     // Single grouped action: treat like ungrouped for safety
-                    var action = groupActions[0];
+                    DrawAction action = groupActions[0];
                     if (action.RenderAction == null)
                         continue;
 
@@ -147,7 +153,7 @@ public class LayeredDrawSystem : ModSystem
 
                     ManagedShader sharedShader = groupActions[0].Shader;
                     sb.Begin(SpriteSortMode.Deferred, blend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, sharedShader?.Effect, Main.GameViewMatrix.TransformationMatrix);
-                    foreach (var action in groupActions)
+                    foreach (DrawAction action in groupActions)
                     {
                         if (action.RenderAction == null)
                             continue;
@@ -166,16 +172,19 @@ public class LayeredDrawSystem : ModSystem
         });
 
         // Clear actions and return to pool
-        foreach (var action in actionSpan)
-            DrawActionPool.Return();
         actions.Clear();
     }
 
-    public static void QueueDrawAction(Action renderAction, PixelationLayer layer, BlendState blendState = null, ManagedShader effect = null, object groupId = null)
+    public static void QueueDrawAction(Action renderAction, PixelationLayer layer, BlendState blendState = null, ManagedShader effect = null, string groupID = null)
     {
         ArgumentNullException.ThrowIfNull(renderAction);
         BlendState blend = blendState ?? BlendState.AlphaBlend;
-        var action = DrawActionPool.Rent(renderAction, blend, isTexture: true, effect, groupId); // Treat as texture for consistency
+
+        // Texture actions not needing an effect will get automatically grouped, unless specified
+        if (groupID == null && effect == null)
+            groupID = $"__Sentinel_{layer}_{blend}";
+
+        DrawAction action = new(renderAction, blend, isTexture: true, effect, groupID); // Treat as texture for consistency
         DrawActionsByLayer[layer].Add(action);
     }
 }

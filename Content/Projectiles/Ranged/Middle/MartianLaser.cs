@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria.ModLoader;
+﻿using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
@@ -29,7 +28,7 @@ public class MartianLaser : ModProjectile
     {
         cache ??= new(40);
         cache.Update(Projectile.Center);
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunction, ColorFunction, null, 40);
 
         Projectile.velocity *= .985f;

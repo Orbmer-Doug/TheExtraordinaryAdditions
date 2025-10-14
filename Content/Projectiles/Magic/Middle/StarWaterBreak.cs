@@ -1,12 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using System;
-using Terraria;
-using Terraria.ID;
+﻿using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
@@ -14,8 +9,6 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
 public class StarWaterBreak : ModProjectile, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.StarWaterBreak);
-    public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer ModdedOwner => Owner.Additions();
 
     public override void SetDefaults()
     {
@@ -29,7 +22,7 @@ public class StarWaterBreak : ModProjectile, ILocalizedModType, IModType
         Projectile.ignoreWater = true;
         Projectile.DamageType = DamageClass.Magic;
     }
-    
+
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
     {
         modifiers.ScalingArmorPenetration += 1f;

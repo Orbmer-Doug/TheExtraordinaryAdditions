@@ -1,13 +1,9 @@
 ﻿using CalamityMod;
 using CalamityMod.Buffs.StatBuffs;
-using CalamityMod.CalPlayer;
-using CalamityMod.NPCs;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
-using ReLogic.Content;
-using ReLogic.Graphics;
 using ReLogic.Utilities;
 using System;
 using System.Collections.Generic;
@@ -16,13 +12,11 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
-using System.Threading;
 using Terraria;
 using Terraria.Audio;
 using Terraria.Chat;
 using Terraria.DataStructures;
 using Terraria.GameContent;
-using Terraria.GameContent.Events;
 using Terraria.GameContent.UI.BigProgressBar;
 using Terraria.GameInput;
 using Terraria.Graphics.Light;
@@ -30,7 +24,6 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Core;
-using TheExtraordinaryAdditions.Core.CrossCompatibility;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Netcode;
@@ -38,9 +31,6 @@ using static TheExtraordinaryAdditions.Core.Graphics.Animators;
 
 namespace TheExtraordinaryAdditions.Core.Utilities;
 
-/// <summary>
-/// The all-in-one toolbox made of tools
-/// </summary>
 public static partial class Utility
 {
     public static bool RunServer(this ModProjectile mod) => Main.netMode != NetmodeID.MultiplayerClient;
@@ -54,22 +44,17 @@ public static partial class Utility
     /// <summary>
     /// Spawning projectiles or npcs, randomness (remember to sync under randoms)
     /// </summary>
-    /// <param name="mod"></param>
-    /// <returns></returns>
     public static bool RunServer(this ModNPC mod) => Main.netMode != NetmodeID.MultiplayerClient;
 
     /// <summary>
-    /// e.g. this npc dying, adding a buff to the player, making an achievement...
+    /// e.g. this npc dying, adding a buff to the player...
     /// </summary>
-    /// <param name="mod"></param>
-    /// <returns></returns>
     public static bool RunClient(this ModNPC mod) => Main.netMode != NetmodeID.Server;
 
     /// <summary>
     /// Sudden shifts in position, state changes/variable updates, persistent position movements (like a dash) <br></br>
     /// <b>The server is in charge of NPCs, changes to NPC data should only happen on the server in multiplayer</b>
     /// </summary>
-    /// <param name="mod"></param>
     public static void Sync(this ModNPC mod)
     {
         mod.NPC.netUpdate = true;
@@ -79,12 +64,10 @@ public static partial class Utility
     public static int EstimateLightRadius(Vector3 lightColor, LightMaskMode medium = LightMaskMode.None,
     float minIntensityThreshold = 0.0185f, int maxRadius = 15)
     {
-        // Get the maximum initial intensity
         float maxIntensity = Math.Max(Math.Max(lightColor.X, lightColor.Y), lightColor.Z);
         if (maxIntensity <= 0)
             return 0;
 
-        // Default decay rates from LightMap
         var decayRate = medium switch
         {
             LightMaskMode.Solid => 0.56f, // LightDecayThroughSolid
@@ -121,16 +104,6 @@ public static partial class Utility
     public static string GetTerrariaProj(this short id) => "Terraria/Images/Projectile_" + id;
     public static string GetTerrariaNPC(this short id) => "Terraria/Images/NPC_" + id;
 
-    public static void Clear(ref Array array, object obj)
-    {
-        object[] copy = (object[])array.Clone();
-        for (int i = 0; i < array.Length; ++i)
-        {
-            copy[i] = obj;
-        }
-        array = copy;
-    }
-
     public static T GetEnumValue<T>(int index) where T : Enum
     {
         Array values = Enum.GetValues(typeof(T));
@@ -144,17 +117,17 @@ public static partial class Utility
     }
 
     public static SlotId Play(this AdditionsSound sound, Vector2 position, float volume = 1f, float pitch = 0f,
-        float pitchVariance = 0f, int maxInstances = 1, string? identifier = null, PauseBehavior behavior = PauseBehavior.KeepPlaying)
+        float pitchVariance = 0f, int maxInstances = 1, string identifier = null, PauseBehavior behavior = PauseBehavior.KeepPlaying)
         => Play(AssetRegistry.GetSound(sound), position, volume, pitch, pitchVariance, null, maxInstances, identifier);
 
     public static SlotId Play(this SoundStyle style, Vector2 position, float volume = 1f, float pitch = 0f,
-        float pitchVariance = 0f, Tuple<float, float> pitchRange = null, int maxInstances = 1, string? identifier = null, PauseBehavior behavior = PauseBehavior.KeepPlaying)
+        float pitchVariance = 0f, (float, float)? pitchRange = null, int maxInstances = 1, string identifier = null, PauseBehavior behavior = PauseBehavior.KeepPlaying)
     {
         SoundStyle sound = style;
         sound.Volume = volume;
         sound.Pitch = pitch;
         if (pitchRange != null)
-            sound.PitchRange = (pitchRange.Item1, pitchRange.Item2);
+            sound.PitchRange = (pitchRange.Value.Item1, pitchRange.Value.Item2);
         sound.PitchVariance = pitchVariance;
         sound.MaxInstances = maxInstances;
         sound.Identifier = identifier;
@@ -164,33 +137,18 @@ public static partial class Utility
     }
 
     public static SlotId Play(this Dictionary<AdditionsSound, float> styles, Vector2 position, float volume = 1f, float pitch = 0f,
-    float pitchVariance = 0f, Tuple<float, float> pitchRange = null, int maxInstances = 1, string? identifier = null, PauseBehavior behavior = PauseBehavior.KeepPlaying)
+    float pitchVariance = 0f, (float, float)? pitchRange = null, int maxInstances = 1, string identifier = null, PauseBehavior behavior = PauseBehavior.KeepPlaying)
     {
-        float totalWeight = styles.Values.Sum();
-        float randomValue = (float)(Main.rand.NextDouble() * totalWeight);
-        float cumulative = 0f;
-        foreach (KeyValuePair<AdditionsSound, float> kvp in styles)
-        {
-            cumulative += kvp.Value;
-            if (randomValue < cumulative)
-            {
-                SoundStyle sound = AssetRegistry.GetSound(kvp.Key);
-
-                sound.Volume = volume;
-                sound.Pitch = pitch;
-                if (pitchRange != null)
-                    sound.PitchRange = (pitchRange.Item1, pitchRange.Item2);
-                sound.PitchVariance = pitchVariance;
-                sound.MaxInstances = maxInstances;
-                sound.Identifier = identifier;
-                sound.PauseBehavior = behavior;
-
-                return SoundEngine.PlaySound(sound, position);
-            }
-        }
-
-        // Fallback
-        return SoundEngine.PlaySound(AssetRegistry.GetSound(styles.Keys.First()), position);
+        SoundStyle sound = AssetRegistry.GetSound(new WeightedDict<AdditionsSound>(styles).GetRandom());
+        sound.Volume = volume;
+        sound.Pitch = pitch;
+        if (pitchRange != null)
+            sound.PitchRange = (pitchRange.Value.Item1, pitchRange.Value.Item2);
+        sound.PitchVariance = pitchVariance;
+        sound.MaxInstances = maxInstances;
+        sound.Identifier = identifier;
+        sound.PauseBehavior = behavior;
+        return SoundEngine.PlaySound(sound, position);
     }
 
     public static float UsedMinions(this Player player, int? ofType = null)
@@ -198,7 +156,12 @@ public static partial class Utility
         float usedMinions = 0;
         foreach (Projectile p in Main.ActiveProjectiles)
         {
-            if (p != null && p.minion && p.owner == player.whoAmI && (ofType != null && p.type == ofType.Value))
+            if (ofType != null)
+            {
+                if (p.type != ofType.Value)
+                    continue;
+            }
+            if (p != null && p.minion && p.owner == player.whoAmI)
                 usedMinions += p.minionSlots;
         }
         return usedMinions;
@@ -247,6 +210,7 @@ public static partial class Utility
             Projectile.extraUpdates = 0;
             Projectile.netImportant = true;
         }
+
         public Color Light;
         public Vector2 Size;
         public Vector2? ToSize;
@@ -293,6 +257,7 @@ public static partial class Utility
             Lighting.AddLight(Projectile.Center, (new Color(Light.R, Light.G, Light.B) * Light.A * completion).ToVector3());
         }
     }
+
     public static void CreateExplosion(IEntitySource source, DamageClass dmgClass, Vector2 position, Vector2 size, int damage, float kb, int lifetime, int iframes, int owner = -1, bool friendly = true, Vector2? toSize = null, Color light = default, string name = "")
     {
         Projectile proj = Main.projectile[Projectile.NewProjectile(source, position, Vector2.Zero, ModContent.ProjectileType<ExplosionProjectile>(), damage, kb, owner)];
@@ -310,22 +275,11 @@ public static partial class Utility
         proj.DamageType = dmgClass;
         proj.netUpdate = true;
     }
+
     public static void CreateFriendlyExplosion(this Projectile proj, Vector2 pos, Vector2 size, int dmg, float kb, int life, int iframes, Vector2? toSize = null, Color light = default)
     {
         if (Main.LocalPlayer == Main.player[proj.owner])
             CreateExplosion(proj.GetSource_FromThis(), proj.DamageType, pos, size, dmg, kb, life, iframes, proj.owner, true, toSize, light, proj.Name);
-    }
-
-    public static T[] RemoveAt<T>(this T[] source, int index)
-    {
-        T[] dest = new T[source.Length - 1];
-        if (index > 0)
-            Array.Copy(source, 0, dest, 0, index);
-
-        if (index < source.Length - 1)
-            Array.Copy(source, index + 1, dest, index, source.Length - index - 1);
-
-        return dest;
     }
 
     public static string ToHexRGB(this Color color) => BitConverter.ToString([color.R, color.G, color.B]).Replace("-", "");
@@ -338,13 +292,13 @@ public static partial class Utility
     public static bool WasOnGround(this Player player)
         => player.oldVelocity.Y == 0f;
 
-    public static bool GetKey(Keys key)
+    public static bool GetKey(this Keys key)
         => !PlayerInput.WritingText && Main.hasFocus && Main.keyState.IsKeyDown(key);
 
-    public static bool GetKeyDown(Keys key)
+    public static bool GetKeyDown(this Keys key)
         => !PlayerInput.WritingText && Main.hasFocus && Main.keyState.IsKeyDown(key) && !Main.oldKeyState.IsKeyDown(key);
 
-    public static bool GetKeyUp(Keys key)
+    public static bool GetKeyUp(this Keys key)
         => !PlayerInput.WritingText && Main.hasFocus && !Main.keyState.IsKeyDown(key) && Main.oldKeyState.IsKeyDown(key);
 
     public static ILCursor HijackIncomingLabels(this ILCursor cursor)
@@ -353,31 +307,30 @@ public static partial class Utility
         cursor.Emit(OpCodes.Nop);
         ILLabel[] array2 = array;
         for (int i = 0; i < array2.Length; i++)
-        {
             array2[i].Target = cursor.Prev;
-        }
         return cursor;
     }
 
-    public static void Kill(this NPC NPC)
+    public static void Kill(this Item item)
     {
-        bool ModNPCDontDie = NPC.ModNPC?.CheckDead() == false;
-
-        if (ModNPCDontDie)
-            return;
-
-        NPC.life = 0;
-        NPC.checkDead();
-        NPC.HitEffect();
-        NPC.active = false;
-        NetMessage.SendData(MessageID.SyncNPC, number: NPC.whoAmI);
+        item.active = false;
+        item.type = 0;
+        item.stack = 0;
+        if (Main.netMode != NetmodeID.SinglePlayer)
+            NetMessage.SendData(MessageID.SyncItem, -1, -1, null, item.whoAmI);
     }
 
-    public static bool IsValidDebuff(Player Player, int buffindex)
+    public static void Kill(this NPC npc)
     {
-        int bufftype = Player.buffType[buffindex];
-        bool vitalbuff = bufftype == BuffID.PotionSickness || bufftype == BuffID.ManaSickness || bufftype == BuffID.ChaosState;
-        return Player.buffTime[buffindex] > 2 && Main.debuff[bufftype] && !Main.buffNoTimeDisplay[bufftype] && !Main.vanityPet[bufftype] && !vitalbuff;
+        if (npc.ModNPC?.CheckDead() == false)
+            return;
+
+        npc.life = 0;
+        npc.checkDead();
+        npc.HitEffect();
+        npc.active = false;
+        if (Main.netMode != NetmodeID.SinglePlayer)
+            NetMessage.SendData(MessageID.SyncNPC, number: npc.whoAmI);
     }
 
     public static void Log(this string message) => AdditionsMain.Instance?.Logger.Info(" " + message);
@@ -427,50 +380,13 @@ public static partial class Utility
         return false;
     }
 
-    public static List<int> GetItems(this Item[] inventory, Predicate<Item> predicate, int stopCountingAt = int.MaxValue)
-    {
-        var indicies = new List<int>();
-
-        for (int i = 0; i < inventory.Length; i++)
-        {
-            if (stopCountingAt <= 0)
-                break;
-
-            if (predicate(inventory[i]))
-            {
-                indicies.Add(i);
-                stopCountingAt -= inventory[i].stack;
-            }
-        }
-
-        return indicies;
-    }
-
-    public static bool HasItem(Player Player, int type, int count)
-    {
-        int items = 0;
-
-        for (int k = 0; k < Player.inventory.Length; k++)
-        {
-            Item Item = Player.inventory[k];
-
-            if (Item.type == type)
-                items += Item.stack;
-        }
-
-        return items >= count;
-    }
-
-    /// <summary>
-    /// returns first open non ammo or coin slot if Player has atleast 1 slot empty otherwise returns -1
-    /// </summary>
-    public static int getFreeInventorySlot(Player Player)
+    public static int GetFreeInventorySlot(Player plr)
     {
         for (int k = 0; k < 49; k++)
         {
-            Item Item = Player.inventory[k];
+            Item item = plr.inventory[k];
 
-            if (Item is null || Item.IsAir)
+            if (item is null || item.IsAir)
                 return k;
         }
 
@@ -586,7 +502,7 @@ public static partial class Utility
     #endregion Tooltips
 
     /// <summary>
-    /// A simple utility that gets an <see cref="Projectile"/>s <see cref="Projectile.ModProjectile"/> instance as a specific type without having to do clunky casting
+    /// A simple utility that gets an <see cref="Projectile"/>s <see cref="Projectile.ModProjectile"/> instance
     /// </summary>
     /// <typeparam name="T">The ModProjectile type to convert to</typeparam>
     /// <param name="p">The Projectile to access the ModProjectile from</param>
@@ -596,7 +512,7 @@ public static partial class Utility
     }
 
     /// <summary>
-    /// A simple utility that gets an <see cref="NPC"/>s <see cref="NPC.ModNPC"/> instance as a specific type without having to do clunky casting
+    /// A simple utility that gets an <see cref="NPC"/>s <see cref="NPC.ModNPC"/> instance
     /// </summary>
     /// <typeparam name="T">The ModNPC type to convert to</typeparam>
     /// <param name="npc">The NPC to access the ModNPC from</param>
@@ -606,19 +522,18 @@ public static partial class Utility
     }
 
     /// <summary>
-    /// A simple utility that gets an <see cref="Item"/>s <see cref="Item.ModItem"/> instance as a specific type without having to do clunky casting
+    /// A simple utility that gets an <see cref="Item"/>s <see cref="Item.ModItem"/> instance
     /// </summary>
     /// <typeparam name="T">The ModNPC type to convert to</typeparam>
-    /// <param name="npc">The NPC to access the ModNPC from</param>
-    public static T As<T>(this Item npc) where T : ModItem
+    /// <param name="item">The NPC to access the ModNPC from</param>
+    public static T As<T>(this Item item) where T : ModItem
     {
-        return npc.ModItem as T;
+        return item.ModItem as T;
     }
 
     /// <summary>
     /// Completely hide a npc from the bestiary
     /// </summary>
-    /// <param name="npc"></param>
     public static void ExcludeFromBestiary(this ModNPC npc)
     {
         NPCID.Sets.NPCBestiaryDrawModifiers value = new()
@@ -629,7 +544,7 @@ public static partial class Utility
     }
 
     /// <summary>
-    /// This effect is temporary and must be used every frame to sustain the close
+    /// Must be used every frame to sustain the close
     /// </summary>
     public static void MakeCalamityBossBarClose(this NPC npc)
     {
@@ -638,62 +553,59 @@ public static partial class Utility
         npc.Calamity().ShouldCloseHPBar = true;
     }
 
-    public static void GrantBossEffectsBuff(this Player p)
-    {
-        p.AddBuff(ModContent.BuffType<BossEffects>(), 2);
-    }
-
-    public static void GrantInfiniteFlight(this Player p)
-    {
-        p.Calamity().infiniteFlight = true;
-    }
+    public static void GrantBossEffectsBuff(this Player p) => p.AddBuff(ModContent.BuffType<BossEffects>(), 2);
+    public static void GrantInfiniteFlight(this Player p) => p.Calamity().infiniteFlight = true;
 
     #region Spawning
 
-    public static int NewPlayerProj(this Player play, Vector2 center, Vector2 velocity, int type, int damage, float knockback, int owner = -1, float ai0 = 0f, float ai1 = 0f, float ai2 = 0f, float extra0 = 0f, float extra1 = 0f)
+    /// <summary>
+    /// Make a new projectile from a source of a player
+    /// </summary>
+    public static int NewPlayerProj(this Player player, Vector2 center, Vector2 velocity, int type, int damage, float knockback, int owner = -1,
+        float ai0 = 0f, float ai1 = 0f, float ai2 = 0f, float extra0 = 0f, float extra1 = 0f)
     {
-        IEntitySource source = play.GetSource_FromThis();
-        int projectile = Projectile.NewProjectile(source, center, velocity, type, damage, knockback, owner, ai0, ai1, ai2);
-        Projectile p = Main.projectile[projectile];
-        if (projectile >= 0 && projectile < Main.maxProjectiles)
+        IEntitySource source = player.GetSource_FromThis();
+        int index = Projectile.NewProjectile(source, center, velocity, type, damage, knockback, owner, ai0, ai1, ai2);
+        Projectile projectile = Main.projectile[index];
+        if (index >= 0 && index < Main.maxProjectiles)
+            projectile.netUpdate = true;
+
+        if (projectile.ModProjectile != null && projectile.ModProjectile.Mod == AdditionsMain.Instance)
         {
-            p.netUpdate = true;
+            projectile.AdditionsInfo().ExtraAI[0] = extra0;
+            projectile.AdditionsInfo().ExtraAI[1] = extra1;
         }
-        p.Additions().ExtraAI[0] = extra0;
-        p.Additions().ExtraAI[1] = extra1;
-        return projectile;
+        return index;
     }
 
     /// <summary>
-    /// Make a new projectile from a source of a projectile in a neater way
+    /// Make a new projectile from a source of a projectile
     /// </summary>
-    public static int NewProj(this Projectile proj, Vector2 center, Vector2 velocity, int type, int damage, float knockback, int owner = -1, float ai0 = 0f, float ai1 = 0f, float ai2 = 0f, float extra0 = 0f, float extra1 = 0f)
+    public static int NewProj(this Projectile proj, Vector2 center, Vector2 velocity, int type, int damage, float knockback, int owner = -1,
+        float ai0 = 0f, float ai1 = 0f, float ai2 = 0f, float extra0 = 0f, float extra1 = 0f)
     {
         IEntitySource source = proj.GetSource_FromThis();
-        int projectile = Projectile.NewProjectile(source, center, velocity, type, damage, knockback, owner, ai0, ai1, ai2);
-        Projectile p = Main.projectile[projectile];
-        if (projectile >= 0 && projectile < 1000)
-        {
-            p.netUpdate = true;
-        }
+        int index = Projectile.NewProjectile(source, center, velocity, type, damage, knockback, owner, ai0, ai1, ai2);
+        Projectile projectile = Main.projectile[index];
+        if (index >= 0 && index < Main.maxProjectiles)
+            projectile.netUpdate = true;
 
-        // Dont apply to vanilla projectiles
-        if (p.type >= ProjectileID.Count)
+        if (projectile.ModProjectile != null && projectile.ModProjectile.Mod == AdditionsMain.Instance)
         {
-            p.Additions().ExtraAI[0] = extra0;
-            p.Additions().ExtraAI[1] = extra1;
+            projectile.AdditionsInfo().ExtraAI[0] = extra0;
+            projectile.AdditionsInfo().ExtraAI[1] = extra1;
         }
-        return projectile;
+        return index;
     }
 
     /// <summary>
     /// Spawns a projectile from this NPC <br></br>
-    /// Automatically assigns the relationship between the NPC and projectile if it is a <see cref="ProjOwnedByNPC{T}"/>
+    /// Automatically assigns the relationship between the NPC and projectile, assuming it is a <see cref="ProjOwnedByNPC{T}"/>
     /// </summary>
-    /// <typeparam name="T">The NPC this is spawning from</typeparam>
+    /// <param name="damage">Automatically fixes damage from current difficulty</param>
     /// <returns>The index within <see cref="Main.projectile"/></returns>
-    public static int NewNPCProj(this NPC npc, Vector2 position, Vector2 velocity, int type, int damage, float knockback
-        , float ai0 = 0f, float ai1 = 0f, float ai2 = 0f, float extra0 = 0f, float extra1 = 0f)
+    public static int NewNPCProj(this NPC npc, Vector2 position, Vector2 velocity, int type, int damage, float knockback,
+        float ai0 = 0f, float ai1 = 0f, float ai2 = 0f, float extra0 = 0f, float extra1 = 0f)
     {
         damage = FixDamageFromDifficulty(damage);
 
@@ -702,10 +614,10 @@ public static partial class Utility
         if (index >= 0 && index < Main.maxProjectiles)
         {
             Projectile projectile = Main.projectile[index];
-            if (projectile.type >= ProjectileID.Count)
+            if (projectile.ModProjectile != null && projectile.ModProjectile.Mod == AdditionsMain.Instance)
             {
-                projectile.Additions().ExtraAI[0] = extra0;
-                projectile.Additions().ExtraAI[1] = extra1;
+                projectile.AdditionsInfo().ExtraAI[0] = extra0;
+                projectile.AdditionsInfo().ExtraAI[1] = extra1;
             }
 
             projectile.localAI[0] = npc.whoAmI;
@@ -718,25 +630,15 @@ public static partial class Utility
 
     /// <summary>
     /// Spawns a new projectile from this NPC <br></br>
-    /// Use <see cref="NewNPCProj(NPC, Vector2, Vector2, int, int, float, int, float, float, float, float, float)"/> if the projectile should have an owner
+    /// Use <see cref="NewNPCProj(NPC, Vector2, Vector2, int, int, float, float, float, float, float, float)"/> if the projectile should have an owner
     /// </summary>
-    /// <returns></returns>
-    public static int Shoot(this NPC proj, Vector2 center, Vector2 velocity, int type, int damage, float knockback, int owner = -1, float ai0 = 0f, float ai1 = 0f, float ai2 = 0f, float extra0 = 0f, float extra1 = 0f)
+    public static int Shoot(this NPC proj, Vector2 center, Vector2 velocity, int type, int damage, float knockback, int owner = -1, float ai0 = 0f, float ai1 = 0f, float ai2 = 0f)
     {
         IEntitySource source = proj.GetSource_FromThis();
         int projectile = Projectile.NewProjectile(source, center, velocity, type, damage, knockback, owner, ai0, ai1, ai2);
         Projectile p = Main.projectile[projectile];
-        if (projectile >= 0 && projectile < 1000)
-        {
+        if (projectile >= 0 && projectile < Main.maxProjectiles)
             p.netUpdate = true;
-        }
-
-        // Dont apply to vanilla projectiles
-        if (p.type >= ProjectileID.Count)
-        {
-            p.Additions().ExtraAI[0] = extra0;
-            p.Additions().ExtraAI[1] = extra1;
-        }
         return projectile;
     }
 
@@ -757,7 +659,8 @@ public static partial class Utility
         return index;
     }
 
-    #endregion;
+    #endregion
+
     public static Entity GetTarget(this NPC npc)
     {
         if (!npc.HasValidTarget)
@@ -769,48 +672,53 @@ public static partial class Utility
     /// <summary>
     /// Set the animation for a projectile
     /// </summary>
-    /// <param name="p">This projectile</param>
+    /// <param name="proj">This projectile</param>
     /// <param name="frames">Total frames this projectile has and what should be cycled through</param>
     /// <param name="ticksPerFrame">How many frames to wait before going to the next frame</param>
     /// <param name="pingPong">Goes back and forth</param>
-    /// <returns></returns>
-    public static int SetAnimation(this Projectile p, int frames, int ticksPerFrame, bool pingPong = false)
+    /// <returns>The current frame</returns>
+    public static int SetAnimation(this Projectile proj, int frames, int ticksPerFrame, bool pingPong = false)
     {
-        p.frameCounter++;
-        int c = p.frameCounter;
+        proj.frameCounter++;
+
         if (!pingPong)
         {
-            if (c % ticksPerFrame == ticksPerFrame - 1f)
-                p.frame = (p.frame + 1) % frames;
-
-            return p.frame;
+            if (proj.frameCounter % ticksPerFrame == ticksPerFrame - 1)
+                proj.frame = (proj.frame + 1) % frames;
+            return proj.frame;
         }
-        if (pingPong)
+
+        // forward + backward
+        int cycleLength = (frames * 2 - 2) * ticksPerFrame;
+
+        if (proj.frameCounter >= cycleLength)
+            proj.frameCounter = 0;
+
+        if (proj.frameCounter % ticksPerFrame == ticksPerFrame - 1)
         {
-            bool wait = c % ticksPerFrame == ticksPerFrame - 1f;
-            bool dont = p.frame < frames;
-            int val = (frames * ticksPerFrame) - ticksPerFrame;
-            float cf = c;
-            if (cf.BetweenNum(0f, val) && wait && dont)
-            {
-                p.frame = (p.frame + 1) % frames;
-            }
-            if (cf.BetweenNum(val, val * 2) && wait && dont)
-            {
-                p.frame -= 1;
-            }
-            if (c > val * 2)
-                p.frameCounter = 0;
+            int cyclePosition = proj.frameCounter / ticksPerFrame;
 
-            return p.frame;
+            // Forward movement
+            if (cyclePosition < frames)
+                proj.frame = cyclePosition;
+
+            // Backward movement
+            else
+                proj.frame = frames * 2 - 2 - cyclePosition;
+
+            proj.frame = Math.Clamp(proj.frame, 0, frames - 1);
         }
-        return 0;
+
+        return proj.frame;
     }
 
     public static IBigProgressBar HideBossBar(NPC npc)
     {
         return npc.BossBar = Main.BigBossProgressBar.NeverValid;
     }
+
+    public static NetworkText GetNetworkText(string key, params object[] substitutions) =>
+        NetworkText.FromKey("Mods.TheExtraordinaryAdditions." + key, substitutions);
 
     public static LocalizedText GetText(string key) =>
          Language.GetOrRegister("Mods.TheExtraordinaryAdditions." + key, null);
@@ -844,18 +752,14 @@ public static partial class Utility
     public static bool PressingShift(this KeyboardState kb)
     {
         if (!kb.IsKeyDown(Keys.LeftShift))
-        {
             return kb.IsKeyDown(Keys.RightShift);
-        }
         return true;
     }
 
     public static bool PressingControl(this KeyboardState kb)
     {
         if (!kb.IsKeyDown(Keys.LeftControl))
-        {
             return kb.IsKeyDown(Keys.RightControl);
-        }
         return true;
     }
 
@@ -871,29 +775,6 @@ public static partial class Utility
             Main.NewText(text, color ?? Color.White);
         else if (Main.dedServ)
             ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral(text), color ?? Color.White);
-    }
-
-    public static void DrawNewInventorySprite(this SpriteBatch spriteBatch, Texture2D newTexture, Vector2 originalSize, Vector2 position, Color drawColor, Vector2 origin, float scale, Vector2? offset = null)
-    {
-        Vector2 extraOffset = offset ?? Vector2.Zero;
-        float num = Math.Max(originalSize.X, originalSize.Y);
-        float largestDimensionNew = Math.Max(newTexture.Width, newTexture.Height);
-        float scaleRatio = Math.Min(num / largestDimensionNew, 1f);
-        Vector2 positionOffset = Vector2.Zero;
-        if (originalSize.X > newTexture.Width)
-        {
-            positionOffset.X = (originalSize.X - newTexture.Width) / 2f;
-        }
-        positionOffset *= scale;
-        spriteBatch.Draw(newTexture, position + positionOffset + extraOffset, null, drawColor, 0f, origin, scale * scaleRatio, 0, 0f);
-    }
-
-    public static void MouseOver(int i, int j, int itemID)
-    {
-        Player localPlayer = Main.LocalPlayer;
-        localPlayer.noThrow = 2;
-        localPlayer.cursorItemIconEnabled = true;
-        localPlayer.cursorItemIconID = itemID;
     }
 
     public static Item HeldMouseItem(this Player player)
@@ -944,83 +825,6 @@ public static partial class Utility
             shopCustomPrice = customValue
         };
         return shop.Add(item, conditions);
-    }
-
-    public static NPCShop AddWithCustomValue<T>(this NPCShop shop, int customValue, params Condition[] conditions) where T : ModItem
-    {
-        return shop.AddWithCustomValue(ModContent.ItemType<T>(), customValue, conditions);
-    }
-
-    public static void ModifyHitNPCSticky(this Projectile projectile, int maxStick)
-    {
-        Player player = Main.player[projectile.owner];
-        Rectangle myRect = projectile.Hitbox;
-        if (projectile.owner != Main.myPlayer)
-            return;
-
-        for (int npcIndex = 0; npcIndex < Main.maxNPCs; npcIndex++)
-        {
-            NPC npc = Main.npc[npcIndex];
-            if (!npc.active || npc.dontTakeDamage || ((!projectile.friendly || (npc.friendly && (npc.type != NPCID.Guide || projectile.owner >= 255 || !player.killGuide) && (npc.type != NPCID.Clothier || projectile.owner >= 255 || !player.killClothier))) && (!projectile.hostile || !npc.friendly || npc.dontTakeDamageFromHostiles)) || (projectile.owner >= 0 && npc.immune[projectile.owner] != 0 && projectile.maxPenetrate != 1) || (!npc.noTileCollide && projectile.ownerHitCheck))
-            {
-                continue;
-            }
-            bool stickingToNPC;
-            if (npc.type == NPCID.SolarCrawltipedeTail)
-            {
-                Rectangle rect = npc.Hitbox;
-                int num31 = 8;
-                rect.X -= num31;
-                rect.Y -= num31;
-                rect.Width += num31 * 2;
-                rect.Height += num31 * 2;
-                stickingToNPC = projectile.Colliding(myRect, rect);
-            }
-            else
-            {
-                stickingToNPC = projectile.Colliding(myRect, npc.Hitbox);
-            }
-            if (!stickingToNPC)
-            {
-                continue;
-            }
-            if (npc.reflectsProjectiles && projectile.CanBeReflected())
-            {
-                npc.ReflectProjectile(projectile);
-                break;
-            }
-            projectile.ai[0] = 1f;
-            projectile.ai[1] = npcIndex;
-            projectile.velocity = (npc.Center - projectile.Center) * 0.75f;
-            projectile.netUpdate = true;
-            Point[] array2 = (Point[])(object)new Point[maxStick];
-            int projCount = 0;
-            for (int projIndex = 0; projIndex < Main.maxProjectiles; projIndex++)
-            {
-                Projectile proj = Main.projectile[projIndex];
-                if (projIndex != projectile.whoAmI && proj.active && proj.owner == Main.myPlayer && proj.type == projectile.type && proj.ai[0] == 1f && proj.ai[1] == npcIndex)
-                {
-                    array2[projCount++] = new Point(projIndex, proj.timeLeft);
-                    if (projCount >= array2.Length)
-                    {
-                        break;
-                    }
-                }
-            }
-            if (projCount < array2.Length)
-            {
-                continue;
-            }
-            int num30 = 0;
-            for (int i = 1; i < array2.Length; i++)
-            {
-                if (array2[i].Y < array2[num30].Y)
-                {
-                    num30 = i;
-                }
-            }
-            Main.projectile[array2[num30].X].Kill();
-        }
     }
 
     public static readonly BindingFlags UniversalBindingFlags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
@@ -1141,27 +945,6 @@ public static partial class Utility
         }
     }
     #endregion Color Utils
-    public static void AddWithCondition<T>(this List<T> list, T type, bool condition)
-    {
-        if (condition)
-            list.Add(type);
-    }
-
-    public static void DrawBorderStringEightWay(SpriteBatch sb, DynamicSpriteFont font, string text, Vector2 baseDrawPosition, Color main, Color border, float rotation, float scale = 1f)
-    {
-        for (int x = -1; x <= 1; x++)
-        {
-            for (int y = -1; y <= 1; y++)
-            {
-                Vector2 drawPosition = baseDrawPosition + new Vector2(x, y);
-                if (x != 0 || y != 0)
-                {
-                    DynamicSpriteFontExtensionMethods.DrawString(sb, font, text, drawPosition, border, rotation, default, scale, 0, 0f);
-                }
-            }
-        }
-        DynamicSpriteFontExtensionMethods.DrawString(sb, font, text, baseDrawPosition, main, rotation, default, scale, 0, 0f);
-    }
 
     public static void CleanHoldStyle(Player player, float desiredRotation, Vector2 desiredPosition, Vector2 spriteSize, Vector2? rotationOriginFromCenter = null, bool noSandstorm = false, bool flipAngle = false, bool stepDisplace = true)
     {
@@ -1194,67 +977,21 @@ public static partial class Utility
         player.itemLocation = finalPosition + new Vector2(spriteSize.X * 0.5f, 0f);
     }
 
-    public static bool UseAmmo(this Projectile projectile, int ammoID, bool doNotConsume = false)
-    {
-        Player player = Main.player[projectile.owner];
-        Item item = new();
-        bool hasFoundAmmo = false;
-
-        for (int i = 54; i < 58; i++)
-        {
-            if (player.inventory[i].ammo == ammoID && player.inventory[i].stack > 0)
-            {
-                item = player.inventory[i];
-                hasFoundAmmo = true;
-                break;
-            }
-        }
-        if (!hasFoundAmmo)
-        {
-            for (int j = 0; j < 54; j++)
-            {
-                if (player.inventory[j].ammo == ammoID && player.inventory[j].stack > 0)
-                {
-                    item = player.inventory[j];
-                    hasFoundAmmo = true;
-                    break;
-                }
-            }
-        }
-        if (hasFoundAmmo)
-        {
-            if (doNotConsume || (player.magicQuiver && ammoID == AmmoID.Arrow && Utils.NextBool(Main.rand, 5))
-                || (player.ammoBox && Utils.NextBool(Main.rand, 5))
-                || (player.ammoPotion && Utils.NextBool(Main.rand, 5))
-                || (player.ammoCost80 && Utils.NextBool(Main.rand, 5))
-                || (player.ammoCost75 && Utils.NextBool(Main.rand, 4)) || !item.consumable)
-
-                return true;
-
-            Item obj = item;
-            obj.stack--;
-            if (item.stack > 0)
-            {
-                return true;
-            }
-            item.active = false;
-            item.TurnToAir(false);
-            return true;
-        }
-        return false;
-    }
-
     public static void BossAwakenMessage(int npcIndex)
     {
         string typeName = Main.npc[npcIndex].TypeName;
         if (Main.netMode == NetmodeID.SinglePlayer)
-        {
             Main.NewText(Language.GetTextValue("Announcement.HasAwoken", typeName), (Color?)new Color(175, 75, 255));
-        }
         else if (Main.dedServ)
-        {
             ChatHelper.BroadcastChatMessage(NetworkText.FromKey("Announcement.HasAwoken", [Main.npc[npcIndex].GetTypeNetName()]), new Color(175, 75, 255), -1);
-        }
+    }
+
+    public static bool IsOffscreen(this Projectile p)
+    {
+        // Check whether the projectile's hitbox intersects the screen, accounting for the screen fluff setting.
+        int fluff = ProjectileID.Sets.DrawScreenCheckFluff[p.type];
+        Rectangle screenArea = new((int)Main.Camera.ScaledPosition.X - fluff, (int)Main.Camera.ScaledPosition.Y - fluff, (int)Main.Camera.ScaledSize.X + fluff * 2, (int)Main.Camera.ScaledSize.Y + fluff * 2);
+        return !screenArea.Intersects(p.Hitbox);
     }
 
     public static void ProjAntiClump(this Projectile projectile, float pushForce = 0.05f, bool minionsOnly = true)
@@ -1288,9 +1025,7 @@ public static partial class Utility
     public static bool WithinBounds(this int index, int cap)
     {
         if (index >= 0)
-        {
             return index < cap;
-        }
         return false;
     }
 
@@ -1370,59 +1105,6 @@ public static partial class Utility
 
     public static bool InventoryHas(this Player player, params int[] items) => player.inventory.Any((Item item) => items.Contains(item.type));
 
-    /// <summary>
-    /// Used for making projectiles stick.
-    /// Uses local[0] and ai[0]
-    /// </summary>
-    /// <param name="projectile"></param>
-    /// <param name="timeLeft"></param>
-    /// <param name="findNewNPC"></param>
-    public static void StickyProjAI(this Projectile projectile, int timeLeft, bool findNewNPC = false)
-    {
-        if (projectile.ai[0] != 1f)
-        {
-            return;
-        }
-
-        bool killProj = false;
-        bool spawnDust = false;
-        projectile.tileCollide = false;
-        projectile.localAI[0]++;
-        if (projectile.localAI[0] % 30f == 0f)
-            spawnDust = true;
-
-        int npcIndex = (int)projectile.ai[1];
-        NPC npc = Main.npc[npcIndex];
-        if (projectile.localAI[0] >= 60 * timeLeft)
-        {
-            killProj = true;
-        }
-        else if (npc.active && !npc.dontTakeDamage)
-        {
-            projectile.Center = npc.Center - projectile.velocity * 2f;
-            projectile.gfxOffY = npc.gfxOffY;
-            if (spawnDust)
-            {
-                npc.HitEffect(0, 1.0, null);
-            }
-        }
-        else
-        {
-            killProj = true;
-        }
-        if (killProj)
-        {
-            if (findNewNPC)
-            {
-                projectile.ai[0] = 0f;
-            }
-            else
-            {
-                projectile.Kill();
-            }
-        }
-    }
-
     public static DamageClass GetBestClass(this Player player)
     {
         float bestDamage = 1f;
@@ -1456,23 +1138,5 @@ public static partial class Utility
             bestClass = DamageClass.Summon;
         }
         return bestClass;
-    }
-
-    public static void InvokeOnMainThread(Action action)
-    {
-        if (!AssetRepository.IsMainThread)
-        {
-            ManualResetEvent evt = new(initialState: false);
-            Main.QueueMainThreadAction(delegate
-            {
-                action();
-                evt.Set();
-            });
-            evt.WaitOne();
-        }
-        else
-        {
-            action();
-        }
     }
 }

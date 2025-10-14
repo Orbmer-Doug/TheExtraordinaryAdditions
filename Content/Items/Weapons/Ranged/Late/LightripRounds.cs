@@ -3,17 +3,19 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
 
 public class LightripRounds : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.LightripRounds);
+
     public override void SetStaticDefaults()
     {
         Item.ResearchUnlockCount = 1;
     }
+
     public override void SetDefaults()
     {
         Item.damage = 22;

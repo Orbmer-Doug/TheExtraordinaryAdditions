@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
-using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Netcode;
 using TheExtraordinaryAdditions.Core.Systems;
 
@@ -18,7 +13,6 @@ public sealed partial class StygainHeart : ModNPC
 {
     public void DoAttack_SpawnEffects(Player target)
     {
-        ref float fogInterpolant = ref NPC.AdditionsInfo().ExtraAI[FogInterpolantIndex];
         const int animationTime = 400;
         HasDoneBloodBeacon = false;
 

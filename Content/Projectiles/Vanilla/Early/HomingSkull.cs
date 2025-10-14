@@ -1,11 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Early;
@@ -49,9 +46,7 @@ public class HomingSkull : ModProjectile
     public override Color? GetAlpha(Color lightColor)
     {
         if (Projectile.alpha > 0)
-        {
             return Color.Transparent;
-        }
         return new Color(255, 255, 255, 200);
     }
 

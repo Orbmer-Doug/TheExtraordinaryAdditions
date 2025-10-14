@@ -1,7 +1,7 @@
 ﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.NPCGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Buffs.Debuff;
 
@@ -16,12 +16,12 @@ public class PlasmaIncineration : ModBuff
         Main.buffNoTimeDisplay[Type] = true;
         BuffID.Sets.NurseCannotRemoveDebuff[Type] = true;
     }
+
     public override void Update(NPC npc, ref int buffIndex)
     {
         if (npc.GetGlobalNPC<AdditionsGlobalNPC>().PlasmaIncineration < npc.buffTime[buffIndex])
-        {
             npc.GetGlobalNPC<AdditionsGlobalNPC>().PlasmaIncineration = npc.buffTime[buffIndex];
-        }
+        
         npc.DelBuff(buffIndex);
         buffIndex--;
     }

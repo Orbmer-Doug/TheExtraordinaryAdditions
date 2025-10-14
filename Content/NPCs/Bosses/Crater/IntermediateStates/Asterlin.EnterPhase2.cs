@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -11,10 +7,11 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
 public partial class Asterlin : ModNPC
 {
+    public static readonly Dictionary<AsterlinAIType, float> EnterPhase2_PossibleStates = new Dictionary<AsterlinAIType, float> { { AsterlinAIType.Tesselestic, 1f } };
     [AutomatedMethodInvoke]
     public void LoadStateTransitions_EnterPhase2()
     {
-        StateMachine.RegisterTransition(AsterlinAIType.EnterPhase2, new Dictionary<AsterlinAIType, float> { { AsterlinAIType.Cleave, 1f } }, false, () => AITimer >= EnterPhase2_Length);
+        StateMachine.RegisterTransition(AsterlinAIType.EnterPhase2, EnterPhase2_PossibleStates, false, () => AITimer >= EnterPhase2_Length);
         StateMachine.RegisterStateBehavior(AsterlinAIType.EnterPhase2, DoBehavior_EnterPhase2);
     }
 

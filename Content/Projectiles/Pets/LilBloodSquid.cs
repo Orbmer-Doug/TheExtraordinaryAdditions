@@ -1,12 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Summon;
-using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
-using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -79,7 +76,7 @@ public class LilBloodSquid : ModProjectile, ILocalizedModType, IModType
                 Vector2 eye2 = Projectile.Center + PolarVector(14f * Projectile.scale, Projectile.rotation - MathHelper.PiOver2);
                 Vector2 eye3 = Projectile.Center + PolarVector(9f * Projectile.scale, Projectile.rotation) + PolarVector(7f * Projectile.scale, Projectile.rotation - MathHelper.PiOver2);
                 Vector2 eye4 = Projectile.Center + PolarVector(-7f * Projectile.scale, Projectile.rotation) + PolarVector(2f * Projectile.scale, Projectile.rotation - MathHelper.PiOver2);
-                
+
                 Main.spriteBatch.DrawBetterRect(star, ToTarget(eye1, Vector2.One * 25f), null, Color.Crimson, 0f, orig);
                 Main.spriteBatch.DrawBetterRect(star, ToTarget(eye2, Vector2.One * 25f), null, Color.Crimson, 0f, orig);
                 Main.spriteBatch.DrawBetterRect(star, ToTarget(eye3, Vector2.One * 25f), null, Color.Crimson, 0f, orig);

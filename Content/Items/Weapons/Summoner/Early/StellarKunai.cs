@@ -1,12 +1,10 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Summoner.Early;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Early;
@@ -14,10 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Early;
 public class StellarKunai : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.StellarKunai);
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        Utility.ColorLocalization(tooltips, Color.CornflowerBlue);
-    }
+
     public override void SetDefaults()
     {
         Item.width = Item.height = 48;
@@ -34,6 +29,11 @@ public class StellarKunai : ModItem
         Item.shootSpeed = 3f;
         Item.DamageType = DamageClass.Summon;
         Item.autoReuse = true;
+    }
+
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        Utility.ColorLocalization(tooltips, Color.CornflowerBlue);
     }
 
     public override bool CanUseItem(Player player)

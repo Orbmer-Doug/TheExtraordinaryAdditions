@@ -7,6 +7,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Novelty;
 public class TortoiseShell : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TortoiseShell);
+
     public override void SetStaticDefaults()
     {
         Item.ResearchUnlockCount = 20;

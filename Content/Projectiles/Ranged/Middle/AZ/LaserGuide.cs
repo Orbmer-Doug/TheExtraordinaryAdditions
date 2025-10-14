@@ -1,10 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using System;
+﻿using System;
 using Terraria;
 using Terraria.Enums;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle.AZ;
 
@@ -21,6 +19,7 @@ public class LaserGuide : ModProjectile
         Projectile.extraUpdates = 100;
         Projectile.timeLeft = 5 * Projectile.extraUpdates;
     }
+
     public Player Owner => Main.player[Projectile.owner];
     public override void AI()
     {
@@ -33,47 +32,17 @@ public class LaserGuide : ModProjectile
             }
         }
         if (Projectile.ai[0]++ % Main.rand.Next(1, 4) == 0f)
-        {
-            Color col = Color.Transparent;
-            if (Owner.team == (int)Team.None)
-            {
-                col = Color.Green;
-            }
-            if (Owner.team == (int)Team.Red)
-            {
-                col = Color.Red;
-            }
-            if (Owner.team == (int)Team.Green || Main.netMode == NetmodeID.SinglePlayer)
-            {
-                col = Color.LimeGreen;
-            }
-            if (Owner.team == (int)Team.Blue)
-            {
-                col = Color.Blue;
-            }
-            if (Owner.team == (int)Team.Yellow)
-            {
-                col = Color.Gold;
-            }
-            if (Owner.team == (int)Team.Pink)
-            {
-                col = Color.Pink;
-            }
-
-            ParticleRegistry.SpawnGlowParticle(Projectile.Center, Projectile.velocity * .01f, 20, 4f, col);
-        }
+            ParticleRegistry.SpawnGlowParticle(Projectile.Center, Projectile.velocity * .01f, 20, 4f, TankHeadHoldout.GetTeamColor(Owner));
     }
+
     public override bool? CanCutTiles() => false;
+
     public override bool OnTileCollide(Vector2 oldVelocity)
     {
         if (Math.Abs(Projectile.velocity.X - oldVelocity.X) > float.Epsilon)
-        {
             Projectile.velocity.X = -oldVelocity.X;
-        }
         if (Math.Abs(Projectile.velocity.Y - oldVelocity.Y) > float.Epsilon)
-        {
             Projectile.velocity.Y = -oldVelocity.Y;
-        }
         return false;
     }
 }

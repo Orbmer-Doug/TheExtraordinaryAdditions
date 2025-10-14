@@ -7,6 +7,7 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
@@ -20,14 +21,10 @@ public class CyberneticRocketGauntlets : ModItem
         CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1;
     }
 
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(Color.Cyan);
-    }
 
     public override void SetDefaults()
     {
-        Item.damage = 1400;
+        Item.damage = 4900;
         Item.DamageType = DamageClass.MeleeNoSpeed;
         Item.width = 54;
         Item.height = 60;
@@ -46,6 +43,11 @@ public class CyberneticRocketGauntlets : ModItem
         Item.noMelee = true;
         Item.noUseGraphic = true;
         Item.useAmmo = AmmoID.None;
+    }
+
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(Color.Cyan);
     }
 
     public override void HoldItem(Player player)
@@ -73,8 +75,8 @@ public class CyberneticRocketGauntlets : ModItem
         GlobalPlayer gp = player.Additions();
         CyberneticPlayer cyber = player.GetModPlayer<CyberneticPlayer>();
         cyber.inputSequence.Add(input);
-        cyber.comboTimer = CyberneticPlayer.COMBO_WINDOW;
-        cyber.clickTimer = CyberneticPlayer.CLICK_WAIT;
+        cyber.ComboTimer = CyberneticPlayer.COMBO_WINDOW;
+        cyber.ClickTimer = CyberneticPlayer.CLICK_WAIT;
 
         string sequence = new string(cyber.inputSequence.ToArray());
         CyberneticSwing.SwingState? state;
@@ -115,18 +117,18 @@ public class CyberneticRocketGauntlets : ModItem
 public class CyberneticPlayer : ModPlayer
 {
     public List<char> inputSequence = new List<char>();
-    public int comboTimer = 0;
+    public int ComboTimer = 0;
     public const int COMBO_WINDOW = 30;
-    public int clickTimer = 0;
+    public int ClickTimer = 0;
     public const int CLICK_WAIT = 10;
 
     public override void PostUpdateMiscEffects()
     {
-        if (clickTimer > 0)
-            clickTimer--;
-        if (comboTimer > 0)
-            comboTimer--;
-        if (comboTimer <= 0)
+        if (ClickTimer > 0)
+            ClickTimer--;
+        if (ComboTimer > 0)
+            ComboTimer--;
+        if (ComboTimer <= 0)
             inputSequence.Clear();
     }
 }

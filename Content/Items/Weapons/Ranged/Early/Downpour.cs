@@ -2,13 +2,14 @@
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Early;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Early;
 
 public class Downpour : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Downpour);
+
     public override void SetDefaults()
     {
         Item.damage = 11;
@@ -30,6 +31,9 @@ public class Downpour : ModItem
         Item.shootSpeed = 10f;
         Item.autoReuse = true;
     }
+
+    public override bool? CanHitNPC(Player player, NPC target) => false;
+
     public override bool CanShoot(Player player) => false;
 
     public override void AddRecipes()

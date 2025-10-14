@@ -1,12 +1,10 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain;
 using TheExtraordinaryAdditions.Content.Projectiles.Misc;
-using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Terraria.ID.ContentSamples.CreativeHelper;
@@ -15,6 +13,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Summon;
 public class CrimsonCarvedBeetle : ModItem, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CrimsonCarvedBeetle);
+
     public override void SetStaticDefaults()
     {
         Main.RegisterItemAnimation(Item.type, new DrawAnimationVertical(15, 5, false));

@@ -1,9 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
@@ -42,7 +39,7 @@ public class StygainAura : ModProjectile
             Projectile.Kill();
             return;
         }
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(c => 6f + StoredDamage * .002f, (c, pos) => Color.Lerp(Color.White, Color.Red * 1.4f, Completion + .3f), null, 40);
 
         Time++;
@@ -86,15 +83,12 @@ public class StygainAura : ModProjectile
         if (StoredDamage >= 10000f)
         {
             Vector2 pos = Owner.Center + new Vector2(-4f * Owner.direction, -20f);
+            Vector2 vel = pos.SafeDirectionTo(Owner.Additions().mouseWorld).SafeNormalize(Vector2.Zero);
+            for (float i = 1f; i > 0f; i -= .2f)
+                ParticleRegistry.SpawnPulseRingParticle(Owner.Center, vel * (14f * i), 40, vel.ToRotation(), new(.5f, 1f), 0f, i * 320f, Color.Crimson);
             if (this.RunLocal())
-            {
-                Vector2 vel = pos.SafeDirectionTo(Owner.Additions().mouseWorld).SafeNormalize(Vector2.Zero);
-                for (float i = 1f; i > 0f; i -= .2f)
-                {
-                    ParticleRegistry.SpawnPulseRingParticle(Owner.Center, vel * (14f * i), 40, vel.ToRotation(), new(.5f, 1f), 0f, i * 320f, Color.Crimson);
-                }
                 Projectile.NewProj(pos, vel, ModContent.ProjectileType<SanguineRay>(), Projectile.damage * 2, 0f, Owner.whoAmI);
-            }
+            
             AdditionsSound.VirtueAttack.Play(pos, .8f, -.3f);
         }
     }
@@ -102,7 +96,7 @@ public class StygainAura : ModProjectile
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => CircularHitboxCollision(Projectile.Center, Radius + 75, targetHitbox);
 
     public OptimizedPrimitiveTrail trail;
-    public ManualTrailPoints points = new(40);
+    public TrailPoints points = new(40);
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()

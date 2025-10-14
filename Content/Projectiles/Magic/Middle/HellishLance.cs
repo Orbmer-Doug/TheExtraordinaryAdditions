@@ -35,7 +35,7 @@ public class HellishLance : ModProjectile
         set => Projectile.ai[1] = value;
     }
     public ref float StickTime => ref Projectile.ai[2];
-    public ref float AfterOpac => ref Projectile.Additions().ExtraAI[0];
+    public ref float AfterOpac => ref Projectile.AdditionsInfo().ExtraAI[0];
 
     public const int Wait = 20;
 
@@ -63,7 +63,6 @@ public class HellishLance : ModProjectile
                 float scal = Main.rand.NextFloat(.4f, .8f);
                 Color col = Color.Lerp(Color.Violet, Color.BlueViolet, Main.rand.NextFloat(.4f, .8f));
                 ParticleRegistry.SpawnBloomPixelParticle(pos, vel, life, scal, col, Color.DarkViolet, null, 1f, 7);
-                ParticleRegistry.SpawnSmokeParticle(pos, vel, scal, col, Color.Transparent, 0f);
             }
         }
         else if (Time > Wait)
@@ -131,7 +130,7 @@ public class HellishLance : ModProjectile
             this.Sync();
         }
         else
-            Projectile.damage = (int)(Projectile.damage * .875f);
+            Projectile.damage = (int)(Projectile.damage * .675f);
     }
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)

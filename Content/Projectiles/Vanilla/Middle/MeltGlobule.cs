@@ -1,8 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Common.Particles.Shader;
-using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
@@ -31,14 +30,10 @@ public class MeltGlobule : ModProjectile, ILocalizedModType, IModType
         Projectile.StickyProjAI(15);
 
         if (Projectile.ai[0] == 0f)
-        {
             Projectile.velocity.Y += .3f;
-        }
 
-        if (Projectile.ai[0] == 2f)
-        {
+        if (Projectile.ai[0] == 1f)
             Projectile.velocity *= 0f;
-        }
     }
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
@@ -48,7 +43,7 @@ public class MeltGlobule : ModProjectile, ILocalizedModType, IModType
 
     public override bool OnTileCollide(Vector2 oldVelocity)
     {
-        Projectile.ai[0] = 2f;
+        Projectile.ai[0] = 1f;
         Projectile.timeLeft = 300;
         return false;
     }

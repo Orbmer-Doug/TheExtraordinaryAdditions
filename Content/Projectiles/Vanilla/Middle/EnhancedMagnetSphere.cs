@@ -1,15 +1,11 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using Terraria;
-using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
-using TheExtraordinaryAdditions.Core.Interfaces;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
@@ -17,11 +13,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 public class EnhancedMagnetSphere : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
-    public override void SetStaticDefaults()
-    {
-        ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
-        ProjectileID.Sets.TrailCacheLength[Projectile.type] = 5;
-    }
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 30;
@@ -34,7 +26,9 @@ public class EnhancedMagnetSphere : ModProjectile
         Projectile.hostile = false;
         Projectile.usesIDStaticNPCImmunity = true;
         Projectile.idStaticNPCHitCooldown = 8;
+        Projectile.DamageType = DamageClass.Magic;
     }
+
     public ref float Time => ref Projectile.ai[0];
     public const float ArcDistance = 750f;
     public const float ArcWidth = 4f;
@@ -69,7 +63,11 @@ public class EnhancedMagnetSphere : ModProjectile
 
         return false;
     }
+
     private List<Projectile> OtherSpheres => Projectile.GetOtherProjs(ArcDistance, 3);
+
+    public static readonly Color MagnetSparkCol = new(2, 254, 201);
+    public static readonly Color MagnetMiddleCol = new(24, 184, 108);
 
     internal float WidthFunction(float completionRatio)
     {
@@ -77,8 +75,6 @@ public class EnhancedMagnetSphere : ModProjectile
     }
     internal Color ColorFunction(SystemVector2 completionRatio, Vector2 position)
     {
-        Color magnet = new(2, 254, 201); // Magnet sphere spark
-
         float opacity = 0f;
         foreach (Projectile sphere in OtherSpheres)
         {
@@ -87,15 +83,13 @@ public class EnhancedMagnetSphere : ModProjectile
         }
 
         // Fade out based on distance from spheres
-        return magnet * opacity * .7f;
+        return MagnetSparkCol * opacity * .7f;
     }
 
     internal float BackgroundWidthFunction(float completionRatio) => WidthFunction(completionRatio) * 2f;
 
     internal Color BackgroundColorFunction(SystemVector2 completionRatio, Vector2 position)
     {
-        Color dimmerMagnet = new(24, 184, 108); // Magnet sphere middle
-
         float opacity = 0f;
         foreach (Projectile sphere in OtherSpheres)
         {
@@ -103,7 +97,7 @@ public class EnhancedMagnetSphere : ModProjectile
             opacity = 1f - Utils.GetLerpValue(0f, ArcDistance, remainingDistance, true);
         }
 
-        return dimmerMagnet * opacity * .6f;
+        return MagnetMiddleCol * opacity * .6f;
     }
 
     public void DrawArcs(Vector2 destination)
@@ -113,7 +107,7 @@ public class EnhancedMagnetSphere : ModProjectile
             Vector2 start = Projectile.Center;
             Vector2 end = start + Projectile.SafeDirectionTo(destination) * (start.Distance(destination) - Projectile.width);
             List<Line> lightning = CreateBolt(start, end, 1f, 20f);
-            ManualTrailPoints final = new(lightning.Count * 2);
+            TrailPoints final = new(lightning.Count * 2);
             List<Vector2> ends = [];
             for (int i = 0; i < lightning.Count; i++)
             {
@@ -141,11 +135,8 @@ public class EnhancedMagnetSphere : ModProjectile
             return false;
 
         foreach (Projectile sphere in OtherSpheres)
-        {
-            float _ = 0f;
-            if (Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.Center, sphere.Center, ArcWidth, ref _))
-                return true;
-        }
+            return targetHitbox.LineCollision(Projectile.Center, sphere.Center, ArcWidth);
+
         return null;
     }
 
@@ -158,14 +149,11 @@ public class EnhancedMagnetSphere : ModProjectile
         ManagedShader shader = ShaderRegistry.Forcefield;
         float intensity = 1f;
         float flickerPower = 0.25f;
-        float opacity = MathHelper.Lerp(1f, MathHelper.Max(1f - flickerPower, 0.56f), MathF.Pow(MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Lerp(3f, 5f, flickerPower)), 24f)) * 2f;
-        Color color = new(15, 88, 113); // Magnet sphere within
-        Color color2 = new(25, 153, 126); // Magnet sphere outline
+        float opacity = MathHelper.Lerp(1f, MathHelper.Max(1f - flickerPower, 0.56f),
+            MathF.Pow(MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Lerp(3f, 5f, flickerPower)), 24f)) * 2f;
+        Color color = new Color(15, 88, 113) * opacity; // Magnet sphere within
+        Color color2 = new Color(25, 153, 126) * opacity; // Magnet sphere outline
         float noiseScale = MathHelper.Lerp(0.4f, 0.8f, Sin01(Main.GlobalTimeWrappedHourly * 0.3f));
-
-        // Colors get effected by the opacity
-        color *= opacity;
-        color2 *= opacity;
 
         shader.TrySetParameter("time", Main.GlobalTimeWrappedHourly * 1.4f);
         shader.TrySetParameter("color", color);
@@ -177,8 +165,8 @@ public class EnhancedMagnetSphere : ModProjectile
         shader.TrySetParameter("blowUpSize", .5f);
         shader.TrySetParameter("edgeBlendStrength", 4f);
         shader.TrySetParameter("resolution", Projectile.Size);
-        
-        PixelationSystem.QueueTextureRenderAction(DrawMagnetField, PixelationLayer.OverPlayers, BlendState.Additive, shader, Type);
+
+        PixelationSystem.QueueTextureRenderAction(DrawMagnetField, PixelationLayer.OverPlayers, BlendState.Additive, shader, nameof(EnhancedMagnetSphere));
         return false;
     }
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using Terraria;
 using Terraria.Utilities;
@@ -361,14 +360,13 @@ public class RandomPushdownAutomata<TStateWrapper, TStateIdentifier>
 
     private readonly UnifiedRandom random;
     private readonly Dictionary<TStateIdentifier, List<RandomTransitionInfo>> transitionTable = [];
-    private readonly Dictionary<TStateIdentifier, Action> stateEntryCallbacks = []; // New dictionary for entry callbacks
+    private readonly Dictionary<TStateIdentifier, Action> stateEntryCallbacks = [];
     public readonly Dictionary<TStateIdentifier, Action> StateBehaviors = [];
     public List<TransitionHijack> HijackActions = [];
     public Dictionary<TStateIdentifier, TStateWrapper> StateRegistry = [];
     public Stack<TStateWrapper> StateStack = new();
-
-    // Cache for filtered weights to avoid allocations
     private readonly Dictionary<TStateIdentifier, Dictionary<TStateIdentifier, float>> filteredWeightsCache = [];
+    private readonly Dictionary<TStateIdentifier, WeightedDict<TStateIdentifier>> weightedRandomCache = [];
 
     /// <summary>
     /// The current state of the automaton.
@@ -406,7 +404,7 @@ public class RandomPushdownAutomata<TStateWrapper, TStateIdentifier>
 
     public void PerformBehaviors()
     {
-        if (CurrentState != null && StateBehaviors.TryGetValue(CurrentState.Identifier, out var behavior))
+        if (CurrentState != null && StateBehaviors.TryGetValue(CurrentState.Identifier, out Action behavior))
         {
             behavior?.Invoke();
         }
@@ -421,10 +419,8 @@ public class RandomPushdownAutomata<TStateWrapper, TStateIdentifier>
         }
 
         TStateWrapper currentState = CurrentState;
-        if (currentState == null || !transitionTable.TryGetValue(currentState.Identifier, out var transitions))
-        {
+        if (currentState == null || !transitionTable.TryGetValue(currentState.Identifier, out List<RandomTransitionInfo> transitions))
             return;
-        }
 
         RandomTransitionInfo transition = null;
         for (int i = 0; i < transitions.Count; i++)
@@ -437,23 +433,19 @@ public class RandomPushdownAutomata<TStateWrapper, TStateIdentifier>
         }
 
         if (transition == null)
-        {
             return;
-        }
 
-        var possibleStatesWeights = transition.PossibleStatesWeights;
-        var filteredStatesWeights = GetFilteredWeights(currentState.Identifier, possibleStatesWeights);
+        Dictionary<TStateIdentifier, float> possibleStatesWeights = transition.PossibleStatesWeights;
+        Dictionary<TStateIdentifier, float> filteredStatesWeights = GetFilteredWeights(currentState.Identifier, possibleStatesWeights);
 
-        TStateIdentifier? newStateId = SelectRandomState(filteredStatesWeights);
+        TStateIdentifier? newStateId = SelectRandomState(currentState.Identifier, filteredStatesWeights);
         if (!newStateId.HasValue)
-        {
             return;
-        }
 
         for (int i = 0; i < HijackActions.Count; i++)
         {
-            var hijack = HijackActions[i];
-            var hijackedState = hijack.SelectionHijackFunction(newStateId);
+            TransitionHijack hijack = HijackActions[i];
+            Nullable<TStateIdentifier> hijackedState = hijack.SelectionHijackFunction(newStateId);
             if (!Equals(hijackedState, newStateId))
             {
                 newStateId = hijackedState;
@@ -471,13 +463,11 @@ public class RandomPushdownAutomata<TStateWrapper, TStateIdentifier>
             oldState?.OnPopped();
         }
 
-        if (newStateId.HasValue && StateRegistry.TryGetValue(newStateId.Value, out var newStateWrapper))
+        if (newStateId.HasValue && StateRegistry.TryGetValue(newStateId.Value, out TStateWrapper newStateWrapper))
         {
             StateStack.Push(newStateWrapper);
-            if (stateEntryCallbacks.TryGetValue(newStateId.Value, out var entryCallback))
-            {
-                entryCallback?.Invoke(); // Invoke the entry callback for the new state
-            }
+            if (stateEntryCallbacks.TryGetValue(newStateId.Value, out Action entryCallback))
+                entryCallback?.Invoke();
         }
 
         OnStateTransition?.Invoke(!transition.RememberPreviousState, oldState);
@@ -493,9 +483,7 @@ public class RandomPushdownAutomata<TStateWrapper, TStateIdentifier>
 
             currentState = CurrentState;
             if (currentState == null || !transitionTable.TryGetValue(currentState.Identifier, out transitions))
-            {
                 break;
-            }
 
             transition = null;
             for (int i = 0; i < transitions.Count; i++)
@@ -515,7 +503,7 @@ public class RandomPushdownAutomata<TStateWrapper, TStateIdentifier>
             possibleStatesWeights = transition.PossibleStatesWeights;
             filteredStatesWeights = GetFilteredWeights(currentState.Identifier, possibleStatesWeights);
 
-            newStateId = SelectRandomState(filteredStatesWeights);
+            newStateId = SelectRandomState(currentState.Identifier, filteredStatesWeights);
             if (!newStateId.HasValue)
             {
                 continue;
@@ -523,8 +511,8 @@ public class RandomPushdownAutomata<TStateWrapper, TStateIdentifier>
 
             for (int i = 0; i < HijackActions.Count; i++)
             {
-                var hijack = HijackActions[i];
-                var hijackedState = hijack.SelectionHijackFunction(newStateId);
+                TransitionHijack hijack = HijackActions[i];
+                Nullable<TStateIdentifier> hijackedState = hijack.SelectionHijackFunction(newStateId);
                 if (!Equals(hijackedState, newStateId))
                 {
                     newStateId = hijackedState;
@@ -544,7 +532,7 @@ public class RandomPushdownAutomata<TStateWrapper, TStateIdentifier>
             if (newStateId.HasValue && StateRegistry.TryGetValue(newStateId.Value, out newStateWrapper))
             {
                 StateStack.Push(newStateWrapper);
-                if (stateEntryCallbacks.TryGetValue(newStateId.Value, out var entryCallback))
+                if (stateEntryCallbacks.TryGetValue(newStateId.Value, out Action entryCallback))
                 {
                     entryCallback?.Invoke(); // Invoke the entry callback for the new state
                 }
@@ -568,7 +556,7 @@ public class RandomPushdownAutomata<TStateWrapper, TStateIdentifier>
     public void RegisterTransition(TStateIdentifier initialState, Dictionary<TStateIdentifier, float> possibleStatesWeights,
                                   bool rememberPreviousState, Func<bool> transitionCondition, Action transitionCallback = null)
     {
-        if (!transitionTable.TryGetValue(initialState, out var list))
+        if (!transitionTable.TryGetValue(initialState, out List<RandomTransitionInfo> list))
         {
             list = new List<RandomTransitionInfo>(4); // Preallocate with reasonable capacity
             transitionTable[initialState] = list;
@@ -586,7 +574,7 @@ public class RandomPushdownAutomata<TStateWrapper, TStateIdentifier>
 
     public void ApplyToAllStatesExcept(Action<TStateIdentifier> action, params TStateIdentifier[] exceptions)
     {
-        foreach (var pair in StateRegistry)
+        foreach (KeyValuePair<TStateIdentifier, TStateWrapper> pair in StateRegistry)
         {
             bool isException = false;
             for (int i = 0; i < exceptions.Length; i++)
@@ -607,13 +595,13 @@ public class RandomPushdownAutomata<TStateWrapper, TStateIdentifier>
     private Dictionary<TStateIdentifier, float> GetFilteredWeights(TStateIdentifier currentStateId, Dictionary<TStateIdentifier, float> possibleStatesWeights)
     {
         // Try to get cached filtered weights
-        if (filteredWeightsCache.TryGetValue(currentStateId, out var cachedWeights))
+        if (filteredWeightsCache.TryGetValue(currentStateId, out Dictionary<TStateIdentifier, float> cachedWeights))
         {
             // Verify cache is still valid (same possibleStatesWeights reference)
             bool isValid = true;
             if (cachedWeights.Count == possibleStatesWeights.Count - (possibleStatesWeights.ContainsKey(currentStateId) ? 1 : 0))
             {
-                foreach (var kv in cachedWeights)
+                foreach (KeyValuePair<TStateIdentifier, float> kv in cachedWeights)
                 {
                     if (!possibleStatesWeights.ContainsKey(kv.Key) || possibleStatesWeights[kv.Key] != kv.Value)
                     {
@@ -634,13 +622,11 @@ public class RandomPushdownAutomata<TStateWrapper, TStateIdentifier>
         }
 
         // Create new filtered dictionary
-        var filtered = new Dictionary<TStateIdentifier, float>(possibleStatesWeights.Count);
-        foreach (var kv in possibleStatesWeights)
+        Dictionary<TStateIdentifier, float> filtered = new Dictionary<TStateIdentifier, float>(possibleStatesWeights.Count);
+        foreach (KeyValuePair<TStateIdentifier, float> kv in possibleStatesWeights)
         {
             if (!Equals(kv.Key, currentStateId))
-            {
                 filtered.Add(kv.Key, kv.Value);
-            }
         }
 
         // Cache the result
@@ -648,38 +634,17 @@ public class RandomPushdownAutomata<TStateWrapper, TStateIdentifier>
         return filtered.Count > 0 ? filtered : possibleStatesWeights;
     }
 
-    private TStateIdentifier? SelectRandomState(Dictionary<TStateIdentifier, float> statesWeights)
+    private TStateIdentifier? SelectRandomState(TStateIdentifier currentStateId, Dictionary<TStateIdentifier, float> statesWeights)
     {
         if (statesWeights.Count == 0)
-        {
             return null;
-        }
 
-        // Inline sum calculation
-        float totalWeight = 0f;
-        foreach (var pair in statesWeights)
+        if (!weightedRandomCache.TryGetValue(currentStateId, out WeightedDict<TStateIdentifier> weightedRandom))
         {
-            totalWeight += pair.Value;
+            weightedRandom = new WeightedDict<TStateIdentifier>(statesWeights);
+            weightedRandomCache[currentStateId] = weightedRandom;
         }
 
-        float randomValue = (float)random.NextDouble() * totalWeight;
-
-        float cumulative = 0f;
-        foreach (var pair in statesWeights)
-        {
-            cumulative += pair.Value;
-            if (randomValue < cumulative)
-            {
-                return pair.Key;
-            }
-        }
-
-        // Fallback to last key
-        foreach (var pair in statesWeights)
-        {
-            return pair.Key;
-        }
-
-        return null;
+        return weightedRandom.GetRandom();
     }
 }

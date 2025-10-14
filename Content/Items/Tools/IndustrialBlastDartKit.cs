@@ -1,17 +1,16 @@
-﻿using System.Collections.Generic;
-using Terraria;
+﻿using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Early;
-using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Utilities;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Tools;
 
 public class IndustrialBlastDartKit : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.IndustrialBlastDartKit);
+
     public override void SetStaticDefaults()
     {
         ItemID.Sets.ItemsThatCountAsBombsForDemolitionistToSpawn[Type] = true;

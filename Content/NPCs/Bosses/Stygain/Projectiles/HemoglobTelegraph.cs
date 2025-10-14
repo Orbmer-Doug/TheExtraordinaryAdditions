@@ -1,13 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
 using Terraria.ID;
-using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -32,9 +28,23 @@ public class HemoglobTelegraph : ProjOwnedByNPC<StygainHeart>
 
     public ref float Time => ref Projectile.ai[0];
     public const int TeleTime = 250;
-    
+
     public override void SafeAI()
     {
+        for (int i = 0; i < 20; i++)
+        {
+            float val = Main.rand.NextFloat(StygainHeart.BarrierSize, StygainHeart.BarrierSize * 8);
+            Vector2 pos = Projectile.Center + Main.rand.NextVector2CircularEdge(val, val);
+            Vector2 vel = pos.SafeDirectionTo(Projectile.Center) * Main.rand.NextFloat(1f, 7f);
+            int life = Main.rand.Next(20, 50);
+            float scale = Main.rand.NextFloat(.5f, 1.1f);
+            Color col = Color.Lerp(Color.Crimson, Color.DarkRed, Main.rand.NextFloat(.2f, .6f));
+            ParticleRegistry.SpawnDustParticle(pos, vel, life, scale, col, .1f, false, true);
+
+            val = Main.rand.NextFloat(StygainHeart.BarrierSize, StygainHeart.BarrierSize * 8);
+            pos = Projectile.Center + Main.rand.NextVector2CircularEdge(val, val);
+            ParticleRegistry.SpawnGlowParticle(pos, vel.RotatedByRandom(.2f), life, scale * 80f, col, Main.rand.NextFloat(.7f, 1.1f));
+        }
         Time++;
     }
 
@@ -65,7 +75,7 @@ public class HemoglobTelegraph : ProjOwnedByNPC<StygainHeart>
         sb.ExitShaderRegion();
 
         // Draw evenly spaced arrows to emphasize to potentially offscreen players where to go
-        // Otherwise they may just see a fog appear and kaboom
+        // Otherwise they may just see fog appear and kaboom
         const int Count = 16;
         Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.HemoglobTeleArrow);
         Vector2 orig = tex.Size() / 2;

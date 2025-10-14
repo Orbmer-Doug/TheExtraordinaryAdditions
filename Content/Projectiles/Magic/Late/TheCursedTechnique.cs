@@ -207,6 +207,7 @@ public class TheCursedTechnique : ModProjectile, ILocalizedModType, IModType
 
         Main.spriteBatch.Draw(pixel, pos, null, Projectile.GetAlpha(new Color(0.7f, 1f, 1f)), 0f, pixel.Size() / 2, scale * 1.2f, 0, 0f);
     }
+
     public override bool PreDraw(ref Color lightColor)
     {
         Main.spriteBatch.PrepareForShaders();

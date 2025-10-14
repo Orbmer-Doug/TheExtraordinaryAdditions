@@ -2,17 +2,19 @@
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 
 public class MartianLaserCapsule : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.MartianLaserCapsule);
+
     public override void SetStaticDefaults()
     {
         Item.ResearchUnlockCount = 99;
     }
+
     public override void SetDefaults()
     {
         Item.damage = 14;

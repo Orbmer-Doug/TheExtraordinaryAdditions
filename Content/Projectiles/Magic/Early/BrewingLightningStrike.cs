@@ -1,12 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.Utilities;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
@@ -20,13 +17,13 @@ public class BrewingLightningStrike : ModProjectile, ILocalizedModType, IModType
     public ref float InitialVelocityAngle => ref Projectile.ai[0];
     public ref float BaseTurnAngleRatio => ref Projectile.ai[1];
     public ref float AccumulatedXMovementSpeeds => ref Projectile.ai[2];
-    public ref float StoredY => ref Projectile.Additions().ExtraAI[0];
+    public ref float StoredY => ref Projectile.AdditionsInfo().ExtraAI[0];
     public bool Init
     {
-        get => Projectile.Additions().ExtraAI[1] == 1;
-        set => Projectile.Additions().ExtraAI[1] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[1] == 1;
+        set => Projectile.AdditionsInfo().ExtraAI[1] = value.ToInt();
     }
-    
+
     public override string Texture => AssetRegistry.Invis;
     public Player Owner => Main.player[Projectile.owner];
     public GlobalPlayer ModdedOwner => Owner.Additions();
@@ -67,7 +64,7 @@ public class BrewingLightningStrike : ModProjectile, ILocalizedModType, IModType
 
     public override void AI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunction, ColorFunction, null, 50);
 
         Projectile.frameCounter++;

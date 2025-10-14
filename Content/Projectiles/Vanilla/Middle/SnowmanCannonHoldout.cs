@@ -1,12 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
-using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Assets;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -43,11 +39,10 @@ public class SnowmanCannonHoldout : BaseIdleHoldoutProjectile
                 this.Sync();
         }
 
-        if (this.RunLocal() && Modded.SafeMouseLeft.Current && Time % Item.useTime == Item.useTime - 1 && Owner.HasAmmo(Item))
+        if (this.RunLocal() && Modded.SafeMouseLeft.Current && Time % Item.useTime == Item.useTime - 1 && TryUseAmmo(out int projToShoot, out float speed, out int dmg, out float kb, out int ammoID))
         {
-            Owner.PickAmmo(Item, out int type, out float speed, out int dmg, out float kb, out int ammoID, Owner.IsAmmoFreeThisShot(Item, Owner.ChooseAmmo(Item), Owner.ChooseAmmo(Item).type));
             Vector2 vel = Projectile.velocity.SafeNormalize(Vector2.Zero) * speed;
-            int typeOf = type switch
+            int typeOf = projToShoot switch
             {
                 ProjectileID.RocketSnowmanI => (int)SnowmanRocket.RocketType.One,
                 ProjectileID.RocketSnowmanII => (int)SnowmanRocket.RocketType.Two,
@@ -75,29 +70,25 @@ public class SnowmanCannonHoldout : BaseIdleHoldoutProjectile
                 ParticleRegistry.SpawnDustParticle(right, veloc, life, scale, col, .1f, true, true);
             }
 
-            SoundEngine.PlaySound(SoundID.Item61 with { Volume = .9f, Pitch = .1f }, right);
-            OffsetLength = 0f;
+            SoundID.Item61.Play(right, .9f, .1f);
+            OffsetLength = Offset / 2;
             this.Sync();
         }
 
         if (OffsetLength != Offset)
             OffsetLength = MathHelper.SmoothStep(OffsetLength, Offset, 0.2f);
 
-        Vector2 armPosition = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
-        Vector2 offset = Projectile.rotation.ToRotationVector2() * OffsetLength;
-        Vector2 unitY = Vector2.UnitY;
-        double num4 = Projectile.rotation;
-        Vector2 armOffset = -Utils.RotatedBy(unitY, num4, default)
-            * Utils.Remap(Vector2.Dot(Projectile.rotation.ToRotationVector2(), -Vector2.UnitY), 0f, -1f, 10f, 3f, true)
-            * Projectile.direction;
-
-        Projectile.Center = armPosition + offset + armOffset;
         Owner.itemRotation = Utils.ToRotation(Projectile.velocity * Projectile.direction);
         Projectile.spriteDirection = Projectile.direction;
         Owner.ChangeDir(Projectile.velocity.X.NonZeroSign());
         Projectile.rotation = Projectile.velocity.ToRotation();
         Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, Projectile.rotation);
         Owner.SetBackHandBetter(Player.CompositeArmStretchAmount.Full, Projectile.rotation);
+
+        Vector2 center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
+        Vector2 offset = Projectile.rotation.ToRotationVector2() * OffsetLength;
+        Projectile.Center = center + offset - PolarVector(6f, Projectile.rotation) + PolarVector(10f * Owner.direction * Owner.gravDir, Projectile.rotation - MathHelper.PiOver2);
+
         Time++;
     }
 

@@ -39,11 +39,11 @@ public class FulgurSwing : BaseSwordSwing
             .Evaluate(SwingCompletion);
     }
 
-    public override int SwingTime => SwingDir == SwingDirection.Up ? 40 : 120;
+    public override int SwingTime => SwingDir == SwingDirection.Up ? 40 : 90;
     public bool Stabbing
     {
-        get => Projectile.Additions().ExtraAI[7] == 1f;
-        set => Projectile.Additions().ExtraAI[7] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[7] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[7] = value.ToInt();
     }
 
     public override bool? CanDamage()
@@ -83,7 +83,7 @@ public class FulgurSwing : BaseSwordSwing
             PlayedSound = true;
         }
 
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, (c) => Center.ToNumerics(), 20);
 
         if (SwingDir == SwingDirection.Down && MathF.Round(Animation(), 2) == .6f)
@@ -99,8 +99,12 @@ public class FulgurSwing : BaseSwordSwing
                 if (Item.CheckManaBetter(Owner, 2, true))
                 {
                     Vector2 pos = Rect().Top;
-                    FulgurZap chain = Main.projectile[Projectile.NewProj(pos, Vector2.Zero, ModContent.ProjectileType<FulgurZap>(), Projectile.damage / 4, Projectile.knockBack / 4, Owner.whoAmI)].As<FulgurZap>();
-                    chain.End = target.RandAreaInEntity();
+                    if (this.RunLocal())
+                    {
+                        FulgurZap chain = Main.projectile[Projectile.NewProj(pos, Vector2.Zero, ModContent.ProjectileType<FulgurZap>(), (int)(Projectile.damage * .28f), Projectile.knockBack / 4, Owner.whoAmI)].As<FulgurZap>();
+                        chain.End = target.RandAreaInEntity();
+                        chain.Sync();
+                    }
                     SoundID.DD2_LightningBugZap.Play(pos, 1f, -.1f, .1f);
                 }
             }
@@ -231,7 +235,7 @@ public class FulgurSwing : BaseSwordSwing
 
         void draw()
         {
-            if (trail == null || points == null || trail._disposed)
+            if (trail == null || points == null || trail.Disposed)
                 return;
 
             ManagedShader shader = ShaderRegistry.SwingShader;
@@ -242,7 +246,6 @@ public class FulgurSwing : BaseSwordSwing
             shader.TrySetParameter("trailSpeed", 2f);
             trail.DrawTrail(shader, points.Points, 100, true);
         }
-
 
         Main.spriteBatch.Draw(Tex, Projectile.Center - Main.screenPosition, null, lightColor,
             Projectile.rotation + RotationOffset, origin, Projectile.scale, Effects, 0f);

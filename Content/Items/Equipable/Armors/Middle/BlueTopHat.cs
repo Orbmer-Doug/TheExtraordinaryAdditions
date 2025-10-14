@@ -1,14 +1,11 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
-using TheExtraordinaryAdditions.Content.Buffs.Debuff;
 using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -18,6 +15,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
 public class BlueTopHat : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BlueTopHat);
+
     public override void SetStaticDefaults()
     {
         ArmorIDs.Head.Sets.DrawHead[Item.headSlot] = true; // Don't draw the head at all. Used by Space Creature Mask
@@ -25,6 +23,7 @@ public class BlueTopHat : ModItem
         ArmorIDs.Head.Sets.DrawFullHair[Item.headSlot] = false; // Draw all hair as normal. Used by Mime Mask, Sunglasses
         ArmorIDs.Head.Sets.DrawsBackHairWithoutHeadgear[Item.headSlot] = true;
     }
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(Color.AliceBlue);
@@ -83,9 +82,9 @@ public class BlueTopHat : ModItem
 
     public override bool IsArmorSet(Item head, Item body, Item legs)
     {
-        if (body.type == Mod.Find<ModItem>("BlueTuxedo").Type)
+        if (body.type == ModContent.ItemType<BlueTuxedo>())
         {
-            return legs.type == Mod.Find<ModItem>("BlueLeggings").Type;
+            return legs.type == ModContent.ItemType<BlueLeggings>();
         }
         return false;
     }
@@ -95,6 +94,7 @@ public class BlueTopHat : ModItem
         player.GetDamage(DamageClass.Melee) += 0.25f;
         player.buffImmune[BuffID.Chilled] = true;
     }
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();

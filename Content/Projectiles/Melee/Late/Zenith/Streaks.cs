@@ -28,6 +28,7 @@ public class Streaks : ModProjectile
         Projectile.localNPCHitCooldown = 10;
         Projectile.noEnchantmentVisuals = true;
     }
+
     public override void AI()
     {
         Projectile.rotation = Projectile.velocity.ToRotation();

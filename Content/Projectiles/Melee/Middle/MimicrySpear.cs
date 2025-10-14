@@ -36,7 +36,7 @@ public class MimicrySpear : ModProjectile
         set => Projectile.ai[1] = value.ToInt();
     }
     public ref float Offset => ref Projectile.ai[2];
-    public ref float CurrentStab => ref Projectile.Additions().ExtraAI[0];
+    public ref float CurrentStab => ref Projectile.AdditionsInfo().ExtraAI[0];
 
     public const float timeReeling = 90f;
     public const float timeOut = 10f;
@@ -209,7 +209,6 @@ public class MimicrySpear : ModProjectile
         }
 
         Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, null, lightColor * Projectile.Opacity, Projectile.rotation + rotOff, tex.Size() / 2, Projectile.scale, fx, 0f);
-
         return false;
     }
 }

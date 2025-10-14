@@ -1,5 +1,4 @@
 ﻿using Terraria;
-using Terraria.Localization;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
 using TheExtraordinaryAdditions.Core.Globals;

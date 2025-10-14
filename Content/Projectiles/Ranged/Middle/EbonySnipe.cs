@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria;
+﻿using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Common.Particles.Metaball;
 
@@ -30,13 +25,11 @@ public class EbonySnipe : ModProjectile
             MetaballRegistry.SpawnOnyxMetaball(Projectile.Center, Vector2.Zero, 40, 45);
         Time++;
     }
-    
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         for (int i = 0; i < 50; i++)
-        {
             MetaballRegistry.SpawnOnyxMetaball(Projectile.Center + Main.rand.NextVector2Circular(40f, 40f), Vector2.Zero, 70, 80);
-        }
 
         if (damageDone > target.life)
             Projectile.penetrate++;
@@ -45,9 +38,7 @@ public class EbonySnipe : ModProjectile
     public override bool OnTileCollide(Vector2 oldVelocity)
     {
         for (int i = 0; i < 50; i++)
-        {
             MetaballRegistry.SpawnOnyxMetaball(Projectile.Center + Main.rand.NextVector2Circular(40f, 40f), Vector2.Zero, 70, 80);
-        }
         return true;
     }
 }

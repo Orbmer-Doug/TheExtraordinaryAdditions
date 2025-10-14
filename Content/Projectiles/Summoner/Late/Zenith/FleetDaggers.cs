@@ -1,13 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Assets;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Late.Avia;
@@ -54,10 +50,11 @@ public class FleetDaggers : ModProjectile
         {
             AdditionsSound.MediumExplosion.Play(Projectile.Center, 1.2f);
 
-            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<TenebrisBlast>(), (int)(Projectile.damage * 1.25), 0f);
+            if (this.RunLocal())
+                Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<TenebrisBlast>(), (int)(Projectile.damage * 1.25), 0f);
         }
     }
-    
+
     public override void AI()
     {
         after ??= new(6, () => Projectile.Center);
@@ -67,7 +64,7 @@ public class FleetDaggers : ModProjectile
         Projectile.Opacity = InverseLerp(0f, 10f, Time);
         if (Main.rand.NextBool())
             ParticleRegistry.SpawnHeavySmokeParticle(Projectile.RotHitbox().RandomPoint(), Projectile.velocity * Main.rand.NextFloat(.1f, .4f), Main.rand.Next(15, 24), Main.rand.NextFloat(.4f, .6f), Color.Purple.Lerp(Color.Violet, .4f), Main.rand.NextFloat(.4f, .8f));
-        
+
         Lighting.AddLight(Projectile.Center, Color.BlueViolet.ToVector3() * 1f);
         Projectile.FacingUp();
     }

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -29,6 +28,7 @@ public class BeetleHoldout : ModProjectile
         Projectile.tileCollide = false;
         Projectile.ignoreWater = true;
     }
+
     public ref float Time => ref Projectile.ai[0];
     public bool Right
     {
@@ -69,13 +69,11 @@ public class BeetleHoldout : ModProjectile
         Projectile.Opacity = Interpolant;
 
         if (Main.rand.NextBool((int)(10 * (1.2f - RiseInterpolant))))
-        {
-            ParticleRegistry.SpawnCloudParticle(Projectile.RotHitbox().RandomPoint(), Main.rand.NextVector2Circular(2f, 2f), Color.Crimson, Color.DarkRed, Main.rand.Next(20, 40), Main.rand.NextFloat(.3f, .45f), .2f + RiseInterpolant * .8f);
-        }
+            ParticleRegistry.SpawnCloudParticle(Projectile.RotHitbox().RandomPoint(), Main.rand.NextVector2Circular(2f, 2f), Color.Crimson, Color.DarkRed,
+                Main.rand.Next(20, 40), Main.rand.NextFloat(.3f, .45f), .2f + RiseInterpolant * .8f);
         if (Main.rand.NextBool((int)(5 * (1.2f - RiseInterpolant))))
-        {
-            ParticleRegistry.SpawnBloomPixelParticle(Projectile.RotHitbox().RandomPoint(), Vector2.UnitY * -(Main.rand.NextFloat(2f, 5f) * Interpolant), Main.rand.Next(30, 45), Main.rand.NextFloat(.4f, .6f), Color.DarkRed, Color.Crimson * 1.4f, null, 1f, 3);
-        }
+            ParticleRegistry.SpawnBloomPixelParticle(Projectile.RotHitbox().RandomPoint(), Vector2.UnitY * -(Main.rand.NextFloat(2f, 5f) * Interpolant),
+                Main.rand.Next(30, 45), Main.rand.NextFloat(.4f, .6f), Color.DarkRed, Color.Crimson * 1.4f, null, 1f, 3);
 
         if (Time >= AnimTime)
         {
@@ -98,7 +96,7 @@ public class BeetleHoldout : ModProjectile
 
                     AdditionsNetcode.SyncAdditionsBloodMoon(Main.myPlayer);
                 }
-                
+
                 AdditionsNetcode.SyncWorld();
             }
             else
@@ -126,9 +124,7 @@ public class BeetleHoldout : ModProjectile
         SpriteEffects fx = Owner.gravDir == -1 ? SpriteEffects.FlipVertically : SpriteEffects.None;
         if (Owner.direction == 1)
             fx |= SpriteEffects.FlipHorizontally;
-
         Main.spriteBatch.DrawBetter(tex, pos, frame, col, 0f, orig, 1f, fx);
-
         return false;
     }
 }

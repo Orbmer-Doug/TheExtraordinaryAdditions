@@ -43,7 +43,7 @@ public class CrimtaneArrow : ModProjectile
         get => Projectile.ai[2] == 1f;
         set => Projectile.ai[2] = value.ToInt();
     }
-    public ref float TrailOpacity => ref Projectile.Additions().ExtraAI[0];
+    public ref float TrailOpacity => ref Projectile.AdditionsInfo().ExtraAI[0];
 
     public override void AI()
     {
@@ -78,7 +78,7 @@ public class CrimtaneArrow : ModProjectile
 
         if (TrailOpacity > .01f)
         {
-            if (trail == null || trail._disposed)
+            if (trail == null || trail.Disposed)
                 trail = new(c => Projectile.width, (c, pos) => Color.Crimson * MathHelper.SmoothStep(1f, 0f, c.X) * TrailOpacity, null, 5);
             points ??= new(5);
             points.Update(Projectile.Center + Projectile.velocity - PolarVector(12f, Projectile.velocity.ToRotation()));
@@ -119,14 +119,17 @@ public class CrimtaneArrow : ModProjectile
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        Projectile.tileCollide = false;
+        if (!HitEnemy)
+        {
+            Projectile.tileCollide = false;
 
-        NPCID = target.whoAmI;
-        Offset = Projectile.position - target.position;
-        Offset -= Projectile.velocity;
+            NPCID = target.whoAmI;
+            Offset = Projectile.position - target.position;
+            Offset -= Projectile.velocity;
 
-        HitEnemy = true;
-        this.Sync();
+            HitEnemy = true;
+            this.Sync();
+        }
     }
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
@@ -145,7 +148,7 @@ public class CrimtaneArrow : ModProjectile
         {
             if (points == null)
                 return;
-            if (trail != null && !trail._disposed && TrailOpacity > .01f)
+            if (trail != null && !trail.Disposed && TrailOpacity > .01f)
                 trail.DrawTrail(ShaderRegistry.StandardPrimitiveShader, points.Points, 50, true);
         }
         PixelationSystem.QueuePrimitiveRenderAction(prim, PixelationLayer.UnderProjectiles);

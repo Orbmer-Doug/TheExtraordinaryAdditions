@@ -1,14 +1,10 @@
-﻿
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.IO;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.ModLoader.IO;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Content.Items.Tools;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Systems;
@@ -153,7 +149,7 @@ public class GodDummyNPC : ModNPC
     {
         if (NPC.justHit || NPC.frameCounter > 0.0 || NPC.frame.Y != 0 && NPC.frame.Y != frameHeight * 4)
             NPC.frameCounter += 1.0;
-        
+
         if (NPC.frameCounter > 6.0)
         {
             NPC.frameCounter = 0.0;

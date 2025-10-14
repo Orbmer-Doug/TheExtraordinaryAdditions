@@ -10,6 +10,7 @@ using Terraria.Graphics.Effects;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
@@ -26,11 +27,11 @@ public abstract class BaseWhip : ModProjectile, ILocalizedModType, IModType
 {
     #region Variables/Defaults
     public const int Samples = 50;
-    public const int MaxUpdates = 3;
+    public const int MaxUpdates = 8;
     public virtual int TipSize => 16;
     public virtual int HandleSize => 24;
     public virtual int SegmentSkip => 1;
-    public int SwingTime => Owner.itemAnimationMax * MaxUpdates;
+    public int SwingTime => Owner.itemTimeMax * MaxUpdates;
 
     /// <summary>
     /// Needs to be set true for every frame to work
@@ -40,7 +41,7 @@ public abstract class BaseWhip : ModProjectile, ILocalizedModType, IModType
     internal bool PauseTimer;
 
     public OptimizedPrimitiveTrail Line;
-    public ManualTrailPoints WhipPoints = new(Samples);
+    public TrailPoints WhipPoints = new(Samples);
     public Vector2 Tip;
     public Vector2 OutwardVel;
 
@@ -105,7 +106,7 @@ public abstract class BaseWhip : ModProjectile, ILocalizedModType, IModType
         Owner.heldProj = Projectile.whoAmI;
 
         float rot = Projectile.velocity.ToRotation() * Owner.gravDir;
-        float armReel = 3 * MathHelper.Pi / 4 * Owner.direction;
+        float armReel = ThreePIOver4 * Owner.direction;
 
         float armRot = new Animators.PiecewiseCurve()
             .Add(rot - armReel, rot, .3f, Animators.MakePoly(4.5f).OutFunction)
@@ -114,13 +115,13 @@ public abstract class BaseWhip : ModProjectile, ILocalizedModType, IModType
             .Evaluate(Completion);
         Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, armRot - MathHelper.PiOver2);
         Projectile.Center = Owner.GetFrontHandPositionImproved();
-        
+
         if (!OverrideWhipPoints)
             UpdateControlPoints();
         else
             OverridePoints();
 
-        if (Line == null || Line._disposed)
+        if (Line == null || Line.Disposed)
             Line = new(LineWidth, LineColor);
 
         if (!Main.dedServ)
@@ -248,7 +249,7 @@ public abstract class BaseWhip : ModProjectile, ILocalizedModType, IModType
         {
             AchievementsHelper.CurrentlyMining = true;
 
-            BaseWhip whip = self.ModProjectile as BaseWhip; 
+            BaseWhip whip = self.ModProjectile as BaseWhip;
             bool[] tileCutIgnorance = whip.Owner.GetTileCutIgnorance(allowRegrowth: false, self.trap);
             DelegateMethods.tilecut_0 = TileCuttingContext.AttackProjectile;
             DelegateMethods.tileCutIgnore = tileCutIgnorance;
@@ -285,7 +286,7 @@ public abstract class BaseWhip : ModProjectile, ILocalizedModType, IModType
 
     public virtual void DrawLine()
     {
-        if (Line != null && !Line._disposed)
+        if (Line != null && !Line.Disposed)
         {
             ManagedShader shader = ShaderRegistry.StandardPrimitiveShader;
             Line.DrawTrail(shader, WhipPoints.Points);

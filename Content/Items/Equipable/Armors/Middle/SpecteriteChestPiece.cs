@@ -1,9 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
@@ -12,6 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
 public class SpecteriteChestPiece : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SpecteriteChestPiece);
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(new Color(85, 77, 255));
@@ -25,12 +25,13 @@ public class SpecteriteChestPiece : ModItem
         Item.rare = ItemRarityID.Yellow;
         Item.defense = 10;
     }
-    public override bool CanConsumeAmmo(Item ammo, Player player) => Main.rand.NextFloat() >= 0.3f;
 
     public override void UpdateEquip(Player player)
     {
+        player.ammoCost75 = true;
         player.GetDamage(DamageClass.Ranged) += 0.25f;
     }
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();

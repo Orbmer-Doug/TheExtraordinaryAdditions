@@ -1,9 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System.Collections.Generic;
 using Terraria;
-using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.UI;
@@ -60,7 +58,7 @@ public class BiomePointerUI : SmartUIState
         float interpolant = 1f - InverseLerp(0f, 1f, Scroll);
         Vector2 finalScale = backgroundScale * interpolant;
         Color drawCol = proj.GetAlpha(Color.White.Lerp(Color.Red, NoTileCompletion).Lerp(Color.Green, TileCompletion)) * interpolant;
-        
+
         switch (pointer.Mode)
         {
             case BlockToPointTo.Marble:

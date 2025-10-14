@@ -1,10 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
@@ -12,39 +11,33 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 public class DecayingCutlery : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.DecayingCutlery);
+
     public override void SetStaticDefaults()
     {
         ItemID.Sets.SkipsInitialUseSound[Item.type] = true;
         ItemID.Sets.Spears[Item.type] = true;
     }
 
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(new Color(166, 147, 38));
-    }
-
     public override void SetDefaults()
     {
-        // Common Properties
         Item.rare = ItemRarityID.Pink;
         Item.value = AdditionsGlobalItem.RarityPinkBuyPrice;
-
-        // Use Properties
         Item.useStyle = ItemUseStyleID.Shoot;
         Item.useAnimation = Item.useTime = 28;
         Item.UseSound = SoundID.Item71;
         Item.autoReuse = true;
-
-        // Weapon Properties
-        Item.damage = 55;
+        Item.damage = 65;
         Item.knockBack = 2.5f;
         Item.noUseGraphic = true;
         Item.DamageType = DamageClass.Melee;
         Item.noMelee = true;
-
-        // Projectile Properties
         Item.shootSpeed = 30f;
         Item.shoot = ModContent.ProjectileType<DecayingCutleryStab>();
+    }
+
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(new Color(166, 147, 38));
     }
 
     public override bool CanUseItem(Player player)

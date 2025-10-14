@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
 using System;
 using System.Collections.Generic;
 using Terraria;
@@ -227,9 +226,9 @@ public sealed class ManagedShader : IDisposable
             Matrix projection;
 
             if (pixelated)
-                UpdatePixelatedBaseEffect(out world, out projection, out view);
+                GetPixelated2DMatrices(out world, out projection, out view);
             else
-                UpdateBaseEffect(out world, out projection, out view);
+                Get2DMatrices(out world, out projection, out view);
             transform = world * view * projection;
         }
         else

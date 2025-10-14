@@ -1,12 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -85,7 +82,7 @@ public class ConsumingVoid : ModProjectile, ILocalizedModType, IModType
         Projectile.Opacity = InverseLerp(0f, 4f * Projectile.MaxUpdates, Time);
         Projectile.scale = Utils.Remap(Time, 0f, Projectile.MaxUpdates * 15f, 0.01f, 1.5f, true) * Utils.GetLerpValue(0f, Projectile.MaxUpdates * 16f, Projectile.timeLeft, true);
         Projectile.ExpandHitboxBy((int)(Projectile.scale * 62f));
-       
+
         if (Time % 3f == 0f)
         {
             // Create suck energy particles.
@@ -151,8 +148,7 @@ public class ConsumingVoid : ModProjectile, ILocalizedModType, IModType
             Vector2 drawOffset = Vector2.UnitY * Projectile.scale * 6f;
             Color color = MulticolorLerp(completion, Color.Violet, Color.BlueViolet, Color.DarkViolet) * Projectile.Opacity;
             Vector2 drawPosition = Projectile.oldPos[i] + Projectile.Size * 0.5f - Main.screenPosition;
-            //Main.spriteBatch.Draw(worleyNoise, drawPosition - drawOffset, null, color, -spinRotation, worleyNoise.Size() * 0.5f, scale, 0, 0f);
-            Main.spriteBatch.Draw(worleyNoise, drawPosition , null, color, spinRotation + (completion * MathHelper.Pi), worleyNoise.Size() * 0.5f, scale, 0, 0f);
+            Main.spriteBatch.Draw(worleyNoise, drawPosition, null, color, spinRotation + (completion * MathHelper.Pi), worleyNoise.Size() * 0.5f, scale, 0, 0f);
         }
         Main.spriteBatch.ExitShaderRegion();
     }
@@ -162,7 +158,6 @@ public class ConsumingVoid : ModProjectile, ILocalizedModType, IModType
         Texture2D bloom = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
         float energyBaseScale = 1f;
 
-        // Draw energy particles that get sucked in.
         foreach (EnergySuckParticle particle in Particles)
         {
             float squish = 0.21f;

@@ -53,9 +53,7 @@ public class CorruptOrb : ModProjectile, ILocalizedModType, IModType
         if (Released)
         {
             for (int i = 0; i < 12; i++)
-            {
                 ParticleRegistry.SpawnBloomPixelParticle(Projectile.Center, Main.rand.NextVector2Circular(5f, 5f), Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .7f), Color.DarkViolet, Color.MediumPurple, null, 1.8f, 8);
-            }
         }
     }
 }

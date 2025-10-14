@@ -22,21 +22,20 @@ public class VaporizingStar : ProjOwnedByNPC<Asterlin>
 
     public StateType CurrentState
     {
-        get
-        {
-            return (StateType)Projectile.ai[1];
-        }
-        set
-        {
-            Projectile.ai[1] = (float)value;
-        }
+        get => (StateType)Projectile.ai[1];
+        set => Projectile.ai[1] = (float)value;
     }
 
-    public ref float TypeOf => ref Projectile.Additions().ExtraAI[0];
+    public int TypeOf
+    {
+        get => (int)Projectile.ai[2];
+        set => Projectile.ai[2] = value;
+    }
+
     public int CurrentShots
     {
-        get => (int)Projectile.Additions().ExtraAI[1];
-        set => Projectile.Additions().ExtraAI[1] = value;
+        get => (int)Projectile.AdditionsInfo().ExtraAI[0];
+        set => Projectile.AdditionsInfo().ExtraAI[0] = value;
     }
 
     public static readonly float GrowTime = SecondsToFrames(1.4f);
@@ -56,13 +55,12 @@ public class VaporizingStar : ProjOwnedByNPC<Asterlin>
         CooldownSlot = ImmunityCooldownID.Bosses;
     }
 
+    public static float TelegraphMaxAngularVelocity => MathHelper.ToRadians(2.1f);
+    public static readonly int LaserWait = DisintegrationBeam.TelegraphTime + DisintegrationBeam.BeamTime + (DisintegrationBeam.FadeTime / 2);
     public override void SafeAI()
     {
-        float telegraphMaxAngularVelocity = MathHelper.ToRadians(2.1f);
-        int wait = DisintegrationBurst.TelegraphTime + DisintegrationBurst.BeamTime;
-
         Vector2 targetPos = Target.Center + new Vector2(350f * TypeOf, -400f);
-        float totalTime = GrowTime + wait * Asterlin.Disintegration_TotalShots;
+        float totalTime = GrowTime + LaserWait * Asterlin.Disintegration_TotalShots;
 
         switch (CurrentState)
         {
@@ -83,28 +81,30 @@ public class VaporizingStar : ProjOwnedByNPC<Asterlin>
 
                 if (CurrentShots >= Asterlin.Disintegration_TotalShots)
                 {
-                    if (!AnyProjectile(ModContent.ProjectileType<DisintegrationBurst>()))
+                    if (!AnyProjectile(ModContent.ProjectileType<DisintegrationBeam>()))
                         Projectile.Opacity = MathHelper.Clamp(Projectile.Opacity - 0.05f, 0f, 1f);
                     if (Projectile.Opacity <= 0f)
                         Projectile.Kill();
                 }
                 else
                 {
-                    if (Timer % wait == wait - 1)
+                    if (Timer % LaserWait == LaserWait - 1)
                     {
                         AdditionsSound.spearLaser.Play(Projectile.Center);
-                        for (int i = 0; i < Asterlin.Disintegration_TotalBeams; i++)
+                        if (this.RunServer())
                         {
-                            float angularVelocity = Main.rand.NextFloat(0.65f, 1f) * Main.rand.NextFromList(-1f, 1f) * telegraphMaxAngularVelocity;
-                            Vector2 laserDirection = (MathHelper.TwoPi * i / Asterlin.Disintegration_TotalBeams + Main.rand.NextFloatDirection() * 0.16f).ToRotationVector2();
+                            for (int i = 0; i < Asterlin.Disintegration_TotalBeams; i++)
+                            {
+                                float angularVelocity = Main.rand.NextFloat(0.65f, 1f) * Main.rand.NextFromList(-1f, 1f) * TelegraphMaxAngularVelocity;
+                                Vector2 laserDirection = (MathHelper.TwoPi * i / Asterlin.Disintegration_TotalBeams + Main.rand.NextFloatDirection() * 0.16f).ToRotationVector2();
 
-                            DisintegrationBurst beam = Main.projectile[SpawnProjectile(Projectile.Center, laserDirection,
-                                ModContent.ProjectileType<DisintegrationBurst>(), Asterlin.HeavyAttackDamage, 0f, -1)].As<DisintegrationBurst>();
-                            beam.MaxAngleShift = angularVelocity;
-                            beam.Projectile.Additions().ExtraAI[2] = Projectile.whoAmI;
+                                int index = SpawnProjectile(Projectile.Center, laserDirection,
+                                    ModContent.ProjectileType<DisintegrationBeam>(), Asterlin.HeavyAttackDamage, 0f, ai0: 0f, ai1: Projectile.whoAmI, ai2: angularVelocity);
+                                Main.projectile[index].netUpdate = true;
+                            }
                         }
                         CurrentShots++;
-                        Boss.Disintegration_CurrentShot = CurrentShots;
+                        ModOwner.Disintegration_CurrentShot = CurrentShots;
                         Owner.netUpdate = true;
                         Projectile.netUpdate = true;
                     }

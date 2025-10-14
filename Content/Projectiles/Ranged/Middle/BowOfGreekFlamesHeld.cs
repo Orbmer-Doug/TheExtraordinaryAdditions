@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,8 +7,6 @@ using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Assets;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
@@ -37,15 +34,15 @@ public class BowOfGreekFlamesHeld : BaseIdleHoldoutProjectile
     }
 
     public List<Vector2> Points;
-    public ManualTrailPoints cache;
+    public TrailPoints cache;
     public const int MaxPoints = 40;
     public const float ReelDist = 15f;
     public int ReelTime => Item.useTime;
     public ref float Time => ref Projectile.ai[0];
     public ref float Switch => ref Projectile.ai[1];
     public ref float StringCompletion => ref Projectile.ai[2];
-    public ref float OldStringCompletion => ref Projectile.Additions().ExtraAI[0];
-    public ref float TotalTime => ref Projectile.Additions().ExtraAI[2];
+    public ref float OldStringCompletion => ref Projectile.AdditionsInfo().ExtraAI[0];
+    public ref float TotalTime => ref Projectile.AdditionsInfo().ExtraAI[2];
     public int Dir => Projectile.velocity.X.NonZeroSign();
     public override void OnSpawn(IEntitySource source)
     {
@@ -68,7 +65,9 @@ public class BowOfGreekFlamesHeld : BaseIdleHoldoutProjectile
     public static readonly Texture2D arrow = AssetRegistry.GetTexture(AdditionsTexture.GreekBombArrow);
     public override void SafeAI()
     {
-        Owner.heldProj = Projectile.whoAmI;
+        if (trail == null || trail.Disposed)
+            trail = new(c => 2f, (c, pos) => new(219, 255, 186), null, MaxPoints);
+
         if (this.RunLocal())
         {
             Projectile.velocity = Center.SafeDirectionTo(Modded.mouseWorld);
@@ -164,10 +163,11 @@ public class BowOfGreekFlamesHeld : BaseIdleHoldoutProjectile
         }
     }
 
+    public OptimizedPrimitiveTrail trail;
     public override bool PreDraw(ref Color lightColor)
     {
-        OptimizedPrimitiveTrail trail = new(c => 2f, (c, pos) => new(219, 255, 186), null, MaxPoints);
-        trail.DrawTrail(ShaderRegistry.StandardPrimitiveShader, cache.Points, 100, false, false);
+        if (trail != null && !trail.Disposed && cache != null)
+            trail.DrawTrail(ShaderRegistry.StandardPrimitiveShader, cache.Points, 100, false, false);
 
         Texture2D texture = Projectile.ThisProjectileTexture();
         float rotation = Projectile.rotation;

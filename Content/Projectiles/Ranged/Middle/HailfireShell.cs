@@ -6,7 +6,6 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
@@ -36,15 +35,9 @@ public class HailfireShell : ModProjectile
     }
 
     private Vector2 offset;
-    public override void SendExtraAI(BinaryWriter writer)
-    {
-        writer.WriteVector2(offset);
-    }
-    public override void ReceiveExtraAI(BinaryReader reader)
-    {
-        offset = reader.ReadVector2();
-    }
-
+    public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(offset);
+    public override void ReceiveExtraAI(BinaryReader reader) => offset = reader.ReadVector2();
+    
     public bool Stuck
     {
         get => Projectile.ai[2] == 1f;
@@ -52,12 +45,12 @@ public class HailfireShell : ModProjectile
     }
     public bool HitGround
     {
-        get => Projectile.Additions().ExtraAI[0] == 1f;
-        set => Projectile.Additions().ExtraAI[0] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[0] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
 
-    public ref float Time => ref Projectile.Additions().ExtraAI[5];
-    public ref float Blink => ref Projectile.Additions().ExtraAI[6];
+    public ref float Time => ref Projectile.AdditionsInfo().ExtraAI[5];
+    public ref float Blink => ref Projectile.AdditionsInfo().ExtraAI[6];
     public ref float EnemyID => ref Projectile.ai[1];
 
     public static readonly float MaxTime = SecondsToFrames(5f);
@@ -108,9 +101,7 @@ public class HailfireShell : ModProjectile
         after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 255, 0, 0f, null, false, .4f));
 
         if (Owner.Additions().SafeMouseRight.JustPressed && this.RunLocal())
-        {
             Projectile.Kill();
-        }
 
         if (Blink > 0f)
         {
@@ -118,22 +109,7 @@ public class HailfireShell : ModProjectile
             Blink--;
         }
 
-        if (Time.BetweenNum(0f, MaxTime * .25f))
-        {
-            Projectile.damage = Hailfire.Damage;
-        }
-        if (Time.BetweenNum(0f, MaxTime * .5f))
-        {
-            Projectile.damage = (int)(Hailfire.Damage * 1.9f);
-        }
-        if (Time.BetweenNum(0f, MaxTime * .75f))
-        {
-            Projectile.damage = (int)(Hailfire.Damage * 2.6f);
-        }
-        if (Time == MaxTime)
-        {
-            Projectile.damage = (int)(Hailfire.Damage * 3f);
-        }
+        Projectile.damage = (int)Utils.Remap(Projectile.damage, 0f, MaxTime, 0f, Projectile.originalDamage * 3f);
     }
 
     public override void OnKill(int timeLeft)
@@ -143,9 +119,7 @@ public class HailfireShell : ModProjectile
         AdditionsSound.crosscodeExplosion.Play(Projectile.Center, .8f, 0f, .1f, 10, Name);
 
         if (this.RunLocal())
-        {
             Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<HailfireExplosion>(), Projectile.damage, 0f, Projectile.owner, (int)(Time * 1.2f), 0f);
-        }
     }
 
     public override bool? CanHitNPC(NPC target) => !HitGround;

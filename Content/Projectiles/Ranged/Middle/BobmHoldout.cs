@@ -1,11 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
-using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
@@ -54,14 +50,15 @@ public class BobmHoldout : BaseHoldoutProjectile
 
         foreach (Player player in Main.ActivePlayers)
         {
-            if (!player.WithinRange(Projectile.Center, Main.screenWidth))
+            if (!player.WithinRange(Projectile.Center, Main.LogicCheckScreenWidth))
                 continue;
             if (player.Available() && player.RotHitbox().Intersects(Projectile.RotHitbox()) && player.whoAmI != Projectile.owner)
                 FoundSuspect();
         }
+
         foreach (NPC npc in Main.ActiveNPCs)
         {
-            if (!npc.WithinRange(Projectile.Center, Main.screenWidth))
+            if (!npc.WithinRange(Projectile.Center, Main.LogicCheckScreenWidth))
                 continue;
             if (npc.RotHitbox().Intersects(Projectile.RotHitbox()))
                 FoundSuspect();

@@ -23,16 +23,9 @@ public class TheExingendies : ModProjectile, ILocalizedModType, IModType
 
     public enum States
     {
-        // Reality tears
         Luminescence,
-
-        // Orion's Sword and numerous constellations
         Constellative,
-
-        // A controlled star
         Vaporization,
-
-        // Gamma Ray
         ActiveGalacticNucleus
     }
 
@@ -43,33 +36,26 @@ public class TheExingendies : ModProjectile, ILocalizedModType, IModType
         set => Projectile.ai[1] = (int)value;
     }
     public ref float ForwardRotation => ref Projectile.ai[2];
-    public ref float ChargeTimer => ref Projectile.Additions().ExtraAI[0];
-    public ref float PhaseTimer => ref Projectile.Additions().ExtraAI[1];
-    public ref float FadeTimer => ref Projectile.Additions().ExtraAI[2];
+    public ref float ChargeTimer => ref Projectile.AdditionsInfo().ExtraAI[0];
+    public ref float PhaseTimer => ref Projectile.AdditionsInfo().ExtraAI[1];
+    public ref float FadeTimer => ref Projectile.AdditionsInfo().ExtraAI[2];
     public States SavePhase
     {
-        get => (States)Projectile.Additions().ExtraAI[3];
-        set => Projectile.Additions().ExtraAI[3] = (int)value;
+        get => (States)Projectile.AdditionsInfo().ExtraAI[3];
+        set => Projectile.AdditionsInfo().ExtraAI[3] = (int)value;
     }
     public bool RayWait
     {
-        get => Projectile.Additions().ExtraAI[4] == 1f;
-        set => Projectile.Additions().ExtraAI[4] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[4] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[4] = value.ToInt();
     }
-    public ref float SpinDirection => ref Projectile.Additions().ExtraAI[5];
+    public ref float SpinDirection => ref Projectile.AdditionsInfo().ExtraAI[5];
 
     public Vector2 Size;
 
-    public override void SendExtraAI(BinaryWriter writer)
-    {
-        writer.WriteVector2(Size);
-    }
-
-    public override void ReceiveExtraAI(BinaryReader reader)
-    {
-        Size = reader.ReadVector2();
-    }
-
+    public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(Size);
+    public override void ReceiveExtraAI(BinaryReader reader) => Size = reader.ReadVector2();
+    
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.CanDistortWater[Type] = false;
@@ -96,6 +82,7 @@ public class TheExingendies : ModProjectile, ILocalizedModType, IModType
     public float FadeCompletion => InverseLerp(FadeTime, 0f, FadeTimer);
     public float Completion => InverseLerp(0f, ChargeTime, ChargeTimer) * FadeCompletion;
     public Vector2 MainCenter => Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
+
     public override void AI()
     {
         if (this.RunLocal())
@@ -142,7 +129,7 @@ public class TheExingendies : ModProjectile, ILocalizedModType, IModType
 
         if (Completion >= 1f)
         {
-            if (AdditionsKeybinds.SetBonusHotKey.JustPressed && Phase != States.ActiveGalacticNucleus && !RayWait && !AdditionsKeybinds.MiscHotKey.Current)
+            if (this.RunLocal() && AdditionsKeybinds.SetBonusHotKey.JustPressed && Phase != States.ActiveGalacticNucleus && !RayWait && !AdditionsKeybinds.MiscHotKey.Current)
             {
                 PhaseTimer = 0f;
                 SavePhase = Phase;
@@ -150,7 +137,7 @@ public class TheExingendies : ModProjectile, ILocalizedModType, IModType
             }
             if (Phase != States.ActiveGalacticNucleus)
             {
-                if (AdditionsKeybinds.MiscHotKey.JustPressed)
+                if (this.RunLocal() && AdditionsKeybinds.MiscHotKey.JustPressed)
                 {
                     PhaseTimer = 0f;
                     Projectile.ai[1] = (Projectile.ai[1] + 1) % (int)GetLastEnumValue<States>();
@@ -190,7 +177,7 @@ public class TheExingendies : ModProjectile, ILocalizedModType, IModType
         if (PhaseTimer % 40 == 39 && this.RunLocal())
         {
             Projectile.NewProj(ModdedOwner.mouseWorld, Vector2.UnitY.RotatedByRandom(.67f),
-                ModContent.ProjectileType<ScreenSplit>(), (int)Owner.GetTotalDamage<GenericDamageClass>().ApplyTo(23500f), Projectile.knockBack, Owner.whoAmI);
+                ModContent.ProjectileType<ScreenSplit>(), (int)Owner.GetTotalDamage<GenericDamageClass>().ApplyTo(7500f), Projectile.knockBack, Owner.whoAmI);
             AdditionsSound.VirtueAttack.Play(ModdedOwner.mouseWorld, 1.4f, -.7f, 0f, 300, Name);
             AdditionsSound.LargeWeaponFireDifferent.Play(ModdedOwner.mouseWorld, 1.3f, .5f, 0f, 300, Name);
         }
@@ -229,11 +216,11 @@ public class TheExingendies : ModProjectile, ILocalizedModType, IModType
         int star = ModContent.ProjectileType<CollapsingStar>();
         if (this.RunLocal() && Owner.ownedProjectileCounts[star] <= 0)
         {
-            Main.projectile[Projectile.NewProj(Projectile.Center, Vector2.Zero, star, (int)Owner.GetTotalDamage<GenericDamageClass>().ApplyTo(42000f), Projectile.knockBack, Owner.whoAmI)].Additions().ExtraAI[3] = Projectile.whoAmI;
+            Main.projectile[Projectile.NewProj(Projectile.Center, Vector2.Zero, star, (int)Owner.GetTotalDamage<GenericDamageClass>().ApplyTo(42000f), Projectile.knockBack, Owner.whoAmI)].AdditionsInfo().ExtraAI[3] = Projectile.whoAmI;
             AdditionsSound.BallFire.Play(Projectile.Center, 1.2f, -.2f, 0f, 50, Name);
         }
 
-        if (this.RunLocal() && PhaseTimer % 40 == 39 )
+        if (this.RunLocal() && PhaseTimer % 40 == 39)
             Projectile.NewProj(Projectile.Center, MainCenter.SafeDirectionTo(ModdedOwner.mouseWorld) * 16f,
                 ModContent.ProjectileType<HighSpeedDebris>(), (int)Owner.GetTotalDamage<GenericDamageClass>().ApplyTo(18000f), Projectile.knockBack, Owner.whoAmI);
 

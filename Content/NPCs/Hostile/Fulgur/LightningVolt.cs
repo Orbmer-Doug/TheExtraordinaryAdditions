@@ -1,11 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
+using System.IO;
 using Terraria;
-using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Lightning;
@@ -32,11 +30,25 @@ public class LightningVolt : ModProjectile
         Projectile.aiStyle = 0;
     }
 
+    public override void SendExtraAI(BinaryWriter writer)
+    {
+        writer.Write(Projectile.friendly);
+        writer.Write(Projectile.hostile);
+        writer.Write(Projectile.penetrate);
+    }
+
+    public override void ReceiveExtraAI(BinaryReader reader)
+    {
+        Projectile.friendly = reader.ReadBoolean();
+        Projectile.hostile = reader.ReadBoolean();
+        Projectile.penetrate = reader.ReadInt32();
+    }
+
     public ref float Time => ref Projectile.ai[0];
     public override void AI()
     {
         after ??= new(5, () => Projectile.Center);
-        
+
         Projectile.Opacity = InverseLerp(0f, 10f, Time);
         if (Projectile.timeLeft > 40)
             Projectile.SetAnimation(2, 7);

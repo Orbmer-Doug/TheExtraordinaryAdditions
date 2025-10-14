@@ -1,12 +1,10 @@
-﻿using log4net;
-using Microsoft.Xna.Framework;
-using Terraria;
+﻿using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Summon;
 using TheExtraordinaryAdditions.Content.Projectiles.Summoner.Early;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Early;
 
@@ -46,11 +44,10 @@ public class RampantShields : ModItem
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
         player.AddBuff(Item.buffType, 2);
-
         Projectile.NewProjectileDirect(source, position, velocity, type, damage, knockback, Main.myPlayer);
-
         return false;
     }
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
@@ -59,5 +56,4 @@ public class RampantShields : ModItem
         recipe.AddTile(TileID.Anvils);
         recipe.Register();
     }
-
 }

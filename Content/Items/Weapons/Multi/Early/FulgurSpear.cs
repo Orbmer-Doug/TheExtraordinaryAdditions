@@ -3,7 +3,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Multi.Early;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Multi.Early;
@@ -11,16 +11,11 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Multi.Early;
 public class FulgurSpear : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.FulgurSpear);
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(new Color(245, 242, 66));
-    }
 
-    public const int Time = 36;
     public override void SetDefaults()
     {
         Item.useStyle = ItemUseStyleID.Shoot;
-        Item.useAnimation = Item.useTime = Time;
+        Item.useAnimation = Item.useTime = 36;
         Item.shootSpeed = 42f;
         Item.knockBack = 3f;
         Item.width = 16;
@@ -34,6 +29,11 @@ public class FulgurSpear : ModItem
         Item.rare = ItemRarityID.Orange;
         Item.damage = 30;
         Item.DamageType = DamageClass.Melee;
+    }
+
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(new Color(245, 242, 66));
     }
 
     public override void AddRecipes()

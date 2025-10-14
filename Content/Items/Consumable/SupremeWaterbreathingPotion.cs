@@ -1,11 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Buff;
 using TheExtraordinaryAdditions.Content.Items.Materials.Middle;
-using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Utilities;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Consumable;
 
@@ -43,12 +41,10 @@ public class SupremeWaterbreathingPotion : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        {
-            recipe.AddIngredient(ItemID.GillsPotion, 1);
-            recipe.AddIngredient(ModContent.ItemType<CracklingFragments>(), 1);
-            recipe.AddIngredient(ItemID.Fireblossom, 3);
-            recipe.AddTile(TileID.AlchemyTable);
-        }
+        recipe.AddIngredient(ItemID.GillsPotion, 1);
+        recipe.AddIngredient(ModContent.ItemType<CracklingFragments>(), 1);
+        recipe.AddIngredient(ItemID.Fireblossom, 3);
+        recipe.AddTile(TileID.AlchemyTable);
         recipe.Register();
     }
 }

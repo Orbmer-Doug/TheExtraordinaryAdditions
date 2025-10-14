@@ -21,9 +21,6 @@ public class LivingStarFlareMinion : ModProjectile
 
     public override void SetStaticDefaults()
     {
-        ProjectileID.Sets.TrailingMode[Type] = 2;
-        ProjectileID.Sets.TrailCacheLength[Type] = 8;
-
         ProjectileID.Sets.DrawScreenCheckFluff[Type] = 12000;
         ProjectileID.Sets.MinionSacrificable[Type] = true;
         ProjectileID.Sets.MinionTargettingFeature[Type] = true;
@@ -48,8 +45,8 @@ public class LivingStarFlareMinion : ModProjectile
     public ref float OrbitRadius => ref Projectile.ai[2];
     public int Time
     {
-        get => (int)Projectile.Additions().ExtraAI[0];
-        set => Projectile.Additions().ExtraAI[0] = value;
+        get => (int)Projectile.AdditionsInfo().ExtraAI[0];
+        set => Projectile.AdditionsInfo().ExtraAI[0] = value;
     }
 
     public override void AI()
@@ -87,7 +84,9 @@ public class LivingStarFlareMinion : ModProjectile
             if (Time % wait == (wait - 1))
             {
                 AdditionsSound.HeavyLaserBlast.Play(Projectile.Center, .6f, -.1f, 0f, 20);
-                Projectile.NewProj(Projectile.Center, Main.rand.NextVector2Circular(1f, 1f), ModContent.ProjectileType<LivingStarBeam>(), Projectile.damage, Projectile.knockBack, Owner.whoAmI, Projectile.whoAmI, Target.whoAmI);
+                if (this.RunLocal())
+                    Projectile.NewProj(Projectile.Center, Projectile.SafeDirectionTo(Target.Center),
+                        ModContent.ProjectileType<LivingStarBeam>(), Projectile.damage, Projectile.knockBack, Owner.whoAmI, Projectile.whoAmI, Target.whoAmI);
             }
         }
 
@@ -156,28 +155,28 @@ public class LivingStarBeam : ModProjectile
     }
     public BeamState CurrentState
     {
-        get => (BeamState)Projectile.Additions().ExtraAI[0];
-        set => Projectile.Additions().ExtraAI[0] = (int)value;
+        get => (BeamState)Projectile.AdditionsInfo().ExtraAI[0];
+        set => Projectile.AdditionsInfo().ExtraAI[0] = (int)value;
     }
     public Vector2 TargetOffset
     {
-        get => new Vector2(Projectile.Additions().ExtraAI[1], Projectile.Additions().ExtraAI[2]);
+        get => new Vector2(Projectile.AdditionsInfo().ExtraAI[1], Projectile.AdditionsInfo().ExtraAI[2]);
         set
         {
-            Projectile.Additions().ExtraAI[1] = value.X;
-            Projectile.Additions().ExtraAI[2] = value.Y;
+            Projectile.AdditionsInfo().ExtraAI[1] = value.X;
+            Projectile.AdditionsInfo().ExtraAI[2] = value.Y;
         }
     }
     public bool Init
     {
-        get => Projectile.Additions().ExtraAI[3] == 1;
-        set => Projectile.Additions().ExtraAI[3] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[3] == 1;
+        set => Projectile.AdditionsInfo().ExtraAI[3] = value.ToInt();
     }
 
     public override bool ShouldUpdatePosition() => false;
     public override void AI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, null, 80);
 
         Projectile owner = Main.projectile?[OwnerIndex] ?? null;
@@ -250,7 +249,7 @@ public class LivingStarBeam : ModProjectile
         return MulticolorLerp(c.X, Color.Goldenrod, Color.Orange, Color.DarkOrange);
     }
 
-    public ManualTrailPoints points = new(80);
+    public TrailPoints points = new(80);
     public OptimizedPrimitiveTrail trail;
     public override bool PreDraw(ref Color lightColor)
     {

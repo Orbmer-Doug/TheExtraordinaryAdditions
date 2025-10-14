@@ -1,6 +1,4 @@
-﻿using Terraria;
-
-namespace TheExtraordinaryAdditions.Core.Graphics.Shaders;
+﻿namespace TheExtraordinaryAdditions.Core.Graphics.Shaders;
 
 /// <summary>
 /// Simple access to all shaders present in the autoloaded effects folder

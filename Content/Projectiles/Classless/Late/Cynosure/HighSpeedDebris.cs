@@ -1,7 +1,5 @@
 ﻿using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles.Metaball;
-using TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.Cynosure;
 
@@ -47,7 +45,7 @@ public class HighSpeedDebris : ModProjectile
             ParticleRegistry.SpawnBloomLineParticle(Projectile.Center, Main.rand.NextVector2CircularLimited(50f, 50f, .7f, 1f), Main.rand.Next(10, 12), Main.rand.NextFloat(.7f, 1.6f), Color.OrangeRed);
         }
         Projectile.CreateFriendlyExplosion(Projectile.Center, Vector2.One * ExplosionRadius, Projectile.damage, Projectile.knockBack, 10, 9);
-        
+
         // Create a 'shockwave'
         for (int i = 0; i < 30; i++)
         {
@@ -67,7 +65,7 @@ public class HighSpeedDebris : ModProjectile
         ParticleRegistry.SpawnBlurParticle(Projectile.Center, 60, .7f, ExplosionRadius * 1.4f);
         ParticleRegistry.SpawnFlash(Projectile.Center, 40, 1.9f, ExplosionRadius, .4f);
         ParticleRegistry.SpawnShockwaveParticle(Projectile.Center, 20, .2f, ExplosionRadius * 3f, 20f, .3f);
-        
+
         AdditionsSound.IkeSpecial5.Play(Projectile.Center, .8f, 0f, .3f, 100, Name);
         AdditionsSound.BraveSpecial1C.Play(Projectile.Center, 1.2f, -.2f);
         Projectile.Kill();

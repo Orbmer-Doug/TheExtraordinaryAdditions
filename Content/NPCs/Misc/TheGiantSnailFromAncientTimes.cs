@@ -22,6 +22,7 @@ public class TheGiantSnailFromAncientTimes : ModNPC
     public override void SetStaticDefaults()
     {
         NPCID.Sets.MPAllowedEnemies[Type] = true;
+        NPCID.Sets.ShouldBeCountedAsBoss[Type] = true;
     }
 
     public override void SetDefaults()
@@ -37,7 +38,6 @@ public class TheGiantSnailFromAncientTimes : ModNPC
         NPC.value = Item.buyPrice(1, 10, 5, 50);
         NPC.HitSound = SoundID.DD2_OgreRoar;
         NPC.DeathSound = SoundID.NPCDeath2;
-        NPC.boss = true;
         NPC.rarity = 5;
         NPC.noGravity = true;
         NPC.noTileCollide = true;
@@ -51,7 +51,7 @@ public class TheGiantSnailFromAncientTimes : ModNPC
     public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
     {
         bestiaryEntry.Info.AddRange([
-                BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Sky,
+                BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.UndergroundSnow,
                 new FlavorTextBestiaryInfoElement(this.GetLocalizedValue("Bestiary")),
                 new BossBestiaryInfoElement(),
             ]);
@@ -72,7 +72,7 @@ public class TheGiantSnailFromAncientTimes : ModNPC
         {
             Utility.DisplayText(this.GetLocalizedValue("Awaken"), Color.Red);
             NPC.ai[1] = 1f;
-            NPC.netUpdate = true;
+            this.Sync();
         }
 
         Player target = Main.player[NPC.target];
@@ -99,7 +99,7 @@ public class TheGiantSnailFromAncientTimes : ModNPC
             int damage = DifficultyBasedValue(30, 50, 65, 69, 80);
             float speed = 10f;
             if (this.RunServer())
-                NPC.Shoot(NPC.Center, direction.RotatedByRandom(.5f) * speed, ModContent.ProjectileType<ParmaJawn>(), damage, 1f, Main.myPlayer);
+                NPC.NewNPCProj(NPC.Center, direction.RotatedByRandom(.5f) * speed, ModContent.ProjectileType<ParmaJawn>(), damage, 1f);
             NPC.netUpdate = true;
         }
 

@@ -17,6 +17,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Early;
 public class BirchStickLance : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BirchStick);
+
     public const int MaxUpdates = 3;
     public override void SetStaticDefaults()
     {
@@ -24,6 +25,7 @@ public class BirchStickLance : ModProjectile
         ProjectileID.Sets.TrailCacheLength[Type] = 20;
         ProjectileID.Sets.HeldProjDoesNotUsePlayerGfxOffY[Type] = true;
     }
+
     public override void SetDefaults()
     {
         Projectile.netImportant = true;
@@ -40,6 +42,7 @@ public class BirchStickLance : ModProjectile
         Projectile.DamageType = DamageClass.MeleeNoSpeed;
         Projectile.noEnchantmentVisuals = true;
     }
+
     public Player Owner => Main.player[Projectile.owner];
     public GlobalPlayer Modded => Owner.Additions();
     public float AngularVelocity => MathF.Abs(Projectile.rotation - OldRot);
@@ -56,35 +59,34 @@ public class BirchStickLance : ModProjectile
     }
     public ref float Time => ref Projectile.ai[1];
     public ref float TimeStop => ref Projectile.ai[2];
-    public ref float Counter => ref Projectile.Additions().ExtraAI[0];
+    public ref float Counter => ref Projectile.AdditionsInfo().ExtraAI[0];
     public bool StruckTile
     {
-        get => Projectile.Additions().ExtraAI[1] == 1f;
-        set => Projectile.Additions().ExtraAI[1] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[1] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[1] = value.ToInt();
     }
     public bool Stabbing
     {
-        get => Projectile.Additions().ExtraAI[2] == 1f;
-        set => Projectile.Additions().ExtraAI[2] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[2] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[2] = value.ToInt();
     }
     public bool Initialized
     {
-        get => Projectile.Additions().ExtraAI[3] == 1f;
-        set => Projectile.Additions().ExtraAI[3] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[3] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[3] = value.ToInt();
     }
-
     public bool PlayedSound
     {
-        get => Projectile.Additions().ExtraAI[4] == 1f;
-        set => Projectile.Additions().ExtraAI[4] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[4] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[4] = value.ToInt();
     }
 
     public const int MaxStopTime = 5;
     public const int StopTime = MaxStopTime * MaxUpdates;
 
-    public ref float VanishTime => ref Projectile.Additions().ExtraAI[5];
-    public ref float TotalTime => ref Projectile.Additions().ExtraAI[6];
-    public ref float OldRot => ref Projectile.Additions().ExtraAI[7];
+    public ref float VanishTime => ref Projectile.AdditionsInfo().ExtraAI[5];
+    public ref float TotalTime => ref Projectile.AdditionsInfo().ExtraAI[6];
+    public ref float OldRot => ref Projectile.AdditionsInfo().ExtraAI[7];
 
     public Vector2 Center => Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
     public Vector2 SwordDir => (Projectile.rotation - MathHelper.PiOver4 + MathHelper.PiOver2).ToRotationVector2() * (State != BirchStickState.BashUp).ToDirectionInt() * Direction;
@@ -104,7 +106,7 @@ public class BirchStickLance : ModProjectile
             Initialized = true;
             this.Sync();
         }
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, (c) => Center.ToNumerics(), 20);
 
         Owner.ChangeDir(Projectile.velocity.X.NonZeroSign());
@@ -371,6 +373,7 @@ public class BirchStickLance : ModProjectile
         float _ = 0f;
         return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), GetRect().Top, GetRect().Bottom, GetRect().Width, ref _);
     }
+
     private Color ColorFunct(SystemVector2 c, Vector2 position) => Color.SaddleBrown * MathHelper.SmoothStep(1f, 0f, c.X) * InverseLerp(0.026f, 0.1f, AngularVelocity);
     private float WidthFunct(float c) => Projectile.width;
     public OptimizedPrimitiveTrail trail;
@@ -379,13 +382,12 @@ public class BirchStickLance : ModProjectile
     {
         if (State != BirchStickState.Poke && trail != null && cache != null)
         {
-            trail.DrawTrail(ShaderRegistry.StandardPrimitiveShader, cache.Points, 100);
+            trail.DrawTrail(ShaderRegistry.StandardPrimitiveShader, cache.Points, 100, false, false);
         }
 
         Texture2D tex = Projectile.ThisProjectileTexture();
         Vector2 orig = tex.Size() / 2;
         Main.spriteBatch.DrawBetter(tex, Projectile.Center, null, lightColor * Projectile.Opacity, Projectile.rotation, orig, Projectile.scale, 0);
-
         return false;
     }
 }

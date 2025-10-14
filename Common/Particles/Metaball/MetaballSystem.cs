@@ -1,10 +1,8 @@
-﻿using CalamityMod.Particles;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Terraria;
-using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -106,7 +104,7 @@ public class MetaballSystem : ModSystem
     public const uint MaxMetaballs = 16384;
     private static Metaball[] metaballs = new Metaball[MaxMetaballs];
     private static ulong[] presenceMask = BitmaskUtils.CreateMask(MaxMetaballs);
-    public static BitmaskUtils.BitmaskEnumerator ActiveMetaballs => new BitmaskUtils.BitmaskEnumerator(presenceMask, MaxMetaballs);
+    public static BitmaskUtils.BitmaskEnumerable ActiveMetaballs => new BitmaskUtils.BitmaskEnumerable(presenceMask.AsSpan(0, presenceMask.Length), MaxMetaballs);
 
     // Metaballs work by having all the particles live on one render target, but this means other types can overpower another one since they both influence each other
     // So we make all types have their own
@@ -416,8 +414,8 @@ public static class MetaballRegistry
 
     public static void Initialize()
     {
-        LavaMetaballDefinition();
         PlasmaMetaballDefinition();
+        LavaMetaballDefinition();
         OnyxMetaballDefinition();
         AbyssalMetaballDefinition();
         GenediesMetaballDefinition();

@@ -38,14 +38,14 @@ public class AstralKatanaSweep : BaseSwordSwing
 
     public bool Orange
     {
-        get => Projectile.Additions().ExtraAI[7] == 1f;
-        set => Projectile.Additions().ExtraAI[7] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[7] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[7] = value.ToInt();
     }
 
     public bool NoReset
     {
-        get => Projectile.Additions().ExtraAI[8] == 1f;
-        set => Projectile.Additions().ExtraAI[8] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[8] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[8] = value.ToInt();
     }
 
     public override int SwingTime => 32;
@@ -105,7 +105,7 @@ public class AstralKatanaSweep : BaseSwordSwing
             PlayedSound = true;
         }
 
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, (c) => Center.ToNumerics(), 25);
 
         // Update trails
@@ -238,7 +238,6 @@ public class AstralKatanaSweep : BaseSwordSwing
     public override bool PreDraw(ref Color lightColor)
     {
         // Determine the effects for drawing. These must be done here otherwise silly things WILL happen.
-
         void draw()
         {
             if (trail == null || old == null || SwingCompletion < .4f)
@@ -249,38 +248,40 @@ public class AstralKatanaSweep : BaseSwordSwing
             trail.DrawTrail(shader, old.Points);
         }
 
+        Vector2 origin;
+        bool flip = SwingDir != SwingDirection.Up;
+        if (Direction == -1)
+            flip = SwingDir == SwingDirection.Up;
+        if (Orange)
+            flip = !flip;
 
+        if (flip)
+        {
+            origin = new Vector2(0, Tex.Height);
+
+            RotationOffset = 0;
+            Effects = SpriteEffects.None;
+        }
+        else
+        {
+            origin = new Vector2(Tex.Width, Tex.Height);
+
+            RotationOffset = PiOver2;
+            Effects = SpriteEffects.FlipHorizontally;
+        }
+
+        Texture2D tex = Tex;
+        float bright = Brightness;
+        float offset = RotationOffset;
+        SpriteEffects effects = Effects;
         void sword()
         {
-            Vector2 origin;
-            bool flip = SwingDir != SwingDirection.Up;
-            if (Direction == -1)
-                flip = SwingDir == SwingDirection.Up;
-            if (Orange)
-                flip = !flip;
-
-            if (flip)
-            {
-                origin = new Vector2(0, Tex.Height);
-
-                RotationOffset = 0;
-                Effects = SpriteEffects.None;
-            }
-            else
-            {
-                origin = new Vector2(Tex.Width, Tex.Height);
-
-                RotationOffset = PiOver2;
-                Effects = SpriteEffects.FlipHorizontally;
-            }
-
-            Main.spriteBatch.Draw(Tex, Projectile.Center - Main.screenPosition, null, Color.White * Brightness,
-                        Projectile.rotation + RotationOffset, origin, Projectile.scale, Effects, 0f);
+            Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, null, Color.White * bright,
+                        Projectile.rotation + offset, origin, Projectile.scale, effects, 0f);
         }
 
         LayeredDrawSystem.QueueDrawAction(sword, Orange ? PixelationLayer.UnderPlayers : PixelationLayer.OverPlayers);
         PixelationSystem.QueuePrimitiveRenderAction(draw, Orange ? PixelationLayer.UnderPlayers : PixelationLayer.OverPlayers);
-
         return false;
     }
 }
@@ -321,19 +322,19 @@ public class AstralKatanaThrow : ModProjectile
     }
     public ref float AccumulatedVel => ref Projectile.ai[1];
     public ref float EnemyID => ref Projectile.ai[2];
-    public ref float Time => ref Projectile.Additions().ExtraAI[0];
+    public ref float Time => ref Projectile.AdditionsInfo().ExtraAI[0];
     public int Dir
     {
-        get => (int)Projectile.Additions().ExtraAI[1];
-        set => Projectile.Additions().ExtraAI[1] = value;
+        get => (int)Projectile.AdditionsInfo().ExtraAI[1];
+        set => Projectile.AdditionsInfo().ExtraAI[1] = value;
     }
     public int InitDir
     {
-        get => (int)Projectile.Additions().ExtraAI[2];
-        set => Projectile.Additions().ExtraAI[2] = value;
+        get => (int)Projectile.AdditionsInfo().ExtraAI[2];
+        set => Projectile.AdditionsInfo().ExtraAI[2] = value;
     }
-    public ref float LungeTime => ref Projectile.Additions().ExtraAI[3];
-    public ref float SavedAngle => ref Projectile.Additions().ExtraAI[4];
+    public ref float LungeTime => ref Projectile.AdditionsInfo().ExtraAI[3];
+    public ref float SavedAngle => ref Projectile.AdditionsInfo().ExtraAI[4];
 
     public const int ThrowTime = 30;
     public float Completion => InverseLerp(0f, ThrowTime, Time);
@@ -389,7 +390,7 @@ public class AstralKatanaThrow : ModProjectile
             {
                 AdditionsSound.etherealReleaseA.Play(Projectile.Center, .6f, .1f);
                 State = CurrentState.Thrown;
-                Time = 0; 
+                Time = 0;
                 if (this.RunLocal())
                     Projectile.velocity = center.SafeDirectionTo(Owner.Additions().mouseWorld) * 6f;
                 this.Sync();
@@ -398,7 +399,7 @@ public class AstralKatanaThrow : ModProjectile
         }
 
         Vector2 dest = Rect().Bottom;
-        Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, (LungeTime <= 0 ? center.AngleTo(dest) : SavedAngle) );
+        Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, (LungeTime <= 0 ? center.AngleTo(dest) : SavedAngle));
         if (LungeTime <= 0)
         {
             Dir = (Projectile.Center.X > Owner.Center.X).ToDirectionInt();
@@ -407,13 +408,11 @@ public class AstralKatanaThrow : ModProjectile
         if (State != CurrentState.HitEnemy)
         {
             if (Rect().SolidCollision())
-            {
                 OnTileCollide(Projectile.oldVelocity);
-            }
         }
 
-        if (trail == null || trail._disposed)
-            trail = new(tip, WidthFunct, ColorFunct, null, 60);
+        if (trail == null || trail.Disposed)
+            trail = new(WidthFunct, ColorFunct, null, 60);
 
         Projectile.extraUpdates = 10;
         cache ??= new(60);
@@ -452,6 +451,11 @@ public class AstralKatanaThrow : ModProjectile
 
             if (this.RunLocal() && Modded.MouseRight.JustReleased)
             {
+                if (center.Distance(dest) > Main.LogicCheckScreenWidth * 2)
+                {
+                    Projectile.Kill();
+                    return;
+                }
                 AdditionsSound.BraveDashStart.Play(center, 1f, .1f);
                 CalUtils.AddCooldown(Owner, AstralDashCooldown.ID, SecondsToFrames(LungeWait));
                 SavedAngle = center.AngleTo(dest);
@@ -504,7 +508,6 @@ public class AstralKatanaThrow : ModProjectile
                         int life = Main.rand.Next(19, 25);
                         float scale = Main.rand.NextFloat(.4f, .8f);
                         Color color = MulticolorLerp(Main.rand.NextFloat(), Utility.FastUnion(AstralKatanaSweep.AstralBluePalette, AstralKatanaSweep.AstralOrangePalette));
-
                         ParticleRegistry.SpawnSquishyPixelParticle(pos, vel, life * 3, scale * 2f, color, Color.White, 4);
                     }
                 }
@@ -577,15 +580,8 @@ public class AstralKatanaThrow : ModProjectile
     }
 
     private Vector2 offset;
-    public override void SendExtraAI(BinaryWriter writer)
-    {
-        writer.WriteVector2(offset);
-    }
-
-    public override void ReceiveExtraAI(BinaryReader reader)
-    {
-        offset = reader.ReadVector2();
-    }
+    public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(offset);
+    public override void ReceiveExtraAI(BinaryReader reader) => offset = reader.ReadVector2();
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
@@ -630,7 +626,7 @@ public class AstralKatanaThrow : ModProjectile
 
     internal float WidthFunct(float c)
     {
-        return SmoothStep(40f, 0f, c);
+        return OptimizedPrimitiveTrail.HemisphereWidthFunct(c, SmoothStep(40f, 0f, c));
     }
 
     internal Color ColorFunct(SystemVector2 c, Vector2 position)
@@ -640,7 +636,6 @@ public class AstralKatanaThrow : ModProjectile
 
     public TrailPoints cache;
     public OptimizedPrimitiveTrail trail;
-    public static readonly ITrailTip tip = new RoundedTip(20);
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -649,7 +644,7 @@ public class AstralKatanaThrow : ModProjectile
             {
                 ManagedShader shader = ShaderRegistry.SideStreakTrail;
                 shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Cosmos), 1);
-                trail.DrawTippedTrail(shader, cache.Points, tip, true);
+                trail.DrawTrail(shader, cache.Points);
             }
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);

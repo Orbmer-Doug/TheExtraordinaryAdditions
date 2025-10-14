@@ -22,14 +22,14 @@ public class HeavenForgedSwing : BaseSwordSwing
 
     public int SwingCounter
     {
-        get => (int)ModdedProj.ExtraAI[9];
-        set => ModdedProj.ExtraAI[9] = value;
+        get => (int)ProjInfo.ExtraAI[9];
+        set => ProjInfo.ExtraAI[9] = value;
     }
 
     public bool DontChangeDir
     {
-        get => ModdedProj.ExtraAI[10] == 1f;
-        set => ModdedProj.ExtraAI[10] = value.ToInt();
+        get => ProjInfo.ExtraAI[10] == 1f;
+        set => ProjInfo.ExtraAI[10] = value.ToInt();
     }
 
     public override int SwingTime => SwingCounter switch
@@ -76,7 +76,7 @@ public class HeavenForgedSwing : BaseSwordSwing
     public override void SafeAI()
     {
         // Create the trail if needed
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, OffsetFunct);
 
         Quaternion start = EulerAnglesConversion(Direction, -.06f, .1f);
@@ -94,7 +94,6 @@ public class HeavenForgedSwing : BaseSwordSwing
         Quaternion spinFinal = EulerAnglesConversion(Direction, (Pi * MakePoly(3.5f).InOutFunction(0f) * 4f) + 3.95f, 0f);
 
         Quaternion slam = EulerAnglesConversion(Direction, -.06f, .2f);
-        Quaternion slamEnd = EulerAnglesConversion(Direction, -1.95f, -.55f);
 
         switch (SwingCounter % 3)
         {
@@ -205,16 +204,11 @@ public class HeavenForgedSwing : BaseSwordSwing
                     vel.Y += Main.rand.NextFloat(-2f, 2f);
 
                     int proj = ModContent.ProjectileType<HeavenForgedSpear>();
-                    int dmg = (int)(Projectile.damage * .33f);
+                    int dmg = (int)(Projectile.damage * .55f);
                     Projectile.NewProj(position, vel, proj, dmg, Projectile.knockBack / 2, Owner.whoAmI);
                 }
             }
         }
-    }
-
-    public override bool? CanDamage()
-    {
-        return base.CanDamage();
     }
 
     public override float SwingOffset()
@@ -229,7 +223,7 @@ public class HeavenForgedSwing : BaseSwordSwing
         Vector3 tip;
         Vector2 begin, end;
 
-        Quaternion angleFix = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, -(3f * Pi / 4f));
+        Quaternion angleFix = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, -ThreePIOver4);
         Quaternion final = Quaternion.Multiply(Rotation, angleFix);
 
         tip = Vector3.Transform(size3D, Quaternion.CreateFromRotationMatrix(Matrix.CreateFromQuaternion(final) * Matrix.CreateRotationZ(InitialMouseAngle)));
@@ -265,7 +259,7 @@ public class HeavenForgedSwing : BaseSwordSwing
     }
 
     public OptimizedPrimitiveTrail trail;
-    private readonly ManualTrailPoints points = new(20);
+    private readonly TrailPoints points = new(20);
 
     public static float WidthFunct(float c)
     {
@@ -318,7 +312,7 @@ public class HeavenForgedSwing : BaseSwordSwing
             trailShader.TrySetParameter("flip", flip);
 
             trailShader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Cosmos), 0, SamplerState.LinearWrap);
-            trailShader.Matrix = Calculate3DPrimitiveMatrix(Projectile.Center, Rotation, Projectile.scale, InitialMouseAngle, 1);
+            trailShader.Matrix = Get3DOrthoPrimitiveMatrix(Projectile.Center, Rotation, Projectile.scale, InitialMouseAngle, 1);
             trail.DrawTrail(trailShader, points.Points, 40);
         }
 
@@ -345,10 +339,8 @@ public class HeavenForgedSwing : BaseSwordSwing
             }
 
             points.SetPoints(trailPositions);
-
             PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.OverPlayers);
         }
-
         return false;
     }
 }

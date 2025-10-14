@@ -46,7 +46,7 @@ public class LightripBullet : ModProjectile, ILocalizedModType, IModType
 
     public override void AI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, null, 50);
 
         points.Update(Projectile.Center + Projectile.velocity);
@@ -108,7 +108,6 @@ public class LightripBullet : ModProjectile, ILocalizedModType, IModType
             trail.DrawTrail(shader, points.Points);
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
-
         return false;
     }
 }

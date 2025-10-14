@@ -7,13 +7,14 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
 
 public class SunsplitHorizon : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SunsplitHorizon);
+
     public override void SetStaticDefaults()
     {
         Main.RegisterItemAnimation(Item.type, new DrawAnimationVertical(6, 4, true));
@@ -23,7 +24,7 @@ public class SunsplitHorizon : ModItem
 
     public override void SetDefaults()
     {
-        Item.damage = 200;
+        Item.damage = 100;
         Item.DamageType = DamageClass.Ranged;
         Item.width = 114;
         Item.height = 50;
@@ -50,7 +51,7 @@ public class SunsplitHorizon : ModItem
         Recipe recipe = CreateRecipe();
         recipe.AddIngredient(ItemID.Flamethrower, 1);
         recipe.AddIngredient(ModContent.ItemType<PlasmaCore>(), 1);
-        recipe.AddIngredient(ModContent.ItemType<UnholyCore>(), 10);
+        recipe.AddIngredient(ModContent.ItemType<DivineGeode>(), 10);
         recipe.AddIngredient(ModContent.ItemType<CoreofHavoc>(), 12);
         recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();

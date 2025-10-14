@@ -46,8 +46,8 @@ public class TorrentialCleave : BaseSwordSwing
 
     public TorrentialSwings State
     {
-        get => (TorrentialSwings)Projectile.Additions().ExtraAI[7];
-        set => Projectile.Additions().ExtraAI[7] = (int)value;
+        get => (TorrentialSwings)Projectile.AdditionsInfo().ExtraAI[7];
+        set => Projectile.AdditionsInfo().ExtraAI[7] = (int)value;
     }
 
     public override float Animation()
@@ -96,14 +96,15 @@ public class TorrentialCleave : BaseSwordSwing
             if (State == TorrentialSwings.HeavyDown)
             {
                 AdditionsSound.HeavySwordSwing.Play(Projectile.Center, 2.6f, -.3f, .1f);
-                Projectile.NewProj(Center, Projectile.velocity * 7f, ModContent.ProjectileType<OceanSlash>(), Projectile.damage, Projectile.knockBack, Owner.whoAmI);
+                if (this.RunLocal())
+                    Projectile.NewProj(Center, Projectile.velocity * 7f, ModContent.ProjectileType<OceanSlash>(), Projectile.damage, Projectile.knockBack, Owner.whoAmI);
             }
             else
                 AdditionsSound.HeavySwordSwing.Play(Projectile.Center, 1.6f, 0f, .1f);
             PlayedSound = true;
         }
 
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, (c) => Center.ToNumerics(), 25);
 
         // Update trails
@@ -224,7 +225,7 @@ public class TorrentialCleave : BaseSwordSwing
 
         void draw()
         {
-            if (trail == null || trail._disposed || old == null || old.Points == default || SwingCompletion < .4f)
+            if (trail == null || trail.Disposed || old == null || old.Points == default || SwingCompletion < .4f)
                 return;
 
             ManagedShader shader = ShaderRegistry.SwingShaderIntense;
@@ -240,7 +241,6 @@ public class TorrentialCleave : BaseSwordSwing
         Main.spriteBatch.Draw(Tex, Projectile.Center - Main.screenPosition, null, lightColor,
             Projectile.rotation, origin, Projectile.scale, Effects, 0f);
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.OverProjectiles);
-
         return false;
     }
 }

@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -23,10 +22,12 @@ public class SnareGas : ModProjectile, ILocalizedModType, IModType
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = 10;
     }
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         Projectile.damage = (int)(Projectile.damage * 0.9);
     }
+
     public override void AI()
     {
         Projectile.velocity *= .975f;
@@ -46,26 +47,30 @@ public class SnareGas : ModProjectile, ILocalizedModType, IModType
         return true;
     }
 
-    public readonly string Gas1 = "Terraria/Images/Projectile_" + ProjectileID.SporeGas;
-    public readonly string Gas2 = "Terraria/Images/Projectile_" + ProjectileID.SporeGas2;
-    public readonly string Gas3 = "Terraria/Images/Projectile_" + ProjectileID.SporeGas3;
+    public readonly string Gas1 = ProjectileID.SporeGas.GetTerrariaProj();
+    public readonly string Gas2 = ProjectileID.SporeGas2.GetTerrariaProj();
+    public readonly string Gas3 = ProjectileID.SporeGas3.GetTerrariaProj();
 
     public ref float Typ => ref Projectile.ai[0];
     public override void OnSpawn(IEntitySource source)
     {
         Typ = Main.rand.Next(0, 3);
+        Projectile.netUpdate = true;
     }
+
     public override bool PreDraw(ref Color lightColor)
     {
         string str = "";
-        if (Typ == 0) str = Gas1;
-        if (Typ == 1) str = Gas2;
-        if (Typ == 2) str = Gas3;
+        if (Typ == 0)
+            str = Gas1;
+        if (Typ == 1) 
+            str = Gas2;
+        if (Typ == 2) 
+            str = Gas3;
 
         Texture2D tex = ModContent.Request<Texture2D>(str).Value;
         Vector2 drawPosition = Projectile.Center - Main.screenPosition;
         Main.EntitySpriteDraw(tex, drawPosition, null, Projectile.GetAlpha(Color.White), Projectile.rotation, tex.Size() * 0.5f, Projectile.scale, 0, 0);
-
         return false;
     }
 }

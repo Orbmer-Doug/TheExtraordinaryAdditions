@@ -1,16 +1,13 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Assets;
 using TheExtraordinaryAdditions.Content.Buffs.Summon;
-using TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
 using TheExtraordinaryAdditions.Content.Projectiles.Summoner.Late;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -19,11 +16,13 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Late;
 public class LivingStarFlare : ModItem
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetStaticDefaults()
     {
         Item.ResearchUnlockCount = 1;
         ItemID.Sets.ItemNoGravity[Type] = true;
     }
+
     public override void SetDefaults()
     {
         Item.damage = 565;
@@ -39,11 +38,6 @@ public class LivingStarFlare : ModItem
         Item.rare = ModContent.RarityType<LegendaryRarity>();
         Item.value = AdditionsGlobalItem.LegendaryRarityPrice;
         Item.noMelee = true;
-    }
-
-    public override bool CanUseItem(Player player)
-    {
-        return true;
     }
 
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
@@ -78,6 +72,7 @@ public class LivingStarFlare : ModItem
         Main.spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, Main.UIScaleMatrix);
         return false;
     }
+
     public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
     {
         Main.spriteBatch.PrepareForShaders();

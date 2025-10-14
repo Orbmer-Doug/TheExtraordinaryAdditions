@@ -4,7 +4,7 @@ using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Middle;
@@ -12,6 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Middle;
 public class IchorWhip : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.IchorWhip);
+
     public override void SetDefaults()
     {
         Item.damage = 74;
@@ -28,6 +29,11 @@ public class IchorWhip : ModItem
         Item.noMelee = Item.noUseGraphic = true;
     }
 
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(new Color(219, 195, 11));
+    }
+
     public override bool CanShoot(Player player)
     {
         return player.ownedProjectileCounts[Item.shoot] <= 0;
@@ -39,9 +45,9 @@ public class IchorWhip : ModItem
         return false;
     }
 
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    public override bool MeleePrefix()
     {
-        tooltips.ColorLocalization(new Color(219, 195, 11));
+        return true;
     }
 
     public override void AddRecipes()
@@ -53,10 +59,5 @@ public class IchorWhip : ModItem
         recipe.AddIngredient(ItemID.TissueSample, 8);
         recipe.AddTile(TileID.MythrilAnvil);
         recipe.Register();
-
-    }
-    public override bool MeleePrefix()
-    {
-        return true;
     }
 }

@@ -2,7 +2,6 @@
 using System;
 using System.IO;
 using Terraria;
-using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Assets.Audio;
@@ -67,10 +66,11 @@ public class BlackHole : ModProjectile, ILocalizedModType, IModType, IHasScreenS
         Projectile.Opacity = Projectile.scale = GetLerpBump(WaitTime, WaitTime * 2f, ChaseTime, ChaseTime - 90f, Time);
 
         // Give a slight delay as to give the black hole the emergence from the star
-        if (Time > WaitTime)
+        if (Time > WaitTime && this.RunLocal())
         {
             Vector2 target = Owner.Additions().mouseWorld;
             Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(target) * MathF.Min(Projectile.Distance(target), 18f), .15f);
+            Projectile.netUpdate = true;
         }
 
         // beeeg
@@ -93,9 +93,8 @@ public class BlackHole : ModProjectile, ILocalizedModType, IModType, IHasScreenS
         {
             NPC npc = Main.npc[i];
             if (!npc.CanBeChasedBy(Projectile, false) || !Collision.CanHit(Projectile.Center, 1, 1, npc.Center, 1, 1) || Utility.AnyBosses())
-            {
                 continue;
-            }
+            
             float npcCenterX = npc.position.X + npc.width / 2;
             float npcCenterY = npc.position.Y + npc.height / 2;
             if (Math.Abs(Projectile.position.X + Projectile.width / 2 - npcCenterX) + Math.Abs(Projectile.position.Y + Projectile.height / 2 - npcCenterY) < i)
@@ -150,8 +149,8 @@ public class BlackHole : ModProjectile, ILocalizedModType, IModType, IHasScreenS
         Shader.TrySetParameter("sourcePosition", sourcePosition);
         Shader.TrySetParameter("blackRadius", blackRadius);
         Shader.TrySetParameter("distortionStrength", Projectile.scale);
-        Shader.TrySetParameter("uColor", Color.Wheat.ToVector3());
-        Shader.TrySetParameter("uSecondaryColor", Color.LightGoldenrodYellow.ToVector3());
+        Shader.TrySetParameter("innerColor", Color.Wheat.ToVector3());
+        Shader.TrySetParameter("outerColor", Color.LightGoldenrodYellow.ToVector3());
         Shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.VoronoiShapes), 1, SamplerState.AnisotropicWrap);
         Shader.Activate();
     }

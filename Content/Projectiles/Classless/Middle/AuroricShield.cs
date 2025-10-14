@@ -1,12 +1,10 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System.IO;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Assets;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ProjectileGlobal;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
@@ -41,15 +39,9 @@ public class AuroricShield : ModProjectile
     }
 
     public Vector2 Offset;
-    public override void SendExtraAI(BinaryWriter writer)
-    {
-        writer.WriteVector2(Offset);
-    }
-    public override void ReceiveExtraAI(BinaryReader reader)
-    {
-        Offset = reader.ReadVector2();
-    }
-
+    public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(Offset);
+    public override void ReceiveExtraAI(BinaryReader reader) => Offset = reader.ReadVector2();
+    
     public Player Owner => Main.player[Projectile.owner];
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
@@ -101,11 +93,11 @@ public class AuroricShield : ModProjectile
                         p.velocity += Projectile.velocity * 10f;
 
                     ParryEffects();
-                    ProjectileDamageModifiers dam = p.GetGlobalProjectile<ProjectileDamageModifiers>();
-                    if (dam.flatDR < 100)
-                        dam.flatDR = 100;
-                    if (dam.flatDRTimer < 90)
-                        dam.flatDRTimer = 90;
+                    ProjectileDamageModifiers dam = p.ProjDamageMod();
+                    if (dam.FlatDR < 100)
+                        dam.FlatDR = 100;
+                    if (dam.FlatDRTimer < 90)
+                        dam.FlatDRTimer = 90;
 
                     Parried = true;
                 }
@@ -121,19 +113,17 @@ public class AuroricShield : ModProjectile
     private void ParryEffects()
     {
         ScreenShakeSystem.New(new(5f, .6f), Projectile.Center);
-        CombatText.NewText(Projectile.Hitbox, Color.DeepSkyBlue, "Parried!", true);
         AdditionsSound.ColdPunch.Play(Projectile.Center, 1.2f, -.1f, .2f);
         for (int i = 0; i < 18; i++)
         {
-            Vector2 Pos = Projectile.Hitbox.ToRotated(Projectile.rotation).RandomPoint();
-
+            Vector2 pos = Projectile.Hitbox.ToRotated(Projectile.rotation).RandomPoint();
             if (i % 2 == 1)
             {
-                ParticleRegistry.SpawnCloudParticle(Pos, Projectile.velocity * Main.rand.NextFloat(2f, 10f),
+                ParticleRegistry.SpawnCloudParticle(pos, Projectile.velocity * Main.rand.NextFloat(2f, 10f),
                     Color.LightCyan, Color.SlateBlue, Main.rand.Next(40, 120), Main.rand.NextFloat(.4f, .6f), Main.rand.NextFloat(.6f, 1f));
             }
-            Dust.NewDustPerfect(Pos, DustID.SilverCoin, Projectile.velocity.RotatedByRandom(.4f) * Main.rand.NextFloat(4f, 8f), 0, default, Main.rand.NextFloat(.6f, .8f));
-            ParticleRegistry.SpawnGlowParticle(Pos, Projectile.velocity * Main.rand.NextFloat(4f, 10f), Main.rand.Next(18, 30), Main.rand.NextFloat(.4f, .7f), Color.SlateBlue);
+            Dust.NewDustPerfect(pos, DustID.SilverCoin, Projectile.velocity.RotatedByRandom(.4f) * Main.rand.NextFloat(4f, 8f), 0, default, Main.rand.NextFloat(.6f, .8f));
+            ParticleRegistry.SpawnGlowParticle(pos, Projectile.velocity * Main.rand.NextFloat(4f, 10f), Main.rand.Next(18, 30), Main.rand.NextFloat(.4f, .7f), Color.SlateBlue);
         }
     }
 

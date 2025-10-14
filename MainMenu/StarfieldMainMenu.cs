@@ -2,9 +2,7 @@
 using ReLogic.Content;
 using System;
 using Terraria;
-using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle.AZ;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Systems;
@@ -15,8 +13,8 @@ public class StarfieldMainMenu : ModMenu
 {
     public override bool IsAvailable => true;
     public override string DisplayName => GetText(Name + ".Name").Value;
-    public override int Music => MusicLoader.GetMusicSlot(AssetRegistry.GetMusicPath(AdditionsSound.clairdelune));
-    public override Asset<Texture2D> Logo => ModContent.Request<Texture2D>("TheExtraordinaryAdditions/icon_workshop");
+    public override int Music => MusicLoader.GetMusicSlot(AssetRegistry.GetMusicPath(AdditionsSound.Protostar));
+    public override Asset<Texture2D> Logo => ModContent.Request<Texture2D>("TheExtraordinaryAdditions/icon_menu");
 
     public OptimizedPrimitiveTrail LogoTrail;
     public TrailPoints Points;
@@ -108,7 +106,7 @@ public class StarfieldMainMenu : ModMenu
             spriteBatch.End();
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, Main.Rasterizer, null, Main.UIScaleMatrix);
         }
-        
+
         if (Main.starGame)
         {
             Texture2D texture = AssetRegistry.GetTexture(AdditionsTexture.TungstenCube);
@@ -117,7 +115,7 @@ public class StarfieldMainMenu : ModMenu
                 Star star = Main.star[i];
                 if (star == null)
                     continue;
-                
+
                 star.rotation += (MathF.Abs(star.fallSpeed.X) + MathF.Abs(star.fallSpeed.Y)) * .009f;
                 spriteBatch.Draw(texture, star.position, null, star.falling ? Color.White : Main.DiscoColor, star.rotation, texture.Size() / 2, star.scale * star.twinkle * Main.ForcedMinimumZoom, 0, 0f);
             }

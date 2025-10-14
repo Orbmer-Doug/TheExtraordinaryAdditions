@@ -1,16 +1,10 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Assets;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
-using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
@@ -20,7 +14,7 @@ public class EtherealRipBlast : ModProjectile
     public override string Texture => AssetRegistry.Invis;
     public ref float Time => ref Projectile.ai[0];
     public int Timeleft = 180;
-    
+
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.DrawScreenCheckFluff[Projectile.type] = 1000;
@@ -44,7 +38,7 @@ public class EtherealRipBlast : ModProjectile
 
     public override void AI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunction, ColorFunction, null, 100);
 
         cache.Update(Projectile.Center + Projectile.velocity);
@@ -69,9 +63,7 @@ public class EtherealRipBlast : ModProjectile
             Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<LightripBlast>(), (int)(Projectile.damage * .5f), Projectile.knockBack, Projectile.owner);
 
         for (int i = 0; i < 20; i++)
-        {
             ParticleRegistry.SpawnSparkParticle(Projectile.Center, -Projectile.velocity.RotatedByRandom(.1f) * i * .1f, 30, .6f, Color.White, true);
-        }
     }
 
     public override void OnKill(int timeLeft)

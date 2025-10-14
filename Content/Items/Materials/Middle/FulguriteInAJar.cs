@@ -7,6 +7,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 public class FulguriteInAJar : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.FulguriteInAJar);
+
     public override void SetStaticDefaults()
     {
         Item.ResearchUnlockCount = 20;

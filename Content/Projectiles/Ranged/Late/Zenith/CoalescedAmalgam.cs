@@ -1,11 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
+﻿using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Assets;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
-
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late.Zenith;
 
@@ -25,6 +21,7 @@ public class CoalescedAmalgam : ModProjectile
         Projectile.timeLeft = 600;
         Projectile.penetrate = 1;
     }
+
     public NPC Target;
     public ref float Time => ref Projectile.ai[0];
     private const int TimeToHome = 60;
@@ -72,6 +69,7 @@ public class CoalescedAmalgam : ModProjectile
 
         Time++;
     }
+
     public override bool? CanHitNPC(NPC target)
     {
         if (Target == null || !Target.active)
@@ -81,6 +79,7 @@ public class CoalescedAmalgam : ModProjectile
 
         return null;
     }
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         AdditionsSound.etherealHit4.Play(Projectile.Center, .8f, -.1f, .2f, 10);

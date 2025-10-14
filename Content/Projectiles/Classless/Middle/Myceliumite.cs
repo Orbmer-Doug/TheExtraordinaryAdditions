@@ -1,13 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using System;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Assets;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -27,10 +22,9 @@ public class Myceliumite : ModProjectile
 
     public override void SetStaticDefaults()
     {
-        ProjectileID.Sets.TrailCacheLength[Projectile.type] = 8;
-        ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
         Main.projFrames[Projectile.type] = 4;
     }
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 10;
@@ -43,6 +37,7 @@ public class Myceliumite : ModProjectile
         Projectile.localNPCHitCooldown = 15;
         Projectile.DamageType = DamageClass.Generic;
     }
+
     public ref float Time => ref Projectile.ai[0];
     public MyceliumType Variant
     {
@@ -51,17 +46,7 @@ public class Myceliumite : ModProjectile
     }
     public ref float NeededTime => ref Projectile.ai[2];
 
-    /// <summary>
-    /// So as to keep the silliness of killing whatever is in sight without deterring from normal gameplay
-    /// </summary>
-    private bool BossSense
-    {
-        get => Projectile.Additions().ExtraAI[0] == 1f;
-        set => Projectile.Additions().ExtraAI[0] = value.ToInt();
-    }
-
     public Texture2D tex;
-
     public override void AI()
     {
         if (Projectile.localAI[0] == 0f)
@@ -129,13 +114,6 @@ public class Myceliumite : ModProjectile
         Projectile.FacingUp();
     }
 
-    public override bool? CanHitNPC(NPC target)
-    {
-        if (!BossSense)
-            return true;
-        return null;
-    }
-
     public override bool OnTileCollide(Vector2 oldVelocity)
     {
         switch (Variant)
@@ -144,15 +122,10 @@ public class Myceliumite : ModProjectile
                 return true;
             case MyceliumType.Bouncy:
                 if (Projectile.velocity.X != oldVelocity.X)
-                {
                     Projectile.velocity.X = -oldVelocity.X;
-                }
                 if (Projectile.velocity.Y != oldVelocity.Y)
-                {
                     Projectile.velocity.Y = -oldVelocity.Y;
-                }
-                SoundEngine.PlaySound(SoundID.Item56 with { Pitch = .4f, Volume = .3f, MaxInstances = 40 }, Projectile.Center);
-
+                SoundID.Item56.Play(Projectile.Center, .3f, .4f, 0f, null, 40);
                 return false;
             case MyceliumType.Piercing:
                 return false;
@@ -162,21 +135,18 @@ public class Myceliumite : ModProjectile
 
         return true;
     }
+
     public override void OnKill(int timeLeft)
     {
         switch (Variant)
         {
             case MyceliumType.Homing:
                 for (int i = 0; i < 25; i++)
-                {
                     Dust.NewDustPerfect(Projectile.RandAreaInEntity(), DustID.GlowingMushroom, Projectile.velocity * Main.rand.NextFloat(.5f, .7f), 0, default, Main.rand.NextFloat(.4f, .5f));
-                }
                 break;
             case MyceliumType.Bouncy:
                 for (int i = 0; i < 16; i++)
-                {
                     Dust.NewDustPerfect(Projectile.RandAreaInEntity(), DustID.MushroomTorch, Projectile.velocity * Main.rand.NextFloat(.6f, .9f), 0, default, Main.rand.NextFloat(.6f, .8f));
-                }
                 break;
             case MyceliumType.Piercing:
                 for (int i = 0; i < Projectile.oldPos.Length; i++)
@@ -184,7 +154,6 @@ public class Myceliumite : ModProjectile
                     for (int j = 0; j < 3; j++)
                         Dust.NewDustPerfect(Projectile.oldPos[i], DustID.MushroomTorch, Projectile.velocity * Main.rand.NextFloat(.6f, .9f), 0, default, Main.rand.NextFloat(.8f, 1f));
                 }
-
                 break;
             case MyceliumType.Exploding:
                 if (this.RunLocal())
@@ -196,16 +165,13 @@ public class Myceliumite : ModProjectile
                 for (int i = 0; i < Main.rand.Next(30, 40); i++)
                 {
                     if (i % 2f == 1f)
-                    {
                         ParticleRegistry.SpawnGlowParticle(Projectile.Center, Main.rand.NextVector2CircularLimited(9f, 9f, .5f, 1f), Main.rand.Next(40, 60), 1f, Color.DodgerBlue);
-                    }
 
                     Dust.NewDustPerfect(Projectile.RandAreaInEntity(), DustID.GlowingMushroom, Main.rand.NextVector2CircularLimited(14f, 14f, .5f, 1f), 0, default, Main.rand.NextFloat(.7f, .9f));
                 }
 
                 ParticleRegistry.SpawnDetailedBlastParticle(Projectile.Center, Vector2.Zero, Vector2.One * 60f, Vector2.Zero, 40, Color.DodgerBlue, 0f, Color.DarkBlue, true);
-
-                SoundEngine.PlaySound(SoundID.Item14 with { Pitch = .4f, Volume = .9f, MaxInstances = 20 }, Projectile.Center);
+                SoundID.Item14.Play(Projectile.Center, .9f, .4f, 0f, null, 20);
                 break;
         }
     }

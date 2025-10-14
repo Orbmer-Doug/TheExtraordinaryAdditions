@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
-using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
@@ -59,12 +58,11 @@ public class LightrippingBeam : ProjOwnedByNPC<Asterlin>
 
         float lifeInterpolant = InverseLerp(0f, Lifetime, Time);
 
-        float portalPlusTelegraphEnd = (float)(PortalAppearTime + TelegraphTime) / Lifetime; // ~0.3509
-        float laserExpandEnd = (float)(PortalAppearTime + TelegraphTime + LaserExpandTime) / Lifetime; // ~0.3860
-        float beamEnd = (float)(PortalAppearTime + TelegraphTime + LaserExpandTime + BeamTime) / Lifetime; // ~0.9123
+        float portalPlusTelegraphEnd = (float)(PortalAppearTime + TelegraphTime) / Lifetime;
+        float laserExpandEnd = (float)(PortalAppearTime + TelegraphTime + LaserExpandTime) / Lifetime;
+        float beamEnd = (float)(PortalAppearTime + TelegraphTime + LaserExpandTime + BeamTime) / Lifetime;
         float collapseEnd = 1f;
 
-        // LaserLength
         LaserLength = new PiecewiseCurve()
             .AddStall(0f, portalPlusTelegraphEnd)
             .Add(0f, MaxLength, laserExpandEnd, MakePoly(3f).OutFunction)
@@ -79,7 +77,7 @@ public class LightrippingBeam : ProjOwnedByNPC<Asterlin>
             .Add(1f, 0f, collapseEnd, MakePoly(4f).InOutFunction)
             .Evaluate(lifeInterpolant);
 
-        // Laser width ratio and Distortion Intensity
+        // Laser width ratio and distortion intensity
         Projectile.scale = new PiecewiseCurve()
             .AddStall(0f, portalPlusTelegraphEnd)
             .Add(0f, 1f, laserExpandEnd, MakePoly(5f).OutFunction)
@@ -94,9 +92,9 @@ public class LightrippingBeam : ProjOwnedByNPC<Asterlin>
         else
             telePoints.SetPoints(Projectile.Center.GetLaserControlPoints(Projectile.Center + Projectile.velocity * MaxLength, 100));
 
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(LaserWidthFunction, LaserColorFunction, null, 100);
-        if (telegraph == null || telegraph._disposed)
+        if (telegraph == null || telegraph.Disposed)
             telegraph = new(TelegraphWidthFunction, TelegraphColorFunction, null, 100);
 
         if (Time == TelegraphTime)
@@ -110,13 +108,12 @@ public class LightrippingBeam : ProjOwnedByNPC<Asterlin>
         {
             Vector2 vel = Projectile.velocity.RotatedByRandom(Main.rand.NextFloat(.34f, .42f)) * Main.rand.NextFloat(150f, 980f);
             ParticleRegistry.SpawnLightningArcParticle(Projectile.Center, vel, Main.rand.Next(10, 20), 1f, Color.DeepSkyBlue);
-
         }
     }
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return targetHitbox.LineCollision(Projectile.Center, Projectile.Center + Projectile.velocity * LaserLength, Projectile.Size.Length());
+        return targetHitbox.LineCollision(Projectile.Center, Projectile.Center + Projectile.velocity * LaserLength, Projectile.Size.Length() * .7f);
     }
 
     public override bool ShouldUpdatePosition() => false;
@@ -139,8 +136,8 @@ public class LightrippingBeam : ProjOwnedByNPC<Asterlin>
 
     public OptimizedPrimitiveTrail trail;
     public OptimizedPrimitiveTrail telegraph;
-    public ManualTrailPoints trailPoints = new(100);
-    public ManualTrailPoints telePoints = new(100);
+    public TrailPoints trailPoints = new(100);
+    public TrailPoints telePoints = new(100);
     public override bool PreDraw(ref Color lightColor)
     {
         void drawPortal()
@@ -169,7 +166,7 @@ public class LightrippingBeam : ProjOwnedByNPC<Asterlin>
 
         void drawTelegraph()
         {
-            if (telegraph != null && !telegraph._disposed)
+            if (telegraph != null && !telegraph.Disposed)
             {
                 ManagedShader shader = ShaderRegistry.SideStreakTrail;
                 shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise), 1);
@@ -180,7 +177,7 @@ public class LightrippingBeam : ProjOwnedByNPC<Asterlin>
 
         void drawBeam()
         {
-            if (trail != null && !trail._disposed)
+            if (trail != null && !trail.Disposed)
             {
                 ManagedShader beam = ShaderRegistry.BaseLaserShader;
                 beam.TrySetParameter("heatInterpolant", 2f);

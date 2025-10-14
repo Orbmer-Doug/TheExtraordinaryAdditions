@@ -1,17 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 using TheExtraordinaryAdditions.Core.DataStructures;
+using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
 public partial class Asterlin : ModNPC
 {
+    public static readonly Dictionary<AsterlinAIType, float> Barrage_PossibleStates =
+        new Dictionary<AsterlinAIType, float> { { AsterlinAIType.Swings, 1f }, { AsterlinAIType.RotatedDicing, .6f } };
     [AutomatedMethodInvoke]
     public void LoadStateTransitions_Barrage()
     {
-        StateMachine.RegisterTransition(AsterlinAIType.Barrage, new Dictionary<AsterlinAIType, float> { { AsterlinAIType.Swings, 1f }, { AsterlinAIType.RotatedDicing, 1f } }, false, () =>
+        StateMachine.RegisterTransition(AsterlinAIType.Barrage, Barrage_PossibleStates, false, () =>
         {
             return AITimer >= Barrage_TotalTime && !AnyProjectile(ModContent.ProjectileType<BarrageBeam>());
         });
@@ -36,6 +41,8 @@ public partial class Asterlin : ModNPC
         {
             SetLookingStraight(true);
             ZPosition = InverseLerp(Barrage_FadeTime, 0f, AITimer);
+            SetLeftHandTarget(NPC.Center - Vector2.UnitX * 10f + NPC.velocity);
+            SetRightHandTarget(NPC.Center + Vector2.UnitX * 10f + NPC.velocity);
 
             if (AITimer >= Barrage_FadeTime)
             {
@@ -54,5 +61,26 @@ public partial class Asterlin : ModNPC
         }
 
         CasualHoverMovement();
+    }
+
+    public void Barrage_Draw()
+    {
+        ManagedShader shader = AssetRegistry.GetShader("EnergyOrbShader");
+        shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TurbulentNoise), 1, SamplerState.PointWrap);
+        shader.TrySetParameter("pulseIntensity", 0.05f);
+        shader.TrySetParameter("glowIntensity", 0.8f);
+        shader.TrySetParameter("glowPower", 2.74f);
+
+        void orb()
+        {
+            float factor = InverseLerp(0f, 40f, AITimer) * Animators.MakePoly(3f).OutFunction(InverseLerp(Barrage_AttackTime, Barrage_AttackTime - 60, AITimer));
+            Vector2 size = new Vector2(40) * factor;
+            Texture2D pixel = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
+            Vector2 scale = size / pixel.Size() * 1.2f;
+            Color draw = Color.Cyan;
+            Vector2 pixelOrig = pixel.Size() * 0.5f;
+            Main.spriteBatch.DrawBetter(pixel, NPC.Center, null, new Color(12, 76, 229), 0f, pixelOrig, scale, 0);
+        }
+        PixelationSystem.QueueTextureRenderAction(orb, PixelationLayer.OverNPCs, null, shader);
     }
 }

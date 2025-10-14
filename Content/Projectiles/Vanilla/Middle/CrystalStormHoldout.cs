@@ -1,21 +1,15 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
-using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
-using TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
-using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
 public class CrystalStormHoldout : BaseIdleHoldoutProjectile
 {
-    public override string Texture => "Terraria/Images/Item_" + ItemID.CrystalStorm;
+    public override string Texture => ItemID.CrystalStorm.GetTerrariaItem();
     public override int AssociatedItemID => ItemID.CrystalStorm;
     public override int IntendedProjectileType => ModContent.ProjectileType<CrystalStormHoldout>();
     public override void Defaults()
@@ -34,7 +28,7 @@ public class CrystalStormHoldout : BaseIdleHoldoutProjectile
     {
         Vector2 pos = Projectile.Center + PolarVector(10f, Projectile.rotation);
         int shard = ModContent.ProjectileType<CrystalShard>();
-        if (Time % Item.useAnimation == Item.useAnimation - 1 && Modded.SafeMouseLeft.Current && this.RunLocal())
+        if (Time % Item.useAnimation == Item.useAnimation - 1 && Modded.SafeMouseLeft.Current && this.RunLocal() && TryUseMana(false))
         {
             SoundID.Item9.Play(pos);
             Vector2 vel = Projectile.velocity.RotatedByRandom(.25f) * Item.shootSpeed;

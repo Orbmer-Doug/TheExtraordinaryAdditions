@@ -54,10 +54,8 @@ internal class WeakReferenceSupport
 
     private static void BossChecklistSupport()
     {
-        AdditionsMain additions = ModContent.GetInstance<AdditionsMain>();
-        Mod bossChecklist = additions.bossChecklist;
-        if (bossChecklist != null)
-            AddAdditionsBosses(bossChecklist, (Mod)(object)additions);
+        if (ModReferences.BossChecklist != null)
+            AddAdditionsBosses(ModReferences.BossChecklist, AdditionsMain.Instance);
     }
 
     private static void AddAdditionsBosses(Mod bossChecklist, Mod additions)
@@ -120,7 +118,7 @@ internal class WeakReferenceSupport
         string auroraName = "AuroraGuard";
         List<int> auroraCollection =
         [
-            
+
         ];
         Action<SpriteBatch, Rectangle, Color> auroraPortrait = delegate (SpriteBatch sb, Rectangle rect, Color color)
         {

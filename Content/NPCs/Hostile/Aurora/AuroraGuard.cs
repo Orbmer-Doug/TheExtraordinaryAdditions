@@ -14,7 +14,6 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
 using TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 using TheExtraordinaryAdditions.Content.Items.Placeable.Banners;
-using TheExtraordinaryAdditions.Content.Items.Placeable.Base;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 using TheExtraordinaryAdditions.Content.NPCs.Hostile.AuroraTurret;
 using TheExtraordinaryAdditions.Core;
@@ -25,10 +24,12 @@ using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
+using static Terraria.Localization.NetworkText;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 
+[AutoloadBossHead]
 public partial class AuroraGuard : ModNPC, IBossDowned
 {
     #region Defaults/Variables
@@ -123,12 +124,9 @@ public partial class AuroraGuard : ModNPC, IBossDowned
     public SlotId DeathSoundSlot;
 
     #region Balancing
-    public static readonly int IcicleDamage = DifficultyBasedValue(90, 130, 150, 200, 230, 250);
-    public static readonly int HeavyBlastDamage = DifficultyBasedValue(90, 130, 150, 200, 230, 250);
-    public static readonly int SkewerDamage = DifficultyBasedValue(90, 130, 150, 200, 230, 250);
-
-    public static readonly int MaxStress = DifficultyBasedValue(100, 120, 140, 160, 180, 200);
-    public static readonly int TimeOverwhelmed = DifficultyBasedValue(SecondsToFrames(4f), SecondsToFrames(3.5f), SecondsToFrames(3.25f), SecondsToFrames(3f), SecondsToFrames(2.75f), SecondsToFrames(2.5f));
+    public static readonly int IcicleDamage = DifficultyBasedValue(52, 92, 112, 132, 198, 220);
+    public static readonly int HeavyBlastDamage = DifficultyBasedValue(90, 120, 136, 152, 228, 250);
+    public static readonly int SkewerDamage = DifficultyBasedValue(90, 138, 161, 184, 276, 300);
 
     public static readonly int ShootTime = SecondsToFrames(5f);
     public static readonly int ShootWait = DifficultyBasedValue(10, 9, 7, 6, 5, 4);
@@ -238,15 +236,6 @@ public partial class AuroraGuard : ModNPC, IBossDowned
     public int CollisionBoxHeight => NPC.height + CollisionBoxYOffset;
     public int CollisionBoxYOffset => 80;
     public Vector2 CollisionBoxOrigin => NPC.Top - Vector2.UnitX * (CollisionBoxWidth / 2);
-
-    public Rectangle CollisionBox
-    {
-        get
-        {
-            Vector2 collisionBoxOrigin = NPC.Bottom - Vector2.UnitX * (CollisionBoxWidth / 2) - Vector2.UnitY * CollisionBoxHeight;
-            return new Rectangle((int)collisionBoxOrigin.X, (int)collisionBoxOrigin.Y, CollisionBoxWidth, CollisionBoxHeight);
-        }
-    }
 
     public float FloorHeight => NPC.Bottom.Y + CollisionBoxYOffset;
     public Vector2 FloorPosition => NPC.Bottom + Vector2.UnitY * CollisionBoxYOffset;
@@ -410,7 +399,7 @@ public partial class AuroraGuard : ModNPC, IBossDowned
 
             for (int k = 0; k < 4; k++)
                 ParticleRegistry.SpawnDustParticle(GlacierHitbox.RandomRectangle(), Vector2.UnitY, Main.rand.Next(30, 60), Main.rand.NextFloat(.4f, .7f), Icey, .1f, true, true);
-            
+
             if (!Main.dedServ)
             {
                 Gore.NewGorePerfect(NPC.GetSource_FromAI(), GlacierHitbox.RandomRectangle(), StruggleDir.RotatedByRandom(.4f) * Main.rand.NextFloat(3f, 5f) * power,
@@ -1121,6 +1110,8 @@ public partial class AuroraGuard : ModNPC, IBossDowned
     #endregion
 
     #region Drawing
+    public override void BossHeadRotation(ref float rotation) => rotation = HeadRotation;
+    public override void BossHeadSpriteEffects(ref SpriteEffects spriteEffects) => spriteEffects = HeadFlip;
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
         Texture2D head = AssetRegistry.GetTexture(AdditionsTexture.AuroraTurretHead);
@@ -1212,14 +1203,16 @@ public partial class AuroraGuard : ModNPC, IBossDowned
 
         ManagedShader shine = AssetRegistry.GetShader("RadialShineShader");
         float completion = InverseLerp(0f, KablooeyMarker, AttackTimer);
+        float fade = MakePoly(2f).OutFunction(completion);
+        Vector2 res = new(800f * fade);
         shine.TrySetParameter("glowPower", .3f * completion);
         shine.TrySetParameter("glowColor", SlateBlue.ToVector4());
         shine.TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly * 3.8f);
+        shine.TrySetParameter("resolution", res / 2);
 
         sb.EnterShaderRegionAlt();
-        float fade = MakePoly(2f).OutFunction(completion);
         shine.Render("AutoloadPass", true, false);
-        sb.Draw(tex, ToTarget(NPC.Center, new(800f * fade)), null, Icey * 0.4f * fade, 0f, tex.Size() / 2, 0, 0f);
+        sb.Draw(tex, ToTarget(NPC.Center, res), null, Icey * 0.4f * fade, 0f, tex.Size() / 2, 0, 0f);
         sb.ExitShaderRegion();
     }
     #endregion

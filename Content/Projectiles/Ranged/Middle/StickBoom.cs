@@ -27,9 +27,7 @@ public class StickBoom : ModProjectile
         if (Main.expertMode)
         {
             if (target.type >= NPCID.EaterofWorldsHead && target.type <= NPCID.EaterofWorldsTail)
-            {
                 modifiers.FinalDamage /= 5;
-            }
         }
     }
 

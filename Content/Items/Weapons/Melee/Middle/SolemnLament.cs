@@ -1,12 +1,11 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
+﻿using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Buff;
 using TheExtraordinaryAdditions.Content.Buffs.Debuff;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
@@ -14,6 +13,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 public class SolemnLament : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SolemnLament);
+
     public override void SetStaticDefaults()
     {
         Item.ResearchUnlockCount = 1;
@@ -42,6 +42,7 @@ public class SolemnLament : ModItem
     }
 
     public override bool AltFunctionUse(Player player) => !player.HasBuff(ModContent.BuffType<EternalRestCooldown>());
+
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
         if (player.altFunctionUse == 2)
@@ -70,5 +71,4 @@ public class SolemnLament : ModItem
         recipe.AddTile(TileID.MythrilAnvil);
         recipe.Register();
     }
-
 }

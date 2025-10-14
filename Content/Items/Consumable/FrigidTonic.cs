@@ -1,11 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Buff;
 using TheExtraordinaryAdditions.Content.Items.Materials.Middle;
-using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Utilities;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Consumable;
 
@@ -40,15 +38,14 @@ public class FrigidTonic : ModItem
         Item.buffType = ModContent.BuffType<WinterHeart>();
         Item.buffTime = SecondsToFrames(260);
     }
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        {
-            recipe.AddIngredient(ItemID.BottledWater, 1);
-            recipe.AddIngredient(ModContent.ItemType<CracklingFragments>(), 1);
-            recipe.AddIngredient(ItemID.Shiverthorn, 2);
-            recipe.AddTile(TileID.AlchemyTable);
-        }
+        recipe.AddIngredient(ItemID.BottledWater, 1);
+        recipe.AddIngredient(ModContent.ItemType<CracklingFragments>(), 1);
+        recipe.AddIngredient(ItemID.Shiverthorn, 2);
+        recipe.AddTile(TileID.AlchemyTable);
         recipe.Register();
     }
 

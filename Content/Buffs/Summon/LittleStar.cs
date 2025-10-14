@@ -1,8 +1,6 @@
 ﻿using Terraria;
-using Terraria.Localization;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Summoner.Late;
-using TheExtraordinaryAdditions.Content.Projectiles.Summoner.Late.Avia;
 using TheExtraordinaryAdditions.Core.Globals;
 
 namespace TheExtraordinaryAdditions.Content.Buffs.Summon;

@@ -6,7 +6,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
@@ -14,10 +14,6 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
 public class TorrentialTides : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TorrentialTides);
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(new Color(96, 143, 181));
-    }
 
     public override void SetDefaults()
     {
@@ -37,6 +33,12 @@ public class TorrentialTides : ModItem
         Item.noUseGraphic = true;
         Item.autoReuse = true;
     }
+    
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(new Color(96, 143, 181));
+    }
+
     public override bool CanShoot(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
 
     public override void AddRecipes()

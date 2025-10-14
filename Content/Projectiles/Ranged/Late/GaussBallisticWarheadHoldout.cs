@@ -25,8 +25,8 @@ public class GaussBallisticWarheadHoldout : BaseIdleHoldoutProjectile
         get => Projectile.ai[2] == 1f;
         set => Projectile.ai[2] = value.ToInt();
     }
-    public ref float Recoil => ref Projectile.Additions().ExtraAI[0];
-    public ref float ReticleRot => ref Projectile.Additions().ExtraAI[1];
+    public ref float Recoil => ref Projectile.AdditionsInfo().ExtraAI[0];
+    public ref float ReticleRot => ref Projectile.AdditionsInfo().ExtraAI[1];
 
     public override void SetStaticDefaults()
     {
@@ -155,7 +155,7 @@ public class GaussBallisticWarheadHoldout : BaseIdleHoldoutProjectile
                 Vector2 vel = Projectile.velocity.SafeNormalize(Vector2.Zero) * speed * (Maxxed ? 1.5f : 1f);
                 int proj = ModContent.ProjectileType<GaussBallisticWarheadRocket>();
                 Projectile rocket = Main.projectile[Projectile.NewProj(Right, vel, proj, damage * (Maxxed ? 2 : 1), knockback, Owner.whoAmI, 0f, Maxxed.ToInt())];
-                rocket.Additions().ExtraAI[1] = Projectile.whoAmI;
+                rocket.AdditionsInfo().ExtraAI[1] = Projectile.whoAmI;
             }
             for (int j = 0; j <= 30; j++)
             {

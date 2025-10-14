@@ -1,10 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using System;
+﻿using System;
 using Terraria;
-using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
@@ -33,6 +30,7 @@ public class InfernalBlast : ModProjectile, ILocalizedModType, IModType
         {
             SoundID.Item74.Play(Projectile.Center);
             Projectile.ai[0] = 1f;
+            Projectile.netUpdate = true;
         }
 
         Lighting.AddLight(Projectile.Center, Color.OrangeRed.ToVector3() * 2.5f);

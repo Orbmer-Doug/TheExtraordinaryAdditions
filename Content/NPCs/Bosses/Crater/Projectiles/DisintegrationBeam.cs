@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
+using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -11,7 +12,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
-public class DisintegrationBurst : ProjOwnedByNPC<Asterlin>
+public class DisintegrationBeam : ProjOwnedByNPC<Asterlin>
 {
     public override string Texture => AssetRegistry.Invis;
     public override void SetDefaults()
@@ -41,28 +42,32 @@ public class DisintegrationBurst : ProjOwnedByNPC<Asterlin>
         get => (int)Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
-    public bool DontTurn
+    public int ProjOwner
     {
-        get => Projectile.ai[1] == 1f;
-        set => Projectile.ai[1] = value.ToInt();
+        get => (int)Projectile.ai[1];
+        set => Projectile.ai[1] = value;
     }
     public ref float MaxAngleShift => ref Projectile.ai[2];
     public BeamState CurrentState
     {
-        get => (BeamState)Projectile.Additions().ExtraAI[0];
-        set => Projectile.Additions().ExtraAI[0] = (int)value;
+        get => (BeamState)Projectile.AdditionsInfo().ExtraAI[0];
+        set => Projectile.AdditionsInfo().ExtraAI[0] = (int)value;
     }
-    public ref float CurrentLength => ref Projectile.Additions().ExtraAI[1];
-    public Projectile ProjOwner;
+    public ref float CurrentLength => ref Projectile.AdditionsInfo().ExtraAI[1];
+    public bool DontTurn
+    {
+        get => Projectile.AdditionsInfo().ExtraAI[1] == 1;
+        set => Projectile.AdditionsInfo().ExtraAI[1] = value.ToInt();
+    }
 
     public override void SafeAI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, null, 80);
 
-        ProjOwner = Main.projectile[(int)Projectile.Additions().ExtraAI[2]] ?? null;
-        if (ProjOwner != null && ProjOwner.active)
-            Projectile.Center = ProjOwner.Center;
+        Projectile owner = Main.projectile?[ProjOwner] ?? null;
+        if (owner != null && owner.active && owner.type == ModContent.ProjectileType<VaporizingStar>())
+            Projectile.Center = owner.Center;
 
         switch (CurrentState)
         {
@@ -79,7 +84,7 @@ public class DisintegrationBurst : ProjOwnedByNPC<Asterlin>
                     AdditionsSound.HeavyLaserBlast.Play(Projectile.Center, 2.2f, -.2f, 0f);
                     Time = 0;
                     CurrentState = BeamState.Vaporizing;
-                    Projectile.netUpdate = true;
+                    this.Sync();
                 }
                 break;
             case BeamState.Vaporizing:
@@ -92,7 +97,7 @@ public class DisintegrationBurst : ProjOwnedByNPC<Asterlin>
                 {
                     Time = 0;
                     CurrentState = BeamState.Fading;
-                    Projectile.netUpdate = true;
+                    this.Sync();
                 }
                 break;
             case BeamState.Fading:
@@ -111,6 +116,8 @@ public class DisintegrationBurst : ProjOwnedByNPC<Asterlin>
         Time++;
     }
 
+    public override bool? CanDamage() => CurrentState == BeamState.Vaporizing ? null : false;
+
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
         return targetHitbox.CollisionFromPoints(points.Points, WidthFunct);
@@ -126,7 +133,7 @@ public class DisintegrationBurst : ProjOwnedByNPC<Asterlin>
         return MulticolorLerp(c.X, Color.Goldenrod, Color.Orange, Color.DarkOrange);
     }
 
-    public ManualTrailPoints points = new(80);
+    public TrailPoints points = new(80);
     public OptimizedPrimitiveTrail trail;
     public override bool PreDraw(ref Color lightColor)
     {

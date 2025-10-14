@@ -1,8 +1,6 @@
 ﻿using SubworldLibrary;
 using System.Collections.Generic;
-using System.IO;
 using Terraria;
-using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using TheExtraordinaryAdditions.Core.Netcode;
@@ -47,7 +45,9 @@ public class BossDownedSaveSystem : ModSystem
     public static bool HasDefeated<BossType>() where BossType : ModNPC =>
         downedRegistry.Contains(ModContent.GetModNPC(ModContent.NPCType<BossType>()).Name);
 }
+
 public interface IBossDowned { }
+
 public class GlobalBossDefeatMarker : GlobalNPC
 {
     public override void OnKill(NPC npc)

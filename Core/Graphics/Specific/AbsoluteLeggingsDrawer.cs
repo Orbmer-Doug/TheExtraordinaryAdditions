@@ -32,18 +32,27 @@ public class AbsoluteLeggingsDrawer : ModSystem
             ArmorOutlineTexture = AssetRegistry.GetTexture(AdditionsTexture.AbsoluteGreaves_Legs);
         }
 
-        RenderTargetManager.RenderTargetUpdateLoopEvent += PrepareAfterimageTarget;
-        Main.QueueMainThreadAction(() =>
+        Main.QueueMainThreadAction(static () =>
         {
             AfterimageTarget = new(true, CreateScreenSizedTarget);
             AfterimageTargetPrevious = new(true, CreateScreenSizedTarget);
         });
+        
+        RenderTargetManager.RenderTargetUpdateLoopEvent += PrepareAfterimageTarget;
         On_LegacyPlayerRenderer.DrawPlayers += DrawLegsTarget;
         On_PlayerDrawLayers.DrawPlayer_13_Leggings += DisallowLeggingDrawingIfNecessary;
     }
 
     public override void OnModUnload()
     {
+        Main.QueueMainThreadAction(static () =>
+        {
+            AfterimageTarget?.Dispose();
+            AfterimageTarget = null;
+            AfterimageTargetPrevious?.Dispose();
+            AfterimageTargetPrevious = null;
+        });
+
         RenderTargetManager.RenderTargetUpdateLoopEvent -= PrepareAfterimageTarget;
         On_LegacyPlayerRenderer.DrawPlayers -= DrawLegsTarget;
         On_PlayerDrawLayers.DrawPlayer_13_Leggings -= DisallowLeggingDrawingIfNecessary;

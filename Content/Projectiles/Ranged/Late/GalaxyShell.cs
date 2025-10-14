@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -22,10 +21,9 @@ public class GalaxyShell : ModProjectile
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = -1;
     }
+
     public int Time;
-
     public bool TouchedGrass;
-
     public override void AI()
     {
         Projectile.extraUpdates = 0;

@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -26,7 +25,7 @@ public class CursedFlamesHoldout : BaseIdleHoldoutProjectile
     {
         Vector2 pos = Projectile.Center + PolarVector(10f, Projectile.rotation);
 
-        if (Time % Item.useAnimation == Item.useAnimation - 1 && Modded.SafeMouseLeft.Current && this.RunLocal())
+        if (Time % Item.useAnimation == Item.useAnimation - 1 && Modded.SafeMouseLeft.Current && this.RunLocal() && TryUseMana(false))
         {
             SoundEngine.PlaySound(SoundID.Item20, Projectile.Center);
             Vector2 vel = Projectile.velocity;
@@ -34,7 +33,7 @@ public class CursedFlamesHoldout : BaseIdleHoldoutProjectile
             Projectile.NewProj(pos + vel, vel, ModContent.ProjectileType<RagingCursedFire>(), Item.damage, Item.knockBack, Owner.whoAmI);
         }
 
-        if (Time % Item.useAnimation == Item.useAnimation - 1 && Modded.SafeMouseRight.Current && Item.CheckManaBetter(Owner, Item.mana, true) && !Modded.MouseLeft.Current && this.RunLocal())
+        if (this.RunLocal() && Time % Item.useAnimation == Item.useAnimation - 1 && Modded.SafeMouseRight.Current && TryUseMana() && !Modded.MouseLeft.Current)
         {
             SoundEngine.PlaySound(SoundID.Item20 with { Pitch = -.45f, Volume = 1.1f }, Projectile.Center);
             Vector2 vel = Projectile.velocity;

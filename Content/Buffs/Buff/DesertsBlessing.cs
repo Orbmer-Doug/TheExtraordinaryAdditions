@@ -1,5 +1,4 @@
 ﻿using Terraria;
-using Terraria.Localization;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
 
@@ -16,6 +15,6 @@ public class DesertsBlessing : ModBuff
 
     public override void Update(Player player, ref int buffIndex)
     {
-        player.GetModPlayer<GlobalPlayer>().aridFlask = true;
+        player.Additions().Buffs[GlobalPlayer.AdditionsBuff.AridFlask] = true;
     }
 }

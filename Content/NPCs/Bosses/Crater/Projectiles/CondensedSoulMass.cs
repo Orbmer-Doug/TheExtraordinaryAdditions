@@ -29,7 +29,7 @@ public class CondensedSoulMass : ProjOwnedByNPC<Asterlin>
 
     public override void SetDefaults()
     {
-        Projectile.width = Projectile.height = 28;
+        Projectile.width = Projectile.height = 300;
         Projectile.scale = 1f;
         Projectile.friendly = true;
         Projectile.penetrate = -1;
@@ -41,17 +41,21 @@ public class CondensedSoulMass : ProjOwnedByNPC<Asterlin>
     public override void SafeAI()
     {
         Holy ??= LoopedSoundManager.CreateNew(new(AdditionsSound.holyLoop, () => 1.2f * Projectile.scale), () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
-        Holy.Update(Projectile.Center);
+        Holy?.Update(Projectile.Center);
 
         Lighting.AddLight(Projectile.Center, Color.Gold.ToVector3() * 3f * Projectile.scale);
 
         if (!Touched)
         {
+            Projectile.scale = Owner.Opacity;
             Vector2 pos = new(270f, 300f + MathF.Sin(Main.GlobalTimeWrappedHourly * .2f) * 20f);
             Projectile.Center = Owner.Center - pos;
 
             foreach (Player player in Main.ActivePlayers)
             {
+                if (player.DeadOrGhost)
+                    continue;
+
                 if (player.Center.WithinRange(Projectile.Center, 100f))
                 {
                     AdditionsSound.BraveEnergy.Play(Projectile.Center, .9f);
@@ -104,8 +108,8 @@ public class CondensedSoulMass : ProjOwnedByNPC<Asterlin>
                     }
                 }
 
-                Boss.FightStarted = true;
-                Boss.Sync();
+                ModOwner.FightStarted = true;
+                ModOwner.Sync();
                 Projectile.Kill();
             }
             Time++;
@@ -114,7 +118,7 @@ public class CondensedSoulMass : ProjOwnedByNPC<Asterlin>
 
     public override bool PreDraw(ref Color lightColor)
     {
-        Vector2 size = new(300f);
+        Vector2 size = Projectile.Size;
         Main.spriteBatch.SetBlendState(BlendState.Additive);
         Texture2D t = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
         Main.spriteBatch.DrawBetterRect(t, ToTarget(Projectile.Center, size * 1.5f * Projectile.scale), null, Color.Gold, 0f, t.Size() / 2, 0);

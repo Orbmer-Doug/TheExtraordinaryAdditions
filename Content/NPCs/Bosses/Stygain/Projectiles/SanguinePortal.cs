@@ -1,15 +1,9 @@
-﻿using log4net.Core;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
-using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
-using TheExtraordinaryAdditions.Core.Interfaces;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
@@ -41,7 +35,7 @@ public class SanguinePortal : ProjOwnedByNPC<StygainHeart>
         int eyeCount = DifficultyBasedValue(14, 16, 18, 20, 22, 24);
         float eyeShootSpeed = DifficultyBasedValue(12f, 14f, 16f, 18f, 20f, 22f);
 
-        if (Boss.HasDonePhase2Drama)
+        if (ModOwner.HasDonePhase2Drama)
             ringCount += 1;
 
         float angleOffset = 0f; // Start with no offset for the first ring

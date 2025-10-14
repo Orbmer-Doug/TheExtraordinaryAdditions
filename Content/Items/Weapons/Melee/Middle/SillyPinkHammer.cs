@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -12,11 +11,8 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 public class SillyPinkHammer : ModItem, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SillyPinkHammer);
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(Color.Pink);
-    }
 
+    public const int BaseUseTime = 50;
     public override void SetDefaults()
     {
         Item.width = Item.height = 96;
@@ -39,8 +35,14 @@ public class SillyPinkHammer : ModItem, ILocalizedModType, IModType
         Item.autoReuse = false;
         Item.channel = true;
     }
-    public const int BaseUseTime = 50;
+    
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(Color.Pink);
+    }
+
     public override bool CanUseItem(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
+
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
         Projectile.NewProjectile(source, position, velocity, type, damage, knockback, ai2: player.itemTimeMax);

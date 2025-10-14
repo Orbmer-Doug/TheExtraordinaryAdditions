@@ -1,8 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.IO;
 using Terraria;
-using Terraria.GameContent.Drawing;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
@@ -24,7 +22,7 @@ public class HorsemenSwing : BaseSwordSwing
         after ??= new(8, () => Projectile.Center);
 
         // Reset arrays
-        after.afterimages = null;
+        after.Clear();
     }
     public override void SafeAI()
     {
@@ -80,7 +78,7 @@ public class HorsemenSwing : BaseSwordSwing
             Dust d = Dust.NewDustPerfect(start + Main.rand.NextVector2Circular(10f, 10f), DustID.Torch, SwordDir.RotatedByRandom(.4f) * Main.rand.NextFloat(6f, 12f),
                 0, default, Main.rand.NextFloat(1.9f, 2.8f));
             d.noGravity = true;
-        }    
+        }
         if (!npc.immortal && !npc.SpawnedFromStatue && !NPCID.Sets.CountsAsCritter[npc.type])
             Owner.HorsemansBlade_SpawnPumpkin(npc.whoAmI, Projectile.damage, Projectile.knockBack);
     }

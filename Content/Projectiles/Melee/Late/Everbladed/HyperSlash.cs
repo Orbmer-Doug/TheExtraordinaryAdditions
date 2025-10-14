@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -14,7 +15,7 @@ public class HyperSlash : ModProjectile
 
     public ref float Time => ref Projectile.ai[0];
 
-    public ManualTrailPoints Positions;
+    public TrailPoints Positions;
     public OptimizedPrimitiveTrail Blood;
     public OptimizedPrimitiveTrail Lightning;
 
@@ -54,12 +55,26 @@ public class HyperSlash : ModProjectile
         set;
     }
 
+    public override void SendExtraAI(BinaryWriter writer)
+    {
+        writer.WriteVector2(Start);
+        writer.WriteVector2(Center);
+        writer.WriteVector2(End);
+    }
+
+    public override void ReceiveExtraAI(BinaryReader reader)
+    {
+        Start = reader.ReadVector2();
+        Center = reader.ReadVector2();
+        End = reader.ReadVector2();
+    }
+
     public List<Vector2> Points = [];
     public override void AI()
     {
-        if (Blood == null || Blood._disposed)
+        if (Blood == null || Blood.Disposed)
             Blood = new(AltWidthFunct, AltColorFunct);
-        if (Lightning == null || Lightning._disposed)
+        if (Lightning == null || Lightning.Disposed)
             Lightning = new(WidthFunct, ColorFunct);
 
         Positions ??= new(40);

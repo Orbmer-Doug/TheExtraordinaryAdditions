@@ -1,25 +1,19 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Utilities;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Terraria;
-using Terraria.Audio;
 using Terraria.ID;
-using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Assets.Audio;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
-using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
-// An adaptation of the deathray made by Lucille Karma in Wrath of the Gods:
-// https://github.com/LucilleKarma/WrathOfTheMachines/blob/main/Content/NPCs/ExoMechs/Projectiles/ExoOverloadbeam.cs
+// An adaptation of the deathray made by Lucille Karma in Wrath of the Machines:
+// https://github.com/LucilleKarma/WrathOfTheMachines/blob/main/Content/NPCs/ExoMechs/Projectiles/ExoOverloadDeathray.cs
 public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
 {
     /// <summary>
@@ -30,8 +24,6 @@ public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
         get;
         set;
     }
-
-    public Projectile ProjOwner;
 
     /// <summary>
     /// How long this beam has existed
@@ -48,10 +40,13 @@ public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
     /// </summary>
     public ref float SideAngle => ref Projectile.ai[2];
 
+    /// <summary>
+    /// The counter to control <see cref="SideAngle"/>
+    /// </summary>
     public int SwayCounter
     {
-        get => (int)Projectile.Additions().ExtraAI[0];
-        set => Projectile.Additions().ExtraAI[0] = value;
+        get => (int)Projectile.AdditionsInfo().ExtraAI[0];
+        set => Projectile.AdditionsInfo().ExtraAI[0] = value;
     }
 
     /// <summary>
@@ -88,13 +83,9 @@ public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
         Projectile.hostile = true;
         Projectile.friendly = false;
         Projectile.timeLeft = 9000000;
-
-        // This is done for more precision in the collision checks, due to the fact that the laser moves rather quickly
-        // Wouldn't want it to skip over the player's hitbox in a single update and do nothing
         Projectile.MaxUpdates = 2;
 
         CooldownSlot = ImmunityCooldownID.Bosses;
-        LaserbeamLength = 800f;
     }
 
     public override void SendAI(BinaryWriter writer)
@@ -117,7 +108,8 @@ public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
     public override void SafeAI()
     {
         // Update the menacing sound
-        gamma ??= LoopedSoundManager.CreateNew(new(AdditionsSound.sunAura, () => MathHelper.Clamp(Projectile.scale, 0f, 1f), () => -.08f), () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
+        gamma ??= LoopedSoundManager.CreateNew(new(AdditionsSound.sunAura, () => MathHelper.Clamp(Projectile.scale, 0f, 1f), () => -.08f),
+            () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
         gamma.Update(Projectile.Center);
 
         // Angle it up and down
@@ -134,24 +126,24 @@ public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
         }
 
         Rotation = Animators.EulerAnglesConversion(1, Projectile.rotation, SideAngle);
-        Projectile.Center = ProjOwner.Center;
 
-        if (Boss.Hyperbeam_CurrentState == Asterlin.Hyperbeam_States.Fade)
+        Projectile.Center = Owner.Center;
+
+        if (ModOwner.Hyperbeam_CurrentState == Asterlin.Hyperbeam_States.Fade)
         {
-            LaserbeamLength = Animators.Sine.InOutFunction.Evaluate(Boss.AITimer, 0f, Asterlin.Hyperbeam_FadeTime, MaxLaserbeamLength, 0f);
-            Projectile.Opacity = Animators.MakePoly(2.2f).InFunction.Evaluate(Boss.AITimer, 0f, Asterlin.Hyperbeam_FadeTime * .35f, 1f, 0f);
-            Projectile.scale = Animators.MakePoly(3f).InOutFunction.Evaluate(Boss.AITimer, 0f, Asterlin.Hyperbeam_FadeTime, 2f, 0f);
+            LaserbeamLength = Animators.Sine.InOutFunction.Evaluate(ModOwner.AITimer, 0f, Asterlin.Hyperbeam_FadeTime, MaxLaserbeamLength, 0f);
+            Projectile.Opacity = Animators.MakePoly(2.2f).InFunction.Evaluate(ModOwner.AITimer, 0f, Asterlin.Hyperbeam_FadeTime * .35f, 1f, 0f);
+            Projectile.scale = Animators.MakePoly(3f).InOutFunction.Evaluate(ModOwner.AITimer, 0f, Asterlin.Hyperbeam_FadeTime, 2f, 0f);
             if (LaserbeamLength <= 0f)
                 Projectile.Kill();
         }
-        else if (Boss.Hyperbeam_CurrentState != Asterlin.Hyperbeam_States.Fade)
+        else if (ModOwner.Hyperbeam_CurrentState != Asterlin.Hyperbeam_States.Fade)
         {
             LaserbeamLength = Animators.CubicBezier(.12f, 1f, .61f, .98f).Evaluate(Time, 0f, Asterlin.Hyperbeam_BeamBuildTime, 0f, MaxLaserbeamLength);
             Projectile.Opacity = Animators.MakePoly(2.2f).OutFunction.Evaluate(Time, 0f, Asterlin.Hyperbeam_BeamBuildTime * .35f, 0f, 1f);
             Projectile.scale = Animators.MakePoly(3f).InOutFunction.Evaluate(Time, 0f, Asterlin.Hyperbeam_BeamBuildTime * .6f, 0f, 2f);
         }
 
-        // Rack up time of existing
         Time++;
     }
 
@@ -159,7 +151,28 @@ public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return false;
+        // Get start and end in 2D space
+        Vector3 start = new(Projectile.Center, 0f);
+        Vector3 end = start + Vector3.Transform(Vector3.UnitX, Rotation) * LaserbeamLength;
+        end.Z /= LaserbeamLength;
+
+        Vector3 rayDirection = Vector3.Normalize(end - start);
+        Vector3 boxMin = new(targetHitbox.TopLeft(), -1f);
+        Vector3 boxMax = new(targetHitbox.BottomRight(), 1f);
+
+        Vector3 tMin = (boxMin - start) / rayDirection;
+        Vector3 tMax = (boxMax - start) / rayDirection;
+        Vector3 t1 = Vector3.Min(tMin, tMax);
+
+        // AABB
+        float tNear = MathF.Max(MathF.Max(t1.X, t1.Y), t1.Z);
+        Vector3 targetCenter = new(targetHitbox.Center(), 0f);
+        Vector3 endPoint = start + rayDirection * tNear;
+        Vector3 directionToTarget = Vector3.Normalize(targetCenter - start);
+        float distanceToProjection = Vector3.Distance(endPoint, targetCenter);
+
+        // Check if the target is in the lasers forward direction within a 16~ degree cone (arccos(.96) = 16 degrees)
+        return distanceToProjection <= Projectile.width * Projectile.scale && Vector3.Dot(directionToTarget, rayDirection) >= 0.96f;
     }
 
     public void GetBloomVerticesAndIndices(Color baseColor, Vector3 start, Vector3 end, out Vertex2D[] leftVertices, out Vertex2D[] rightVertices, out int[] indices)
@@ -253,43 +266,6 @@ public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
         }
     }
 
-    /// <summary>
-    /// Renders the beam.
-    /// </summary>
-    /// <param name="start">The starting point of the beam, in 3D space.</param>
-    /// <param name="end">The ending point of the beam, in 3D space.</param>
-    /// <param name="baseColor">The color of the cylinder.</param>
-    /// <param name="widthFactor">The width factor of the cylinder.</param>
-    public void RenderLaser(Vector3 start, Vector3 end, Color baseColor, float widthFactor)
-    {
-        GraphicsDevice gd = Main.instance.GraphicsDevice;
-        GetVerticesAndIndices(widthFactor, baseColor, start, end, MathHelper.Pi, out Vertex2D[] rightVertices, out int[] indices);
-        gd.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, rightVertices, 0, rightVertices.Length, indices, 0, indices.Length / 3);
-
-        GetVerticesAndIndices(widthFactor, baseColor, start, end, 0f, out Vertex2D[] leftVertices, out _);
-        gd.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, leftVertices, 0, leftVertices.Length, indices, 0, indices.Length / 3);
-    }
-
-    /// <summary>
-    /// Renders bloom for the beam.
-    /// </summary>
-    /// <param name="start">The starting point of the beam, in 3D space.</param>
-    /// <param name="end">The ending point of the beam, in 3D space.</param>
-    /// <param name="projection">The matrix responsible for manipulating primitive vertices.</param>
-    public void RenderBloom(Vector3 start, Vector3 end)
-    {
-        Color bloomColor = Color.Orange with { A = 0 };
-
-        ManagedShader bloomShader = ShaderRegistry.StandardPrimitiveShader;
-        bloomShader.Render();
-
-        GetBloomVerticesAndIndices(bloomColor, start, end, out Vertex2D[] leftVertices, out Vertex2D[] rightVertices, out int[] indices);
-
-        GraphicsDevice gd = Main.instance.GraphicsDevice;
-        gd.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, rightVertices, 0, rightVertices.Length, indices, 0, indices.Length / 3);
-        gd.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, leftVertices, 0, leftVertices.Length, indices, 0, indices.Length / 3);
-    }
-
     public override bool PreDraw(ref Color lightColor)
     {
         void drawLaser()
@@ -304,8 +280,15 @@ public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
             int width = Main.screenWidth;
             int height = Main.screenHeight;
 
-            RenderBloom(start, end);
+            // Render the bloom
+            Color bloomColor = Color.Orange with { A = 0 };
+            ManagedShader bloomShader = ShaderRegistry.StandardPrimitiveShader;
+            bloomShader.Render();
+            GetBloomVerticesAndIndices(bloomColor, start, end, out Vertex2D[] leftVertices, out Vertex2D[] rightVertices, out int[] indices);
+            gd.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, rightVertices, 0, rightVertices.Length, indices, 0, indices.Length / 3);
+            gd.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, leftVertices, 0, leftVertices.Length, indices, 0, indices.Length / 3);
 
+            // Render the laser
             Color color = new Color((byte)(byte.MaxValue * .961f), (byte)(byte.MaxValue * .592f), (byte)(byte.MaxValue * .078f));
             ManagedShader shader = AssetRegistry.GetShader("AsterlinDeathrayShader");
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DendriticNoiseDim), 1, SamplerState.LinearWrap);
@@ -313,7 +296,11 @@ public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
             shader.TrySetParameter("baseColor", color.ToVector3());
             shader.Render();
 
-            RenderLaser(start, end, color, 1f);
+            GetVerticesAndIndices(1f, color, start, end, MathHelper.Pi, out rightVertices, out indices);
+            gd.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, rightVertices, 0, rightVertices.Length, indices, 0, indices.Length / 3);
+            GetVerticesAndIndices(1f, color, start, end, 0f, out leftVertices, out _);
+            gd.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, leftVertices, 0, leftVertices.Length, indices, 0, indices.Length / 3);
+
         }
         PixelationSystem.QueuePrimitiveRenderAction(drawLaser, PixelationLayer.OverPlayers);
         return false;

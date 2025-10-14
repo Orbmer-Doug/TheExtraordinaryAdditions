@@ -1,11 +1,10 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Middle;
@@ -13,17 +12,15 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Middle;
 public class Fireball : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Fireball);
+
     public override void SetStaticDefaults()
     {
         CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1;
     }
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(new Color(227, 170, 36));
-    }
+
     public override void SetDefaults()
     {
-        Item.damage = 48;
+        Item.damage = 56;
         Item.DamageType = DamageClass.Magic;
         Item.width = 32;
         Item.height = 40;
@@ -42,5 +39,11 @@ public class Fireball : ModItem
         Item.crit = 40; //it is very effective
         Item.mana = 15;
     }
+    
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(new Color(227, 170, 36));
+    }
+
     public override bool CanShoot(Player player) => false;
 }

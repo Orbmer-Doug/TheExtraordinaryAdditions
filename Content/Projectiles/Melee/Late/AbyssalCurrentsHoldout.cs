@@ -27,6 +27,7 @@ public class AbyssalCurrentsHoldout : ModProjectile, IHasScreenShader
         ProjectileID.Sets.CanDistortWater[Type] = false;
         ProjectileID.Sets.HeldProjDoesNotUsePlayerGfxOffY[Type] = true;
     }
+
     public override void SetDefaults()
     {
         Projectile.Size = new(134);
@@ -45,21 +46,25 @@ public class AbyssalCurrentsHoldout : ModProjectile, IHasScreenShader
         Spin,
         Chase,
     }
+
     public int Time
     {
         get => (int)Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
+
     public AbyssalState State
     {
         get => (AbyssalState)Projectile.ai[1];
         set => Projectile.ai[1] = (int)value;
     }
+
     public ref float OldArmRot => ref Projectile.ai[2];
+
     public int BackTime
     {
-        get => (int)Projectile.Additions().ExtraAI[0];
-        set => Projectile.Additions().ExtraAI[0] = value;
+        get => (int)Projectile.AdditionsInfo().ExtraAI[0];
+        set => Projectile.AdditionsInfo().ExtraAI[0] = value;
     }
 
     public float MeleeSpeed => Owner.GetTotalAttackSpeed(DamageClass.MeleeNoSpeed);
@@ -364,7 +369,6 @@ public class AbyssalCurrentsHoldout : ModProjectile, IHasScreenShader
             ManagedShader shader = AssetRegistry.GetShader("WhirlpoolShader");
             PixelationSystem.QueueTextureRenderAction(pool, PixelationLayer.UnderNPCs, BlendState.AlphaBlend, shader);
         }
-
         return false;
     }
 }

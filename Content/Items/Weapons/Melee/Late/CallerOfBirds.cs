@@ -1,11 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
@@ -13,12 +11,13 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
 public class CallerOfBirds : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CallerOfBirds);
+
     public override void SetDefaults()
     {
-        Item.damage = 510;
+        Item.damage = 250;
         Item.DamageType = DamageClass.Melee;
         Item.width = 28;
-        Item.height = 52;
+        Item.height = 28;
         Item.maxStack = 1;
         Item.useTime = 6;
         Item.useAnimation = 20;
@@ -35,11 +34,12 @@ public class CallerOfBirds : ModItem
         Item.noUseGraphic = true;
     }
 
-    public override bool CanShoot(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(new Color(64, 81, 219));
     }
+
+    public override bool CanShoot(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
 
     public override void AddRecipes()
     {

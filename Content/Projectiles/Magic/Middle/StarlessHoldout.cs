@@ -1,5 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Middle;
@@ -27,7 +27,7 @@ public class StarlessHoldout : BaseIdleHoldoutProjectile
         set => Projectile.ai[1] = value.ToInt();
     }
     public ref float Counter => ref Projectile.ai[2];
-    public ref float Offset => ref Projectile.Additions().ExtraAI[0];
+    public ref float Offset => ref Projectile.AdditionsInfo().ExtraAI[0];
     public int?[] CurrentLances = new int?[4];
     private const int OffsetMax = 200;
     public override void SafeAI()
@@ -49,7 +49,7 @@ public class StarlessHoldout : BaseIdleHoldoutProjectile
         {
             int type = ModContent.ProjectileType<TheStarsAreAfraid>();
 
-            if (Time % Item.useTime == Item.useTime - 1 && Counter < 4)
+            if (Time % Item.useTime == Item.useTime - 1 && Counter < 4 && TryUseMana())
             {
                 for (int i = 0; i < 4; i++)
                 {
@@ -95,15 +95,15 @@ public class StarlessHoldout : BaseIdleHoldoutProjectile
             int amt = Owner.CountOwnerProjectiles(type);
 
             float wait = Item.useTime * .1f;
-            if (Time % wait == wait - 1 && amt < 30)
+            if (Time % wait == wait - 1 && amt < 30 && TryUseMana())
             {
                 StarWater water = Main.projectile[Projectile.NewProj(Owner.Center, Vector2.Zero, type,
                     Projectile.damage, Projectile.knockBack, Owner.whoAmI)].As<StarWater>();
                 water.Offset = Main.rand.NextVector2Circular(OffsetMax, OffsetMax);
             }
 
-            Span<Projectile> waters = Utility.AllProjectilesFromOwner(type, Owner);
-            if ((this.RunLocal() && Modded.SafeMouseLeft.Current) && !Released && waters.Length > 0)
+            List<Projectile> waters = Utility.AllProjectilesFromOwner(type, Owner);
+            if ((this.RunLocal() && Modded.SafeMouseLeft.Current) && !Released && waters.Count > 0)
             {
                 AdditionsSound.MagicStrike.Play(Projectile.Center, 1.2f, .2f, .1f, 20, Name);
 

@@ -1,13 +1,11 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Early;
 using TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Middle;
@@ -15,10 +13,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Middle;
 public class VirulentEntrapment : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.VirulentEntrapment);
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(new Color(23, 244, 23));
-    }
+
     public override void SetStaticDefaults()
     {
         Main.RegisterItemAnimation(Item.type, new DrawAnimationVertical(10, 9, false));
@@ -45,6 +40,11 @@ public class VirulentEntrapment : ModItem
         Item.shootSpeed = 16f;
         Item.mana = 3;
         Item.noUseGraphic = true;
+    }
+
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(new Color(23, 244, 23));
     }
 
     public override bool CanUseItem(Player player)

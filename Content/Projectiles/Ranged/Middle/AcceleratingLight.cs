@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
+﻿using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
@@ -38,6 +37,9 @@ public class AcceleratingLight : ModProjectile
     public TrailPoints cache;
     public override void AI()
     {
+        if (trail == null || trail.Disposed)
+            trail = new(c => Projectile.height / 2 * GetLerpBump(0f, .2f, 1f, .2f, c), (c, pos) => Color.Gold, null, 15);
+
         float lifeRatio = GetLerpBump(0f, 20f, Life, Life - 20f, Time) * InverseLerp(0f, 30f, Projectile.timeLeft);
         Projectile.Opacity = lifeRatio;
         Projectile.scale = lifeRatio * .1f;
@@ -61,13 +63,15 @@ public class AcceleratingLight : ModProjectile
         Time++;
     }
 
+    public OptimizedPrimitiveTrail trail;
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
         {
+            if (trail == null || trail.Disposed || cache == null)
+                return;
             ManagedShader shader = ShaderRegistry.FadedStreak;
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.StreakMagma), 1);
-            OptimizedPrimitiveTrail trail = new(c => Projectile.height / 2 * GetLerpBump(0f, .2f, 1f, .2f, c), (c, pos) => Color.Gold, null, 15);
             trail.DrawTrail(shader, cache.Points, 60);
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);

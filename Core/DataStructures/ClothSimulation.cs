@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Terraria;
 using Terraria.Graphics;
@@ -377,7 +376,7 @@ public class ClothSimulation : IDisposable
 
             GraphicsDevice gd = Main.instance.GraphicsDevice;
 
-            UpdatePixelatedBaseEffect(out Matrix offset, out Matrix projection, out Matrix view);
+            GetPixelated2DMatrices(out Matrix offset, out Matrix projection, out Matrix view);
 
             ManagedShader clothShader = AssetRegistry.GetShader("ClothShader");
             clothShader.TrySetParameter("size", new Vector2(_gridWidth, _gridHeight));

@@ -7,7 +7,6 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -27,8 +26,8 @@ public class LanikeaHoldout : BaseIdleHoldoutProjectile
     public ref float Time => ref Projectile.ai[2];
     public int Recoil
     {
-        get => (int)Projectile.Additions().ExtraAI[0];
-        set => Projectile.Additions().ExtraAI[0] = value;
+        get => (int)Projectile.AdditionsInfo().ExtraAI[0];
+        set => Projectile.AdditionsInfo().ExtraAI[0] = value;
     }
     public ref bool Reloading => ref Owner.GetModPlayer<LanikeaPlayer>().Reloading;
     public float ChargeProgress => MathHelper.Clamp(Charge, 0f, MaxCharge) / MaxCharge;
@@ -152,26 +151,23 @@ public class LanikeaHoldout : BaseIdleHoldoutProjectile
         {
             AdditionsSound.Laser3.Play(Projectile.Center, 1.4f);
             Vector2 direction2 = Utils.ToRotationVector2(velRot);
-            if (Owner.whoAmI == Main.myPlayer)
+            Owner.velocity = Owner.SafeDirectionTo(Projectile.Center) * -8f;
+            Vector2 velocity = direction2 * 10f;
+
+            for (int i = 0; i < 27; i++)
             {
-                Owner.velocity = Owner.SafeDirectionTo(Projectile.Center) * -8f;
-                Vector2 velocity = direction2 * 10f;
-
-                for (int i = 0; i < 27; i++)
-                {
-                    Vector2 pos = Tip + Utils.NextVector2Circular(Main.rand, 5f, 5f);
-                    ParticleRegistry.SpawnMistParticle(pos, velocity.RotatedByRandom(.55f) * Main.rand.NextFloat(.4f, 4.2f), Main.rand.NextFloat(.9f, 2.1f), Color.BlueViolet, Color.SlateBlue, 180);
-                }
-
-                for (int i = 0; i < 8; i++)
-                {
-                    int type = ModContent.ProjectileType<CosmicSlugCharge>();
-                    int damage = Projectile.damage;
-                    Vector2 FinalVelocity = velocity.RotatedByRandom(.36f) * Main.rand.NextFloat(.5f, .7f);
-                    Projectile.NewProj(Tip, FinalVelocity, type, damage, 6f, Owner.whoAmI, 0f, 0f, 0f);
-                }
-                Projectile.NewProj(Projectile.Center, new Vector2(5 * -Projectile.direction, -5f), ModContent.ProjectileType<GalaxyShell>(), 0, 0f, -1, 0f, 0f, 0f);
+                Vector2 pos = Tip + Utils.NextVector2Circular(Main.rand, 5f, 5f);
+                ParticleRegistry.SpawnMistParticle(pos, velocity.RotatedByRandom(.55f) * Main.rand.NextFloat(.4f, 4.2f), Main.rand.NextFloat(.9f, 2.1f), Color.BlueViolet, Color.SlateBlue, 180);
             }
+
+            for (int i = 0; i < 8; i++)
+            {
+                int type = ModContent.ProjectileType<CosmicSlugCharge>();
+                int damage = (int)(Projectile.damage * .65f);
+                Vector2 final = velocity.RotatedByRandom(.36f) * Main.rand.NextFloat(.5f, .7f);
+                Projectile.NewProj(Tip, final, type, damage, 6f, Owner.whoAmI, 0f, 0f, 0f);
+            }
+            Projectile.NewProj(Projectile.Center, new Vector2(5 * -Projectile.direction, -5f), ModContent.ProjectileType<GalaxyShell>(), 0, 0f, -1, 0f, 0f, 0f);
 
             Color pulseColor2 = (Utils.NextBool(Main.rand) ? Color.BlueViolet : Color.SlateGray);
             ParticleRegistry.SpawnPulseRingParticle(Tip, direction2 * 5, 40, direction2.ToRotation(), new(.5f, 1f), 160f, 0f, pulseColor2);

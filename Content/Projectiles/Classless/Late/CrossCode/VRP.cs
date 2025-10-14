@@ -47,16 +47,16 @@ public class VRP : ModProjectile
         get => (int)Projectile.ai[2];
         set => Projectile.ai[2] = value;
     }
-    public ref float Time => ref Projectile.Additions().ExtraAI[0];
+    public ref float Time => ref Projectile.AdditionsInfo().ExtraAI[0];
     public bool TileDeath
     {
-        get => Projectile.Additions().ExtraAI[1] == 1f;
-        set => Projectile.Additions().ExtraAI[1] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[1] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[1] = value.ToInt();
     }
     public bool Charged
     {
-        get => Projectile.Additions().ExtraAI[2] == 1f;
-        set => Projectile.Additions().ExtraAI[2] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[2] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[2] = value.ToInt();
     }
     public int MaxBounces => Charged ? 4 : 1;
 
@@ -207,11 +207,30 @@ public class VRP : ModProjectile
 
             ParticleRegistry.SpawnCrossCodeHit(Projectile.Center, ParticleRegistry.CrosscodeHitType.Medium, State);
         }
+
+        switch (State)
+        {
+            case Element.Neutral:
+                break;
+            case Element.Cold:
+                target.AddBuff(BuffID.Frostburn, SecondsToFrames(3));
+                target.AddBuff(BuffID.Frostburn2, SecondsToFrames(3));
+                break;
+            case Element.Heat:
+                target.AddBuff(BuffID.OnFire, SecondsToFrames(3));
+                target.AddBuff(BuffID.OnFire3, SecondsToFrames(3));
+                break;
+            case Element.Shock:
+                break;
+            case Element.Wave:
+                break;
+        }
     }
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
     {
-        modifiers.FinalDamage *= Charged ? 1.25f : Completion * .9f;
+        if (Charged)
+            modifiers.FinalDamage *= 1.5f;
     }
 
     public override void OnKill(int timeLeft)

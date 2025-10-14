@@ -7,7 +7,7 @@ public class ModReferences : ModSystem
     public static Mod Fables
     {
         get;
-        internal set;
+        private set;
     }
     public static Mod BossChecklist
     {
@@ -35,5 +35,10 @@ public class ModReferences : ModSystem
             Infernum = inf;
         if (ModLoader.TryGetMod("NoxusBoss", out Mod knocksus))
             WotG = knocksus;
+    }
+
+    public override void Unload()
+    {
+        Fables = BossChecklist = Infernum = WotG = null;
     }
 }

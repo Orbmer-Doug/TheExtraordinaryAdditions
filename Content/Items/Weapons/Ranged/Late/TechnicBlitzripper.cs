@@ -4,24 +4,22 @@ using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
 
 public class TechnicBlitzripper : ModItem, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TechnicBlitzripper);
+
     public override void SetStaticDefaults()
     {
         CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1;
     }
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(Color.Cyan);
-    }
+
     public override void SetDefaults()
     {
-        Item.damage = 242;
+        Item.damage = 222;
         Item.DamageType = DamageClass.Ranged;
         Item.width = 138;
         Item.height = 176;
@@ -39,5 +37,11 @@ public class TechnicBlitzripper : ModItem, ILocalizedModType, IModType
         Item.rare = ModContent.RarityType<CyberneticRarity>();
         Item.value = AdditionsGlobalItem.LegendaryRarityPrice;
     }
+    
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(Color.Cyan);
+    }
+
     public override bool CanShoot(Player player) => false;
 }

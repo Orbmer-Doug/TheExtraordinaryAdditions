@@ -1,18 +1,13 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using System;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
-using Terraria.GameContent;
 using Terraria.Graphics;
 using Terraria.Graphics.Renderers;
 using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Late;
-using TheExtraordinaryAdditions.Content.Projectiles.Vanilla;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -36,18 +31,27 @@ public class AbsoluteHeadDrawer : ModSystem
             ArmorOutlineTexture = AssetRegistry.GetTexture(AdditionsTexture.AbsoluteGreathelm);
         }
 
-        RenderTargetManager.RenderTargetUpdateLoopEvent += PrepareAfterimageTarget;
-        Main.QueueMainThreadAction(() =>
+        Main.QueueMainThreadAction(static () =>
         {
             AfterimageTarget = new(true, CreateScreenSizedTarget);
             AfterimageTargetPrevious = new(true, CreateScreenSizedTarget);
         });
+
+        RenderTargetManager.RenderTargetUpdateLoopEvent += PrepareAfterimageTarget;
         On_LegacyPlayerRenderer.DrawPlayers += DrawHeadTarget;
         On_PlayerDrawLayers.DrawPlayer_21_Head += DisallowHeadDrawingIfNecessary;
     }
 
     public override void OnModUnload()
     {
+        Main.QueueMainThreadAction(static () =>
+        {
+            AfterimageTarget?.Dispose();
+            AfterimageTarget = null;
+            AfterimageTargetPrevious?.Dispose();
+            AfterimageTargetPrevious = null;
+        });
+
         RenderTargetManager.RenderTargetUpdateLoopEvent -= PrepareAfterimageTarget;
         On_LegacyPlayerRenderer.DrawPlayers -= DrawHeadTarget;
         On_PlayerDrawLayers.DrawPlayer_21_Head -= DisallowHeadDrawingIfNecessary;
@@ -151,7 +155,7 @@ public class AbsoluteHeadDrawer : ModSystem
             drawInfo.BoringSetup(p, [], [], [], p.TopLeft + Vector2.UnitY * p.gfxOffY, 0f, p.fullRotation, p.fullRotationOrigin);
 
             PlayerDrawLayers.DrawPlayer_21_Head(ref drawInfo);
-            
+
             // Draw the headgear with the activated shader
             foreach (DrawData armorData in drawInfo.DrawDataCache)
             {

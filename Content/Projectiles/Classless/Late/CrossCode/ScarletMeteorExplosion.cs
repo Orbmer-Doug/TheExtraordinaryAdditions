@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -9,15 +8,21 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.CrossCode
 public class ScarletMeteorExplosion : ModProjectile, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ScarletMeteorExplosion);
-    public int frameX;
-
-    public int frameY;
 
     private const int horiz = 6;
 
     private const int vert = 2;
 
-    public ref float Time => ref Projectile.ai[0];
+    public int FrameX
+    {
+        get => (int)Projectile.ai[0];
+        set => Projectile.ai[0] = value;
+    }
+    public int FrameY
+    {
+        get => (int)Projectile.ai[1];
+        set => Projectile.ai[1] = value;
+    }
 
     public override void SetDefaults()
     {
@@ -35,13 +40,13 @@ public class ScarletMeteorExplosion : ModProjectile, ILocalizedModType, IModType
         Projectile.frameCounter++;
         if (Projectile.frameCounter % 3 == 2)
         {
-            frameX++;
-            if (frameX >= horiz)
+            FrameX++;
+            if (FrameX >= horiz)
             {
-                frameY++;
-                frameX = 0;
+                FrameY++;
+                FrameX = 0;
             }
-            if (frameY >= 2)
+            if (FrameY >= 2)
             {
                 Projectile.Kill();
             }
@@ -63,7 +68,7 @@ public class ScarletMeteorExplosion : ModProjectile, ILocalizedModType, IModType
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D tex = Projectile.ThisProjectileTexture();
-        Rectangle frame = tex.Frame(horiz, vert, frameX, frameY);
+        Rectangle frame = tex.Frame(horiz, vert, FrameX, FrameY);
         Vector2 orig = frame.Size() / 2;
         Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, frame, Color.White, Projectile.rotation, orig, 1f, 0, 0f);
         return false;

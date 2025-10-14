@@ -4,12 +4,10 @@ using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
-// orbital light beams near players + radial dart emission in cyclic pattern (not immediate circle) + pushing fireballs away
 public partial class Asterlin : ModNPC
 {
     [AutomatedMethodInvoke]
@@ -17,58 +15,47 @@ public partial class Asterlin : ModNPC
     {
         StateMachine.RegisterTransition(AsterlinAIType.UnveilingZenith, new Dictionary<AsterlinAIType, float> { { AsterlinAIType.GabrielLeave, 1f } }, false, () =>
         {
-            return AITimer >= UnveilingZenith_TotalTime;
+            return AITimer >= UnveilingZenith_TotalTime && !Utility.AnyProjectile(ModContent.ProjectileType<BarrageBeam>());
         });
-        StateMachine.RegisterStateEntryCallback(AsterlinAIType.UnveilingZenith, () => 
+        StateMachine.RegisterTransition(AsterlinAIType.UnveilingZenith, new Dictionary<AsterlinAIType, float> { { AsterlinAIType.GetScrewed, 1f } }, false, () =>
         {
+            return UnveilingZenith_CollapseTimer >= UnveilingZenith_StarCollapseTime;
+        });
 
+        StateMachine.RegisterStateEntryCallback(AsterlinAIType.UnveilingZenith, () =>
+        {
+            foreach (Player player in Main.ActivePlayers)
+            {
+                if (this.RunServer())
+                    NPC.NewNPCProj(player.Center - Vector2.UnitY * 400f, Main.rand.NextVector2Circular(10f, 10f), ModContent.ProjectileType<ConvergentFireball>(), 0, 0f, 0f, 0f, 0f, 0f, 0f);
+            }
         });
         StateMachine.RegisterStateBehavior(AsterlinAIType.UnveilingZenith, DoBehavior_UnveilingZenith);
     }
 
     public static int UnveilingZenith_StarCollapseTime => SecondsToFrames(.3f);
-    public static int UnveilingZenith_BeamReleaseRate => DifficultyBasedValue(SecondsToFrames(1f), SecondsToFrames(1f), SecondsToFrames(1f), SecondsToFrames(1f), SecondsToFrames(1f), SecondsToFrames(1f));
+    public static int UnveilingZenith_FlameReleaseRate => DifficultyBasedValue(SecondsToFrames(.4f), SecondsToFrames(.3f), SecondsToFrames(.25f), SecondsToFrames(.22f), SecondsToFrames(.2f), SecondsToFrames(.17f));
+    public static int UnveilingZenith_BeamReleaseRate => DifficultyBasedValue(SecondsToFrames(.5f), SecondsToFrames(.4f), SecondsToFrames(.3f), SecondsToFrames(.25f), SecondsToFrames(.2f), SecondsToFrames(.2f));
     public static int UnveilingZenith_TotalTime => SecondsToFrames(20.8f);
-
-    public int UnveilingZenith_WaitTimer
-    {
-        get => (int)NPC.AdditionsInfo().ExtraAI[0];
-        set => NPC.AdditionsInfo().ExtraAI[0] = value;
-    }
-
-    public int UnveilingZenith_NeededAmount
-    {
-        get => (int)NPC.AdditionsInfo().ExtraAI[1];
-        set => NPC.AdditionsInfo().ExtraAI[1] = value;
-    }
+    public static float UnveilingZenith_BlurAmount => .4f;
 
     public int UnveilingZenith_CurrentAmount
     {
-        get => (int)NPC.AdditionsInfo().ExtraAI[2];
-        set => NPC.AdditionsInfo().ExtraAI[2] = value;
+        get => (int)ExtraAI[0];
+        set => ExtraAI[0] = value;
     }
 
     public int UnveilingZenith_CollapseTimer
     {
-        get => (int)NPC.AdditionsInfo().ExtraAI[3];
-        set => NPC.AdditionsInfo().ExtraAI[3] = value;
+        get => (int)ExtraAI[1];
+        set => ExtraAI[1] = value;
     }
 
     public void DoBehavior_UnveilingZenith()
     {
-        if (AITimer == 0)
-        {
-            foreach (Player player in Main.ActivePlayers)
-            {
-                if (this.RunServer())
-                    NPC.NewNPCProj(player.Center, Main.rand.NextVector2Circular(10f, 10f), ModContent.ProjectileType<ConvergentFireball>(), 0, 0f, 0f, 0f, 0f, 0f, 0f);
-            }
-
-            PlayerCount(out int total, out _);
-            UnveilingZenith_NeededAmount = total;
-        }
-
-        if (UnveilingZenith_CurrentAmount >= UnveilingZenith_NeededAmount)
+        BarrageBeamManager.Golden = true;
+        PlayerCount(out int total, out _);
+        if (UnveilingZenith_CurrentAmount >= total)
         {
             UnveilingZenith_CollapseTimer++;
 
@@ -76,14 +63,28 @@ public partial class Asterlin : ModNPC
             {
                 if (this.RunServer())
                     NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<DisintegrationNova>(), Asterlin.SuperHeavyAttackDamage * 5, 100f);
+                foreach (Projectile p in Utility.AllProjectilesByID(ModContent.ProjectileType<ConvergentFireball>()))
+                    p.Kill();
             }
         }
 
-        float velocity = 6f;
+        SetMotionBlurInterpolant(InverseLerp(0f, ConvergentFireball.ScaleUpTime, AITimer) * UnveilingZenith_BlurAmount);
+
+        if (AITimer < UnveilingZenith_TotalTime)
+        {
+            Vector2 pos = Vector2.Lerp(LeftVentPosition, RightVentPosition, .5f);
+            if (AITimer % UnveilingZenith_BeamReleaseRate == (UnveilingZenith_BeamReleaseRate - 1))
+            {
+                if (this.RunServer())
+                    NPC.NewNPCProj(pos, Vector2.Zero, ModContent.ProjectileType<BarrageBeam>(), LightAttackDamage, 0f);
+            }
+        }
+
+        float velocity = 4f;
         float amt = .1f;
         Vector2 target = Target.Position + new Vector2(400f * (NPC.Center.X > Target.Center.X).ToDirectionInt(), Target.Velocity.Y * 15f);
         NPC.velocity = Vector2.SmoothStep(NPC.velocity, NPC.SafeDirectionTo(target) * MathF.Min(NPC.Center.Distance(target), velocity), amt);
 
-        SetRightHandTarget(rightArm.RootPosition + PolarVector(400f, -MathHelper.PiOver2));
+        SetRightHandTarget(RightArm.RootPosition + PolarVector(400f, -MathHelper.PiOver2));
     }
 }

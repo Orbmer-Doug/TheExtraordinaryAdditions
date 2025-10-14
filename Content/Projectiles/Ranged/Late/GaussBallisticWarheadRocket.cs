@@ -39,13 +39,13 @@ public class GaussBallisticWarheadRocket : ModProjectile
     public NPC Target;
     public Player Owner => Main.player[Projectile.owner];
     public Vector2 Back => Projectile.Hitbox.ToRotated(Projectile.rotation).Left;
-    private ref float InitVelLength => ref Projectile.Additions().ExtraAI[0];
+    private ref float InitVelLength => ref Projectile.AdditionsInfo().ExtraAI[0];
 
     public Projectile OwnerProj
     {
         get
         {
-            return Main.projectile[(int)Projectile.Additions().ExtraAI[1]];
+            return Main.projectile[(int)Projectile.AdditionsInfo().ExtraAI[1]];
         }
     }
 
@@ -58,7 +58,7 @@ public class GaussBallisticWarheadRocket : ModProjectile
             this.Sync();
         }
 
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunction, ColorFunction, null, 30);
 
         Time++;
@@ -102,38 +102,13 @@ public class GaussBallisticWarheadRocket : ModProjectile
     {
         return MathHelper.SmoothStep(Projectile.height, 0f, completion) * FuelCompletion;
     }
+
     private Color ColorFunction(SystemVector2 completion, Vector2 position)
     {
         Color startingColor = Color.Lerp(Color.Yellow * 1.6f, Color.White, 0.4f);
         Color middleColor = Color.Lerp(Color.YellowGreen * .4f, Color.YellowGreen, 0.2f);
         Color endColor = Color.Lerp(Color.YellowGreen * .3f, Color.YellowGreen, 0.67f);
         return MulticolorLerp(completion.X, startingColor, middleColor, endColor) * GetLerpBump(.8f, .2f, 0f, 0.067f, completion.X) * FuelCompletion;
-    }
-
-    public TrailPoints cache = new(30);
-    public OptimizedPrimitiveTrail trail;
-    public override bool PreDraw(ref Color lightColor)
-    {
-        void draw()
-        {
-            if (trail != null)
-            {
-                ManagedShader shader = ShaderRegistry.SmoothFlame;
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.SuperWavyPerlin), 1);
-                shader.TrySetParameter("heatInterpolant", 2f);
-                trail.DrawTrail(shader, cache.Points, 100, true);
-            }
-        }
-        PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
-
-        Texture2D texture = Projectile.ThisProjectileTexture();
-        Vector2 drawPosition = Projectile.Center - Main.screenPosition;
-        if (Maxxed)
-            Projectile.DrawProjectileBackglow(Color.GreenYellow * 1.4f, 8f * FuelCompletion, 90, 12);
-        Main.EntitySpriteDraw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), Projectile.rotation, texture.Size() * 0.5f, Projectile.scale, 0, 0);
-        Main.EntitySpriteDraw(AssetRegistry.GetTexture(AdditionsTexture.GaussBallisticWarheadRocket_Glow), drawPosition, null, Projectile.GetAlpha(Color.White), Projectile.rotation, texture.Size() * 0.5f, Projectile.scale, 0, 0);
-
-        return false;
     }
 
     public override void OnKill(int timeLeft)
@@ -204,5 +179,30 @@ public class GaussBallisticWarheadRocket : ModProjectile
                 }
             }
         }
+    }
+    
+    public TrailPoints cache = new(30);
+    public OptimizedPrimitiveTrail trail;
+    public override bool PreDraw(ref Color lightColor)
+    {
+        void draw()
+        {
+            if (trail != null)
+            {
+                ManagedShader shader = ShaderRegistry.SmoothFlame;
+                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.SuperWavyPerlin), 1);
+                shader.TrySetParameter("heatInterpolant", 2f);
+                trail.DrawTrail(shader, cache.Points, 100, true);
+            }
+        }
+        PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
+
+        Texture2D texture = Projectile.ThisProjectileTexture();
+        Vector2 drawPosition = Projectile.Center - Main.screenPosition;
+        if (Maxxed)
+            Projectile.DrawProjectileBackglow(Color.GreenYellow * 1.4f, 8f * FuelCompletion, 90, 12);
+        Main.EntitySpriteDraw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), Projectile.rotation, texture.Size() * 0.5f, Projectile.scale, 0, 0);
+        Main.EntitySpriteDraw(AssetRegistry.GetTexture(AdditionsTexture.GaussBallisticWarheadRocket_Glow), drawPosition, null, Projectile.GetAlpha(Color.White), Projectile.rotation, texture.Size() * 0.5f, Projectile.scale, 0, 0);
+        return false;
     }
 }

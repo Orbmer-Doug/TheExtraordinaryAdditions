@@ -29,11 +29,19 @@ public abstract class BaseHoldoutProjectile : ModProjectile, ILocalizedModType, 
     public Vector2 Mouse;
     public virtual bool SetItemTime => true;
 
-    public bool TryUseMana() => Item.CheckManaBetter(Owner, Item.mana, true);
-    public bool TryUseAmmo(out int type, out float speed, out int dmg, out float kb, out int ammoID)
+    public bool TryUseMana(bool pay = true) => Item.CheckManaBetter(Owner, Owner.GetManaCost(Item), pay);
+    public bool HasMana() => Item.CheckManaBetter(Owner, Owner.GetManaCost(Item), false);
+    public bool TryUseAmmo(out int projToShoot, out float speed, out int dmg, out float kb, out int ammoID)
     {
-        Owner.PickAmmo(Item, out type, out speed, out dmg, out kb, out ammoID, Owner.IsAmmoFreeThisShot(Item, Owner.ChooseAmmo(Item), Owner.ChooseAmmo(Item).type));
-        return Owner.HasAmmo(Item);
+        if (!Owner.HasAmmo(Item))
+        {
+            projToShoot = dmg = ammoID = 0;
+            speed = kb = 0f;
+            return false;
+        }
+
+        Owner.PickAmmo(Item, out projToShoot, out speed, out dmg, out kb, out ammoID, Owner.IsAmmoFreeThisShot(Item, Owner.ChooseAmmo(Item), Owner.ChooseAmmo(Item).type));
+        return true;
     }
     public SpriteEffects FixedDirection()
     {
@@ -44,6 +52,8 @@ public abstract class BaseHoldoutProjectile : ModProjectile, ILocalizedModType, 
     }
 
     public override bool? CanDamage() => false;
+    public sealed override bool? CanHitNPC(NPC target) => CanDamage();
+    public sealed override bool CanHitPlayer(Player target) => false;
     public override bool? CanCutTiles() => false;
     public sealed override bool ShouldUpdatePosition() => false;
     public sealed override void AI()

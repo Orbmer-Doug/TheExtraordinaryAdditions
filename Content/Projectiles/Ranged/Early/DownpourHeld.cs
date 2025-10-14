@@ -32,15 +32,15 @@ public class DownpourHeld : BaseIdleHoldoutProjectile
     }
 
     public List<Vector2> Points = [];
-    public ManualTrailPoints cache;
+    public TrailPoints cache;
     public const int MaxPoints = 40;
     public const float ReelDist = 15f;
     public int ReelTime => Item.useTime;
     public ref float Time => ref Projectile.ai[0];
     public ref float Switch => ref Projectile.ai[1];
     public ref float StringCompletion => ref Projectile.ai[2];
-    public ref float OldStringCompletion => ref Projectile.Additions().ExtraAI[0];
-    public ref float TotalTime => ref Projectile.Additions().ExtraAI[2];
+    public ref float OldStringCompletion => ref Projectile.AdditionsInfo().ExtraAI[0];
+    public ref float TotalTime => ref Projectile.AdditionsInfo().ExtraAI[2];
     public int Dir => Projectile.velocity.X.NonZeroSign();
     public override void OnSpawn(IEntitySource source)
     {
@@ -65,7 +65,8 @@ public class DownpourHeld : BaseIdleHoldoutProjectile
         Item ammoItem = Owner.ChooseAmmo(Item);
         Texture2D arrow = ammoItem != null ? ammoItem.ThisItemTexture() : AssetRegistry.GetTexture(AdditionsTexture.Pixel);
 
-        Owner.heldProj = Projectile.whoAmI;
+        if (trail == null || trail.Disposed)
+            trail = new(c => 2f, (c, pos) => new Color(143, 152, 203) * Lighting.Brightness(pos.ToTileCoordinates().X, pos.ToTileCoordinates().Y), null, MaxPoints);
         if (this.RunLocal())
         {
             Projectile.velocity = Center.SafeDirectionTo(Modded.mouseWorld);
@@ -132,17 +133,13 @@ public class DownpourHeld : BaseIdleHoldoutProjectile
                         for (int i = 0; i < (reel < .33f ? 1 : reel < .66f ? 2 : 3); i++)
                         {
                             Vector2 offset = Main.rand.NextVector2CircularLimited(60f, 60f, .6f, 1f);
-                            Vector2 pos = arrowPos + offset; 
+                            Vector2 pos = arrowPos + offset;
+                            Vector2 vel = pos.SafeDirectionTo(Modded.mouseWorld + offset) * speed * Main.rand.NextFloat(.8f, 1.3f);
                             if (this.RunLocal())
-                            {
-                                Vector2 vel = pos.SafeDirectionTo(Modded.mouseWorld + offset) * speed * Main.rand.NextFloat(.8f, 1.3f);
                                 Projectile.NewProj(pos, vel, ModContent.ProjectileType<RainDrop>(), dmg / 3, kb / 3, Owner.whoAmI);
-                                ParticleRegistry.SpawnPulseRingParticle(pos, vel.SafeNormalize(Vector2.Zero), Main.rand.Next(20, 30), vel.ToRotation(), new(.5f, 1f), 0f, 30f, Color.CornflowerBlue);
-                                for (int j = 0; j < 6; j++)
-                                {
-                                    Dust.NewDustPerfect(pos, DustID.Water, vel.RotatedByRandom(.2f) * Main.rand.NextFloat(.4f, .8f), 0, default, Main.rand.NextFloat(1.5f, 1.9f)).noGravity = true;
-                                }
-                            }
+                            ParticleRegistry.SpawnPulseRingParticle(pos, vel.SafeNormalize(Vector2.Zero), Main.rand.Next(20, 30), vel.ToRotation(), new(.5f, 1f), 0f, 30f, Color.CornflowerBlue);
+                            for (int j = 0; j < 6; j++)
+                                Dust.NewDustPerfect(pos, DustID.Water, vel.RotatedByRandom(.2f) * Main.rand.NextFloat(.4f, .8f), 0, default, Main.rand.NextFloat(1.5f, 1.9f)).noGravity = true;
                         }
                         SoundEngine.PlaySound(SoundID.Item5 with { Volume = Main.rand.NextFloat(.9f, 1.2f), PitchVariance = .1f, Identifier = Name }, arrowPos);
 
@@ -164,14 +161,14 @@ public class DownpourHeld : BaseIdleHoldoutProjectile
         }
     }
 
+    public OptimizedPrimitiveTrail trail;
     public override bool PreDraw(ref Color lightColor)
     {
         Item ammoItem = Owner.ChooseAmmo(Item);
         Texture2D arrow = ammoItem != null ? ammoItem.ThisItemTexture() : AssetRegistry.GetTexture(AdditionsTexture.Pixel);
 
-        Point p = Projectile.RotHitbox().Center.ToTileCoordinates();
-        OptimizedPrimitiveTrail trail = new(c => 2f, (c, pos) => new Color(143, 152, 203) * Lighting.Brightness(p.X, p.Y), null, MaxPoints);
-        trail.DrawTrail(ShaderRegistry.StandardPrimitiveShader, cache.Points, 100, false, false);
+        if (trail != null && !trail.Disposed && cache != null)
+            trail.DrawTrail(ShaderRegistry.StandardPrimitiveShader, cache.Points, 100, false, false);
 
         Texture2D texture = Projectile.ThisProjectileTexture();
         float rotation = Projectile.rotation;

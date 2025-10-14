@@ -64,7 +64,7 @@ public class SuperheatedPlasmaBeam : ModProjectile, ILocalizedModType, IModType
         else
             Projectile.timeLeft = 2;
 
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunction, ColorFunction, null, 100);
 
         Projectile.scale = MakePoly(3f).OutFunction.Evaluate(Time, 0f, 20f, 0f, 2f);
@@ -115,24 +115,6 @@ public class SuperheatedPlasmaBeam : ModProjectile, ILocalizedModType, IModType
         return MulticolorLerp(completionRatio.X, Color.White, Color.Chocolate, Color.OrangeRed, Color.OrangeRed * 1.2f) * InverseLerp(0f, .01f, completionRatio.X);
     }
 
-    public ManualTrailPoints cache = new(100);
-    public OptimizedPrimitiveTrail trail;
-    public override bool PreDraw(ref Color lightColor)
-    {
-        void draw()
-        {
-            if (trail == null || cache == null)
-                return;
-
-            ManagedShader shader = ShaderRegistry.FlameTrail;
-            shader.TrySetParameter("heatInterpolant", .2f + Utils.Turn01ToCyclic010(Main.GlobalTimeWrappedHourly * .5f));
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FlameMap2), 1);
-            trail.DrawTrail(shader, cache.Points, 250);
-        }
-        PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
-        return false;
-    }
-
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
         return targetHitbox.LineCollision(cache.Points[0], cache.Points[^1], WidthFunction(1f));
@@ -156,4 +138,22 @@ public class SuperheatedPlasmaBeam : ModProjectile, ILocalizedModType, IModType
     }
 
     public override bool ShouldUpdatePosition() => false;
+
+    public TrailPoints cache = new(100);
+    public OptimizedPrimitiveTrail trail;
+    public override bool PreDraw(ref Color lightColor)
+    {
+        void draw()
+        {
+            if (trail == null || cache == null)
+                return;
+
+            ManagedShader shader = ShaderRegistry.FlameTrail;
+            shader.TrySetParameter("heatInterpolant", .2f + Utils.Turn01ToCyclic010(Main.GlobalTimeWrappedHourly * .5f));
+            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FlameMap2), 1);
+            trail.DrawTrail(shader, cache.Points, 250);
+        }
+        PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
+        return false;
+    }
 }

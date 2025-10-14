@@ -6,7 +6,7 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Early;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Late;
 
@@ -39,7 +39,6 @@ public class AbsoluteCoreplate : ModItem, ILocalizedModType, IModType
         player.statLifeMax2 += 110;
         player.lifeRegenTime += 2f;
         player.lifeRegen += 1;
-        player.GetModPlayer<GlobalPlayer>().AbsoluteArmor = true;
     }
 
     public override void AddRecipes()

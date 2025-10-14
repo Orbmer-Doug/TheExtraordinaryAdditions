@@ -10,7 +10,7 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Summon;
 using TheExtraordinaryAdditions.Content.Projectiles.Summoner.Late.Avia;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Late;
@@ -18,10 +18,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Late;
 public class Avragen : ModItem, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Avragen);
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(Color.Lerp(Color.Violet, Color.PaleVioletRed, (float)MathF.Sin(Main.GlobalTimeWrappedHourly * 6f)));
-    }
+
     public override void SetDefaults()
     {
         Item.damage = 2050;
@@ -37,6 +34,11 @@ public class Avragen : ModItem, ILocalizedModType, IModType
         Item.rare = ModContent.RarityType<ShadowRarity>();
         Item.value = AdditionsGlobalItem.LegendaryRarityPrice;
         Item.noMelee = true;
+    }
+
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(Color.Lerp(Color.Violet, Color.PaleVioletRed, (float)MathF.Sin(Main.GlobalTimeWrappedHourly * 6f)));
     }
 
     public override bool CanUseItem(Player player)

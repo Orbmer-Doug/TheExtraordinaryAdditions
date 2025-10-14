@@ -1,4 +1,4 @@
-static const float resolution = 256;
+static const float resolution = 128;
 static const float quantization = 16;
 static const float erasureBlend = .2;
 

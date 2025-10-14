@@ -1,9 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
+﻿using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
@@ -34,9 +32,7 @@ public class RagingCursedFire : ModProjectile
         if (Time > 20)
             Projectile.velocity.Y += .2f;
         if (Projectile.velocity.Y > 16f)
-        {
             Projectile.velocity.Y = 16f;
-        }
 
         Lighting.AddLight(Projectile.Center, .35f, 1f, 0f);
 
@@ -53,9 +49,7 @@ public class RagingCursedFire : ModProjectile
 
             ParticleRegistry.SpawnHeavySmokeParticle(pos, vel, time, size, color, opacity, true);
             if (Main.rand.NextBool(5))
-            {
                 ParticleRegistry.SpawnHeavySmokeParticle(pos, vel, time, size, color2, opacity, true);
-            }
         }
     }
 

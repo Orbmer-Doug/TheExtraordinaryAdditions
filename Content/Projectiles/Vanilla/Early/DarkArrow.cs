@@ -27,7 +27,7 @@ public class DarkArrow : ModProjectile
     }
 
     public Player Owner => Main.player[Projectile.owner];
-    public ref float Time => ref Projectile.Additions().ExtraAI[0];
+    public ref float Time => ref Projectile.AdditionsInfo().ExtraAI[0];
     public override void AI()
     {
         Projectile.FacingUp();
@@ -45,14 +45,13 @@ public class DarkArrow : ModProjectile
         if (Time == 45f)
         {
             Vector2 orbVel = Main.rand.NextVector2Circular(2f, 2f);
-            Projectile.NewProj(pos, orbVel, ModContent.ProjectileType<CorruptOrb>(), (int)(Projectile.damage * .4f), Projectile.knockBack * .4f, Projectile.owner);
+            if (this.RunLocal())
+                Projectile.NewProj(pos, orbVel, ModContent.ProjectileType<CorruptOrb>(), (int)(Projectile.damage * .4f), Projectile.knockBack * .4f, Projectile.owner);
             for (int i = 0; i < 12; i++)
-            {
                 ParticleRegistry.SpawnSquishyPixelParticle(pos, orbVel.RotatedByRandom(.3f) * Main.rand.NextFloat(.6f, .9f), Main.rand.Next(70, 120), Main.rand.NextFloat(.8f, 1.2f), Color.Violet, Color.DarkViolet, 5);
-            }
         }
 
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(c => Projectile.width, (c, pos) => Color.Violet.Lerp(Color.DarkViolet, MathHelper.SmoothStep(1f, 0f, c.X)) * MathHelper.SmoothStep(1f, 0f, c.X), null, 5);
         points ??= new(5);
         points.Update(Projectile.Center + Projectile.velocity - PolarVector(12f, Projectile.velocity.ToRotation()));
@@ -79,7 +78,7 @@ public class DarkArrow : ModProjectile
     {
         void prim()
         {
-            if (trail != null && !trail._disposed)
+            if (trail != null && !trail.Disposed)
                 trail.DrawTrail(ShaderRegistry.StandardPrimitiveShader, points.Points, 50, true);
         }
         PixelationSystem.QueuePrimitiveRenderAction(prim, PixelationLayer.UnderProjectiles);

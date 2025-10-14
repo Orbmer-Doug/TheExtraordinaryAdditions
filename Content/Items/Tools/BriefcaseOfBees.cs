@@ -1,10 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
+﻿using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Tools;
 
@@ -33,6 +32,7 @@ public class BriefcaseOfBees : ModItem
         Item.shootSpeed = 1f;
         Item.crit = 0;
     }
+
     public override bool? UseItem(Player player)
     {
         for (int i = 0; i < 50; i++)
@@ -41,22 +41,10 @@ public class BriefcaseOfBees : ModItem
             Main.npc[THEBEESHAVEMANIFESTED].velocity = Main.rand.NextVector2CircularEdge(18f, 18f) * Main.rand.NextFloat(0f, 1f);
             Main.npc[THEBEESHAVEMANIFESTED].npcSlots = .1f;
         }
-
         return true;
     }
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
-    {
-        return false;
-    }
-    public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
-    {
-        Vector2 muzzleOffset = Vector2.Normalize(velocity) * 25f;
 
-        if (Collision.CanHit(position, 0, 0, position + muzzleOffset, 7, 0))
-        {
-            position += muzzleOffset;
-        }
-    }
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback) => false;
 
     public override void AddRecipes()
     {

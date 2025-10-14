@@ -25,8 +25,8 @@ public class JudgeSwing : BaseSwordSwing
     /// </summary>
     public bool Splendor
     {
-        get => Projectile.Additions().ExtraAI[7] == 1f;
-        set => Projectile.Additions().ExtraAI[7] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[7] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[7] = value.ToInt();
     }
 
     public override int SwingTime => 20;
@@ -55,7 +55,7 @@ public class JudgeSwing : BaseSwordSwing
 
     public override void SafeAI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, (c) => Center.ToNumerics(), 20);
 
         // Owner values
@@ -167,30 +167,33 @@ public class JudgeSwing : BaseSwordSwing
             trail.DrawTrail(ShaderRegistry.StandardPrimitiveShader, points.Points);
         }
 
+        Vector2 origin;
+        bool flip = SwingDir != SwingDirection.Up;
+        if (Direction == -1)
+            flip = SwingDir == SwingDirection.Up;
 
+        if (flip)
+        {
+            origin = new Vector2(0, Tex.Height);
+
+            RotationOffset = 0;
+            Effects = SpriteEffects.None;
+        }
+        else
+        {
+            origin = new Vector2(Tex.Width, Tex.Height);
+
+            RotationOffset = PiOver2;
+            Effects = SpriteEffects.FlipHorizontally;
+        }
+
+        Texture2D tex = Splendor ? AssetRegistry.GetTexture(AdditionsTexture.SplendorIsJusticeW) : Tex;
+        float rot = RotationOffset;
+        SpriteEffects fx = Effects;
         void sword()
         {
-            Vector2 origin;
-            bool flip = SwingDir != SwingDirection.Up;
-            if (Direction == -1)
-                flip = SwingDir == SwingDirection.Up;
-
-            if (flip)
-            {
-                origin = new Vector2(0, Tex.Height);
-
-                RotationOffset = 0;
-                Effects = SpriteEffects.None;
-            }
-            else
-            {
-                origin = new Vector2(Tex.Width, Tex.Height);
-
-                RotationOffset = PiOver2;
-                Effects = SpriteEffects.FlipHorizontally;
-            }
-            Main.spriteBatch.Draw(Splendor ? AssetRegistry.GetTexture(AdditionsTexture.SplendorIsJusticeW) : Tex, Projectile.Center - Main.screenPosition, null, Color.White * Brightness * Projectile.Opacity,
-                Projectile.rotation + RotationOffset, origin, Projectile.scale, Effects, 0f);
+            Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, null, Color.White * Projectile.Opacity,
+                Projectile.rotation + rot, origin, Projectile.scale, fx, 0f);
         }
         PixelationLayer layer = Splendor ? PixelationLayer.UnderPlayers : PixelationLayer.OverPlayers;
         LayeredDrawSystem.QueueDrawAction(sword, layer);
@@ -272,7 +275,7 @@ public class JudgeSpear : ModProjectile
                     Projectile.velocity = Center.SafeDirectionTo(Modded.mouseWorld);
                     TeleEnd = Modded.mouseWorld.ClampInCircle(Center, 700f);
                 }
-                
+
                 dir = Projectile.velocity.X.NonZeroSign();
                 Projectile.spriteDirection = dir;
 

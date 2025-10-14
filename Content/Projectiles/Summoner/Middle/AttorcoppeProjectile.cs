@@ -24,7 +24,7 @@ public class AttorcoppeProjectile : BaseWhip
 
     public override void SafeAI()
     {
-        if (Completion.BetweenNum(.2f, .8f))
+        if (Completion.BetweenNum(.2f, .8f) && Projectile.numUpdates < 3)
         {
             Dust.NewDustPerfect(Tip, DustID.Venom, Main.rand.NextVector2Circular(5f, 5f), 0, default, Main.rand.NextFloat(.5f, .9f)).noGravity = true;
 
@@ -50,7 +50,7 @@ public class AttorcoppeProjectile : BaseWhip
     {
         if (index == (WhipPoints.Count - 1))
             target.AddBuff(BuffID.Venom, 180);
-        Projectile.damage = (int)(Projectile.damage * 0.9f);
+        Projectile.damage = (int)(Projectile.damage * 0.8f);
     }
 
     public override void ModifyNPCEffects(NPC target, ref NPC.HitModifiers modifiers, in Vector2 pos, in int index)

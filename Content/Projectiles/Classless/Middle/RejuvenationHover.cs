@@ -1,12 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using Terraria;
-using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
@@ -42,7 +39,7 @@ public class RejuvenationHover : ModProjectile
     public static readonly int timeForHeal = SecondsToFrames(7);
     public override void AI()
     {
-        if (!Owner.Available() || Owner.Additions().HealingArtifact == false)
+        if (!Owner.Available() || Owner.GetModPlayer<RejuvenationArtifactPlayer>().Equipped == false)
         {
             Projectile.Kill();
             return;
@@ -128,7 +125,7 @@ public class RejuvenationHover : ModProjectile
                 ManagedShader prim = ShaderRegistry.SpecialLightningTrail;
                 prim.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DendriticNoise), 1);
 
-                ManualTrailPoints points = new(20);
+                TrailPoints points = new(20);
                 points.SetPoints(Projectile.Center.GetLaserControlPoints(Projectile.Center + Projectile.SafeDirectionTo(player.Center) * (Projectile.Center.Distance(player.Center) * completion), 20));
 
                 OptimizedPrimitiveTrail line = new(WidthFunct,

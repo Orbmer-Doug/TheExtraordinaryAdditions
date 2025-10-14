@@ -1,8 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
+using System;
 using Terraria;
 using Terraria.ID;
-using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
@@ -23,7 +22,7 @@ public class TheLightripBullet : ProjOwnedByNPC<Asterlin>
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 14;
-        Projectile.friendly = false;
+        Projectile.friendly = Projectile.tileCollide = false;
         Projectile.ignoreWater = Projectile.usesLocalNPCImmunity = true;
         Projectile.hostile = true;
         Projectile.localNPCHitCooldown = 2;
@@ -48,7 +47,7 @@ public class TheLightripBullet : ProjOwnedByNPC<Asterlin>
 
     public override void SafeAI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, null, 50);
 
         points.Update(Projectile.Center + Projectile.velocity);
@@ -65,30 +64,32 @@ public class TheLightripBullet : ProjOwnedByNPC<Asterlin>
         Time++;
     }
 
-    public override void OnHitPlayer(Player target, Player.HurtInfo info)
-    {
-        HitEffects();
-    }
-
-    public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
-    {
-        HitEffects();
-    }
-
-    public override bool OnTileCollide(Vector2 oldVelocity)
-    {
-        HitEffects();
-        return false;
-    }
+    public override void OnHitPlayer(Player target, Player.HurtInfo info) => HitEffects();
+    public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone) => HitEffects();
 
     public void HitEffects()
     {
         if (!Main.dedServ)
             AdditionsSound.FireImpact.Play(Projectile.Center, .8f, 0f, .1f, 40, Name);
-        SpawnProjectile(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<LightripBlast>(), Projectile.damage / 2, 0f);
+
+        for (int i = 0; i < 30; i++)
+        {
+            Vector2 off = Main.rand.NextVector2Unit(0f, MathHelper.TwoPi) * (float)Math.Pow(Main.rand.NextFloat(), 2.4) * Projectile.Size * 0.5f;
+            Vector2 vel = off.SafeNormalize(Vector2.UnitY).RotatedByRandom((double)(MathHelper.PiOver2 * Main.rand.NextFloatDirection()));
+            Vector2 val2 = off / Projectile.Size / 0.5f;
+            vel *= MathHelper.Lerp(3f, 9f, Utils.GetLerpValue(0.05f, 0.85f, val2.Length(), false));
+
+            Vector2 pos = Projectile.Center + off;
+            Color color = MulticolorLerp(Main.rand.NextFloat(0.2f, 0.8f), Color.Cyan, Color.DeepSkyBlue, Color.SkyBlue, Color.LightCyan);
+
+            ParticleRegistry.SpawnHeavySmokeParticle(pos, vel / 2, 50, 1f, color, .4f, true);
+            ParticleRegistry.SpawnMistParticle(pos, vel.RotatedByRandom(.3f), Main.rand.NextFloat(.7f, 1.1f), color, Color.Transparent, Main.rand.NextFloat(160f, 190f), Main.rand.NextFloat(-.2f, .2f));
+        }
+
         Time = 0;
         Wait = true;
         Projectile.velocity *= 0f;
+        this.Sync();
     }
 
     public float Completion => InverseLerp(0f, Lifetime * Projectile.MaxUpdates, Time);

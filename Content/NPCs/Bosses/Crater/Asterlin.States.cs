@@ -1,41 +1,47 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria.ModLoader;
-using Terraria.ModLoader.IO;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Globals;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
 public partial class Asterlin : ModNPC
 {
-    private RandomPushdownAutomata<EntityAIState<AsterlinAIType>, AsterlinAIType> stateMachine;
+    public RandomPushdownAutomata<EntityAIState<AsterlinAIType>, AsterlinAIType> StateMachine;
 
-    public RandomPushdownAutomata<EntityAIState<AsterlinAIType>, AsterlinAIType> StateMachine
+    /// <summary>
+    /// The state that Asterlin is currently in
+    /// </summary>
+    public AsterlinAIType CurrentState
     {
         get
         {
-            if (stateMachine is null)
-                LoadStates();
-            return stateMachine!;
+            if (StateMachine == null)
+                return AsterlinAIType.AbsorbingEnergy;
+            return StateMachine.CurrentState.Identifier;
         }
-        set => stateMachine = value;
+        set
+        {
+            if (StateMachine != null)
+                StateMachine.StateStack.Push(StateMachine.StateRegistry[value]);
+        }
     }
 
-    public ref int AITimer => ref StateMachine.CurrentState.Time;
-
-    public void States_SendExtraAI(BinaryWriter wr)
+    /// <summary>
+    /// The time spent in the current state
+    /// </summary>
+    public int AITimer
     {
-        wr.Write((int)AITimer);
-    }
-
-    public void States_RecieveExtraAI(BinaryReader re)
-    {
-        AITimer = re.ReadInt32();
+        get
+        {
+            if (StateMachine == null)
+                return 0;
+            return StateMachine.CurrentState.Time;
+        }
+        set
+        {
+            if (StateMachine != null)
+                StateMachine.CurrentState.Time = value;
+        }
     }
 
     public void LoadStates()
@@ -86,7 +92,7 @@ public partial class Asterlin : ModNPC
     {
         AITimer = 0;
         for (int i = 0; i < 10; i++)
-            NPC.AdditionsInfo().ExtraAI[i] = 0f;
-        NPC.netUpdate = true;
+            ExtraAI[i] = 0f;
+        this.Sync();
     }
 }

@@ -53,9 +53,8 @@ public class HailfireHoldout : BaseIdleHoldoutProjectile
         Projectile.Center = Center + PolarVector(22f - Recoil, Projectile.rotation);
 
         int shell = ModContent.ProjectileType<HailfireShell>();
-        if ((this.RunLocal() && Modded.SafeMouseLeft.Current) && Wait <= 0f && Owner.HasAmmo(Item) && Owner.ownedProjectileCounts[shell] < 6)
+        if ((this.RunLocal() && Modded.SafeMouseLeft.Current) && Wait <= 0f && Owner.ownedProjectileCounts[shell] < 6 && TryUseAmmo(out _, out _, out _, out _, out _))
         {
-            Owner.PickAmmo(Item, out int type, out float speed, out int dmg, out float kb, out int ammoID, Owner.IsAmmoFreeThisShot(Item, Owner.ChooseAmmo(Item), Owner.ChooseAmmo(Item).type));
             SoundID.Item61.Play(Tip, 1.1f, -.1f, .1f);
             Vector2 vel = Projectile.velocity.SafeNormalize(Vector2.Zero);
 

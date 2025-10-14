@@ -7,6 +7,7 @@ using TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
@@ -14,16 +15,12 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 public class Mimicry : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Mimicry);
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(new Color(193, 0, 0));
-    }
 
     public override void SetDefaults()
     {
         Item.useStyle = ItemUseStyleID.Swing;
         Item.useTime = Item.useAnimation = 60;
-        Item.damage = 1500;
+        Item.damage = 1000;
         Item.knockBack = 1.5f;
         Item.width = Item.height = 20;
         Item.useTurn = true;
@@ -35,6 +32,11 @@ public class Mimicry : ModItem
         Item.noMelee = true;
         Item.noUseGraphic = true;
         Item.autoReuse = true;
+    }
+
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(new Color(193, 0, 0));
     }
 
     public override bool CanShoot(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;

@@ -1,13 +1,10 @@
-﻿using System.Collections.Generic;
-using Terraria;
-using Terraria.DataStructures;
+﻿using Terraria;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Misc;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Netcode;
-using TheExtraordinaryAdditions.Core.Utilities;
 using TheExtraordinaryAdditions.UI.GodDummyUI;
 
 namespace TheExtraordinaryAdditions.Content.Items.Tools;
@@ -67,7 +64,7 @@ public class GodDummy : ModItem
             if (NPC.CountNPCS(ModContent.NPCType<GodDummyNPC>()) < 25)
                 AdditionsNetcode.SpawnGodDummy(player.Additions().mouseWorld);
         }
-        
+
         return true;
     }
 

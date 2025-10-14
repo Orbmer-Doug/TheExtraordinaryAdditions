@@ -1,11 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Assets;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -29,7 +25,7 @@ public class GarciaShotgunHoldout : BaseIdleHoldoutProjectile
     public override bool? CanDamage() => false;
     public override bool? CanCutTiles() => false;
     public ref float Wait => ref Projectile.ai[0];
-    public ref int Shells => ref Modded.GarciaOverload;
+    public ref int Shells => ref Owner.GetModPlayer<GarciaPlayer>().Shells;
     public bool Taunting
     {
         get => Projectile.ai[1] == 1f;
@@ -89,10 +85,9 @@ public class GarciaShotgunHoldout : BaseIdleHoldoutProjectile
             Owner.SetCompositeArmBack(true, stretch, backArmRotation - MathHelper.Pi);
         }
 
-        if ((this.RunLocal() && Modded.SafeMouseLeft.Current) && Wait <= 0 && Owner.HasAmmo(Item))
+        if ((this.RunLocal() && Modded.SafeMouseLeft.Current) && Wait <= 0 && TryUseAmmo(out int type, out float speed, out int dmg, out float kb, out int ammo))
         {
             Vector2 pos = Projectile.RotHitbox().Right + PolarVector(2f * Dir, Projectile.rotation - MathHelper.PiOver2);
-            Owner.PickAmmo(Item, out int type, out float speed, out int dmg, out float kb, out int ammoID, Owner.IsAmmoFreeThisShot(Item, Owner.ChooseAmmo(Item), Owner.ChooseAmmo(Item).type));
             Vector2 vel = Center.SafeDirectionTo(Modded.mouseWorld) * MathHelper.Clamp(speed, Item.shootSpeed, Item.shootSpeed * 2);
 
             if (this.RunLocal())
@@ -108,11 +103,13 @@ public class GarciaShotgunHoldout : BaseIdleHoldoutProjectile
 
             for (int i = 0; i < 20; i++)
             {
-                ParticleRegistry.SpawnSparkParticle(pos, vel.RotatedByRandom(.2f) * Main.rand.NextFloat(.6f, .8f), Main.rand.Next(20, 30), Main.rand.NextFloat(.7f, .8f), Color.Chocolate.Lerp(Color.OrangeRed, Main.rand.NextFloat(.4f, .5f)), false, true);
+                ParticleRegistry.SpawnSparkParticle(pos, vel.RotatedByRandom(.2f) * Main.rand.NextFloat(.6f, .8f), Main.rand.Next(20, 30),
+                    Main.rand.NextFloat(.7f, .8f), Color.Chocolate.Lerp(Color.OrangeRed, Main.rand.NextFloat(.4f, .5f)), false, true);
 
                 ParticleRegistry.SpawnGlowParticle(pos, Vector2.Zero, 10, Main.rand.NextFloat(.3f, .45f), Color.OrangeRed, 1f);
 
-                ParticleRegistry.SpawnMistParticle(pos, vel.SafeNormalize(Vector2.Zero).RotatedByRandom(.45f) * Main.rand.NextFloat(1f, 4f), Main.rand.NextFloat(.1f, .3f), Color.Chocolate * 1.2f, Color.DarkGray, Main.rand.NextFloat(130f, 160f));
+                ParticleRegistry.SpawnMistParticle(pos, vel.SafeNormalize(Vector2.Zero).RotatedByRandom(.45f) * Main.rand.NextFloat(1f, 4f),
+                    Main.rand.NextFloat(.1f, .3f), Color.Chocolate * 1.2f, Color.DarkGray, Main.rand.NextFloat(130f, 160f));
             }
 
             AdditionsSound.Garciaboom.Play(pos, Shells > 0 ? 1.2f : .9f, Shells > 0 ? -.3f : 0f, .1f, 2);
@@ -160,4 +157,10 @@ public class GarciaShotgunHoldout : BaseIdleHoldoutProjectile
         Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), rotation, origin, Projectile.scale, FixedDirection(), 0f);
         return false;
     }
+}
+
+public sealed class GarciaPlayer : ModPlayer
+{
+    public int Shells;
+    public override void UpdateDead() => Shells = 0;
 }

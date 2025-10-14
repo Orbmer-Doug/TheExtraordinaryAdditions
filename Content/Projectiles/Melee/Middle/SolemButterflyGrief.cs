@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Debuff;
@@ -49,14 +48,14 @@ public class SolemButterflyGrief : ModProjectile, ILocalizedModType, IModType
     {
         target.AddBuff(ModContent.BuffType<Curse>(), SecondsToFrames(1));
     }
+
     public override bool PreDraw(ref Color lightColor)
     {
-        Texture2D texture =Projectile.ThisProjectileTexture();
+        Texture2D texture = Projectile.ThisProjectileTexture();
         Rectangle frame = texture.Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame);
         Vector2 drawPosition = Projectile.Center - Main.screenPosition;
         SpriteEffects direction = Projectile.direction == 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
         Main.EntitySpriteDraw(texture, drawPosition, frame, Projectile.GetAlpha(lightColor), Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, direction, 0);
         return false;
     }
-
 }

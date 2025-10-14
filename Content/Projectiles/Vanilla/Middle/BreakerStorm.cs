@@ -1,8 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
+﻿using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Assets;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
@@ -18,8 +15,8 @@ public class BreakerStorm : ModProjectile
         Projectile.ignoreWater = true;
         Projectile.tileCollide = false;
         Projectile.timeLeft = 50;
-        Projectile.usesLocalNPCImmunity = true;
-        Projectile.localNPCHitCooldown = 10;
+        Projectile.usesIDStaticNPCImmunity = true;
+        Projectile.idStaticNPCHitCooldown = 10;
         Projectile.penetrate = -1;
     }
 
@@ -32,7 +29,6 @@ public class BreakerStorm : ModProjectile
         if (Time % 2 == 1)
         {
             Vector2 size = new Vector2(Main.rand.NextFloat(.2f, .5f) * 230f);
-            Projectile.CreateFriendlyExplosion(Projectile.Center, size, Projectile.damage, Projectile.knockBack, 5, 4);
             ParticleRegistry.SpawnDetailedBlastParticle(Projectile.Center, Vector2.Zero, size,
                 Main.rand.NextVector2CircularLimited(3f, 3f, .5f, 1f), Main.rand.Next(28, 35), Color.LightBlue);
         }

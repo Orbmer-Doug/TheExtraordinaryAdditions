@@ -14,14 +14,20 @@ public class GrubShrapnel : ModProjectile
         Projectile.ignoreWater = true;
         Projectile.tileCollide = false;
     }
-    float SavedVel;
-    private bool init;
+
+    public ref float SavedVel => ref Projectile.ai[0];
+    private bool Init
+    {
+        get => Projectile.ai[1] == 1;
+        set => Projectile.ai[1] = value.ToInt();
+    }
+
     public override void AI()
     {
-        if (!init)
+        if (!Init)
         {
             SavedVel = Projectile.velocity.Length();
-            init = true;
+            Init = true;
         }
         if (Projectile.velocity.Length() < SavedVel)
             Projectile.velocity *= 2f;

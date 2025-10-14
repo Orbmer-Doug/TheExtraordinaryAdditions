@@ -1,8 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
@@ -47,7 +45,7 @@ public class InfernalFork : ModProjectile, ILocalizedModType, IModType
     {
         target.AddBuff(BuffID.OnFire3, 60 * Main.rand.Next(8, 16));
     }
-    
+
     public override void OnKill(int timeLeft)
     {
         if (this.RunLocal())

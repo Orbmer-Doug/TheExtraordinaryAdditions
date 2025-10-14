@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -10,6 +9,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 public class MythicScrap : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.MythicScrap);
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(new Color(97, 102, 0));

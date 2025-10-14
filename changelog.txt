@@ -6,7 +6,7 @@ NPCs:
 - Aurora Turret is now a mini-boss
 - Solar Guardian is much more threatening
 - Desert Prowlers should be not stupid now and have much better visuals
-- Fulmination Spirit is a little smarter
+- Fulmination Spirit is a little smarter but is a little more balanced
 
 Items:
 - Biome Pointer has a new option for the shimmer and can capture a larger distance
@@ -18,6 +18,7 @@ Items:
 
 Weapons:
 Nearly every weapon has been reworked/overhauled graphically and/or functionally. Try them all!
+All weapons should work on multiplayer, so now you can see your friends wreck havoc too!
 - Removed Inconspicuous Bag
 - Removed Fulgur Artillery Cannon
 - Removed Pair of Scissors
@@ -56,6 +57,7 @@ Tool Overhaul:
 
 Bosses:
 All boss attacks 'should' be more fair. Doesn't mean they're any less difficult!
+Every boss works in multiplayer too (at least to the furthest extent I can make it)
 
 Overhauled Stygain Heart:
 - Resprited (no longer smooth)
@@ -70,13 +72,20 @@ most Abysslon content is still left in however, especially the music box
 
 Overhauled Asterlin:
 - New model with posable limbs (no longer stiff)
-- Random attack pattern between the 3 phases. Every fight is different!
-- Fixed the bug with being a little too chatty during desperation
+- Random attack pattern between 3 phases. Every fight is different!
+- Fixed the bug with being a little too chatty during desperation...
+
+Tips in multiplayer for Asterlin:
+- Dont see everyone? Leave the subworld and rejoin.
+- Confused about something not working as expected? Me too. I dont know the answer.
+- Pray for multiplayer asterlin
+- If all else fails turn on dragon lens and spam delete npcs and projectiles a few times from all ends
 
 Misc:
+- Added new achievements
 - Added new client and server configs
 - Added support for Calamity's cooldowns
-	This is the primary way cooldowns in TEA are represented
+	This is the primary way cooldowns in TEA are represented!
 
 Technical:
 - Optimized most graphical occurences (e.g. trails behind swords, particles), there should be much less of a chance for your computer to explode

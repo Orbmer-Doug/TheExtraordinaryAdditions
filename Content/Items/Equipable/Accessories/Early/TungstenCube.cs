@@ -1,10 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Early;
@@ -16,10 +15,12 @@ public class TungstenCube : ModItem
     {
         CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1;
     }
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(new Color(247, 226, 218));
     }
+
     public override void SetDefaults()
     {
         Item.width = 22;
@@ -30,6 +31,7 @@ public class TungstenCube : ModItem
         Item.value = AdditionsGlobalItem.RarityOrangeBuyPrice;
         Item.maxStack = 1;
     }
+
     public override void UpdateAccessory(Player player, bool hideVisual)
     {
         player.GetArmorPenetration(DamageClass.Generic) += 10f;
@@ -37,18 +39,14 @@ public class TungstenCube : ModItem
         player.fallStart = 2000;
         player.fallStart2 = 2000;
         player.thorns = .5f;
-        player.noKnockback = true;
         player.moveSpeed -= .65f;
         player.runAcceleration *= .9f;
-        player.ignoreWater = true;
-        player.canFloatInWater = false;
-        player.adjWater = false;
-        player.waterWalk = false;
-        player.waterWalk2 = false;
-        player.jumpBoost = false;
+        player.ignoreWater = player.noKnockback = true;
+        player.canFloatInWater = player.adjWater = player.waterWalk = player.waterWalk2 = player.jumpBoost = false;
         player.jumpSpeedBoost = -1;
         player.wingTimeMax -= 20;
     }
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();

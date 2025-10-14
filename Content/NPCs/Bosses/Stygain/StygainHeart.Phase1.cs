@@ -5,7 +5,6 @@ using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
-using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -18,14 +17,13 @@ public sealed partial class StygainHeart : ModNPC
     {
         int shootCycleTime = DifficultyBasedValue(65, 60, 51, 47, 44, 40);
         int shootPrepareTime = DifficultyBasedValue(42, 36, 30, 25, 23, 20);
-        int shotCount = DifficultyBasedValue(2, 2, 3, 3, 4, 4);
+        int shotCount = DifficultyBasedValue(2, 2, 3, 3, 3, 4);
         int projectileCount = DifficultyBasedValue(10, 11, 12, 13, 15, 17);
 
         if (phase2)
         {
             shootCycleTime += 15;
             shootPrepareTime -= 15;
-            shotCount = 4;
             projectileCount += 2;
         }
 
@@ -140,11 +138,11 @@ public sealed partial class StygainHeart : ModNPC
         float lifeRatio = NPC.life / (float)NPC.lifeMax;
         float chargeSpeed = MathHelper.Lerp(30f, Main.getGoodWorld ? 60f : 45f, 1f - lifeRatio);
 
-        ref float aimTimer = ref NPC.AdditionsInfo().ExtraAI[2];
-        ref float chargeTimer = ref NPC.AdditionsInfo().ExtraAI[3];
-        ref float chosenDirection = ref NPC.AdditionsInfo().ExtraAI[4];
-        ref float currentCharges = ref NPC.AdditionsInfo().ExtraAI[5];
-        ref float start = ref NPC.AdditionsInfo().ExtraAI[6];
+        ref float aimTimer = ref ExtraAI[2];
+        ref float chargeTimer = ref ExtraAI[3];
+        ref float chosenDirection = ref ExtraAI[4];
+        ref float currentCharges = ref ExtraAI[5];
+        ref float start = ref ExtraAI[6];
 
         // Initially pick a random, unchosen position
         if (this.RunServer() && start == 0f)
@@ -233,7 +231,7 @@ public sealed partial class StygainHeart : ModNPC
                         Vector2 pos = i == -1 ? NPC.RotHitbox().Left : NPC.RotHitbox().Right;
                         Vector2 vel = NPC.velocity.RotatedBy(MathHelper.PiOver2).SafeNormalize(Vector2.Zero) * 2.5f * i;
                         if (this.RunServer())
-                            NPC.NewNPCProj(pos, vel, ModContent.ProjectileType<TaintedStar>(), BloodwavesDamage, 2f);
+                            NPC.NewNPCProj(pos, vel, ModContent.ProjectileType<TaintedStar>(), BloodshotDamage, 2f);
                         for (int a = 0; a < 18; a++)
                         {
                             ParticleRegistry.SpawnGlowParticle(pos + Main.rand.NextVector2Circular(10f, 10f), vel.RotatedByRandom(.25f) * Main.rand.NextFloat(.5f, 5.8f), Main.rand.Next(20, 50),
@@ -259,8 +257,8 @@ public sealed partial class StygainHeart : ModNPC
 
     public void DoAttack_PortalSmash(Player target)
     {
-        ref float counter = ref NPC.AdditionsInfo().ExtraAI[0];
-        ref float hit = ref NPC.AdditionsInfo().ExtraAI[1];
+        ref float counter = ref ExtraAI[0];
+        ref float hit = ref ExtraAI[1];
         float summonTime = DifficultyBasedValue(40f, 35f, 30f, 28f, 25f, 20f);
         float reelTime = DifficultyBasedValue(100f, 90f, 85f, 80f, 70f, 60f);
         float smashTime = DifficultyBasedValue(50f, 45f, 40f, 35f, 30f, 25f);
@@ -328,8 +326,9 @@ public sealed partial class StygainHeart : ModNPC
 
     public void DoAttack_Assimilations(Player target, bool phase2)
     {
-        ref float Counter = ref NPC.AdditionsInfo().ExtraAI[2];
-        int count = DifficultyBasedValue(2, 3, 4, 5, 6, 7) + (int)Counter;
+        ref float counter = ref ExtraAI[2];
+        int count = DifficultyBasedValue(2, 3, 4, 5) + (int)counter;
+        int cycles = 4;
 
         const int life = SanguineAssimilation.TimeForBeam;
         float wait = DifficultyBasedValue(life + 10f, life, life - 25f, life - 35f, life - 40f, life - 40f);
@@ -342,24 +341,25 @@ public sealed partial class StygainHeart : ModNPC
         NPC.velocity = Vector2.SmoothStep(NPC.velocity, NPC.SafeDirectionTo(dest) * MathF.Min(NPC.Distance(dest), 15f), .4f);
         NPC.rotation = NPC.rotation.AngleLerp(NPC.velocity.X * .04f, .1f);
 
-        if (AttackTimer % wait == wait - 1f)
+        int ass = ModContent.ProjectileType<SanguineAssimilation>();
+        if (counter < cycles && AttackTimer % wait == wait - 1f)
         {
             if (this.RunServer())
             {
                 int dir = Main.rand.NextBool().ToDirectionInt();
                 for (int i = 0; i < count; i++)
                 {
-                    Projectile p = Main.projectile[NPC.NewNPCProj(NPC.Center + Main.rand.NextVector2CircularLimited(200f, 200f, .4f, 1f), Vector2.Zero, ModContent.ProjectileType<SanguineAssimilation>(), BloodBeaconLanceDamage, 0f, -1)];
+                    Projectile p = Main.projectile[NPC.NewNPCProj(NPC.Center + Main.rand.NextVector2CircularLimited(200f, 200f, .4f, 1f), Vector2.Zero, ass, BloodBeaconLanceDamage, 0f, -1)];
                     SanguineAssimilation sangue = p.As<SanguineAssimilation>();
                     sangue.Rot = MathHelper.TwoPi * i / count;
                     sangue.Dir = dir;
                 }
             }
-            Counter++;
+            counter++;
             NPC.netUpdate = true;
         }
 
-        if (Counter > 4)
+        if (counter >= cycles && !AnyProjectile(ass))
         {
             SelectNextAttack();
         }
@@ -367,14 +367,14 @@ public sealed partial class StygainHeart : ModNPC
 
     public void DoAttack_Bloodrain(Player target, bool phase2)
     {
-        float attackTime = SecondsToFrames(15f);
         int conjureTime = 180;
         int lances = conjureTime + 60;
         int throwLances = conjureTime + 220;
         int lanceCount = DifficultyBasedValue(3, 4, 5, 6, 7, 8);
-        ref float cycles = ref NPC.AdditionsInfo().ExtraAI[2];
-        ref float rot = ref NPC.AdditionsInfo().ExtraAI[1];
+        ref float cycles = ref ExtraAI[2];
+        ref float rot = ref ExtraAI[1];
 
+        NPC.damage = 0;
         rot = (rot + .05f) % MathHelper.TwoPi;
         FixedRotation(target, .6f);
 
@@ -406,7 +406,7 @@ public sealed partial class StygainHeart : ModNPC
             NPC.velocity = Vector2.SmoothStep(NPC.velocity, NPC.SafeDirectionTo(target.Center + (target.velocity * 10f)) * MathF.Min(NPC.Distance(target.Center), 12f), .09f);
 
             // Create the rain
-            float wait = DifficultyBasedValue(15f, 14f, 13f, 12f, 10f, 8f);
+            float wait = DifficultyBasedValue(22f, 20f, 18f, 14f, 12f, 10f);
             if (AttackTimer % wait == wait - 1f && this.RunServer())
             {
                 int rainCount = 5;
@@ -443,7 +443,7 @@ public sealed partial class StygainHeart : ModNPC
                     ExsanguinationLance lance = p.As<ExsanguinationLance>();
                     if (p != null && p.type == ModContent.ProjectileType<ExsanguinationLance>() && lance.Released)
                     {
-                        lance.HitPlayer = lance.Released = false;
+                        lance.Released = false;
                         p.netUpdate = true;
                     }
                 }
@@ -455,7 +455,7 @@ public sealed partial class StygainHeart : ModNPC
             foreach (Projectile p in Main.ActiveProjectiles)
             {
                 ExsanguinationLance lance = p.As<ExsanguinationLance>();
-                if (p != null && p.type == lanceType && !lance.Released && !lance.HitPlayer)
+                if (p != null && p.type == lanceType && !lance.Released)
                 {
                     lance.Released = true;
                     p.netUpdate = true;
@@ -468,9 +468,9 @@ public sealed partial class StygainHeart : ModNPC
             NPC.netUpdate = true;
         }
 
-        if (cycles > 5)
+        if (cycles >= 5)
         {
-            DeleteAllProjectiles(false, ModContent.ProjectileType<BloodDroplet>(), lanceType);
+            DeleteAllProjectiles(false, [ModContent.ProjectileType<BloodDroplet>(), lanceType]);
             SelectNextAttack();
         }
     }

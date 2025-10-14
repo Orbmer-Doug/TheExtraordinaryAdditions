@@ -23,7 +23,7 @@ public class WrithingEyeball : ProjOwnedByNPC<StygainHeart>
         set => Projectile.ai[2] = value.ToInt();
     }
 
-    public ref float State => ref Projectile.Additions().ExtraAI[1];
+    public ref float State => ref Projectile.AdditionsInfo().ExtraAI[1];
     public override void SetStaticDefaults()
     {
         // Ensure the telegraph can be seen
@@ -53,7 +53,7 @@ public class WrithingEyeball : ProjOwnedByNPC<StygainHeart>
     {
         after ??= new(6, () => Projectile.Center);
         after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 0, 0, 0f, null, false, -.1f));
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunction, ColorFunction, OffsetFunction, 60);
 
         // Increasing power of light
@@ -164,7 +164,7 @@ public class WrithingEyeball : ProjOwnedByNPC<StygainHeart>
         return SystemVector2.One * MathF.Sin(completionRatio * MathHelper.Pi + Time / 11f) * 8f;
     }
 
-    public ManualTrailPoints cache;
+    public TrailPoints cache;
     public FancyAfterimages after;
     public OptimizedPrimitiveTrail trail;
     public override bool PreDraw(ref Color lightColor)
@@ -173,7 +173,7 @@ public class WrithingEyeball : ProjOwnedByNPC<StygainHeart>
         {
             void draw()
             {
-                if (trail == null || trail._disposed || cache == null)
+                if (trail == null || trail.Disposed || cache == null)
                     return;
                 ManagedShader prim = ShaderRegistry.SideStreakTrail;
                 prim.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DendriticNoise), 1);

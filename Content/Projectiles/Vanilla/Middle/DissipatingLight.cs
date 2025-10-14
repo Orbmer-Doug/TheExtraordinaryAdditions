@@ -23,6 +23,7 @@ public class DissipatingLight : ModProjectile, ILocalizedModType, IModType
         Projectile.localNPCHitCooldown = 10;
         Projectile.penetrate = -1;
     }
+
     public override void AI()
     {
         if (Projectile.localAI[0] == 0f)

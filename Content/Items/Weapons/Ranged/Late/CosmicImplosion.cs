@@ -1,12 +1,13 @@
-﻿using CalamityMod.Items.Materials;
+﻿using CalamityMod.Items;
+using CalamityMod.Items.Materials;
 using CalamityMod.Items.Weapons.Ranged;
+using CalamityMod.Rarities;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
-using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
@@ -14,14 +15,10 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
 public class CosmicImplosion : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CosmicImplosion);
+
     public override void SetStaticDefaults()
     {
         CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1;
-    }
-
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(ColorSwap(Color.Fuchsia, Color.Cyan, 6f));
     }
 
     public override void SetDefaults()
@@ -38,12 +35,18 @@ public class CosmicImplosion : ModItem
         Item.autoReuse = true;
         Item.shoot = ModContent.ProjectileType<CosmicImplosionHoldout>();
         Item.shootSpeed = 24f;
-        Item.rare = ItemRarityID.Purple;
-        Item.value = AdditionsGlobalItem.RarityPurpleBuyPrice;
+        Item.rare = ModContent.RarityType<Turquoise>();
+        Item.value = CalamityGlobalItem.RarityTurquoiseBuyPrice;
         Item.UseSound = SoundID.Item1;
     }
 
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(ColorSwap(Color.Fuchsia, Color.Cyan, 6f));
+    }
+
     public override bool CanShoot(Player player) => false;
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();

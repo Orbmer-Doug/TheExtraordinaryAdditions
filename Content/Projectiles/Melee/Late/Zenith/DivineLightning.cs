@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
@@ -26,18 +25,23 @@ public class DivineLightning : ModProjectile
     }
 
     public ref float Time => ref Projectile.ai[0];
-    public Vector2 Start { get; set; }
-    public Vector2 End { get; set; }
+    public Vector2 End
+    {
+        get => new(Projectile.ai[1], Projectile.ai[2]);
+        set
+        {
+            Projectile.ai[1] = value.X;
+            Projectile.ai[2] = value.Y;
+        }
+    }
     public float Completion => Animators.MakePoly(6).OutFunction(InverseLerp(0f, Life, Time));
 
-    private List<List<Line>> Branches;
+    private List<List<Line>> Branches = [];
     public override bool ShouldUpdatePosition() => false;
     public override void AI()
     {
         if (Time == 0f)
-        {
-            Branches = CreateLightningBranch(Start, End, Main.rand.Next(1, 6), 2f, Main.rand.NextFloat(.4f, .7f), Main.rand.NextFloat(40f, 80f));
-        }
+            Branches = CreateLightningBranch(Projectile.Center, End, Main.rand.Next(1, 6), 2f, Main.rand.NextFloat(.4f, .7f), Main.rand.NextFloat(40f, 80f));
 
         Projectile.Opacity = 1f - Completion;
         if (Projectile.Opacity.BetweenNum(0f, .05f))
@@ -66,9 +70,6 @@ public class DivineLightning : ModProjectile
         if (Branches == null || Branches.Count == 0)
             return false;
 
-        Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Texture, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-
         foreach (List<Line> list in Branches)
         {
             foreach (Line line in list)
@@ -77,10 +78,6 @@ public class DivineLightning : ModProjectile
                     * Projectile.Opacity), PixelationLayer.OverNPCs, BlendState.Additive);
             }
         }
-
-        Main.spriteBatch.ResetToDefault();
-
         return false;
     }
-
 }

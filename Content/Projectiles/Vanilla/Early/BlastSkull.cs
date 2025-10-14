@@ -1,26 +1,20 @@
-﻿
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
-using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Early;
 
 public class BlastSkull : ModProjectile
 {
-    public override string Texture => "Terraria/Images/Projectile_" + ProjectileID.Skull;
+    public override string Texture => ProjectileID.Skull.GetTerrariaProj();
 
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
         ProjectileID.Sets.TrailCacheLength[Projectile.type] = 5;
-
         Main.projFrames[Projectile.type] = 3;
     }
 
@@ -49,9 +43,7 @@ public class BlastSkull : ModProjectile
     public override Color? GetAlpha(Color lightColor)
     {
         if (Projectile.alpha > 0)
-        {
             return Color.Transparent;
-        }
         return new Color(255, 255, 255, 200);
     }
 

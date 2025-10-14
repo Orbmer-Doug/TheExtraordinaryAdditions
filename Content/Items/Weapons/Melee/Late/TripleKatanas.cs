@@ -1,26 +1,24 @@
-﻿using Microsoft.Xna.Framework;
-using System.Linq;
-using Terraria;
+﻿using Terraria;
 using Terraria.DataStructures;
-using Terraria.GameInput;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
 
 public class TripleKatanas : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TripleKatanas);
+
     public override void SetDefaults()
     {
         Item.useStyle = ItemUseStyleID.Swing;
         Item.useTime = Item.useAnimation = 60;
         Item.width = 96;
         Item.height = 92;
-        Item.damage = 1450;
+        Item.damage = 520;
         Item.knockBack = 0f;
         Item.useTurn = true;
         Item.UseSound = null;
@@ -35,6 +33,7 @@ public class TripleKatanas : ModItem
     }
 
     public override bool CanShoot(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
+
     public override bool AltFunctionUse(Player player) => player.ownedProjectileCounts[ModContent.ProjectileType<KatanaSweep>()] <= 0;
 
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
@@ -48,6 +47,7 @@ public class TripleKatanas : ModItem
 
         return false;
     }
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();

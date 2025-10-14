@@ -35,7 +35,7 @@ public class ThrashedVoid : BaseWhip
             SwingDir = Main.rand.NextFromList(-1, 1);
         }
 
-        if (Trail == null || Trail._disposed)
+        if (Trail == null || Trail.Disposed)
             Trail = new(TrailWidth, TrailColor, null, Samples);
 
         points.Update(Tip);
@@ -57,6 +57,7 @@ public class ThrashedVoid : BaseWhip
 
     public override void NPCHitEffects(NPC target, NPC.HitInfo hit, in Vector2 pos, in Vector2 vel, in int index)
     {
+        Projectile.damage = (int)(Projectile.damage * .85f);
         target.AddBuff(ModContent.BuffType<VoidDebuff>(), SecondsToFrames(4));
     }
 

@@ -1,6 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
 using Terraria.DataStructures;
@@ -18,12 +16,11 @@ public class SupremeBubbleLayer : PlayerDrawLayer
 
     public override bool GetDefaultVisibility(PlayerDrawSet drawInfo)
     {
-        if (drawInfo.drawPlayer.Additions().BigOxygen)
-        {
+        if (drawInfo.drawPlayer.Additions().Buffs[GlobalPlayer.AdditionsBuff.BigOxygen])
             return drawInfo.shadow == 0f;
-        }
         return false;
     }
+
     public override void Draw(ref PlayerDrawSet drawInfo)
     {
         Texture2D texture = AssetRegistry.GetTexture(AdditionsTexture.Bubble);

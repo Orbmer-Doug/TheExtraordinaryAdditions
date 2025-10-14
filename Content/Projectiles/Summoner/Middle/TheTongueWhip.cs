@@ -21,22 +21,28 @@ public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TheTongueWhip);
     public const int SegmentCount = 20;
-
     public const int FadeoutTime = 20;
 
     public List<VerletSimulatedSegment> Segments;
 
     public Player Owner => Main.player[Projectile.owner];
 
-    public ref float Initialized => ref Projectile.ai[0];
+    public bool Init
+    {
+        get => Projectile.ai[0] == 1;
+        set => Projectile.ai[0] = value.ToInt();
+    }
 
-    public ref float Timer => ref Projectile.ai[1];
+    public int Timer
+    {
+        get => (int)Projectile.ai[1];
+        set => Projectile.ai[1] = value;
+    }
 
     public override void SetDefaults()
     {
         Projectile.aiStyle = -1;
-        Projectile.width = 28;
-        Projectile.height = 28;
+        Projectile.Size = new(28);
         Projectile.scale = 1.15f;
         Projectile.friendly = true;
         Projectile.DamageType = DamageClass.Summon;
@@ -46,6 +52,7 @@ public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
         Projectile.localNPCHitCooldown = 20;
         Projectile.ignoreWater = true;
         Projectile.tileCollide = false;
+        Projectile.netImportant = true;
     }
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
@@ -58,89 +65,81 @@ public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
 
     public override bool? CanCutTiles() => false;
     public Vector2 MouseWorld => Owner.Additions().mouseWorld;
-    public void Initialize()
-    {
-        Projectile.Center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
-        Segments = new List<VerletSimulatedSegment>(SegmentCount);
-        for (int i = 0; i < SegmentCount; i++)
-        {
-            VerletSimulatedSegment segment = new(Projectile.Center + Vector2.UnitY * 20f * i);
-            Segments.Add(segment);
-        }
-        Segments[0].locked = true;
-        Initialized = 1f;
-        this.Sync();
-    }
 
     public override void AI()
     {
         Projectile.velocity = Vector2.Zero;
-        if (Initialized == 0f)
+        if (!Init)
         {
-            Initialize();
-        }
-        if (Owner.channel)
-        {
-            Projectile.timeLeft = FadeoutTime;
-        }
+            Projectile.Center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
 
-        // Hold hands out
-        float dest = Owner.AngleTo(Segments.Last().position) - MathHelper.PiOver2;
-        Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, dest);
-        Owner.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.Full, dest);
-
-        // Face the projectile
-        int dir = Owner.direction = (!(Segments.Last().position.X < Owner.Center.X)) ? 1 : (-1);
-        Owner.ChangeDir(dir);
+            Segments = new List<VerletSimulatedSegment>(SegmentCount);
+            for (int i = 0; i < SegmentCount; i++)
+            {
+                VerletSimulatedSegment segment = new(Projectile.Center + Vector2.UnitY * 5f * i);
+                Segments.Add(segment);
+            }
+            Segments[0].locked = true;
+            Init = true;
+            this.Sync();
+        }
 
         Projectile.Center = Projectile.Center.MoveTowards(Owner.RotatedRelativePoint(Owner.MountedCenter, false, true), 10f);
-        SimulateSegments();
 
-        if (Timer % 3f == 0f)
-        {
-            Vector2 pos = Segments[Main.rand.Next(0, SegmentCount)].position;
-            Dust.NewDust(pos, Projectile.width, Projectile.height, DustID.Water);
-        }
-
-        Vector2 val = Segments.Last().position - Owner.Center;
-        if (val.Length() > 380f * Owner.whipRangeMultiplier)
-        {
-            Vector2 maxDist = Owner.Center + Utils.SafeNormalize(val, Vector2.One) * 380f * Owner.whipRangeMultiplier;
-            Segments.Last().position = maxDist;
-        }
-        else
-        {
-            if (this.RunLocal())
-            {
-                Segments.Last().position = Vector2.Lerp(Segments.Last().position, MouseWorld, .1f);
-                this.Sync();
-            }
-        }
-
-        Vector2 val2 = Segments.Last().position - Segments.Last().oldPosition;
-        float centrifugalForce = Math.Clamp(((Vector2)val2).Length() * 2f, 0f, 130f) / 130f;
-        Projectile.damage = (int)(Owner.HeldItem.damage * centrifugalForce * 2f);
-
-        if (val.Length() > 3200f)
-        {
-            Projectile.Kill();
-        }
-        Timer++;
-    }
-
-    public void SimulateSegments()
-    {
         if (Segments == null)
         {
             Segments = new List<VerletSimulatedSegment>(SegmentCount);
             for (int i = 0; i < SegmentCount; i++)
             {
-                Segments[i] = new VerletSimulatedSegment(Projectile.Center);
+                VerletSimulatedSegment segment = new(Projectile.Center + Vector2.UnitY * 5f * i);
+                Segments.Add(segment);
             }
         }
-        Segments[0].oldPosition = Segments[0].position;
-        Segments[0].position = Projectile.Center;
-        Segments = VerletSimulatedSegment.SimpleSimulation(Segments, 10f);
+
+        if (Owner.channel)
+            Projectile.timeLeft = FadeoutTime;
+
+        if (Segments != null)
+        {
+            Segments[0].oldPosition = Segments[0].position;
+            Segments[0].position = Projectile.Center;
+            Segments = VerletSimulatedSegment.SimpleSimulation(Segments, 10f);
+
+            float dest = Owner.AngleTo(Segments.Last().position);
+            Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, dest);
+            Owner.SetBackHandBetter(Player.CompositeArmStretchAmount.Full, dest);
+            Owner.ChangeDir((Segments.Last().position.X > Owner.Center.X).ToDirectionInt());
+
+            if (Timer % 3f == 0f)
+            {
+                Vector2 pos = Segments[Main.rand.Next(0, SegmentCount)].position;
+                Dust.NewDust(pos, Projectile.width, Projectile.height, DustID.Water);
+            }
+
+            Vector2 dir = Segments.Last().position - Owner.Center;
+            if (dir.Length() > 380f * Owner.whipRangeMultiplier)
+            {
+                Vector2 maxDist = Owner.Center + Utils.SafeNormalize(dir, Vector2.One) * 380f * Owner.whipRangeMultiplier;
+                Segments.Last().position = maxDist;
+            }
+            else
+            {
+                if (this.RunLocal())
+                {
+                    Segments.Last().position = Vector2.Lerp(Segments.Last().position, MouseWorld, .1f);
+                    this.Sync();
+                }
+            }
+
+            Vector2 delta = Segments.Last().position - Segments.Last().oldPosition;
+            float centrifugalForce = Math.Clamp(delta.Length() * 2f, 0f, 130f) / 130f;
+            Projectile.damage = (int)(Owner.HeldItem.damage * centrifugalForce * 2f);
+
+            if (dir.Length() > 3200f)
+                Projectile.Kill();
+
+            Timer++;
+        }
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
@@ -195,7 +194,7 @@ public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
         modifiers.FinalDamage *= power * (centrifugalForce + .5f);
     }
 
-    public void DrawChain()
+    public override bool PreDraw(ref Color lightColor)
     {
         Texture2D innerTongueTex = AssetRegistry.GetTexture(AdditionsTexture.TongueSegment);
         Texture2D tongueTex = Projectile.ThisProjectileTexture();
@@ -207,6 +206,8 @@ public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
         // Calculate squish vectors based on how fast the tongue is moving and how far it is from the player
         Vector2 val = Segments.Last().position - Segments.Last().oldPosition;
         float stretchFactor = MathHelper.Clamp(Segments.Last().position.Distance(Owner.Center) / MouseWorld.Distance(Owner.Center), .5f, 1f);
+        if (!this.RunLocal())
+            stretchFactor = 1f;
         float centrifugalForce = Math.Clamp(val.Length() * 2f - 10f, 0f, 130f) / 150f;
         Vector2 centrifugalSquish = new(1f + centrifugalForce * 0.66f, 1f - centrifugalForce);
         centrifugalSquish.ClampLength(.4f, 1f);
@@ -226,23 +227,17 @@ public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
 
             Main.EntitySpriteDraw(innerTongueTex, drawPosition - Main.screenPosition, null, baseChainColor.MultiplyRGBA(Color.White) * (Projectile.timeLeft / (float)FadeoutTime), angle, innerTongueTex.Size() * 0.5f, scale, SpriteEffects.None, 0);
         }
-    }
-
-    public override bool PreDraw(ref Color lightColor)
-    {
-        DrawChain();
         return false;
     }
 
     public override void SendExtraAI(BinaryWriter writer)
     {
         if (Segments != null)
-            Utils.WriteVector2(writer, Segments.Last().position);
+            writer.WriteVector2(Segments.Last().position);
     }
-
     public override void ReceiveExtraAI(BinaryReader reader)
     {
         if (Segments != null)
-            Segments.Last().position = Utils.ReadVector2(reader);
+            Segments.Last().position = reader.ReadVector2();
     }
 }

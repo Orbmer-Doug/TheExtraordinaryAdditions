@@ -44,7 +44,7 @@ public class SolarBrandSword : BaseIdleHoldoutProjectile
         }
     }
 
-    public ref float FadeTimer => ref Projectile.Additions().ExtraAI[1];
+    public ref float FadeTimer => ref Projectile.AdditionsInfo().ExtraAI[1];
     internal const int FadeTime = 40;
     public float FadeInterpolant => InverseLerp(0f, FadeTime, FadeTimer);
 
@@ -89,7 +89,7 @@ public class SolarBrandSword : BaseIdleHoldoutProjectile
             this.Sync();
         }
 
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(TrailWidthFunct, TrailColorFunct, TrailOffsetFunct, Points);
 
         if (base.ShouldDie())

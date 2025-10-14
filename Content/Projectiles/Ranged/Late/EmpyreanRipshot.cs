@@ -24,7 +24,7 @@ public class EmpyreanRipshot : ModProjectile
 
     public override void SetStaticDefaults()
     {
-        ProjectileID.Sets.DrawScreenCheckFluff[Projectile.type] = DistanceToTiles(120);
+        ProjectileID.Sets.DrawScreenCheckFluff[Projectile.type] = 1400;
     }
 
     public override void SetDefaults()
@@ -41,7 +41,7 @@ public class EmpyreanRipshot : ModProjectile
     public Player Owner => Main.player[Projectile.owner];
     public override void AI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunction, ColorFunction, null, 20);
 
         points.Update(Projectile.Center + Projectile.velocity);
@@ -66,11 +66,14 @@ public class EmpyreanRipshot : ModProjectile
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         AdditionsSound.etherealHitBoom2.Play(Projectile.Center, 1.6f, 0f, .1f, 10);
-        CosmicBlast blast = Main.projectile[Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<CosmicBlast>(),
-            Projectile.damage * 2, Projectile.knockBack, Owner.whoAmI)].As< CosmicBlast>();
-        blast.Target = target;
-        blast.Offset = Projectile.position - target.position;
-        blast.Offset -= Projectile.velocity;
+        if (this.RunLocal())
+        {
+            CosmicBlast blast = Main.projectile[Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<CosmicBlast>(),
+                (int)(Projectile.damage * 1.25f), Projectile.knockBack, Owner.whoAmI)].As<CosmicBlast>();
+            blast.Target = target;
+            blast.Offset = Projectile.position - target.position;
+            blast.Offset -= Projectile.velocity;
+        }
         Hit = true;
     }
 
@@ -107,7 +110,6 @@ public class EmpyreanRipshot : ModProjectile
             trail.DrawTrail(glow, points.Points);
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.OverProjectiles);
-
         return false;
     }
 }

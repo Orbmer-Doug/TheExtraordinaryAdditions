@@ -1,13 +1,11 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
-using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Systems;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
@@ -25,7 +23,7 @@ public class HemoglobbedCapsule : ModItem
     public override void SetDefaults()
     {
         Item.width = Item.height = 48;
-        Item.damage = 1100;
+        Item.damage = 700;
         Item.noMelee = true;
         Item.noUseGraphic = true;
         Item.channel = true;

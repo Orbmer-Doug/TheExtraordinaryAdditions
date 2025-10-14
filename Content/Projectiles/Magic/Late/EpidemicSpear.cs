@@ -1,8 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Common.Particles.Shader;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -11,6 +9,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
 
 public class EpidemicSpear : ModProjectile
 {
+    public override string Texture => AssetRegistry.Invis;
     public ref float Time => ref Projectile.ai[0];
     public Projectile Proj => Main.projectile[(int)Projectile.ai[1]];
     public Player Owner => Main.player[Projectile.owner];
@@ -19,7 +18,6 @@ public class EpidemicSpear : ModProjectile
         get => Projectile.ai[2] == 1f;
         set => Projectile.ai[2] = value.ToInt();
     }
-    public override string Texture => AssetRegistry.Invis;
 
     public override void SetStaticDefaults() => ProjectileID.Sets.DrawScreenCheckFluff[Type] = 2000;
 
@@ -43,13 +41,14 @@ public class EpidemicSpear : ModProjectile
     public const float IdealScale = 2f;
 
     public static readonly int TotalCharge = SecondsToFrames(5f);
+
     public override bool? CanDamage()
     {
         if (Time < TotalCharge)
             return false;
-
         return null;
     }
+
     public override void AI()
     {
         Projectile.scale = InverseLerp(0f, TotalCharge, Time) * 1.2f;
@@ -76,7 +75,7 @@ public class EpidemicSpear : ModProjectile
         if (this.RunLocal() && Owner.Additions().MouseRight.Current == false && Time < TotalCharge && !Released)
             Projectile.Kill();
 
-        ref float Offset = ref Projectile.Additions().ExtraAI[0];
+        ref float Offset = ref Projectile.AdditionsInfo().ExtraAI[0];
         Offset += .05f % MathHelper.TwoPi;
         int arms = 3;
 

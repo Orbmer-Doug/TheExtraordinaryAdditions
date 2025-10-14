@@ -42,8 +42,8 @@ public class ShroomiteDash : ModProjectile
     }
     private bool HitEnemy
     {
-        get => Projectile.Additions().ExtraAI[0] == 1f;
-        set => Projectile.Additions().ExtraAI[0] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[0] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
     private float trailWidth = 1;
 
@@ -62,8 +62,8 @@ public class ShroomiteDash : ModProjectile
         if (!HitEnemy)
             Projectile.Center = Owner.RotatedRelativePoint(Owner.MountedCenter);
 
-        if (trail == null || trail._disposed)
-            trail = new(tip, WidthFunct, ColorFunct, null, 10);
+        if (trail == null || trail.Disposed)
+            trail = new(WidthFunct, ColorFunct, null, 10);
 
         if ((this.RunLocal() && AdditionsKeybinds.SetBonusHotKey.JustReleased) && Completion >= 1f && !IsDashing)
         {
@@ -80,9 +80,7 @@ public class ShroomiteDash : ModProjectile
                 Projectile.localAI[0] = 1f;
             }
             if (Completion >= 1f && Main.rand.NextBool(5))
-            {
                 ParticleRegistry.SpawnBloomPixelParticle(Owner.RotHitbox().RandomPoint(), -Vector2.UnitY * Main.rand.NextFloat(3f, 6f), Main.rand.Next(20, 40), Main.rand.NextFloat(.1f, .2f), new(85, 89, 225), Color.DarkBlue, null, .5f);
-            }
             IsDashing = false;
             this.Sync();
         }
@@ -139,9 +137,8 @@ public class ShroomiteDash : ModProjectile
     public override bool? CanHitNPC(NPC target)
     {
         if (IsDashing)
-        {
             return null;
-        }
+        
         return false;
     }
 
@@ -181,7 +178,7 @@ public class ShroomiteDash : ModProjectile
         Owner.fullRotation = 0f;
     }
 
-    public float WidthFunct(float c) => 80f * trailWidth * MathHelper.SmoothStep(1f, 0f, c);
+    public float WidthFunct(float c) => OptimizedPrimitiveTrail.PyriformWidthFunct(c, 80f * trailWidth, 1f, .2f, .8f);
     public Color ColorFunct(SystemVector2 c, Vector2 position)
     {
         Color col = Color.Lerp(Color.Lerp(new Color(85, 89, 225), new Color(66, 180, 216), DashCompletion), new Color(99, 155, 255), c.X) * MathHelper.SmoothStep(1f, 0f, c.X);
@@ -191,7 +188,6 @@ public class ShroomiteDash : ModProjectile
 
     public TrailPoints cache;
     public OptimizedPrimitiveTrail trail;
-    public static readonly ITrailTip tip = new RoundedTip(20);
     public override bool PreDraw(ref Color lightColor)
     {
         if (!IsDashing)
@@ -227,7 +223,7 @@ public class ShroomiteDash : ModProjectile
                 shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Streak), 1, SamplerState.LinearWrap);
                 shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.SuperWavyPerlin), 2, SamplerState.LinearWrap);
 
-                trail.DrawTippedTrail(shader, cache.Points, tip, true);
+                trail.DrawTrail(shader, cache.Points);
             }
             PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         }

@@ -1,9 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
@@ -22,6 +20,7 @@ public class AlucardsSwordThrow : ModProjectile, ILocalizedModType, IModType
         ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
         ProjectileID.Sets.TrailCacheLength[Projectile.type] = 3;
     }
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 48;
@@ -36,24 +35,25 @@ public class AlucardsSwordThrow : ModProjectile, ILocalizedModType, IModType
         Projectile.localNPCHitCooldown = 12;
         Projectile.tileCollide = false;
     }
+
     public override void AI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(c => 18f * MathHelper.SmoothStep(1f, 0f, c), (c, pos) => Color.DarkRed.Lerp(Color.Black, c.X) * MathHelper.SmoothStep(1f, 0f, c.X), null, 15);
         cache ??= new(15);
         cache.Update(Projectile.RotHitbox().Right);
 
+        Projectile.Center = Projectile.Center.ClampInCircle(Owner.Center, Main.LogicCheckScreenWidth / 1.5f);
         Projectile.Opacity = Utils.GetLerpValue(0f, 15f, Time, true);
         if (Time % 16f == 0f)
         {
-            float lightVelocityArc = MathHelper.PiOver2;
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 3; i++)
             {
-                Vector2 pos = Projectile.Center + Main.rand.NextVector2Unit() * Projectile.width * 1.5f * Main.rand.NextFloat(0.75f, 0.96f);
-                Vector2 vel = (pos - Projectile.Center).SafeNormalize(Vector2.UnitY).RotatedBy(lightVelocityArc) * Main.rand.NextFloat(1f, 3f);
-                float size = Main.rand.NextFloat(0.24f, 0.51f);
+                Vector2 pos = Projectile.Center + Main.rand.NextVector2Unit() * Projectile.width * .8f * Main.rand.NextFloat(0.75f, 0.96f);
+                Vector2 vel = (pos - Projectile.Center).SafeNormalize(Vector2.UnitY).RotatedBy(MathHelper.PiOver2) * Main.rand.NextFloat(1f, 3f);
+                float size = Main.rand.NextFloat(.5f, .8f);
                 int lifetime = Main.rand.Next(21, 34);
-                ParticleRegistry.SpawnGlowParticle(pos, vel, lifetime, size, Color.DarkRed);
+                ParticleRegistry.SpawnDustParticle(pos, vel, lifetime, size, Color.DarkRed, .1f, false, true, true, false);
             }
         }
 
@@ -101,15 +101,11 @@ public class AlucardsSwordThrow : ModProjectile, ILocalizedModType, IModType
         Time++;
     }
 
-    public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
-    {
-        modifiers.FinalDamage *= InverseLerp(10f, 40f, Projectile.velocity.Length()) * 2f;
-    }
-
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
         return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.RotHitbox().Left, Projectile.RotHitbox().Right);
     }
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         Vector2 pos;
@@ -149,11 +145,9 @@ public class AlucardsSwordThrow : ModProjectile, ILocalizedModType, IModType
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 
-        // Draw the base sprite and glowmask.
+        // Draw the base sprite and glowmask
         Main.EntitySpriteDraw(texture, drawPosition, frame, Projectile.GetAlpha(lightColor), Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, direction, 0);
         Main.EntitySpriteDraw(glowmask, drawPosition, frame, Projectile.GetAlpha(Color.White), Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, direction, 0);
-
         return false;
     }
-
 }

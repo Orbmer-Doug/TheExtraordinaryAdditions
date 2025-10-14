@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
-using Terraria.ModLoader;
 using Terraria.ObjectData;
-using TheExtraordinaryAdditions.Core.Systems;
 
 namespace TheExtraordinaryAdditions.Core.Utilities;
 
@@ -166,7 +163,7 @@ public static partial class Utility
         int ex = (int)entity.Center.X >> 4; // X tile at entity's center
         int ey = (int)entity.position.Y + entity.height >> 4; // Y tile just below entity's feet
         int direction = entity.direction; // 1 (right) or -1 (left)
-        int heightInTiles = (int)Math.Ceiling(entity.height / 16f); // Entity height in tiles (e.g., 3 for player)
+        int heightInTiles = (int)Math.Ceiling(entity.height / 16f); // Entity height in tiles
         int clearanceHeight = heightInTiles; // Clearance height above the chasm, set to entity's height
 
         int currentCount = 0; // Count of consecutive chasm tiles
@@ -400,36 +397,32 @@ public static partial class Utility
         MathHelper.Clamp(vector.X, Main.leftWorld, Main.rightWorld),
         MathHelper.Clamp(vector.Y, Main.topWorld, Main.bottomWorld));
 
-    /// Notes:
-    /// <see cref="Collision.TileCollision(Vector2, Vector2, int, int, bool, bool, int)"/> and <see cref="Collision.AnyCollision(Vector2, Vector2, int, int, bool)"/> take a inputted velocity and return it in relation to if there is a tile there or not, 0 if there is
-    /// <see cref="Collision.SolidCollision(Vector2, int, int)"/> can be used as a boolean operator to determine if a position intersects a solid tile, useful for reaper scythe like things
     public static bool CheckSolidGround(this Player player, int solidGroundAhead = 0, int airExposureNeeded = 0)
     {
         if (player.velocity.Y != 0f)
-        {
             return false;
-        }
-        bool ConditionMet = true;
+
+        bool ground = true;
         int playerCenterX = (int)player.Center.X / 16;
         int playerCenterY = (int)(player.position.Y + player.height - 1f) / 16 + 1;
         for (int i = 0; i <= solidGroundAhead; i++)
         {
-            ConditionMet = Main.tile[playerCenterX + player.direction * i, playerCenterY].IsTileSolidGround();
-            if (!ConditionMet)
+            ground = Main.tile[playerCenterX + player.direction * i, playerCenterY].IsTileSolidGround();
+            if (!ground)
             {
-                return ConditionMet;
+                return ground;
             }
             for (int j = 1; j <= airExposureNeeded; j++)
             {
                 Tile checkedTile = Main.tile[playerCenterX + player.direction * i, playerCenterY - j];
-                ConditionMet = !(checkedTile != null) || !checkedTile.HasUnactuatedTile || !Main.tileSolid[checkedTile.TileType];
-                if (!ConditionMet)
+                ground = !(checkedTile != null) || !checkedTile.HasUnactuatedTile || !Main.tileSolid[checkedTile.TileType];
+                if (!ground)
                 {
-                    return ConditionMet;
+                    return ground;
                 }
             }
         }
-        return ConditionMet;
+        return ground;
     }
 
     public static bool Active(this Tile tile, bool countActuater = true)
@@ -453,47 +446,14 @@ public static partial class Utility
     public static Tile ParanoidTileRetrieval(int x, int y)
     {
         if (!WorldGen.InWorld(x, y, 0))
-        {
             return default;
-        }
+
         return Main.tile[x, y];
     }
 
     public static float GetTileRNG(this Point tilePos, int shift = 0)
     {
         return (float)(Math.Sin(tilePos.X * 17.07947 + shift * 36) + Math.Sin(tilePos.Y * 25.13274)) * 0.25f + 0.5f;
-    }
-
-    public static Vector2 FindSmashSpot(this NPC NPC, Vector2 target)
-    {
-        Vector2 pos = target;
-        Point world = default;
-        for (int i = 0; i < 36; i++)
-        {
-            world = new Point(Utils.ToTileCoordinates(pos).X, Utils.ToTileCoordinates(pos).Y + i);
-            if (WorldGen.InWorld(world.X, world.Y, 0) && WorldGen.SolidTileAllowTopSlope(world.X, world.Y + i))
-            {
-                pos.Y = (int)(pos.Y / 16f) * 16f + i * 16 - NPC.height / 2f - 8f;
-                break;
-            }
-        }
-        return pos;
-    }
-
-    public static Vector2 FindSmashSpot(this Projectile Projectile, Vector2 target)
-    {
-        Vector2 pos = target;
-        Point world = default;
-        for (int i = 0; i < 32; i++)
-        {
-            world = new Point(Utils.ToTileCoordinates(pos).X, Utils.ToTileCoordinates(pos).Y + i);
-            if (WorldGen.InWorld(world.X, world.Y, 0) && WorldGen.SolidTileAllowTopSlope(world.X, world.Y + i))
-            {
-                pos.Y = (int)(pos.Y / 16f) * 16f + i * 16 - Projectile.height / 2f + 16f;
-                break;
-            }
-        }
-        return pos;
     }
 
     public static bool IsTileSolid(this Tile tile) => tile.HasUnactuatedTile && Main.tileSolid[tile.TileType] && !Main.tileSolidTop[tile.TileType];
@@ -541,9 +501,7 @@ public static partial class Utility
         if (tile != null && tile.HasUnactuatedTile)
         {
             if (!Main.tileSolid[tile.TileType])
-            {
                 return Main.tileSolidTop[tile.TileType];
-            }
             return true;
         }
         return false;
@@ -552,9 +510,7 @@ public static partial class Utility
     public static bool IsTileFull(this Tile tile)
     {
         if (tile != null && tile.HasTile)
-        {
             return Main.tileSolid[tile.TileType];
-        }
         return false;
     }
 
@@ -600,8 +556,6 @@ public static partial class Utility
         int num = i - tile.TileFrameX / 18 % data.Width;
         int topLeftY = j - tile.TileFrameY / 18 % data.Height;
         if (WorldGen.IsBelowANonHammeredPlatform(num, topLeftY))
-        {
             offsetY -= 8;
-        }
     }
 }

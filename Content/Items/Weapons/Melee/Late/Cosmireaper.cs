@@ -7,7 +7,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Late.Cosmireaper;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
@@ -15,10 +15,6 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
 public class Cosmireaper : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Cosmireaper);
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(ColorSwap(Color.MediumPurple * 1.1f, Color.PaleVioletRed, 4f));
-    }
 
     public override void SetDefaults()
     {
@@ -40,6 +36,11 @@ public class Cosmireaper : ModItem
         Item.noUseGraphic = true;
     }
 
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(ColorSwap(Color.MediumPurple * 1.1f, Color.PaleVioletRed, 4f));
+    }
+
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
         player.NewPlayerProj(position, Vector2.Zero, type, damage, knockback, player.whoAmI);
@@ -48,7 +49,12 @@ public class Cosmireaper : ModItem
 
     public override bool CanUseItem(Player player)
     {
-        return player.ownedProjectileCounts[Item.shoot] < 1;
+        if (Utility.FindProjectile(out Projectile scythe, Item.shoot, player.whoAmI))
+        {
+            if (!scythe.As<CosmireapHoldout>().Released || scythe.As<CosmireapHoldout>().State == CosmireapHoldout.States.Impact)
+                return false;
+        }
+        return true;
     }
 
     public override void AddRecipes()

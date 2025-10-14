@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 using TheExtraordinaryAdditions.UI.LaserUI;
 
@@ -35,7 +37,7 @@ public class NitrogenCoolingPack : ModItem, ILocalizedModType
     {
         LaserResource modPlayer = player.GetModPlayer<LaserResource>();
 
-        player.Additions().Nitrogen = true;
+        player.GetModPlayer<NitrogenCoolingPackPlayer>().Equipped = true;
         player.buffImmune[BuffID.OnFire & BuffID.OnFire3 & BuffID.Burning & BuffID.Frostburn & BuffID.Frostburn2 & BuffID.Frozen & BuffID.Slow & BuffID.Chilled] = true;
         player.resistCold = true;
         modPlayer.HeatRegenRate *= 2f;
@@ -50,5 +52,35 @@ public class NitrogenCoolingPack : ModItem, ILocalizedModType
         recipe.AddIngredient(ModContent.ItemType<CoreofEleum>(), 8);
         recipe.AddTile(TileID.MythrilAnvil);
         recipe.Register();
+    }
+}
+
+public sealed class NitrogenCoolingPackPlayer : ModPlayer
+{
+    public bool Equipped;
+    public override void ResetEffects() => Equipped = false;
+    public int Counter;
+    public override void UpdateDead() => Counter = 0;
+
+    public override void PostUpdateMiscEffects()
+    {
+        if (!Equipped)
+            return;
+
+        Item item = Player.HeldItem;
+
+        if (Player.Additions().SafeMouseLeft.Current && GlobalPlayer.HasDamageClass(Player) && item.damage > 0)
+            Counter++;
+
+        if (Counter >= 20)
+        {
+            Vector2 pos = Player.RotatedRelativePoint(Player.MountedCenter)
+                + PolarVector(10f * Player.direction, Player.fullRotation + MathHelper.Pi)
+                + PolarVector(4f * Player.direction * Player.gravDir, Player.fullRotation + MathHelper.PiOver2);
+            Vector2 vel = Main.rand.NextVector2CircularEdge(5f, 5f);
+            if (Main.myPlayer == Player.whoAmI)
+                Player.NewPlayerProj(pos, vel, ModContent.ProjectileType<IcyShards>(), DamageSoftCap(item.damage, 150), 1f, Main.myPlayer);
+            Counter = 0;
+        }
     }
 }

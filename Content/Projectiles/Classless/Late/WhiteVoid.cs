@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
-using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
@@ -61,7 +60,7 @@ public class WhiteVoid : ModProjectile, IHasScreenShader
         Shader.TrySetParameter("screenPos", GetTransformedScreenCoords(Projectile.Center));
         Shader.TrySetParameter("screenSize", Main.ScreenSize.ToVector2());
         Shader.TrySetParameter("edgeColor", Color.AntiqueWhite * fade);
-        Shader.TrySetParameter("radius", (float)Projectile.width / Main.screenWidth);
+        Shader.TrySetParameter("radius", (float)Projectile.width / Main.screenWidth * Main.GameViewMatrix.Zoom.X);
         Shader.TrySetParameter("scale", scale);
         Shader.TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly);
         Shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FlameMap2), 1, SamplerState.LinearWrap);

@@ -28,8 +28,8 @@ public class SpoonSwing : BaseSwordSwing
 
     public SpoonState CurrentState
     {
-        get => (SpoonState)Projectile.Additions().ExtraAI[7];
-        set => Projectile.Additions().ExtraAI[7] = (float)value;
+        get => (SpoonState)Projectile.AdditionsInfo().ExtraAI[7];
+        set => Projectile.AdditionsInfo().ExtraAI[7] = (float)value;
     }
 
     public int GetSwingTime
@@ -110,7 +110,7 @@ public class SpoonSwing : BaseSwordSwing
     public override void SafeInitialize()
     {
         after ??= new(8, () => Projectile.Center);
-        after.afterimages = null;
+        after.Clear();
     }
 
     public override void SafeAI()
@@ -244,7 +244,7 @@ public class SpoonSwing : BaseSwordSwing
                 break;
             case SpoonState.Smash:
                 int type = ModContent.ProjectileType<SpoonShockwave>();
-                if (Owner.ownedProjectileCounts[type] <= 0 && Utility.CountOwnerProjectiles(Owner, type) <= 0)
+                if (this.RunLocal() && Owner.ownedProjectileCounts[type] <= 0 && Utility.CountOwnerProjectiles(Owner, type) <= 0)
                 {
                     ParticleRegistry.SpawnBlurParticle(Projectile.Center, 40, .4f, 800f);
 

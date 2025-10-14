@@ -122,7 +122,6 @@ public class TremorSpike : ModProjectile
         {
             Vector2 position = pos.Position + Main.rand.NextVector2Circular(16f, 16f);
             Dust.NewDustPerfect(position, DustID.Stone, Main.rand.NextVector2Circular(2f, 2f), Main.rand.Next(0, 100), default, Main.rand.NextFloat(.6f, 1f));
-            ParticleRegistry.SpawnSmokeParticle(position, RandomVelocity(2f, 1f, 6f), Main.rand.NextFloat(.3f, .6f), Color.LightGray, Color.DarkGray, Main.rand.NextByte(100, 140));
         }
         Segments.Clear();
     }

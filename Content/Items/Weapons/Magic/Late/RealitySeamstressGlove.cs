@@ -12,7 +12,7 @@ using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Early;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Magic.Late.Zenith;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Late;
@@ -20,10 +20,12 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Late;
 public class RealitySeamstressesGlove : ModItem, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.RealitySeamstressesGlove);
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(Color.Lerp(new Color(255, 217, 236), Color.Violet * 1.1f, (float)Math.Sin(Main.GlobalTimeWrappedHourly)));
     }
+
     public override void SetDefaults()
     {
         Item.damage = 1500;
@@ -44,11 +46,20 @@ public class RealitySeamstressesGlove : ModItem, ILocalizedModType, IModType
         Item.rare = ModContent.RarityType<LegendaryRarity>();
     }
 
-    public override void SetStaticDefaults()
+    public override void PostUpdate()
     {
-        Main.RegisterItemAnimation(Item.type, new DrawAnimationVertical(1, 1, false));
+        float brightness = Main.essScale * Main.rand.NextFloat(0.2f, .6f);
+        Lighting.AddLight(Item.Center, 0.94f * brightness, 0.95f * brightness, 0.56f * brightness);
 
+        Vector2 pos = Item.Hitbox.RandomRectangle();
+        if (Main.rand.NextBool(10))
+        {
+            Vector2 vel = Vector2.Lerp(Main.rand.NextVector2Unit(0f, MathHelper.TwoPi), -Vector2.UnitY, 0.5f) * Main.rand.NextFloat(1.8f, 2.6f);
+            float scale = Main.rand.NextFloat(0.85f, 1.15f);
+            ParticleRegistry.SpawnSparkleParticle(pos, vel, 20, scale, Color.Purple, Color.BlueViolet, 2.5f, .1f * Main.rand.NextBool().ToDirectionInt());
+        }
     }
+
     public void DrawBackAfterimage(SpriteBatch spriteBatch, Vector2 baseDrawPosition, Rectangle frame, float baseScale)
     {
         if (Item.velocity.X == 0f)
@@ -64,19 +75,6 @@ public class RealitySeamstressesGlove : ModItem, ILocalizedModType, IModType
                 Vector2 drawPosition = baseDrawPosition + (MathHelper.TwoPi * i / amount).ToRotationVector2() * drawPositionOffset;
                 spriteBatch.Draw(TextureAssets.Item[Item.type].Value, drawPosition, frame, drawColor, 0f, Vector2.Zero, baseScale, 0, 0f);
             }
-        }
-    }
-    public override void Update(ref float gravity, ref float maxFallSpeed)
-    {
-        float brightness = Main.essScale * Main.rand.NextFloat(0.2f, .6f);
-        Lighting.AddLight(Item.Center, 0.94f * brightness, 0.95f * brightness, 0.56f * brightness);
-
-        Vector2 pos = Item.Hitbox.RandomRectangle();
-        if (Main.rand.NextBool(10))
-        {
-            Vector2 vel = Vector2.Lerp(Main.rand.NextVector2Unit(0f, MathHelper.TwoPi), -Vector2.UnitY, 0.5f) * Main.rand.NextFloat(1.8f, 2.6f);
-            float scale = Main.rand.NextFloat(0.85f, 1.15f);
-            ParticleRegistry.SpawnSparkleParticle(pos, vel, 20, scale, Color.Purple, Color.BlueViolet, 2.5f, .1f * Main.rand.NextBool().ToDirectionInt());
         }
     }
 

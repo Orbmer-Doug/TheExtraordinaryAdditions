@@ -1,10 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using System;
-using Terraria;
-using Terraria.ID;
+﻿using Terraria;
 using Terraria.ModLoader;
-using Terraria.Utilities;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
@@ -42,7 +37,7 @@ public class TesselesticLightning : ModProjectile
 
     public override void AI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, null);
 
         if (Time == 0f)
@@ -70,7 +65,7 @@ public class TesselesticLightning : ModProjectile
 
     public float WidthFunct(float c) => 40f * InverseLerp(1.5f, 0f, c) * Projectile.Opacity;
     public Color ColorFunct(SystemVector2 c, Vector2 pos) => MulticolorLerp(Completion, Color.White, MainColor) * Projectile.Opacity;
-    public ManualTrailPoints points;
+    public TrailPoints points;
     public OptimizedPrimitiveTrail trail;
     public override bool PreDraw(ref Color lightColor)
     {
@@ -80,11 +75,10 @@ public class TesselesticLightning : ModProjectile
             {
                 ManagedShader shader = ShaderRegistry.SpecialLightningTrail;
                 shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise), 1);
-                trail.DrawTrail(shader, points.Points);
+                trail.DrawTrail(shader, points.Points, -1, false, true);
             }
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
-
         return false;
     }
 }

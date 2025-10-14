@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Summoner.Early;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Early;
@@ -12,6 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Early;
 public class TimberLash : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TimberLash);
+
     public override void SetDefaults()
     {
         Item.damage = 11;
@@ -28,20 +28,14 @@ public class TimberLash : ModItem
         Item.noMelee = Item.noUseGraphic = true;
     }
 
-    public override bool CanShoot(Player player)
-    {
-        return player.ownedProjectileCounts[Item.shoot] <= 0;
-    }
-
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
-    {
-        player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI);
-        return false;
-    }
-
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(new Color(201, 142, 32));
+    }
+
+    public override bool CanShoot(Player player)
+    {
+        return player.ownedProjectileCounts[Item.shoot] <= 0;
     }
 
     public override void AddRecipes()

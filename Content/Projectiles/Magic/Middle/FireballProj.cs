@@ -1,9 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
+﻿using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
@@ -22,6 +20,7 @@ public class FireballProj : ModProjectile
         Projectile.DamageType = DamageClass.Magic;
         Projectile.timeLeft = TotalTime;
     }
+
     public ref float Time => ref Projectile.ai[0];
     public Player Owner => Main.player[Projectile.owner];
     public override void AI()
@@ -54,6 +53,7 @@ public class FireballProj : ModProjectile
 
         Time++;
     }
+
     public void Kaboom()
     {
         Vector2 pos = Projectile.Center;
@@ -73,12 +73,14 @@ public class FireballProj : ModProjectile
         SoundEngine.PlaySound(SoundID.Item14 with { Pitch = -.2f, Volume = Projectile.scale + .1f, MaxInstances = 0 }, Projectile.Center);
         Projectile.CreateFriendlyExplosion(Projectile.Center, Projectile.Size * 3.5f, Projectile.damage, Projectile.knockBack, 5, 7);
     }
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         target.AddBuff(BuffID.OnFire, 180);
         target.AddBuff(BuffID.OnFire3, 120);
         Kaboom();
     }
+
     public override bool OnTileCollide(Vector2 oldVelocity)
     {
         Kaboom();

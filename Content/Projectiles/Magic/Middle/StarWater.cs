@@ -1,12 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System.IO;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Middle;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -23,16 +20,8 @@ public class StarWater : ModProjectile
     public GlobalPlayer ModdedOwner => Owner.Additions();
 
     public Vector2 Offset;
-    public override void SendExtraAI(BinaryWriter writer)
-    {
-        writer.WriteVector2(Offset);
-    }
-
-    public override void ReceiveExtraAI(BinaryReader reader)
-    {
-        Offset = reader.ReadVector2();
-    }
-
+    public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(Offset);
+    public override void ReceiveExtraAI(BinaryReader reader) => Offset = reader.ReadVector2();
     public override void SetDefaults()
     {
         Projectile.width = 54;
@@ -73,7 +62,7 @@ public class StarWater : ModProjectile
             Projectile.Kill();
             return;
         }
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunction, ColorFunction, null, 20);
 
         Lighting.AddLight(Projectile.Center, Color.DarkViolet.ToVector3() * .9f * Projectile.Opacity);
@@ -109,7 +98,6 @@ public class StarWater : ModProjectile
                 Main.rand.Next(30, 40), Main.rand.NextFloat(.2f, .6f) * Projectile.Opacity, Color.DarkSlateBlue, Color.White, null, 1.2f);
         }
 
-
         Time++;
     }
 
@@ -131,7 +119,7 @@ public class StarWater : ModProjectile
         Projectile.Kill();
         return false;
     }
-    
+
     public override void OnKill(int timeLeft)
     {
         SoundEngine.PlaySound(SoundID.Shatter with { Volume = .35f, Pitch = -.2f });
@@ -150,7 +138,7 @@ public class StarWater : ModProjectile
             }
         }
     }
-    
+
     public TrailPoints cache = new(6);
     public OptimizedPrimitiveTrail trail;
     public override bool PreDraw(ref Color lightColor)
@@ -172,8 +160,6 @@ public class StarWater : ModProjectile
         SpriteEffects direction = Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
         Main.EntitySpriteDraw(texture, drawPosition, null, Projectile.GetAlpha(Color.White), Projectile.rotation, texture.Size() * 0.5f, Projectile.scale, 0, 0);
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
-
         return false;
     }
-
 }

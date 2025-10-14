@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -33,15 +29,18 @@ internal class HonedLightning : ModProjectile
         Projectile.localNPCHitCooldown = -1;
         Projectile.width = Projectile.height = 16;
     }
+
     public ref float Time => ref Projectile.ai[0];
     public ref float Power => ref Projectile.ai[1];
     public float Width => Utils.Remap(Power, 0f, CondereFulminaHoldout.TotalReelTime, 32f, 100f);
     public Vector2 End { get; set; }
+    public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(End);
+    public override void ReceiveExtraAI(BinaryReader reader) => End = reader.ReadVector2();
     public float Completion => Animators.MakePoly(6f).OutFunction(InverseLerp(0f, Life, Time));
     public override bool ShouldUpdatePosition() => false;
     public override void AI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, null);
 
         if (Time == 0f)
@@ -66,7 +65,7 @@ internal class HonedLightning : ModProjectile
 
     public float WidthFunct(float c) => Width * Projectile.Opacity;
     public Color ColorFunct(SystemVector2 c, Vector2 pos) => MulticolorLerp(Completion, Color.White, Color.LightCyan, Color.Cyan, Color.DarkCyan) * Projectile.Opacity;
-    public ManualTrailPoints points;
+    public TrailPoints points;
     public OptimizedPrimitiveTrail trail;
     public override bool PreDraw(ref Color lightColor)
     {

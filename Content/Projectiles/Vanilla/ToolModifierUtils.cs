@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reflection;
 using Terraria;
-using Terraria.ID;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla;
 
@@ -12,16 +11,14 @@ public static class ToolModifierUtils
 {
     public static Point GetTileTarget(Player player)
     {
-        Type type = typeof(Player);
-        FieldInfo p = type.GetField("tileTargetX", BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static);
-        int x = (int)p.GetValue(player);
-        FieldInfo pp = type.GetField("tileTargetY", BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static);
-        int y = (int)pp.GetValue(player);
-        return new Point(x, y);
+        return new Point(Player.tileTargetX, Player.tileTargetY);
     }
 
     public static void Mine(Player player, Item tool, bool hammer = false, bool right = false, Point? overrideTileTarget = null)
     {
+        if (player.whoAmI != Main.myPlayer)
+            return;
+
         if (tool.pick <= 0 && tool.axe <= 0 && tool.hammer <= 0)
             return;
 

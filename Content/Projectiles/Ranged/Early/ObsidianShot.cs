@@ -1,9 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
+﻿using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
@@ -42,6 +40,8 @@ public class ObsidianShot : ModProjectile
         int count = 2 * Projectile.MaxUpdates;
         cache ??= new(count);
         cache.Update(Projectile.Center);
+        if (trail == null || trail.Disposed)
+            trail = new(WidthFunct, ColorFunct, null, count);
 
         Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver2;
 
@@ -90,6 +90,7 @@ public class ObsidianShot : ModProjectile
         return true;
     }
 
+    public OptimizedPrimitiveTrail trail;
     public TrailPoints cache;
     private float WidthFunct(float c) => Projectile.height / 2 * MathHelper.SmoothStep(1f, 0f, c);
     private Color ColorFunct(SystemVector2 c, Vector2 position) => MulticolorLerp(MathHelper.SmoothStep(1f, 0f, c.X), Color.Violet, Color.BlueViolet, Color.DarkViolet) * Projectile.Opacity;
@@ -97,9 +98,10 @@ public class ObsidianShot : ModProjectile
     {
         void draw()
         {
+            if (trail == null || trail.Disposed || cache == null)
+                return;
             ManagedShader shader = ShaderRegistry.FadedStreak;
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Pixel), 1);
-            OptimizedPrimitiveTrail trail = new(WidthFunct, ColorFunct, null, 2 * Projectile.MaxUpdates);
             trail.DrawTrail(shader, cache.Points, 30);
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);

@@ -1,11 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
-using System.IO;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
-using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -19,16 +14,6 @@ public class ExsanguinationLance : ProjOwnedByNPC<StygainHeart>
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ExsanguinationLance);
 
-    public Vector2 Offset;
-    public override void SendAI(BinaryWriter writer)
-    {
-        writer.WriteVector2(Offset);
-    }
-    public override void ReceiveAI(BinaryReader reader)
-    {
-        Offset = reader.ReadVector2();
-    }
-
     public ref float Time => ref Projectile.ai[0];
     public bool Free
     {
@@ -40,20 +25,10 @@ public class ExsanguinationLance : ProjOwnedByNPC<StygainHeart>
         get => Projectile.ai[2] == 1f;
         set => Projectile.ai[2] = value.ToInt();
     }
-    public int PlayerIndex
-    {
-        get => (int)Projectile.Additions().ExtraAI[0];
-        set => Projectile.Additions().ExtraAI[0] = value;
-    }
-    public ref float ReleaseTime => ref Projectile.Additions().ExtraAI[1];
-    public ref float Rot => ref Projectile.Additions().ExtraAI[2];
-    public bool HitPlayer
-    {
-        get => Projectile.Additions().ExtraAI[3] == 1f;
-        set => Projectile.Additions().ExtraAI[3] = value.ToInt();
-    }
+    public ref float ReleaseTime => ref Projectile.AdditionsInfo().ExtraAI[0];
+    public ref float Rot => ref Projectile.AdditionsInfo().ExtraAI[1];
 
-    public Vector2 CurrentOffset => PolarVector(Owner.width * .7f, Owner.AdditionsInfo().ExtraAI[1] + Rot);
+    public Vector2 CurrentOffset => PolarVector(Owner.width * .6f, Owner.AdditionsInfo().ExtraAI[1] + Rot);
     public Vector2 Destination => Owner.Center + CurrentOffset;
 
     public override void SetStaticDefaults()
@@ -76,9 +51,10 @@ public class ExsanguinationLance : ProjOwnedByNPC<StygainHeart>
 
     public override void SafeAI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, null, 24);
-        
+        Projectile.Center = ClampToWorld(Projectile.Center);
+
         if (!Free)
         {
             if (Owner != null && Owner.active)
@@ -101,29 +77,13 @@ public class ExsanguinationLance : ProjOwnedByNPC<StygainHeart>
                 Projectile.velocity *= 1.045f;
         }
 
-        if (HitPlayer)
-        {
-            if (PlayerIndex >= 0 && PlayerIndex < Main.maxPlayers)
-            {
-                Player target = Main.player[PlayerIndex];
-                if (target == null)
-                {
-                    HitPlayer = Released = false;
-                }
-                else
-                {
-                    Projectile.position = target.position + Offset;
-                    if (Projectile.position != Projectile.oldPosition)
-                        this.Sync();
-                }
-            }
-        }
-        else if (!Free)
+        if (!Free)
         {
             if (!Released)
             {
                 ReleaseTime = 0f;
-                Projectile.velocity = Projectile.SafeDirectionTo(Target.Center + CurrentOffset);
+                if (Target != null)
+                    Projectile.velocity = Projectile.SafeDirectionTo(Target.Center + CurrentOffset);
                 Projectile.Center = Vector2.SmoothStep(Projectile.Center, Destination, .2f);
                 this.Sync();
             }
@@ -162,35 +122,21 @@ public class ExsanguinationLance : ProjOwnedByNPC<StygainHeart>
         return targetHitbox.LineCollision(Projectile.BaseRotHitbox().Left, Projectile.BaseRotHitbox().Right, Projectile.height - 5f);
     }
 
-    public override bool CanHitPlayer(Player target) => !Free && Released && !HitPlayer || Free;
+    public override bool CanHitPlayer(Player target) => (!Free && Released) || Free;
     public override void OnHitPlayer(Player target, Player.HurtInfo info)
     {
         StygainHeart.ApplyLifesteal(this, target, info.Damage);
         ParticleRegistry.SpawnBloodStreakParticle(Projectile.Center, Projectile.velocity.SafeNormalize(Vector2.UnitY).RotatedByRandom(.25f) * 2f,
             30, Main.rand.NextFloat(.5f, .8f), Color.DarkRed);
 
-        if (!HitPlayer)
+        float scale = Main.rand.NextFloat(.4f, .6f);
+        for (int i = 0; i < 20; i++)
         {
-            if (!Free)
-            {
-                if (Projectile.timeLeft > 50)
-                    Projectile.timeLeft = 50;
-            }
-            float scale = Main.rand.NextFloat(.4f, .6f);
-            for (int i = 0; i < 20; i++)
-            {
-                Vector2 vel = (MathHelper.TwoPi * i / 20 + RandomRotation()).ToRotationVector2() * 10f * Main.rand.NextBool().ToDirectionInt();
-                ParticleRegistry.SpawnDustParticle(Projectile.RotHitbox().Right, vel, 40, scale, Color.Crimson, .06f, false, true, true);
-            }
-
-            PlayerIndex = target.whoAmI;
-            Offset = Projectile.position - target.position;
-            Offset -= Projectile.velocity;
-            HitPlayer = true;
-            this.Sync();
+            Vector2 vel = (MathHelper.TwoPi * i / 20 + RandomRotation()).ToRotationVector2() * 10f * Main.rand.NextBool().ToDirectionInt();
+            ParticleRegistry.SpawnDustParticle(Projectile.RotHitbox().Right, vel, 40, scale, Color.Crimson, .06f, false, true, true);
         }
     }
-    
+
     public TrailPoints cache = new(24);
     public OptimizedPrimitiveTrail trail;
     public float WidthFunct(float c) => Projectile.height / 2 * GetLerpBump(0f, .75f, 1f, .25f, c) * Projectile.Opacity;

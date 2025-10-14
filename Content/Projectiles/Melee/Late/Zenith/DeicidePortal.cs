@@ -1,9 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Assets;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -12,10 +9,10 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Late.Zenith;
 public class DeicidePortal : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
-    public static readonly int Life = SecondsToFrames(5);
+    public static readonly int Life = SecondsToFrames(8);
     public override void SetDefaults()
     {
-        Projectile.width = Projectile.height = 180;
+        Projectile.width = Projectile.height = 210;
         Projectile.ignoreWater = true;
         Projectile.tileCollide = false;
         Projectile.timeLeft = Life;
@@ -27,17 +24,26 @@ public class DeicidePortal : ModProjectile
         get => Projectile.ai[1] == 1f;
         set => Projectile.ai[1] = value.ToInt();
     }
-    public FinalStrikeHoldout Spear;
-    public Player Owner => Main.player[Projectile.owner];
+    public int SpearIndex
+    {
+        get => (int)Projectile.ai[2];
+        set => Projectile.ai[2] = value;
+    }
+
     public override void AI()
     {
         if (SearchForSpear() && Projectile.timeLeft > 20)
         {
-            if (Spear.Projectile.RotHitbox().Intersects(Projectile.RotHitbox()) && Spear.CurrentState == FinalStrikeHoldout.FinalStrikeState.Fire)
+            Projectile proj = Main.projectile?[SpearIndex] ?? null;
+            if (proj != null)
             {
-                Spear.StateTime = 0f;
-                Spear.portal = Projectile.As<DeicidePortal>();
-                Spear.CurrentState = FinalStrikeHoldout.FinalStrikeState.Wait;
+                FinalStrikeHoldout spear = proj.As<FinalStrikeHoldout>();
+                if (proj.RotHitbox().Intersects(Projectile.RotHitbox()) && spear.CurrentState == FinalStrikeHoldout.FinalStrikeState.Fire)
+                {
+                    spear.StateTime = 0f;
+                    spear.PortalIndex = Projectile.whoAmI;
+                    spear.CurrentState = FinalStrikeHoldout.FinalStrikeState.Wait;
+                }
             }
         }
         if (Fade)
@@ -54,9 +60,9 @@ public class DeicidePortal : ModProjectile
     {
         foreach (Projectile proj in Main.ActiveProjectiles)
         {
-            if (proj is not null && proj.active && proj.type == ModContent.ProjectileType<FinalStrikeHoldout>() && proj.owner == Projectile.owner)
+            if (proj.type == ModContent.ProjectileType<FinalStrikeHoldout>() && proj.owner == Projectile.owner)
             {
-                Spear = proj.As<FinalStrikeHoldout>();
+                SpearIndex = proj.whoAmI;
                 return true;
             }
         }

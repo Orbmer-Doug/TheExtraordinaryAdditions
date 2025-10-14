@@ -20,8 +20,8 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Late.Everbladed;
 public class EverbladedSwing : BaseSwordSwing
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.EverbladedSwing);
-    public ref float ForwardAngle => ref ModdedProj.ExtraAI[8];
-    public ref float DesiredForwardAngle => ref ModdedProj.ExtraAI[9];
+    public ref float ForwardAngle => ref ProjInfo.ExtraAI[8];
+    public ref float DesiredForwardAngle => ref ProjInfo.ExtraAI[9];
 
     public Quaternion Rotation
     {
@@ -37,14 +37,8 @@ public class EverbladedSwing : BaseSwordSwing
 
     internal Phase CurrentPhase
     {
-        get => (Phase)ModdedProj.ExtraAI[10];
-        set => ModdedProj.ExtraAI[10] = (int)value;
-    }
-
-    public bool ReachedTarget
-    {
-        get => ModdedProj.ExtraAI[11] == 1f;
-        set => ModdedProj.ExtraAI[11] = value.ToInt();
+        get => (Phase)ProjInfo.ExtraAI[10];
+        set => ProjInfo.ExtraAI[10] = (int)value;
     }
 
     public override void WriteExtraAI(BinaryWriter writer)
@@ -90,7 +84,7 @@ public class EverbladedSwing : BaseSwordSwing
     public override void SafeAI()
     {
         // Create the trail if needed
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, OffsetFunct);
 
         switch (CurrentPhase)
@@ -228,7 +222,7 @@ public class EverbladedSwing : BaseSwordSwing
         Vector3 tip;
         Vector2 begin, end;
 
-        Quaternion angleFix = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, -(3f * Pi / 4f));
+        Quaternion angleFix = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, -ThreePIOver4);
         Quaternion final = Quaternion.Multiply(Rotation, angleFix);
 
         tip = Vector3.Transform(size3D, Quaternion.CreateFromRotationMatrix(Matrix.CreateFromQuaternion(final) * Matrix.CreateRotationZ(InitialMouseAngle)));
@@ -274,6 +268,7 @@ public class EverbladedSwing : BaseSwordSwing
                         slash.Start = pos + PolarVector(dist, angle + offset);
                         slash.Center = pos;
                         slash.End = pos + PolarVector(dist, angle - offset);
+                        slash.Sync();
                     }
                 }
 
@@ -339,7 +334,7 @@ public class EverbladedSwing : BaseSwordSwing
     }
 
     public OptimizedPrimitiveTrail trail;
-    private readonly ManualTrailPoints points = new(20);
+    private readonly TrailPoints points = new(20);
 
     public static float WidthFunct(float c)
     {
@@ -389,10 +384,10 @@ public class EverbladedSwing : BaseSwordSwing
             trailShader.TrySetParameter("firstColor", new Color(152, 15, 16));
             trailShader.TrySetParameter("secondaryColor", new Color(168, 50, 50));
             trailShader.TrySetParameter("tertiaryColor", new Color(173, 26, 16));
-            trailShader.TrySetParameter("flip", flip);
+            trailShader.TrySetParameter("flip", CurrentPhase == Phase.VisceralSlice && Owner.gravDir == -1 ? Direction == 1 : flip);
 
             trailShader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.SuperWavyPerlin), 0, SamplerState.LinearWrap);
-            trailShader.Matrix = Calculate3DPrimitiveMatrix(Projectile.Center, Rotation, Projectile.scale, InitialMouseAngle, 1);
+            trailShader.Matrix = Get3DOrthoPrimitiveMatrix(Projectile.Center, Rotation, Projectile.scale, InitialMouseAngle, 1);
             trail.DrawTrail(trailShader, points.Points);
         }
 
@@ -419,7 +414,6 @@ public class EverbladedSwing : BaseSwordSwing
             }
 
             points.SetPoints(trailPositions);
-
             PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.OverProjectiles);
         }
 

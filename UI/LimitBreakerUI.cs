@@ -1,10 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
 using Terraria.UI;
-using TheExtraordinaryAdditions.Content.Projectiles.Classless.Early;
 using TheExtraordinaryAdditions.Core.Globals;
 
 namespace TheExtraordinaryAdditions.UI;

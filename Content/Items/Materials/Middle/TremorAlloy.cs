@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using Terraria;
@@ -13,14 +12,25 @@ namespace TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 public class TremorAlloy : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TremorAlloy);
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(new Color(128, 86, 73));
-    }
 
     public override void SetStaticDefaults()
     {
         Item.ResearchUnlockCount = 20;
+    }
+
+    public override void SetDefaults()
+    {
+        Item.width = 48;
+        Item.height = 46;
+        Item.rare = ItemRarityID.Cyan;
+
+        Item.maxStack = Item.CommonMaxStack;
+        Item.value = Item.buyPrice(gold: 1);
+    }
+
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(new Color(128, 86, 73));
     }
 
     public void DrawBackAfterimage(SpriteBatch spriteBatch, Vector2 baseDrawPosition, Rectangle frame, float baseScale)
@@ -40,31 +50,26 @@ public class TremorAlloy : ModItem
             spriteBatch.Draw(tex, baseDrawPosition, frame, drawColor * MathHelper.Lerp(0.7f, 0f, time), 0f, tex.Size() / 2f, scale, 0, 0f);
         }
     }
+
     public override void Update(ref float gravity, ref float maxFallSpeed)
     {
         maxFallSpeed = 20f;
     }
+
     public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
     {
         Rectangle frame = TextureAssets.Item[Item.type].Value.Frame(1, 1, 0, 0, 0, 0);
         DrawBackAfterimage(spriteBatch, Item.Center - Main.screenPosition, frame, scale);
         return true;
     }
+
     public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
     {
         Item.velocity.X = 0f;
         DrawBackAfterimage(spriteBatch, position, frame, .2f);
         return true;
     }
-    public override void SetDefaults()
-    {
-        Item.width = 48;
-        Item.height = 46;
-        Item.rare = ItemRarityID.Cyan;
 
-        Item.maxStack = Item.CommonMaxStack;
-        Item.value = Item.buyPrice(gold: 1);
-    }
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();

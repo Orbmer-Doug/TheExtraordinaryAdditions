@@ -1,11 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
@@ -38,9 +35,13 @@ public class CosmicSlugCharge : ModProjectile, ILocalizedModType, IModType
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = 40;
     }
+
     public override bool? CanDamage() => null;
     public override void AI()
     {
+        if (trail == null || trail.Disposed)
+            trail = new(WidthFunction, ColorFunction, null, 35);
+
         Projectile.Opacity = Projectile.scale = GetLerpBump(0f, .01f, 1f, .9f, InverseLerp(0f, Lifetime, Projectile.timeLeft));
         Lighting.AddLight(Projectile.Center, Color.BlueViolet.ToVector3() * 2f);
 
@@ -62,7 +63,6 @@ public class CosmicSlugCharge : ModProjectile, ILocalizedModType, IModType
                     38, Main.rand.NextFloat(.3f, .6f), Color.Cyan, Color.BlueViolet, 1.7f);
             }
         }
-
     }
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
@@ -83,15 +83,17 @@ public class CosmicSlugCharge : ModProjectile, ILocalizedModType, IModType
         return (1f - completionRatio) * Projectile.width * width * Projectile.scale;
     }
 
+    public OptimizedPrimitiveTrail trail;
     public TrailPoints cache;
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
         {
+            if (trail == null || trail.Disposed || cache == null)
+                return;
             ManagedShader shader = ShaderRegistry.SmoothFlame;
             shader.TrySetParameter("heatInterpolant", 1f);
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.StreakLightning), 1);
-            OptimizedPrimitiveTrail trail = new(WidthFunction, ColorFunction, null, 35);
             trail.DrawTrail(shader, cache.Points, 90);
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
@@ -107,7 +109,6 @@ public class CosmicSlugCharge : ModProjectile, ILocalizedModType, IModType
             Main.EntitySpriteDraw(bloom, pos, null, ColorFunction(SystemVector2.One / 2, Vector2.Zero) * .5f, Projectile.velocity.ToRotation(), bloom.Size() * .5f, Projectile.Opacity * .5f, 0, 0f);
         }
         PixelationSystem.QueueTextureRenderAction(flare, PixelationLayer.UnderProjectiles, BlendState.Additive);
-        
         return false;
     }
 }

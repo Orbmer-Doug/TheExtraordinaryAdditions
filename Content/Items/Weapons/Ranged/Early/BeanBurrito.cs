@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Late;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Early;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -18,11 +18,6 @@ public class BeanBurrito : ModItem
     public override void SetStaticDefaults()
     {
         CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1;
-    }
-
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(new Color(227, 112, 5));
     }
 
     public override void SetDefaults()
@@ -47,6 +42,11 @@ public class BeanBurrito : ModItem
         Item.shootSpeed = 10f;
     }
 
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(new Color(227, 112, 5));
+    }
+
     public override void UpdateInventory(Player player)
     {
         if (player.Additions().GlobalTimer % 20 == 19)
@@ -60,7 +60,7 @@ public class BeanBurrito : ModItem
         int amount = 1;
         float radians = 0f;
         float multiplier = 1f;
-        if (player.Additions().AshersTie || player.Additions().TungstenTie)
+        if (player.GetModPlayer<AshersWhiteTiePlayer>().Equipped || player.GetModPlayer<TungstenTiePlayer>().Equipped)
         {
             amount = 4;
             radians = .15f;

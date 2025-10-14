@@ -1,10 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -14,6 +13,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
 public class SpecteriteMask : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SpecteriteMask);
+
     public override void SetStaticDefaults()
     {
         ArmorIDs.Head.Sets.DrawHead[Item.headSlot] = false; // Don't draw the head at all. Used by Space Creature Mask
@@ -21,6 +21,7 @@ public class SpecteriteMask : ModItem
         ArmorIDs.Head.Sets.DrawFullHair[Item.headSlot] = false; // Draw all hair as normal. Used by Mime Mask, Sunglasses
         ArmorIDs.Head.Sets.DrawsBackHairWithoutHeadgear[Item.headSlot] = false;
     }
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(new Color(85, 77, 255));
@@ -34,6 +35,7 @@ public class SpecteriteMask : ModItem
         Item.rare = ItemRarityID.Yellow;
         Item.defense = 7;
     }
+
     public override void UpdateArmorSet(Player player)
     {
         string hotkey = AdditionsKeybinds.SetBonusHotKey.TooltipHotkeyString();
@@ -41,18 +43,16 @@ public class SpecteriteMask : ModItem
 
         int type = ModContent.ProjectileType<ShroomiteDash>();
         if (AdditionsKeybinds.SetBonusHotKey.Current && player.CountOwnerProjectiles(type) <= 0 && player.whoAmI == Main.myPlayer)
-        {
             player.NewPlayerProj(player.Center, Vector2.Zero, type, 500, 10f, player.whoAmI);
-        }
 
-        player.GetModPlayer<GlobalPlayer>().SpecteriteArmor = true;
+        player.GetModPlayer<SpecteritePlayer>().Equipped = true;
     }
 
     public override bool IsArmorSet(Item head, Item body, Item legs)
     {
-        if (body.type == Mod.Find<ModItem>("SpecteriteChestPiece").Type)
+        if (body.type == ModContent.ItemType<SpecteriteChestPiece>())
         {
-            return legs.type == Mod.Find<ModItem>("SpecteriteGreaves").Type;
+            return legs.type == ModContent.ItemType<SpecteriteGreaves>();
         }
         return false;
     }
@@ -63,6 +63,7 @@ public class SpecteriteMask : ModItem
         player.GetDamage(DamageClass.Ranged) += 0.18f;
         player.buffImmune[BuffID.Blackout] = true;
     }
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
@@ -88,5 +89,25 @@ public class SpecteriteMask : ModItem
         recipe3.AddTile(TileID.MythrilAnvil);
         recipe3.AddTile(TileID.AdamantiteForge);
         recipe3.Register();
+    }
+}
+
+public sealed class SpecteritePlayer : ModPlayer
+{
+    public bool Equipped;
+    public override void ResetEffects() => Equipped = false;
+
+    public override void PostUpdate()
+    {
+        if (!Equipped)
+            return;
+
+        bool active = Player.active && !Player.DeadOrGhost;
+        if (active && Player.velocity.Length() != 0 && !Player.mount.Active)
+        {
+            Vector2 randPos = Player.RotatedRelativePoint(Player.MountedCenter) + PolarVector(Player.height / 2 * Player.gravDir, Player.fullRotation + MathHelper.PiOver2) + PolarVector(Main.rand.NextFloat(-Player.width / 2, Player.width / 2), Player.fullRotation);
+            Vector2 vel = -Player.velocity.RotatedByRandom(.18f) * Main.rand.NextFloat(.3f, .5f);
+            ParticleRegistry.SpawnMistParticle(randPos, vel, Main.rand.NextFloat(.5f, .8f), new(85, 89, 225), new(8, 35, 97), Main.rand.NextByte(98, 182), .05f);
+        }
     }
 }

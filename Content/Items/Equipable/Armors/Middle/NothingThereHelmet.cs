@@ -1,14 +1,13 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -18,6 +17,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
 public class NothingThereHelmet : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.NothingThereHelmet);
+
     public override void SetStaticDefaults()
     {
         ArmorIDs.Head.Sets.DrawHead[Item.headSlot] = false; // Don't draw the head at all. Used by Space Creature Mask
@@ -25,6 +25,7 @@ public class NothingThereHelmet : ModItem
         ArmorIDs.Head.Sets.DrawFullHair[Item.headSlot] = false; // Draw all hair as normal. Used by Mime Mask, Sunglasses
         ArmorIDs.Head.Sets.DrawsBackHairWithoutHeadgear[Item.headSlot] = true;
     }
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(new Color(235, 64, 52));
@@ -41,13 +42,14 @@ public class NothingThereHelmet : ModItem
 
     public override void UpdateArmorSet(Player player)
     {
+        NothingTherePlayer there = player.GetModPlayer<NothingTherePlayer>();
         player.setBonus = this.GetLocalization("SetBonus").Format(AdditionsKeybinds.SetBonusHotKey.TooltipHotkeyString());
         player.moveSpeed += 0.3f;
-        ref int counter = ref player.Additions().NothingThereCounter;
+        ref int counter = ref there.Counter;
         int time = SecondsToFrames(4);
 
         // Start knashing
-        if (AdditionsKeybinds.SetBonusHotKey.JustPressed && counter <= 0 && !CalUtils.HasCooldown(player, MimicryCooldown.ID) && player.whoAmI == Main.myPlayer)
+        if (player.whoAmI == Main.myPlayer && AdditionsKeybinds.SetBonusHotKey.JustPressed && counter <= 0 && !CalUtils.HasCooldown(player, MimicryCooldown.ID))
         {
             Vector2 pos = player.Center + new Vector2(0f, -20f);
             for (float i = .1f; i < .3f; i += .1f)
@@ -83,14 +85,14 @@ public class NothingThereHelmet : ModItem
             SoundEngine.PlaySound(SoundID.DD2_JavelinThrowersAttack with { MaxInstances = 0, PitchVariance = .3f, Volume = 1.2f }, pos, null);
         }
 
-        player.Additions().NothingThere = true;
+        there.Equipped = true;
     }
 
     public override bool IsArmorSet(Item head, Item body, Item legs)
     {
-        if (body.type == Mod.Find<ModItem>("MimicryChestplate").Type)
+        if (body.type == ModContent.ItemType<MimicryChestplate>())
         {
-            return legs.type == Mod.Find<ModItem>("MimicryLeggings").Type;
+            return legs.type == ModContent.ItemType<MimicryLeggings>();
         }
         return false;
     }
@@ -104,5 +106,22 @@ public class NothingThereHelmet : ModItem
         player.maxMinions += 2;
         player.maxTurrets += 1;
         player.buffImmune[BuffID.Chilled] = true;
+    }
+}
+
+public sealed class NothingTherePlayer : ModPlayer
+{
+    public bool Equipped;
+    public override void ResetEffects() => Equipped = false;
+    public int Counter;
+    public override void UpdateDead() => Counter = 0;
+
+    public override void PostUpdate()
+    {
+        if (!Equipped)
+            return;
+
+        if (Counter > 0)
+            Counter--;
     }
 }

@@ -1,8 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
+using TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -28,7 +27,7 @@ public class EclipsedAura : ModProjectile
     public ref float Time => ref Projectile.ai[0];
     public override void AI()
     {
-        if (Owner == null || Owner.dead || Owner.active == false || !ModdedOwner.EclipsedOne)
+        if (Owner == null || Owner.dead || Owner.active == false || !Owner.GetModPlayer<EclipsedOnesCloakPlayer>().Equipped)
         {
             Projectile.Kill();
             return;

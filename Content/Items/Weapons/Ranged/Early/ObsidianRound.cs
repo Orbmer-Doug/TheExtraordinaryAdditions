@@ -1,15 +1,15 @@
-﻿using System.Collections.Generic;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Early;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Early;
 
 public class ObsidianRound : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ObsidianRound);
+
     public override void SetStaticDefaults()
     {
         Item.ResearchUnlockCount = 99;
@@ -30,6 +30,7 @@ public class ObsidianRound : ModItem
         Item.shootSpeed = 16f;
         Item.ammo = AmmoID.Bullet;
     }
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe(60);
@@ -37,6 +38,5 @@ public class ObsidianRound : ModItem
         recipe.AddIngredient(ItemID.Obsidian, 3);
         recipe.AddTile(TileID.Anvils);
         recipe.Register();
-
     }
 }

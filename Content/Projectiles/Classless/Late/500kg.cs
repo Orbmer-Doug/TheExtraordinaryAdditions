@@ -1,13 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
-using TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.Cynosure;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.ScreenEffects;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -17,10 +13,10 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Late;
 public class _500kg : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture._500kg);
+
     public override void SetDefaults()
     {
-        Projectile.width = 20;//106;
-        Projectile.height = 20;
+        Projectile.width = Projectile.height = 20;
         Projectile.timeLeft = 300;
         Projectile.ignoreWater = false;
         Projectile.tileCollide = true;
@@ -43,7 +39,7 @@ public class _500kg : ModProjectile
     {
         cache ??= new(20);
         cache.Update(Projectile.Center);
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(c => Projectile.height, (c, pos) => Color.WhiteSmoke * MathHelper.SmoothStep(1f, 0f, c.X), null, 20);
 
         if (HitGround)
@@ -90,6 +86,7 @@ public class _500kg : ModProjectile
         float fallOff = Utils.Remap(Size - target.Distance(Projectile.Center) * 2, 0f, Size, 0.05f, 1f);
         target.velocity += Projectile.Center.SafeDirectionTo(target.Center) * Projectile.knockBack * fallOff * (target.knockBackResist * .9f);
     }
+
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
     {
         modifiers.Knockback *= 0f;
@@ -130,7 +127,7 @@ public class _500kg : ModProjectile
         }
 
         ScreenShakeSystem.New(new(3f, 2.3f), Projectile.Center);
-        
+
         ParticleRegistry.SpawnFlash(Projectile.Center, 22, 1.6f, Size * 1.5f);
         ParticleRegistry.SpawnChromaticAberration(Projectile.Center, 142, .8f, Size * 2f);
 

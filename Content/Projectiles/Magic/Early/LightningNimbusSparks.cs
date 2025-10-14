@@ -1,12 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
-using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Early;
@@ -38,7 +35,7 @@ public class LightningNimbusSparks : ModProjectile
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        ref int counter = ref Owner.Additions().BrewingStormsCounter;
+        ref int counter = ref Owner.GetModPlayer<BrewingStormsPlayer>().Counter;
         counter += Projectile.numHits > 0 ? 1 : 3;
     }
 
@@ -87,7 +84,7 @@ public class LightningNimbusSparks : ModProjectile
     {
         for (int i = 0; i < 8; i++)
             Dust.NewDustPerfect(Projectile.Center, DustID.WitherLightning, Main.rand.NextVector2Circular(4f, 4f), 0, default, Main.rand.NextFloat(.7f, 1.2f)).noGravity = true;
-        
+
         SoundID.NPCHit53.Play(Projectile.Center, .6f);
     }
 }

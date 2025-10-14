@@ -15,68 +15,61 @@ public class BitmaskUtils
     public const int BitsPerMask = sizeof(ulong) * 8;
 
     /// <summary>
-    /// An enumerator for iterating over active indices in a bitmask
+    /// An iterator that goes over active indices in a bitmask
     /// </summary>
-    public struct BitmaskEnumerator : IEnumerable<int>, IEnumerator<int>
+    public readonly ref struct BitmaskEnumerable
     {
-        private readonly ulong[] presenceMask;
-        private readonly uint maxIndex;
-        private int currentMaskIndex;
-        private ulong currentMask;
-        private int currentIndex;
-
-        public BitmaskEnumerator(ulong[] presenceMask, uint maxIndex)
+        public ref struct BitmaskEnumerator(ReadOnlySpan<ulong> presenceMask, uint maxIndex)
         {
-            this.presenceMask = presenceMask;
-            this.maxIndex = maxIndex;
-            currentMaskIndex = -1;
-            currentMask = 0;
-            currentIndex = -1;
-        }
+            private readonly ReadOnlySpan<ulong> presenceMask = presenceMask;
+            private readonly uint maxIndex = maxIndex;
+            private int currentMaskIndex = -1;
+            private ulong currentMask = 0;
+            private int currentIndex = -1;
 
-        public BitmaskEnumerator GetEnumerator() => this;
+            public readonly BitmaskEnumerator GetEnumerator() => this;
 
-        IEnumerator<int> IEnumerable<int>.GetEnumerator() => this;
+            public readonly int Current => currentIndex;
 
-        IEnumerator IEnumerable.GetEnumerator() => this;
-
-        public int Current => currentIndex;
-
-        object IEnumerator.Current => currentIndex;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool MoveNext()
-        {
-            while (true)
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public bool MoveNext()
             {
-                // If current mask has bits left, process them
-                if (currentMask != 0)
+                while (true)
                 {
-                    int bitIndex = BitOperations.TrailingZeroCount(currentMask);
-                    currentMask &= ~(1ul << bitIndex);
-                    currentIndex = currentMaskIndex * 64 + bitIndex;
-                    if (currentIndex < maxIndex)
-                        return true;
-                }
-                else
-                {
-                    // Move to next mask
-                    currentMaskIndex++;
-                    if (currentMaskIndex >= presenceMask.Length)
-                        return false;
-                    currentMask = presenceMask[currentMaskIndex];
+                    // If current mask has bits left, process them
+                    if (currentMask != 0)
+                    {
+                        int bitIndex = BitOperations.TrailingZeroCount(currentMask);
+                        currentMask &= ~(1ul << bitIndex);
+                        currentIndex = currentMaskIndex * BitsPerMask + bitIndex;
+                        if (currentIndex < maxIndex)
+                            return true;
+                    }
+                    else
+                    {
+                        // Move to next mask
+                        currentMaskIndex++;
+                        if (currentMaskIndex >= presenceMask.Length)
+                            return false;
+                        currentMask = presenceMask[currentMaskIndex];
+                    }
                 }
             }
         }
 
-        public void Reset()
+        public readonly ReadOnlySpan<ulong> mask;
+        public readonly uint maxIndex;
+
+        public BitmaskEnumerable(ReadOnlySpan<ulong> mask, uint maxIndex)
         {
-            currentMaskIndex = -1;
-            currentMask = 0;
-            currentIndex = -1;
+            this.mask = mask;
+            this.maxIndex = maxIndex;
         }
 
-        public void Dispose() { }
+        public BitmaskEnumerator GetEnumerator()
+        {
+            return new BitmaskEnumerator(mask, maxIndex);
+        }
     }
 
     /// <summary>
@@ -89,8 +82,8 @@ public class BitmaskUtils
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void SetBit(in ulong[] presenceMask, int index, bool value)
     {
-        int maskIndex = index / 64;
-        int bitIndex = index % 64;
+        int maskIndex = index / BitsPerMask;
+        int bitIndex = index % BitsPerMask;
         if (value)
             presenceMask[maskIndex] |= (1ul << bitIndex);
         else

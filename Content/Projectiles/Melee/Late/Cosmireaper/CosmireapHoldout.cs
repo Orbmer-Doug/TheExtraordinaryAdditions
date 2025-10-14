@@ -19,7 +19,7 @@ public class CosmireapHoldout : ModProjectile
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Cosmireaper_Proj);
     public Player Owner => Main.player[Projectile.owner];
     public GlobalPlayer Modded => Owner.Additions();
-    internal enum States
+    public enum States
     {
         Sweep,
         Acceleration,
@@ -51,7 +51,7 @@ public class CosmireapHoldout : ModProjectile
 
 
     public float ChargeProgress => InverseLerp(0f, ChargeupTime, Timer);
-    private States State
+    public States State
     {
         get => (States)Projectile.ai[0];
         set => Projectile.ai[0] = (float)value;
@@ -59,46 +59,46 @@ public class CosmireapHoldout : ModProjectile
     public ref float Timer => ref Projectile.ai[1];
     public ref float Counter => ref Projectile.ai[2];
 
-    public ref float CurrentVelocity => ref Projectile.Additions().ExtraAI[0];
+    public ref float CurrentVelocity => ref Projectile.AdditionsInfo().ExtraAI[0];
     public bool Returning
     {
-        get => Projectile.Additions().ExtraAI[1] == 1f;
-        set => Projectile.Additions().ExtraAI[1] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[1] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[1] = value.ToInt();
     }
 
     public bool HasHitTarget
     {
-        get => Projectile.Additions().ExtraAI[2] == 1f;
-        set => Projectile.Additions().ExtraAI[2] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[2] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[2] = value.ToInt();
     }
 
     public bool Released
     {
-        get => Projectile.Additions().ExtraAI[3] == 1f;
-        set => Projectile.Additions().ExtraAI[3] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[3] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[3] = value.ToInt();
     }
 
     public bool ChargeComplete
     {
-        get => Projectile.Additions().ExtraAI[4] == 1f;
-        set => Projectile.Additions().ExtraAI[4] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[4] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[4] = value.ToInt();
     }
 
     public bool ReleasedInit
     {
-        get => Projectile.Additions().ExtraAI[5] == 1f;
-        set => Projectile.Additions().ExtraAI[5] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[5] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[5] = value.ToInt();
     }
 
     public bool ImpactInit
     {
-        get => Projectile.Additions().ExtraAI[6] == 1f;
-        set => Projectile.Additions().ExtraAI[6] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[6] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[6] = value.ToInt();
     }
 
-    public ref float NPCIndex => ref Projectile.Additions().ExtraAI[7];
+    public ref float NPCIndex => ref Projectile.AdditionsInfo().ExtraAI[7];
     public NPC Target => Main.npc[(int)NPCIndex];
-    public ref float TotalTime => ref Projectile.Additions().ExtraAI[8];
+    public ref float TotalTime => ref Projectile.AdditionsInfo().ExtraAI[8];
 
     private Vector2 dir;
     public override void SendExtraAI(BinaryWriter writer)
@@ -127,6 +127,7 @@ public class CosmireapHoldout : ModProjectile
         Projectile.width = 92;
         Projectile.height = 118;
         Projectile.penetrate = -1;
+        Projectile.Opacity = 0f;
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = 10;
         Projectile.tileCollide = false;
@@ -171,7 +172,7 @@ public class CosmireapHoldout : ModProjectile
         }
         TotalTime++;
         Owner.heldProj = Projectile.whoAmI;
-        Projectile.spriteDirection = (int)(Owner.direction == -1 ? SpriteEffects.FlipVertically : SpriteEffects.None);
+        Projectile.Opacity = InverseLerp(0f, 10f, TotalTime);
 
         // Set reeling times
         if (Owner.channel)
@@ -203,7 +204,8 @@ public class CosmireapHoldout : ModProjectile
                 if (Projectile.velocity != Projectile.oldVelocity)
                     this.Sync();
             }
-            float armRotation = Projectile.velocity.ToRotation() + ArmAnticipationMovement * Owner.direction;
+            Projectile.spriteDirection = (int)(Projectile.velocity.X.NonZeroSign() == -1 ? SpriteEffects.FlipVertically : SpriteEffects.None);
+            float armRotation = Projectile.velocity.ToRotation() + ArmAnticipationMovement * Projectile.velocity.X.NonZeroSign();
 
             float num = armRotation * Owner.gravDir;
             Projectile.Center = center + PolarVector(80f, num) * Owner.gravDir;
@@ -290,6 +292,7 @@ public class CosmireapHoldout : ModProjectile
             Timer++;
             return;
         }
+        Projectile.spriteDirection = (int)(Projectile.velocity.X.NonZeroSign() == -1 ? SpriteEffects.FlipVertically : SpriteEffects.None);
 
         if (ReleasedInit == false)
         {
@@ -300,8 +303,7 @@ public class CosmireapHoldout : ModProjectile
         }
 
         // Kill if too far
-        bool distance = Vector2.Distance(Projectile.Center, Owner.Center) > Main.screenWidth * 2;
-        if (distance)
+        if (Vector2.Distance(Projectile.Center, Owner.Center) > Main.LogicCheckScreenWidth * 2)
             Projectile.Kill();
 
         switch (State)
@@ -374,6 +376,7 @@ public class CosmireapHoldout : ModProjectile
 
         // Hold out hand
         Owner.SetFrontHandBetter(0, Owner.AngleTo(Projectile.Center));
+        Owner.SetDummyItemTime(2);
 
         // Rotate and set the player to it
         Projectile.rotation += (Math.Abs(Projectile.velocity.X) + Math.Abs(Projectile.velocity.Y)) * 0.008f;
@@ -426,15 +429,18 @@ public class CosmireapHoldout : ModProjectile
         {
             if (Timer < MaxSwingTime)
             {
+                Owner.SetDummyItemTime(2);
                 Vector2 center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
-                float armRotation = Projectile.velocity.ToRotation() + ReleaseRatio * Owner.direction;
+                Owner.ChangeDir(Projectile.velocity.X.NonZeroSign());
+                float armRotation = Projectile.velocity.ToRotation() + ReleaseRatio * Projectile.velocity.X.NonZeroSign();
                 float num = armRotation * Owner.gravDir;
                 Projectile.Center = center + PolarVector(80f, num) * Owner.gravDir;
                 Projectile.rotation = armRotation + Correction * Owner.gravDir;
-                Owner.SetFrontHandBetter(0, Projectile.rotation);
+                Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, Projectile.rotation);
             }
             else if (Timer >= MaxSwingTime && ImpactInit == false)
             {
+                Projectile.timeLeft = 300;
                 NPCIndex = 0;
                 if (this.RunLocal())
                     Projectile.velocity = Projectile.SafeDirectionTo(Owner.Additions().mouseWorld) * 30f;
@@ -454,7 +460,6 @@ public class CosmireapHoldout : ModProjectile
                         Vector2 pos = Projectile.RandAreaInEntity();
                         Vector2 vel = -Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.25f) * Main.rand.NextFloat(4f, 20f);
                         ParticleRegistry.SpawnHeavySmokeParticle(pos, vel * Main.rand.NextFloat(.75f, 1f), life, scale, color, 1f, true);
-                        ParticleRegistry.SpawnSmokeParticle(pos, vel, scale * 1.1f, color, Color.Black, Main.rand.NextByte(120, 220));
                     }
                 }
                 Projectile.rotation += .25f * Direction;
@@ -483,6 +488,7 @@ public class CosmireapHoldout : ModProjectile
 
         // Hold hand out to projectile, cause chains
         Owner.SetFrontHandBetter(0, Owner.AngleTo(Projectile.Center));
+        Owner.SetDummyItemTime(2);
 
         // Face the projectile
         Owner.ChangeDir(Owner.direction = !(Projectile.Center.X < Owner.Center.X) ? 1 : -1);
@@ -490,7 +496,7 @@ public class CosmireapHoldout : ModProjectile
         if (ThrowCompletion > .5f)
         {
             Returning = true;
-            
+
             int type = ModContent.ProjectileType<LaceratedSpace>();
             if (Counter == 0f)
             {
@@ -538,16 +544,17 @@ public class CosmireapHoldout : ModProjectile
         Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver4;
         if (Projectile.direction == -1)
             Projectile.rotation += MathHelper.Pi;
-        Owner.ChangeDir((Projectile.velocity.X > 0f).ToDirectionInt());
+        Owner.ChangeDir(Projectile.velocity.X.NonZeroSign());
 
         Vector2 center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
 
-        float armRotation = Projectile.velocity.ToRotation() + SwingRatio * Owner.direction;
+        float armRotation = Projectile.velocity.ToRotation() + SwingRatio * Projectile.velocity.X.NonZeroSign();
         float num = armRotation * Owner.gravDir;
         Projectile.Center = center + PolarVector(80f, num) * Owner.gravDir;
 
         Projectile.rotation = armRotation + Correction * Owner.gravDir;
         Owner.SetCompositeArmFront(true, 0, Projectile.rotation - MathHelper.PiOver2);
+        Owner.SetDummyItemTime(2);
         Projectile.Opacity = InverseLerp(0f, 9f, Projectile.timeLeft);
 
         if (Projectile.timeLeft > MaxSwingTime)
@@ -630,9 +637,7 @@ public class CosmireapHoldout : ModProjectile
             case States.Force:
                 {
                     if (Returning == true)
-                    {
-                        ScreenShakeSystem.New(new(7f, .3f, 1600f), Projectile.Center);
-                    }
+                        ScreenShakeSystem.New(new(.6f, .3f, 1600f), Projectile.Center);
                     break;
                 }
             case States.Sweep:
@@ -642,9 +647,7 @@ public class CosmireapHoldout : ModProjectile
                     if (Main.netMode != NetmodeID.Server)
                     {
                         for (int i = 0; i < 60; i++)
-                        {
                             ShaderParticleRegistry.SpawnCosmicParticle(target.Center + Utils.NextVector2Circular(Main.rand, 40f, 40f), Utils.NextVector2Circular(Main.rand, 3f, 3f), 70f);
-                        }
                     }
                     break;
                 }
@@ -676,7 +679,7 @@ public class CosmireapHoldout : ModProjectile
                 }
             case States.Force:
                 {
-                    ref float returning = ref Projectile.Additions().ExtraAI[4];
+                    ref float returning = ref Projectile.AdditionsInfo().ExtraAI[4];
                     if (Returning == true)
                     {
                         modifiers.FinalDamage *= 2f;

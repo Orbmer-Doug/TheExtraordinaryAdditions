@@ -18,7 +18,7 @@ namespace TheExtraordinaryAdditions.Content.Tiles;
 
 public class TechnicTransmitterPlaced : ModTile
 {
-    public const int Width = 8;
+    public const int Width = 7;
     public const int Height = 12;
 
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TechnicTransmitterPlaced);
@@ -27,6 +27,7 @@ public class TechnicTransmitterPlaced : ModTile
     {
         Main.tileFrameImportant[Type] = true;
         Main.tileObsidianKill[Type] = true;
+        Main.tileLighted[Type] = true;
 
         TileObjectData.newTile.CopyFrom(TileObjectData.Style1xX);
         TileObjectData.newTile.Width = Width;
@@ -42,6 +43,13 @@ public class TechnicTransmitterPlaced : ModTile
         AddMapEntry(new Color(0, 230, 242), CreateMapEntryName());
 
         HitSound = SoundID.Tink;
+    }
+
+    public override void ModifyLight(int i, int j, ref float r, ref float g, ref float b)
+    {
+        r = .16f;
+        g = 1f;
+        b = .9f;
     }
 
     public override void MouseOver(int i, int j)
@@ -86,6 +94,10 @@ public class TechnicTransmitterPlaced : ModTile
 public class TransmitterLightspeed : ModProjectile, IHasScreenShader
 {
     public override string Texture => AssetRegistry.Invis;
+    public override void SetStaticDefaults()
+    {
+        ProjectileID.Sets.DrawScreenCheckFluff[Type] = 60000;
+    }
     public override void SetDefaults()
     {
         Projectile.Size = new(1f);
@@ -109,7 +121,7 @@ public class TransmitterLightspeed : ModProjectile, IHasScreenShader
     {
         if (!Reverse)
         {
-            if (beam == null || beam._disposed)
+            if (beam == null || beam.Disposed)
                 beam = new(WidthFunct, ColorFunct, null, 20);
 
             Vector2 start = Projectile.Center;
@@ -192,7 +204,7 @@ public class TransmitterLightspeed : ModProjectile, IHasScreenShader
     public Color ColorFunct(SystemVector2 c, Vector2 pos) => Color.Cyan * InverseLerp(0f, 1.4f, Time);
 
     public OptimizedPrimitiveTrail beam;
-    public ManualTrailPoints points = new(20);
+    public TrailPoints points = new(20);
     public override bool PreDraw(ref Color lightColor)
     {
         if (this.RunLocal())

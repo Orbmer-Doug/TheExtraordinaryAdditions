@@ -1,12 +1,10 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System.IO;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
+using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
-using TheExtraordinaryAdditions.Core.Graphics;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
@@ -43,8 +41,8 @@ public class LaserBlast : ModProjectile, ILocalizedModType, IModType
     public override void ReceiveExtraAI(BinaryReader reader) => End = reader.ReadVector2();
     public override void AI()
     {
-        if (trail == null || trail._disposed)
-            trail = new(tip, WidthFunct, ColorFunct, null, 50);
+        if (trail == null || trail.Disposed)
+            trail = new(WidthFunct, ColorFunct, null, 50);
 
         Vector2 expected = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero) * Animators.MakePoly(3f).OutFunction.Evaluate(Time, 0f, Lifetime, 0f, 1000f);
         End = LaserCollision(Projectile.Center, expected, CollisionTarget.Tiles | CollisionTarget.NPCs, out CollisionTarget hit, WidthFunct(.5f));
@@ -61,7 +59,6 @@ public class LaserBlast : ModProjectile, ILocalizedModType, IModType
         {
             Color color = Main.rand.NextBool(4) ? new Color(106, 93, 255) * 1.6f : new Color(106, 93, 255);
             ParticleRegistry.SpawnSparkParticle(End + Main.rand.NextVector2Circular(Projectile.height, Projectile.height) * 2, Projectile.velocity, 30, .6f, color);
-
             Time++;
         }
     }
@@ -81,7 +78,7 @@ public class LaserBlast : ModProjectile, ILocalizedModType, IModType
 
     public float WidthFunct(float c)
     {
-        return Projectile.height * Projectile.Opacity;
+        return OptimizedPrimitiveTrail.HemisphereWidthFunct(c, Projectile.height * Projectile.Opacity);
     }
 
     public Color ColorFunct(SystemVector2 c, Vector2 pos)
@@ -89,9 +86,8 @@ public class LaserBlast : ModProjectile, ILocalizedModType, IModType
         return Color.Violet * InverseLerp(0f, .04f, c.X) * Projectile.Opacity;
     }
 
-    public ManualTrailPoints points = new(50);
+    public TrailPoints points = new(50);
     public OptimizedPrimitiveTrail trail;
-    public static readonly ITrailTip tip = new RoundedTip(10);
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -101,7 +97,7 @@ public class LaserBlast : ModProjectile, ILocalizedModType, IModType
 
             ManagedShader shader = ShaderRegistry.FlameTrail;
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FireNoise), 1, SamplerState.LinearWrap);
-            trail.DrawTippedTrail(shader, points.Points, tip);
+            trail.DrawTrail(shader, points.Points);
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;

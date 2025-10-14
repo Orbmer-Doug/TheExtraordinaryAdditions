@@ -97,11 +97,11 @@ public static class MusicBoxAutoloader
         }
     }
 
-    public static void Create(Mod mod, string texPath, string tileTexPath, string musicPath)
+    public static void Create(Mod mod, string texPath, string tileTexPath, string musicPath, out int itemID)
     {
         AutoloadableMusicBoxItem boxItem = new AutoloadableMusicBoxItem(texPath, musicPath);
         mod.AddContent(boxItem);
-        int itemID = boxItem.Type;
+        itemID = boxItem.Type;
 
         AutoloadableMusicBoxTile boxTile = new AutoloadableMusicBoxTile(tileTexPath);
         mod.AddContent(boxTile);

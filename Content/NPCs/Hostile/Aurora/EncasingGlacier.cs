@@ -3,7 +3,6 @@ using System.IO;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 
@@ -12,7 +11,6 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 public class EncasingGlacier : ModNPC
 {
     public override string Texture => AssetRegistry.Invis;
-    public static readonly int Life = 15000;
     public override void SetStaticDefaults()
     {
         NPCID.Sets.ImmuneToRegularBuffs[Type] =
@@ -30,7 +28,7 @@ public class EncasingGlacier : ModNPC
 
     public override void SetDefaults()
     {
-        NPC.lifeMax = Life;
+        NPC.lifeMax = 5000;
         NPC.defense = 20;
         NPC.knockBackResist = 0f;
         NPC.width = NPC.height = 200;
@@ -79,7 +77,7 @@ public class EncasingGlacier : ModNPC
     public override void AI()
     {
         float start = InverseLerp(0f, 90f, Time);
-        float life = InverseLerp(0f, Life, NPC.life) * .5f + .5f;
+        float life = InverseLerp(0f, NPC.lifeMax, NPC.life) * .5f + .5f;
 
         HideBossBar(NPC);
         NPC.Opacity = NPC.scale = start * life;

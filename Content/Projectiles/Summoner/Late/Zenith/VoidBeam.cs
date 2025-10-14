@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
@@ -34,10 +33,10 @@ public class VoidBeam : ModProjectile
 
     public bool Fade
     {
-        get => Projectile.Additions().ExtraAI[0] == 1f;
-        set => Projectile.Additions().ExtraAI[0] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[0] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
-    public ref float FadeTime => ref Projectile.Additions().ExtraAI[1];
+    public ref float FadeTime => ref Projectile.AdditionsInfo().ExtraAI[1];
 
     public override void SetStaticDefaults()
     {
@@ -66,8 +65,8 @@ public class VoidBeam : ModProjectile
             Projectile.timeLeft = 2;
 
         points.SetPoints(Projectile.Center.GetLaserControlPoints(Projectile.Center + Proj.rotation.ToRotationVector2() * Length, 50));
-        if (laser == null || laser._disposed)
-            laser = new(new RoundedTip(33), WidthFunct, ColorFunct, null, 50);
+        if (laser == null || laser.Disposed)
+            laser = new(WidthFunct, ColorFunct, null, 50);
         Projectile.Center = Proj.Center;
 
         if (Proj.As<AvragenMinion>().Phase != AvragenMinion.AvraPhases.CurvedBeam || Proj.As<AvragenMinion>().Idling)
@@ -75,15 +74,18 @@ public class VoidBeam : ModProjectile
 
         if (Fade)
             FadeTime++;
-        
+
         Length = Animators.MakePoly(4f).InOutFunction.Evaluate(0f, MaxLength, Fade ? FadeInterpolant : InverseLerp(0f, 30f, Time));
         Time++;
     }
+
     public float FadeInterpolant => InverseLerp(30f, 0f, FadeTime);
     public float WidthFunct(float c)
     {
-        return 15f + Animators.MakePoly(10f).OutFunction(MathHelper.SmoothStep(0f, 1f, c)) * Projectile.height * FadeInterpolant;
+        return OptimizedPrimitiveTrail.HemisphereWidthFunct(c,
+            15f + Animators.MakePoly(10f).OutFunction(MathHelper.SmoothStep(0f, 1f, c)) * Projectile.height * FadeInterpolant);
     }
+
     public Color ColorFunct(SystemVector2 c, Vector2 position)
     {
         return MulticolorLerp(c.X, Color.Purple, Color.Violet, Color.BlueViolet, Color.DarkViolet);
@@ -95,17 +97,17 @@ public class VoidBeam : ModProjectile
     }
 
     public OptimizedPrimitiveTrail laser;
-    public ManualTrailPoints points = new(50);
+    public TrailPoints points = new(50);
     public override bool PreDraw(ref Color lightColor)
     {
         void beam()
         {
-            if (laser != null && !laser._disposed)
+            if (laser != null && !laser.Disposed)
             {
                 ManagedShader shader = ShaderRegistry.CrunchyLaserShader;
                 shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.CrackedNoise2), 1);
 
-                laser.DrawTippedTrail(shader, points.Points, new RoundedTip(33, null, 1f), false, 100);
+                laser.DrawTrail(shader, points.Points, 100);
             }
         }
         PixelationSystem.QueuePrimitiveRenderAction(beam, PixelationLayer.OverProjectiles);

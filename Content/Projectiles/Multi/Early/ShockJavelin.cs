@@ -49,8 +49,8 @@ public class ShockJavelin : ModProjectile
     public ref float Timer => ref Projectile.localAI[1];
     public override void AI()
     {
-        if (trail == null || trail._disposed)
-            trail = new(tip, StripWidth, StripColor, null, 120);
+        if (trail == null || trail.Disposed)
+            trail = new(StripWidth, StripColor, null, 120);
         cache ??= new(120);
         cache.Update(Projectile.Center);
 
@@ -245,7 +245,6 @@ public class ShockJavelin : ModProjectile
         }
     }
 
-    public static readonly ITrailTip tip = new RoundedTip(20);
     public OptimizedPrimitiveTrail trail;
     public TrailPoints cache;
     public override bool PreDraw(ref Color lightColor)
@@ -260,7 +259,7 @@ public class ShockJavelin : ModProjectile
                 ManagedShader shader = ShaderRegistry.SpecialLightningTrail;
                 shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.StreakMagma), 1);
                 shader.TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly * 5f);
-                trail.DrawTippedTrail(shader, cache.Points, tip, true, 200, true);
+                trail.DrawTrail(shader, cache.Points, 200, true);
             }
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
@@ -283,10 +282,12 @@ public class ShockJavelin : ModProjectile
         Main.EntitySpriteDraw(texture, pos, null, lightColor * Projectile.Opacity, Projectile.rotation, orig, Projectile.scale, 0, 0f);
         return false;
     }
+
     internal float StripWidth(float c)
     {
-        return MathHelper.SmoothStep(Projectile.height * .9f, 0f, c) * Projectile.scale * 1.5f;
+        return OptimizedPrimitiveTrail.HemisphereWidthFunct(c, MathHelper.SmoothStep(Projectile.height * .9f, 0f, c) * Projectile.scale * 1.5f);
     }
+
     internal Color StripColor(SystemVector2 c, Vector2 position)
     {
         Color color = Color.Lerp(new Color(234, 164, 244, 0), new Color(154, 92, 236, 128), Main.GlobalTimeWrappedHourly + c.X);

@@ -1,5 +1,4 @@
 ﻿using Terraria;
-using Terraria.Localization;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Summoner.Late;
 
@@ -8,6 +7,7 @@ namespace TheExtraordinaryAdditions.Content.Buffs.Summon;
 public class SuperLoki : ModBuff
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SuperLoki);
+
     public override void SetStaticDefaults()
     {
         Main.buffNoSave[Type] = true;
@@ -25,6 +25,5 @@ public class SuperLoki : ModBuff
             player.DelBuff(buffIndex);
             buffIndex--;
         }
-
     }
 }

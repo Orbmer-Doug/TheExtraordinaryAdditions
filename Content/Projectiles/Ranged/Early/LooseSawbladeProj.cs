@@ -1,15 +1,10 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System.IO;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
-using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Early;
@@ -33,27 +28,16 @@ public class LooseSawbladeProj : ModProjectile, ILocalizedModType, IModType
     }
 
     public ref float Time => ref Projectile.ai[0];
-    public bool Supercharged
-    {
-        get => Projectile.ai[1] == 1f;
-        set => Projectile.ai[1] = value.ToInt();
-    }
-    public ref float EnemyID => ref Projectile.Additions().ExtraAI[0];
+    public ref float EnemyID => ref Projectile.ai[1];
     public bool HitTile
     {
-        get => Projectile.Additions().ExtraAI[1] == 1f;
-        set => Projectile.Additions().ExtraAI[1] = value.ToInt();
+        get => Projectile.ai[2] == 1f;
+        set => Projectile.ai[2] = value.ToInt();
     }
 
     private Vector2 offset;
-    public override void SendExtraAI(BinaryWriter writer)
-    {
-        writer.WriteVector2(offset);
-    }
-    public override void ReceiveExtraAI(BinaryReader reader)
-    {
-        offset = reader.ReadVector2();
-    }
+    public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(offset);
+    public override void ReceiveExtraAI(BinaryReader reader) => offset = reader.ReadVector2();
 
     public override void AI()
     {
@@ -101,20 +85,6 @@ public class LooseSawbladeProj : ModProjectile, ILocalizedModType, IModType
     {
         Texture2D tex = Projectile.ThisProjectileTexture();
         Vector2 orig = tex.Size() / 2;
-        if (Supercharged == true)
-        {
-            Color backglow = Color.DarkRed;
-            Vector2 spinPoint = -Vector2.UnitY * (9f * (Sin01(Main.GlobalTimeWrappedHourly) * .5f + .5f));
-            float rotation = Main.GlobalTimeWrappedHourly * 2f;
-
-            for (int i = 0; i < 8; i++)
-            {
-                Vector2 spinStart = Projectile.Center - Main.screenPosition + Utils.RotatedBy(spinPoint, (double)(rotation - (float)Math.PI * i / 4f), default);
-                Color glowAlpha = Projectile.GetAlpha(backglow);
-                glowAlpha.A = 125;
-                Main.spriteBatch.Draw(tex, spinStart, null, glowAlpha * .85f, 0f, orig, Projectile.scale, 0, 0f);
-            }
-        }
         after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [lightColor], Projectile.Opacity);
         return false;
     }

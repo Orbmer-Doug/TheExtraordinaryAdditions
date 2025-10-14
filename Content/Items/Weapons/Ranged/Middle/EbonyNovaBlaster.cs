@@ -3,13 +3,14 @@ using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 
 public class EbonyNovaBlaster : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.EbonyNovaBlaster);
+
     public override void SetStaticDefaults()
     {
         CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1;
@@ -19,20 +20,14 @@ public class EbonyNovaBlaster : ModItem
     {
         Item.width = 66;
         Item.height = 22;
-        Item.scale = 1f;
         Item.rare = ItemRarityID.Yellow;
         Item.value = AdditionsGlobalItem.RarityYellowBuyPrice;
-
-        Item.useTime = 5;
-        Item.useAnimation = 5;
+        Item.useTime = Item.useAnimation = 5;
         Item.useStyle = ItemUseStyleID.Shoot;
         Item.autoReuse = true;
-
         Item.UseSound = null;
-
-        // Weapon Properties
         Item.DamageType = DamageClass.Ranged;
-        Item.damage = 300;
+        Item.damage = 670;
         Item.knockBack = 8f;
         Item.noMelee = true;
         Item.shoot = ModContent.ProjectileType<EbonyNovaBlasterHeld>();

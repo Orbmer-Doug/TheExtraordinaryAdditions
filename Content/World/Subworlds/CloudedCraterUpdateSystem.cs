@@ -11,6 +11,8 @@ using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 using TheExtraordinaryAdditions.Content.Projectiles.Misc;
 using TheExtraordinaryAdditions.Content.Tiles;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
+using TheExtraordinaryAdditions.Core.Globals.ProjectileGlobal;
 using TheExtraordinaryAdditions.Core.Netcode;
 using TheExtraordinaryAdditions.Core.Systems;
 using static TheExtraordinaryAdditions.Content.World.Subworlds.CloudedCrater;
@@ -29,7 +31,7 @@ public class CloudedCraterUpdateSystem : ModSystem
     {
         AdditionsGlobalItem.CanUseItemEvent += DisableCelestialSigil;
         AdditionsGlobalItem.CanUseItemEvent += DisableProblematicItems;
-        //AdditionsGlobalProjectile.PreAIEvent += KillProblematicProjectiles;
+        AdditionsGlobalProjectile.PreAIEvent += KillProblematicProjectiles;
         AdditionsGlobalTile.NearbyEffectsEvent += ObliterateTom;
         AdditionsGlobalTile.IsTileUnbreakableEvent += DisallowTileBreakage;
         AdditionsGlobalWall.IsWallUnbreakableEvent += DisallowWallBreakage;
@@ -156,9 +158,10 @@ public class CloudedCraterUpdateSystem : ModSystem
             {
                 if (Main.netMode != NetmodeID.Server)
                     LoadWorldDataFromTag("Client", ClientWorldDataTag);
-
-                PlayerEnterEffects();
             }
+
+            // Allow the fade in when entering either world
+            PlayerEnterEffects();
 
             WasInSubworldLastUpdateFrame = inCrater;
         }
@@ -170,8 +173,31 @@ public class CloudedCraterUpdateSystem : ModSystem
         SubworldSpecificUpdateBehaviors();
     }
 
+    public override void PreUpdateTime()
+    {
+        if (!WasInSubworldLastUpdateFrame)
+            return;
+
+        // Does time not normally update in subworlds????
+        Main.UpdateTimeRate();
+        Main.time += Main.dayRate;
+        bool stopEvents = Main.ShouldNormalEventsBeAbleToStart();
+        if (!Main.dayTime)
+        {
+            if (Main.time > 32400.0)
+                Main.UpdateTime_StartDay(ref stopEvents);
+        }
+        else
+        {
+            if (Main.time > 54000.0)
+                Main.UpdateTime_StartNight(ref stopEvents);
+        }
+    }
+
     private static void SubworldSpecificUpdateBehaviors()
     {
+        SubworldSystem.noReturn = true;
+
         int asterlin = ModContent.NPCType<Asterlin>();
         PlayerCount(out int total, out int alive);
         if (!NPC.AnyNPCs(asterlin) && total == alive)

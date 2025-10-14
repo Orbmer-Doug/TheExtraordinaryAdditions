@@ -1,15 +1,10 @@
-﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using Terraria;
+﻿using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
-using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
@@ -46,50 +41,19 @@ public class ShotgunBullet : ModProjectile
     private static readonly float DropOff = SecondsToFrames(1.25f);
     public override void AI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunction, ColorFunction, null, 10);
         points.Update(Projectile.RotHitbox().Right);
 
         if (Time < DropOff)
-        {
             Lighting.AddLight(Projectile.Center, Color.OrangeRed.ToVector3() * .5f * Interpolant);
-        }
         if (Time.BetweenNum(DropOff - 30f, DropOff))
-        {
             Dust.NewDustPerfect(Projectile.RotHitbox().RandomPoint(), DustID.Smoke, Projectile.velocity * Main.rand.NextFloat(.3f, .6f) - Vector2.UnitY * 4f);
-        }
         if (Time > DropOff)
-        {
             Projectile.velocity.Y = MathHelper.Clamp(Projectile.velocity.Y + .2f, -20f, 18f);
-        }
 
         Projectile.FacingRight();
         Time++;
-    }
-    
-    public TrailPoints points = new(4);
-    public OptimizedPrimitiveTrail trail;
-    public override bool PreDraw(ref Color lightColor)
-    {
-        void draw()
-        {
-            if (trail != null && !trail._disposed && Interpolant > 0f)
-            {
-                ManagedShader shader = ShaderRegistry.FlameTrail;
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.CrackedNoise), 1);
-                trail.DrawTrail(shader, points.Points);
-            }
-        }
-        PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
-
-        void bullet()
-        {
-            Projectile.DrawBaseProjectile(Lighting.GetColor(Projectile.Center.ToTileCoordinates()));
-            Projectile.DrawProjectileBackglow(Color.Chocolate * Interpolant, 3f * Interpolant, 0, 10);
-        }
-        PixelationSystem.QueueTextureRenderAction(bullet, PixelationLayer.UnderProjectiles);
-
-        return false;
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
@@ -114,12 +78,35 @@ public class ShotgunBullet : ModProjectile
             }
         }
     }
+
     public override bool OnTileCollide(Vector2 oldVelocity)
     {
         Collision.HitTiles(Projectile.position + Projectile.velocity, Projectile.velocity, Projectile.width, Projectile.height);
         SoundEngine.PlaySound(SoundID.Dig, Projectile.position);
-
         return true;
     }
 
+    public TrailPoints points = new(4);
+    public OptimizedPrimitiveTrail trail;
+    public override bool PreDraw(ref Color lightColor)
+    {
+        void draw()
+        {
+            if (trail != null && !trail.Disposed && Interpolant > 0f)
+            {
+                ManagedShader shader = ShaderRegistry.FlameTrail;
+                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.CrackedNoise), 1);
+                trail.DrawTrail(shader, points.Points);
+            }
+        }
+        PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
+
+        void bullet()
+        {
+            Projectile.DrawBaseProjectile(Lighting.GetColor(Projectile.Center.ToTileCoordinates()));
+            Projectile.DrawProjectileBackglow(Color.Chocolate * Interpolant, 3f * Interpolant, 0, 10);
+        }
+        PixelationSystem.QueueTextureRenderAction(bullet, PixelationLayer.UnderProjectiles);
+        return false;
+    }
 }

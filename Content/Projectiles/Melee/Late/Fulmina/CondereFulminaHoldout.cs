@@ -49,8 +49,8 @@ public class CondereFulminaHoldout : ModProjectile
         set => Projectile.ai[2] = (int)value;
     }
 
-    public ref float OldArmRot => ref Projectile.Additions().ExtraAI[0];
-    public ref float TotalTime => ref Projectile.Additions().ExtraAI[1];
+    public ref float OldArmRot => ref Projectile.AdditionsInfo().ExtraAI[0];
+    public ref float TotalTime => ref Projectile.AdditionsInfo().ExtraAI[1];
 
     public Vector2 Tip => Projectile.RotHitbox().TopRight;
     public Vector2 Center => Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
@@ -251,7 +251,7 @@ public class CondereFulminaHoldout : ModProjectile
         Texture2D tex = Projectile.ThisProjectileTexture();
         Vector2 orig = tex.Size() / 2;
 
-        if (State == FulminaState.Firing && after.afterimages != null)
+        if (State == FulminaState.Firing)
             after?.DrawFancyAfterimages(tex, [Color.Cyan]);
 
         Main.spriteBatch.DrawBetter(tex, Projectile.Center, null, Color.White, Projectile.rotation, orig, Projectile.scale);

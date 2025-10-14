@@ -1,5 +1,4 @@
 ﻿using Terraria;
-using Terraria.Audio;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Assets.Audio;
 using TheExtraordinaryAdditions.Core.Globals;
@@ -35,6 +34,30 @@ public class SuperheatedPlasmaArrayHoldout : ModProjectile, ILocalizedModType, I
             return;
         }
 
+        Projectile.timeLeft = 2;
+        Owner.heldProj = Projectile.whoAmI;
+        Owner.itemTime = 2;
+        Owner.itemAnimation = 2;
+        Owner.itemRotation = 0f;
+
+        if (this.RunLocal())
+        {
+            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, (Owner.Additions().mouseWorld - Owner.MountedCenter).SafeNormalize(Vector2.Zero) * Projectile.Size.Length() * .3f, 0.3f);
+            if (Projectile.velocity != Projectile.oldVelocity)
+                Projectile.netUpdate = true;
+        }
+
+        Projectile.spriteDirection = (Projectile.velocity.X > 0f).ToDirectionInt();
+        Projectile.rotation = Projectile.velocity.ToRotation();
+        if (Projectile.spriteDirection == -1)
+            Projectile.rotation += MathHelper.Pi;
+        Owner.ChangeDir(Projectile.spriteDirection);
+
+        float frontArmRotation = Projectile.rotation + Owner.direction * -0.4f;
+        Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, frontArmRotation);
+
+        Projectile.Center = Owner.RotatedRelativePoint(Owner.MountedCenter) + Projectile.rotation.ToRotationVector2();
+
         Vector2 tipOfGun = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.UnitY) * Owner.HeldItem.width * .5f;
         if (Time < ChargeUpTime)
         {
@@ -59,7 +82,6 @@ public class SuperheatedPlasmaArrayHoldout : ModProjectile, ILocalizedModType, I
             Lighting.AddLight(tipOfGun, Color.OrangeRed.ToVector3() * 2f);
         }
 
-        AdjustPlayerHoldValues();
         Time++;
     }
 
@@ -70,36 +92,6 @@ public class SuperheatedPlasmaArrayHoldout : ModProjectile, ILocalizedModType, I
             AdditionsSound.FireBeamEnd.Play(Projectile.Center, 1.1f, 0f, .1f);
     }
 
-    public void AdjustPlayerHoldValues()
-    {
-        Projectile.timeLeft = 2;
-        Owner.heldProj = Projectile.whoAmI;
-        Owner.itemTime = 2;
-        Owner.itemAnimation = 2;
-        Owner.itemRotation = 0f;
-
-        if (this.RunLocal())
-        {
-            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, (Owner.Additions().mouseWorld - Owner.MountedCenter).SafeNormalize(Vector2.Zero) * Projectile.Size.Length() * .3f, 0.3f);
-
-            if (Projectile.velocity != Projectile.oldVelocity)
-                Projectile.netUpdate = true;
-        }
-
-        Projectile.spriteDirection = (Projectile.velocity.X > 0f).ToDirectionInt();
-        Projectile.rotation = Projectile.velocity.ToRotation();
-        if (Projectile.spriteDirection == -1)
-            Projectile.rotation += MathHelper.Pi;
-        Owner.ChangeDir(Projectile.spriteDirection);
-
-        float frontArmRotation = Projectile.rotation + Owner.direction * -0.4f;
-        Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, frontArmRotation);
-
-        Projectile.Center = Owner.RotatedRelativePoint(Owner.MountedCenter) + Projectile.rotation.ToRotationVector2();
-    }
-
-    public override bool? CanDamage()
-    {
-        return false;
-    }
+    public override bool? CanDamage() => false;
+    public override bool? CanCutTiles() => false;
 }

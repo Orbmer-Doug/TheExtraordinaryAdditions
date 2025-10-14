@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -13,10 +12,6 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Multi.Early;
 public class ChainStrikeJavelin : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ChainStrikeJavelin);
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(new Color(231, 191, 255));
-    }
 
     public override void SetStaticDefaults()
     {
@@ -43,6 +38,11 @@ public class ChainStrikeJavelin : ModItem
         Item.shootSpeed = 6.2f;
         Item.DamageType = DamageClass.Melee;
         Item.mana = 3;
+    }
+
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(new Color(231, 191, 255));
     }
 
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)

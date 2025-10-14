@@ -22,7 +22,7 @@ public class InfluxWaverSwing : BaseSwordSwing
         after ??= new(8, () => Projectile.Center);
 
         // Reset arrays
-        after.afterimages = null;
+        after.Clear();
     }
 
     public override void SafeAI()

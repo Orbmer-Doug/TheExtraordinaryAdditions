@@ -11,7 +11,7 @@ using TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
@@ -19,6 +19,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
 public class Sunspot : ModItem, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Sunspot);
+
     public const int Damage = 1480;
     public override void SetDefaults()
     {
@@ -40,6 +41,12 @@ public class Sunspot : ModItem, ILocalizedModType, IModType
         Item.noMelee = true;
     }
 
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.FirstOrDefault(n => n.Name == "Damage").Text = tooltips.FirstOrDefault(n => n.Name == "Damage").Text.Replace("damage", GetTextValue("Items.SolarBrand.Damage"));
+        tooltips.ColorLocalization(new(255, 72, 31));
+    }
+
     public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
     {
         DrawInventoryCustomScale(spriteBatch, TextureAssets.Item[Type].Value, position, frame, drawColor, itemColor, origin, scale, .2f, new Vector2(0f, 0f));
@@ -49,20 +56,6 @@ public class Sunspot : ModItem, ILocalizedModType, IModType
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
         return false;
-    }
-
-    public override void HoldItem(Player player)
-    {
-        if (player.ownedProjectileCounts[Item.shoot] == 0)
-            Projectile.NewProjectile(player.GetSource_ItemUse(Item), player.Center, Vector2.Zero, Item.shoot, Item.damage, Item.knockBack, player.whoAmI);
-
-        base.HoldItem(player);
-    }
-
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.FirstOrDefault(n => n.Name == "Damage").Text = tooltips.FirstOrDefault(n => n.Name == "Damage").Text.Replace("damage", "damage swung");
-        tooltips.ColorLocalization(new(255, 72, 31));
     }
 
     public override void AddRecipes()

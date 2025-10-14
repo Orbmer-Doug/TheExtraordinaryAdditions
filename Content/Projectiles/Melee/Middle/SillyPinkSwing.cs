@@ -24,8 +24,8 @@ public class SillyPinkSwing : BaseSwordSwing
 
     public SillyState State
     {
-        get => (SillyState)Projectile.Additions().ExtraAI[7];
-        set => Projectile.Additions().ExtraAI[7] = (int)value;
+        get => (SillyState)Projectile.AdditionsInfo().ExtraAI[7];
+        set => Projectile.AdditionsInfo().ExtraAI[7] = (int)value;
     }
 
     public int ReelTime => (int)(80f / MeleeSpeed);
@@ -56,7 +56,7 @@ public class SillyPinkSwing : BaseSwordSwing
     public override void SafeInitialize()
     {
         after ??= new(8, () => Projectile.Center);
-        after.afterimages = null;
+        after.Clear();
         State = SillyState.Reel;
     }
 
@@ -138,7 +138,7 @@ public class SillyPinkSwing : BaseSwordSwing
         if (this.RunLocal())
         {
             for (int i = 0; i < 2; i++)
-                Projectile.NewProj(pos, -SwordDir.RotatedByRandom(.4f) * Main.rand.NextFloat(5f, 12f), ProjectileID.PartyGirlGrenade, Projectile.damage / 4, 0f, Owner.whoAmI);
+                Projectile.NewProj(pos, -SwordDir.RotatedByRandom(.4f) * Main.rand.NextFloat(5f, 12f), ProjectileID.PartyGirlGrenade, Projectile.damage, 0f, Owner.whoAmI);
         }
         for (int i = 0; i < 40; i++)
         {

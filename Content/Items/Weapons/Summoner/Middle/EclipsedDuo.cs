@@ -1,13 +1,10 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
 using TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Middle;
@@ -32,6 +29,11 @@ public class EclipsedDuo : ModItem
         Item.noMelee = Item.noUseGraphic = true;
     }
 
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(new Color(255, 213, 176));
+    }
+
     public override bool CanShoot(Player player)
     {
         return player.ownedProjectileCounts[Item.shoot] <= 0;
@@ -46,11 +48,6 @@ public class EclipsedDuo : ModItem
         NetMessage.SendData(MessageID.PlayerControls, -1, -1, null, player.whoAmI);
 
         return false;
-    }
-
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(new Color(255, 213, 176));
     }
 
     public override bool MeleePrefix()

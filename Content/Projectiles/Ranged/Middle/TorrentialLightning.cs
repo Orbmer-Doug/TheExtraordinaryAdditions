@@ -31,12 +31,7 @@ public class TorrentialLightning : ModProjectile
 
     private List<List<Line>> Branches;
     public override bool ShouldUpdatePosition() => false;
-    public override void SendExtraAI(BinaryWriter writer)
-    {
-    }
-    public override void ReceiveExtraAI(BinaryReader reader)
-    {
-    }
+
     public override void AI()
     {
         if (Time == 0f)

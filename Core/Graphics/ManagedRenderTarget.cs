@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Diagnostics;
 using Terraria;
@@ -13,7 +12,7 @@ public class ManagedRenderTarget : IDisposable
     private RenderTarget2D target;
 
     /// <summary>
-    ///     Whether this render target if waiting for its first initialization or not.
+    ///     Whether this render target if waiting for its first initialization or not
     /// </summary>
     internal bool WaitingForFirstInitialization
     {
@@ -22,7 +21,7 @@ public class ManagedRenderTarget : IDisposable
     } = true;
 
     /// <summary>
-    ///     The initialization action that dictates how this render target should be (re)initialized.
+    ///     The initialization action that dictates how this render target should be (re)initialized
     /// </summary>
     internal RenderTargetInitializationAction InitializationAction
     {
@@ -36,10 +35,10 @@ public class ManagedRenderTarget : IDisposable
     public bool IsUninitialized => target is null || target.IsDisposed;
 
     /// <summary>
-    ///     How long it's been, in frames, since this render target was last used in some way.
+    ///     How long it's been, in frames, since this render target was last used in some way
     /// </summary>
     /// <remarks>
-    ///     This is based on calls to the <see cref="Target"/> property getter.
+    ///     This is based on calls to the <see cref="Target"/> property getter
     /// </remarks>
     public int TimeSinceLastUsage
     {
@@ -48,7 +47,7 @@ public class ManagedRenderTarget : IDisposable
     }
 
     /// <summary>
-    ///     Whether this render target is disposed or not.
+    ///     Whether this render target is disposed or not
     /// </summary>
     public bool IsDisposed
     {
@@ -57,7 +56,7 @@ public class ManagedRenderTarget : IDisposable
     }
 
     /// <summary>
-    ///     Whether this render target should be reset when the screen size changes.
+    ///     Whether this render target should be reset when the screen size changes
     /// </summary>
     public bool ShouldResetUponScreenResize
     {
@@ -66,7 +65,7 @@ public class ManagedRenderTarget : IDisposable
     }
 
     /// <summary>
-    ///     Whether this render target should be subject to automatic garbage collection when not in use.
+    ///     Whether this render target should be subject to automatic garbage collection when not in use
     /// </summary>
     public bool SubjectToGarbageCollection
     {
@@ -75,7 +74,7 @@ public class ManagedRenderTarget : IDisposable
     }
 
     /// <summary>
-    ///     The raw <see cref="RenderTarget2D"/> this wrapper holds.
+    ///     The raw <see cref="RenderTarget2D"/> this wrapper holds
     /// </summary>
     public RenderTarget2D Target
     {
@@ -94,12 +93,12 @@ public class ManagedRenderTarget : IDisposable
     }
 
     /// <summary>
-    ///     The width of the render target.
+    ///     The width of the render target
     /// </summary>
     public int Width => Target.Width;
 
     /// <summary>
-    ///     The height of the render target.
+    ///     The height of the render target
     /// </summary>
     public int Height => Target.Height;
 
@@ -113,16 +112,15 @@ public class ManagedRenderTarget : IDisposable
         RenderTargetManager.ManagedTargets.Add(this);
     }
 
-    // For some reason, adding more arguments to the render target constructor causes really low end pcs to crash. The exact reason has not yet been ascertained. Until it is found, do not use them.
     /// <summary>
-    ///     Represents a standard render target regeneration method. Used commonly in conjunction with <see cref="RenderTargetInitializationAction"/> and the ManagedRenderTarget constructor.
+    ///     Represents a standard render target regeneration method. Used commonly in conjunction with <see cref="RenderTargetInitializationAction"/> and the ManagedRenderTarget constructor
     /// </summary>
     /// <param name="screenWidth">The screen width.</param>
     /// <param name="screenHeight">The screen height.</param>
     public static RenderTarget2D CreateScreenSizedTarget(int screenWidth, int screenHeight) => new(Main.instance.GraphicsDevice, screenWidth, screenHeight);
 
     /// <summary>
-    ///     Immediately disposes of this render target, freeing unmanaged GPU resources in the process.
+    ///     Immediately disposes of this render target, freeing unmanaged GPU resources in the process
     /// </summary>
     public void Dispose()
     {
@@ -136,7 +134,7 @@ public class ManagedRenderTarget : IDisposable
     }
 
     /// <summary>
-    ///     Recreates this render target, freeing old unmanaged GPU resources in the process before creating new ones.
+    ///     Recreates this render target, freeing old unmanaged GPU resources in the process before creating new ones
     /// </summary>
     /// <param name="screenWidth">The width that should be used as a basis for recreating the render target.</param>
     /// <param name="screenHeight">The height that should be used as a basis for recreating the render target.</param>
@@ -149,7 +147,7 @@ public class ManagedRenderTarget : IDisposable
         target = InitializationAction(screenWidth, screenHeight);
     }
 
-    // These extension methods don't apply to ManagedRenderTarget instances, even with the implicit conversion operator. As such, they are implemented manually.
+    // These extension methods don't apply to ManagedRenderTarget instances, even with the implicit conversion operator. As such, they are implemented manually
     public Vector2 Size() => Target.Size();
 
     public void SwapToRenderTarget(Color? flushColor = null) => Target.SwapToRenderTarget(flushColor);
@@ -168,7 +166,7 @@ public class ManagedRenderTarget : IDisposable
         Main.instance.GraphicsDevice.SetRenderTarget(null);
     }
 
-    // This allows for easy shorthand conversions from ManagedRenderTarget to RenderTarget2D without having to manually type out ManagedTarget.Target all the time.
-    // This is functionally equivalent to accessing the getter manually and will activate all of the relevant checks within said getter.
+    // This allows for easy shorthand conversions from ManagedRenderTarget to RenderTarget2D without having to manually type out ManagedTarget.Target all the time
+    // This is functionally equivalent to accessing the getter manually and will activate all of the relevant checks within said getter
     public static implicit operator RenderTarget2D(ManagedRenderTarget targetWrapper) => targetWrapper.Target;
 }

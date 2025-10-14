@@ -1,36 +1,44 @@
-﻿using Mono.Cecil.Cil;
+﻿using Microsoft.CodeAnalysis.Differencing;
+using Mono.Cecil.Cil;
 using MonoMod.Cil;
+using MonoMod.RuntimeDetour;
 using System.Reflection;
+using Terraria;
 using Terraria.Audio;
+using Terraria.ModLoader;
 
 namespace TheExtraordinaryAdditions.Core.ILEditing;
 
 public class AdditionsHooks
 {
     // why clamp
-    // you can make ear blasters by simply setting max instances to 0
-    public class AllowLouderSoundsEdit : ILEditProvider
+    public class AllowLouderSounds : ModSystem
     {
-        public override void Subscribe(ManagedILEdit edit)
+        private ILHook _volumeSetterHook;
+
+        public override void Load()
         {
-            // Get the set_Volume method
-            MethodBase methodToModify = typeof(SoundStyle).GetMethod("set_Volume", BindingFlags.Public | BindingFlags.Instance);
-            if (methodToModify == null)
+            MethodBase setVolumeMethod = typeof(SoundStyle).GetMethod("set_Volume", BindingFlags.Public | BindingFlags.Instance);
+
+            if (setVolumeMethod is null)
             {
-                edit.LogFailure("Could not find SoundStyle.set_Volume method");
+                AdditionsMain.Instance.Logger.Error("Could not find SoundStyle.set_Volume method!");
                 return;
             }
 
-            // Apply the IL edit using HookHelper
-            HookHelper.ModifyMethodWithIL(methodToModify, (il) => PerformEdit(il, edit));
+            _volumeSetterHook = new ILHook(
+                setVolumeMethod,
+                Edit
+            );
         }
 
-        public override void Unsubscribe(ManagedILEdit edit)
+        public override void Unload()
         {
-            // The ILHook is automatically undone by HookHelper.UnloadHooks
+            _volumeSetterHook?.Dispose();
+            _volumeSetterHook = null;
         }
 
-        public override void PerformEdit(ILContext il, ManagedILEdit edit)
+        private static void Edit(ILContext il)
         {
             ILCursor cursor = new(il);
 
@@ -38,7 +46,7 @@ public class AdditionsHooks
             if (!cursor.TryGotoNext(MoveType.Before,
                 i => i.OpCode == OpCodes.Ldc_R4 && i.Operand is float f && f == 1f))
             {
-                edit.LogFailure("Could not find ldc.r4 1 instruction in SoundStyle.set_Volume");
+                AdditionsMain.Instance.Logger.Error("Could not find ldc.r4 1 instruction in SoundStyle.set_Volume");
                 return;
             }
 

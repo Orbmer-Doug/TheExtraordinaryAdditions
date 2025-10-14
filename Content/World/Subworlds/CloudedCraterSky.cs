@@ -1,19 +1,14 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using SubworldLibrary;
 using System;
-using System.Reflection;
 using Terraria;
 using Terraria.GameContent;
-using Terraria.GameContent.Events;
-using Terraria.Graphics.Capture;
 using Terraria.Graphics.Effects;
 using Terraria.Graphics.Shaders;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using static Microsoft.Xna.Framework.MathHelper;
 using static Terraria.Main;
-using Terraria.ID;
-using Terraria.Enums;
 
 namespace TheExtraordinaryAdditions.Content.World.Subworlds;
 
@@ -28,14 +23,6 @@ public class CloudyCraterSky : CustomSky
         get
         {
             return SubworldSystem.IsActive<CloudedCrater>();
-        }
-    }
-
-    public static float CurrentIntensity
-    {
-        get
-        {
-            return 1f;
         }
     }
 

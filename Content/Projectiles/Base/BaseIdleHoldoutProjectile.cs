@@ -1,11 +1,12 @@
-﻿using Microsoft.Xna.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.ModLoader.Core;
 using TheExtraordinaryAdditions.Core;
 using TheExtraordinaryAdditions.Core.Config;
-using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Base;
@@ -16,39 +17,29 @@ public abstract class BaseIdleHoldoutProjectile : BaseHoldoutProjectile
     private static Dictionary<int, int> itemProjectileRelationship = [];
     public abstract int AssociatedItemID { get; }
     public abstract int IntendedProjectileType { get; }
-    public static Dictionary<int, int> ItemProjectileRelationship { get => itemProjectileRelationship; set => itemProjectileRelationship = value; }
-    public static void LoadAll()
+    public static Dictionary<int, int> ItemProjectileRelationship
     {
-        ItemProjectileRelationship = [];
-        Type[] types = typeof(AdditionsMain).Assembly.GetTypes();
-        foreach (Type type in types)
-        {
-            if (!type.IsAbstract && type.IsSubclassOf(typeof(BaseIdleHoldoutProjectile)))
-            {
-                if ((Activator.CreateInstance(type) as Item)?.ModItem == null && !AdditionsConfigServer.Instance.UseCustomAI)
-                    continue;
-
-                BaseIdleHoldoutProjectile instance = Activator.CreateInstance(type) as BaseIdleHoldoutProjectile;
-                ItemProjectileRelationship[instance.AssociatedItemID] = instance.IntendedProjectileType;
-            }
-        }
+        get => itemProjectileRelationship;
+        set => itemProjectileRelationship = value ?? new();
     }
 
-    public static void CheckForEveryHoldout(Player player)
+    // Unsure if reflection is best practice but considering 50+ derived subclasses... convenience?
+    public static void LoadAll()
     {
-        foreach (int itemID in ItemProjectileRelationship.Keys)
+        ItemProjectileRelationship = new Dictionary<int, int>();
+        Type[] types = AssemblyManager.GetLoadableTypes(AdditionsMain.Instance.Code);
+        foreach (Type type in types)
         {
-            Item heldItem = player.HeldItem;
-            if (heldItem.type != itemID)
+            if (type.IsAbstract)
                 continue;
 
-            int holdoutType = ItemProjectileRelationship[itemID];
-            if (Main.myPlayer == player.whoAmI && player.CountOwnerProjectiles(holdoutType) < 1)
+            if (type.IsSubclassOf(typeof(BaseIdleHoldoutProjectile)))
             {
-                int damage = player.GetWeaponDamage(heldItem, false);
-                float kb = player.GetWeaponKnockback(heldItem, heldItem.knockBack);
-                Projectile p = Main.projectile[Projectile.NewProjectile(player.GetSource_ItemUse(heldItem, null), player.Center,
-                    Vector2.Zero, holdoutType, damage, kb, player.whoAmI, 0f, 0f, 0f)];
+                BaseIdleHoldoutProjectile instance = Activator.CreateInstance(type) as BaseIdleHoldoutProjectile;
+                if (instance.AssociatedItemID < ItemID.Count && !AdditionsConfigServer.Instance.UseCustomAI)
+                    continue;
+
+                ItemProjectileRelationship[instance.AssociatedItemID] = instance.IntendedProjectileType;
             }
         }
     }
@@ -70,11 +61,34 @@ public class GlobalIdleHoldoutItem : GlobalItem
             entity.UseSound = null;
         }
     }
+
     public override bool CanShoot(Item item, Player player)
     {
         if (BaseIdleHoldoutProjectile.ItemProjectileRelationship.ContainsKey(item.type))
             return false;
 
         return base.CanShoot(item, player);
+    }
+}
+
+public class GlobalIdleHoldoutPlayer : ModPlayer
+{
+    public override void PostUpdateEquips()
+    {
+        foreach (int itemID in BaseIdleHoldoutProjectile.ItemProjectileRelationship.Keys)
+        {
+            Item heldItem = Player.HeldItem;
+            if (heldItem.type != itemID)
+                continue;
+
+            int holdoutType = BaseIdleHoldoutProjectile.ItemProjectileRelationship[itemID];
+            if (Main.myPlayer == Player.whoAmI && Player.CountOwnerProjectiles(holdoutType) <= 0)
+            {
+                int damage = Player.GetWeaponDamage(heldItem, false);
+                float kb = Player.GetWeaponKnockback(heldItem, heldItem.knockBack);
+                Projectile p = Main.projectile[Projectile.NewProjectile(Player.GetSource_ItemUse(heldItem, null), Player.Center,
+                    Vector2.Zero, holdoutType, damage, kb, Player.whoAmI, 0f, 0f, 0f)];
+            }
+        }
     }
 }

@@ -7,11 +7,13 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 using TheExtraordinaryAdditions.Content.Items.Placeable.Banners;
+using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
+using static Terraria.Utilities.NPCUtils;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Arid;
 
@@ -44,7 +46,6 @@ public class GlassPiercer : ModNPC
     {
         bestiaryEntry.Info.AddRange([
                 BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Desert,
-
                 new FlavorTextBestiaryInfoElement(this.GetLocalizedValue("Bestiary"))
             ]);
 
@@ -121,7 +122,8 @@ public class GlassPiercer : ModNPC
     {
         if (NPC.localAI[0] == 0)
         {
-            NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<GlassFocusedSniper>(), NPC.damage, 2f, NPC.whoAmI);
+            if (this.RunServer())
+                NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<GlassFocusedSniper>(), NPC.damage, 2f, NPC.whoAmI);
             Running = false;
             NPC.localAI[0] = 1;
             NPC.netUpdate = true;
@@ -562,7 +564,7 @@ public class GlassPiercer : ModNPC
     }
 }
 
-public class GlassFocusedSniper : ModProjectile
+public class GlassFocusedSniper : ProjOwnedByNPC<GlassPiercer>
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GlassFocusedSniper);
     public override void SetDefaults()
@@ -589,19 +591,11 @@ public class GlassFocusedSniper : ModProjectile
     public override bool? CanDamage() => false;
     public override bool? CanCutTiles() => false;
     public override bool ShouldUpdatePosition() => false;
-    public override void AI()
+    public override void SafeAI()
     {
-        NPC owner = Main.npc?[NPCIndex] ?? null;
-        if (owner == null || !owner.active || owner.type != ModContent.NPCType<GlassPiercer>())
-        {
-            Projectile.Kill();
-            return;
-        }
         Projectile.timeLeft = 3;
-
-        Player target = Main.player?[owner.target] ?? null;
-
-        if (target != null && target.active && !target.dead && !target.ghost && owner.As<GlassPiercer>().Running != true)
+        Player target = Main.player?[Target.whoAmI] ?? null;
+        if (target != null && target.active && !target.DeadOrGhost && ModOwner.Running != true)
         {
             float turnAmt = .09f;
             if (Main.expertMode)
@@ -613,20 +607,20 @@ public class GlassFocusedSniper : ModProjectile
         }
         else
         {
-            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Vector2.UnitX * owner.direction, .1f);
+            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Vector2.UnitX * Owner.direction, .1f);
             Time = 0;
         }
 
         Projectile.rotation = Projectile.velocity.ToRotation();
-        Projectile.Center = owner.RotHitbox().Center + PolarVector(25f, Projectile.rotation) + PolarVector(3f, Projectile.rotation + MathHelper.PiOver2);
-        if (Time % 60 == 59 && Collision.CanHit(Projectile, target))
+        Projectile.Center = Owner.RotHitbox().Center + PolarVector(25f, Projectile.rotation) + PolarVector(3f, Projectile.rotation + MathHelper.PiOver2);
+        if (target != null && Time % 60 == 59 && Collision.CanHit(Projectile, target))
         {
             Vector2 tip = Projectile.RotHitbox().Right;
 
             if (this.RunServer())
             {
-                Projectile.NewProj(tip, Projectile.velocity * 10f, ModContent.ProjectileType<GlassFocusedShot>(), ShotDamage, 2f, Main.myPlayer);
-                Projectile.NewProj(Projectile.Center, -Projectile.velocity.RotatedBy(.4f * Projectile.direction) * Main.rand.NextFloat(2f, 5f), ModContent.ProjectileType<GlassShell>(), 0, 0f, Main.myPlayer);
+                SpawnProjectile(tip, Projectile.velocity * 10f, ModContent.ProjectileType<GlassFocusedShot>(), ShotDamage, 2f);
+                SpawnProjectile(Projectile.Center, -Projectile.velocity.RotatedBy(.4f * Projectile.direction) * Main.rand.NextFloat(2f, 5f), ModContent.ProjectileType<GlassShell>(), 0, 0);
             }
             for (int i = 0; i < 12; i++)
             {
@@ -647,9 +641,10 @@ public class GlassFocusedSniper : ModProjectile
     }
 }
 
-public class GlassShell : ModProjectile
+public class GlassShell : ProjOwnedByNPC<GlassPiercer>
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.EmptyRound);
+    public override bool IgnoreOwnerActivity => true;
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 10;
@@ -667,7 +662,7 @@ public class GlassShell : ModProjectile
         set => Projectile.ai[2] = value.ToInt();
     }
 
-    public override void AI()
+    public override void SafeAI()
     {
         if (!TouchedGrass)
         {
@@ -689,9 +684,10 @@ public class GlassShell : ModProjectile
     }
 }
 
-public class GlassFocusedShot : ModProjectile
+public class GlassFocusedShot : ProjOwnedByNPC<GlassPiercer>
 {
     public override string Texture => AssetRegistry.Invis;
+    public override bool IgnoreOwnerActivity => true;
 
     public override void SetDefaults()
     {
@@ -703,9 +699,9 @@ public class GlassFocusedShot : ModProjectile
         Projectile.MaxUpdates = 7;
     }
 
-    public override void AI()
+    public override void SafeAI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunction, ColorFunction, null, 20);
 
         points.Update(Projectile.Center);
@@ -727,7 +723,7 @@ public class GlassFocusedShot : ModProjectile
     {
         void draw()
         {
-            if (trail == null || trail._disposed || points == null)
+            if (trail == null || trail.Disposed || points == null)
                 return;
 
             ManagedShader shader = ShaderRegistry.FlameTrail;

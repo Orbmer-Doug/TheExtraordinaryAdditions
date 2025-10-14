@@ -1,10 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Materials.Early;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Early;
@@ -35,6 +34,7 @@ public class VoltChestplate : ModItem, ILocalizedModType, IModType
         player.GetCritChance<MeleeDamageClass>() += 6f;
         player.GetCritChance<MagicDamageClass>() += 6f;
     }
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
@@ -42,5 +42,4 @@ public class VoltChestplate : ModItem, ILocalizedModType, IModType
         recipe.AddTile(TileID.Anvils);
         recipe.Register();
     }
-
 }

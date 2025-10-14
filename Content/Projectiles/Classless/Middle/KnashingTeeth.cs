@@ -1,7 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
+﻿using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Common.Particles.Shader;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -16,8 +14,8 @@ public class KnashingTeeth : ModProjectile
     {
         Projectile.width = Projectile.height = 2;
         Projectile.DamageType = DamageClass.Generic;
-        Projectile.ignoreWater =Projectile.friendly = true;
-        Projectile.tileCollide = Projectile.hostile =false;
+        Projectile.ignoreWater = Projectile.friendly = true;
+        Projectile.tileCollide = Projectile.hostile = false;
         Projectile.timeLeft = Lifetime;
         Projectile.penetrate = 1;
         Projectile.MaxUpdates = 3;

@@ -1,9 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
+﻿using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
@@ -24,10 +22,12 @@ public class CharringBlast : ModProjectile, ILocalizedModType, IModType
     }
 
     public ref float Time => ref Projectile.ai[0];
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         target.AddBuff(BuffID.OnFire3, 100);
     }
+
     public override void AI()
     {
         float interpol = Projectile.scale = Projectile.Opacity = GetLerpBump(0f, 5f, 300f, 290f, Time);
@@ -43,26 +43,20 @@ public class CharringBlast : ModProjectile, ILocalizedModType, IModType
             int life = Main.rand.Next(20, 30);
             ParticleRegistry.SpawnHeavySmokeParticle(pos, vel, life, size, col, Main.rand.NextFloat(.5f, 1f), true);
 
-            if (Main.rand.NextBool(8))
-            {
-                ParticleRegistry.SpawnSmokeParticle(pos, vel, size * .5f, col, Color.DarkGray, Main.rand.NextByte(100, 200));
-            }
             if (Main.rand.NextBool(12))
-            {
                 Dust.NewDustPerfect(pos, DustID.Smoke, vel * .5f + Vector2.UnitY * -Main.rand.NextFloat(1f, 2f));
-            }
         }
 
         Time++;
     }
+
     public override void OnKill(int timeLeft)
     {
-        if (Projectile.owner != Main.myPlayer)
-            return;
-
         SoundEngine.PlaySound(SoundID.Item20 with { Volume = Main.rand.NextFloat(.8f, .9f), Pitch = -.1f, PitchVariance = .05f, MaxInstances = 10 }, Projectile.Center);
         SoundEngine.PlaySound(SoundID.Item14 with { Volume = Main.rand.NextFloat(1.1f, 1.25f), Pitch = .15f, PitchVariance = .1f, MaxInstances = 10 }, Projectile.Center);
-        Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<CharringBlastBlast>(), Projectile.damage, Projectile.knockBack, Projectile.owner, 0f, 0f, 0f);
+        if (this.RunLocal())
+            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<CharringBlastBlast>(), Projectile.damage, Projectile.knockBack, Projectile.owner, 0f, 0f, 0f);
     }
+
     public override bool PreDraw(ref Color lightColor) => false;
 }

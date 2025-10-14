@@ -1,14 +1,10 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Utilities;
-using System;
 using Terraria;
 using Terraria.Audio;
-using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
-using TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
-using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
@@ -52,7 +48,7 @@ public class SunsplitHoldout : BaseIdleHoldoutProjectile
         Lighting.AddLight(Projectile.Center - PolarVector(28f, Projectile.rotation) + PolarVector(16f * Dir * Owner.gravDir, Projectile.rotation + MathHelper.PiOver2), col);
         Lighting.AddLight(Projectile.Center + PolarVector(68f, Projectile.rotation) + PolarVector(9f * Dir * Owner.gravDir, Projectile.rotation + MathHelper.PiOver2), col * .4f);
 
-        if (this.RunLocal()&& Modded.SafeMouseLeft.Current)
+        if (this.RunLocal() && Modded.SafeMouseLeft.Current)
         {
             if (SoundEngine.TryGetActiveSound(Slot, out var t) && t.IsPlaying)
                 t.Position = Projectile.Center;
@@ -94,108 +90,3 @@ public class SunsplitHoldout : BaseIdleHoldoutProjectile
         return false;
     }
 }
-
-/*
-[Autoload(Side = ModSide.Client)]
-public class SunsplitSystem : ModSystem
-{
-    private ManagedRenderTarget _heatMapA;
-    private ManagedRenderTarget _heatMapB;
-    private static readonly Texture2D Noise = AssetRegistry.GetTexture(AdditionsTexture.OrganicNoise);
-    private ManagedShader _heatShader;
-    private ManagedShader _colorShader;
-    private static readonly RenderTargetInitializationAction TargetInitializer = (width, height) => new RenderTarget2D(Main.instance.GraphicsDevice, width, height);
-
-    public override void Load()
-    {
-        if (Main.netMode == NetmodeID.Server)
-            return;
-
-        Main.QueueMainThreadAction(() =>
-        {
-            _heatMapA = new ManagedRenderTarget(true, TargetInitializer, true);
-            _heatMapB = new ManagedRenderTarget(true, TargetInitializer, true);
-
-            // Initialize heat maps to black (0 temperature)
-            GraphicsDevice device = Main.instance.GraphicsDevice;
-            device.SetRenderTarget(_heatMapA);
-            device.Clear(Color.Transparent);
-            device.SetRenderTarget(_heatMapB);
-            device.Clear(Color.Transparent);
-            device.SetRenderTarget(null);
-        });
-
-        RenderTargetManager.RenderTargetUpdateLoopEvent += PrepareFlameEffect;
-        On_Main.DrawProjectiles += Flames;
-    }
-
-    public override void Unload()
-    {
-        Main.QueueMainThreadAction(() =>
-        {
-            _heatMapA?.Dispose();
-            _heatMapB?.Dispose();
-            _heatMapA = null;
-            _heatMapB = null;
-        });
-
-        RenderTargetManager.RenderTargetUpdateLoopEvent -= PrepareFlameEffect;
-        On_Main.DrawProjectiles -= Flames;
-    }
-
-    private void PrepareFlameEffect()
-    {
-        if (!AssetRegistry.HasFinishedLoading || Main.gameMenu || Main.netMode == NetmodeID.Server)
-            return;
-
-        GraphicsDevice device = Main.instance.GraphicsDevice;
-        Point resolution = new(Main.screenWidth, Main.screenHeight);
-        GlobalPlayer moddedPlayer = Main.LocalPlayer.Additions();
-
-        // Load shaders
-        _heatShader = AssetRegistry.GetShader("SunsplitHeatSim");
-        _colorShader = AssetRegistry.GetShader("SunsplitColorMapping");
-
-        // Set shader parameters
-        _heatShader.TrySetParameter("Resolution", resolution.ToVector2());
-        _heatShader.TrySetParameter("MousePos", Utility.GetTransformedScreenCoords(moddedPlayer.mouseWorld) / resolution.ToVector2());
-        _heatShader.TrySetParameter("MouseDown", moddedPlayer.SafeMouseLeft.Current ? 1f : 0f);
-        _heatShader.TrySetParameter("Time", TimeSystem.LogicTime);
-        _heatShader.TrySetParameter("Diff", 0.001f);
-        _heatShader.TrySetParameter("NoiseTexture", Noise);
-        _heatShader.TrySetParameter("AimDirection", Vector2.UnitY);
-
-        // Pass 1: Render heat simulation (HeatMapB -> HeatMapA)
-        device.SetRenderTarget(_heatMapA);
-        device.Clear(Color.Transparent);
-
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, Main.Rasterizer, _heatShader.Effect, Matrix.Identity);
-        _heatShader.TrySetParameter("PreviousHeatMap", _heatMapB.Target);
-        // Draw the previous heat map instead of the noise texture to avoid amplifying noise
-        Main.spriteBatch.Draw(_heatMapB, new Rectangle(0, 0, resolution.X, resolution.Y), Color.White);
-        Main.spriteBatch.End();
-
-        // Swap render targets
-        var temp = _heatMapA;
-        _heatMapA = _heatMapB;
-        _heatMapB = temp;
-    }
-
-    private void Flames(On_Main.orig_DrawProjectiles orig, Main self)
-    {
-        orig(self);
-
-        if (!AssetRegistry.HasFinishedLoading || Main.gameMenu || Main.netMode == NetmodeID.Server)
-            return;
-
-        // Render to screen using color shader
-        GraphicsDevice device = Main.graphics.GraphicsDevice;
-        Point resolution = new(Main.screenWidth, Main.screenHeight);
-
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, Main.Rasterizer, _colorShader.Effect, Main.GameViewMatrix.TransformationMatrix);
-        _colorShader.TrySetParameter("HeatMap", _heatMapB.Target);
-        Main.spriteBatch.Draw(_heatMapB, new Rectangle(0, 0, resolution.X, resolution.Y), Color.White);
-        Main.spriteBatch.End();
-    }
-}
-*/

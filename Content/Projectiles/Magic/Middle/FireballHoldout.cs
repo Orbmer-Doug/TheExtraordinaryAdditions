@@ -1,9 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Assets;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -12,16 +9,19 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
 
 public class FireballHoldout : BaseIdleHoldoutProjectile
 {
+    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Fireball);
     public override int AssociatedItemID => ModContent.ItemType<Fireball>();
     public override int IntendedProjectileType => ModContent.ProjectileType<FireballHoldout>();
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Fireball);
+
     public override void Defaults()
     {
         Projectile.width = 32;
         Projectile.height = 40;
         Projectile.DamageType = DamageClass.Magic;
     }
+
     public ref float Time => ref Projectile.ai[0];
+
     public static readonly Color[] FireColors =
         [
         new(255, 219, 25),
@@ -29,6 +29,7 @@ public class FireballHoldout : BaseIdleHoldoutProjectile
         new(255, 98, 0),
         new(255, 65, 0),
         ];
+
     public override void SafeAI()
     {
         if (this.RunLocal())
@@ -47,7 +48,7 @@ public class FireballHoldout : BaseIdleHoldoutProjectile
         if (Projectile.direction == -1)
             Projectile.rotation += MathHelper.Pi;
 
-        if (this.RunLocal() && Modded.SafeMouseLeft.Current && Time % Item.useTime == Item.useTime - 1 && TryUseMana())
+        if (this.RunLocal() && Modded.SafeMouseLeft.Current && Time % Item.useTime == Item.useTime - 1 && HasMana())
         {
             AdditionsSound.FireballShort.Play(Projectile.Center, .6f, 0f, .1f, 30);
             Vector2 dir = Projectile.Center.SafeDirectionTo(Modded.mouseWorld);

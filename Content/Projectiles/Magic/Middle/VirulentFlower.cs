@@ -1,8 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
-using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -22,9 +20,12 @@ public class VirulentFlower : ModProjectile, ILocalizedModType, IModType
         Projectile.tileCollide = false;
         Projectile.penetrate = -1;
         Projectile.timeLeft = Timeleft;
+        Projectile.Opacity = Projectile.scale = 0;
         Projectile.DamageType = DamageClass.Magic;
     }
+
     public override bool? CanDamage() => false;
+
     public override void AI()
     {
         Projectile.scale = Projectile.Opacity = GetLerpBump(0f, .3f, 1f, .7f, InverseLerp(0f, Timeleft, Projectile.timeLeft));
@@ -36,12 +37,9 @@ public class VirulentFlower : ModProjectile, ILocalizedModType, IModType
         Lighting.AddLight(Projectile.Center, Color.LawnGreen.ToVector3() * Projectile.scale);
 
         // Enable "punching" the flower to go boom
-        for (int i = 0; i < Main.maxProjectiles; i++)
+        foreach (Projectile proj in Main.ActiveProjectiles)
         {
-            Projectile proj = Main.projectile[i];
-
-            int type = ModContent.ProjectileType<VirulentPunch>();
-            if (proj.type == type && Projectile.Distance(proj.Center) <= Projectile.width && proj.active && proj.owner == Projectile.owner)
+            if (proj.type == ModContent.ProjectileType<VirulentPunch>() && Projectile.Distance(proj.Center) <= (proj.width * .6f) && proj.owner == Projectile.owner)
             {
                 SoundID.Item43.Play(Projectile.Center, 1.2f, .1f, .1f);
                 float offsetAngle = Main.rand.NextFloat(MathHelper.TwoPi);
@@ -65,5 +63,4 @@ public class VirulentFlower : ModProjectile, ILocalizedModType, IModType
         Main.EntitySpriteDraw(tex, drawPosition, null, Projectile.GetAlpha(lightColor), Projectile.rotation, orig, Projectile.scale, 0, 0);
         return false;
     }
-
 }

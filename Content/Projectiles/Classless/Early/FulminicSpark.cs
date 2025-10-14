@@ -29,7 +29,7 @@ public class FulminicSpark : ModProjectile
     public ref float Power => ref Projectile.ai[1];
     public float Completion => Animators.MakePoly(5).OutFunction(InverseLerp(0f, Life, Time));
 
-    private List<Line> Branches;
+    private List<Line> Branches = [];
     public override bool ShouldUpdatePosition() => false;
     public override void AI()
     {

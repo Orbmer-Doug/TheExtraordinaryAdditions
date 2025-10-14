@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Graphics;
 using System;
 using System.Collections.Generic;
@@ -106,7 +105,7 @@ public class UnitCircle : ModProjectile
             float rot = -MathHelper.ToRadians(Degrees[i]);
 
             // Create the lines
-            ManualTrailPoints points = new(10);
+            TrailPoints points = new(10);
             points.SetPoints(Projectile.Center.GetLaserControlPoints(Projectile.Center + PolarVector(scale / 2, rot), 10));
             OptimizedPrimitiveTrail trail = new(c => 6f, (c, pos) => Color.IndianRed * .6f, null, 10);
             trail.DrawTrail(ShaderRegistry.StandardPrimitiveShader, points.Points, -1, false, false);

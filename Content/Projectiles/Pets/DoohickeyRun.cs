@@ -123,7 +123,7 @@ public class DoohickeyRun : ModProjectile
 
                 Projectile.velocity.X = MathHelper.Lerp(Projectile.velocity.X, Projectile.SafeDirectionTo(dest).X * 6f, acceleration);
                 Projectile.velocity.Y = MathHelper.Clamp(Projectile.velocity.Y + .3f, -20f, 20f);
-                
+
                 if (distanceToPlayer > 1000 || verticalDistanceToPlayer > 300 || Owner.rocketDelay2 > 0)
                     State = PetState.Flying;
 

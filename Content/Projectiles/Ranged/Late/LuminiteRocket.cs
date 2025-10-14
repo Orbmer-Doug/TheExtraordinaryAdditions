@@ -1,11 +1,9 @@
 ﻿using System;
 using Terraria;
-using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
-using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
@@ -32,37 +30,13 @@ public class LuminiteRocket : ModProjectile
     public Vector2 Back => Projectile.Center + PolarVector(Projectile.width / 2, Projectile.rotation - MathHelper.PiOver2);
     public override void AI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunction, ColorFunction, null, 30);
         points.Update(Back + Projectile.velocity);
 
         Projectile.FacingUp();
 
         Lighting.AddLight(Back, Color.DarkCyan.ToVector3() * 1.1f);
-
-        float pushForce = .26f;
-        for (int i = 0; i < Main.maxProjectiles; i++)
-        {
-            Projectile otherProj = Main.projectile[i];
-            if (!otherProj.active || otherProj.owner != Projectile.owner || i == Projectile.whoAmI)
-                continue;
-
-            bool num = otherProj.type == Projectile.type;
-            float taxicabDist = Math.Abs(Projectile.position.X - otherProj.position.X) + Math.Abs(Projectile.position.Y - otherProj.position.Y);
-            if (num && taxicabDist < Projectile.width)
-            {
-                if (Projectile.position.X < otherProj.position.X)
-                    Projectile.velocity.X -= pushForce;
-                else
-                    Projectile.velocity.X += pushForce;
-
-                if (Projectile.position.Y < otherProj.position.Y)
-                    Projectile.velocity.Y -= pushForce;
-                else
-                    Projectile.velocity.Y += pushForce;
-            }
-        }
-
         Time++;
     }
 
@@ -79,24 +53,6 @@ public class LuminiteRocket : ModProjectile
         return MathHelper.SmoothStep(Projectile.height * .5f, 4f, completionRatio);
     }
 
-    public OptimizedPrimitiveTrail trail;
-    public TrailPoints points = new(30);
-    public override bool PreDraw(ref Color lightColor)
-    {
-        void draw()
-        {
-            if (trail == null || points == null)
-                return;
-
-            ManagedShader shader = ShaderRegistry.SpecialLightningTrail;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DendriticNoiseDim), 1);
-            trail.DrawTrail(shader, points.Points);
-        }
-
-        Projectile.DrawBaseProjectile(Color.White);
-        PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
-        return false;
-    }
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
     {
@@ -124,7 +80,27 @@ public class LuminiteRocket : ModProjectile
             }
         }
 
-        Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<LuminiteBlast>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
+        if (this.RunLocal())
+            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<LuminiteBlast>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
+    }
+    
+    public OptimizedPrimitiveTrail trail;
+    public TrailPoints points = new(30);
+    public override bool PreDraw(ref Color lightColor)
+    {
+        void draw()
+        {
+            if (trail == null || points == null)
+                return;
+
+            ManagedShader shader = ShaderRegistry.SpecialLightningTrail;
+            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DendriticNoiseDim), 1);
+            trail.DrawTrail(shader, points.Points);
+        }
+
+        Projectile.DrawBaseProjectile(Color.White);
+        PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
+        return false;
     }
 }
 

@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
+﻿using Terraria;
 using Terraria.DataStructures;
 using Terraria.Enums;
 using Terraria.ID;
@@ -8,10 +7,8 @@ using Terraria.ModLoader;
 using Terraria.ObjectData;
 using TheExtraordinaryAdditions.Content.NPCs.Hostile.Arid;
 using TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
-using TheExtraordinaryAdditions.Content.NPCs.Hostile.AuroraTurret;
 using TheExtraordinaryAdditions.Content.NPCs.Hostile.Lightning;
 using TheExtraordinaryAdditions.Content.NPCs.Hostile.SolarGuardian;
-using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Tiles;
 

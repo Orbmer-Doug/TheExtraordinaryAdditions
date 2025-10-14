@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -26,7 +25,7 @@ public class TenebrisBlast : ModProjectile
     public override string Texture => AssetRegistry.Invis;
     public override void SetStaticDefaults()
     {
-        ProjectileID.Sets.DrawScreenCheckFluff[Projectile.type] = DistanceToTiles(120);
+        ProjectileID.Sets.DrawScreenCheckFluff[Projectile.type] = 1111;
     }
     public override void SetDefaults()
     {

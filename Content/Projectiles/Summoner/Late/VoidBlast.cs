@@ -12,7 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Late;
 public class VoidBlast : ModProjectile
 {
     public OptimizedPrimitiveTrail circle;
-    private readonly ManualTrailPoints points = new(40);
+    private readonly TrailPoints points = new(40);
 
     private const int Lifetime = 35;
     public float Completion => InverseLerp(0f, Lifetime, Time);
@@ -42,7 +42,7 @@ public class VoidBlast : ModProjectile
                     Main.rand.NextFloat(.7f, 1.4f), Color.Violet, Color.DarkViolet, Main.rand.NextFloat(150f, 220f), Main.rand.NextFloat(-.1f, .1f));
         }
 
-        if (circle == null || circle._disposed)
+        if (circle == null || circle.Disposed)
             circle = new(WidthFunct, ColorFunct, null, points.Count);
 
         for (int i = 0; i < points.Count; i++)

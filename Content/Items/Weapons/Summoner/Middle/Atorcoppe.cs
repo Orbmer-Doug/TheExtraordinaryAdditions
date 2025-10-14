@@ -3,7 +3,7 @@ using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Middle;
 
@@ -40,6 +40,11 @@ public class Atorcoppe : ModItem
         return false;
     }
 
+    public override bool MeleePrefix()
+    {
+        return true;
+    }
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
@@ -47,10 +52,5 @@ public class Atorcoppe : ModItem
         recipe.AddIngredient(ItemID.Cobweb, 200);
         recipe.AddTile(TileID.Anvils);
         recipe.Register();
-    }
-
-    public override bool MeleePrefix()
-    {
-        return true;
     }
 }

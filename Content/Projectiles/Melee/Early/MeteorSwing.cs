@@ -17,8 +17,8 @@ public class MeteorSwing : BaseSwordSwing
 
     public int HitCounter
     {
-        get => (int)Projectile.Additions().ExtraAI[7];
-        set => Projectile.Additions().ExtraAI[7] = value;
+        get => (int)Projectile.AdditionsInfo().ExtraAI[7];
+        set => Projectile.AdditionsInfo().ExtraAI[7] = value;
     }
 
     public override int SwingTime => 30;
@@ -41,7 +41,7 @@ public class MeteorSwing : BaseSwordSwing
     {
         after ??= new(4, () => Projectile.Center);
         Projectile.numHits = 0;
-        after.afterimages = null;
+        after.Clear();
     }
 
     public override void SafeAI()
@@ -72,7 +72,7 @@ public class MeteorSwing : BaseSwordSwing
             }
         }
 
-        float scaleUp = MeleeScale * 1.15f;
+        float scaleUp = MeleeScale * 1.25f;
         if (VanishTime <= 0)
         {
             Projectile.scale = MakePoly(3f).OutFunction(InverseLerp(0f, 10f * MaxUpdates, OverallTime)) * scaleUp;
@@ -141,7 +141,7 @@ public class MeteorSwing : BaseSwordSwing
         npc.velocity += SwordDir * Item.knockBack * npc.knockBackResist;
 
         int type = ModContent.ProjectileType<MeteorSpawn>();
-        if (Owner.CountOwnerProjectiles(type) < 3 && Projectile.numHits <= 0)
+        if (this.RunLocal() && Owner.CountOwnerProjectiles(type) < 3 && Projectile.numHits <= 0)
         {
             HitCounter++;
             if (HitCounter % 3 == 0)

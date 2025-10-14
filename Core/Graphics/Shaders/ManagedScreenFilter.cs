@@ -8,7 +8,6 @@ using Terraria.Graphics.Effects;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Config;
-using TheExtraordinaryAdditions.Core.Utilities;
 using static TheExtraordinaryAdditions.Common.Particles.ParticleRegistry;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
@@ -177,7 +176,7 @@ public class ManagedScreenShader : IDisposable
     }
 
     /// <summary>
-    ///     Sets a texture at a given index for this shader to use. Typically, index 0 is populated with whatever was passed into a <see cref="SpriteBatch"/>.Draw call.
+    /// Sets a texture at a given index for this shader to use. Typically, index 0 is populated with whatever was passed into a <see cref="SpriteBatch"/>.Draw call.
     /// </summary>
     /// <param name="texture">The texture to supply.</param>
     /// <param name="textureIndex">The index to place the texture in.</param>
@@ -265,13 +264,13 @@ public sealed class ScreenShaderUpdates : ModSystem
     private static readonly List<ManagedScreenShader> chromaticAberrationParticles = [];
     private static readonly List<ManagedScreenShader> flashParticles = [];
     private static readonly List<ManagedScreenShader> shockwaveParticles = [];
-    private static readonly List<DrawAction> DrawActions = new(DrawActionPool.InitialCapacity / 8);
+    private static readonly List<DrawAction> DrawActions = new(9000);
 
-    public static void QueueDrawAction(Action renderAction, BlendState blendState = null, ManagedShader effect = null, object groupId = null)
+    public static void QueueDrawAction(Action renderAction, BlendState blendState = null, ManagedShader effect = null, string groupID = null)
     {
         ArgumentNullException.ThrowIfNull(renderAction);
         BlendState blend = blendState ?? BlendState.AlphaBlend;
-        DrawAction action = DrawActionPool.Rent(renderAction, blend, isTexture: true, effect, groupId); // Treat as texture for consistency
+        DrawAction action = new DrawAction(renderAction, blend, isTexture: true, effect, groupID); // Treat as texture for consistency
         DrawActions.Add(action);
     }
 
@@ -348,8 +347,23 @@ public sealed class ScreenShaderUpdates : ModSystem
         if (Main.netMode == NetmodeID.Server)
             return;
 
-        MainTarget = new ManagedRenderTarget(true, ManagedRenderTarget.CreateScreenSizedTarget, true);
-        AuxiliaryTarget = new ManagedRenderTarget(true, ManagedRenderTarget.CreateScreenSizedTarget, true);
+        Main.QueueMainThreadAction(static () =>
+        {
+            MainTarget = new ManagedRenderTarget(true, ManagedRenderTarget.CreateScreenSizedTarget, true);
+            AuxiliaryTarget = new ManagedRenderTarget(true, ManagedRenderTarget.CreateScreenSizedTarget, true);
+        });
+    }
+
+    public override void OnModUnload()
+    {
+        if (Main.netMode == NetmodeID.Server)
+            return;
+
+        Main.QueueMainThreadAction(static () =>
+        {
+            MainTarget.Dispose();
+            AuxiliaryTarget.Dispose();
+        });
     }
 
     internal static void ApplyScreenFilters(RenderTarget2D _, RenderTarget2D screenTarget1, RenderTarget2D _2, Color clearColor)
@@ -374,13 +388,9 @@ public sealed class ScreenShaderUpdates : ModSystem
             handler.ShaderList.Clear();
 
         // Process particles
-        ParticleSystem particleSystem = ModContent.GetInstance<ParticleSystem>();
-        ParticleData[] particles = particleSystem.GetParticles();
-        ulong[] presenceMask = particleSystem.GetPresenceMask();
-
-        foreach (int index in new BitmaskUtils.BitmaskEnumerator(presenceMask, (uint)presenceMask.Length))
+        foreach (int index in ParticleSystem.ActiveParticles)
         {
-            ref ParticleData particle = ref particles[index];
+            ref ParticleData particle = ref ParticleSystem.Instance.GetParticles()[index];
             foreach (ParticleShaderHandler handler in ParticleHandlers)
                 handler.ProcessParticle(ref particle);
         }
@@ -426,9 +436,9 @@ public sealed class ScreenShaderUpdates : ModSystem
             Span<DrawAction> actionSpan = CollectionsMarshal.AsSpan(actions);
             DrawActionGrouper.GroupByBlendAndGroupId(actionSpan, [], (blend, groupGroups) =>
             {
-                foreach (KeyValuePair<object, List<DrawAction>> groupEntry in groupGroups)
+                foreach (KeyValuePair<string, List<DrawAction>> groupEntry in groupGroups)
                 {
-                    object groupId = groupEntry.Key;
+                    string groupId = groupEntry.Key;
                     List<DrawAction> groupActions = groupEntry.Value;
 
                     if (groupId == DrawActionGrouper.UngroupedKey)
@@ -478,8 +488,6 @@ public sealed class ScreenShaderUpdates : ModSystem
             });
 
             // Clear actions and return to pool
-            foreach (DrawAction action in actionSpan)
-                DrawActionPool.Return();
             actions.Clear();
         }
 
@@ -531,17 +539,12 @@ public sealed class ScreenShaderUpdates : ModSystem
 
         ActiveShaders.Clear();
         foreach (ManagedScreenShader filter in AssetRegistry.Filters.Values)
-        {
             filter.Deactivate();
-        }
 
-        ReadOnlySpan<IHasScreenShader> shaderEntities = CollectionsMarshal.AsSpan(ShaderEntities);
-        foreach (IHasScreenShader entity in shaderEntities)
+        foreach (IHasScreenShader entity in CollectionsMarshal.AsSpan(ShaderEntities))
         {
             if (entity.HasShader && entity.Shader != null && entity.Shader.IsActive)
-            {
                 ActiveShaders.Add(entity.Shader);
-            }
         }
     }
 

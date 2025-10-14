@@ -1,8 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Threading;
-using System;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.Enums;
@@ -12,8 +9,6 @@ using Terraria.ModLoader;
 using Terraria.ObjectData;
 using TheExtraordinaryAdditions.Core;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
-using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Tiles;
 
@@ -99,7 +94,7 @@ public class FlagPolePlaced : ModTile
 public class FlagTileEntity : ModTileEntity, IClientSideTileEntityUpdater
 {
     /// <summary>
-    /// The flag cloth that this tile entity holds locally.
+    /// The flag cloth that this tile entity holds locally
     /// </summary>
     public ClothSimulationTiles FlagCloth
     {

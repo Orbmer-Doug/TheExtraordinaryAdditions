@@ -98,7 +98,7 @@ public class CoalescentMass : ModNPC
     {
         NPC.immune[player.whoAmI] = ImmuneTime;
     }
-    
+
     public override bool? CanFallThroughPlatforms() => true;
     public override bool CanHitPlayer(Player target, ref int cooldownSlot) => false;
     public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position) => false;
@@ -191,7 +191,6 @@ public class HeadDetour : ModSystem
 
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, Main.UIScaleMatrix);
-            return;
         }
 
         orig(theNPC, alpha, headScale, rotation, effects, bossHeadId, x, y);

@@ -144,14 +144,14 @@ float3 RaymarchGalaxy(float3 rayOrigin, float3 rayDirection)
     return 0.8 * color;
 }
 
-struct VertexShaderOutput
+struct VertexInput
 {
     float4 Position : SV_POSITION;
     float4 Color : COLOR0;
     float2 TextureCoordinates : TEXCOORD0;
 };
 
-float4 PixelShaderFunction(VertexShaderOutput input) : COLOR
+float4 PixelShaderFunction(VertexInput input) : COLOR
 {
     // Normalize texture coordinates for rendering
     float2 normalizedCoords = input.TextureCoordinates * Zoom;

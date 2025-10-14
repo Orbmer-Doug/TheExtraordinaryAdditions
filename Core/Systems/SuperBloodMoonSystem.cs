@@ -1,11 +1,10 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
-using SubworldLibrary;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using Terraria;
 using Terraria.DataStructures;
+using Terraria.Enums;
 using Terraria.GameContent;
 using Terraria.GameContent.Achievements;
 using Terraria.ID;
@@ -46,13 +45,20 @@ public class IncreaseBloodMoonSpawnRate : ModSystem
 {
     public override void Load()
     {
-        On_Main.UpdateTime_StartNight += IncreaseBloodMoonRate;
-        On_Main.DrawSunAndMoon += ModifyMoon;
+        Main.QueueMainThreadAction(static () =>
+        {
+            On_Main.UpdateTime_StartNight += IncreaseBloodMoonRate;
+            On_Main.DrawSunAndMoon += ModifyMoon;
+        });
     }
+
     public override void Unload()
     {
-        On_Main.UpdateTime_StartNight -= IncreaseBloodMoonRate;
-        On_Main.DrawSunAndMoon -= ModifyMoon;
+        Main.QueueMainThreadAction(static () =>
+        {
+            On_Main.UpdateTime_StartNight -= IncreaseBloodMoonRate;
+            On_Main.DrawSunAndMoon -= ModifyMoon;
+        });
     }
 
     public static void IncreaseBloodMoonRate(On_Main.orig_UpdateTime_StartNight orig, ref bool stopEvents)
@@ -62,7 +68,7 @@ public class IncreaseBloodMoonSpawnRate : ModSystem
         if (SuperBloodMoonSystem.SuperBloodMoon && !bloodMoon)
         {
             // Literally just run the check again
-            if (!WorldGen.spawnEye && moonPhase != 4 && rand.NextBool(4) && netMode != NetmodeID.MultiplayerClient)
+            if (!WorldGen.spawnEye && moonPhase != (int)MoonPhase.Empty && rand.NextBool(4) && netMode != NetmodeID.MultiplayerClient)
             {
                 foreach (Player p in ActivePlayers)
                 {
@@ -180,6 +186,8 @@ public class SuperBloodMoonGlobalNPC : GlobalNPC
 
     public static readonly HashSet<int> EyeList = [NPCID.CataractEye, NPCID.CataractEye2, NPCID.DemonEye, NPCID.DemonEye2, NPCID.DialatedEye,
     NPCID.DialatedEye2, NPCID.GreenEye, NPCID.GreenEye2, NPCID.PurpleEye, NPCID.PurpleEye2, NPCID.SleepyEye, NPCID.SleepyEye2];
+    public static int EyeShootWait => DifficultyBasedValue(40, 35, 30, 25, 23, 20);
+    public const int Eyesight = 700;
 
     public override void AI(NPC npc)
     {
@@ -194,13 +202,9 @@ public class SuperBloodMoonGlobalNPC : GlobalNPC
                 return;
 
             Entity target = npc.GetTarget();
-
             float rot = npc.velocity.ToRotation();
-            const int sight = 700;
             Vector2 tip = npc.Center + PolarVector(npc.width / 2, rot);
-
-            int wait = DifficultyBasedValue(40, 35, 30, 25, 23, 20);
-            if (timer % wait == (wait - 1) && tip.IsInFieldOfView(rot, target.Center, .55f, sight))
+            if (timer % EyeShootWait == (EyeShootWait - 1) && tip.IsInFieldOfView(rot, target.Center, .55f, Eyesight))
             {
                 Vector2 vel = npc.Center.SafeDirectionTo(target.Center) * 7;
                 npc.Shoot(tip, vel, ModContent.ProjectileType<VermillionTear>(), npc.damage / 2, 2f);
@@ -507,10 +511,9 @@ public class VermillionTear : ModProjectile
             spriteBatch.DrawBetterRect(soft, ToTarget(Projectile.Center, Projectile.Size * 2.5f), null, Color.Crimson * Projectile.Opacity, 0f, soft.Size() / 2);
 
             Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.LensStar);
-            after.DrawFancyAfterimages(tex, [Color.Crimson, Color.Red, Color.DarkRed], Projectile.Opacity, 1f, 0f, true);
+            after?.DrawFancyAfterimages(tex, [Color.Crimson, Color.Red, Color.DarkRed], Projectile.Opacity, 1f, 0f, true);
         }
         PixelationSystem.QueueTextureRenderAction(glow, PixelationLayer.UnderProjectiles, BlendState.Additive);
-
         return false;
     }
 }

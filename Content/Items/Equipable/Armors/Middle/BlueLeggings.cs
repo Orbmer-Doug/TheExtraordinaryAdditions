@@ -1,9 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
@@ -12,6 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
 public class BlueLeggings : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BlueLeggings);
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(Color.AliceBlue);
@@ -25,11 +25,13 @@ public class BlueLeggings : ModItem
         Item.rare = ItemRarityID.Lime;
         Item.defense = 18;
     }
+
     public override void UpdateEquip(Player player)
     {
         player.GetCritChance(DamageClass.Melee) += 25f;
         player.buffImmune[BuffID.Electrified] = true;
     }
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();

@@ -25,7 +25,7 @@ public class SkeleShot : ModProjectile
     public TrailPoints cache;
     public override void AI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunction, ColorFunction, null, 5);
 
         if (Projectile.velocity != Vector2.Zero)
@@ -67,7 +67,7 @@ public class SkeleShot : ModProjectile
     {
         void draw()
         {
-            if (trail == null || trail._disposed || cache == null)
+            if (trail == null || trail.Disposed || cache == null)
                 return;
 
             ManagedShader shader = ShaderRegistry.FlameTrail;

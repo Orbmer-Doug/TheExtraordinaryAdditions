@@ -1,29 +1,33 @@
 Mods: {
 	TheExtraordinaryAdditions: {
 		Projectiles: {
-			AbsorbantLight.DisplayName: Absorbant Light
-			ArcanePortal.DisplayName: Arcane Portal
-			BlindingLight.DisplayName: Blinding Light
+			BarrageBeam.DisplayName: Barrage Beam
+			BurstingLight.DisplayName: Bursting Light
+			CondensedSoulMass.DisplayName: Condensed Soul Mass
+			ConvergentFireball.DisplayName: Convergent Fireball
 			CyberneticSword.DisplayName: Cybernetic Sword
 			DartBomb.DisplayName: Dart Bomb
 			DisintegrationBeam.DisplayName: Disintegration Beam
-			ExperimentalGammaRay.DisplayName: Experimental Gamma Ray
+			DisintegrationNova.DisplayName: Disintegration Nova
 			FallingPillar.DisplayName: Falling Pillar
 			GodPiercingDart.DisplayName: God Piercing Dart
-			HyperAttunedExtirpationNuke.DisplayName: Hyper Attuned Extirpation Nuke
+			HonedTesselesticLightning.DisplayName: Honed Tesselestic Lightning
 			JudgementHammer.DisplayName: Judgement Hammer
-			LightBlast.DisplayName: Light Blast
 			LightPillar.DisplayName: Light Pillar
 			LightrippingBeam.DisplayName: Lightripping Beam
-			NovaeBlast.DisplayName: Novae Blast
-			NovaeBomb.DisplayName: Novae Bomb
+			OverchargedLaser.DisplayName: Overcharged Laser
 			OverloadedLightDart.DisplayName: Overloaded Light Dart
-			Rockball.DisplayName: Rockball
+			RadiantPulser.DisplayName: Radiant Pulser
 			SeethingRockball.DisplayName: Seething Rockball
-			SpacedSlice.DisplayName: Spaced Slice
-			SpacedSliceCreator.DisplayName: Spaced Slice Creator
+			SoulCleansingFlame.DisplayName: Soul Cleansing Flame
+			SoulForgedRift.DisplayName: Soul Forged Rift
+			TechnicBlast.DisplayName: Technic Blast
 			TechnicBomb.DisplayName: Technic Bomb
-			TelegraphedSlice.DisplayName: Telegraphed Slice
+			TechnicPortal.DisplayName: Technic Portal
+			TheLightripBullet.DisplayName: The Lightrip Bullet
+			TheTechnicBlitzripper.DisplayName: The Technic Blitzripper
+			TheTesselesticMeltdown.DisplayName: The Tesselestic Meltdown
+			TranscendentSoulRay.DisplayName: Transcendent Soul Ray
 			VaporizingStar.DisplayName: Vaporizing Star
 			BloodBeacon.DisplayName: Blood Beacon
 			BloodDroplet.DisplayName: Blood Droplet
@@ -38,13 +42,13 @@ Mods: {
 			MassExplosion.DisplayName: Mass Explosion
 			SanguineAssimilation.DisplayName: Sanguine Assimilation
 			SanguinePortal.DisplayName: Sanguine Portal
-			StarTelegraph.DisplayName: Star Telegraph
 			StygainRoar.DisplayName: Stygain Roar
 			TaintedStar.DisplayName: Tainted Star
 			WrithingEyeball.DisplayName: Writhing Eyeball
 			EmptyRound.DisplayName: Empty Round
+			GlassFocusedShot.DisplayName: Glass Focused Shot
+			GlassFocusedSniper.DisplayName: Glass Focused Sniper
 			GlassShell.DisplayName: Glass Shell
-			RifleBullet.DisplayName: Rifle Bullet
 			GlacialSpike.DisplayName: Glacial Spike
 			HeavyFrostBlast.DisplayName: Heavy Frost Blast
 			OverheatedBlast.DisplayName: Overheated Blast
@@ -65,11 +69,10 @@ Mods: {
 			BouncyIcicle.DisplayName: Bouncy Icicle
 			CrossDiscHoldout.DisplayName: Cross Disc Holdout
 			CrossSwing.DisplayName: Cross Swing
-			DiscSlash.DisplayName: Disc Slash
 			ScarletMeteor.DisplayName: Scarlet Meteor
 			ScarletMeteorExplosion.DisplayName: Scarlet Meteor Explosion
 			ShockLightning.DisplayName: Shock Lightning
-			VRP.DisplayName: VRP
+			VRP.DisplayName: V R P
 			WaveSiphon.DisplayName: Wave Siphon
 			CryogenicBlast.DisplayName: Cryogenic Blast
 			BlackHole.DisplayName: Black Hole
@@ -111,12 +114,10 @@ Mods: {
 			Comet.DisplayName: Comet
 			CometBlast.DisplayName: Comet Blast
 			CometStormHoldout.DisplayName: Comet Storm Holdout
-			ControllableTornado.DisplayName: Controllable Tornado
 			EpidemicHoldout.DisplayName: Epidemic Holdout
 			EpidemicLob.DisplayName: Epidemic Lob
 			EpidemicSpear.DisplayName: Epidemic Spear
 			PyroclasticHover.DisplayName: Pyroclastic Hover
-			SerratedBolt.DisplayName: Serrated Bolt
 			SuperheatedPlasmaArrayHoldout.DisplayName: Superheated Plasma Array Holdout
 			SuperheatedPlasmaBeam.DisplayName: Superheated Plasma Beam
 			TesselesticBeam.DisplayName: Tesselestic Beam
@@ -129,7 +130,6 @@ Mods: {
 			SeamsCreator.DisplayName: Seams Creator
 			SeamstressMagic.DisplayName: Seamstress Magic
 			SewingNeedle.DisplayName: Sewing Needle
-			SupernovaGas.DisplayName: Supernova Gas
 			AcheronHeld.DisplayName: Acheron Held
 			AttunedBloodRain.DisplayName: Attuned Blood Rain
 			FireballHoldout.DisplayName: Fireball Holdout
@@ -167,6 +167,7 @@ Mods: {
 			CondereFulminaHoldout.DisplayName: Condere Fulmina Holdout
 			HonedLightning.DisplayName: Honed Lightning
 			LightningChain.DisplayName: Lightning Chain
+			Lightning.DisplayName: Lightning
 			HeavenForgedSpear.DisplayName: Heaven Forged Spear
 			HeavenForgedSwing.DisplayName: Heaven Forged Swing
 			KatanaCleave.DisplayName: Katana Cleave
@@ -188,12 +189,12 @@ Mods: {
 			AstralKatanaSweep.DisplayName: Astral Katana Sweep
 			AstralKatanaThrow.DisplayName: Astral Katana Throw
 			BergcrusherSwing.DisplayName: Bergcrusher Swing
+			BergIcicle.DisplayName: Berg Icicle
+			Bergwave.DisplayName: Bergwave
 			CryingEye.DisplayName: Crying Eye
 			CryingTear.DisplayName: Crying Tear
 			DecayingCutleryStab.DisplayName: Decaying Cutlery Stab
 			EtherealSwing.DisplayName: Ethereal Swing
-			GlacialShards.DisplayName: Glacial Shards
-			Glacier.DisplayName: Glacier
 			HellFlame.DisplayName: Hell Flame
 			HellsToothpickHeld.DisplayName: Hells Toothpick Held
 			HolyDart.DisplayName: Holy Dart
@@ -213,16 +214,9 @@ Mods: {
 			SolemButterflyLament.DisplayName: Solem Butterfly Lament
 			SolemnLamentProj.DisplayName: Solemn Lament Proj
 			ThreadripperYo.DisplayName: Threadripper Yo
-			AshyWaterBalloonProjectile.DisplayName: Ashy Water Balloon Projectile
 			BeetleHoldout.DisplayName: Beetle Holdout
 			CannonHoldout.DisplayName: Cannon Holdout
-			GodDummyProjectile.DisplayName: God Dummy Projectile
-			ShatteredComet.DisplayName: Shattered Comet
 			SmartPistolHeld.DisplayName: Smart Pistol Held
-			SmartShot.DisplayName: Smart Shot
-			SmartTracer.DisplayName: Smart Tracer
-			testRope.DisplayName: test Rope
-			TomeHoldout.DisplayName: Tome Holdout
 			FulgurSwing.DisplayName: Fulgur Swing
 			FulgurZap.DisplayName: Fulgur Zap
 			ShockJavelin.DisplayName: Shock Javelin
@@ -232,11 +226,10 @@ Mods: {
 			SplinteredBone.DisplayName: Splintered Bone
 			Antfly.DisplayName: Antfly
 			DoohickeyRun.DisplayName: Doohickey Run
+			FloatingScreen.DisplayName: Floating Screen
 			Gearcat.DisplayName: Gearcat
 			JellyfishVro.DisplayName: Jellyfish Vro
 			LilBloodSquid.DisplayName: Lil Blood Squid
-			qwerFlame.DisplayName: qwer Flame
-			_9mm.DisplayName: _9mm
 			BeanFire.DisplayName: Bean Fire
 			BoneFlintlockHeld.DisplayName: Bone Flintlock Held
 			CalciumBomb.DisplayName: Calcium Bomb
@@ -248,9 +241,6 @@ Mods: {
 			ObsidianShot.DisplayName: Obsidian Shot
 			RainDrop.DisplayName: Rain Drop
 			SnapcurveHeld.DisplayName: Snapcurve Held
-			TheSpores.DisplayName: The Spores
-			AlchemicCyclone.DisplayName: Alchemic Cyclone
-			AlchemicCycloneThrown.DisplayName: Alchemic Cyclone Thrown
 			AntiBulletp.DisplayName: Anti Bulletp
 			AntiBulletShell.DisplayName: Anti Bullet Shell
 			AntiBulletShrapnel.DisplayName: Anti Bullet Shrapnel
@@ -329,13 +319,13 @@ Mods: {
 			EnchantedShield.DisplayName: Enchanted Shield
 			StellarKunaiProj.DisplayName: Stellar Kunai Proj
 			TimberWhip.DisplayName: Timber Whip
-			AbyssalShadows.DisplayName: Abyssal Shadows
 			AvragenMinion.DisplayName: Avragen Minion
 			ConsumingVoid.DisplayName: Consuming Void
 			FleetDaggers.DisplayName: Fleet Daggers
 			TenebrisBlast.DisplayName: Tenebris Blast
 			VoidBeam.DisplayName: Void Beam
 			DelugeWhip.DisplayName: Deluge Whip
+			LivingStarBeam.DisplayName: Living Star Beam
 			LivingStarFlareMinion.DisplayName: Living Star Flare Minion
 			LokiBoom.DisplayName: Loki Boom
 			SuperIztMinion.DisplayName: Super Izt Minion
@@ -372,7 +362,7 @@ Mods: {
 			WaterStream.DisplayName: Water Stream
 			FancyChainsaw.DisplayName: Fancy Chainsaw
 			FancyDrill.DisplayName: Fancy Drill
-			LunarFlare.DisplayName: Lunar Flare
+			FancyTool.DisplayName: Fancy Tool
 			BreakerBeam.DisplayName: Breaker Beam
 			BreakerBladeCrush.DisplayName: Breaker Blade Crush
 			BreakerStorm.DisplayName: Breaker Storm
@@ -404,54 +394,15 @@ Mods: {
 			SnowmanCannonHoldout.DisplayName: Snowman Cannon Holdout
 			SnowmanRocket.DisplayName: Snowman Rocket
 			TinyServant.DisplayName: Tiny Servant
-			SwungAxe.DisplayName: Swung Axe
-			SwungHammer.DisplayName: Swung Hammer
-			SwungPickaxe.DisplayName: Swung Pickaxe
-			qwerIKArm.DisplayName: qwer
+			TransmitterLightspeed.DisplayName: Transmitter Lightspeed
 			VermillionTear.DisplayName: Vermillion Tear
 			ExplosionProjectile.DisplayName: Explosion Projectile
-			qwerBossProj.DisplayName: qwer Boss Proj
-			qwerBossProj2.DisplayName: qwer Boss Proj2
-			MinionBossEye.DisplayName: Minion Boss Eye
-			qwerik.DisplayName: qwerik
-			qwerTrAIL.DisplayName: qwer Tr A I L
-			qwerproj.DisplayName: qwerproj
-			qwerPA.DisplayName: qwer P A
-			CondensedSoulMass.DisplayName: Condensed Soul Mass
-			TheLightripBullet.DisplayName: The Lightrip Bullet
-			TheTechnicBlitzripper.DisplayName: The Technic Blitzripper
-			TheTesselesticMeltdown.DisplayName: The Tesselestic Meltdown
-			BurstingLight.DisplayName: Bursting Light
-			RadiantPulser.DisplayName: Radiant Pulser
-			DartBomb2.DisplayName: Dart Bomb2
-			ControlledTesselesticBeam.DisplayName: Controlled Tesselestic Beam
-			HonedTesselesticLightning.DisplayName: Honed Tesselestic Lightning
-			DisintegrationBurst.DisplayName: Disintegration Burst
-			PillarFalling.DisplayName: Pillar Falling
-			qwerfuck.DisplayName: qwerfuck
-			SoulForgedRift.DisplayName: Soul Forged Rift
-			TranscendentSoulRay.DisplayName: Transcendent Soul Ray
-			OverchargedLaser.DisplayName: Overcharged Laser
-			TechnicBlast.DisplayName: Technic Blast
-			TechnicPortal.DisplayName: Technic Portal
-			RadiantBeam.DisplayName: Radiant Beam
-			VaporizingSupergiant.DisplayName: Vaporizing Supergiant
-			DisintegrationNova.DisplayName: Disintegration Nova
-			BarrageBeam.DisplayName: Barrage Beam
-			BarrageBeamAlt.DisplayName: Barrage Beam Alt
-			FloatingScreen.DisplayName: Floating Screen
-			ConvergingFlame.DisplayName: Converging Flame
-			qwerFlag.DisplayName: qwer Flag
-			qwerDIALOGUE.DisplayName: qwer D I A L O G U E
-			GlassFocusedShot.DisplayName: Glass Focused Shot
-			GlassFocusedSniper.DisplayName: Glass Focused Sniper
-			TransmitterLightspeed.DisplayName: Transmitter Lightspeed
-			LivingStarBeam.DisplayName: Living Star Beam
-			BergIcicle.DisplayName: Berg Icicle
-			Bergwave.DisplayName: Bergwave
-			EvenFancierPickaxe.DisplayName: Even Fancier Pickaxe
-			FancyTool.DisplayName: Fancy Tool
-			ConvergentFireball.DisplayName: Convergent Fireball
+			CyberDart.DisplayName: Cyber Dart
+			CyberPierce.DisplayName: Cyber Pierce
+			StarFlares.DisplayName: Star Flares
+			qwer.DisplayName: qwer
+			LightningNode.DisplayName: Lightning Node
+			Node.DisplayName: Node
 		}
 
 		Keybinds: {
@@ -465,7 +416,7 @@ Mods: {
 		Biomes: {
 			CloudedCraterBiome: {
 				DisplayName: Clouded Crater Biome
-				TownNPCDialogueName: the Clouded Crater Biome
+				TownNPCDialogueName: The Clouded Crater
 			}
 		}
 
@@ -779,7 +730,7 @@ Mods: {
 				DisplayName: Asher's White Tie
 				Tooltip:
 					'''
-					Revives you from a attack that would of killed you on a 90 second cooldown
+					Revives you from a attack that would of killed you on a 4.5 minute cooldown
 					Summons child ties to protect you
 					"Smells funny..."
 					'''
@@ -809,7 +760,7 @@ Mods: {
 				DisplayName: Tungsten Tie
 				Tooltip:
 					'''
-					Revives you from a attack that would of killed you on a 80 second cooldown
+					Revives you from a attack that would of killed you on a 3.5 minute cooldown
 					Summons child ties to protect you
 					'''
 			}
@@ -836,7 +787,7 @@ Mods: {
 				DisplayName: Flame Insignia
 				Tooltip:
 					'''
-					Creates a aura to burn the nearest 10 enemies with incinerating flames
+					Creates an aura to burn the nearest 10 enemies with incinerating flames
 					10% increased critical strike chance
 					'''
 			}
@@ -1033,12 +984,12 @@ Mods: {
 
 			SpecteriteChestPiece: {
 				DisplayName: Specterite Chest Piece
-				Tooltip: 30% chance to save ammo and 25% increased damage.
+				Tooltip: 25% chance to save ammo and 25% increased ranged damage
 			}
 
 			SpecteriteGreaves: {
 				DisplayName: Specterite Greaves
-				Tooltip: 10% increased ranged crit chance and 50% increased movement speed.
+				Tooltip: 10% increased ranged crit chance and 50% increased movement speed
 			}
 
 			SpecteriteMask: {
@@ -1292,18 +1243,17 @@ Mods: {
 				DisplayName: Cross Disc
 				Tooltip:
 					'''
-					The elemental balance bar shows how much you have, if used too much a overcharge will occur
-					Hold G to bring up element selection and hover the mouse over the desired side
-					Hold <left> to charge up VRP's and release to fire. The more charged, the more powerful.
+					The elemental balance bar shows how much you have, if used too much an overcharge will occur
+					Hold G to bring up the element selection and hover the mouse over the desired side
+					Hold <left> to charge up VRP's and release to fire. The more charged, the more powerful
 					However if spinning too fast, accuracy is reduced
 					<right> to swing the disc
-					Hold SHIFT to see an expanded description for melee attacks
+					Hold SHIFT to see an expanded description for melee attacks and buffs
 					'''
-				FeelingIceolated: Cold releases chilling icicles which bounce
-				LightningReturns: Shock causes lightning to strike upon hitting enemies
-				PlayingWithFire: Heat releases meteors from the sky
-				WhatDoYouMeanNotEarth: Wave releases siphoning orbs that heal you
-				balls: For all m
+				FeelingIceolated: Cold releases chilling icicles which bounce, increases defense
+				LightningReturns: Shock causes lightning to strike upon hitting enemies, increases run acceleration
+				PlayingWithFire: Heat releases meteors from the sky, increases effectiveness of life regen
+				WhatDoYouMeanNotEarth: Wave releases siphoning orbs that heal you, increases life regen
 			}
 
 			BrewingStorms: {
@@ -1429,7 +1379,7 @@ Mods: {
 					'''
 					Summons flowers in a large poisonous aura
 					Spawns powerful spore explosions at the cursor while its in the aura
-					Touching a flower with the explosion makes it pop and release seeds that momentarily go to the cursor
+					Touching a flower with the explosion makes it pop and release seeds that go to the enemies with the least life
 					'''
 			}
 
@@ -1500,9 +1450,9 @@ Mods: {
 					<left> or <right> to start attacks with different combos
 					L - L causes the fist to do a punch, doing extreme knockback and causing an explosion on hit
 					L - R parries projectiles and reflects them back at the cursor
-					R - R swings down with the fist
-					R - L swings up with the fist
-					Swings with the fist do double damage and ignore armor
+					R - R swings down with the fist, releasing a piercing wave
+					R - L swings up with the fist, releasing 3 darts which chase enemies
+					Strikes with the fist on swings do double damage and ignore armor
 					'''
 			}
 
@@ -1667,6 +1617,7 @@ Mods: {
 			SolarBrand: {
 				DisplayName: Solar Brand
 				Tooltip: Emits homing sparks when swung
+				Damage: damage swung
 			}
 
 			SolemnLament: {
@@ -1977,7 +1928,11 @@ Mods: {
 
 			EclipsedDuo: {
 				DisplayName: Eclipsed Duo
-				Tooltip: Strike enemies to power up the whips, with sufficient power causing an eruption of homing energies
+				Tooltip:
+					'''
+					Striking with the tip of the moon whip does a critical strike
+					The sun whip causes an explosion at the tip
+					'''
 			}
 
 			IchorWhip: {
@@ -2169,6 +2124,16 @@ Mods: {
 				DisplayName: Music Box (Aurora Guard)
 				Tooltip: SomeRandomMalePerson - Frigid Gale
 			}
+
+			StygainHeartRelic: {
+				DisplayName: Stygain Heart Relic
+				Tooltip: ""
+			}
+
+			AsterlinRelic: {
+				DisplayName: Asterlin Relic
+				Tooltip: ""
+			}
 		}
 
 		Content: {
@@ -2200,25 +2165,26 @@ Mods: {
 					Its origins are completely unknown, given its usage of lightspeed travel to someplace in the universe
 					Whatever the undisclosed intentions of the otherworldly scientist that presumably made it are, they have been stopped from fully attaining such power
 					'''
-				OverheatTemperatureWarning: "[{0}] [NEXUS Worker/WARNING]: CORE TEMPERATURES EXCEEDING 7000 DEGREES"
-				OverheatImminent: "[{0}] [NEXUS Worker/WARNING]: OVERHEATING IMMINENT..."
-				OverheatHeatsinks: "[{0}] [NEXUS Worker/INFO]: Activating heat sinks..."
-				OverheatEyeScan: "[{0}] [NEXUS Worker/STATUS]: VISUAL CORTEX MODULE SCAN..."
-				OverheatEyeScan1: "[{0}] [NEXUS Worker/STATUS]: VISUAL PROCESSING ACCURACY: ADEPT"
-				OverheatEyeScan2: "[{0}] [NEXUS Worker/STATUS]: INERTIAL GUIDANCE SYSTEM: OK"
-				OverheatEyeScan3: "[{0}] [NEXUS Worker/STATUS]: INTERPLANETARY TRANSMITTER: OK"
-				OverheatLegScans: "[{0}] [NEXUS Worker/STATUS]: LEG MODULE (2) SCAN..."
-				OverheatLegScans1: "[{0}] [NEXUS Worker/STATUS]: INSTANT PROPULSION SYSTEM: OK"
-				OverheatLegScans2: "[{0}] [NEXUS Worker/STATUS]: CONTINUOUS PROPULSION SYSTEM: OK"
-				OverheatLegScans3: "[{0}] [NEXUS Worker/STATUS]: POTENTIAL ENERGY STORAGE SYSTEM: OK"
-				OverheatCoreScan: "[{0}] [NEXUS Worker/STATUS]: CORE MODULE SCAN..."
-				OverheatCoreScan1: "[{0}] [NEXUS Worker/STATUS]: SOUL ENERGY TRANSUMATION SYSTEM: OK"
-				OverheatCoreScan2: "[{0}] [NEXUS Worker/STATUS]: AUTOMATIC REORIENTATION SYSTEM: OK"
-				OverheatCoreScan3: "[{0}] [NEXUS Worker/STATUS]: INERTIA CORRECTION SYSTEM: OK"
-				OverheatArmScans: "[{0}] [NEXUS Worker/STATUS]: ARM MODULE (2) SCAN..."
-				OverheatArmScans1: "[{0}] [NEXUS Worker/STATUS]: ARSENAL MATERIALIZATION SYSTEM: OK"
-				OverheatArmScans2: "[{0}] [NEXUS Worker/STATUS]: SOUL ENERGY CONDUIT: OK"
-				OverheatUhOh: "[{0}] [NEXUS Worker/INFO]: Utilizing remaining reservoir of hyper-condensed soul energy"
+				OverheatTemperatureWarning: "[NEXUS Worker/WARNING]: CORE TEMPERATURES EXCEEDING 7000 DEGREES"
+				OverheatImminent: "[NEXUS Worker/WARNING]: OVERHEATING IMMINENT..."
+				OverheatHeatsinks: "[NEXUS Worker/INFO]: Activating heat sinks..."
+				OverheatEyeScan: "[NEXUS Worker/STATUS]: VISUAL CORTEX MODULE SCAN..."
+				OverheatEyeScan1: "[NEXUS Worker/STATUS]: VISUAL PROCESSING ACCURACY: ADEPT"
+				OverheatEyeScan2: "[NEXUS Worker/STATUS]: INERTIAL GUIDANCE SYSTEM: OK"
+				OverheatEyeScan3: "[NEXUS Worker/STATUS]: INTERPLANETARY TRANSMITTER: OK"
+				OverheatLegScans: "[NEXUS Worker/STATUS]: LEG MODULE (2) SCAN..."
+				OverheatLegScans1: "[NEXUS Worker/STATUS]: INSTANT PROPULSION SYSTEM: OK"
+				OverheatLegScans2: "[NEXUS Worker/STATUS]: CONTINUOUS PROPULSION SYSTEM: OK"
+				OverheatLegScans3: "[NEXUS Worker/STATUS]: POTENTIAL ENERGY STORAGE SYSTEM: OK"
+				OverheatCoreScan: "[NEXUS Worker/STATUS]: CORE MODULE SCAN..."
+				OverheatCoreScan1: "[NEXUS Worker/STATUS]: SOUL ENERGY TRANSUMATION SYSTEM: OK"
+				OverheatCoreScan2: "[NEXUS Worker/STATUS]: AUTOMATIC REORIENTATION SYSTEM: OK"
+				OverheatCoreScan3: "[NEXUS Worker/STATUS]: INERTIA CORRECTION SYSTEM: OK"
+				OverheatArmScans: "[NEXUS Worker/STATUS]: ARM MODULE (2) SCAN..."
+				OverheatArmScans1: "[NEXUS Worker/STATUS]: ARSENAL MATERIALIZATION SYSTEM: OK"
+				OverheatArmScans2: "[NEXUS Worker/STATUS]: SOUL ENERGY CONDUIT: OK"
+				OverheatUhOh: "[NEXUS Worker/INFO]: Utilizing remaining reservoir of hyper-condensed soul energy"
+				DialogueHint: Press Left-Alt to skip!
 			}
 
 			StygainHeart: {
@@ -2403,5 +2369,37 @@ Mods: {
 
 		StarfieldMainMenu.Name: Starfield
 		Emotes.OldManBubble.Command: creepyoldman
+
+		Achievements: {
+			DefeatedAsterlin: {
+				FriendlyName: Mechanical Rivalry
+				Description: Defeat Asterlin, the god-like machine from unknown origin.
+			}
+
+			DefeatedSnail: {
+				FriendlyName: Old Enemy
+				Description: Obliterate The Giant Snail From Ancient Times, a greatly feared entity which sleeps in the coldest caverns.
+			}
+
+			DefeatedStygain: {
+				FriendlyName: Tenebre Rosso... Heart?
+				Description: Defeat the Stygain Heart, the eldritch horror of the most crimson moons.
+			}
+
+			DefeatedAuroraGuard: {
+				FriendlyName: Glacial Defense
+				Description: Defeat the Aurora Guard, the ancient defense system for the frozen tundra.
+			}
+
+			ObtainedCube: {
+				FriendlyName: Densest of them All
+				Description: Obtain the Tungsten Cube, an unwavering metal.
+			}
+
+			ObtainedGenedies: {
+				FriendlyName: Transcendence
+				Description: Obtain the Exingenedies, an unfathomable object which warns what's to come.
+			}
+		}
 	}
 }

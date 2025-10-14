@@ -37,7 +37,7 @@ float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 coords : TEXCOORD
         );
         float maxDist = max(edgeDist.x, edgeDist.y); // closest distance to any edge
         float outlineDist = max(0, outline - maxDist) / outline;
-        return lerp(float4(0.8, 0.8, 0.8, 1), float4(0.1, 0.1, 0.1, 1), smoothstep(0, 1, outlineDist));
+        return floor(lerp(float4(0.8, 0.8, 0.8, 1), float4(0.1, 0.1, 0.1, 1), smoothstep(0, 1, outlineDist)) * 8) / 8;
     }
     
     float4 color = tex2D(tex, warpedUV) * sampleColor;

@@ -1,8 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Utilities;
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
@@ -43,9 +41,7 @@ public class CursedEruption : ModProjectile
             Color color2 = new(96, 248, 2);
             ParticleRegistry.SpawnHeavySmokeParticle(pos, vel, time, size, color, opacity, true);
             if (Main.rand.NextBool(3))
-            {
                 ParticleRegistry.SpawnHeavySmokeParticle(pos, vel, time, size, color2, opacity, true);
-            }
         }
     }
 
@@ -53,7 +49,7 @@ public class CursedEruption : ModProjectile
     {
         return CircularHitboxCollision(Projectile.Center, Projectile.width * 3f * Projectile.scale, targetHitbox);
     }
-    
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         target.AddBuff(BuffID.CursedInferno, 420);

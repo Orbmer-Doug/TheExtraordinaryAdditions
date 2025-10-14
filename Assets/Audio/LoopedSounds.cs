@@ -1,9 +1,6 @@
 ﻿using ReLogic.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ModLoader;
@@ -14,13 +11,13 @@ public readonly struct AdditionsLoopedSound()
 {
     public AdditionsLoopedSound(SoundStyle style, Func<float> volume = null, Func<float> pitch = null) : this()
     {
-        Style = style with { MaxInstances = 0, IsLooped = true, PauseBehavior = PauseBehavior.PauseWithGame };
+        Style = style with { MaxInstances = 0, PauseBehavior = PauseBehavior.PauseWithGame };
         Volume = volume ?? (() => 1f);
         Pitch = pitch ?? (() => 0f);
     }
     public AdditionsLoopedSound(AdditionsSound sound, Func<float> volume = null, Func<float> pitch = null) : this()
     {
-        Style = AssetRegistry.GetSound(sound) with { MaxInstances = 0, IsLooped = true, PauseBehavior = PauseBehavior.PauseWithGame };
+        Style = AssetRegistry.GetSound(sound) with { MaxInstances = 0, PauseBehavior = PauseBehavior.PauseWithGame };
         Volume = volume ?? (() => 1f);
         Pitch = pitch ?? (() => 0f);
     }
@@ -41,8 +38,12 @@ public sealed class LoopedSoundManager : ModSystem
     {
         On_SoundEngine.Update += UpdateLoopedSounds;
     }
+    public override void OnModUnload()
+    {
+        On_SoundEngine.Update -= UpdateLoopedSounds;
+    }
 
-    private void UpdateLoopedSounds(On_SoundEngine.orig_Update orig)
+    private static void UpdateLoopedSounds(On_SoundEngine.orig_Update orig)
     {
         if (!SoundEngine.IsAudioSupported)
             return;
@@ -106,8 +107,8 @@ public sealed class LoopedSoundInstance
         private set;
     }
 
-    public Func<bool> ActiveCondition 
-    { 
+    public Func<bool> ActiveCondition
+    {
         get;
         private set;
     }
@@ -175,6 +176,7 @@ public sealed class LoopedSoundInstance
         // If a starting sound should be used, play that first, and wait for it to end before playing the looping sound
         if (!HasLoopSoundBeenStarted && isActive && !IsBeingPlayed)
         {
+            /*
             bool hasStartEnded = !HasStartingSoundBeenStarted || (SoundEngine.TryGetActiveSound(StartingSoundSlot, out ActiveSound s) && s.IsPlaying);
             if (!UsesStartingSound)
                 hasStartEnded = false;
@@ -189,6 +191,20 @@ public sealed class LoopedSoundInstance
             {
                 StartingSoundSlot = SoundEngine.PlaySound(startSound.Value.Style, soundPosition);
                 HasStartingSoundBeenStarted = true;
+            }
+            */
+
+            bool hasStartEnded = HasStartingSoundBeenStarted && (!SoundEngine.TryGetActiveSound(StartingSoundSlot, out ActiveSound s) || !s.IsPlaying);
+
+            if (UsesStartingSound && !HasStartingSoundBeenStarted)
+            {
+                StartingSoundSlot = SoundEngine.PlaySound(startSound.Value.Style, soundPosition);
+                HasStartingSoundBeenStarted = true;
+            }
+            else if (!UsesStartingSound || hasStartEnded)
+            {
+                LoopingSoundSlot = SoundEngine.PlaySound(loopSound.Style, soundPosition);
+                HasLoopSoundBeenStarted = true;
             }
         }
 

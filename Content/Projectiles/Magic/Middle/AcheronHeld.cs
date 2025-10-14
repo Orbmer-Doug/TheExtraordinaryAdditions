@@ -43,7 +43,7 @@ public class AcheronHeld : BaseIdleHoldoutProjectile
     public float Flash => MathHelper.Lerp(1f, 5f, InverseLerp(0f, Owner.itemAnimationMax, Wait));
     public override void SafeAI()
     {
-        if (telegraph == null || telegraph._disposed)
+        if (telegraph == null || telegraph.Disposed)
             telegraph = new(WidthFunct, ColorFunct, null, 50);
 
         Vector2 center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
@@ -56,14 +56,14 @@ public class AcheronHeld : BaseIdleHoldoutProjectile
                 Owner.Center.X + Main.screenWidth / 2 - TeleWidth / 2), Owner.Center.Y + Main.screenHeight / 2);
             this.Sync();
         }
-        
+
         Projectile.velocity = center.SafeDirectionTo(SummonPos);
         Projectile.rotation = Projectile.velocity.ToRotation();
         Projectile.Center = center + PolarVector(50f, Projectile.rotation);
         Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, Projectile.rotation - MathHelper.PiOver2);
         Lighting.AddLight(Eye, Color.Violet.ToVector3() * .7f);
 
-        if ((this.RunLocal() && Modded.SafeMouseLeft.Current) && Wait == 0)
+        if ((this.RunLocal() && Modded.SafeMouseLeft.Current) && Wait == 0 && HasMana())
         {
             Vector2 pos = SummonPos + new Vector2(Main.rand.NextFloat(-TeleWidth, TeleWidth) / 2, -Main.rand.NextFloat(20f, 80f));
             Projectile.NewProj(pos, Vector2.UnitY, ModContent.ProjectileType<HellishLance>(), Projectile.damage, Projectile.knockBack, Owner.whoAmI);
@@ -89,7 +89,7 @@ public class AcheronHeld : BaseIdleHoldoutProjectile
     public static float WidthFunct(float c) => TeleWidth;
 
     public OptimizedPrimitiveTrail telegraph;
-    public ManualTrailPoints points = new(50);
+    public TrailPoints points = new(50);
     public override bool PreDraw(ref Color lightColor)
     {
         Projectile.DrawBaseProjectile(lightColor);
@@ -112,7 +112,6 @@ public class AcheronHeld : BaseIdleHoldoutProjectile
             PixelationSystem.QueuePrimitiveRenderAction(tele, PixelationLayer.UnderProjectiles);
         }
 
-
         void glow()
         {
             Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
@@ -124,7 +123,6 @@ public class AcheronHeld : BaseIdleHoldoutProjectile
             }
         }
         PixelationSystem.QueueTextureRenderAction(glow, PixelationLayer.Dusts, BlendState.Additive);
-
         return false;
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
-using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -83,6 +82,7 @@ public class SeethingRockball : ProjOwnedByNPC<Asterlin>
             if (Projectile.timeLeft > 120)
                 Projectile.timeLeft = 120;
             HitGround = true;
+            Projectile.netUpdate = true;
         }
 
         Projectile.velocity *= 0f;

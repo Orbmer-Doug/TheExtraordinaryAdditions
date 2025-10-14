@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.IO;
 using Terraria;
-using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
@@ -27,69 +26,48 @@ public partial class Asterlin
     }
     public void Dialogue_RecieveExtraAI(BinaryReader re)
     {
-        Dialogue_ScreenInterpolant = re.ReadSingle();
-        Dialogue_FindingChannel = re.ReadBoolean();
+        Dialogue_ScreenInterpolant = (float)re.ReadSingle();
+        Dialogue_FindingChannel = (bool)re.ReadBoolean();
     }
 
     public static readonly Color Dialogue_InfoColor = Color.Goldenrod;
     public static readonly Color Dialogue_WarningColor = Color.Red;
     public static readonly Color Dialogue_StatusColor = Color.DeepSkyBlue;
-    public TextSnippet Dialogue_Pause => new(" ", Color.Transparent, .5f);
-    public TextSnippet Dialogue_LongPause => new(" ", Color.Transparent, 3.6f);
-    public string GetIngameTime()
-    {
-        const double fullDayLength = Main.dayLength + Main.nightLength;
-        double num5 = Main.time;
-        if (!Main.dayTime)
-            num5 += Main.dayLength;
-        num5 = Main.time / fullDayLength * 24.0;
-        double num6 = 7.5;
-        num5 = Main.time - num6 - 12.0;
-        if (Main.time < 0.0)
-            num5 += 24.0;
-        int num7 = (int)(double)Main.time;
-        double num8 = Main.time - (double)num7;
-        num8 = (int)(num8 * 60.0);
-        string text4 = string.Concat(num8);
-        if (num8 < 10.0)
-            text4 = "0" + text4;
-        if (num7 > 12)
-            num7 -= 12;
-        if (num7 == 0)
-            num7 = 12;
-        text4 = ((!(num8 < 30.0)) ? "30" : "00");
-        return num7 + ":" + text4;
-    }
-
+    public static readonly TextSnippet Dialogue_Pause = new(" ", Color.Transparent, .5f);
+    public static readonly TextSnippet Dialogue_LongPause = new(" ", Color.Transparent, 3.6f);
     public AwesomeSentence FullDialogue => new(1000f, [
-        new TextSnippet(this.GetLocalization("OverheatTemperatureWarning").Format(GetIngameTime()), Dialogue_WarningColor, .045f, TextSnippet.AppearFadingFromRight, null, true, 2.4f),
-         new TextSnippet(this.GetLocalization($"OverheatImminent").Format(GetIngameTime()), Dialogue_WarningColor, .045f, TextSnippet.AppearFadingFromRight, null, true, 2.4f),
-         new TextSnippet(this.GetLocalization($"OverheatHeatsinks").Format(GetIngameTime()), Dialogue_InfoColor, .025f, TextSnippet.AppearFadingFromRight, null, true, 2.4f),
-        new TextSnippet(this.GetLocalization($"OverheatEyeScan").Format(GetIngameTime()), Dialogue_StatusColor, .02f, null, null, true, 2.4f),
+        new TextSnippet(this.GetLocalization("OverheatTemperatureWarning").Value, Dialogue_WarningColor, .045f, TextSnippet.AppearFadingFromRight, null, true, 2.4f),
+         new TextSnippet(this.GetLocalization("OverheatImminent").Value, Dialogue_WarningColor, .045f, TextSnippet.AppearFadingFromRight, null, true, 2.4f),
+         new TextSnippet(this.GetLocalization("OverheatHeatsinks").Value, Dialogue_InfoColor, .025f, TextSnippet.AppearFadingFromRight, null, true, 2.4f),
+        new TextSnippet(this.GetLocalization("OverheatEyeScan").Value, Dialogue_StatusColor, .02f, null, null, true, 2.4f),
          Dialogue_Pause,
-         new TextSnippet(this.GetLocalization($"OverheatEyeScan1").Format(GetIngameTime()), Dialogue_StatusColor, .015f, null, null, true, 2.4f),
-         new TextSnippet(this.GetLocalization($"OverheatEyeScan2").Format(GetIngameTime()), Dialogue_StatusColor, .015f, null, null, true, 2.4f),
-         new TextSnippet(this.GetLocalization($"OverheatEyeScan3").Format(GetIngameTime()), Dialogue_StatusColor, .015f, null, null, true, 2.4f),
-        new TextSnippet(this.GetLocalization($"OverheatLegScans").Format(GetIngameTime()), Dialogue_StatusColor, .02f, null, null, true, 2.4f),
+         new TextSnippet(this.GetLocalization("OverheatEyeScan1").Value, Dialogue_StatusColor, .015f, null, null, true, 2.4f),
+         new TextSnippet(this.GetLocalization("OverheatEyeScan2").Value, Dialogue_StatusColor, .015f, null, null, true, 2.4f),
+         new TextSnippet(this.GetLocalization("OverheatEyeScan3").Value, Dialogue_StatusColor, .015f, null, null, true, 2.4f),
+        new TextSnippet(this.GetLocalization("OverheatLegScans").Value, Dialogue_StatusColor, .02f, null, null, true, 2.4f),
          Dialogue_Pause,
-         new TextSnippet(this.GetLocalization($"OverheatLegScans1").Format(GetIngameTime()), Dialogue_StatusColor, .015f, null, null, true, 2.4f),
-         new TextSnippet(this.GetLocalization($"OverheatLegScans2").Format(GetIngameTime()), Dialogue_StatusColor, .015f, null, null, true, 2.4f),
-         new TextSnippet(this.GetLocalization($"OverheatLegScans3").Format(GetIngameTime()), Dialogue_StatusColor, .015f, null, null, true, 2.4f),
-        new TextSnippet(this.GetLocalization($"OverheatArmScans").Format(GetIngameTime()), Dialogue_StatusColor, .02f, null, null, true, 2.4f),
+         new TextSnippet(this.GetLocalization("OverheatLegScans1").Value, Dialogue_StatusColor, .015f, null, null, true, 2.4f),
+         new TextSnippet(this.GetLocalization("OverheatLegScans2").Value, Dialogue_StatusColor, .015f, null, null, true, 2.4f),
+         new TextSnippet(this.GetLocalization("OverheatLegScans3").Value, Dialogue_StatusColor, .015f, null, null, true, 2.4f),
+        new TextSnippet(this.GetLocalization("OverheatArmScans").Value, Dialogue_StatusColor, .02f, null, null, true, 2.4f),
          Dialogue_Pause,
-         new TextSnippet(this.GetLocalization($"OverheatArmScans1").Format(GetIngameTime()), Dialogue_StatusColor, .015f, null, null, true, 2.4f),
-         new TextSnippet(this.GetLocalization($"OverheatArmScans2").Format(GetIngameTime()), Dialogue_StatusColor, .015f, null, null, true, 2.4f),
-        new TextSnippet(this.GetLocalization($"OverheatUhOh").Format(GetIngameTime()), Dialogue_InfoColor, .037f, TextSnippet.AppearFadingFromRight, TextSnippet.RandomDisplacement, true, 2.4f),
+         new TextSnippet(this.GetLocalization("OverheatArmScans1").Value, Dialogue_StatusColor, .015f, null, null, true, 2.4f),
+         new TextSnippet(this.GetLocalization("OverheatArmScans2").Value, Dialogue_StatusColor, .015f, null, null, true, 2.4f),
+        new TextSnippet(this.GetLocalization("OverheatUhOh").Value, Dialogue_InfoColor, .037f, TextSnippet.AppearFadingFromRight, TextSnippet.RandomDisplacement, true, 2.4f),
         Dialogue_LongPause
     ]);
 
-    public AwesomeSentence LeavingDialogue => new(1000f, [
-        new TextSnippet("", Dialogue_StatusColor)
-        ]);
+    // Because multiplayer wants to be retarded
+    public const int TimeToTemp = 191; // FullDialogue.GetTimeToSnippet(1);
+    public const int TimeToHeatsink = 356; // FullDialogue.GetTimeToSnippet(2);
+    public const int TimeToChange = 1089; // FullDialogue.GetTimeToSnippet(15);
+    public const int TimeToUhOh = 1145; // FullDialogue.GetTimeToSnippet(16);
+    public const int TimeToLast = 1201; // FullDialogue.GetTimeToSnippet(17);
+    public const float DialogueTime = 1256.94f; // FullDialogue.MaxProgress * 60
 
     public void LoadDialogue()
     {
-        if (Main.netMode == NetmodeID.Server)
+        if (Main.dedServ)
             return;
 
         Main.QueueMainThreadAction(() =>
@@ -101,10 +79,11 @@ public partial class Asterlin
             device.SetRenderTarget(crtTarget);
             device.Clear(Color.Transparent);
             device.SetRenderTarget(null);
+
+            On_Main.DrawProjectiles += DrawTheTarget;
         });
 
         RenderTargetManager.RenderTargetUpdateLoopEvent += DrawToTarget;
-        On_Main.DrawProjectiles += DrawTheTarget;
     }
 
     public void UnloadDialogue()
@@ -113,17 +92,17 @@ public partial class Asterlin
         {
             crtTarget?.Dispose();
             crtTarget = null;
+            On_Main.DrawProjectiles -= DrawTheTarget;
         });
 
         RenderTargetManager.RenderTargetUpdateLoopEvent -= DrawToTarget;
-        On_Main.DrawProjectiles -= DrawTheTarget;
     }
 
     // Despite being in the same file as Asterlin, the render target knows nothing other than its own target and shader
     // So for any outside changes to variables they must be yoinked from the raw npc to reflect changes
-    private void DrawToTarget()
+    private static void DrawToTarget()
     {
-        if (!AssetRegistry.HasFinishedLoading || Main.gameMenu || Main.netMode == NetmodeID.Server)
+        if (!AssetRegistry.HasFinishedLoading || Main.gameMenu || Main.dedServ)
             return;
 
         if (!FindNPC(out NPC npc, ModContent.NPCType<Asterlin>()))
@@ -150,11 +129,11 @@ public partial class Asterlin
         Main.spriteBatch.End();
     }
 
-    private void DrawTheTarget(On_Main.orig_DrawProjectiles orig, Main self)
+    private static void DrawTheTarget(On_Main.orig_DrawProjectiles orig, Main self)
     {
         orig(self);
 
-        if (!AssetRegistry.HasFinishedLoading || Main.gameMenu || Main.netMode == NetmodeID.Server)
+        if (!AssetRegistry.HasFinishedLoading || Main.gameMenu || Main.dedServ)
             return;
 
         if (!FindNPC(out NPC npc, ModContent.NPCType<Asterlin>()))

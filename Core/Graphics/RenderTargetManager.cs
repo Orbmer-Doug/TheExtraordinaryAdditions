@@ -1,13 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using MonoMod.Cil;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Collections.Generic;
 using Terraria;
-using Terraria.GameContent;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.ILEditing;
-using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Core.Graphics;
 
@@ -63,7 +56,7 @@ public class RenderTargetManager : ModSystem
 
         // Unsubscribe from the OnPreDraw event
         Terraria.Main.OnPreDraw -= HandleTargetUpdateLoop;
-        
+
         // Reset the update loop event
         RenderTargetUpdateLoopEvent = null;
     }

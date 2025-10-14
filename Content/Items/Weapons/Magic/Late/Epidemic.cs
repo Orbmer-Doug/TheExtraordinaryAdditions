@@ -1,4 +1,6 @@
-﻿using CalamityMod.Items.Materials;
+﻿using CalamityMod.Items;
+using CalamityMod.Items.Materials;
+using CalamityMod.Rarities;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
@@ -6,7 +8,6 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
-using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Late;
@@ -14,40 +15,38 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Late;
 public class Epidemic : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Epidemic);
+
     public override void SetStaticDefaults()
     {
         ItemID.Sets.AnimatesAsSoul[Item.type] = true;
         Main.RegisterItemAnimation(Item.type, new DrawAnimationVertical(6, 8, false));
     }
+
+    public override void SetDefaults()
+    {
+        Item.damage = 980;
+        Item.DamageType = DamageClass.Magic;
+        Item.width = 92;
+        Item.height = 76;
+        Item.useTime = Item.useAnimation = 26;
+        Item.useStyle = ItemUseStyleID.Shoot;
+        Item.noMelee = Item.noUseGraphic = Item.channel = Item.autoReuse = true;
+        Item.knockBack = 2f;
+        Item.value = CalamityGlobalItem.RarityTurquoiseBuyPrice;
+        Item.rare = ModContent.RarityType<Turquoise>();
+        Item.UseSound = SoundID.Grass;
+        Item.shoot = ModContent.ProjectileType<EpidemicHoldout>();
+        Item.shootSpeed = 16f;
+        Item.mana = 2;
+    }
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(ColorSwap(Color.LawnGreen, Color.LimeGreen, 5f));
     }
 
-    public override void SetDefaults()
-    {
-        Item.damage = 210;
-        Item.DamageType = DamageClass.Magic;
-        Item.width = 92;
-        Item.height = 76;
-        Item.useTime = 26;
-        Item.useAnimation = 26;
-        Item.useStyle = ItemUseStyleID.Shoot;
-        Item.noMelee = true;
-        Item.channel = true;
-        Item.knockBack = 2f;
-        Item.value = AdditionsGlobalItem.RarityPurpleBuyPrice;
-        Item.rare = ItemRarityID.Purple;
-        Item.UseSound = SoundID.Grass;
-        Item.autoReuse = true;
-        Item.shoot = ModContent.ProjectileType<EpidemicHoldout>();
-        Item.shootSpeed = 16f;
-        Item.mana = 2;
-
-        Item.noUseGraphic = true;
-    }
-
     public override bool CanShoot(Player player) => false;
+
     public override bool CanUseItem(Player player)
     {
         return player.ownedProjectileCounts[Item.shoot] <= 0;

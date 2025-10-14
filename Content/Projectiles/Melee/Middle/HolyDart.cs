@@ -37,13 +37,14 @@ public class HolyDart : ModProjectile, ILocalizedModType, IModType
             ParticleRegistry.SpawnSparkleParticle(Projectile.Center + Main.rand.NextVector2Circular(8f, 8f), vel, life, scale, col, col * 2f);
             ParticleRegistry.SpawnHeavySmokeParticle(Projectile.Center + Main.rand.NextVector2Circular(9f, 9f), vel, life, scale, col);
         }
-
         Projectile.netUpdate = true;
     }
 
     public ref float Time => ref Projectile.ai[0];
     public override void AI()
     {
+        if (trail == null || trail.Disposed)
+            trail = new(WidthFunction, ColorFunction, null, 30);
         cache ??= new(30);
         cache.Update(Projectile.Center);
 
@@ -81,15 +82,23 @@ public class HolyDart : ModProjectile, ILocalizedModType, IModType
         return Projectile.height / 2 * MathHelper.SmoothStep(1f, 0f, completionRatio);
     }
 
+    public override bool? CanHitNPC(NPC target) => Projectile.numHits <= 0;
+    public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+    {
+        SoundID.DD2_WitherBeastDeath.Play(Projectile.Center, Main.rand.NextFloat(1.5f, 2.2f), 0f, .3f, null, 20);
+    }
+    
+    public OptimizedPrimitiveTrail trail;
     public TrailPoints cache;
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
         {
+            if (trail == null || trail.Disposed || cache == null)
+                return;
             ManagedShader shader = ShaderRegistry.SmoothFlame;
             shader.TrySetParameter("heatInterpolant", 2f);
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.CrackedNoise), 1);
-            OptimizedPrimitiveTrail trail = new(WidthFunction, ColorFunction, null, 30);
             trail.DrawTrail(shader, cache.Points, 120);
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
@@ -107,10 +116,5 @@ public class HolyDart : ModProjectile, ILocalizedModType, IModType
         PixelationSystem.QueueTextureRenderAction(flare, PixelationLayer.UnderProjectiles, BlendState.Additive);
 
         return false;
-    }
-    public override bool? CanHitNPC(NPC target) => Projectile.numHits <= 0;
-    public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
-    {
-        SoundEngine.PlaySound(SoundID.DD2_WitherBeastDeath with { Volume = Main.rand.NextFloat(1.5f, 2.2f), PitchVariance = .3f, MaxInstances = 20 }, Projectile.Center, null);
     }
 }

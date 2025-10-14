@@ -30,14 +30,14 @@ public class KatanaCleave : BaseSwordSwing
 
     public Power Swing
     {
-        get => (Power)Projectile.Additions().ExtraAI[7];
-        set => Projectile.Additions().ExtraAI[7] = (int)value;
+        get => (Power)Projectile.AdditionsInfo().ExtraAI[7];
+        set => Projectile.AdditionsInfo().ExtraAI[7] = (int)value;
     }
 
     public bool MadeBlade
     {
-        get => Projectile.Additions().ExtraAI[8] == 1f;
-        set => Projectile.Additions().ExtraAI[8] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[8] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[8] = value.ToInt();
     }
 
     public override float Animation()
@@ -88,11 +88,11 @@ public class KatanaCleave : BaseSwordSwing
         // swoosh
         if (Animation() >= .26f && !PlayedSound && !Main.dedServ)
         {
-            AdditionsSound.MediumSwing2.Play(Projectile.Center, .6f, Swing switch { Power.Main => 0f, Power.Second => -.3f, Power.Third => -.5f, _ => -10f }, .2f, 0, Name);
+            AdditionsSound.MediumSwing2.Play(Projectile.Center, .6f, Swing switch { Power.Main => 0f, Power.Second => -.3f, Power.Third => -.5f, _ => 0f }, .2f, 0, Name);
             PlayedSound = true;
         }
 
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, (c) => Center.ToNumerics(), 40);
 
         // Update trails
@@ -172,7 +172,6 @@ public class KatanaCleave : BaseSwordSwing
         Projectile.EmitEnchantmentVisualsAt(Rect().RandomPoint(), 1, 1);
     }
 
-    // Create hitlag and pretty sparkles on hit with enemies
     public override void NPCHitEffects(in Vector2 start, in Vector2 end, NPC npc, NPC.HitInfo hit)
     {
         for (int i = 0; i < 30; i++)
@@ -194,7 +193,6 @@ public class KatanaCleave : BaseSwordSwing
         AdditionsSound.RoySpecial2.Play(start, .6f, 0f, .3f);
     }
 
-    // Do the same for players (if it ever happened)
     public override void PlayerHitEffects(in Vector2 start, in Vector2 end, Player player, Player.HurtInfo info)
     {
         for (int i = 0; i < 30; i++)
@@ -278,15 +276,13 @@ public class KatanaCleave : BaseSwordSwing
             if (trail == null || points == null)
                 return;
 
-            ManagedShader shader = AssetRegistry.GetShader("KatanaTrail");//ShaderRegistry.SwingShader;
+            ManagedShader shader = AssetRegistry.GetShader("KatanaTrail");
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WavyBlotchNoise), 0);
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DarkTurbulentNoise), 1);
             shader.TrySetParameter("flip", flip);
             shader.TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly);
-
             trail.DrawTrail(shader, points.Points);
         }
-
 
         if (Swing == Power.Main)
         {
@@ -304,7 +300,6 @@ public class KatanaCleave : BaseSwordSwing
             }
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
-
         return false;
     }
 }
@@ -356,7 +351,7 @@ public class KatanaSweep : ModProjectile
         set => Projectile.ai[2] = value.ToInt();
     }
 
-    public ref float TotalTime => ref Projectile.Additions().ExtraAI[0];
+    public ref float TotalTime => ref Projectile.AdditionsInfo().ExtraAI[0];
     public Vector2 Center => Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
     public int Dir => Projectile.velocity.X.NonZeroSign();
     public Vector2 InitialStart;
@@ -443,7 +438,7 @@ public class KatanaSweep : ModProjectile
                     {
                         Vector2 pos = Vector2.Lerp(InitialStart, End, Main.rand.NextFloat()) + Main.rand.NextVector2Circular(150f, 150f);
                         Vector2 vel = Main.rand.NextVector2Circular(1f, 1f);
-                        Projectile.NewProj(pos, vel, ModContent.ProjectileType<KatanaSlice>(), Projectile.damage / 10, 0f, Owner.whoAmI);
+                        Projectile.NewProj(pos, vel, ModContent.ProjectileType<KatanaSlice>(), (int)(Projectile.damage * .3f), 0f, Owner.whoAmI);
 
                         AdditionsSound.SwordSliceShort.Play(pos, .4f, .1f, 0f, 0, Name);
                     }
@@ -601,11 +596,9 @@ public class KatanaSlice : ModProjectile
                 Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Size.ToVector2() * i * .4f * Projectile.Opacity), null, Color.White * Projectile.Opacity, Projectile.rotation, origin);
                 Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Size.ToVector2() * i), null, col, Projectile.rotation, origin);
                 Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Size.ToVector2() * i * 1.3f), null, Color.DarkSlateBlue * Projectile.Opacity * .4f, Projectile.rotation, origin);
-
             }
         }
         PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.Dusts, BlendState.Additive);
-
         return false;
     }
 }

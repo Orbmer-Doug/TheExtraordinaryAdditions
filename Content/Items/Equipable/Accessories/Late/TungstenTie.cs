@@ -5,10 +5,11 @@ using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TheExtraordinaryAdditions.Content.Buffs.Debuff;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Early;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Late;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Late;
@@ -16,14 +17,17 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Late;
 public class TungstenTie : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TungstenTie);
+
     public override void SetStaticDefaults()
     {
         CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1;
     }
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(new Color(247, 226, 218));
     }
+
     public override void SetDefaults()
     {
         Item.width = 20;
@@ -34,115 +38,57 @@ public class TungstenTie : ModItem
         Item.value = AdditionsGlobalItem.UniqueRarityPrice;
         Item.maxStack = 1;
     }
+
     public override void UpdateAccessory(Player player, bool hideVisual)
     {
-        player.GetModPlayer<GlobalPlayer>().TungstenTie = true;
-        if (player.GetModPlayer<GlobalPlayer>().AshersTie == true)
-        {
-            player.GetModPlayer<GlobalPlayer>().AshersTie = false;
-        }
-        int damage = (int)player.GetDamage(DamageClass.Melee).ApplyTo(350f);
-        float knockBack = 3f;
+        player.GetModPlayer<TungstenTiePlayer>().Equipped = true;
+
+        player.GetArmorPenetration(DamageClass.Generic) += 10f;
+        player.maxFallSpeed = 15f;
+        player.fallStart = 1000;
+        player.fallStart2 = 1000;
+        player.thorns = 1f;
+        player.moveSpeed -= 0.1f;
+        player.runAcceleration -= .05f;
+        player.ignoreWater = player.noKnockback = true;
+        player.canFloatInWater = player.adjWater = player.waterWalk = player.waterWalk2 = player.jumpBoost = false;
+        player.wingTimeMax -= 10;
+
         if (!Main.rand.NextBool(15))
-        {
             return;
-        }
-        int num = 0;
-        for (int i = 0; i < Main.maxProjectiles; i++)
-        {
-            if (Main.projectile[i].active && Main.projectile[i].owner == player.whoAmI && Main.projectile[i].type == ModContent.ProjectileType<SharpTie>())
-            {
-                num++;
-            }
-        }
-        IEntitySource source = player.GetSource_Accessory(Item, null);
-        if (Main.rand.Next(15) < num || num >= 10)
-        {
+
+        int tie = ModContent.ProjectileType<SharpTie>();
+        int owned = player.CountOwnerProjectiles(tie);
+        if (owned >= 10)
             return;
-        }
 
         for (int j = 0; j < 50; j++)
         {
-            int num5 = Main.rand.Next(200 - j * 2, 400 + j * 2);
+            int area = Main.rand.Next(200 - j * 2, 400 + j * 2);
             Vector2 center = player.Center;
-            center.X += Main.rand.Next(-num5, num5 + 1);
-            center.Y += Main.rand.Next(-num5, num5 + 1);
-            center.X += 12;
-            center.Y += 12;
-            if (!Collision.CanHit(new Vector2(player.Center.X, player.position.Y), 1, 1, center, 1, 1) && !Collision.CanHit(new Vector2(player.Center.X, player.position.Y - 50f), 1, 1, center, 1, 1))
-            {
+            center.X += Main.rand.Next(-area, area + 1) + 12;
+            center.Y += Main.rand.Next(-area, area + 1) + 12;
+            if (!Collision.CanHit(new Vector2(player.Center.X, player.position.Y), 1, 1, center, 1, 1)
+                && !Collision.CanHit(new Vector2(player.Center.X, player.position.Y - 50f), 1, 1, center, 1, 1))
                 continue;
-            }
-            int num6 = (int)center.X / 16;
-            int num7 = (int)center.Y / 16;
-            bool flag = false;
-            if (Main.rand.NextBool(3) && Main.tile[num6, num7] != null)
+
+            if (Main.myPlayer == player.whoAmI)
             {
-                Tile val = Main.tile[num6, num7];
-                if (val.WallType > 0)
-                {
-                    flag = true;
-                    goto IL_028d;
-                }
-            }
-            center.X -= 45;
-            center.Y -= 45;
-            {
-                center.X += 45;
-                center.Y += 45;
-                flag = true;
-            }
-            goto IL_028d;
-        IL_028d:
-            if (!flag)
-            {
-                continue;
-            }
-            for (int k = 0; k < Main.maxProjectiles; k++)
-            {
-                if (Main.projectile[k].active && Main.projectile[k].owner == player.whoAmI && Main.projectile[k].type == ModContent.ProjectileType<SharpTie>())
-                {
-                    Vector2 val2 = center - Main.projectile[k].Center;
-                    if (((Vector2)val2).Length() < 48f)
-                    {
-                        flag = false;
-                        break;
-                    }
-                }
-            }
-            if (flag && Main.myPlayer == player.whoAmI)
-            {
-                Projectile.NewProjectile(source, center.X, center.Y, 0f, 0f, ModContent.ProjectileType<SharpTie>(), damage, knockBack, player.whoAmI, 0f, 0f, 0f);
-                for (int i = 0; i < 60; i++)
+                int damage = (int)player.GetDamage(DamageClass.Generic).ApplyTo(350f);
+                Projectile.NewProjectileDirect(player.GetSource_Accessory(Item, null), center, Vector2.Zero,
+                    tie, damage, 3f, player.whoAmI);
+                for (int i = 0; i < 65; i++)
                 {
                     float offsetAngle = Main.rand.NextFloat(MathHelper.TwoPi);
-                    Vector2 shootVelocity = (MathHelper.TwoPi * i / 10f + offsetAngle).ToRotationVector2() * 8f;
+                    Vector2 shootVelocity = (MathHelper.TwoPi * i / 10f + offsetAngle).ToRotationVector2() * 6f;
                     Dust dust = Dust.NewDustPerfect(center, DustID.AncientLight, shootVelocity, default, default, 1.6f);
                     dust.noGravity = true;
                 }
-
                 break;
             }
-
-
-            player.GetArmorPenetration(DamageClass.Generic) += 10f;
-            player.GetCritChance(DamageClass.Generic) += 10f;
-            player.GetDamage(DamageClass.Generic) += .2f;
-            player.maxFallSpeed = 15f;
-            player.fallStart = 1000;
-            player.fallStart2 = 1000;
-            player.thorns = 1f;
-            player.noKnockback = true;
-            player.moveSpeed -= 0.1f;
-            player.runAcceleration -= .05f;
-            player.ignoreWater = true;
-            player.canFloatInWater = false;
-            player.adjWater = false;
-            player.waterWalk = false;
-            player.waterWalk2 = false;
-            player.wingTimeMax -= 10;
         }
     }
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
@@ -153,5 +99,36 @@ public class TungstenTie : ModItem
         recipe.AddTile(TileID.Loom);
         recipe.AddTile(TileID.LunarMonolith);
         recipe.Register();
+    }
+}
+
+public sealed class TungstenTiePlayer : ModPlayer
+{
+    public bool Equipped;
+    public override void ResetEffects() => Equipped = false;
+
+    public override bool PreKill(double damage, int hitDirection, bool pvp, ref bool playSound, ref bool genDust, ref PlayerDeathReason damageSource)
+    {
+        if (Equipped && !Player.HasBuff<TheTiesCooldown>() && !Player.GetModPlayer<AshersWhiteTiePlayer>().Equipped)
+        {
+            AdditionsSound.etherealNuhUh.Play(Player.Center, 1.4f, -.2f);
+            for (int l = 0; l < 12; l++)
+            {
+                ParticleRegistry.SpawnPulseRingParticle(Player.Center, Vector2.Zero, 20, RandomRotation(), new(.5f, 1f),
+                    0f, .15f, Color.DarkGray);
+                ParticleRegistry.SpawnSparkParticle(Player.Center, Main.rand.NextVector2CircularLimited(12, 12f, .4f, 1f),
+                    40, Main.rand.NextFloat(.4f, .6f), Color.Gray);
+            }
+            ParticleRegistry.SpawnThunderParticle(Player.Center, 140, 1.5f, new(1f), 0f, Color.WhiteSmoke);
+
+            Player.Heal(100);
+            if (Player.statLife > Player.statLifeMax2)
+                Player.statLife = Player.statLifeMax2;
+
+            Player.AddBuff(ModContent.BuffType<TheTiesCooldown>(), SecondsToFrames(210));
+            return false;
+        }
+
+        return base.PreKill(damage, hitDirection, pvp, ref playSound, ref genDust, ref damageSource);
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Terraria;
-using Terraria.Localization;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
 
@@ -17,7 +16,7 @@ public class SupremeWaterbreathing : ModBuff
 
     public override void Update(Player player, ref int buffIndex)
     {
-        player.Additions().BigOxygen = true;
+        player.Additions().Buffs[GlobalPlayer.AdditionsBuff.BigOxygen] = true;
         player.breath = player.breathMax + 91;
     }
 }

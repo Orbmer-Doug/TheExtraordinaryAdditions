@@ -1,11 +1,11 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Early;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Early;
@@ -13,10 +13,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Early;
 public class BirchStick : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BirchStick);
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(new Color(200, 200, 200));
-    }
+
     public override void SetDefaults()
     {
         Item.width = 106;
@@ -37,6 +34,11 @@ public class BirchStick : ModItem
         Item.shoot = ModContent.ProjectileType<BirchStickLance>();
     }
 
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(new Color(200, 200, 200));
+    }
+
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
         BirchStickLance lance = Main.projectile[player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI)].As<BirchStickLance>();
@@ -48,7 +50,9 @@ public class BirchStick : ModItem
 
         return false;
     }
+
     public override bool AltFunctionUse(Player player) => true;
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();

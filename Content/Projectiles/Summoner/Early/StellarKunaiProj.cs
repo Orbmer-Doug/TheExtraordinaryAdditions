@@ -1,14 +1,10 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Content.Buffs.Debuff;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -26,15 +22,9 @@ public class StellarKunaiProj : ModProjectile, ILocalizedModType, IModType
     public Player Owner => Main.player[Projectile.owner];
 
     private Vector2 offset;
-    public override void SendExtraAI(BinaryWriter writer)
-    {
-        writer.WriteVector2(offset);
-    }
-    public override void ReceiveExtraAI(BinaryReader reader)
-    {
-        offset = reader.ReadVector2();
-    }
-
+    public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(offset);
+    public override void ReceiveExtraAI(BinaryReader reader) => offset = reader.ReadVector2();
+    
     public const int ChargeupTime = 30;
     public const int Lifetime = 200;
     public float ChargeProgress => InverseLerp(0f, ChargeupTime, Timer);
@@ -51,8 +41,8 @@ public class StellarKunaiProj : ModProjectile, ILocalizedModType, IModType
         set => Projectile.ai[2] = value.ToInt();
     }
 
-    public ref float Timer => ref Projectile.Additions().ExtraAI[1];
-    public ref float ReturningTimer => ref Projectile.Additions().ExtraAI[2];
+    public ref float Timer => ref Projectile.AdditionsInfo().ExtraAI[1];
+    public ref float ReturningTimer => ref Projectile.AdditionsInfo().ExtraAI[2];
 
     public override void SetStaticDefaults()
     {
@@ -88,7 +78,7 @@ public class StellarKunaiProj : ModProjectile, ILocalizedModType, IModType
 
     public override void AI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunction, ColorFunction, null, 30);
 
         Vector2 center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
@@ -120,7 +110,7 @@ public class StellarKunaiProj : ModProjectile, ILocalizedModType, IModType
         }
         if (Timer == ChargeupTime)
         {
-            SoundEngine.PlaySound(SoundID.Item1 with { Volume = Main.rand.NextFloat(.9f, 1.2f), PitchVariance = .1f, Identifier = Name }, (Vector2?)Projectile.Center, null);
+            SoundID.Item1.Play(Projectile.Center, Main.rand.NextFloat(.9f, 1.2f), 0f, .1f, null, 1, Name);
             Projectile.velocity *= 13.5f;
             Projectile.tileCollide = true;
         }
@@ -280,7 +270,7 @@ public class StellarKunaiProj : ModProjectile, ILocalizedModType, IModType
         return col * ReelInterpolant;
     }
 
-    public ManualTrailPoints line = new(30);
+    public TrailPoints line = new(30);
     public OptimizedPrimitiveTrail trail;
     public override bool PreDraw(ref Color lightColor)
     {

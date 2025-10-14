@@ -4,7 +4,6 @@ using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -13,12 +12,21 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
 public partial class Asterlin : ModNPC
 {
+    public static readonly Dictionary<AsterlinAIType, float> UnrelentingRush_PossibleStates = new Dictionary<AsterlinAIType, float> { { AsterlinAIType.UnveilingZenith, 1f } };
     [AutomatedMethodInvoke]
     public void LoadStateTransitions_UnrelentingRush()
     {
-        StateMachine.RegisterTransition(AsterlinAIType.UnrelentingRush, new Dictionary<AsterlinAIType, float> { { AsterlinAIType.UnveilingZenith, 1f } }, false, () =>
+        StateMachine.RegisterTransition(AsterlinAIType.UnrelentingRush, UnrelentingRush_PossibleStates, false, () =>
         {
             return UnrelentingRush_WaitTimer >= UnrelentingRush_WaitTime;
+        },
+        () =>
+        {
+            if (ExtraUpdates != 1)
+            {
+                ExtraUpdates = 1;
+                this.Sync();
+            }
         });
         StateMachine.RegisterStateBehavior(AsterlinAIType.UnrelentingRush, DoBehavior_UnrelentingRush);
     }
@@ -26,10 +34,12 @@ public partial class Asterlin : ModNPC
     public static int UnrelentingRush_TotalDashes => DifficultyBasedValue(10, 13, 16, 18, 20, 24);
     public static int UnrelentingRush_SlowdownTime => DifficultyBasedValue(SecondsToFrames(.7f), SecondsToFrames(.6f), SecondsToFrames(.5f), SecondsToFrames(.46f), SecondsToFrames(.4f), SecondsToFrames(.36f));
     public static int UnrelentingRush_InitialFadeTime => SecondsToFrames(.7f);
-    public static int UnrelentingRush_PortalFadeIn => DifficultyBasedValue(SecondsToFrames(.6f), SecondsToFrames(.44f), SecondsToFrames(.42f), SecondsToFrames(.39f), SecondsToFrames(.35f), SecondsToFrames(.3f));
+    public static int UnrelentingRush_PortalFadeIn => DifficultyBasedValue(SecondsToFrames(.8f), SecondsToFrames(.64f), SecondsToFrames(.62f), SecondsToFrames(.59f), SecondsToFrames(.55f), SecondsToFrames(.5f));
+    public static int UnrelentingRush_LaserCount => DifficultyBasedValue(6, 8, 10, 12, 14);
     public static int UnrelentingRush_PortalFadeOut => SecondsToFrames(.9f);
     public static int UnrelentingRush_PortalLifetime => UnrelentingRush_PortalFadeIn + UnrelentingRush_PortalFadeOut + SecondsToFrames(2f);
-    public static int UnrelentingRush_WaitTime => SecondsToFrames(1.2f);
+    public static readonly int UnrelentingRush_WaitTime = SecondsToFrames(1.2f);
+    public static readonly int UnrelentingRush_MaxUpdates = 10;
 
     public enum UnrelentingRush_States
     {
@@ -39,24 +49,24 @@ public partial class Asterlin : ModNPC
     }
     public int UnrelentingRush_DashCounter
     {
-        get => (int)NPC.AdditionsInfo().ExtraAI[0];
-        set => NPC.AdditionsInfo().ExtraAI[0] = value;
+        get => (int)ExtraAI[0];
+        set => ExtraAI[0] = value;
     }
     public UnrelentingRush_States UnrelentingRush_CurrentState
     {
-        get => (UnrelentingRush_States)NPC.AdditionsInfo().ExtraAI[1];
-        set => NPC.AdditionsInfo().ExtraAI[1] = (int)value;
+        get => (UnrelentingRush_States)ExtraAI[1];
+        set => ExtraAI[1] = (int)value;
     }
-    public ref float UnrelentingRush_SavedRotation => ref NPC.AdditionsInfo().ExtraAI[2];
+    public ref float UnrelentingRush_SavedRotation => ref ExtraAI[2];
     public int UnrelentingRush_DashTimer
     {
-        get => (int)NPC.AdditionsInfo().ExtraAI[3];
-        set => NPC.AdditionsInfo().ExtraAI[3] = value;
+        get => (int)ExtraAI[3];
+        set => ExtraAI[3] = value;
     }
     public int UnrelentingRush_WaitTimer
     {
-        get => (int)NPC.AdditionsInfo().ExtraAI[4];
-        set => NPC.AdditionsInfo().ExtraAI[4] = value;
+        get => (int)ExtraAI[4];
+        set => ExtraAI[4] = value;
     }
 
     public void DoBehavior_UnrelentingRush()
@@ -109,7 +119,7 @@ public partial class Asterlin : ModNPC
                         }
                         break;
                     case UnrelentingRush_States.Dash:
-                        NPC.velocity = UnrelentingRush_SavedRotation.ToRotationVector2() * 220f;
+                        NPC.velocity = UnrelentingRush_SavedRotation.ToRotationVector2() * 220f / UnrelentingRush_MaxUpdates;
                         NPC.Opacity = 1f;
                         SetZPosition(1f);
 
@@ -147,40 +157,55 @@ public partial class Asterlin : ModNPC
                         ScreenShakeSystem.New(new ScreenShake(1f, .8f, 2000f), NPC.Center);
                         AdditionsSound.IkeFinal.Play(NPC.Center, 2.2f, .3f, .1f);
 
-                        int cnt = 8;
-                        for (int i = 0; i < cnt; i++)
+                        if (this.RunServer())
                         {
-                            float comp = InverseLerp(0, cnt - 1, i);
-                            float speed = MathHelper.Lerp(16f, 28f, Convert01To010(comp));
-                            Vector2 vel = NPC.velocity.SafeNormalize(Vector2.Zero).RotatedBy(MathHelper.Lerp(-1.2f, 1.2f, comp)) * speed;
-                            NPC.NewNPCProj(NPC.Center, vel, ModContent.ProjectileType<OverchargedLaser>(), LightAttackDamage, 0f, -1, 1f);
+                            for (int i = 0; i < UnrelentingRush_LaserCount; i++)
+                            {
+                                float comp = InverseLerp(0, UnrelentingRush_LaserCount - 1, i);
+                                float speed = MathHelper.Lerp(16f, 28f, Convert01To010(comp));
+                                Vector2 vel = NPC.velocity.SafeNormalize(Vector2.Zero).RotatedBy(MathHelper.Lerp(-1.2f, 1.2f, comp)) * speed;
+                                NPC.NewNPCProj(NPC.Center, vel, ModContent.ProjectileType<OverchargedLaser>(), LightAttackDamage, 0f, -1, 1f);
+                            }
                         }
 
+                        NPC.damage = NPC.defDamage;
                         UnrelentingRush_DashCounter++;
                         UnrelentingRush_DashTimer = 0;
                         UnrelentingRush_CurrentState = UnrelentingRush_States.Slowdown;
                         NPC.netUpdate = true;
                         break;
                     case UnrelentingRush_States.Slowdown:
+                        if (ExtraUpdates != UnrelentingRush_MaxUpdates)
+                        {
+                            ExtraUpdates = UnrelentingRush_MaxUpdates;
+                            this.Sync();
+                        }
                         NPC.velocity *= .95f;
+                        NPC.damage = NPC.defDamage;
 
                         if (UnrelentingRush_DashTimer >= UnrelentingRush_SlowdownTime)
                         {
+                            ExtraUpdates = 1;
                             UnrelentingRush_DashTimer = 0;
                             UnrelentingRush_CurrentState = UnrelentingRush_States.MakePortal;
-                            NPC.netUpdate = true;
+                            this.Sync();
                         }
                         break;
                 }
-                SetRightHandTarget(rightArm.RootPosition + PolarVector(400f, UnrelentingRush_SavedRotation));
+                SetRightHandTarget(RightArm.RootPosition + PolarVector(400f, UnrelentingRush_SavedRotation));
                 SetHeadRotation(UnrelentingRush_SavedRotation);
                 SetBodyRotation(UnrelentingRush_SavedRotation + MathHelper.PiOver2);
                 SetFlipped(false);
 
-                FlameEngulfInterpolant = InverseLerp(10f, 200f, NPC.velocity.Length());
+                FlameEngulfInterpolant = InverseLerp(10f, 200f, (NPC.velocity * ExtraUpdates).Length());
             }
             else
             {
+                if (ExtraUpdates != 1)
+                {
+                    ExtraUpdates = 1;
+                    this.Sync();
+                }
                 FlameEngulfInterpolant = 0f;
                 NPC.velocity = Vector2.SmoothStep(NPC.Center, Target.Center + new Vector2(200f * (NPC.Center.X > Target.Center.X).ToDirectionInt(), -90f), .1f) - NPC.Center;
                 UnrelentingRush_WaitTimer++;

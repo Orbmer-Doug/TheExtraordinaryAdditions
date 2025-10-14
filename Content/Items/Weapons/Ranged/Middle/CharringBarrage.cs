@@ -1,10 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
@@ -12,6 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 public class CharringBarrage : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CharringBarrage);
+
     public override void SetDefaults()
     {
         Item.damage = 35;
@@ -33,11 +33,14 @@ public class CharringBarrage : ModItem
         Item.shootSpeed = 10f;
         Item.autoReuse = true;
     }
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(new Color(240, 82, 10));
     }
+
     public override bool CanShoot(Player player) => false;
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();

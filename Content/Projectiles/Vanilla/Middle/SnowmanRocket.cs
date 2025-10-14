@@ -70,6 +70,7 @@ public class SnowmanRocket : ModProjectile
         /// </summary>
         MiniNuke2,
     }
+
     public override void SetDefaults()
     {
         Projectile.aiStyle = -1;
@@ -87,6 +88,9 @@ public class SnowmanRocket : ModProjectile
     public ref float Time => ref Projectile.ai[1];
     public override void AI()
     {
+        if (trail == null || trail.Disposed)
+            trail = new(c => MathHelper.SmoothStep(Projectile.width, 0f, c), ColorFunct, null, 40);
+
         switch (State)
         {
             case (int)RocketType.One:
@@ -369,14 +373,16 @@ public class SnowmanRocket : ModProjectile
         _ => ProjectileID.RocketSnowmanI.GetTerrariaProj(),
     }, AssetRequestMode.AsyncLoad).Value;
 
+    public OptimizedPrimitiveTrail trail;
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
         {
+            if (trail == null || trail.Disposed || points == null)
+                return;
             ManagedShader fire = ShaderRegistry.SmoothFlame;
             fire.TrySetParameter("heatInterpolant", 6f * Projectile.Opacity);
             fire.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WavyNeurons), 1);
-            OptimizedPrimitiveTrail trail = new(c => MathHelper.SmoothStep(Projectile.width, 0f, c), ColorFunct, null, 40);
             trail.DrawTrail(fire, points.Points, 100, true);
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.OverProjectiles);

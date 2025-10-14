@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
 using System.Collections.Generic;
@@ -19,11 +18,9 @@ public abstract class Behavior<TInfo>
         where TInfo : struct
 {
     public abstract string TexturePath { get; }
-    public const string Path = "TheExtraordinaryAdditions/Content/Rarities/RarityTextures/";
     public abstract void Update();
     public abstract void Draw(SpriteBatch sb, Vector2 position, DrawableTooltipLine line = null);
     public virtual bool UseAdditive { get; } = false;
-
     public TInfo Info;
 }
 
@@ -45,11 +42,6 @@ public struct RarityParticleInfo(Vector2 position, Vector2 velocity, int life, f
 
     public Rectangle? BaseFrame;
     public readonly float TimeRatio => InverseLerp(0f, Lifetime, Time);
-
-    public override readonly string ToString()
-    {
-        return $"Time: {Time}, Lifetime: {Lifetime}, Position: {Position}, Velocity: {Velocity}, Scale: {Scale}, Rotation: {Rotation}, " + "Color".ColoredText(DrawColor);
-    }
 }
 
 public class CustomRaritySystem : ModSystem

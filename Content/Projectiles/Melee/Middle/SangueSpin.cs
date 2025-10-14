@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using System;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
@@ -43,8 +42,8 @@ public class SangueSpin : ModProjectile
         set => Projectile.ai[2] = value.ToInt();
     }
 
-    public ref float Dist => ref Projectile.Additions().ExtraAI[0];
-    public ref float OldRot => ref Projectile.Additions().ExtraAI[1];
+    public ref float Dist => ref Projectile.AdditionsInfo().ExtraAI[0];
+    public ref float OldRot => ref Projectile.AdditionsInfo().ExtraAI[1];
 
     public override void SetDefaults()
     {
@@ -71,7 +70,7 @@ public class SangueSpin : ModProjectile
             Init = true;
         }
 
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, (c) => Projectile.Center.ToNumerics(), 20);
 
         Owner.heldProj = Projectile.whoAmI;
@@ -224,7 +223,6 @@ public class SangueSpin : ModProjectile
         Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, null, lightColor * Projectile.Opacity,
             Projectile.rotation + offset, origin, Projectile.scale, fx, 0f);
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.OverProjectiles);
-
         return false;
     }
 }

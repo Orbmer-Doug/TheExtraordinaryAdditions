@@ -1,23 +1,18 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Assets;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Early;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.ScreenEffects;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -38,15 +33,15 @@ public class TorrentialStormsHeld : BaseIdleHoldoutProjectile
     }
 
     public List<Vector2> Points;
-    public ManualTrailPoints cache = new(MaxPoints);
+    public TrailPoints cache = new(MaxPoints);
     public const int MaxPoints = 40;
     public const float ReelDist = 15f;
     public int ReelTime => Item.useTime;
     public ref float Time => ref Projectile.ai[0];
     public ref float Switch => ref Projectile.ai[1];
     public ref float StringCompletion => ref Projectile.ai[2];
-    public ref float OldStringCompletion => ref Projectile.Additions().ExtraAI[0];
-    public ref float TotalTime => ref Projectile.Additions().ExtraAI[2];
+    public ref float OldStringCompletion => ref Projectile.AdditionsInfo().ExtraAI[0];
+    public ref float TotalTime => ref Projectile.AdditionsInfo().ExtraAI[2];
     public int Dir => Projectile.velocity.X.NonZeroSign();
     public override void OnSpawn(IEntitySource source)
     {
@@ -70,6 +65,8 @@ public class TorrentialStormsHeld : BaseIdleHoldoutProjectile
     {
         Item ammoItem = Owner.ChooseAmmo(Item);
         Texture2D arrow = ammoItem != null ? ammoItem.ThisItemTexture() : AssetRegistry.GetTexture(AdditionsTexture.Pixel);
+        if (trail == null || trail.Disposed)
+            trail = new(c => 14f, (c, pos) => MulticolorLerp(Sin01(Main.GlobalTimeWrappedHourly * 1.2f) + c.X, new(77, 89, 151), new(109, 119, 169), new(143, 152, 203)), null, 150);
 
         if (this.RunLocal())
         {
@@ -180,20 +177,16 @@ public class TorrentialStormsHeld : BaseIdleHoldoutProjectile
                         }
                         SoundEngine.PlaySound(SoundID.Item5 with { Volume = Main.rand.NextFloat(.9f, 1.2f), PitchVariance = .1f, Identifier = Name }, arrowPos);
 
-                        if (this.RunLocal())
+                        for (int i = 0; i < (reel < .33f ? 2 : reel < .66f ? 3 : 4); i++)
                         {
-                            for (int i = 0; i < (reel < .33f ? 2 : reel < .66f ? 3 : 4); i++)
-                            {
-                                Vector2 offset = Main.rand.NextVector2CircularLimited(70f, 70f, .4f, 1f);
-                                Vector2 posit = arrowPos + offset;
-                                Vector2 veloc = posit.SafeDirectionTo(Modded.mouseWorld + offset) * speed * Main.rand.NextFloat(.6f, 1.25f);
+                            Vector2 offset = Main.rand.NextVector2CircularLimited(70f, 70f, .4f, 1f);
+                            Vector2 posit = arrowPos + offset;
+                            Vector2 veloc = posit.SafeDirectionTo(Modded.mouseWorld + offset) * speed * Main.rand.NextFloat(.6f, 1.25f);
+                            if (this.RunLocal())
                                 Projectile.NewProj(posit, veloc, ModContent.ProjectileType<RainDrop>(), dmg / 3, kb / 3, Owner.whoAmI);
-                                ParticleRegistry.SpawnPulseRingParticle(posit, veloc.SafeNormalize(Vector2.Zero), Main.rand.Next(35, 50), veloc.ToRotation(), new(.5f, 1f), 0f, 30f, Color.CornflowerBlue);
-                                for (int j = 0; j < 12; j++)
-                                {
-                                    Dust.NewDustPerfect(posit, DustID.Water, veloc.RotatedByRandom(.2f) * Main.rand.NextFloat(.4f, .8f), 0, default, Main.rand.NextFloat(1.5f, 1.9f)).noGravity = true;
-                                }
-                            }
+                            ParticleRegistry.SpawnPulseRingParticle(posit, veloc.SafeNormalize(Vector2.Zero), Main.rand.Next(35, 50), veloc.ToRotation(), new(.5f, 1f), 0f, 30f, Color.CornflowerBlue);
+                            for (int j = 0; j < 12; j++)
+                                Dust.NewDustPerfect(posit, DustID.Water, veloc.RotatedByRandom(.2f) * Main.rand.NextFloat(.4f, .8f), 0, default, Main.rand.NextFloat(1.5f, 1.9f)).noGravity = true;
                         }
 
                         OldStringCompletion = StringCompletion;
@@ -214,6 +207,7 @@ public class TorrentialStormsHeld : BaseIdleHoldoutProjectile
         }
     }
 
+    public OptimizedPrimitiveTrail trail;
     public override bool PreDraw(ref Color lightColor)
     {
         Item ammoItem = Owner.ChooseAmmo(Item);
@@ -221,10 +215,11 @@ public class TorrentialStormsHeld : BaseIdleHoldoutProjectile
 
         void draw()
         {
+            if (trail == null || trail.Disposed || cache == null)
+                return;
             ManagedShader shader = ShaderRegistry.EnlightenedBeam;
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.StreakLightning), 1);
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Lightning2), 2);
-            OptimizedPrimitiveTrail trail = new(c => 14f, (c, pos) => MulticolorLerp(Sin01(Main.GlobalTimeWrappedHourly * 1.2f) + c.X, new(77, 89, 151), new(109, 119, 169), new(143, 152, 203)), null, 150);
             trail.DrawTrail(shader, cache.Points, 150);
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.HeldProjectiles);

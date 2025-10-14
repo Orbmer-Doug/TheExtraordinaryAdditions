@@ -1,9 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using ReLogic.Utilities;
+﻿using ReLogic.Utilities;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
@@ -16,20 +14,6 @@ public class ScarletMeteor : ModProjectile, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ScarletMeteor);
     public ref float Time => ref Projectile.ai[0];
-    public override bool PreDraw(ref Color lightColor)
-    {
-        void draw()
-        {
-            if (trail == null || cache == null)
-                return;
-
-            trail.DrawTrail(ShaderRegistry.StandardPrimitiveShader, cache.Points, 30);
-        }
-        PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
-
-        Projectile.DrawBaseProjectile(Color.White * Projectile.Opacity);
-        return false;
-    }
 
     public override void SetDefaults()
     {
@@ -51,7 +35,7 @@ public class ScarletMeteor : ModProjectile, ILocalizedModType, IModType
             Projectile.velocity.Y = MathHelper.Clamp(Projectile.velocity.Y + .1f, -20f, 20f);
         Projectile.Opacity = InverseLerp(0f, 20f, Time);
 
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(c => Projectile.width, (c, pos) => Color.OrangeRed * MathHelper.SmoothStep(1f, 0f, c.X) * Projectile.Opacity, null, 10);
         cache ??= new(10);
         cache.Update(Projectile.Center + Projectile.velocity);
@@ -84,5 +68,20 @@ public class ScarletMeteor : ModProjectile, ILocalizedModType, IModType
                     Projectile.damage / 4, Projectile.knockBack / 4f, Projectile.owner, 0f, 0f, 0f);
             }
         }
+    }
+    
+    public override bool PreDraw(ref Color lightColor)
+    {
+        void draw()
+        {
+            if (trail == null || cache == null)
+                return;
+
+            trail.DrawTrail(ShaderRegistry.StandardPrimitiveShader, cache.Points, 30);
+        }
+        PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
+
+        Projectile.DrawBaseProjectile(Color.White * Projectile.Opacity);
+        return false;
     }
 }

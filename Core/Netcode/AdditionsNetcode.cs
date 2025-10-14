@@ -7,7 +7,6 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Tools;
 using TheExtraordinaryAdditions.Content.NPCs.Misc;
 using TheExtraordinaryAdditions.Core.Systems;
-using TheExtraordinaryAdditions.Core.Utilities;
 using TheExtraordinaryAdditions.UI.GodDummyUI;
 //using static Terraria.ModLoader.BackupIO;
 

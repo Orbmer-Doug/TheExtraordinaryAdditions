@@ -8,7 +8,7 @@ using TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Early;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Late;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -48,6 +48,7 @@ public class AbsoluteGreathelm : ModItem, ILocalizedModType, IModType
 
     public override void UpdateArmorSet(Player player)
     {
+        player.GetModPlayer<AbsoluteArmorPlayer>().Equipped = true;
         player.GetAttackSpeed<MeleeDamageClass>() += 0.15f;
 
         player.ignoreWater = true;
@@ -60,7 +61,7 @@ public class AbsoluteGreathelm : ModItem, ILocalizedModType, IModType
         string hotkey = AdditionsKeybinds.SetBonusHotKey.TooltipHotkeyString();
         player.setBonus = this.GetLocalization("SetBonus").Format(hotkey);
 
-        if (AdditionsKeybinds.SetBonusHotKey.JustPressed && !CalUtils.HasCooldown(player, AbsoluteCooldown.ID))
+        if (AdditionsKeybinds.SetBonusHotKey.JustPressed && !CalUtils.HasCooldown(player, AbsoluteCooldown.ID) && player.whoAmI == Main.myPlayer)
         {
             player.NewPlayerProj(player.Center, Vector2.Zero, ModContent.ProjectileType<WhiteVoid>(), (int)player.GetTotalDamage<GenericDamageClass>().ApplyTo(7000), 0f, Main.myPlayer);
             CalUtils.AddCooldown(player, AbsoluteCooldown.ID, SecondsToFrames(15));
@@ -93,5 +94,43 @@ public class AbsoluteGreathelm : ModItem, ILocalizedModType, IModType
         recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 10);
         recipe.AddTile(ModContent.TileType<CosmicAnvil>());
         recipe.Register();
+    }
+}
+
+public sealed class AbsoluteArmorPlayer : ModPlayer
+{
+    public bool Equipped;
+    public override void ResetEffects() => Equipped = false;
+
+    public override void UpdateLifeRegen()
+    {
+        if (!Equipped)
+            return;
+
+        Player.lifeRegenCount += 4;
+
+        while (Player.lifeRegenCount >= 120)
+        {
+            Player.lifeRegenCount -= 120;
+
+            if (Player.statLife < Player.statLifeMax2)
+            {
+                Player.statLife += 2;
+                {
+                    for (int i = 0; i < 10; i++)
+                    {
+                        Vector2 pos = Player.Center;
+                        float lightSpawnOffset = Main.rand.NextFloat(120f, 120f);
+                        Vector2 lightSpawnPosition = pos + Main.rand.NextVector2Unit() * lightSpawnOffset;
+                        Vector2 lightSpawnVelocity = (pos - lightSpawnPosition) * 0.0411f;
+                        float particleScale = Main.rand.NextFloat(.4f, 1.1f);
+                        ParticleRegistry.SpawnSparkParticle(lightSpawnPosition, lightSpawnVelocity, 40, particleScale, Color.AntiqueWhite, false, false, pos);
+                    }
+                }
+            }
+
+            if (Player.statLife > Player.statLifeMax2)
+                Player.statLife = Player.statLifeMax2;
+        }
     }
 }

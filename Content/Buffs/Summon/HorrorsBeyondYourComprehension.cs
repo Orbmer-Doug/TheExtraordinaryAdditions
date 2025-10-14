@@ -1,9 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
-using Terraria.Localization;
+﻿using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Pets;
-using TheExtraordinaryAdditions.Core.Globals;
 
 namespace TheExtraordinaryAdditions.Content.Buffs.Summon;
 

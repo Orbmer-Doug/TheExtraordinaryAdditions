@@ -1,11 +1,8 @@
 ﻿using System;
-using System.IO;
 using Terraria;
-using Terraria.Audio;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Assets.Audio;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
@@ -19,10 +16,10 @@ public class BloodBeacon : ProjOwnedByNPC<StygainHeart>
     public override string Texture => AssetRegistry.Invis;
 
     public static readonly int Lifetime = SecondsToFrames(15);
+
     public const int MaxLaserLength = 3000;
 
-    public ref float Time => ref Projectile.ai[0];
-    public ref float LaserLength => ref Projectile.ai[1];
+    public ref float LaserLength => ref Projectile.ai[0];
 
     public override void SetStaticDefaults()
     {
@@ -41,27 +38,25 @@ public class BloodBeacon : ProjOwnedByNPC<StygainHeart>
 
     public Vector2 Start => Owner.Center - Vector2.UnitY * MaxLaserLength;
     public Vector2 End => Start + Vector2.UnitY * LaserLength;
-    public float Completion => Owner.AdditionsInfo().ExtraAI[2];
+    public float Completion => ModOwner.ExtraAI[2];
     public LoopedSoundInstance sound;
     public override void SafeAI()
     {
         sound ??= LoopedSoundManager.CreateNew(new(AdditionsSound.BraveMediumFireLoop, () => Completion, () => -.1f), () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
         sound?.Update(Projectile.Center);
 
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunction, ColorFunction, null, 24);
-        if (trail2 == null || trail2._disposed)
+        if (trail2 == null || trail2.Disposed)
             trail2 = new(AltWidthFunction, AltColorFunction, null, 24);
 
         // Make the laser expand outward.
         LaserLength = Animators.MakePoly(3f).InOutFunction.Evaluate(0f, MaxLaserLength * 2, Completion);
         ScreenShakeSystem.New(new(.4f, .2f, 5000f), Projectile.Center);
         Projectile.Center = Owner.Center;
-        if (Boss.CurrentState == StygainHeart.StygainAttackType.BloodBeacon)
+        if (ModOwner.CurrentState == StygainHeart.StygainAttackType.BloodBeacon)
             Projectile.timeLeft = 2;
         cache.SetPoints(Start.GetLaserControlPoints(End, 24));
-
-        Time++;
     }
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
@@ -76,17 +71,19 @@ public class BloodBeacon : ProjOwnedByNPC<StygainHeart>
         float colorInterpolant = 0.5f * MathF.Sin(-9f * Main.GlobalTimeWrappedHourly) + 0.5f;
         return Color.Lerp(Color.DarkRed, Color.Black, 0.25f * colorInterpolant);
     }
+
     public float AltWidthFunction(float _) => WidthFunction(_) * 2f;
+
     public static Color AltColorFunction(SystemVector2 completionRatio, Vector2 position) => ColorFunction(completionRatio, position) * .4f;
 
-    public ManualTrailPoints cache = new(24);
+    public TrailPoints cache = new(24);
     public OptimizedPrimitiveTrail trail;
     public OptimizedPrimitiveTrail trail2;
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
         {
-            if (trail == null || trail2 == null || trail._disposed || trail2._disposed || cache == null)
+            if (trail == null || trail2 == null || trail.Disposed || trail2.Disposed || cache == null)
                 return;
 
             ManagedShader shader = ShaderRegistry.BloodBeacon;

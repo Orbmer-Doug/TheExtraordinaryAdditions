@@ -1,14 +1,12 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Assets;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Content.Buffs.Debuff;
 using TheExtraordinaryAdditions.Content.Items.Materials.Early;
 using TheExtraordinaryAdditions.Content.NPCs.Hostile.Lightning;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -40,13 +38,14 @@ public class VoltHelmet : ModItem, ILocalizedModType, IModType
         }
         return false;
     }
+
     public override void UpdateArmorSet(Player player)
     {
         player.GetAttackSpeed<MeleeDamageClass>() += 0.06f;
         string hotkey = AdditionsKeybinds.SetBonusHotKey.TooltipHotkeyString();
         player.setBonus = this.GetLocalization("SetBonus").Format(hotkey);
 
-        if (AdditionsKeybinds.SetBonusHotKey.JustPressed && !player.HasBuff(ModContent.BuffType<FulminationCooldown>()) && player.whoAmI == Main.myPlayer)
+        if (player.whoAmI == Main.myPlayer && AdditionsKeybinds.SetBonusHotKey.JustPressed && !player.HasBuff(ModContent.BuffType<FulminationCooldown>()))
         {
             player.AddBuff(ModContent.BuffType<FulminationCooldown>(), SecondsToFrames(15));
             AdditionsSound.LightningStrike.Play(player.Center, 1f, 0f, .2f);
@@ -56,6 +55,7 @@ public class VoltHelmet : ModItem, ILocalizedModType, IModType
             bolt.hostile = false;
             bolt.penetrate = 6;
             bolt.velocity = bolt.SafeDirectionTo(player.Additions().mouseWorld) * 10f;
+            bolt.netUpdate = true;
             for (int i = 0; i < 20; i++)
                 ParticleRegistry.SpawnSparkParticle(player.RandAreaInEntity(), bolt.velocity * Main.rand.NextFloat(.4f, 1.1f), Main.rand.Next(18, 22), Main.rand.NextFloat(.6f, .8f), Color.Purple);
         }

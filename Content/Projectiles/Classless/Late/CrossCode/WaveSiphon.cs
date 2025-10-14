@@ -1,9 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
-using static TheExtraordinaryAdditions.Core.Utilities.Utility;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.CrossCode;
 

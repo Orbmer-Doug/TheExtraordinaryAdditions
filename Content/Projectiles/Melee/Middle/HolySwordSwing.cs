@@ -1,8 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Linq;
 using Terraria;
-using Terraria.Audio;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
@@ -22,10 +20,10 @@ public class HolySwordSwing : BaseSwordSwing
 
     public bool Mark
     {
-        get => Projectile.Additions().ExtraAI[7] == 1f;
-        set => Projectile.Additions().ExtraAI[7] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[7] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[7] = value.ToInt();
     }
-    public ref float Shots => ref Projectile.Additions().ExtraAI[8];
+    public ref float Shots => ref Projectile.AdditionsInfo().ExtraAI[8];
 
     public float MaxScale => 2f * MeleeScale;
     public override int SwingTime => Mark ? 170 : base.SwingTime;
@@ -67,8 +65,8 @@ public class HolySwordSwing : BaseSwordSwing
 
     public override void SafeAI()
     {
-        if (trail == null || trail._disposed)
-            trail = new(tip, WidthFunct, ColorFunct, (c) => Center.ToNumerics(), 150);
+        if (trail == null || trail.Disposed)
+            trail = new(WidthFunct, ColorFunct, (c) => Center.ToNumerics(), 150);
 
         // Owner values
         if (!Mark)
@@ -102,9 +100,7 @@ public class HolySwordSwing : BaseSwordSwing
                     foreach (NPC npc in Main.ActiveNPCs)
                     {
                         if (npc.CanHomeInto() && Utility.IsInFieldOfView(LightPos, PiOver2, npc.Center, LightWidth * 2f, 1000f) && npc.GetGlobalNPC<HolyGlobalNPC>().MarkedTime <= 0)
-                        {
                             npc.GetGlobalNPC<HolyGlobalNPC>().MarkedTime = HolyGlobalNPC.TimeMarked;
-                        }
                     }
 
                     if (!PlayedSound)
@@ -120,8 +116,14 @@ public class HolySwordSwing : BaseSwordSwing
             }
             else
             {
-                int count = Main.npc.Count((NPC npc) => npc.CanHomeInto() && npc.GetGlobalNPC<HolyGlobalNPC>().MarkedTime > 0);
-                const int maxDarts = 7;
+                int count = 0;
+                foreach (NPC npc in Main.ActiveNPCs)
+                {
+                    if (npc.CanHomeInto() && npc.GetGlobalNPC<HolyGlobalNPC>().MarkedTime > 0)
+                        count += (npc.boss ? 2 : 1);
+                }
+
+                const int maxDarts = 8;
                 if (SwingCompletion > ReelPercent && AngularVelocity > .1f && Shots < Clamp(count, 0, maxDarts))
                 {
                     if (Time % 2 == 1)
@@ -131,7 +133,9 @@ public class HolySwordSwing : BaseSwordSwing
                             if (npc.CanHomeInto() && npc.GetGlobalNPC<HolyGlobalNPC>().MarkedTime > 0)
                             {
                                 Vector2 pos = Rect().Top;
-                                Projectile.NewProj(pos, Center.SafeDirectionTo(pos) * Main.rand.NextFloat(5f, 9f), ModContent.ProjectileType<HolyDart>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
+                                if (this.RunLocal())
+                                    Projectile.NewProj(pos, Center.SafeDirectionTo(pos) * Main.rand.NextFloat(5f, 9f),
+                                        ModContent.ProjectileType<HolyDart>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
                                 Shots++;
                                 break;
                             }
@@ -243,10 +247,9 @@ public class HolySwordSwing : BaseSwordSwing
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints points = new(20);
-    public static readonly ITrailTip tip = new RoundedTip(20);
     public static float WidthFunct(float c)
     {
-        return SmoothStep(1f, 0f, c) * 30f;
+        return OptimizedPrimitiveTrail.HemisphereWidthFunct(c, SmoothStep(1f, 0f, c) * 30f);
     }
 
     public Color ColorFunct(SystemVector2 c, Vector2 position)
@@ -299,15 +302,14 @@ public class HolySwordSwing : BaseSwordSwing
 
         void draw()
         {
-            if (trail != null && !trail._disposed && points != null)
+            if (trail != null && !trail.Disposed && points != null)
             {
                 ManagedShader shader = ShaderRegistry.SpecialLightningTrail;
                 shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FlameMap2), 1);
                 shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Cosmos), 2);
-                trail.DrawTippedTrail(shader, points.Points, tip, true, 150, true);
+                trail.DrawTrail(shader, points.Points, 150, true);
             }
         }
-
 
         Main.spriteBatch.Draw(Tex, Projectile.Center - Main.screenPosition, null, lightColor,
             Projectile.rotation + RotationOffset, origin, Projectile.scale, Effects, 0f);
@@ -327,7 +329,7 @@ public class HolyGlobalNPC : GlobalNPC
     public static readonly int TimeMarked = SecondsToFrames(10);
     public override bool AppliesToEntity(NPC entity, bool lateInstantiation)
     {
-        return entity.realLife <= 0;
+        return lateInstantiation && entity.realLife <= 0;
     }
     public override void PostAI(NPC npc)
     {

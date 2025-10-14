@@ -1,13 +1,10 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.IO;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Assets;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -36,8 +33,8 @@ public class ForkStab : ModProjectile
 
     public bool PlayedSound
     {
-        get => Projectile.Additions().ExtraAI[0] == 1f;
-        set => Projectile.Additions().ExtraAI[0] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[0] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
 
     public Vector2 offset;
@@ -158,7 +155,7 @@ public class ForkStab : ModProjectile
         }
 
         Vector2 off = new Vector2(0f, -45f).RotatedBy(Projectile.rotation - MathHelper.PiOver4);
-        Projectile.Center = Owner.MountedCenter + offset + off;
+        Projectile.Center = Owner.MountedCenter + offset;
 
         Owner.SetCompositeArmFront(true, stretch, Projectile.rotation - (MathHelper.PiOver4 + MathHelper.PiOver2));
         Owner.ChangeDir(Projectile.direction);
@@ -193,9 +190,7 @@ public class ForkStab : ModProjectile
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        bool original = projHitbox.Intersects(targetHitbox);
-        bool line = Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Owner.Center, Projectile.Center);
-        return original || line;
+        return targetHitbox.LineCollision(Projectile.RotHitbox().BottomLeft, Projectile.RotHitbox().TopRight, 20f);
     }
 
     public override bool? CanHitNPC(NPC target)
@@ -222,10 +217,10 @@ public class ForkStab : ModProjectile
             AfterimageData afterImage = afterImages[i];
 
             float opacity = MathHelper.Lerp(0.5f, 0f, 1f - afterImage.time / 15f);
-            Main.spriteBatch.Draw(tex, afterImage.pos - Main.screenPosition + off, null, Color.Red * 0.5f * opacity, afterImage.rot, Vector2.Zero, scale, 0f, 0f);
+            Main.spriteBatch.Draw(tex, afterImage.pos - Main.screenPosition + off, null, Color.Red * 0.5f * opacity, afterImage.rot, tex.Size() / 2, scale, 0f, 0f);
         }
 
-        sb.Draw(tex, pos + off, null, Color.White * fade, rot, Vector2.Zero, scale, 0, 0);
+        sb.Draw(tex, pos + off, null, Color.White * fade, rot, tex.Size() / 2, scale, 0, 0);
         return false;
     }
 }

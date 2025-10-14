@@ -3,11 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Terraria;
-using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Assets.Audio;
-using TheExtraordinaryAdditions.Common.Particles.Shader;
+using TheExtraordinaryAdditions.Common.Particles.Metaball;
 using TheExtraordinaryAdditions.Content.Buffs.Debuff;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
@@ -32,7 +31,7 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
     public const int MaxHeight = 500;
     public const int Points = 200;
     public List<Vector2> cache;
-    public ManualTrailPoints points = new(Points);
+    public TrailPoints points = new(Points);
     public OptimizedPrimitiveTrail trail;
 
     public float RotationDifference => CurrentRotation - (Projectile.rotation + MathHelper.PiOver2);
@@ -61,9 +60,9 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
     /// <summary>
     /// Lags behind the leading rotation (<see cref="Projectile.rotation"/>)
     /// </summary>
-    public ref float CurrentRotation => ref Projectile.Additions().ExtraAI[0];
+    public ref float CurrentRotation => ref Projectile.AdditionsInfo().ExtraAI[0];
 
-    public ref float FadeTimer => ref Projectile.Additions().ExtraAI[1];
+    public ref float FadeTimer => ref Projectile.AdditionsInfo().ExtraAI[1];
     internal const int FadeTime = 40;
     public float FadeInterpolant => InverseLerp(0f, FadeTime, FadeTimer);
 
@@ -103,7 +102,7 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
             Projectile.netUpdate = true;
         }
 
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(c => 174f * 2f, (c, pos) => Lighting.GetColor(pos.ToTileCoordinates()), OffsetFunct, Points);
 
         if (base.ShouldDie())
@@ -135,8 +134,8 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
         RotationUpdate = .18f;
 
         // Update fire sounds
-        slot ??= LoopedSoundManager.CreateNew(new(AdditionsSound.HeavyFireLoop, () => .47f * Projectile.scale), () => AdditionsLoopedSound.ProjectileNotActive(Projectile), () => Projectile.active);
-        slot?.Update(Projectile.Center);
+        slot ??= LoopedSoundManager.CreateNew(new(AdditionsSound.HeavyFireLoop, () => .47f * Projectile.scale), () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
+        slot.Update(Projectile.Center);
 
         float towards = Projectile.rotation - MathHelper.PiOver2;
         Projectile.velocity = towards.ToRotationVector2();
@@ -176,6 +175,19 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
             ParticleRegistry.SpawnHeavySmokeParticle(pos, vel * Main.rand.NextFloat(1f, 3f), Main.rand.Next(30, 40), Main.rand.NextFloat(.4f, .8f) * Projectile.scale, fireColor, 2f);
         }
 
+        if (MathF.Abs(MathHelper.WrapAngle(Projectile.rotation - Projectile.oldRot[1])) > .4f && Projectile.soundDelay == 0 && Time > 6f)
+        {
+            if (this.RunLocal())
+                Projectile.NewProj(pos, Projectile.velocity * 15f, ModContent.ProjectileType<StarFlares>(), (int)(Projectile.damage * 0.35f), 0f, Owner.whoAmI, 0f, 0f, 0f);
+
+            for (int i = 0; i < 35; i++)
+                ParticleRegistry.SpawnHeavySmokeParticle(pos, vel.RotatedByRandom(.2f) * Main.rand.NextFloat(.8f, 1.3f), Main.rand.Next(20, 35), Main.rand.NextFloat(.4f, .8f), Color.OrangeRed);
+
+            SoundID.DD2_BetsyFireballShot.Play(Projectile.Center, 1.3f, -.4f, .2f);
+
+            Projectile.soundDelay = 12;
+        }
+
         HandleDamage();
         ManageCaches();
         Time++;
@@ -201,10 +213,6 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
         return base.PreKill(timeLeft);
     }
 
-    public override void OnKill(int timeLeft)
-    {
-    }
-
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
         return targetHitbox.CollisionFromPoints(points.Points, c => 120f);
@@ -218,8 +226,6 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
         if (AngularDamageFactor > 0.1f)
         {
             AdditionsSound.etherealHit1.Play(target.Center, 1.2f, 0f, .16f);
-            for (int i = 0; i < 12; i++)
-                ShaderParticleRegistry.SpawnMoltenParticle(target.RotHitbox().RandomPoint(), 90f * AngularDamageFactor);
         }
     }
 
@@ -319,5 +325,48 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
             }
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.HeldProjectiles, BlendState.Additive);
+    }
+}
+
+public class StarFlares : ModProjectile
+{
+    public override string Texture => AssetRegistry.Invis;
+    public override void SetDefaults()
+    {
+        Projectile.Size = new(20);
+        Projectile.hostile = Projectile.tileCollide = false;
+        Projectile.friendly = Projectile.ignoreWater = Projectile.noEnchantmentVisuals =
+            Projectile.usesLocalNPCImmunity = true;
+        Projectile.penetrate = 1;
+        Projectile.timeLeft = 300;
+        Projectile.MaxUpdates = 1;
+        Projectile.DamageType = DamageClass.MeleeNoSpeed;
+    }
+
+    public override void AI()
+    {
+        MetaballRegistry.SpawnPlasmaMetaball(Projectile.Center, Vector2.Zero, 30, 100, 2f);
+        ParticleRegistry.SpawnGlowParticle(Projectile.Center, -Projectile.velocity * Main.rand.NextFloat(.1f, .5f), Main.rand.Next(20, 60), Main.rand.NextFloat(20f, 90f), Color.OrangeRed);
+        NPC target = NPCTargeting.GetNPCInLargestCluster(new(Projectile.Center, 800));
+        if (target.CanHomeInto())
+            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.SafeDirectionTo(target.Center) * 24f, .2f);
+    }
+
+    public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+    {
+        for (int i = 0; i < 120; i++)
+        {
+            MetaballRegistry.SpawnPlasmaMetaball(Projectile.Center,
+                Main.rand.NextVector2Circular(5f, 5f) + Main.rand.NextVector2Circular(6f, 6f), Main.rand.Next(50, 100), Main.rand.Next(40, 100), 1.4f);
+        }
+        ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 20, 0f, Vector2.One, 0f, 200f, Color.OrangeRed, true);
+
+        if (this.RunLocal())
+        {
+            Projectile.penetrate = -1;
+            Projectile.ExpandHitboxBy(200);
+            Projectile.Damage();
+        }
+        Projectile.Kill();
     }
 }

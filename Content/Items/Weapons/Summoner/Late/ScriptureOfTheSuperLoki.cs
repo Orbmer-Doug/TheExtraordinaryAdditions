@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -8,6 +7,7 @@ using TheExtraordinaryAdditions.Content.Buffs.Summon;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Summoner.Late;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Late;
@@ -15,6 +15,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Late;
 public class ScriptureOfTheSuperLoki : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ScriptureOfTheSuperLoki);
+
     public override void SetStaticDefaults()
     {
         // DisplayName.SetDefault("Scripture of the Super Loki");
@@ -31,11 +32,10 @@ public class ScriptureOfTheSuperLoki : ModItem
 
     public override void SetDefaults()
     {
-        Item.damage = 180;
+        Item.damage = 160;
         Item.knockBack = 3f;
         Item.mana = 20;
-        Item.width = 100;
-        Item.height = 100;
+        Item.width = Item.height = 100;
         Item.useTime = 32;
         Item.useAnimation = 32;
         Item.useStyle = ItemUseStyleID.Shoot;
@@ -51,7 +51,6 @@ public class ScriptureOfTheSuperLoki : ModItem
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
         player.AddBuff(Item.buffType, 2);
-
         Projectile projectile = Projectile.NewProjectileDirect(source, player.Additions().mouseWorld, velocity, type, damage, knockback, Main.myPlayer);
         projectile.originalDamage = Item.damage;
         return false;

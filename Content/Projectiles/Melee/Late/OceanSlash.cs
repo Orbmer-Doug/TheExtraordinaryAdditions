@@ -32,11 +32,11 @@ public class OceanSlash : ModProjectile
     }
 
     public ref float Time => ref Projectile.ai[0];
-    public ManualTrailPoints points = new(20);
+    public TrailPoints points = new(20);
     public float Fade => Animators.MakePoly(4f).InFunction(InverseLerp(0f, 20f * Projectile.MaxUpdates, Projectile.timeLeft));
     public override void AI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, Colorfunct, null, 20);
 
         Lighting.AddLight(Projectile.Center, Color.Aqua.ToVector3() * 1f);
@@ -52,7 +52,6 @@ public class OceanSlash : ModProjectile
             Vector2 pos = QuadraticBezier(a, b, c, lerp);
             points.SetPoint(i, pos);
         }
-
         Time++;
     }
 
@@ -69,7 +68,8 @@ public class OceanSlash : ModProjectile
 
     public OptimizedPrimitiveTrail trail;
     public float WidthFunct(float c) => Convert01To010(c) * 150f * Animators.MakePoly(3f).InOutFunction(InverseLerp(0f, 20f * Projectile.MaxUpdates, Time)) * Fade;
-    public Color Colorfunct(SystemVector2 c, Vector2 pos) => Color.DarkBlue.Lerp(Color.Black, c.Y) * (1f + Convert01To010(c.X) * 4f) * Animators.MakePoly(3f).OutFunction(InverseLerp(10f * Projectile.MaxUpdates, 20f * Projectile.MaxUpdates, Time));
+    public Color Colorfunct(SystemVector2 c, Vector2 pos) => Color.DarkBlue.Lerp(Color.Black, c.Y) * (1f + Convert01To010(c.X) * 4f)
+        * Animators.MakePoly(3f).OutFunction(InverseLerp(Projectile.MaxUpdates, 20f * Projectile.MaxUpdates, Time));
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -82,7 +82,6 @@ public class OceanSlash : ModProjectile
             }
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
-
         return false;
     }
 }

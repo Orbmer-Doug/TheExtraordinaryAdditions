@@ -22,12 +22,12 @@ public class KrakenTentacle : ModProjectile, ILocalizedModType, IModType
     public Projectile Kraken => Main.projectile[(int)Projectile.ai[2]];
     public bool Attack
     {
-        get => Projectile.Additions().ExtraAI[0] == 1f;
-        set => Projectile.Additions().ExtraAI[0] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[0] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
-    public ref float AttackWait => ref Projectile.Additions().ExtraAI[1];
+    public ref float AttackWait => ref Projectile.AdditionsInfo().ExtraAI[1];
     public float WaitTime => 40f;
-    public ref float Spin => ref Projectile.Additions().ExtraAI[2];
+    public ref float Spin => ref Projectile.AdditionsInfo().ExtraAI[2];
 
     public Player Owner => Main.player[Projectile.owner];
     public GlobalPlayer Modded => Owner.Additions();
@@ -39,7 +39,7 @@ public class KrakenTentacle : ModProjectile, ILocalizedModType, IModType
     {
         Projectile.aiStyle = -1;
         Projectile.width = Projectile.height = 28;
-        Projectile.DamageType = DamageClass.Summon;
+        Projectile.DamageType = DamageClass.MeleeNoSpeed;
         Projectile.penetrate = -1;
         Projectile.usesLocalNPCImmunity = Projectile.friendly = Projectile.ignoreWater = true;
         Projectile.localNPCHitCooldown = 20;
@@ -128,10 +128,12 @@ public class KrakenTentacle : ModProjectile, ILocalizedModType, IModType
 
     public override bool PreDraw(ref Color lightColor)
     {
+        if (segments == null)
+            return false;
+
         Texture2D tip = Projectile.ThisProjectileTexture();
         Texture2D inner = AssetRegistry.GetTexture(AdditionsTexture.KrakenTentacleSegment);
 
-        // Collect chain draw positions.
         Vector2[] bezierPoints = segments.Select(x => x.position).ToArray();
         BezierCurves bezierCurve = new(bezierPoints);
         Vector2 val = segments[^1].position - segments[^1].oldPosition;

@@ -1,10 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Magic.Early;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Early;
@@ -12,6 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Early;
 public class BrewingStorms : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BrewingStorms);
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(new Color(231, 196, 255));
@@ -36,5 +36,6 @@ public class BrewingStorms : ModItem
         Item.mana = 7;
         Item.noUseGraphic = true;
     }
+
     public override bool CanShoot(Player player) => false;
 }

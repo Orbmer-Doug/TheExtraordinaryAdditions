@@ -1,7 +1,5 @@
 ﻿using Terraria;
 using Terraria.ID;
-using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using static TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora.AuroraGuard;
 

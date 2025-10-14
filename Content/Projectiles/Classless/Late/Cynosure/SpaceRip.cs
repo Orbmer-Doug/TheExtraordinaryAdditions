@@ -1,13 +1,6 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using Terraria;
+﻿using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Common.Particles.Metaball;
-using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Utilities;
-using static Microsoft.Xna.Framework.MathHelper;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.Cynosure;
 
@@ -34,9 +27,5 @@ public class SpaceRip : ModProjectile
     {
         MetaballRegistry.SpawnGenediesMetaball(Projectile.Center, Main.rand.NextVector2Circular(5f, 5f), Main.rand.Next(50, 70), Main.rand.Next(360, 460));
         Time++;
-    }
-
-    public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
-    {
     }
 }

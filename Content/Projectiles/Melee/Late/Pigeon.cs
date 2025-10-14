@@ -64,18 +64,21 @@ public class Pigeon : ModProjectile
             SoundEngine.PlaySound(SoundID.Item10, Projectile.position);
 
             if (Math.Abs(Projectile.velocity.X - oldVelocity.X) > float.Epsilon)
-            {
                 Projectile.velocity.X = -oldVelocity.X;
-            }
             if (Math.Abs(Projectile.velocity.Y - oldVelocity.Y) > float.Epsilon)
-            {
                 Projectile.velocity.Y = -oldVelocity.Y;
-            }
         }
 
         return false;
     }
 
+    public override void OnKill(int timeLeft)
+    {
+        SoundID.NPCDeath1.Play(Projectile.Center, .3f, .3f, .2f, null, 400, Name);
+        for (int i = 0; i < 40; i++)
+            Dust.NewDustPerfect(Projectile.RandAreaInEntity(), DustID.Blood, Main.rand.NextVector2Circular(4f, 4f), 0, default, Main.rand.NextFloat(.9f, 1.5f));
+    }
+    
     public FancyAfterimages after;
     public override bool PreDraw(ref Color lightColor)
     {
@@ -89,18 +92,8 @@ public class Pigeon : ModProjectile
             direction = SpriteEffects.FlipHorizontally;
             rotation += MathHelper.Pi;
         }
-
         after?.DrawFancyAfterimages(texture, [lightColor], Projectile.Opacity * .5f, Projectile.scale);
         Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), rotation, origin, Projectile.scale, direction, 0f);
-
         return false;
     }
-
-    public override void OnKill(int timeLeft)
-    {
-        SoundID.NPCDeath1.Play(Projectile.Center, .3f, .3f, .2f, null, 400, Name);
-        for (int i = 0; i < 40; i++)
-            Dust.NewDustPerfect(Projectile.RandAreaInEntity(), DustID.Blood, Main.rand.NextVector2Circular(4f, 4f), 0, default, Main.rand.NextFloat(.9f, 1.5f));
-    }
 }
-

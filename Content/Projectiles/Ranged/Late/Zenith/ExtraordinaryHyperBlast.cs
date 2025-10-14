@@ -33,7 +33,7 @@ public class ExtraordinaryHyperBlast : ModProjectile, ILocalizedModType, IModTyp
 
     public override void AI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, null, amt);
 
         if (Projectile.ai[2] == 0f)
@@ -77,7 +77,7 @@ public class ExtraordinaryHyperBlast : ModProjectile, ILocalizedModType, IModTyp
 
     private List<Vector2> cache;
     public const int amt = 70;
-    private readonly ManualTrailPoints points = new(amt);
+    private readonly TrailPoints points = new(amt);
     private void ManageCaches()
     {
         if (cache is null)

@@ -2,7 +2,7 @@
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -41,7 +41,7 @@ public class LightSpirit : ModProjectile, ILocalizedModType, IModType
         Projectile.Opacity = InverseLerp(0f, 30f, Time);
         Lighting.AddLight(Projectile.Center, Color.Goldenrod.ToVector3() * 1.4f * Projectile.Opacity);
 
-        if (!Owner.Additions().LightSpiritBand)
+        if (!Owner.GetModPlayer<BandOfSunraysPlayer>().Equipped)
         {
             Projectile.Kill();
             return;

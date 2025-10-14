@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
@@ -63,9 +62,8 @@ public class RockLightning : ModProjectile
 
         foreach (Line line in Branches)
         {
-            line.thickness = 4f * Projectile.Opacity;
             PixelationSystem.QueueTextureRenderAction(() => line.Draw(MulticolorLerp(Completion, Color.White, Color.AntiqueWhite, Color.WhiteSmoke)
-                * Projectile.Opacity), PixelationLayer.OverNPCs, BlendState.Additive);
+                * Projectile.Opacity, Projectile.Opacity), PixelationLayer.OverNPCs, BlendState.Additive);
         }
 
         return false;

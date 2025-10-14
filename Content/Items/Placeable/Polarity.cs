@@ -8,6 +8,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Placeable;
 public class Polarity : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Polarity);
+
     public override void SetDefaults()
     {
         Item.DefaultToPlaceableTile(ModContent.TileType<PolarityPlaced>());

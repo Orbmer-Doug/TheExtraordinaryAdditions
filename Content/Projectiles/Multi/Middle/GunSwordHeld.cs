@@ -38,7 +38,7 @@ public class GunSwordSword : BaseSwordSwing
     public override void SafeInitialize()
     {
         after ??= new(7, () => Projectile.Center);
-        after.afterimages = null;
+        after.Clear();
     }
 
     public override void SafeAI()
@@ -221,14 +221,14 @@ public class GunGunSword : ModProjectile
         set => Projectile.ai[1] = value.ToInt();
     }
     public ref float EngagedTime => ref Projectile.ai[2];
-    public ref float Fade => ref Projectile.Additions().ExtraAI[0];
-    public ref float Wait => ref Projectile.Additions().ExtraAI[1];
-    public ref float Dist => ref Projectile.Additions().ExtraAI[2];
-    public ref float Recoil => ref Projectile.Additions().ExtraAI[3];
+    public ref float Fade => ref Projectile.AdditionsInfo().ExtraAI[0];
+    public ref float Wait => ref Projectile.AdditionsInfo().ExtraAI[1];
+    public ref float Dist => ref Projectile.AdditionsInfo().ExtraAI[2];
+    public ref float Recoil => ref Projectile.AdditionsInfo().ExtraAI[3];
     public int NPCIndex
     {
-        get => (int)Projectile.Additions().ExtraAI[4];
-        set => Projectile.Additions().ExtraAI[4] = value;
+        get => (int)Projectile.AdditionsInfo().ExtraAI[4];
+        set => Projectile.AdditionsInfo().ExtraAI[4] = value;
     }
     public NPC Target;
     public Player Owner => Main.player[Projectile.owner];
@@ -264,7 +264,7 @@ public class GunGunSword : ModProjectile
                 Projectile.velocity = Center.SafeDirectionTo(Modded.mouseWorld);
                 this.Sync();
             }
-                AdditionsSound.SnakeRocketOut.Play(Projectile.Center, .6f);
+            AdditionsSound.SnakeRocketOut.Play(Projectile.Center, .6f);
         }
 
         Dist = MakePoly(20f).OutFunction.Evaluate(Time, 0f, StabTime, 0f, 60f);
@@ -304,7 +304,8 @@ public class GunGunSword : ModProjectile
                     }
                     ParticleRegistry.SpawnDetailedBlastParticle(pos, Vector2.Zero, Vector2.One * 120f, Vector2.Zero, 30, Color.OrangeRed, null, Color.Red, true);
                     ParticleRegistry.SpawnBlurParticle(pos, 60, .4f, 120f, .7f);
-                    Projectile.CreateFriendlyExplosion(pos, Vector2.One * 120f, (int)(Projectile.damage * 1.5f), 8f, 8, 5);
+                    if (this.RunLocal())
+                        Projectile.CreateFriendlyExplosion(pos, Vector2.One * 120f, (int)(Projectile.damage * 1.5f), 8f, 8, 5);
 
                     Owner.velocity -= Projectile.velocity * Utils.Remap(Owner.Distance(pos), 0f, 500f, 10f, 0f);
                     Modded.LungingDown = true;
@@ -346,7 +347,7 @@ public class GunGunSword : ModProjectile
                     for (int i = 0; i < 4; i++)
                     {
                         vel *= Main.rand.NextFloat(.8f, 1.2f);
-                        Projectile.NewProj(pos, vel.RotatedByRandom(.2f), ModContent.ProjectileType<SkeleShot>(), dmg / 2, kb / 2, Projectile.owner);
+                        Projectile.NewProj(pos, vel.RotatedByRandom(.2f), ModContent.ProjectileType<SkeleShot>(), dmg, kb, Projectile.owner);
                     }
 
                     for (int i = 0; i < 25; i++)

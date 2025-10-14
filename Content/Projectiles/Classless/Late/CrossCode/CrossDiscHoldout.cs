@@ -1,18 +1,12 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
 using Terraria;
-using Terraria.Audio;
-using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Buffs.Debuff;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Classless;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 using TheExtraordinaryAdditions.UI.CrossUI;
 using static TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.CrossCode.CrossDiscHoldout;
@@ -22,27 +16,35 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.CrossCode
 public class CrossDiscHoldout : BaseIdleHoldoutProjectile
 {
     #region Defaults
+    public override string Texture => AssetRegistry.Invis;
+    public override int IntendedProjectileType => ModContent.ProjectileType<CrossDiscHoldout>();
+    public override int AssociatedItemID => ModContent.ItemType<CrossDisc>();
+
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.TrailCacheLength[Type] = 5;
         ProjectileID.Sets.TrailingMode[Type] = 2;
     }
+
     public override void Defaults()
     {
         Projectile.width = Projectile.height = 1;
     }
-    public override string Texture => AssetRegistry.Invis;
-    public override int IntendedProjectileType => ModContent.ProjectileType<CrossDiscHoldout>();
-    public override int AssociatedItemID => ModContent.ItemType<CrossDisc>();
 
     public override void Load()
     {
-        On_Main.DrawInterface_36_Cursor += ChangeCursor;
+        Main.QueueMainThreadAction(() =>
+        {
+            On_Main.DrawInterface_36_Cursor += ChangeCursor;
+        });
     }
 
     public override void Unload()
     {
-        On_Main.DrawInterface_36_Cursor -= ChangeCursor;
+        Main.QueueMainThreadAction(() =>
+        {
+            On_Main.DrawInterface_36_Cursor -= ChangeCursor;
+        });
     }
 
     private static void ChangeCursor(On_Main.orig_DrawInterface_36_Cursor orig)
@@ -54,10 +56,11 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
 
             Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.CursorMelee);
             GlobalPlayer player = Main.LocalPlayer.Additions();
-            if (player.MouseLeft.Current && Main.LocalPlayer.ownedProjectileCounts[ModContent.ProjectileType<CrossSwing>()] <= 0)
+            if (player.SafeMouseLeft.Current && Main.LocalPlayer.ownedProjectileCounts[ModContent.ProjectileType<CrossSwing>()] <= 0)
                 tex = AssetRegistry.GetTexture(AdditionsTexture.CursorRanged);
 
-            Main.spriteBatch.Draw(tex, new Vector2(Main.mouseX + 1, Main.mouseY + 1), null, Color.White, 0f, new Vector2(.5f) * tex.Size(), Main.cursorScale * 1.1f, SpriteEffects.None, 0f);
+            Main.spriteBatch.Draw(tex, new Vector2(Main.mouseX + 1, Main.mouseY + 1), null, Color.White, 0f,
+                new Vector2(.5f) * tex.Size(), Main.cursorScale * 1.1f, SpriteEffects.None, 0f);
         }
         else
             orig();
@@ -101,30 +104,24 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
     /// <summary>
     /// The extra counter for a charged boll
     /// </summary>
-    public ref float FullReticleCounter => ref Projectile.Additions().ExtraAI[0];
+    public ref float FullReticleCounter => ref Projectile.AdditionsInfo().ExtraAI[0];
 
     /// <summary>
     /// How much balance this attack is going to use
     /// </summary>
-    public ref float ElementalAmount => ref Projectile.Additions().ExtraAI[1];
+    public ref float ElementalAmount => ref Projectile.AdditionsInfo().ExtraAI[1];
 
     /// <summary>
     /// A small cooldown between shooting any boll
     /// </summary>
-    public ref float BallCooldown => ref Projectile.Additions().ExtraAI[2];
+    public ref float BallCooldown => ref Projectile.AdditionsInfo().ExtraAI[2];
 
     /// <summary>
     /// A small cooldown before the reticle disappears
     /// </summary>
-    public ref float ReticleWait => ref Projectile.Additions().ExtraAI[3];
-
-    /// <summary>
-    /// 1 if melee, 0 if boll
-    /// </summary>
-    public float AttackState => Modded.mouseWorld.Distance(Owner.Center) < 200f ? 1f : 0f;
+    public ref float ReticleWait => ref Projectile.AdditionsInfo().ExtraAI[3];
 
     public ElementalBalance ElementPlayer => Owner.GetModPlayer<ElementalBalance>();
-    public bool HasOverload => Modded.CircuitOverload > 0;
     public const int BigBollCooldown = 20;
     public const int BollCooldown = 15;
     #endregion Definitions
@@ -153,40 +150,31 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
         Projectile.owner = Owner.whoAmI;
         Owner.ChangeDir((Projectile.velocity.X > 0f).ToDirectionInt());
         Projectile.Center = Center;
+        Owner.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.Full, 0f);
         #endregion Held
 
         ElementalBalanceUI.visible = true;
 
-        Modded.crossIce = false;
-        Modded.crossFire = false;
-        Modded.crossWave = false;
-        Modded.crossLightning = false;
-
         // For simplification in the ui
-        ref int mode = ref Item.As<CrossDisc>().mode;
-
-        mode = (int)Projectile.ai[0];
+        int mode = (int)Projectile.ai[0];
 
         #region Idle Effects
+        Owner.GetModPlayer<CrossDiscPlayer>().Element = State;
 
         // this adds in the overload on the circuit if used too much
         if (ElementPlayer.ElementCompletion >= 1f && State != Element.Neutral)
         {
             ElementalBalance.OverloadSound.Play(Owner.Center, 1.5f, -.2f);
             State = Element.Neutral;
-            Modded.CircuitOverload = SecondsToFrames(30);
+            ElementPlayer.CircuitOverload = SecondsToFrames(30);
             this.Sync();
         }
 
         switch (State)
         {
             case Element.Neutral:
-                Owner.statDefense += 10;
-                Owner.statLifeMax2 += 50;
-                Owner.lifeRegen += 1;
-                Projectile.damage = 7200;
+                Projectile.damage = 3600;
                 ElementalAmount -= 2;
-
                 if (Modded.GlobalTimer % 3 == 2)
                     ElementPlayer.ElementalResourceCurrent -= 1;
                 break;
@@ -195,36 +183,32 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
                 ElementalAmount = 7;
                 break;
             case Element.Heat:
-                Owner.lifeRegenTime += 200;
+                Projectile.damage = 4250;
                 ElementalAmount = 7;
                 break;
             case Element.Shock:
-                Owner.moveSpeed *= 1.15f;
-                Owner.runAcceleration += .05f;
-                Owner.wingTimeMax += 25;
-                Owner.statDefense -= 10;
+                Projectile.damage = 5500;
                 ElementalAmount = 3;
                 break;
             case Element.Wave:
-                Projectile.damage = 10000;
+                Projectile.damage = 4500;
                 Projectile.knockBack = 10f;
-                Owner.lifeRegen += 3;
                 ElementalAmount = 7;
                 break;
         }
         #endregion Idle Effects
 
         #region Shoot Effects
-        int type = ModContent.ProjectileType<CrossSwing>();
-        if (Modded.SafeMouseRight.JustPressed && Owner.ownedProjectileCounts[type] <= 0 && this.RunLocal())
+        int swingType = ModContent.ProjectileType<CrossSwing>();
+        if (Modded.SafeMouseRight.JustPressed && Owner.ownedProjectileCounts[swingType] <= 0 && this.RunLocal())
         {
             Vector2 velocity = Projectile.SafeDirectionTo(Modded.mouseWorld);
 
             // Make the swing
-            Projectile swing = Main.projectile[Projectile.NewProj(Center, velocity, type,
+            Projectile swing = Main.projectile[Projectile.NewProj(Center, velocity, swingType,
                 Projectile.damage, Projectile.knockBack, Projectile.owner)];
-            swing.Additions().ExtraAI[6] = (float)BaseSwordSwing.SwingDirection.Up;
-            swing.Additions().ExtraAI[7] = (float)State;
+            swing.AdditionsInfo().ExtraAI[6] = (float)BaseSwordSwing.SwingDirection.Up;
+            swing.AdditionsInfo().ExtraAI[7] = (float)State;
             swing.netUpdate = true;
 
             SwingCooldown = Item.useTime;
@@ -233,10 +217,8 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
         #endregion Shoot Effects
 
         // Handle Virtual Ricochet Projectile behaviors
-        if (Owner.ownedProjectileCounts[type] <= 0)
+        if (Owner.ownedProjectileCounts[swingType] <= 0)
             VRPBehavior();
-
-        Owner.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.Full, 0f);
     }
 
     public static readonly float MaxCharge = SecondsToFrames(.9f);
@@ -248,10 +230,9 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
         // Apply a decrease in accuracy the faster the cursor is spinning
         ReticleCounter = MathHelper.Clamp(ReticleCounter - (MathF.Abs(MathHelper.WrapAngle(Projectile.oldRot[0] - Projectile.oldRot[1])) * 5f), 0f, MaxCharge);
 
-        if (Modded.MouseLeft.Current && this.RunLocal())
+        if (Modded.SafeMouseLeft.Current && this.RunLocal())
         {
             Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, Projectile.rotation);
-            Owner.moveSpeed *= .75f;
 
             if (ReticleCounter < MaxCharge)
                 ReticleCounter++;
@@ -265,7 +246,7 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
             ReticleWait = 30f;
             this.Sync();
         }
-        else if (!Modded.MouseLeft.Current && this.RunLocal())
+        else if (!Modded.SafeMouseLeft.Current && this.RunLocal())
         {
             if (ReticleWait > 0f)
             {
@@ -281,21 +262,21 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
         if (BallCooldown > 0f)
             BallCooldown--;
 
-        if (Modded.MouseLeft.JustReleased && this.RunLocal())
+        if (Modded.SafeMouseLeft.JustReleased && this.RunLocal())
         {
             Vector2 pos = Center;
             Vector2 vel = Center.SafeDirectionTo(Modded.mouseWorld)
                 .RotatedByRandom(Spread) * 5f;
 
             int type = ModContent.ProjectileType<VRP>();
-            int damage = 10000;
+            int damage = Projectile.damage;
             float kB = 0f;
             int own = Projectile.owner;
             float state = Projectile.ai[0];
             float progress = ReticleProgress;
 
             Projectile vrp = Main.projectile[Projectile.NewProj(pos, vel, type, damage, kB, own, state, progress)];
-            vrp.Additions().ExtraAI[2] = (FullReticleProgress >= 1f).ToInt();
+            vrp.AdditionsInfo().ExtraAI[2] = (FullReticleProgress >= 1f).ToInt();
 
             AdditionsSound shoot = new();
             switch (State)
@@ -367,7 +348,7 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
     public override bool PreDraw(ref Color lightColor)
     {
         Vector2 screenPos = Main.screenPosition;
-        if ((Modded.MouseLeft.Current || ReticleWait > 0f) && Owner.ownedProjectileCounts[ModContent.ProjectileType<CrossSwing>()] <= 0)
+        if ((Modded.SafeMouseLeft.Current || ReticleWait > 0f) && Owner.ownedProjectileCounts[ModContent.ProjectileType<CrossSwing>()] <= 0)
         {
             float opacity = ReticleWait < 29f ? .3f : 1f;
             int frame = (int)(FullReticleProgress * 3f);
@@ -402,6 +383,48 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
         return false;
     }
     #endregion Drawing
+}
+
+public sealed class CrossDiscPlayer : ModPlayer
+{
+    public Element Element;
+
+    public bool DiscHeld => Player.HeldItem.ModItem is CrossDisc;
+    public override void ResetEffects()
+    {
+        if (!DiscHeld)
+            Element = Element.Neutral;
+    }
+
+    public override void PostUpdateEquips()
+    {
+        if (Element == Element.Cold)
+            Player.statDefense += 10;
+    }
+
+    public override void PostUpdateMiscEffects()
+    {
+        if (DiscHeld && Player.Additions().SafeMouseLeft.Current)
+            Player.moveSpeed *= .7f;
+    }
+
+    public override void PostUpdateRunSpeeds()
+    {
+        if (Element == Element.Shock)
+            Player.runAcceleration *= 2f;
+    }
+
+    public override void NaturalLifeRegen(ref float regen)
+    {
+        if (Element == Element.Heat)
+            Player.lifeRegenTime += 200;
+    }
+
+    public override void UpdateLifeRegen()
+    {
+        if (Element == Element.Wave)
+            Player.lifeRegen += 3;
+    }
 }
 
 /* Still pretty scuffed, thank red for tile code...

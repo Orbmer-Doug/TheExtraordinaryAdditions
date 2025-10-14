@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CalamityMod.Cooldowns;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
@@ -6,7 +6,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Systems;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
@@ -14,11 +14,6 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 public class JudgeOfHellsArmaments : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.JudgeOfHellsArmaments);
-
-    public override void ModifyTooltips(List<TooltipLine> list)
-    {
-        list.ColorLocalization(new Color(255, 217, 0));
-    }
 
     public override void SetDefaults()
     {
@@ -28,7 +23,7 @@ public class JudgeOfHellsArmaments : ModItem
         Item.useStyle = ItemUseStyleID.Shoot;
         Item.noMelee = true;
         Item.channel = true;
-        Item.damage = 500;
+        Item.damage = 120;
         Item.knockBack = 4.5f;
         Item.width = 98;
         Item.height = 16;
@@ -45,25 +40,35 @@ public class JudgeOfHellsArmaments : ModItem
         Item.ArmorPenetration = 20;
     }
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    public override void ModifyTooltips(List<TooltipLine> list)
     {
-        if (player.altFunctionUse == 2)
-        {
-            player.NewPlayerProj(position, velocity, ModContent.ProjectileType<JudgeSpear>(), damage, knockback, player.whoAmI);
-            return false;
-        }
-        else
-        {
-            player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI);
-            Main.projectile[player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI)].As<JudgeSwing>().Splendor = true;
-            return false;
-        }
+        list.ColorLocalization(new Color(255, 217, 0));
     }
 
-    public override bool AltFunctionUse(Player player) => Collision.CanHitLine(player.Center, 20, 20, player.Additions().mouseWorld, 8, 8);
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    {
+        if (player.altFunctionUse == ItemAlternativeFunctionID.ActivatedAndUsed)
+        {
+            player.NewPlayerProj(position, velocity, ModContent.ProjectileType<JudgeSpear>(), damage * 2, knockback, player.whoAmI);
+            CalUtils.AddCooldown(player, ChaosState.ID, SecondsToFrames(5));
+            return false;
+        }
+        else if (player.altFunctionUse == ItemAlternativeFunctionID.None)
+        {
+            player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI);
+            Main.projectile[player.NewPlayerProj(position, velocity, type, damage / 2, knockback, player.whoAmI)].As<JudgeSwing>().Splendor = true;
+            return false;
+        }
+        return false;
+    }
+
+    public override bool AltFunctionUse(Player player) 
+        => Collision.CanHitLine(player.Center, 20, 20, player.Additions().mouseWorld, 8, 8) && !CalUtils.HasCooldown(player, ChaosState.ID);
+
     public override bool CanShoot(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
+
     public override bool MeleePrefix() => false;
-    
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();

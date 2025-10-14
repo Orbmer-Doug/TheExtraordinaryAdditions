@@ -1,9 +1,13 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
+using SubworldLibrary;
 using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.ID;
 using Terraria.ModLoader;
+using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
+using TheExtraordinaryAdditions.Content.World.Subworlds;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
@@ -15,7 +19,8 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
 public partial class Asterlin : ModNPC, IHasScreenShader
 {
-    public static AsterlinTarget target;
+    private static AsterlinTarget mainTarget;
+    private static AsterlinPostProcessTarget postProcessingTarget;
 
     // i dont actually want to make a atlas system but i dont want 19 images in the asset folder
     public static readonly Rectangle HeadRect = new(0, 0, 46, 60);
@@ -53,6 +58,7 @@ public partial class Asterlin : ModNPC, IHasScreenShader
     public Vector2 RightFootPosition;
     public Vector2 LeftVentPosition;
     public Vector2 RightVentPosition;
+    public Vector2 TopAntennaPosition;
 
     public Vector2 LeftHandTarget;
     public Vector2 RightHandTarget;
@@ -84,6 +90,10 @@ public partial class Asterlin : ModNPC, IHasScreenShader
 
     public float FlameEngulfInterpolant;
 
+    public float MotionBlurInterpolant;
+
+    public float DisintegrationInterpolant;
+
     // These variables do not reset after being assigned
     public float EyeGleamInterpolant;
 
@@ -110,6 +120,7 @@ public partial class Asterlin : ModNPC, IHasScreenShader
     private bool ManualDirection;
     private bool ManualFlipped;
     private bool ManualLegFlamesInterpolant;
+    private bool ManualMotionBlurInterpolant;
 
     public void SetLeftHandTarget(Vector2 target)
     {
@@ -171,14 +182,134 @@ public partial class Asterlin : ModNPC, IHasScreenShader
         LegFlamesInterpolant = target;
         ManualLegFlamesInterpolant = true;
     }
-
-    public JointChain leftArm;
-    public JointChain rightArm;
-
-    public void ResetGraphics()
+    public void SetMotionBlurInterpolant(float target)
     {
-        ManualLeftHandTarget = ManualRightHandTarget = ManualBodyRotation = ManualLeftLegRotation = ManualRightLegRotation =
-            ManualHeadRotation = ManualZPosition = ManualEyeGleam = ManualLookingStraight = ManualDirection = ManualFlipped = ManualLegFlamesInterpolant = LookingStraight = false;
+        MotionBlurInterpolant = target;
+        ManualMotionBlurInterpolant = true;
+    }
+
+    public TrailPoints OldPositions = new(30);
+
+    public TrailPoints LeftLegPoints = new(30);
+    public OptimizedPrimitiveTrail LeftLegFlame;
+
+    public TrailPoints RightLegPoints = new(30);
+    public OptimizedPrimitiveTrail RightLegFlame;
+
+    public TrailPoints FlameEngulfPoints = new(10);
+    public OptimizedPrimitiveTrail FlameEngulfTrail;
+
+    public static float[] BlurWeights = new float[12];
+
+    public JointChain LeftArm;
+    public JointChain RightArm;
+    public static readonly CCDKinematicsConstraint? NoConstraint;
+    public static readonly CCDKinematicsConstraint? ElbowConstraint = new CCDKinematicsConstraint(
+        minimumAngle: 0f,
+        maximumAngle: ThreePIOver4,
+        delta: 0.2f, stiffness: 2f, flip: true
+    );
+
+    public static readonly CCDKinematicsConstraint? RightElbowConstraint = new CCDKinematicsConstraint(
+        minimumAngle: 0f,
+        maximumAngle: ThreePIOver4,
+        delta: 0.2f, stiffness: 2f, flip: false
+    );
+
+    public static readonly CCDKinematicsConstraint? WristConstraint = new CCDKinematicsConstraint(
+        minimumAngle: -Pi / 2f,
+        maximumAngle: Pi / 2f,
+        delta: 0.2f, stiffness: 2f, flip: false
+    );
+
+    public static void LoadGraphics()
+    {
+        mainTarget = new();
+        postProcessingTarget = new();
+        Main.ContentThatNeedsRenderTargets.AddRange([mainTarget, postProcessingTarget]);
+
+        Main.QueueMainThreadAction(static () =>
+        {
+            On_Main.DoDraw_DrawNPCsBehindTiles += DrawBehindTiles;
+            On_Main.DrawInterface += DrawHints;
+        });
+    }
+
+    public static void UnloadGraphics()
+    {
+        Main.QueueMainThreadAction(static () =>
+        {
+            On_Main.DoDraw_DrawNPCsBehindTiles -= DrawBehindTiles;
+            On_Main.DrawInterface -= DrawHints;
+        });
+    }
+
+    private static int arrowFrame;
+    private static int arrowFrameCounter;
+    private static void DrawHints(On_Main.orig_DrawInterface orig, Main self, GameTime gameTime)
+    {
+        if (SubworldSystem.IsActive<CloudedCrater>() && Utility.FindNPC(out NPC npc, ModContent.NPCType<Asterlin>()))
+        {
+            Asterlin aster = npc.As<Asterlin>();
+            if (Main.netMode == NetmodeID.SinglePlayer && aster.CurrentState == AsterlinAIType.DesperationDrama && aster.AITimer >= Asterlin.DesperationDrama_Wait)
+            {
+                if (aster.PlayerTarget.whoAmI == Main.myPlayer)
+                {
+                    string text = Utility.GetTextValue(LocalizedKey + "DialogueHint");
+                    Utility.ResetToDefaultUI(Main.spriteBatch, false);
+                    Utility.DrawText(Main.spriteBatch, text, 1, aster.PlayerTarget.Center + Vector2.UnitY * 60f - Main.screenPosition, Color.White, Color.Black, new(.5f, 0f), aster.Dialogue_ScreenInterpolant);
+                    Main.spriteBatch.End();
+                }
+            }
+
+            if (aster.CurrentState == AsterlinAIType.UnveilingZenith)
+            {
+                Utility.ResetToDefaultUI(Main.spriteBatch, false);
+                Texture2D arrow = AssetRegistry.GetTexture(AdditionsTexture.FireballArrow);
+                arrowFrameCounter++;
+                if (arrowFrameCounter > 10)
+                {
+                    arrowFrame = (arrowFrame + 1) % 4;
+                    arrowFrameCounter = 0;
+                }
+                Rectangle frame = arrow.Frame(1, 4, 0, arrowFrame);
+                foreach (Player player in Main.ActivePlayers)
+                {
+                    if (player.DeadOrGhost || player.whoAmI != Main.myPlayer)
+                        continue;
+
+                    Projectile closest = ProjectileTargeting.GetClosestProjectile(new(player.Center, 2000, false, ModContent.ProjectileType<ConvergentFireball>()));
+                    if (closest != null)
+                    {
+                        Vector2 pos = player.MountedCenter - Vector2.UnitY * 80f;
+                        Main.spriteBatch.DrawBetter(arrow, pos, frame, Color.White * closest.Opacity, pos.AngleTo(closest.Center) - MathHelper.PiOver2, frame.Size() / 2f, 1f);
+                    }
+                }
+                Main.spriteBatch.End();
+            }
+        }
+
+        orig(self, gameTime);
+    }
+
+    public void InitializeGraphics()
+    {
+        for (int i = 0; i < BlurWeights.Length; i++)
+            BlurWeights[i] = Utility.GaussianDistribution(i / (float)(BlurWeights.Length - 1f) * 1.5f, 0.6f) * 0.81f;
+
+        LeftArm = new JointChain(
+                NPC.Center,
+                (LeftAngledBackLimbRect.Height, NoConstraint), // Shoulder
+                (LeftAngledForeLimbRect.Height, ElbowConstraint), // Elbow
+                (LeftAngledHandRect.Height, WristConstraint) // Hand
+            );
+
+        RightArm = new JointChain(
+                NPC.Center,
+                (RightAngledBackLimbRect.Height, NoConstraint), // Shoulder
+                (RightAngledForeLimbRect.Height, ElbowConstraint), // Elbow
+                (RightAngledHandRect.Height, WristConstraint) // Hand
+            );
     }
 
     public void UpdateGraphics()
@@ -189,7 +320,7 @@ public partial class Asterlin : ModNPC, IHasScreenShader
             Direction = 1;
 
         if (!ManualBodyRotation)
-            BodyRotation = MathHelper.Clamp(BodyRotation.AngleLerp(NPC.velocity.X * .02f, .1f), -.4f, .4f);
+            BodyRotation = Clamp(BodyRotation.AngleLerp(NPC.velocity.X * .02f, .1f), -.4f, .4f);
 
         if (!ManualFlipped)
         {
@@ -208,20 +339,20 @@ public partial class Asterlin : ModNPC, IHasScreenShader
         }
 
         if (!ManualZPosition)
-            ZPosition = MathHelper.Lerp(ZPosition, 1f, .1f);
+            ZPosition = Lerp(ZPosition, 1f, .1f);
 
         if (!ManualEyeGleam)
-            EyeGleamInterpolant = MathHelper.Lerp(EyeGleamInterpolant, 0f, .1f);
+            EyeGleamInterpolant = Lerp(EyeGleamInterpolant, 0f, .1f);
 
         if (!ManualLegFlamesInterpolant)
-            LegFlamesInterpolant = MathHelper.Lerp(LegFlamesInterpolant, 1f, .2f);
+            LegFlamesInterpolant = Lerp(LegFlamesInterpolant, 1f, .2f);
 
-        List<CCDKinematicJoint> leftJoints = leftArm.Root.GetSubLimb();
-        List<CCDKinematicJoint> rightJoints = rightArm.Root.GetSubLimb();
+        List<CCDKinematicJoint> leftJoints = LeftArm.Root.GetSubLimb();
+        List<CCDKinematicJoint> rightJoints = RightArm.Root.GetSubLimb();
 
         // 0 is the root
-        // 1 is the back limb
-        // 2 is the fore limb
+        // 1 is the shoulder
+        // 2 is the elbow
         // 3 is the hand
         if (!LookingStraight) // Angled
         {
@@ -246,24 +377,26 @@ public partial class Asterlin : ModNPC, IHasScreenShader
             rightJoints[3].JointLength = RightStraightHandRect.Height * ZPosition;
         }
 
+        Vector2 fixedVel = NPC.velocity * ExtraUpdates;
+
         Vector2 leftRoot = LookingStraight ? NPC.Center + PolarVector(13f * ZPosition, BodyRotation - PiOver2) + PolarVector(44f * ZPosition * Direction, BodyRotation + Pi) :
             NPC.Center + PolarVector(26f * ZPosition, BodyRotation - PiOver2) + PolarVector(42f * Direction * ZPosition, BodyRotation + Pi);
-        leftArm.RootPosition = leftRoot + NPC.velocity;
+        LeftArm.RootPosition = leftRoot + NPC.velocity;
         float leftHandRot = leftJoints[2].Position.AngleTo(leftJoints[3].Position) - PiOver2;
         Vector2 leftHandOffset = LookingStraight ? PolarVector(4f * ZPosition * Direction, leftHandRot + Pi) :
             PolarVector(11f * ZPosition * Direction, leftHandRot + Pi) + PolarVector(8f * ZPosition, leftHandRot - PiOver2);
-        leftArm.Update(LeftHandTarget - leftHandOffset, 50);
+        LeftArm.Update(LeftHandTarget - leftHandOffset, 50);
         if (!ManualLeftHandTarget)
-            LeftHandTarget = Vector2.Lerp(LeftHandTarget, leftArm.RootPosition + PolarVector(200f, BodyRotation + MathHelper.PiOver2), .1f);
+            LeftHandTarget = Vector2.Lerp(LeftHandTarget, LeftArm.RootPosition + PolarVector(200f, BodyRotation + PiOver2), .1f);
 
         Vector2 rightRoot = LookingStraight ? NPC.Center + PolarVector(13f * ZPosition, BodyRotation - PiOver2) + PolarVector(46f * ZPosition * Direction, BodyRotation) :
             NPC.Center + PolarVector(33f * ZPosition, BodyRotation - PiOver2) + PolarVector(42f * Direction * ZPosition, BodyRotation);
-        rightArm.RootPosition = rightRoot + NPC.velocity;
+        RightArm.RootPosition = rightRoot + NPC.velocity;
         float rightHandRot = rightJoints[2].Position.AngleTo(rightJoints[3].Position) - PiOver2;
         Vector2 rightHandOffset = PolarVector(6f * Direction, rightHandRot);
-        rightArm.Update(RightHandTarget - rightHandOffset, 50);
+        RightArm.Update(RightHandTarget - rightHandOffset, 50);
         if (!ManualRightHandTarget)
-            RightHandTarget = Vector2.Lerp(RightHandTarget, leftArm.RootPosition + PolarVector(200f, BodyRotation + MathHelper.PiOver2), .1f);
+            RightHandTarget = Vector2.Lerp(RightHandTarget, RightArm.RootPosition + PolarVector(200f, BodyRotation + PiOver2), .1f);
 
         LeftHandPosition = leftJoints[2].Position + leftHandOffset + PolarVector(LeftAngledHandRect.Height, leftHandRot + PiOver2);
         RightHandPosition = rightJoints[2].Position + rightHandOffset + PolarVector(RightAngledHandRect.Height, rightHandRot + PiOver2);
@@ -273,15 +406,21 @@ public partial class Asterlin : ModNPC, IHasScreenShader
         RightVentPosition = LookingStraight ? NPC.Center + PolarVector(18f * ZPosition * Direction, BodyRotation) + PolarVector(5f * ZPosition, BodyRotation - PiOver2) :
             NPC.Center + PolarVector(26f * ZPosition, BodyRotation - PiOver2);
 
-        EyePosition = LookingStraight ? NPC.Center + PolarVector(52f, BodyRotation - PiOver2) :
-            NPC.Center + PolarVector(62f * ZPosition, BodyRotation - PiOver2) + PolarVector(2f * ZPosition * Direction, BodyRotation) + PolarVector(18f * ZPosition * -Direction, (-.91f * -Direction) + HeadRotation);
+        // The magical .91 comes from rect (the rectangle created from the point from the rotation pivot to the desired position)
+        // c = sqrt(rect.width^2 + rect.height^2) -> arccos(rect.width / c)
+        Vector2 headPos = NPC.Center + PolarVector(62f * ZPosition, BodyRotation - PiOver2) + PolarVector(2f * ZPosition * Direction, BodyRotation);
+        EyePosition = LookingStraight ? NPC.Center + PolarVector(52f * ZPosition, BodyRotation - PiOver2) :
+            headPos + PolarVector(18f * ZPosition * -Direction, (-.91f * -Direction) + HeadRotation);
 
-        if (!ManualHeadRotation)
+        TopAntennaPosition = LookingStraight ? NPC.Center + PolarVector(8f * ZPosition * Direction, BodyRotation) + PolarVector(97f, BodyRotation - PiOver2) :
+            headPos + PolarVector(55f * ZPosition * -Direction, (-1.6f * -Direction) + HeadRotation);
+
+        if (!ManualHeadRotation && EyePosition.Distance(Target.Center) > 40f)
             HeadRotation = EyePosition.AngleTo(Target.Center);
         if (Direction == 1 && !LookingStraight)
             HeadRotation += Pi;
 
-        float velRot = Vector2.Dot(NPC.velocity, BodyRotation.ToRotationVector2()) * .03f;
+        float velRot = Vector2.Dot(fixedVel, BodyRotation.ToRotationVector2()) * .03f;
         if (!ManualLeftLegRotation)
             LeftLegRotation = LeftLegRotation.AngleLerp(velRot, .2f);
         if (!ManualRightLegRotation)
@@ -301,27 +440,37 @@ public partial class Asterlin : ModNPC, IHasScreenShader
 
         RightFootPosition = rightLegPos + rightShift + NPC.velocity;
 
-        if (LeftLegFlame == null || LeftLegFlame._disposed)
+        if (LeftLegFlame == null || LeftLegFlame.Disposed)
             LeftLegFlame = new(FlameWidthFunct, FlameColorFunct, null, 30);
-        if (RightLegFlame == null || RightLegFlame._disposed)
+        if (RightLegFlame == null || RightLegFlame.Disposed)
             RightLegFlame = new(FlameWidthFunct, FlameColorFunct, null, 30);
 
-        OldPositions.Update(NPC.Center);
+        OldPositions?.Update(NPC.Center);
 
-        float dist = MathHelper.Lerp(110f, 200f, AperiodicSin(Main.GameUpdateCount * 0.02f) * 0.5f + 0.5f) * LegFlamesInterpolant;
+        float dist = Lerp(110f, 200f, AperiodicSin(Main.GameUpdateCount * 0.02f) * 0.5f + 0.5f) * LegFlamesInterpolant;
         for (int i = 0; i < LeftLegPoints.Points.Length; i++)
         {
             LeftLegPoints.SetPoint(i, Vector2.Lerp(OldPositions.Points[i] + (LeftFootPosition - NPC.Center), LeftFootPosition, .5f)
-                - PolarVector(1f, ((BodyRotation + LeftLegRotation) - MathHelper.PiOver2)) * i / (float)(LeftLegPoints.Points.Length - 1f) * dist);
+                - PolarVector(1f, ((BodyRotation + LeftLegRotation) - PiOver2)) * i / (float)(LeftLegPoints.Points.Length - 1f) * dist);
             RightLegPoints.SetPoint(i, Vector2.Lerp(OldPositions.Points[i] + (RightFootPosition - NPC.Center), RightFootPosition, .5f)
-                - PolarVector(1f, ((BodyRotation + RightLegRotation) - MathHelper.PiOver2)) * i / (float)(RightLegPoints.Points.Length - 1f) * dist);
+                - PolarVector(1f, ((BodyRotation + RightLegRotation) - PiOver2)) * i / (float)(RightLegPoints.Points.Length - 1f) * dist);
         }
 
-        if (FlameEngulfTrail == null || FlameEngulfTrail._disposed)
+        if (FlameEngulfTrail == null || FlameEngulfTrail.Disposed)
             FlameEngulfTrail = new(FlameEngulfWidthFunct, FlameEngulfColorFunct, null, 8);
 
         RotatedHitbox = new(NPC.position, NPC.Size, BodyRotation);
-        FlameEngulfPoints.Update(RotatedHitbox.Center + NPC.velocity + NPC.velocity.SafeNormalize(Vector2.Zero) * RotatedHitbox.Height / 2);
+        FlameEngulfPoints?.Update(RotatedHitbox.Center + fixedVel + fixedVel.SafeNormalize(Vector2.Zero) * RotatedHitbox.Height / 2);
+
+        if (!ManualMotionBlurInterpolant)
+            MotionBlurInterpolant = Animators.MakePoly(2.5f).InFunction(InverseLerp(30f, 80f, fixedVel.Length()));
+    }
+
+    public void ResetGraphics()
+    {
+        ManualLeftHandTarget = ManualRightHandTarget = ManualBodyRotation = ManualLeftLegRotation = ManualRightLegRotation =
+            ManualHeadRotation = ManualZPosition = ManualEyeGleam = ManualLookingStraight = ManualDirection = ManualFlipped =
+            ManualLegFlamesInterpolant = LookingStraight = ManualMotionBlurInterpolant = false;
     }
 
     public void DrawGlowForPiece(Texture2D glow, Vector2 position, Rectangle source, float rotation, Vector2 origin, SpriteEffects flip)
@@ -329,62 +478,89 @@ public partial class Asterlin : ModNPC, IHasScreenShader
         const int glowCount = 10;
         for (int x = 0; x < glowCount; x++)
         {
-            Vector2 offset = PolarVector(MathHelper.Lerp(0f, 2f, GlowInterpolant), MathHelper.TwoPi * InverseLerp(0f, glowCount, x) + (Main.GlobalTimeWrappedHourly * .5f));
+            Vector2 offset = PolarVector(Lerp(0f, 2f, GlowInterpolant), TwoPi * InverseLerp(0f, glowCount, x) + (Main.GlobalTimeWrappedHourly * .5f));
             Color color = Color.DeepSkyBlue with { A = 0 } * GlowInterpolant;
             Main.spriteBatch.DrawBetter(glow, position + offset, source, color, rotation, origin, ZPosition, flip);
         }
     }
 
+    public SpriteEffects FXForArmJoint(float rot)
+    {
+        if (LookingStraight)
+        {
+            rot += PiOver2;
+            if (rot < 0f && rot > -Pi)
+                return SpriteEffects.FlipHorizontally;
+        }
+        return SpriteEffects.None;
+    }
+
+    // Behind body
     public void DrawLeftArm(Texture2D atlas, Texture2D glow, Color color, SpriteEffects flip)
     {
-        if (leftArm != null)
+        if (LeftArm != null)
         {
             // Collect all joints in the chain
-            List<CCDKinematicJoint> joints = leftArm.Root.GetSubLimb();
+            List<CCDKinematicJoint> joints = LeftArm.Root.GetSubLimb();
+            Vector2 offset;
+            SpriteEffects fx;
 
             float backLimbRot = joints[0].Position.AngleTo(joints[1].Position) - PiOver2;
             Rectangle backLimbSource = LookingStraight ? LeftStraightBackLimbRect : LeftAngledBackLimbRect;
+            fx = flip;
             Main.spriteBatch.DrawBetter(atlas, joints[0].Position,
-                backLimbSource, color, backLimbRot, new(backLimbSource.Width / 2f, 0f), ZPosition, flip);
-            DrawGlowForPiece(glow, joints[0].Position, backLimbSource, backLimbRot, new(backLimbSource.Width / 2f, 0f), flip);
+                backLimbSource, color, backLimbRot, new(backLimbSource.Width / 2f, 0f), ZPosition, fx);
+            DrawGlowForPiece(glow, joints[0].Position, backLimbSource, backLimbRot, new(backLimbSource.Width / 2f, 0f), fx);
 
             float foreLimbRot = joints[1].Position.AngleTo(joints[2].Position) - PiOver2;
             Rectangle foreLimbSource = LookingStraight ? LeftStraightForeLimbRect : LeftAngledForeLimbRect;
-            Main.spriteBatch.DrawBetter(atlas, joints[1].Position - PolarVector(4f * Direction, foreLimbRot),
-                foreLimbSource, color, foreLimbRot, new(foreLimbSource.Width / 2f, 0f), ZPosition, flip);
-            DrawGlowForPiece(glow, joints[1].Position - PolarVector(4f * Direction, foreLimbRot), foreLimbSource, foreLimbRot, new(foreLimbSource.Width / 2f, 0f), flip);
+            offset = -PolarVector(4f * Direction, foreLimbRot);
+            fx = FXForArmJoint(foreLimbRot) | flip;
+            Main.spriteBatch.DrawBetter(atlas, joints[1].Position + offset,
+                foreLimbSource, color, foreLimbRot, new(foreLimbSource.Width / 2f, 0f), ZPosition, fx);
+            DrawGlowForPiece(glow, joints[1].Position + offset, foreLimbSource, foreLimbRot, new(foreLimbSource.Width / 2f, 0f), fx);
 
             float handRot = joints[2].Position.AngleTo(joints[3].Position) - PiOver2;
             Rectangle handSource = LookingStraight ? LeftStraightHandRect : LeftAngledHandRect;
-            Main.spriteBatch.DrawBetter(atlas, joints[2].Position + (LookingStraight ? PolarVector(4f * ZPosition * Direction, handRot + Pi) : PolarVector(11f * ZPosition * Direction, handRot + Pi) + PolarVector(8f * ZPosition, handRot - PiOver2)),
-                handSource, color, handRot, new(handSource.Width / 2, 0f), ZPosition, flip);
-            DrawGlowForPiece(glow, joints[2].Position + (LookingStraight ? PolarVector(4f * ZPosition * Direction, handRot + Pi) : PolarVector(11f * ZPosition * Direction, handRot + Pi) + PolarVector(8f * ZPosition, handRot - PiOver2)), handSource, handRot, new(handSource.Width / 2f, 0f), flip);
+            offset = (LookingStraight ? PolarVector(4f * ZPosition * Direction, handRot + Pi) : PolarVector(11f * ZPosition * Direction, handRot + Pi) + PolarVector(8f * ZPosition, handRot - PiOver2));
+            fx = FXForArmJoint(handRot) | flip;
+            Main.spriteBatch.DrawBetter(atlas, joints[2].Position + offset,
+                handSource, color, handRot, new(handSource.Width / 2, 0f), ZPosition, fx);
+            DrawGlowForPiece(glow, joints[2].Position + offset, handSource, handRot, new(handSource.Width / 2f, 0f), fx);
         }
     }
 
+    // Over body
     public void DrawRightArm(Texture2D atlas, Texture2D glow, Color color, SpriteEffects flip)
     {
-        if (rightArm != null)
+        if (RightArm != null)
         {
-            List<CCDKinematicJoint> joints = rightArm.Root.GetSubLimb();
+            List<CCDKinematicJoint> joints = RightArm.Root.GetSubLimb();
+            Vector2 offset;
+            SpriteEffects fx;
 
             float backLimbRot = joints[0].Position.AngleTo(joints[1].Position) - PiOver2;
             Rectangle backLimbSource = LookingStraight ? RightStraightBackLimbRect : RightAngledBackLimbRect;
+            fx = flip;
             Main.spriteBatch.DrawBetter(atlas, joints[0].Position,
-                backLimbSource, color, backLimbRot, new(backLimbSource.Width / 2f, 0f), ZPosition, flip);
-            DrawGlowForPiece(glow, joints[0].Position, backLimbSource, backLimbRot, new(backLimbSource.Width / 2f, 0f), flip);
+                backLimbSource, color, backLimbRot, new(backLimbSource.Width / 2f, 0f), ZPosition, fx);
+            DrawGlowForPiece(glow, joints[0].Position, backLimbSource, backLimbRot, new(backLimbSource.Width / 2f, 0f), fx);
 
             float foreLimbRot = joints[1].Position.AngleTo(joints[2].Position) - PiOver2;
             Rectangle foreLimbSource = LookingStraight ? RightStraightForeLimbRect : RightAngledForeLimbRect;
-            Main.spriteBatch.DrawBetter(atlas, joints[1].Position + PolarVector(5f * Direction, foreLimbRot),
-                foreLimbSource, color, foreLimbRot, new(foreLimbSource.Width / 2f, 0f), ZPosition, flip);
-            DrawGlowForPiece(glow, joints[1].Position + PolarVector(5f * Direction, foreLimbRot), foreLimbSource, foreLimbRot, new(foreLimbSource.Width / 2f, 0f), flip);
+            offset = PolarVector(5f * Direction, foreLimbRot);
+            fx = FXForArmJoint(foreLimbRot) | flip;
+            Main.spriteBatch.DrawBetter(atlas, joints[1].Position + offset,
+                foreLimbSource, color, foreLimbRot, new(foreLimbSource.Width / 2f, 0f), ZPosition, fx);
+            DrawGlowForPiece(glow, joints[1].Position + offset, foreLimbSource, foreLimbRot, new(foreLimbSource.Width / 2f, 0f), fx);
 
             float handRot = joints[2].Position.AngleTo(joints[3].Position) - PiOver2;
             Rectangle handSource = LookingStraight ? RightStraightHandRect : RightAngledHandRect;
-            Main.spriteBatch.DrawBetter(atlas, joints[2].Position + PolarVector(6f * Direction, handRot),
-                handSource, color, handRot, new(handSource.Width / 2, 0f), ZPosition, flip);
-            DrawGlowForPiece(glow, joints[2].Position + PolarVector(6f * Direction, handRot), handSource, handRot, new(handSource.Width / 2f, 0f), flip);
+            offset = PolarVector(6f * Direction, handRot);
+            fx |= FXForArmJoint(handRot) | flip;
+            Main.spriteBatch.DrawBetter(atlas, joints[2].Position + offset,
+                handSource, color, handRot, new(handSource.Width / 2, 0f), ZPosition, fx);
+            DrawGlowForPiece(glow, joints[2].Position + offset, handSource, handRot, new(handSource.Width / 2f, 0f), fx);
         }
     }
 
@@ -397,7 +573,7 @@ public partial class Asterlin : ModNPC, IHasScreenShader
         const int glowCount = 10;
         for (int x = 0; x < glowCount; x++)
         {
-            Vector2 offset = PolarVector(MathHelper.Lerp(0f, 6f, VentGlowInterpolant), MathHelper.TwoPi * InverseLerp(0f, glowCount, x));
+            Vector2 offset = PolarVector(Lerp(0f, 6f, VentGlowInterpolant), TwoPi * InverseLerp(0f, glowCount, x));
             Color ventColor = Color.OrangeRed with { A = 0 } * VentGlowInterpolant;
             Main.spriteBatch.DrawBetter(vent, NPC.Center + offset, bodySource, ventColor, BodyRotation, bodySource.Size() / 2f, ZPosition, flip);
         }
@@ -427,15 +603,7 @@ public partial class Asterlin : ModNPC, IHasScreenShader
         }
     }
 
-    public TrailPoints OldPositions = new(30);
-
-    public ManualTrailPoints LeftLegPoints = new(30);
-    public OptimizedPrimitiveTrail LeftLegFlame;
-
-    public ManualTrailPoints RightLegPoints = new(30);
-    public OptimizedPrimitiveTrail RightLegFlame;
-
-    public float FlameWidthFunct(float completionRatio) => MathHelper.SmoothStep(32f, 8f, Animators.MakePoly(1.4f).OutFunction(completionRatio)) * NPC.scale;
+    public float FlameWidthFunct(float completionRatio) => SmoothStep(32f, 8f, Animators.MakePoly(1.4f).OutFunction(completionRatio)) * NPC.scale;
 
     public Color FlameColorFunct(SystemVector2 completionRatio, Vector2 pos)
     {
@@ -467,24 +635,18 @@ public partial class Asterlin : ModNPC, IHasScreenShader
             shader.TrySetParameter("heatInterpolant", 1.9f);
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WavyBlotchNoise), 1, SamplerState.LinearWrap);
 
-            if (LeftLegFlame != null && LeftLegPoints != null)
-            {
+            if (LeftLegFlame != null && LeftLegFlame.Disposed == false)
                 LeftLegFlame.DrawTrail(shader, LeftLegPoints.Points, 200, true, true);
-            }
 
-            if (RightLegFlame != null && RightLegPoints != null)
-            {
+            if (RightLegFlame != null && RightLegFlame.Disposed == false)
                 RightLegFlame.DrawTrail(shader, RightLegPoints.Points, 200, true, true);
-            }
         }
         PixelationSystem.QueuePrimitiveRenderAction(flame, PixelationLayer.OverNPCs, null);
     }
 
-    public TrailPoints FlameEngulfPoints = new(8);
-    public OptimizedPrimitiveTrail FlameEngulfTrail;
     public float FlameEngulfWidthFunct(float c)
     {
-        float baseWidth = MathHelper.Lerp(RotatedHitbox.Height, 50f, c);
+        float baseWidth = Lerp(RotatedHitbox.Height, 50f, c);
         float tipSmoothenFactor = MathF.Sqrt(1f - Animators.MakePoly(3f).InFunction(InverseLerp(0.3f, 0.015f, c)));
         return NPC.scale * baseWidth * tipSmoothenFactor;
     }
@@ -499,7 +661,7 @@ public partial class Asterlin : ModNPC, IHasScreenShader
     {
         void engulf()
         {
-            if (FlameEngulfTrail != null && FlameEngulfTrail._disposed == false && FlameEngulfPoints != null)
+            if (FlameEngulfTrail != null && FlameEngulfTrail.Disposed == false && FlameEngulfPoints != null)
             {
                 ManagedShader shader = AssetRegistry.GetShader("FlameEngulfShader");
                 shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TurbulentNoise), 1, SamplerState.AnisotropicWrap);
@@ -540,69 +702,43 @@ public partial class Asterlin : ModNPC, IHasScreenShader
             ScreenShaderUpdates.UnregisterEntity(this);
         }
     }
+
     public bool IsEntityActive() => NPC.active;
 
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
-        if (HeatDistortionStrength != 0f)
+        if (HeatDistortionStrength > 0f)
         {
             if (!HasShader)
                 InitializeShader();
             UpdateShader();
         }
 
-        /*
-        Texture2D atlas = AssetRegistry.GetTexture(AdditionsTexture.AsterlinAtlas);
-        Texture2D glow = AssetRegistry.GetTexture(AdditionsTexture.AsterlinAtlasGlow);
-        Texture2D vent = AssetRegistry.GetTexture(AdditionsTexture.AsterlinAtlasVentGlow);
+        if (CurrentState == AsterlinAIType.GabrielLeave)
+            GabrielLeave_DrawBeam();
 
-        SpriteEffects flip = LookingStraight ? SpriteEffects.None : (Direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
-        Color color = Color.White.Lerp(Color.Gray, 1f - ZPosition) * NPC.Opacity;
-
-        if (!LookingStraight)
-        {
-            DrawLeftArm(atlas, glow, color, flip);
-            if (CurrentState == AsterlinAIType.TechnicBombBarrage)
-                TechnicBombBarrage_Draw();
-        }
-
-        DrawBody(atlas, glow, vent, color, flip);
-        DrawLegs(atlas, glow, color, flip);
-        DrawHead(atlas, glow, color, flip);
-        if (CurrentState == AsterlinAIType.TechnicBombBarrage)
-            Gun?.DrawGun();
-
-        if (LookingStraight)
-        {
-            DrawLeftArm(atlas, glow, color, flip);
-            DrawRightArm(atlas, glow, color, flip);
-        }
-        else
-        {
-            DrawRightArm(atlas, glow, color, flip);
-        }
-        if (CurrentState == AsterlinAIType.RotatedDicing)
-            RotatedDicing_Draw();
-        if (CurrentState == AsterlinAIType.TechnicBombBarrage)
-            TechnicBombBarrage_DrawReticle();
-        if (CurrentState == AsterlinAIType.UnrelentingRush)
-            UnrelentingRush_DrawTelegraph();
-        if (CurrentState == AsterlinAIType.AbsorbingEnergy)
-            AbsorbingEnergy_Draw();
-        DrawFlameEngulf();
-        */
-        RenderFromTarget();
+        if (NPC.scale >= .6f)
+            RenderFromProcessingTarget();
 
         return false;
     }
 
-    public static void LoadTarget()
+    private static void DrawBehindTiles(On_Main.orig_DoDraw_DrawNPCsBehindTiles orig, Main self)
     {
-        target = new();
-        Main.ContentThatNeedsRenderTargets.Add(target);
+        orig(self);
+        if (FindNPC(out NPC npc, ModContent.NPCType<Asterlin>()))
+        {
+            if (npc.scale < .6f)
+            {
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp,
+                    DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+                RenderFromProcessingTarget();
+                Main.spriteBatch.End();
+            }
+        }
     }
 
-    public static void RenderToTarget()
+    public static void RenderToMainTarget()
     {
         if (!FindNPC(out NPC npc, ModContent.NPCType<Asterlin>()))
             return;
@@ -637,6 +773,8 @@ public partial class Asterlin : ModNPC, IHasScreenShader
         {
             asterlin.DrawRightArm(atlas, glow, color, flip);
         }
+        if (asterlin.CurrentState == AsterlinAIType.Barrage)
+            asterlin.Barrage_Draw();
         if (asterlin.CurrentState == AsterlinAIType.RotatedDicing)
             asterlin.RotatedDicing_Draw();
         if (asterlin.CurrentState == AsterlinAIType.TechnicBombBarrage)
@@ -648,12 +786,12 @@ public partial class Asterlin : ModNPC, IHasScreenShader
         asterlin.DrawFlameEngulf();
     }
 
-    public static void RenderFromTarget()
+    public static void RenderToProcessingTarget()
     {
-        target.Request();
+        mainTarget.Request();
 
         // Wait until the drawers ready
-        if (!target.IsReady)
+        if (!mainTarget.IsReady)
             return;
 
         if (!FindNPC(out NPC npc, ModContent.NPCType<Asterlin>()))
@@ -667,10 +805,54 @@ public partial class Asterlin : ModNPC, IHasScreenShader
             shader.TrySetParameter("resolution", new Vector2(2000f));
             shader.TrySetParameter("opacity", asterlin.PowerInterpolant);
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, Main.Rasterizer, shader.Effect, Main.GameViewMatrix.TransformationMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp,
+                DepthStencilState.None, Main.Rasterizer, shader.Effect, Main.GameViewMatrix.TransformationMatrix);
         }
-        Main.spriteBatch.Draw(target.GetTarget(), Main.screenLastPosition - Main.screenPosition, Color.White);
+        Main.spriteBatch.Draw(mainTarget.GetTarget(), Vector2.Zero, Color.White);
         if (asterlin.PowerInterpolant > 0f)
+            Main.spriteBatch.ResetToDefault();
+    }
+
+    public static void RenderFromProcessingTarget()
+    {
+        postProcessingTarget.Request();
+
+        // Wait until the drawers ready
+        if (!postProcessingTarget.IsReady)
+            return;
+
+        if (!FindNPC(out NPC npc, ModContent.NPCType<Asterlin>()))
+            return;
+        Asterlin asterlin = npc.As<Asterlin>();
+
+        RenderTarget2D post = postProcessingTarget.GetTarget();
+        Color color = Color.White;
+        if (asterlin.CurrentState == AsterlinAIType.GabrielLeave && asterlin.AITimer > Asterlin.GabrielLeave_HoverTime)
+        {
+            color = Color.Black;
+            ManagedShader shader = AssetRegistry.GetShader("AsterlinDisintegration");
+            shader.TrySetParameter("interpolant", asterlin.DisintegrationInterpolant);
+            shader.TrySetParameter("center", WorldSpaceToScreenUV(asterlin.NPC.Center));
+            shader.TrySetParameter("screenPosition", Main.screenPosition);
+            shader.TrySetParameter("texSize", post.Size());
+            shader.TrySetParameter("direction", Vector2.UnitY);
+            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.OrganicNoise), 1, SamplerState.LinearWrap);
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp,
+                DepthStencilState.None, Main.Rasterizer, shader.Effect, Main.GameViewMatrix.TransformationMatrix);
+        }
+        else if (asterlin.MotionBlurInterpolant > 0f)
+        {
+            ManagedShader shader = AssetRegistry.GetShader("MotionBlurShader");
+            shader.TrySetParameter("blurInterpolant", asterlin.MotionBlurInterpolant);
+            shader.TrySetParameter("blurWeights", BlurWeights);
+            shader.TrySetParameter("blurDirection", asterlin.NPC.velocity.SafeNormalize(Vector2.UnitY) * 2f);
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp,
+                DepthStencilState.None, Main.Rasterizer, shader.Effect, Main.GameViewMatrix.TransformationMatrix);
+        }
+        Main.spriteBatch.Draw(post, Main.screenLastPosition - Main.screenPosition, color);
+        if (asterlin.MotionBlurInterpolant > 0f || asterlin.DisintegrationInterpolant > 0f)
             Main.spriteBatch.ResetToDefault();
     }
 }
@@ -686,7 +868,27 @@ public class AsterlinTarget : ARenderTargetContentByRequest
         device.Clear(Color.Transparent);
 
         Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, Main.Rasterizer, null, Matrix.Identity);
-        Asterlin.RenderToTarget();
+        Asterlin.RenderToMainTarget();
+        Main.spriteBatch.End();
+
+        device.SetRenderTarget(null);
+
+        _wasPrepared = true;
+    }
+}
+
+public class AsterlinPostProcessTarget : ARenderTargetContentByRequest
+{
+    public override void HandleUseReqest(GraphicsDevice device, SpriteBatch spriteBatch)
+    {
+        Vector2 size = new(device.Viewport.Width, device.Viewport.Height);
+        PrepareARenderTarget_WithoutListeningToEvents(ref _target, Main.instance.GraphicsDevice, (int)size.X, (int)size.Y, RenderTargetUsage.PreserveContents);
+
+        device.SetRenderTarget(_target);
+        device.Clear(Color.Transparent);
+
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, Main.Rasterizer, null, Matrix.Identity);
+        Asterlin.RenderToProcessingTarget();
         Main.spriteBatch.End();
 
         device.SetRenderTarget(null);

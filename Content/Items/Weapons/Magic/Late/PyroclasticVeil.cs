@@ -7,7 +7,7 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Early;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Late;
@@ -28,7 +28,7 @@ public class PyroclasticVeil : ModItem
 
     public override void SetDefaults()
     {
-        Item.damage = 744;
+        Item.damage = 450;
         Item.DamageType = DamageClass.Magic;
         Item.width = Item.height = 38;
         Item.useTime = 4;

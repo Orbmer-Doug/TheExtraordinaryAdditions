@@ -1,9 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Utilities;
 using System;
 using System.IO;
 using Terraria;
-using Terraria.Audio;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Assets.Audio;
 using TheExtraordinaryAdditions.Common.Particles.Metaball;
@@ -62,7 +60,7 @@ public class PyroclasticHover : BaseIdleHoldoutProjectile
         }
         Owner.ChangeDir(Projectile.spriteDirection);
 
-        int height = 116;
+        const int height = 116;
         if (this.RunLocal() && Modded.SafeMouseLeft.Current)
         {
             if (AppearTimer <= AppearTime)
@@ -72,13 +70,9 @@ public class PyroclasticHover : BaseIdleHoldoutProjectile
         else
         {
             if (AppearTimer > 0f)
-            {
                 AppearTimer--;
-            }
             else
-            {
                 Projectile.rotation = Projectile.rotation.SmoothAngleLerp(-MathHelper.PiOver2, .4f, .5f);
-            }
         }
 
         if (AppearTimer > 0)
@@ -89,7 +83,6 @@ public class PyroclasticHover : BaseIdleHoldoutProjectile
 
         if (AppearCompletion >= 1f)
         {
-            // Release flames outward.
             MetaballRegistry.SpawnLavaMetaball(Projectile.Center, Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.2f) * 14f, SecondsToFrames(7), 120, Owner.whoAmI, Projectile.damage);
             if (Time % 2 == 1)
                 Item.CheckManaBetter(Owner, 1, true);

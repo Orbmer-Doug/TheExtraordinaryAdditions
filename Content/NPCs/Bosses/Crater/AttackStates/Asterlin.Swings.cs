@@ -1,31 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Globals;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
 public partial class Asterlin : ModNPC
 {
+    public static readonly Dictionary<AsterlinAIType, float> Swings_PossibleStates =
+        new Dictionary<AsterlinAIType, float> { { AsterlinAIType.RotatedDicing, 1f }, { AsterlinAIType.Barrage, .6f } };
     [AutomatedMethodInvoke]
     public void LoadStateTransitions_Swings()
     {
-        StateMachine.RegisterTransition(AsterlinAIType.Swings, new Dictionary<AsterlinAIType, float> { { AsterlinAIType.RotatedDicing, 1f }, { AsterlinAIType.Barrage, 1f } }, false, () =>
+        StateMachine.RegisterTransition(AsterlinAIType.Swings, Swings_PossibleStates, false, () =>
         {
-            return NPC.AdditionsInfo().ExtraAI[0] >= Swings_MaxSwingCount && Sword == null;
+            return ExtraAI[0] >= Swings_MaxSwingCount && Sword == null;
         });
-        StateMachine.RegisterStateEntryCallback(AsterlinAIType.Swings, () => 
+        StateMachine.RegisterStateEntryCallback(AsterlinAIType.Swings, () =>
         {
             if (this.RunServer())
-            {
                 NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<CyberneticSword>(), MediumAttackDamage, 0f);
-            }
         });
         StateMachine.RegisterStateBehavior(AsterlinAIType.Swings, DoBehavior_Swings);
     }

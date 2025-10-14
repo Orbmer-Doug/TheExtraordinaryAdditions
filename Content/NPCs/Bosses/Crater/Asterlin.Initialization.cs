@@ -1,23 +1,25 @@
 ﻿using CalamityMod.Items.Potions;
+using CalamityMod.NPCs.Yharon;
 using Terraria;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TheExtraordinaryAdditions.Content.Autoloaders;
 using TheExtraordinaryAdditions.Content.Items.Consumable.BossBags;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Pets;
 using TheExtraordinaryAdditions.Content.Items.Placeable;
-using TheExtraordinaryAdditions.Content.Items.Placeable.Base;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Late;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Late;
-using TheExtraordinaryAdditions.Core.DataStructures;
+using TheExtraordinaryAdditions.Content.NPCs.BossBars;
 using TheExtraordinaryAdditions.Core.Utilities;
+using static CalamityMod.DropHelper;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
-/// Basic initialization for Asterlin
+// Basic initialization for Asterlin
 public partial class Asterlin
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Asterlin_BossChecklist);
@@ -28,9 +30,10 @@ public partial class Asterlin
         NPCID.Sets.TrailCacheLength[NPC.type] = 30;
 
         NPCID.Sets.SpecificDebuffImmunity[Type][BuffID.Slow & BuffID.Webbed & BuffID.Confused] = true;
-        NPCID.Sets.BossBestiaryPriority.Add(Type);
         NPCID.Sets.MPAllowedEnemies[Type] = true;
         NPCID.Sets.UsesNewTargetting[Type] = true;
+        NPCID.Sets.DoesntDespawnToInactivityAndCountsNPCSlots[Type] = true;
+        NPCID.Sets.MustAlwaysDraw[Type] = true;
 
         NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers()
         {
@@ -39,6 +42,7 @@ public partial class Asterlin
             PortraitPositionYOverride = 100
         };
         NPCID.Sets.NPCBestiaryDrawOffset.Add(Type, drawModifiers);
+        NPCID.Sets.BossBestiaryPriority.Add(Type);
     }
 
     public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
@@ -52,8 +56,8 @@ public partial class Asterlin
 
     public override void SetDefaults()
     {
-        NPC.SetLifeMaxByMode(1300000 / 3, 2800000 / 3, 4500000 / 3);
-        NPC.damage = 300;
+        NPC.lifeMax = 1_500_000;
+        NPC.damage = 335;
         NPC.defense = 150;
         NPC.width = 128;
         NPC.height = 278;
@@ -68,6 +72,7 @@ public partial class Asterlin
         NPC.HitSound = AssetRegistry.GetSound(AdditionsSound.AsterlinHit) with { Volume = 1f, PitchVariance = .2f, PitchRange = new(-.2f, 0f) };
         NPC.DeathSound = null;
         NPC.value = Item.buyPrice(50, 0, 0, 0) / 5;
+        NPC.BossBar = ModContent.GetInstance<AsterlinBossbar>();
         NPC.netAlways = true;
 
         if (!Main.dedServ)
@@ -76,30 +81,51 @@ public partial class Asterlin
         }
 
         NPC.scale = NPC.Opacity = ZPosition = 1f;
-        leftArm = new JointChain(
-                NPC.Center,
-                (LeftAngledBackLimbRect.Height, null), // Back limb
-                (LeftAngledForeLimbRect.Height, null), // Fore limb
-                (LeftAngledHandRect.Height, null) // Hand
-            );
+        InitializeGraphics();
+    }
 
-        rightArm = new JointChain(
-                NPC.Center,
-                (RightAngledBackLimbRect.Height, null), // Back limb
-                (RightAngledForeLimbRect.Height, null), // Fore limb
-                (RightAngledHandRect.Height, null) // Hand
-            );
+    public const string LocalizedKey = "NPCs.Asterlin.";
+    public static int RelicID
+    {
+        get;
+        private set;
     }
 
     public override void Load()
     {
-        LoadTarget();
+        RelicAutoloader.Create(Mod, AssetRegistry.GetTexturePath(AdditionsTexture.AsterlinRelic),
+            AssetRegistry.GetTexturePath(AdditionsTexture.AsterlinRelicPlaced), out int id);
+        RelicID = id;
+
+        On_NPC.UpdateNPC += MoreUpdates;
+        LoadGraphics();
         LoadDialogue();
     }
 
     public override void Unload()
     {
+        On_NPC.UpdateNPC -= MoreUpdates;
+        UnloadGraphics();
         UnloadDialogue();
+    }
+
+    // For any high speed attacks we dont want the hitbox to skip over players
+    public int ExtraUpdates;
+    public int NumUpdates;
+    private static void MoreUpdates(On_NPC.orig_UpdateNPC orig, NPC self, int i)
+    {
+        if (self.type == ModContent.NPCType<Asterlin>())
+        {
+            Asterlin aster = self.As<Asterlin>();
+            aster.NumUpdates = aster.ExtraUpdates;
+            while (aster.NumUpdates >= 0)
+            {
+                aster.NumUpdates--;
+                orig(self, i);
+            }
+        }
+        else
+            orig(self, i);
     }
 
     public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position) => false;
@@ -112,7 +138,9 @@ public partial class Asterlin
 
     public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)
     {
-        NPC.lifeMax = (int)(NPC.lifeMax * bossAdjustment / (Main.masterMode ? 3f : 2f));
+        // Unfortunately, theres no way to check the total amount of players between both worlds
+        // And due to the shenanigans described in Asterlin.AbsorbingEnergy, it wont capture the correct amount of players
+        NPC.lifeMax = (int)((float)NPC.lifeMax * 0.8f * balance * bossAdjustment);
     }
 
     public override void BossLoot(ref int potionType) => potionType = ModContent.ItemType<OmegaHealingPotion>();
@@ -120,11 +148,9 @@ public partial class Asterlin
     public override void ModifyNPCLoot(NPCLoot npcLoot)
     {
         npcLoot.Add(ItemDropRule.BossBag(ModContent.ItemType<TreasureBoxAsterlin>()));
-        npcLoot.Add(ItemDropRule.MasterModeDropOnAllPlayers(ModContent.ItemType<TVRemote>()));
-        npcLoot.Add(ModContent.ItemType<LockedCyberneticSword>(), 1);
 
-        LeadingConditionRule normalOnly = npcLoot.DefineNormalOnlyDropSet();
-        int[] weapons =
+        LeadingConditionRule normalRule = npcLoot.DefineNormalOnlyDropSet();
+        int[] itemIDs =
         [
             ModContent.ItemType<CyberneticRocketGauntlets>(),
             ModContent.ItemType<TechnicBlitzripper>(),
@@ -132,6 +158,10 @@ public partial class Asterlin
             ModContent.ItemType<TesselesticMeltdown>(),
             ModContent.ItemType<LivingStarFlare>(),
         ];
-        normalOnly.Add(DropHelper.CalamityStyle(DropHelper.NormalWeaponDropRateFraction, weapons));
+        normalRule.Add(CalamityStyle(NormalWeaponDropRateFraction, itemIDs));
+
+        npcLoot.Add(ModContent.ItemType<LockedCyberneticSword>(), 10);
+        npcLoot.DefineConditionalDropSet(RevAndMaster).Add(RelicID);
+        npcLoot.Add(ItemDropRule.MasterModeDropOnAllPlayers(ModContent.ItemType<TVRemote>()));
     }
 }

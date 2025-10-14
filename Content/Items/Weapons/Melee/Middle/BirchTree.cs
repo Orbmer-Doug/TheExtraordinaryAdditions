@@ -1,12 +1,11 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Early;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
@@ -14,10 +13,6 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 public class BirchTree : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BirchTree);
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(new(143, 94, 66));
-    }
 
     public override void SetDefaults()
     {
@@ -33,7 +28,13 @@ public class BirchTree : ModItem
         Item.noUseGraphic = Item.noMelee = Item.autoReuse = true;
     }
 
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(new(143, 94, 66));
+    }
+
     public override bool CanUseItem(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
+
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
         Main.projectile[Projectile.NewProjectile(source, position, velocity, type, damage, knockback, Main.myPlayer)].As<Birch>().SwingDir = Projectiles.Base.BaseSwordSwing.SwingDirection.Up;

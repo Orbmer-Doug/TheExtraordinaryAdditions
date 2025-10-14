@@ -99,7 +99,8 @@ public class EclipseWhip : BaseWhip
                 ParticleRegistry.SpawnSquishyPixelParticle(Tip, Main.rand.NextVector2Circular(10f, 10f), Main.rand.Next(60, 90), Main.rand.NextFloat(1f, 1.6f), col, col * 1.8f, 5);
                 ParticleRegistry.SpawnHeavySmokeParticle(Tip, Main.rand.NextVector2Circular(5f, 5f), Main.rand.Next(40, 50), Main.rand.NextFloat(.5f, .7f), col, 1.4f);
             }
-            Projectile.CreateFriendlyExplosion(Tip, new(70), Projectile.damage / 2, Projectile.knockBack, 10, 20);
+            if (this.RunLocal())
+                Projectile.CreateFriendlyExplosion(Tip, new(70), Projectile.damage / 2, Projectile.knockBack, 10, 20);
             SoundID.DD2_BetsyFireballImpact.Play(Tip, 1f, .1f);
         }
         else
@@ -174,7 +175,7 @@ public class EclipseWhip : BaseWhip
     {
         if (!Moon)
         {
-            if (Line != null && !Line._disposed)
+            if (Line != null && !Line.Disposed)
             {
                 ManagedShader shader = ShaderRegistry.CrunchyLaserShader;
                 shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DarkTurbulentNoise), 1, SamplerState.LinearWrap);

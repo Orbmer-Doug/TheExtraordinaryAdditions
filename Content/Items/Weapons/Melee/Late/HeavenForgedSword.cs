@@ -1,13 +1,10 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
@@ -18,10 +15,6 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
 public class HeavenForgedSword : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.HeavenForgedSword);
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(new Color(11, 113, 153));
-    }
 
     public override void SetDefaults()
     {
@@ -40,6 +33,11 @@ public class HeavenForgedSword : ModItem
         Item.noMelee = true;
         Item.noUseGraphic = true;
         Item.autoReuse = true;
+    }
+
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(new Color(11, 113, 153));
     }
 
     public override bool CanShoot(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;

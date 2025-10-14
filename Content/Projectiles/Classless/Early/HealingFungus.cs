@@ -1,9 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using System;
+﻿using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -11,12 +9,8 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Early;
 
 public class HealingFungus : ModProjectile
 {
-    public override string Texture => "Terraria/Images/Item_" + ItemID.GlowingMushroom;
-    public override void SetStaticDefaults()
-    {
-        ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
-        ProjectileID.Sets.TrailCacheLength[Projectile.type] = 5;
-    }
+    public override string Texture => ItemID.GlowingMushroom.GetTerrariaItem();
+
     public override void SetDefaults()
     {
         Projectile.width = 22; Projectile.height = 24;
@@ -27,6 +21,7 @@ public class HealingFungus : ModProjectile
         Projectile.penetrate = -1;
         Projectile.timeLeft = SecondsToFrames(8);
     }
+
     public override bool? CanDamage() => false;
     public ref float Time => ref Projectile.ai[0];
     public Player Owner => Main.player[Projectile.owner];
@@ -61,11 +56,10 @@ public class HealingFungus : ModProjectile
 
     public override void OnKill(int timeLeft)
     {
-        float offsetAngle = Main.rand.NextFloat(MathHelper.TwoPi);
-        int count = 20;
-        for (int i = 0; i < count; i++)
+        float offsetAngle = RandomRotation();
+        for (int i = 0; i < 20; i++)
         {
-            Vector2 shootVelocity = (MathHelper.TwoPi * i / count + offsetAngle).ToRotationVector2() * 5f;
+            Vector2 shootVelocity = (MathHelper.TwoPi * i / 20 + offsetAngle).ToRotationVector2() * 5f;
             ParticleRegistry.SpawnGlowParticle(Projectile.Center, shootVelocity, 20, 30f, Color.DarkBlue);
         }
     }
@@ -76,7 +70,6 @@ public class HealingFungus : ModProjectile
             Projectile.velocity.X = -oldVelocity.X / 2;
         if (Math.Abs(Projectile.velocity.Y - oldVelocity.Y) > float.Epsilon)
             Projectile.velocity.Y = -oldVelocity.Y / 2;
-        
         return false;
     }
 

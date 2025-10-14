@@ -1,9 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
@@ -22,7 +20,7 @@ public class TechnicBomb : ProjOwnedByNPC<Asterlin>
         Projectile.timeLeft = 350;
         Projectile.hostile = true;
         Projectile.friendly = false;
-        Projectile.tileCollide = true;
+        Projectile.tileCollide = false;
         Projectile.ignoreWater = true;
     }
 
@@ -35,9 +33,9 @@ public class TechnicBomb : ProjOwnedByNPC<Asterlin>
     }
     public override void SafeAI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, null, 10);
-        if (trail2 == null || trail2._disposed)
+        if (trail2 == null || trail2.Disposed)
             trail2 = new(WidthFunct2, ColorFunct2, null, 10);
 
         Projectile.velocity *= .98f;
@@ -77,15 +75,14 @@ public class TechnicBomb : ProjOwnedByNPC<Asterlin>
                 }
                 SpawnProjectile(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<TechnicBlast>(), Asterlin.MediumAttackDamage, 0f);
             }
-                
+
             Hit = true;
             Projectile.Kill();
         }
 
         Time++;
     }
-    public override bool OnTileCollide(Vector2 oldVelocity) => false;
-
+    public override bool? CanDamage() => false;
     public float WidthFunct(float c) => 40f * MathHelper.SmoothStep(1f, 0f, c) * GetCircularSectionValue(Main.GameUpdateCount * 0.15f, .3f, .5f, 1f);
     public float WidthFunct2(float c) => 40f * MathHelper.SmoothStep(1f, 0f, c) * GetCircularSectionValue(Main.GameUpdateCount * 0.15f + MathHelper.Pi, .3f, .5f, 1f, MathHelper.PiOver2);
     public Color ColorFunct(SystemVector2 c, Vector2 pos)
@@ -108,14 +105,10 @@ public class TechnicBomb : ProjOwnedByNPC<Asterlin>
             ManagedShader shader = ShaderRegistry.FireTrail;
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DendriticNoiseZoomedOut), 1, SamplerState.AnisotropicWrap);
             if (trail != null && points != null)
-            {
                 trail.DrawTrail(shader, points.Points, 50);
-            }
 
             if (trail2 != null && points2 != null)
-            {
                 trail2.DrawTrail(shader, points2.Points, 50);
-            }
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 
@@ -166,14 +159,14 @@ public class TechnicBlast : ProjOwnedByNPC<Asterlin>
         {
             for (int i = 0; i < 50; i++)
                 ParticleRegistry.SpawnBloomLineParticle(Projectile.Center, Main.rand.NextVector2Circular(5f, 5f) + Main.rand.NextVector2CircularLimited(10f, 10f, .5f, 1f), Main.rand.Next(20, 30), Main.rand.NextFloat(.3f, .5f), new(112, 218, 255));
-            
+
             for (int i = 0; i < 20; i++)
                 ParticleRegistry.SpawnLightningArcParticle(Projectile.Center, Main.rand.NextVector2CircularLimited(120f, 120f, .7f, 1f), 12, Main.rand.NextFloat(.2f, .3f), new(66, 206, 255));
 
             for (int i = 0; i < 30; i++)
                 ParticleRegistry.SpawnSparkParticle(Projectile.Center, Main.rand.NextVector2Circular(1f, 1f), Main.rand.Next(30, 40), Main.rand.NextFloat(.9f, 1.3f), Color.Cyan);
         }
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, null, 40);
 
         Radius = Animators.MakePoly(4f).OutFunction.Evaluate(Time, 0f, MaxTime, 0f, MaxRadius);
@@ -182,6 +175,7 @@ public class TechnicBlast : ProjOwnedByNPC<Asterlin>
             points.SetPoint(i, Projectile.Center + Vector2.One.RotatedBy(i / 19f * MathHelper.TwoPi) * Radius);
         Time++;
     }
+
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
         return Utility.CircularHitboxCollision(Projectile.Center, Radius, targetHitbox);
@@ -191,12 +185,12 @@ public class TechnicBlast : ProjOwnedByNPC<Asterlin>
     public Color ColorFunct(SystemVector2 c, Vector2 pos) => MulticolorLerp(InverseLerp(0f, MaxTime, Time), Color.White, Color.LightCyan, Color.Cyan, Color.DarkCyan);
 
     public OptimizedPrimitiveTrail trail;
-    public ManualTrailPoints points = new(40);
+    public TrailPoints points = new(40);
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
         {
-            if (trail == null || points == null || trail._disposed)
+            if (trail == null || points == null || trail.Disposed)
                 return;
 
             ManagedShader shader = ShaderRegistry.PierceTrailShader;

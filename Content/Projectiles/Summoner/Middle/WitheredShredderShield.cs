@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
-using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Assets.Audio;
@@ -50,8 +49,8 @@ public class WitheredShredderShield : ModProjectile
     public override bool MinionContactDamage() => true;
     public override bool? CanCutTiles() => false;
     public ref float Timer => ref Projectile.ai[0];
-    public ref float ShredTimer => ref Projectile.Additions().ExtraAI[1];
-    public ref float AltRotation => ref Projectile.Additions().ExtraAI[2];
+    public ref float ShredTimer => ref Projectile.AdditionsInfo().ExtraAI[1];
+    public ref float AltRotation => ref Projectile.AdditionsInfo().ExtraAI[2];
 
     public enum CurrentState
     {
@@ -81,22 +80,22 @@ public class WitheredShredderShield : ModProjectile
 
     public bool HasHitTarget
     {
-        get => Projectile.Additions().ExtraAI[0] == 1f;
-        set => Projectile.Additions().ExtraAI[0] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[0] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
 
-    public ref float AltCounter => ref Projectile.Additions().ExtraAI[2];
+    public ref float AltCounter => ref Projectile.AdditionsInfo().ExtraAI[2];
 
     public bool Init
     {
-        get => Projectile.Additions().ExtraAI[3] == 1f;
-        set => Projectile.Additions().ExtraAI[3] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[3] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[3] = value.ToInt();
     }
 
     public bool PlayedSound
     {
-        get => Projectile.Additions().ExtraAI[4] == 1f;
-        set => Projectile.Additions().ExtraAI[4] = value.ToInt();
+        get => Projectile.AdditionsInfo().ExtraAI[4] == 1f;
+        set => Projectile.AdditionsInfo().ExtraAI[4] = value.ToInt();
     }
 
     private bool CheckActive()
@@ -130,6 +129,7 @@ public class WitheredShredderShield : ModProjectile
             State = CurrentState.Hover;
             subState = SubState.Position;
             Init = true;
+            this.Sync();
         }
 
         if (!CheckActive())
@@ -189,12 +189,8 @@ public class WitheredShredderShield : ModProjectile
     {
         // Make it not fly into oblivion if it didn't manage to hit something
         float dist = Projectile.Distance(Owner.Center);
-
-        // Run back if too far
         if (dist > 1750f)
-        {
             Projectile.velocity = Projectile.Center.SafeDirectionTo(Owner.Center) * 40f;
-        }
 
         // Variables
         float speed = 40f;
@@ -206,7 +202,7 @@ public class WitheredShredderShield : ModProjectile
 
         Vector2 destination = Target.Center + spawnOffset;
 
-        Vector2 targetDestination = Utility.GetHomingVelocity(Projectile.position, Target.position, Target.velocity, speed);//Target.Center + Target.velocity * 2f;
+        Vector2 targetDestination = Utility.GetHomingVelocity(Projectile.position, Target.position, Target.velocity, speed);
         switch (subState)
         {
             case SubState.Position:
@@ -217,8 +213,7 @@ public class WitheredShredderShield : ModProjectile
                     // Reel back
                     Projectile.velocity = Projectile.SafeDirectionTo(Target.Center) * -11f;
                     subState = SubState.Reelback;
-                    SyncVariables();
-                    Projectile.netUpdate = true;
+                    this.Sync();
                 }
                 break;
             case SubState.Reelback:
@@ -231,9 +226,8 @@ public class WitheredShredderShield : ModProjectile
                     // Accelerate
                     Projectile.velocity = targetDestination;
                     subState = SubState.Ram;
-                    SyncVariables();
                     Timer = 0f;
-                    Projectile.netUpdate = true;
+                    this.Sync();
                 }
                 break;
             case SubState.Ram:
@@ -260,18 +254,18 @@ public class WitheredShredderShield : ModProjectile
                 if (HasHitTarget == true && AltCounter > 40f)
                 {
                     subState = SubState.Shred;
-                    SyncVariables();
+                    this.Sync();
                 }
 
                 // Otherwise repeat
-                else if (HasHitTarget == false && AltCounter > ReelBackTime * 2f)
+                else if (HasHitTarget == false && AltCounter > ReelBackTime)
                 {
                     Timer = 0f;
                     PlayedSound = false;
                     HasHitTarget = false;
                     AltCounter = 0f;
                     subState = SubState.Position;
-                    SyncVariables();
+                    this.Sync();
                 }
 
                 if (PlayedSound == false && !Main.dedServ)
@@ -300,7 +294,7 @@ public class WitheredShredderShield : ModProjectile
             PlayedSound = false;
             ShredTimer = 0f;
             subState = SubState.Position;
-            SyncVariables();
+            this.Sync();
         }
 
         if (ShredTimer % 6f == 5f)
@@ -322,15 +316,6 @@ public class WitheredShredderShield : ModProjectile
         AltRotation = (AltRotation + .05f) % MathHelper.TwoPi;
     }
 
-    public void SyncVariables()
-    {
-        Projectile.netUpdate = true;
-        if (Projectile.netSpam >= 10)
-        {
-            Projectile.netSpam = 9;
-        }
-    }
-
     public override bool? CanDamage()
     {
         if (subState == SubState.Ram || subState == SubState.Shred)
@@ -341,7 +326,10 @@ public class WitheredShredderShield : ModProjectile
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         if (!HasHitTarget)
+        {
             HasHitTarget = true;
+            this.Sync();
+        }
 
         // Impact particles
         for (int i = 0; i < 40; i++)
@@ -373,7 +361,7 @@ public class WitheredShredderShield : ModProjectile
         float rotation = Projectile.rotation;
 
         bool ramming = subState == SubState.Ram && HasHitTarget == false;
-        if (ramming || subState == SubState.Shred) 
+        if (ramming || subState == SubState.Shred)
         {
             Color[] col = ramming ? [lightColor] : [Color.DarkRed, Color.Red];
             after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), col, Projectile.Opacity);

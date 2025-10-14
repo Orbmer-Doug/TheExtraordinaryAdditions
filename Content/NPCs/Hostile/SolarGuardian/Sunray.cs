@@ -3,11 +3,9 @@ using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
-using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.SolarGuardian;
 
@@ -38,7 +36,7 @@ public class Sunray : ModProjectile, ILocalizedModType, IModType
     }
     public override void AI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, null, 20);
         points.Update(Projectile.Center);
 
@@ -68,7 +66,7 @@ public class Sunray : ModProjectile, ILocalizedModType, IModType
     {
         void draw()
         {
-            if (trail == null || trail._disposed || points == null)
+            if (trail == null || trail.Disposed || points == null)
                 return;
 
             ManagedShader shader = ShaderRegistry.SpecialLightningTrail;

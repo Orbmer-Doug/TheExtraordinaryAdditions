@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
 using Terraria.GameContent;
@@ -7,19 +6,19 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Early;
 
 public class MiniValor : ModProjectile
 {
-    public override string Texture => "Terraria/Images/Projectile_" + ProjectileID.Valor;
+    public override string Texture => ProjectileID.Valor.GetTerrariaProj();
 
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.TrailCacheLength[Projectile.type] = 12;
         ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
     }
+
     public override void SetDefaults()
     {
         Projectile.scale = .5f;
@@ -36,11 +35,13 @@ public class MiniValor : ModProjectile
     public Player Owner => Main.player[Projectile.owner];
     public Projectile Proj => Main.projectile[(int)Projectile.ai[1]];
     public ref float Timer => ref Projectile.ai[2];
-    public ref float Rotation => ref Projectile.Additions().ExtraAI[0];
-    public ref float OffsetAngle => ref Projectile.Additions().ExtraAI[1];
-    public ref float Direction => ref Projectile.Additions().ExtraAI[2];
+    public ref float Rotation => ref Projectile.AdditionsInfo().ExtraAI[0];
+    public ref float OffsetAngle => ref Projectile.AdditionsInfo().ExtraAI[1];
+    public ref float Direction => ref Projectile.AdditionsInfo().ExtraAI[2];
     public override void AI()
     {
+        if (Timer == 0)
+            this.Sync();
         Timer++;
         Rotation++;
 
@@ -215,7 +216,7 @@ public class MiniValor : ModProjectile
             Vector2 pos = new Vector2(center.X + (float)texture.Width * 0.5f * Projectile.scale, center.Y + (float)texture.Height * 0.5f * Projectile.scale) - new Vector2(6f * Projectile.scale, 0f);
             Rectangle frame = new Rectangle(0, 0, texture.Width, (int)num6);
             Vector2 orig = new Vector2(texture.Width * 0.5f, 0f);
-            Main.spriteBatch.DrawBetter(texture, pos,frame, white * opacity, rotation, orig, 1f, SpriteEffects.None);
+            Main.spriteBatch.DrawBetter(texture, pos, frame, white * opacity, rotation, orig, 1f, SpriteEffects.None);
         }
 
         Texture2D tex = Projectile.ThisProjectileTexture();

@@ -1,23 +1,16 @@
 ﻿using System.Collections.Generic;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
-using static TheExtraordinaryAdditions.Content.Projectiles.Melee.Late.SpoonSwing;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
 
 public class TheSpoon : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TheSpoon);
-
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(new Color(200, 113, 15));
-    }
 
     public override void SetDefaults()
     {
@@ -35,6 +28,11 @@ public class TheSpoon : ModItem
         Item.noMelee = true;
         Item.noUseGraphic = true;
         Item.autoReuse = true;
+    }
+
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(new Color(200, 113, 15));
     }
 
     public override bool CanShoot(Player player)

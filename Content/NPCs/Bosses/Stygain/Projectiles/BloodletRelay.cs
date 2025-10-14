@@ -7,6 +7,7 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 public class BloodletRelay : ProjOwnedByNPC<StygainHeart>
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.friendly = Projectile.hostile = false;
@@ -24,7 +25,7 @@ public class BloodletRelay : ProjOwnedByNPC<StygainHeart>
             return;
         }
 
-        this.Sync();
+        Projectile.netUpdate = true;
         ref float Offset = ref Projectile.ai[2];
         Offset += .09f * (Projectile.identity % 2f == 1f).ToDirectionInt() % MathHelper.TwoPi;
         int arms = 3;

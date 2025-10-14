@@ -7,7 +7,7 @@ namespace TheExtraordinaryAdditions.Core.Utilities;
 
 public static partial class Utility
 {
-    #region Raytracing
+    #region Raycasting
     [Flags]
     public enum CollisionTarget : byte
     {
@@ -507,65 +507,6 @@ public static partial class Utility
 
             return null;
         }
-
-        /* First iteration
-        else
-        {
-            Vector2 direction = (end - start);
-            float length = direction.Length();
-            if (length <= 0)
-                return null;
-            direction /= length; // Normalize
-            Vector2 perp = new Vector2(-direction.Y, direction.X);
-
-            List<(Vector2 point, float t, float offsetFactor)> intersections = new List<(Vector2, float, float)>();
-            for (int k = 0; k < numRays; k++)
-            {
-                float offsetFactor = (k / (numRays - 1f)) - 0.5f; // -0.5 to 0.5
-                Vector2 offset = offsetFactor * thickness * perp;
-                Vector2 startOffset = start + offset;
-                Vector2 endOffset = end + offset;
-                Vector2? intersect = RaytraceTiles(startOffset, endOffset, topSurfaces, 0f, 1);
-                if (intersect.HasValue)
-                {
-                    float t = Vector2.Dot(intersect.Value - start, direction);
-                    intersections.Add((intersect.Value, t, offsetFactor));
-                }
-            }
-
-            if (intersections.Count == 0)
-                return null;
-
-            // Find the best intersection in a single pass
-            float t_min = float.MaxValue;
-            float epsilon = 16f;
-            Vector2? bestPoint = null;
-            float bestOffsetFactor = float.MaxValue;
-            float bestT = float.MaxValue;
-
-            foreach (var (point, t, offsetFactor) in intersections)
-            {
-                if (t < t_min)
-                    t_min = t;
-            }
-
-            foreach (var (point, t, offsetFactor) in intersections)
-            {
-                if (t <= t_min + epsilon)
-                {
-                    float absOffset = Math.Abs(offsetFactor);
-                    if (absOffset < bestOffsetFactor || (absOffset == bestOffsetFactor && t < bestT))
-                    {
-                        bestOffsetFactor = absOffset;
-                        bestT = t;
-                        bestPoint = point;
-                    }
-                }
-            }
-
-            return bestPoint;
-        }
-        */
     }
 
     /// <summary>
@@ -993,13 +934,6 @@ public static partial class Utility
         return distanceSquared <= (end - start).LengthSquared();
     }
 
-    public static bool RaytraceTo(this Vector2 pos1, Vector2 pos2)
-    {
-        Point point1 = pos1.ToSafeTileCoordinates();
-        Point point2 = pos2.ToSafeTileCoordinates();
-        return RaytraceTo(point1.X, point1.Y, point2.X, point2.Y);
-    }
-
     public static bool RaytraceTo(int x0, int y0, int x1, int y1, bool ignoreHalfTiles = false)
     {
         // Bresenham's algorithm
@@ -1145,80 +1079,6 @@ public static partial class Utility
         }
 
         return (min, max);
-    }
-
-    public static (Vector2 start, Vector2 end)? GetIntersectionPoints(Vector2 A, Vector2 B, Rectangle rect)
-    {
-        // Calculate direction and length
-        Vector2 D = B - A;
-        float L = D.Length();
-
-        // Avoid division by zero; if A and B are the same point, there's no line segment
-        if (L == 0)
-            return null;
-
-        // Normalize direction
-        D /= L;
-
-        // Rectangle bounds
-        float minX = rect.X;
-        float maxX = rect.X + rect.Width;
-        float minY = rect.Y;
-        float maxY = rect.Y + rect.Height;
-
-        // Initialize entering and exiting parameters
-        float tEnter = float.NegativeInfinity;
-        float tExit = float.PositiveInfinity;
-
-        // Check X constraints
-        if (D.X > 0)
-        {
-            tEnter = Math.Max(tEnter, (minX - A.X) / D.X); // Entering x >= minX
-            tExit = Math.Min(tExit, (maxX - A.X) / D.X);   // Exiting x <= maxX
-        }
-        else if (D.X < 0)
-        {
-            tEnter = Math.Max(tEnter, (maxX - A.X) / D.X); // Entering x <= maxX
-            tExit = Math.Min(tExit, (minX - A.X) / D.X);   // Exiting x >= minX
-        }
-        else // D.X == 0
-        {
-            // Parallel and outside
-            if (A.X < minX || A.X > maxX) 
-                return null;    
-        }
-
-        // Check Y constraints (Y increases downward in FNA)
-        if (D.Y > 0)
-        {
-            tEnter = Math.Max(tEnter, (minY - A.Y) / D.Y); // Entering y >= minY
-            tExit = Math.Min(tExit, (maxY - A.Y) / D.Y);   // Exiting y <= maxY
-        }
-        else if (D.Y < 0)
-        {
-            tEnter = Math.Max(tEnter, (maxY - A.Y) / D.Y); // Entering y <= maxY
-            tExit = Math.Min(tExit, (minY - A.Y) / D.Y);   // Exiting y >= minY
-        }
-        else // D.Y == 0
-        {
-            // Parallel and outside
-            if (A.Y < minY || A.Y > maxY) 
-                return null;   
-        }
-
-        // Clip to the line segment's range [0, L]
-        float tStart = Math.Max(0, tEnter);
-        float tEnd = Math.Min(L, tExit);
-
-        // If tStart <= tEnd, there is an intersection
-        if (tStart <= tEnd)
-        {
-            Vector2 start = A + tStart * D;
-            Vector2 end = A + tEnd * D;
-            return (start, end);
-        }
-
-        return null; // No intersection
     }
 
     public static Vector2 ResolveCollision(ref Rectangle rect, RotatedRectangle rotatedRect, Vector2 velocity, out bool collisionOccurred, int iterations = 4)
@@ -1464,6 +1324,80 @@ public static partial class Utility
         return false;
     }
 
+    public static (Vector2 start, Vector2 end)? GetIntersectionPoints(Vector2 A, Vector2 B, Rectangle rect)
+    {
+        // Calculate direction and length
+        Vector2 D = B - A;
+        float L = D.Length();
+
+        // Avoid division by zero; if A and B are the same point, there's no line segment
+        if (L == 0)
+            return null;
+
+        // Normalize direction
+        D /= L;
+
+        // Rectangle bounds
+        float minX = rect.X;
+        float maxX = rect.X + rect.Width;
+        float minY = rect.Y;
+        float maxY = rect.Y + rect.Height;
+
+        // Initialize entering and exiting parameters
+        float tEnter = float.NegativeInfinity;
+        float tExit = float.PositiveInfinity;
+
+        // Check X constraints
+        if (D.X > 0)
+        {
+            tEnter = Math.Max(tEnter, (minX - A.X) / D.X); // Entering x >= minX
+            tExit = Math.Min(tExit, (maxX - A.X) / D.X);   // Exiting x <= maxX
+        }
+        else if (D.X < 0)
+        {
+            tEnter = Math.Max(tEnter, (maxX - A.X) / D.X); // Entering x <= maxX
+            tExit = Math.Min(tExit, (minX - A.X) / D.X);   // Exiting x >= minX
+        }
+        else // D.X == 0
+        {
+            // Parallel and outside
+            if (A.X < minX || A.X > maxX)
+                return null;
+        }
+
+        // Check Y constraints (Y increases downward in FNA)
+        if (D.Y > 0)
+        {
+            tEnter = Math.Max(tEnter, (minY - A.Y) / D.Y); // Entering y >= minY
+            tExit = Math.Min(tExit, (maxY - A.Y) / D.Y);   // Exiting y <= maxY
+        }
+        else if (D.Y < 0)
+        {
+            tEnter = Math.Max(tEnter, (maxY - A.Y) / D.Y); // Entering y <= maxY
+            tExit = Math.Min(tExit, (minY - A.Y) / D.Y);   // Exiting y >= minY
+        }
+        else // D.Y == 0
+        {
+            // Parallel and outside
+            if (A.Y < minY || A.Y > maxY)
+                return null;
+        }
+
+        // Clip to the line segment's range [0, L]
+        float tStart = Math.Max(0, tEnter);
+        float tEnd = Math.Min(L, tExit);
+
+        // If tStart <= tEnd, there is an intersection
+        if (tStart <= tEnd)
+        {
+            Vector2 start = A + tStart * D;
+            Vector2 end = A + tEnd * D;
+            return (start, end);
+        }
+
+        return null; // No intersection
+    }
+
     public static bool CheckLinearCollision(Vector2 point1, Vector2 point2, Rectangle hitbox, out Vector2 start, out Vector2 end)
     {
         (Vector2 start, Vector2 end)? points = GetIntersectionPoints(point1, point2, hitbox);
@@ -1526,11 +1460,11 @@ public static partial class Utility
         return distanceSquared <= radius * radius;
     }
 
-    public static bool EllipseCollision(Rectangle rectangle, float ellipseWidth, float ellipseHeight, float ellipseRotation, Vector2 ellipseCenter)
+    public static bool EllipseCollision(Rectangle target, float ellipseWidth, float ellipseHeight, float ellipseRotation, Vector2 ellipseCenter)
     {
         // Rectangle center and half-extents
-        Vector2 rectCenter = new(rectangle.Center.X, rectangle.Center.Y);
-        Vector2 rectHalfExtents = new(rectangle.Width / 2f, rectangle.Height / 2f);
+        Vector2 rectCenter = new(target.Center.X, target.Center.Y);
+        Vector2 rectHalfExtents = new(target.Width / 2f, target.Height / 2f);
 
         // Translate ellipse center relative to rectangle center (simplifies math)
         Vector2 translatedEllipseCenter = ellipseCenter - rectCenter;
@@ -1570,15 +1504,5 @@ public static partial class Utility
         }
 
         return true; // No separating axis found, shapes intersect
-    }
-
-    public static bool RotatingHitboxCollision(this Entity entity, Vector2 targetTopLeft, Vector2 targetHitboxDimensions, Vector2? directionOverride = null, float scale = 1f, float? width = null)
-    {
-        Vector2 lineDirection = (directionOverride) ?? entity.velocity;
-        lineDirection = Utils.SafeNormalize(lineDirection, Vector2.UnitY);
-        Vector2 start = entity.Center - lineDirection * entity.height * 0.5f * scale;
-        Vector2 end = entity.Center + lineDirection * entity.height * 0.5f * scale;
-        float _ = 0f;
-        return Collision.CheckAABBvLineCollision(targetTopLeft, targetHitboxDimensions, start, end, (width) ?? entity.width * scale, ref _);
     }
 }

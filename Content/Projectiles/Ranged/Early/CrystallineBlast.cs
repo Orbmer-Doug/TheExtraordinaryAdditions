@@ -1,13 +1,11 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Assets;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Early;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Early;
@@ -175,27 +173,31 @@ public class CrystallineBlast : ModProjectile
 
         return false;
     }
+
     public override bool PreDraw(ref Color lightColor)
     {
-        Main.spriteBatch.UseBlendState(BlendState.Additive);
-        Vector2 origin = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall).Size() * 0.5f;
-        Vector2 drawPosition = Projectile.Center - Main.screenPosition;
+        void draw()
+        {
+            Vector2 origin = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall).Size() * 0.5f;
+            Vector2 drawPosition = Projectile.Center - Main.screenPosition;
 
-        float val = .1f;
-        Vector2 baseScale = new Vector2(val) * Projectile.scale;
+            float val = .1f;
+            Vector2 baseScale = new Vector2(val) * Projectile.scale;
 
-        Main.spriteBatch.Draw(AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall), drawPosition, null, Color.White, 0f, origin, baseScale, 0, 0f);
+            Main.spriteBatch.Draw(AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall), drawPosition, null, Color.White, 0f, origin, baseScale, 0, 0f);
 
-        Vector2 flareOrigin = AssetRegistry.GetTexture(AdditionsTexture.BloomFlare).Size() * .5f;
-        Color bloomFlareColor = Color.Lerp(Color.Wheat, Color.WhiteSmoke, 0.7f);
-        float bloomFlareRotation = Main.GlobalTimeWrappedHourly * 1.76f;
-        Main.spriteBatch.Draw(AssetRegistry.GetTexture(AdditionsTexture.BloomFlare), drawPosition, null, bloomFlareColor, -bloomFlareRotation, flareOrigin, baseScale, 0, 0f);
+            Vector2 flareOrigin = AssetRegistry.GetTexture(AdditionsTexture.BloomFlare).Size() * .5f;
+            Color bloomFlareColor = Color.Lerp(Color.Wheat, Color.WhiteSmoke, 0.7f);
+            float bloomFlareRotation = Main.GlobalTimeWrappedHourly * 1.76f;
+            Main.spriteBatch.Draw(AssetRegistry.GetTexture(AdditionsTexture.BloomFlare), drawPosition, null, bloomFlareColor, -bloomFlareRotation, flareOrigin, baseScale, 0, 0f);
 
-        bloomFlareColor = Color.Lerp(Color.Wheat, Main.hslToRgb((Main.GlobalTimeWrappedHourly * 0.2f + 0.5f) % 1f, 1f, 0.55f), 0.7f);
-        bloomFlareColor = Color.Lerp(bloomFlareColor, Color.LightCyan, 0.63f);
-        Main.spriteBatch.Draw(AssetRegistry.GetTexture(AdditionsTexture.BloomFlare), drawPosition, null, bloomFlareColor, bloomFlareRotation, flareOrigin, baseScale, 0, 0f);
-        Main.spriteBatch.ResetBlendState();
+            bloomFlareColor = Color.Lerp(Color.Wheat, Main.hslToRgb((Main.GlobalTimeWrappedHourly * 0.2f + 0.5f) % 1f, 1f, 0.55f), 0.7f);
+            bloomFlareColor = Color.Lerp(bloomFlareColor, Color.LightCyan, 0.63f);
+            Main.spriteBatch.Draw(AssetRegistry.GetTexture(AdditionsTexture.BloomFlare), drawPosition, null, bloomFlareColor, bloomFlareRotation, flareOrigin, baseScale, 0, 0f);
+        }
+        PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.UnderProjectiles, BlendState.Additive);
         return false;
     }
+
     public override bool? CanHitNPC(NPC target) => Released ? null : false;
 }

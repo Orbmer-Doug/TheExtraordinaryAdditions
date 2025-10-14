@@ -31,7 +31,7 @@ public class ChasersDrawer : ModSystem
     public override void OnModLoad()
     {
         RenderTargetManager.RenderTargetUpdateLoopEvent += PrepareAfterimageTarget;
-        Main.QueueMainThreadAction(() =>
+        Main.QueueMainThreadAction(static () =>
         {
             ChaserTarget = new(true, ManagedRenderTarget.CreateScreenSizedTarget);
             ChaserTargetPrevious ??= new(true, ManagedRenderTarget.CreateScreenSizedTarget);
@@ -45,7 +45,7 @@ public class ChasersDrawer : ModSystem
 
         bool active = AnyProjectile(ModContent.ProjectileType<LuminescentChaser>());
 
-        if(!active && ContinueRenderingCountdown <= 0)
+        if (!active && ContinueRenderingCountdown <= 0)
             return;
 
         if (active)
@@ -65,23 +65,18 @@ public class ChasersDrawer : ModSystem
         // Draw the blur shader to the result
         ApplyBlurEffects();
 
-        // Draw all slash projectiles to the render target
-        DrawAllSlashes();
+        // Draw all chaers to the render target
+        foreach (Projectile p in Main.ActiveProjectiles)
+        {
+            if (p.type == ModContent.ProjectileType<LuminescentChaser>())
+                p.As<LuminescentChaser>().DrawToTarget();
+        }
 
         // Return to the backbuffer
         Main.spriteBatch.End();
         gd.SetRenderTarget(null);
 
         PrepareScreenShader();
-    }
-
-    private static void DrawAllSlashes()
-    {
-        foreach (Projectile p in Main.ActiveProjectiles)
-        {
-            if (p.type == ModContent.ProjectileType<LuminescentChaser>())
-                p.As<LuminescentChaser>().DrawToTarget();
-        }
     }
 
     public static void ApplyBlurEffects()

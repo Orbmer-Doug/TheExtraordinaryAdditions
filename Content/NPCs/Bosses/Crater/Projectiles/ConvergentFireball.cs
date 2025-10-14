@@ -1,15 +1,10 @@
-﻿using CalamityMod.Buffs.StatBuffs;
-using CalamityMod.CalPlayer;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Assets.Audio;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Systems;
@@ -33,18 +28,13 @@ public class ConvergentFireball : ProjOwnedByNPC<Asterlin>
         set => Projectile.ai[1] = value;
     }
 
-    public float HitCount
-    {
-        get => (int)Projectile.ai[2];
-        set => Projectile.ai[2] = value;
-    }
-
     public bool Stolen
     {
-        get => Projectile.Additions().ExtraAI[0] == 1;
-        set => Projectile.Additions().ExtraAI[0] = value.ToInt();
+        get => Projectile.ai[2] == 1;
+        set => Projectile.ai[2] = value.ToInt();
     }
 
+    public static readonly int ScaleUpTime = SecondsToFrames(1f);
     public const int MaxScale = 200;
     public LoopedSoundInstance flame;
 
@@ -63,82 +53,88 @@ public class ConvergentFireball : ProjOwnedByNPC<Asterlin>
 
     public override void SafeAI()
     {
-        flame ??= LoopedSoundManager.CreateNew(new(AdditionsSound.BraveMediumFireLoop, () => 1.2f, () => -.2f), () => AdditionsLoopedSound.ProjectileNotActive(Projectile), () => Projectile.active);
-        flame.Update(Projectile.Center);
+        flame ??= LoopedSoundManager.CreateNew(new(AdditionsSound.BraveSmallFireLoop, () => .6f,
+            () => -.2f), () => AdditionsLoopedSound.ProjectileNotActive(Projectile), () => Projectile.active);
+        flame?.Update(Projectile.Center);
 
-        if (Time < 60f)
+        Player playerTarget = null;
+        PlayerTargeting.FindNearestPlayer(Projectile.Center, out playerTarget);
+
+        if (Time < ScaleUpTime)
         {
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Target.velocity, 0.9f);
-            Projectile.scale = Animators.MakePoly(3f).OutFunction.Evaluate(Time, 0f, 60f, 0f, MaxScale);
+            if (playerTarget != null)
+                Projectile.velocity = Vector2.Lerp(Projectile.velocity, playerTarget.velocity, 0.6f);
+            Projectile.scale = Animators.MakePoly(3f).OutFunction.Evaluate(Time, 0f, ScaleUpTime, 0f, MaxScale);
         }
 
+        float fade = InverseLerp(Asterlin.UnveilingZenith_TotalTime, Asterlin.UnveilingZenith_TotalTime - 80f, ModOwner.AITimer);
+        Vector2 target = Vector2.Lerp(ModOwner.LeftVentPosition, ModOwner.RightVentPosition, .5f);
         if (!Stolen)
         {
-            if (HitCount < 0f || HitCount == 1f)
-            {
-                Projectile.velocity = Projectile.DirectionTo(Target.Center).SafeNormalize(Vector2.Zero) * 36f;
-                Cooldown = 0;
-            }
-            else
-            {
-                if (Main.rand.NextBool(5))
-                {
-                    Projectile.velocity += Main.rand.NextVector2Circular(3f, 3f);
-                }
-                Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.DirectionTo(Owner.Center).SafeNormalize(Vector2.Zero) * 3f, 0.03f) * InverseLerp(500f, 470f, Time);
-                Projectile.velocity += Projectile.DirectionTo(Owner.Center).SafeNormalize(Vector2.Zero) * (0.3f + InverseLerp(500f, 800f, Projectile.Distance(Owner.Center)));
-            }
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.DirectionTo(target).SafeNormalize(Vector2.Zero) * 2f, 0.03f * fade);
+            Projectile.velocity += Projectile.DirectionTo(target).SafeNormalize(Vector2.Zero) * (0.1f + InverseLerp(900f, 1600f, Projectile.Distance(target)) * fade);
         }
         else
         {
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.DirectionTo(Owner.Center).SafeNormalize(Vector2.Zero) * MathHelper.Min(Projectile.Distance(Owner.Center), 10f), 0.7f);
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.DirectionTo(target).SafeNormalize(Vector2.Zero) * MathHelper.Min(Projectile.Distance(target), 10f), 0.7f);
         }
 
-        Projectile.ProjAntiClump(.05f, false);
+        Projectile.ProjAntiClump(.1f, false);
 
-        if (Cooldown <= 0f && !Stolen)
+        if (Cooldown <= 0f && !Stolen && fade == 1)
         {
-            if (Projectile.Distance(Owner.Center) < 84f && Time > 60f )
+            if (Projectile.Distance(target) < 84f && Time > ScaleUpTime)
             {
                 Stolen = true;
-                Boss.UnveilingZenith_CurrentAmount++;
+                ModOwner.UnveilingZenith_CurrentAmount++;
+                ModOwner.Sync();
                 this.Sync();
             }
 
-            using IEnumerator<Player> enumerator = Main.player.Where((Player n) => n.active && !n.dead && n.Distance(Projectile.Center) < 64f).GetEnumerator();
-            if (enumerator.MoveNext())
+            foreach (Player player in Main.ActivePlayers)
             {
-                Player player = enumerator.Current;
-                if (HitCount < 0f || HitCount == 1f)
-                {
-                    HitCount += 1f;
-                    Cooldown += 15f;
-                    Projectile.velocity = -Vector2.UnitY * 10f;
-                }
-                else
-                {
-                    Projectile.velocity = Projectile.DirectionFrom(player.Center).SafeNormalize(Vector2.Zero) * (14f + Projectile.velocity.Length() + player.velocity.Length());
-                }
+                if (player.DeadOrGhost || player.Distance(Projectile.Center) > 64f)
+                    continue;
+
+                Projectile.velocity = Projectile.DirectionFrom(player.Center).SafeNormalize(Vector2.Zero) * (14f + Projectile.velocity.Length() + player.velocity.Length());
                 Cooldown += 15f;
                 if (Time > 40f)
-                    SoundID.Item56.Play(Projectile.Center, 2f, -.4f, .2f);
+                    SoundID.Item56.Play(Projectile.Center, 5f, -.4f, .2f);
 
                 for (int i = 0; i < 40; i++)
                 {
-                    Color glowColor2 = Main.hslToRgb(Projectile.localAI[0] * 0.01f % 1f, 1f, 0.5f, 0);
-                    glowColor2.A /= 2;
-                    Dust.NewDustPerfect(Projectile.Center + Main.rand.NextVector2Circular(36f, 36f), 261, Main.rand.NextVector2Circular(15f, 15f) + Projectile.velocity, 0, glowColor2, 1f + Main.rand.NextFloat(2f)).noGravity = true;
-                    if (Main.rand.NextBool(3))
-                    {
-
-                    }
+                    Vector2 pos = Projectile.Center + Main.rand.NextVector2Circular(36f, 36f);
+                    Vector2 vel = Main.rand.NextVector2Circular(7f, 7f) + Projectile.velocity * Main.rand.NextFloat(.5f, .8f);
+                    int life = Main.rand.Next(30, 45);
+                    ParticleRegistry.SpawnGlowParticle(pos, vel * .1f, life / 2, Main.rand.NextFloat(40f, 140f), Color.Orange, .9f);
+                    ParticleRegistry.SpawnSquishyPixelParticle(pos, vel, life * 2, Main.rand.NextFloat(.8f, 2.4f), Color.OrangeRed, Color.Goldenrod, 4);
+                    ParticleRegistry.SpawnHeavySmokeParticle(pos, vel, life, Main.rand.NextFloat(.6f, 1.1f), Color.OrangeRed);
                 }
+
+                this.Sync();
             }
         }
+
         if (Cooldown > 0f)
-        {
             Cooldown--;
+
+        Projectile.scale = MathHelper.Lerp(0f, MaxScale, 1f - InverseLerp(0f, Asterlin.UnveilingZenith_StarCollapseTime, ModOwner.UnveilingZenith_CollapseTimer));
+        Projectile.Opacity = Animators.BezierEase(InverseLerp(0f, ScaleUpTime, Time)) * Animators.MakePoly(2f).InFunction(fade);
+        if (fade != 1)
+        {
+            for (int i = 0; i < 7; i++)
+            {
+                ParticleRegistry.SpawnHeavySmokeParticle(Projectile.Center + Main.rand.NextVector2Circular(10f, 10f),
+                    Main.rand.NextVector2Circular(10f, 10f) + Main.rand.NextVector2Circular(4f, 4f),
+                    Main.rand.Next(30, 50), Main.rand.NextFloat(1.4f, 2.4f) * Projectile.Opacity,
+                    Color.OrangeRed.Lerp(Color.Gold, Main.rand.NextFloat(0f, .4f)), Projectile.Opacity + .2f);
+                ParticleRegistry.SpawnSquishyPixelParticle(Projectile.Center + Main.rand.NextVector2Circular(10f, 10f),
+                    Main.rand.NextVector2Circular(14f, 14f) + Main.rand.NextVector2Circular(4f, 4f),
+                    Main.rand.Next(40, 60), Main.rand.NextFloat(2.5f, 3.5f) * Projectile.Opacity, Color.OrangeRed, Color.Gold, 4, false, false, Main.rand.NextFloat(-.2f, .2f));
+            }
         }
+        if (fade <= 0)
+            Projectile.Kill();
 
         Projectile.timeLeft = 7000;
         Time++;
@@ -165,7 +161,7 @@ public class ConvergentFireball : ProjOwnedByNPC<Asterlin>
         ManagedShader shader = AssetRegistry.GetShader("IntenseFireball");
         shader.TrySetParameter("time", Time * .01f);
         shader.TrySetParameter("resolution", new Vector2(rad));
-        shader.TrySetParameter("opacity", Animators.MakePoly(3f).OutFunction(Utils.Remap(Projectile.scale, 0f, MaxScale, 0f, 1f)));
+        shader.TrySetParameter("opacity", Projectile.Opacity);
 
         PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.UnderPlayers, null, shader);
         return false;
@@ -188,6 +184,7 @@ public class DisintegrationNova : ProjOwnedByNPC<Asterlin>
     {
         ProjectileID.Sets.DrawScreenCheckFluff[Type] = 14000;
     }
+
     public override void SetDefaults()
     {
         Projectile.Size = new(1);
@@ -205,8 +202,10 @@ public class DisintegrationNova : ProjOwnedByNPC<Asterlin>
         foreach (Player player in Main.ActivePlayers)
         {
             if (player.creativeGodMode)
-                return;
-            player.KillMe(PlayerDeathReason.ByProjectile(player.whoAmI, Projectile.whoAmI), Projectile.damage, (Projectile.Center.X > player.Center.X).ToDirectionInt(), false);
+                continue;
+
+            player.KillMe(PlayerDeathReason.ByCustomReason(GetNetworkText($"Status.Death." + (Main.rand.NextBool() ? "AsterlinDeath2" : "AsterlinDeath1"), player.name)),
+                Projectile.damage, (Projectile.Center.X > player.Center.X).ToDirectionInt(), false);
             player.RemoveAllIFrames();
         }
 
@@ -229,14 +228,18 @@ public class DisintegrationNova : ProjOwnedByNPC<Asterlin>
 
     public override bool PreDraw(ref Color lightColor)
     {
-        ManagedShader fireball = AssetRegistry.GetShader("FireballExplosion");
-        fireball.TrySetParameter("scale", Projectile.scale);
+        void draw()
+        {
+            ManagedShader fireball = AssetRegistry.GetShader("FireballExplosion");
+            fireball.TrySetParameter("scale", Projectile.scale);
 
-        Main.spriteBatch.EnterShaderRegion(null, fireball.Effect);
-        Texture2D noise = AssetRegistry.GetTexture(AdditionsTexture.TurbulentNoise);
-        fireball.Render();
-        Main.spriteBatch.DrawBetterRect(noise, ToTarget(Projectile.Center, new Vector2(MaxRadius)), null, Color.Goldenrod, 0f, noise.Size() / 2f);
-        Main.spriteBatch.ExitShaderRegion();
+            Main.spriteBatch.EnterShaderRegion(null, fireball.Effect);
+            Texture2D noise = AssetRegistry.GetTexture(AdditionsTexture.TurbulentNoise);
+            fireball.Render();
+            Main.spriteBatch.DrawBetterRect(noise, ToTarget(Projectile.Center, new Vector2(MaxRadius)), null, Color.Goldenrod, 0f, noise.Size() / 2f);
+            Main.spriteBatch.ExitShaderRegion();
+        }
+        LayeredDrawSystem.QueueDrawAction(draw, PixelationLayer.Dusts);
         return false;
     }
 }

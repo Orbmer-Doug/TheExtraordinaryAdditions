@@ -7,7 +7,6 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
-using static TheExtraordinaryAdditions.Core.Graphics.Primitives.OptimizedPrimitiveTrail;
 
 namespace TheExtraordinaryAdditions.Core.Graphics.Primitives;
 
@@ -51,40 +50,66 @@ public readonly struct Vertex2D(SystemVector2 position, Color color, SystemVecto
 }
 
 /// <summary>
-/// A class managing a dynamic buffer of trail points with automatic updating and shifting.
+/// A class managing a dynamic buffer of trail points.
 /// Provides a read-only span of valid points for rendering or processing.
 /// </summary>
-/// <remarks>
-/// This class is designed for real-time trail updates, shifting older points out as new ones are added.
-/// </remarks>
-public class TrailPoints
+public sealed class TrailPoints
 {
-    private readonly Vector2[] _trailBuffer;
-    private int _trailCount;
+    private Vector2[] trailBuffer;
+    private int count;
+    public int Count => count;
 
-    // Public property to access the current trail points as a ReadOnlySpan
-    public ReadOnlySpan<Vector2> Points => _trailBuffer.AsSpan(0, _trailCount);
+    public ReadOnlySpan<Vector2> Points => trailBuffer.AsSpan(0, count);
 
     public TrailPoints(int max)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(max, nameof(max));
 
-        _trailBuffer = new Vector2[max];
-        _trailCount = 0;
+        trailBuffer = new Vector2[max];
+        count = max;
+    }
+
+    /// <summary>
+    /// Sets a single point at the specified index.
+    /// </summary>
+    /// <param name="index">The index of the point to set.</param>
+    /// <param name="value">The Vector2 value to set.</param>
+    public void SetPoint(int index, Vector2 value)
+    {
+        if (index < 0 || index >= trailBuffer.Length)
+            throw new IndexOutOfRangeException("Index is out of range for the trail points.");
+        trailBuffer[index] = value;
+    }
+
+    /// <summary>
+    /// Sets all points at once from a list.
+    /// </summary>
+    /// <param name="newPoints">The list of points to set.</param>
+    public void SetPoints(List<Vector2> newPoints)
+    {
+        if (newPoints.Count > trailBuffer.Length)
+            trailBuffer = new Vector2[newPoints.Count];
+
+        newPoints.CopyTo(0, trailBuffer, 0, newPoints.Count);
+        count = newPoints.Count;
+    }
+
+    /// <summary>
+    /// Sets all points at once from a span.
+    /// </summary>
+    /// <param name="newPoints">The span of points to set.</param>
+    public void SetPoints(ReadOnlySpan<Vector2> newPoints)
+    {
+        if (newPoints.Length > trailBuffer.Length)
+            trailBuffer = new Vector2[newPoints.Length];
+
+        newPoints.CopyTo(trailBuffer);
+        count = newPoints.Length;
     }
 
     public void Update(Vector2 newPosition)
     {
-        CreateTrail(_trailBuffer.AsSpan(), newPosition, _trailBuffer.Length, ref _trailCount);
-    }
-
-    public void Clear()
-    {
-        if (_trailBuffer.Length != 0)
-        {
-            _trailCount = 0;
-            Array.Clear(_trailBuffer);
-        }
+        CreateTrail(trailBuffer.AsSpan(), newPosition, trailBuffer.Length, ref count);
     }
 
     /// <summary>
@@ -122,317 +147,68 @@ public class TrailPoints
 
         return trailBuffer[..currentCount];
     }
-}
-
-/// <summary>
-/// A class for manually managing a trail's points with a fixed capacity.
-/// </summary>
-/// <remarks>
-/// This class assumes the initial capacity is fully utilized unless overwritten.
-/// It resizes the buffer only when new data exceeds the current capacity.
-/// </remarks>
-public class ManualTrailPoints
-{
-    private Vector2[] points;
-    private int count;
-
-    /// <summary>
-    /// Initializes a new instance with a fixed capacity.
-    /// </summary>
-    /// <param name="capacity">The number of points the trail can hold.</param>
-    public ManualTrailPoints(int capacity)
-    {
-        points = new Vector2[capacity];
-        count = capacity; // Assume full capacity is used unless set otherwise
-    }
-
-    /// <summary>
-    /// Sets all points at once from a list.
-    /// </summary>
-    /// <param name="newPoints">The list of points to set.</param>
-    public void SetPoints(List<Vector2> newPoints)
-    {
-        if (newPoints.Count > points.Length)
-        {
-            points = new Vector2[newPoints.Count];
-        }
-        newPoints.CopyTo(0, points, 0, newPoints.Count);
-        count = newPoints.Count;
-    }
-
-    /// <summary>
-    /// Sets all points at once from a span.
-    /// </summary>
-    /// <param name="newPoints">The span of points to set.</param>
-    public void SetPoints(ReadOnlySpan<Vector2> newPoints)
-    {
-        if (newPoints.Length > points.Length)
-        {
-            points = new Vector2[newPoints.Length];
-        }
-        newPoints.CopyTo(points);
-        count = newPoints.Length;
-    }
-
-    /// <summary>
-    /// Sets a single point at the specified index.
-    /// </summary>
-    /// <param name="index">The index of the point to set.</param>
-    /// <param name="value">The Vector2 value to set.</param>
-    public void SetPoint(int index, Vector2 value)
-    {
-        if (index < 0 || index >= points.Length)
-            throw new IndexOutOfRangeException("Index is out of range for the trail points.");
-        points[index] = value;
-    }
-
-    /// <summary>
-    /// Gets the points as a read-only span for rendering.
-    /// </summary>
-    public ReadOnlySpan<Vector2> Points => points.AsSpan(0, count);
-
-    /// <summary>
-    /// Gets the number of points currently in use.
-    /// </summary>
-    public int Count => count;
-
-    /// <summary>
-    /// Ensures the internal buffer can hold at least the required capacity.
-    /// </summary>
-    /// <param name="requiredCapacity">The minimum capacity needed.</param>
-    public void EnsureCapacity(int requiredCapacity)
-    {
-        if (requiredCapacity > points.Length)
-        {
-            int newCapacity = Math.Max(requiredCapacity, points.Length * 2); // Double capacity to reduce future resizes
-            Array.Resize(ref points, newCapacity);
-        }
-    }
 
     /// <summary>
     /// Clears all points, resetting the count to zero.
     /// </summary>
     public void Clear()
     {
-        Array.Clear(points, 0, points.Length);
-        count = 0;
-    }
-}
-
-// TODO: Evaluate if tips are necessary and if they can be remedied with sufficient width calculations in the trail itself.
-/// <summary>
-/// Defines the contract for a trail tip implementation, which provides additional geometry at the end of a trail.
-/// Tips are responsible for calculating their own vertex and index counts, as well as generating mesh data.
-/// </summary>
-/// <remarks>
-/// Implementations should ensure that <see cref="ExtraVertices"/> and <see cref="ExtraIndices"/> are consistent with
-/// the geometry generated in <see cref="GenerateMesh"/>.
-/// </remarks>
-public interface ITrailTip
-{
-    int ExtraVertices { get; }
-    int ExtraIndices { get; }
-    void GenerateMesh(SystemVector2 trailTipPosition, SystemVector2 trailTipNormal, int startFromIndex,
-        Span<Vertex2D> vertices, Span<short> indices, VertexWidthFunction trailWidthFunction, VertexColorFunction trailColorFunction);
-}
-
-public class NoTip : ITrailTip
-{
-    public int ExtraVertices => 0;
-    public int ExtraIndices => 0;
-
-    public void GenerateMesh(SystemVector2 trailTipPosition, SystemVector2 trailTipNormal, int startFromIndex, Span<Vertex2D> vertices, Span<short> indices, VertexWidthFunction trailWidthFunction, VertexColorFunction trailColorFunction)
-    {
-    }
-}
-
-public class TriangularTip(float length) : ITrailTip
-{
-    private readonly float length = length;
-
-    public int ExtraVertices => 3;
-    public int ExtraIndices => 3;
-
-    /// <summary>
-    /// Generates a triangular mesh at the trail's end, using the trail's width and color functions.
-    /// </summary>
-    public void GenerateMesh(SystemVector2 trailTipPosition, SystemVector2 trailTipNormal, int startFromIndex, Span<Vertex2D> vertices, Span<short> indices, VertexWidthFunction trailWidthFunction, VertexColorFunction trailColorFunction)
-    {
-        if (vertices.Length < ExtraVertices || indices.Length < ExtraIndices)
-            return;
-
-        SystemVector2 normalPerp = trailTipNormal.RotatedBy(PiOver2);
-        float width = trailWidthFunction?.Invoke(1f) ?? 1f;
-        SystemVector2 a = trailTipPosition + normalPerp * width;
-        SystemVector2 b = trailTipPosition - normalPerp * width;
-        SystemVector2 c = trailTipPosition + trailTipNormal * length;
-
-        SystemVector2 texCoordA = SystemVector2.UnitX;
-        SystemVector2 texCoordB = SystemVector2.One;
-        SystemVector2 texCoordC = new(1f, 0.5f);
-
-        Color colorA = trailColorFunction?.Invoke(texCoordA, a.FromNumerics()) ?? Color.White;
-        Color colorB = trailColorFunction?.Invoke(texCoordB, b.FromNumerics()) ?? Color.White;
-        Color colorC = trailColorFunction?.Invoke(texCoordC, c.FromNumerics()) ?? Color.White;
-
-        vertices[0] = new Vertex2D(a, colorA, texCoordA);
-        vertices[1] = new Vertex2D(b, colorB, texCoordB);
-        vertices[2] = new Vertex2D(c, colorC, texCoordC);
-
-        indices[0] = (short)startFromIndex;
-        indices[1] = (short)(startFromIndex + 1);
-        indices[2] = (short)(startFromIndex + 2);
-    }
-}
-
-public class RoundedTip : ITrailTip
-{
-    private readonly int triCount;
-    private readonly SystemVector2? centerTexCoord;
-    private readonly float colorStart;
-    public int ExtraVertices => 1 + 2 * triCount;
-    public int ExtraIndices => 6 * triCount;
-
-    /// <summary>
-    /// Initializes a new <see cref="RoundedTip"/> with the specified triangle count.
-    /// </summary>
-    /// <param name="triCount">The number of triangles per layer (must be at least 2 for a valid shape).</param>
-    /// <param name="centerTexCoord">An optional modifier for where the tips color sampling should take place.</param>
-    public RoundedTip(int triCount = 2, SystemVector2? centerTexCoord = null, float colorStart = 0f)
-    {
-        this.triCount = triCount;
-        this.centerTexCoord = centerTexCoord;
-        this.colorStart = colorStart;
-        if (triCount < 2)
-            throw new ArgumentException($"Parameter {nameof(triCount)} cannot be less than 2.");
-    }
-
-    /// <summary>
-    /// Generates a rounded mesh at the trail's end, using two concentric hemispherical layers.
-    /// </summary>
-    public void GenerateMesh(SystemVector2 trailTipPosition, SystemVector2 tipNormal, int startFromIndex, Span<Vertex2D> vertices, Span<short> indices, VertexWidthFunction trailWidthFunction, VertexColorFunction trailColorFunction)
-    {
-        // Calculate required space including the starting index
-        if (startFromIndex + ExtraVertices > vertices.Length || ExtraIndices > indices.Length)
+        if (trailBuffer.Length != 0)
         {
-            $"Buffer overflow: startFromIndex={startFromIndex}, ExtraVertices={ExtraVertices}, vertices.Length={vertices.Length}, ExtraIndices={ExtraIndices}, indices.Length={indices.Length}".Log();
-            return;
-        }
-
-        // Calculate radius based on the trail's width
-        float radius = trailWidthFunction?.Invoke(colorStart) ?? 10f;
-
-        SystemVector2 fanCenterTexCoord = centerTexCoord ?? new(0f, 0.5f);
-        Color centerColor = (trailColorFunction?.Invoke(fanCenterTexCoord, trailTipPosition.FromNumerics()) ?? Color.White) * 0.75f;
-        vertices[startFromIndex] = new Vertex2D(trailTipPosition, centerColor, fanCenterTexCoord);
-        tipNormal = (tipNormal.FromNumerics().SafeNormalize(Vector2.UnitX)).ToNumerics();
-
-        int vertexIndex = startFromIndex + 1; // Start after the center vertex
-        int indexCount = 0;
-        int triCount = (ExtraVertices - 1) / 2;
-
-        // First layer (outer hemisphere)
-        float firstLayerRadius = radius * .5f;
-        for (int k = 0; k < triCount; k++)
-        {
-            float rotationFactor = k / (float)(triCount - 1);
-            float angle = -Pi / 2 + rotationFactor * Pi;
-            SystemVector2 offset = tipNormal.RotatedBy(angle) * firstLayerRadius;
-            SystemVector2 circlePoint = trailTipPosition + offset;
-            SystemVector2 texCoord = new(rotationFactor, 1f);
-            Color vertexColor = (trailColorFunction?.Invoke(texCoord, trailTipPosition.FromNumerics()) ?? Color.White) * (0.85f + rotationFactor * 0.35f);
-
-            vertices[vertexIndex++] = new Vertex2D(circlePoint, vertexColor, texCoord);
-
-            // Write indices for the triangle clockwise (fan around the center)
-            int nextVertex = startFromIndex + 1 + (k + 1) % triCount;
-            indices[indexCount++] = (short)startFromIndex; // Center
-            indices[indexCount++] = (short)(startFromIndex + 1 + k); // Current vertex
-            indices[indexCount++] = (short)nextVertex; // Next vertex
-        }
-
-        // Second layer (inner hemisphere)
-        float secondLayerRadius = radius * .3f;
-        for (int k = 0; k < triCount; k++)
-        {
-            float rotationFactor = k / (float)(triCount - 1);
-            float angle = -Pi / 2 + rotationFactor * Pi;
-            SystemVector2 offset = tipNormal.RotatedBy(-angle) * secondLayerRadius;
-            SystemVector2 circlePoint = trailTipPosition + offset;
-            SystemVector2 texCoord = new(rotationFactor, 0f);
-            Color vertexColor = (trailColorFunction?.Invoke(texCoord, trailTipPosition.FromNumerics()) ?? Color.White) * (0.85f + rotationFactor * 0.25f);
-
-            vertices[vertexIndex++] = new Vertex2D(circlePoint, vertexColor, texCoord);
-
-            // Write indices for the triangle counter-clockwise (fan around the center)
-            int nextVertex = startFromIndex + 1 + triCount + (k + 1) % triCount;
-            indices[indexCount++] = (short)startFromIndex; // Center
-            indices[indexCount++] = (short)nextVertex; // Next vertex
-            indices[indexCount++] = (short)(startFromIndex + 1 + triCount + k); // Current vertex
-        }
-
-        // Don't exceed buffer limits
-        if (indexCount > indices.Length)
-        {
-            $"Index overflow: indexCount={indexCount}, indices.Length={indices.Length}".Log();
+            count = 0;
+            Array.Clear(trailBuffer);
         }
     }
 }
 
 /// <summary>
-/// I suspect there to be better options but this is the only reliable thing I can think of to
-/// ensure a trail sometime somewhere is removed to prevent memory leak when whatever object that needed it is gone <br></br>
-/// So in this case we are just gonna do a little SLR
+/// I suspect there to be better options but this is the only reliable thing I can think of to <br></br>
+/// ensure a trail sometime somewhere is removed to prevent memory leak when whatever object that needed it is gone
 /// </summary>
-public sealed class TrailManager : ModSystem
+public sealed class TrailCleaner : ModSystem
 {
-    public static TrailManager Instance => ModContent.GetInstance<TrailManager>();
+    public static TrailCleaner Instance => ModContent.GetInstance<TrailCleaner>();
     public List<OptimizedPrimitiveTrail> trails = [];
-    public int cleanCounter;
+    private int cleanCounter;
+
     public override void PostUpdateEverything()
     {
-        if (Main.dedServ || trails.Count == 0)
+        if (trails.Count == 0)
             return;
 
-        // Only run ~12 times a second to reduce overhead
-        cleanCounter++;
-        if (cleanCounter < 5)
+        if (cleanCounter++ < 10)
             return;
         cleanCounter = 0;
 
-        List<int> toRemove = new List<int>();
-
-        ReadOnlySpan<OptimizedPrimitiveTrail> span = (ReadOnlySpan<OptimizedPrimitiveTrail>)CollectionsMarshal.AsSpan(trails);
-        for (int i = 0; i < span.Length; i++)
+        int writeIndex = 0;
+        for (int readIndex = 0; readIndex < trails.Count; readIndex++)
         {
-            OptimizedPrimitiveTrail trail = span[i];
-            if (trail == null || trail._disposed)
+            OptimizedPrimitiveTrail trail = trails[readIndex];
+            if (trail == null || trail.Disposed)
+                continue;
+
+            trail.FailedTicks--;
+            if (trail.FailedTicks <= 0)
             {
-                toRemove.Add(i);
+                trail.Dispose();
                 continue;
             }
 
-            trail.failedTicks--;
-            if (trail.failedTicks <= 0)
-            {
-                trail.Dispose();
-                toRemove.Add(i);
-            }
+            trails[writeIndex] = trail;
+            writeIndex++;
         }
 
-        // Remove trails in reverse order to avoid index shifting
-        for (int i = toRemove.Count - 1; i >= 0; i--)
-        {
-            trails.RemoveAt(toRemove[i]);
-        }
+        if (writeIndex < trails.Count)
+            trails.RemoveRange(writeIndex, trails.Count - writeIndex);
     }
 }
 
 /// <summary>
-/// A highly optimized class for rendering trails with optional tips
+/// A highly optimized class for rendering trails
 /// </summary>
 public sealed class OptimizedPrimitiveTrail : IDisposable
 {
+    #region Public Delegates
     /// <summary>
     /// Delegate for a function that returns the trail width based on a completion ratio.
     /// </summary>
@@ -454,76 +230,53 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
     /// <param name="completionRatio">A value from 0 to 1 indicating progress along the trail.</param>
     /// <returns>The offset vector to apply at the given completion ratio.</returns>
     public delegate SystemVector2 VertexOffsetFunction(float completionRatio);
+    #endregion
 
-    internal readonly VertexWidthFunction _widthFunction;
-    internal readonly VertexColorFunction _colorFunction;
-    internal readonly VertexOffsetFunction _offsetFunction;
-
+    #region Private Fields
     private SystemVector2[] _trailPointsBuffer;
     private Vertex2D[] _verticesBuffer;
     private short[] _indicesBuffer;
-
-    // Separate buffers for the tip
-    private Vertex2D[] _tipVerticesBuffer;
-    private short[] _tipIndicesBuffer;
-
     private readonly int _maxTrailPoints;
+    #endregion
 
-    public bool _disposed;
-    public int failedTicks;
+    #region Internal Fields
+    internal readonly VertexWidthFunction widthFunction;
+    internal readonly VertexColorFunction colorFunction;
+    internal readonly VertexOffsetFunction offsetFunction;
+    #endregion
 
+    #region Public Fields
+    public bool Disposed;
+    public int FailedTicks;
+    #endregion
+
+    #region Public Constructor
     /// <summary>
-    /// Initializes a new <see cref="OptimizedPrimitiveTrail"/> with a tip.
-    /// </summary>
-    public OptimizedPrimitiveTrail(ITrailTip tip, VertexWidthFunction widthFunction, VertexColorFunction colorFunction,
-        VertexOffsetFunction offsetFunction = null, int maxTrailPoints = 1024)
-    {
-        if (Main.dedServ)
-            return;
-
-        _widthFunction = widthFunction ?? throw new ArgumentNullException(nameof(widthFunction));
-        _colorFunction = colorFunction ?? throw new ArgumentNullException(nameof(colorFunction));
-        _offsetFunction = offsetFunction;
-
-        _maxTrailPoints = maxTrailPoints;
-        _trailPointsBuffer = new SystemVector2[maxTrailPoints];
-        _verticesBuffer = new Vertex2D[(maxTrailPoints) * 2 + tip.ExtraVertices];
-        _indicesBuffer = new short[(maxTrailPoints - 1) * 6 + tip.ExtraIndices];
-        _tipVerticesBuffer = new Vertex2D[tip.ExtraVertices];
-        _tipIndicesBuffer = new short[tip.ExtraIndices];
-
-        PrecomputeIndices(maxTrailPoints);
-        Register();
-    }
-
-    /// <summary>
-    /// Initializes a new <see cref="OptimizedPrimitiveTrail"/> without a tip.
+    /// Initializes a new <see cref="OptimizedPrimitiveTrail"/>.
     /// </summary>
     public OptimizedPrimitiveTrail(VertexWidthFunction widthFunction, VertexColorFunction colorFunction,
     VertexOffsetFunction offsetFunction = null, int maxTrailPoints = 1024)
     {
-        if (Main.dedServ)
-            return;
+        if (!Main.dedServ)
+        {
+            this.widthFunction = widthFunction ?? throw new ArgumentNullException(nameof(widthFunction));
+            this.colorFunction = colorFunction ?? throw new ArgumentNullException(nameof(colorFunction));
+            this.offsetFunction = offsetFunction;
 
-        _widthFunction = widthFunction ?? throw new ArgumentNullException(nameof(widthFunction));
-        _colorFunction = colorFunction ?? throw new ArgumentNullException(nameof(colorFunction));
-        _offsetFunction = offsetFunction;
+            _maxTrailPoints = maxTrailPoints;
+            _trailPointsBuffer = new SystemVector2[maxTrailPoints];
+            _verticesBuffer = new Vertex2D[(maxTrailPoints) * 2];
+            _indicesBuffer = new short[(maxTrailPoints - 1) * 6];
 
-        _maxTrailPoints = maxTrailPoints;
-        _trailPointsBuffer = new SystemVector2[maxTrailPoints];
-        _verticesBuffer = new Vertex2D[(maxTrailPoints) * 2];
-        _indicesBuffer = new short[(maxTrailPoints - 1) * 6];
+            PrecomputeIndices(maxTrailPoints);
+        }
 
-        PrecomputeIndices(maxTrailPoints);
-        Register();
+        TrailCleaner.Instance.trails.Add(this);
+        FailedTicks = 10;
     }
+    #endregion
 
-    private void Register()
-    {
-        TrailManager.Instance.trails.Add(this);
-        failedTicks = 10;
-    }
-
+    #region Private Methods
     /// <summary>
     /// Precomputes the triangle indices for the trail body to improve rendering efficiency.
     /// </summary>
@@ -546,23 +299,21 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
     /// <summary>
     /// Ensures the internal buffers are large enough to handle the required number of trail points with the given tip.
     /// </summary>
-    private void EnsureBuffers(int requiredTrailPoints, ITrailTip tip)
+    private void EnsureBuffers(int requiredTrailPoints)
     {
         if (requiredTrailPoints > _trailPointsBuffer.Length)
         {
             _trailPointsBuffer = new SystemVector2[requiredTrailPoints];
-            _verticesBuffer = new Vertex2D[(requiredTrailPoints) * 2 + tip.ExtraVertices];
-            _indicesBuffer = new short[(requiredTrailPoints - 1) * 6 + tip.ExtraIndices];
+            _verticesBuffer = new Vertex2D[(requiredTrailPoints) * 2];
+            _indicesBuffer = new short[(requiredTrailPoints - 1) * 6];
             PrecomputeIndices(requiredTrailPoints);
         }
         else
         {
             // Sometimes one of these goes null for some reason despite the trail being correctly created in the constructor???
             // idk its wildly inconsistent to replicate the problem so this will do for now
-            _verticesBuffer ??= new Vertex2D[(requiredTrailPoints) * 2 + tip.ExtraVertices];
-            _indicesBuffer ??= new short[(requiredTrailPoints - 1) * 6 + tip.ExtraIndices];
-            _tipVerticesBuffer ??= new Vertex2D[tip.ExtraVertices];
-            _tipIndicesBuffer ??= new short[tip.ExtraIndices];
+            _verticesBuffer ??= new Vertex2D[(requiredTrailPoints) * 2];
+            _indicesBuffer ??= new short[(requiredTrailPoints - 1) * 6];
         }
     }
 
@@ -676,7 +427,6 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
         return totalTrailPoints;
     }
 
-
     /// <summary>
     /// Converts trail points into vertex data for rendering, including width and color.
     /// </summary>
@@ -710,25 +460,27 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
                 direction = PolarVector2(1f, directionOverride.Value);
 
             SystemVector2 normal = new(-direction.Y, direction.X);
-            float width = _widthFunction(completion);
-            SystemVector2 offset = _offsetFunction != null ? _offsetFunction(completion) : SystemVector2.Zero;
+            float width = widthFunction(completion);
+            SystemVector2 offset = offsetFunction != null ? offsetFunction(completion) : SystemVector2.Zero;
             SystemVector2 trailPoint = trailPoints[i];
 
             vertices[i * 2] = new Vertex2D(
                 trailPoint + offset + normal * width * 0.5f,
-                _colorFunction(new SystemVector2(completion, 0), trailPoint.FromNumerics()),
+                colorFunction(new SystemVector2(completion, 0), trailPoint.FromNumerics()),
                 new SystemVector2(completion, 0)
             );
             vertices[i * 2 + 1] = new Vertex2D(
                 trailPoint + offset - normal * width * 0.5f,
-                _colorFunction(new SystemVector2(completion, 1), trailPoint.FromNumerics()),
+                colorFunction(new SystemVector2(completion, 1), trailPoint.FromNumerics()),
                 new SystemVector2(completion, 1)
             );
         }
 
         return trailPoints.Length * 2;
     }
+    #endregion
 
+    #region Public Methods
     /// <summary>
     /// Directly draws a trail.
     /// </summary>
@@ -741,15 +493,11 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
     {
         if (Main.dedServ)
             return;
-
-        if (this == null)
-            throw new NullReferenceException("This primitive trail cannot be null!");
-
         if (originalPositions == null || originalPositions.Length < 2 || Utility.ContainsInvalidPoint(originalPositions) || Utility.AllPointsEqual(originalPositions))
             return;
 
         int effectiveTotalPoints = totalTrailPoints > 0 ? totalTrailPoints : _maxTrailPoints;
-        EnsureBuffers(effectiveTotalPoints, new NoTip());
+        EnsureBuffers(effectiveTotalPoints);
 
         Span<SystemVector2> convertedPositions = stackalloc SystemVector2[originalPositions.Length];
         for (int i = 0; i < originalPositions.Length; i++)
@@ -797,7 +545,7 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
             0,
             trailIndexCount / 3
         );
-        failedTicks = 10;
+        FailedTicks = 10;
 
         // Restore render states
         device.RasterizerState = prevRasterizer;
@@ -806,123 +554,20 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
     }
 
     /// <summary>
-    /// Directly draws a trail with a specified tip.
+    /// Retrieves the last (or first) trail point, optionally smoothed.
     /// </summary>
-    /// 
-    /// <inheritdoc cref="DrawTrail(ManagedShader, ReadOnlySpan{Vector2}, int, bool, bool)"></inheritdoc>
-    /// <param name="tip">What tip to use</param>
-    /// <param name="isPrepended">Is this trails positions added from the front?</param>
-    /// <param name="positionOverride">Override where the tip is</param>
-    /// <param name="directionOverride">Override where the tip is pointing</param>
-    /// 
-    /// <remarks>
-    /// This method uses separate buffers for the tip to avoid artifacts from index merging.
-    /// The performance impact is minimal due to the trail's optimization, but merging indices/vertices
-    /// remains a challenge. If anyone has a solution let me know!
-    /// </remarks>
-    public void DrawTippedTrail(ManagedShader effect, ReadOnlySpan<Vector2> originalPositions, ITrailTip tip, bool isPrepended = false, int totalTrailPoints = -1, bool smooth = false, Vector2 directionOverride = default, Vector2 positionOverride = default, bool pixelated = true)
+    public Vector2 GetEndPoint(ReadOnlySpan<Vector2> positions, bool getFirstPoint = false, bool smooth = false)
     {
-        if (Main.dedServ)
-            return;
-
-        if (this == null)
-            throw new NullReferenceException("This primitive trail cannot be null!");
-
-        if (originalPositions == null || originalPositions.Length < 2 || Utility.ContainsInvalidPoint(originalPositions) || Utility.AllPointsEqual(originalPositions))
-            return;
-
-        int effectiveTotalPoints = totalTrailPoints > 0 ? totalTrailPoints : _maxTrailPoints;
-        EnsureBuffers(effectiveTotalPoints, tip);
-
-        Span<SystemVector2> convertedPositions = stackalloc SystemVector2[originalPositions.Length];
-        for (int i = 0; i < originalPositions.Length; i++)
-            convertedPositions[i] = originalPositions[i].ToNumerics();
-
-        // Clear potentially stale data
-        Array.Clear(_trailPointsBuffer, 0, _trailPointsBuffer.Length);
-        int pointCount = smooth
-            ? GetSmoothTrailPoints(convertedPositions, _trailPointsBuffer.AsSpan(0, effectiveTotalPoints), effectiveTotalPoints)
-            : GetLinearTrailPoints(convertedPositions, _trailPointsBuffer.AsSpan(0, effectiveTotalPoints), effectiveTotalPoints);
-
-        if (pointCount < 2)
-            return;
-
-        // Clear potentially stale data
-        Array.Clear(_verticesBuffer, 0, _verticesBuffer.Length);
-        int trailVertexCount = GetVerticesFromTrailPoints(_trailPointsBuffer.AsSpan(0, pointCount),
-            _verticesBuffer.AsSpan(0, (pointCount) * 2), null);
-        if (trailVertexCount < 3)
-            return;
-
-        // Calculate trail end and normal
-        SystemVector2 effectiveTipPos = (positionOverride != default ? positionOverride : GetLastTrailPoint(originalPositions, isPrepended, tip, totalTrailPoints, smooth)).ToNumerics();
-
-        SystemVector2 firstCenter = (_verticesBuffer[0].position + _verticesBuffer[1].position) / 2;
-        SystemVector2 secondCenter = (_verticesBuffer[2].position + _verticesBuffer[3].position) / 2;
-        SystemVector2 direction = isPrepended ? secondCenter.SafeDirectionTo(firstCenter) : firstCenter.SafeDirectionTo(secondCenter);
-
-        // Generate tip geometry into its own buffers
-        tip.GenerateMesh(effectiveTipPos, direction, 0, _tipVerticesBuffer.AsSpan(0, tip.ExtraVertices), _tipIndicesBuffer.AsSpan(0, tip.ExtraIndices), _widthFunction, _colorFunction);
-        GraphicsDevice device = Main.instance.GraphicsDevice;
-
-        // Save and set render states
-        RasterizerState prevRasterizer = device.RasterizerState;
-        Rectangle prevScissor = device.ScissorRectangle;
-        BlendState prevBlendState = Main.instance.GraphicsDevice.BlendState;
-
-        device.RasterizerState = CullOnlyScreen;
-        device.ScissorRectangle = new Rectangle(0, 0, device.Viewport.Width, device.Viewport.Height);
-        device.BlendState = BlendState.AlphaBlend;
-
-        // Apply effect
-        effect.Render(ManagedShader.DefaultPassName, pixelated);
-
-        // Draw trail body
-        int trailIndexCount = (pointCount - 1) * 6;
-        device.DrawUserIndexedPrimitives(
-            PrimitiveType.TriangleList,
-            _verticesBuffer,
-            0,
-            trailVertexCount,
-            _indicesBuffer,
-            0,
-            trailIndexCount / 3
-        );
-
-        // Draw tip
-        device.DrawUserIndexedPrimitives(
-            PrimitiveType.TriangleList,
-            _tipVerticesBuffer,
-            0,
-            tip.ExtraVertices,
-            _tipIndicesBuffer,
-            0,
-            tip.ExtraIndices / 3
-        );
-        failedTicks = 10;
-
-        // Restore render states
-        device.RasterizerState = prevRasterizer;
-        device.ScissorRectangle = prevScissor;
-        device.BlendState = prevBlendState;
-    }
-
-    /// <summary>
-    /// Retrieves the last (or first) trail point, optionally smoothed, for use with tips or other logic.
-    /// </summary>
-    public Vector2 GetLastTrailPoint(ReadOnlySpan<Vector2> positions, bool getFirstPoint = true, ITrailTip tip = null, int totalTrailPoints = -1, bool smooth = false)
-    {
-        int effectiveTotalPoints = totalTrailPoints > 0 ? totalTrailPoints : _maxTrailPoints;
-        EnsureBuffers(effectiveTotalPoints, tip ?? new NoTip());
+        EnsureBuffers(_maxTrailPoints);
 
         Span<SystemVector2> convertedPositions = stackalloc SystemVector2[positions.Length];
         for (int i = 0; i < positions.Length; i++)
             convertedPositions[i] = positions[i].ToNumerics();
 
-        Span<SystemVector2> tempPoints = stackalloc SystemVector2[effectiveTotalPoints];
+        Span<SystemVector2> tempPoints = stackalloc SystemVector2[_maxTrailPoints];
         int pointCount = smooth
-            ? GetSmoothTrailPoints(convertedPositions, tempPoints, effectiveTotalPoints)
-            : GetLinearTrailPoints(convertedPositions, tempPoints, effectiveTotalPoints);
+            ? GetSmoothTrailPoints(convertedPositions, tempPoints, _maxTrailPoints)
+            : GetLinearTrailPoints(convertedPositions, tempPoints, _maxTrailPoints);
 
         if (pointCount < 2)
             return convertedPositions[^1].FromNumerics();
@@ -949,32 +594,63 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
 
     public void Dispose()
     {
-        if (!_disposed)
+        if (!Disposed)
         {
             _indicesBuffer = null;
             _verticesBuffer = null;
-            _tipVerticesBuffer = null;
-            _tipIndicesBuffer = null;
 
-            _disposed = true;
+            Disposed = true;
             GC.SuppressFinalize(this);
         }
     }
+    #endregion
 
+    #region Public Static Methods
+    /// <summary>
+    /// Helps make a <see cref="VertexWidthFunction"/> that creates a pyriform shaped trail (commonly referred to as a meteor trail or pear)
+    /// </summary>
+    /// <param name="completionRatio">A value from 0 to 1 indicating progress along the trail.</param>
+    /// <param name="width">The thickness of the trail.</param>
+    /// <param name="power">The thickness of the base</param>
+    /// <param name="hemisphereAmt">The percentage of how much of the trail the hemisphere should take.</param>
+    /// <param name="taperAmt">The percentage of how much of the trail should taper off.</param>
+    /// <returns></returns>
+    public static float PyriformWidthFunct(float completionRatio, float width, float power = 2f, float hemisphereAmt = .3f, float taperAmt = .4f)
+    {
+        float tipInterpolant = MathF.Sqrt(1f - Animators.MakePoly(power).InFunction(InverseLerp(hemisphereAmt, 0f, completionRatio)));
+        return width * InverseLerp(1f, taperAmt, completionRatio) * tipInterpolant;
+    }
+
+    /// <summary>
+    /// Helps make a <see cref="VertexWidthFunction"/> that creates a hemispherical tip at the end of a trail
+    /// </summary>
+    /// <param name="completionRatio">A value from 0 to 1 indicating progress along the trail.</param>
+    /// <param name="width">The thickness of the trail.</param>
+    /// <param name="power">The thickness of the base</param>
+    /// <param name="hemisphereAmt">The percentage of how much of the trail the hemisphere should take.</param>
+    /// <returns></returns>
+    public static float HemisphereWidthFunct(float completionRatio, float width, float power = 1f, float hemisphereAmt = .3f)
+    {
+        float tipInterpolant = MathF.Sqrt(1f - Animators.MakePoly(power).InFunction(InverseLerp(hemisphereAmt, 0f, completionRatio)));
+        return width * tipInterpolant;
+    }
+    #endregion
+
+    #region Destructor
     ~OptimizedPrimitiveTrail()
     {
-        if (!_disposed)
+        if (!Disposed)
         {
             _indicesBuffer = null;
             _verticesBuffer = null;
-            _tipVerticesBuffer = null;
-            _tipIndicesBuffer = null;
         }
     }
+    #endregion
 
+    #region Override Methods
     public override string ToString()
     {
-        return $"Rendering {_trailPointsBuffer.Length} trail points, {_verticesBuffer} vertices, and {_indicesBuffer} indices. Is this trail disposed? {_disposed} \n" +
-            $"{((_tipVerticesBuffer == null || _tipIndicesBuffer == null) ? "This trail has no tip" : $"Rendering {_tipVerticesBuffer.Length} tip vertices and {_tipIndicesBuffer.Length} tip indices")}";
+        return $"Rendering {_trailPointsBuffer.Length} trail points, {_verticesBuffer} vertices, and {_indicesBuffer} indices. Is this trail disposed? {Disposed} \n";
     }
+    #endregion
 }

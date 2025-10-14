@@ -1,5 +1,4 @@
 ﻿using Terraria;
-using Terraria.Localization;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
 
@@ -26,6 +25,5 @@ public class MidnightBats : ModBuff
             player.DelBuff(buffIndex);
             buffIndex--;
         }
-
     }
 }

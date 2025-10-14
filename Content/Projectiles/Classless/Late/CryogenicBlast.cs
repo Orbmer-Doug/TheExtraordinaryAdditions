@@ -1,11 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -27,8 +24,9 @@ public class CryogenicBlast : ModProjectile
     public override string Texture => AssetRegistry.Invis;
     public override void SetStaticDefaults()
     {
-        ProjectileID.Sets.DrawScreenCheckFluff[Projectile.type] = DistanceToTiles(120);
+        ProjectileID.Sets.DrawScreenCheckFluff[Projectile.type] = 1200;
     }
+
     public override void SetDefaults()
     {
         Projectile.width = 72;
@@ -50,7 +48,6 @@ public class CryogenicBlast : ModProjectile
 
     public override void AI()
     {
-        // Cause the wave to expand outward, along with its hitbox.
         Radius = MathHelper.Lerp(Radius, 400f, 0.39f);
         Projectile.scale = MathHelper.Lerp(.8f, 1f, InverseLerp(Lifetime, 0f, Projectile.timeLeft));
         Projectile.Opacity = InverseLerp(2f, 15f, Projectile.timeLeft);

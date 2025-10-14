@@ -1,9 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
 using Terraria;
-using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -15,7 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
 public class TinyServant : ModProjectile
 {
-    public override string Texture => "Terraria/Images/NPC_" + NPCID.ServantofCthulhu;
+    public override string Texture => NPCID.ServantofCthulhu.GetTerrariaNPC();
 
     public override void SetStaticDefaults()
     {
@@ -43,7 +40,7 @@ public class TinyServant : ModProjectile
     public ref float Timer => ref Projectile.ai[0];
     public override void AI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunction, ColorFunction, null, 20);
 
         Projectile.FacingLeft();

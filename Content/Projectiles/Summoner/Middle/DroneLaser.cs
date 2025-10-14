@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using System.IO;
+﻿using System.IO;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -13,7 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
 public class DroneLaser : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
-    
+
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.MinionShot[Type] = true;
@@ -57,8 +56,8 @@ public class DroneLaser : ModProjectile
     {
         Projectile.width = Projectile.height = 10 + (int)(10 * ChargeCompletion);
 
-        if (trail == null || trail._disposed)
-            trail = new(tip, c => Projectile.height * Projectile.scale, (c, pos) => Color.Cyan * Projectile.scale, null, 50);
+        if (trail == null || trail.Disposed)
+            trail = new(c => OptimizedPrimitiveTrail.HemisphereWidthFunct(c, Projectile.height * Projectile.scale), (c, pos) => Color.Cyan * Projectile.scale, null, 50);
 
         Vector2 expected = Start + Projectile.velocity.SafeNormalize(Vector2.Zero) * Animators.MakePoly(2.8f).OutFunction.Evaluate(Time, 0f, 17f, 0f, MaxDist);
         End = LaserCollision(Start, expected, CollisionTarget.Tiles | CollisionTarget.NPCs);
@@ -66,6 +65,7 @@ public class DroneLaser : ModProjectile
         if (End != expected && !HitSomething)
         {
             HitSomething = true;
+            this.Sync();
         }
 
         cache ??= new(50);
@@ -81,9 +81,8 @@ public class DroneLaser : ModProjectile
         return targetHitbox.CollisionFromPoints(cache.Points, c => 10f * Projectile.scale);
     }
 
-    public ManualTrailPoints cache;
+    public TrailPoints cache;
     public OptimizedPrimitiveTrail trail;
-    public static readonly ITrailTip tip = new RoundedTip(20);
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -92,7 +91,7 @@ public class DroneLaser : ModProjectile
                 return;
             ManagedShader shader = ShaderRegistry.CrunchyLaserShader;
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DarkTurbulentNoise), 1);
-            trail.DrawTippedTrail(shader, cache.Points, tip);
+            trail.DrawTrail(shader, cache.Points);
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;

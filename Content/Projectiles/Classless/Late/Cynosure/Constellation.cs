@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
-using System.IO;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
@@ -35,9 +34,9 @@ public class Constellation : ModProjectile
     public List<Projectile> Others = [];
     public ref float NextProjIndex => ref Projectile.ai[2];
 
-    public ref float InitOpac => ref Projectile.Additions().ExtraAI[0];
-    public ref float InitScale => ref Projectile.Additions().ExtraAI[1];
-    public ref float Spin => ref Projectile.Additions().ExtraAI[2];
+    public ref float InitOpac => ref Projectile.AdditionsInfo().ExtraAI[0];
+    public ref float InitScale => ref Projectile.AdditionsInfo().ExtraAI[1];
+    public ref float Spin => ref Projectile.AdditionsInfo().ExtraAI[2];
     public Player Owner => Main.player[Projectile.owner];
     public override void AI()
     {
@@ -134,9 +133,7 @@ public class Constellation : ModProjectile
         {
             Projectile nextProj = Main.projectile[(int)NextProjIndex];
             if (nextProj.active && nextProj.type == Type)
-            {
                 return targetHitbox.LineCollision(Projectile.Center, nextProj.Center, 8f);
-            }
         }
 
         return false;

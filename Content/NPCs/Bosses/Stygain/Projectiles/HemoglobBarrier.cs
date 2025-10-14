@@ -13,7 +13,7 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 public class HemoglobBarrier : ProjOwnedByNPC<StygainHeart>
 {
     private List<Vector2> cache;
-    private ManualTrailPoints points;
+    private TrailPoints points;
     public ref float CurrentWidth => ref Projectile.ai[0];
     public bool FadeOut
     {
@@ -54,7 +54,7 @@ public class HemoglobBarrier : ProjOwnedByNPC<StygainHeart>
         for (int k = 0; k < Points; k++)
             cache[k] = Projectile.Center + ((MathF.Tau + .1f) * InverseLerp(0f, Points, k)).ToRotationVector2() * StygainHeart.BarrierSize;
 
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunction, ColorFunction, null, 5);
         points.SetPoints(cache);
 
@@ -76,6 +76,13 @@ public class HemoglobBarrier : ProjOwnedByNPC<StygainHeart>
             {
                 ParticleRegistry.SpawnBloomLineParticle(player.RotHitbox().RandomPoint(), Vector2.UnitY * -Main.rand.NextFloat(2f, 5f),
                     Main.rand.Next(10, 20), Main.rand.NextFloat(.3f, .6f), Color.DarkRed);
+
+                Vector2 edge = ClosestPointOnCircle(player.Center, Projectile.Center, StygainHeart.BarrierSize, true);
+                foreach (Vector2 point in edge.GetLaserControlPoints(player.Center, 30))
+                {
+                    ParticleRegistry.SpawnGlowParticle(point, player.Center.SafeDirectionTo(edge) * Main.rand.NextFloat(1f, 3f),
+                        Main.rand.Next(30, 40), Main.rand.NextFloat(30f, 40f), Color.Crimson, 1.2f);
+                }
                 player.velocity = player.SafeDirectionTo(Projectile.Center)
                     * MathF.Min(15f, player.Distance(Projectile.Center + PolarVector(StygainHeart.BarrierSize, player.SafeDirectionTo(Projectile.Center).ToRotation())));
             }
@@ -133,7 +140,7 @@ public class HemoglobBarrier : ProjOwnedByNPC<StygainHeart>
     {
         void draw()
         {
-            if (trail == null || trail._disposed || points == null)
+            if (trail == null || trail.Disposed || points == null)
                 return;
 
             ManagedShader barrier = ShaderRegistry.EnlightenedBeam;

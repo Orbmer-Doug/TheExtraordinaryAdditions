@@ -1,9 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
+﻿using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
@@ -47,23 +45,24 @@ public class GreekBombArrow : ModProjectile
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return Projectile.RotatingHitboxCollision(targetHitbox.TopLeft(), targetHitbox.Size());
+        return targetHitbox.LineCollision(Projectile.BaseRotHitbox().Top, Projectile.BaseRotHitbox().Bottom, Projectile.width);
     }
 
     public override void OnKill(int timeLeft)
     {
         SoundEngine.PlaySound(SoundID.Item14 with { Pitch = .2f, PitchVariance = .1f, Volume = Main.rand.NextFloat(.8f, 1.1f), Identifier = Name }, Projectile.Center);
 
-        //Particle.Spawn(new TileHeatParticle(Projectile.Center, 2f, 3, Color.Lime, Color.DarkGreen, Color.DarkOliveGreen));
-        for (int i = 0; i < Main.rand.Next(3, 5); i++)
-            Projectile.NewProj(Projectile.Center, -Projectile.oldVelocity.RotatedByRandom(1.8f) * Main.rand.NextFloat(.2f, .4f), ModContent.ProjectileType<GreekNapalm>(), Projectile.damage / 2, 0f, Projectile.owner);
+        if (this.RunLocal())
+        {
+            for (int i = 0; i < Main.rand.Next(3, 5); i++)
+                Projectile.NewProj(Projectile.Center, -Projectile.oldVelocity.RotatedByRandom(1.8f) * Main.rand.NextFloat(.2f, .4f), ModContent.ProjectileType<GreekNapalm>(), Projectile.damage / 2, 0f, Projectile.owner);
+        }
 
         for (int i = 0; i < 30; i++)
         {
             Vector2 shootVelocity = (MathHelper.TwoPi * Main.rand.Next(0, 11) / 10f + RandomRotation()).ToRotationVector2() * Main.rand.NextFloat(4f, 9f);
 
-            ParticleRegistry.SpawnGlowParticle(Projectile.Center, shootVelocity, Main.rand.Next(18, 25), Main.rand.NextFloat(.4f, .6f), Color.LawnGreen, 1f);
-
+            ParticleRegistry.SpawnGlowParticle(Projectile.Center, shootVelocity, Main.rand.Next(18, 25), Main.rand.NextFloat(24f, 34f), Color.LawnGreen, 1f);
             ParticleRegistry.SpawnSparkParticle(Projectile.Center, shootVelocity, Main.rand.Next(28, 34), .6f, Color.Lime);
         }
     }

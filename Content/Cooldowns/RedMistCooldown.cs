@@ -1,12 +1,6 @@
 ﻿using CalamityMod.Cooldowns;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 using Terraria.Localization;
-using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 
 namespace TheExtraordinaryAdditions.Content.Cooldowns;
 

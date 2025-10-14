@@ -4,7 +4,6 @@ using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -13,16 +12,19 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
 public partial class Asterlin : ModNPC
 {
+    public static readonly Dictionary<AsterlinAIType, float> TechnicBombBarrage_PossibleStates =
+        new Dictionary<AsterlinAIType, float> { { AsterlinAIType.Cleave, 1f }, { AsterlinAIType.Hyperbeam, .6f } };
     [AutomatedMethodInvoke]
     public void LoadStateTransitions_TechnicBombBarrage()
     {
-        StateMachine.RegisterTransition(AsterlinAIType.TechnicBombBarrage, new Dictionary<AsterlinAIType, float> { { AsterlinAIType.Judgement, 1f }, { AsterlinAIType.Hyperbeam, 1f } }, false, () =>
+        StateMachine.RegisterTransition(AsterlinAIType.TechnicBombBarrage, TechnicBombBarrage_PossibleStates, false, () =>
         {
             return AITimer >= TechnicBombBarrage_TotalTime;
         });
         StateMachine.RegisterStateEntryCallback(AsterlinAIType.TechnicBombBarrage, () =>
         {
-            NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<TheTechnicBlitzripper>(), Asterlin.MediumAttackDamage, 0f);
+            if (this.RunServer())
+                NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<TheTechnicBlitzripper>(), Asterlin.MediumAttackDamage, 0f);
             ReticlePosition = Target.Center - Vector2.UnitY * 200f;
         });
         StateMachine.RegisterStateBehavior(AsterlinAIType.TechnicBombBarrage, DoBehavior_TechnicBombBarrage);
@@ -34,14 +36,25 @@ public partial class Asterlin : ModNPC
     public static int TechnicBombBarrage_BombReleaseRate => DifficultyBasedValue(30, 28, 27, 25, 24, 21);
     public int TechnicBombBarrage_FadeTimer
     {
-        get => (int)NPC.AdditionsInfo().ExtraAI[0];
-        set => NPC.AdditionsInfo().ExtraAI[0] = value;
+        get => (int)ExtraAI[0];
+        set => ExtraAI[0] = value;
     }
-    public ref float TechnicBombBarrage_RotationStart => ref NPC.AdditionsInfo().ExtraAI[1];
-    public ref float TechnicBombBarrage_RotationDir => ref NPC.AdditionsInfo().ExtraAI[2];
-
-    public Vector2 ReticlePosition;
-    public Projectile CurrentBombTarget;
+    public ref float TechnicBombBarrage_RotationStart => ref ExtraAI[1];
+    public ref float TechnicBombBarrage_RotationDir => ref ExtraAI[2];
+    public int CurrentBombTargetIndex
+    {
+        get => (int)ExtraAI[3];
+        set => ExtraAI[3] = value;
+    }
+    public Vector2 ReticlePosition
+    {
+        get => new(ExtraAI[4], ExtraAI[5]);
+        set
+        {
+            ExtraAI[4] = value.X;
+            ExtraAI[5] = value.Y;
+        }
+    }
 
     public void DoBehavior_TechnicBombBarrage()
     {
@@ -66,28 +79,38 @@ public partial class Asterlin : ModNPC
             }
             else
             {
-                if (CurrentBombTarget == null || CurrentBombTarget.active == false)
+                int type = ModContent.ProjectileType<TechnicBomb>();
+                Projectile bombTarget = Main.projectile?[CurrentBombTargetIndex] ?? null;
+                bool valid = bombTarget != null && bombTarget.active && bombTarget.type == type;
+                if (!valid)
                 {
-                    CurrentBombTarget = ProjectileTargeting.GetClosestProjectile(new(Target.Center, 5000, true, ModContent.ProjectileType<TechnicBomb>())) ?? null;
+                    Projectile close = ProjectileTargeting.GetClosestProjectile(new(Target.Center, 5000, false, type));
+                    CurrentBombTargetIndex = close == null ? 0 : close.whoAmI;
+                    if (close != null)
+                    {
+                        bombTarget = Main.projectile?[CurrentBombTargetIndex];
+                        valid = true;
+                    }
+                    NPC.netUpdate = true;
                 }
 
                 if (Gun != null)
                 {
-                    if (CurrentBombTarget != null && CurrentBombTarget.active == true)
+                    if (valid)
                     {
-                        if (!Collision.CanHitLine(Gun.Tip, 1, 1, CurrentBombTarget.Center, 1, 1))
-                            CurrentBombTarget = null;
-
-                        ReticlePosition = Vector2.SmoothStep(ReticlePosition, CurrentBombTarget.Center, Utils.Remap(ReticlePosition.Distance(CurrentBombTarget.Center), 0f, 400f, .24f, .14f));
-                        if (ReticlePosition.WithinRange(CurrentBombTarget.Center, 100f))
-                            Gun?.Shoot();
+                        if (bombTarget != null)
+                        {
+                            ReticlePosition = Vector2.SmoothStep(ReticlePosition, bombTarget.Center, Utils.Remap(ReticlePosition.Distance(bombTarget.Center), 0f, 400f, .24f, .14f));
+                            if (ReticlePosition.WithinRange(bombTarget.Center, 100f))
+                                Gun?.Shoot();
+                        }
                     }
 
                     // If the reticle gets too close everything freaks out
                     ReticlePosition = ReticlePosition.ClampOutCircle(Gun.Projectile.Center, 100f);
 
-                    SetLeftHandTarget(leftArm.RootPosition + PolarVector(400f, Utils.AngleLerp(MathHelper.PiOver2 + (.1f * Direction), -MathHelper.PiOver2, Animators.MakePoly(3f).OutFunction(InverseLerp(0f, 40f, AITimer)))));
-                    SetRightHandTarget(rightArm.RootPosition + Gun.Projectile.velocity.SafeNormalize(Vector2.Zero) * 400f);
+                    SetLeftHandTarget(LeftArm.RootPosition + PolarVector(400f, Utils.AngleLerp(MathHelper.PiOver2 + (.1f * Direction), -MathHelper.PiOver2, Animators.MakePoly(3f).OutFunction(InverseLerp(0f, 40f, AITimer)))));
+                    SetRightHandTarget(RightArm.RootPosition + Gun.Projectile.velocity.SafeNormalize(Vector2.Zero) * 400f);
                 }
 
                 if (AITimer % TechnicBombBarrage_BombReleaseRate == (TechnicBombBarrage_BombReleaseRate - 1))

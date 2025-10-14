@@ -1,8 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -10,13 +8,14 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
 public class CrystalShard : ModProjectile
 {
-    public override string Texture => "Terraria/Images/Projectile_" + ProjectileID.CrystalStorm;
+    public override string Texture => ProjectileID.CrystalStorm.GetTerrariaProj();
 
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
         ProjectileID.Sets.TrailCacheLength[Projectile.type] = 5;
     }
+
     private const int Lifetime = 600;
     public override void SetDefaults()
     {
@@ -30,11 +29,9 @@ public class CrystalShard : ModProjectile
         Projectile.DamageType = DamageClass.Magic;
         Projectile.tileCollide = true;
         Projectile.penetrate = 1;
-        if (Version == 1f)
-            Projectile.extraUpdates = 1;
     }
+
     public ref float Time => ref Projectile.ai[0];
-    public ref float Version => ref Projectile.ai[1];
     public FancyAfterimages fancy;
     public override void AI()
     {
@@ -50,7 +47,7 @@ public class CrystalShard : ModProjectile
             ParticleRegistry.SpawnSparkleParticle(Projectile.RandAreaInEntity(), Vector2.Zero, Main.rand.Next(18, 22),
                 Main.rand.NextFloat(.3f, .45f), new(155, 44, 111), new(136, 29, 94), Main.rand.NextFloat(.9f, 1.2f));
         }
-        fancy.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.scale, Projectile.Opacity, Projectile.rotation, 0, 10, 4, 1f - Projectile.Opacity, null, false, -.1f));
+        fancy?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.scale, Projectile.Opacity, Projectile.rotation, 0, 10, 4, 1f - Projectile.Opacity, null, false, -.1f));
 
         Projectile.velocity *= 0.985f;
         if (Time > 130f)
@@ -63,11 +60,7 @@ public class CrystalShard : ModProjectile
             }
         }
     }
-    public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
-    {
-        if (Version == 1f)
-            modifiers.ScalingArmorPenetration += 1f;
-    }
+
     public override bool OnTileCollide(Vector2 oldVelocity)
     {
         if (Projectile.velocity.X != oldVelocity.X)
@@ -76,22 +69,23 @@ public class CrystalShard : ModProjectile
             Projectile.velocity.Y = -oldVelocity.Y;
         return false;
     }
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         for (int i = 0; i < 8; i++)
-        {
-            ParticleRegistry.SpawnSparkParticle(Projectile.Center, Main.rand.NextVector2Circular(5f, 5f), Main.rand.Next(20, 30), Main.rand.NextFloat(.35f, .45f), Color.Lerp(new(74, 128, 164), new(155, 44, 111), Main.rand.NextFloat()), false, true);
-        }
+            ParticleRegistry.SpawnSparkParticle(Projectile.Center, Main.rand.NextVector2Circular(5f, 5f), Main.rand.Next(20, 30),
+                Main.rand.NextFloat(.35f, .45f), Color.Lerp(new(74, 128, 164), new(155, 44, 111), Main.rand.NextFloat()), false, true);
     }
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
         {
             Projectile.DrawBaseProjectile(Lighting.GetColor(Projectile.Center.ToTileCoordinates()));
-            fancy.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [new(0, 39, 65), new(0, 73, 121), new(74, 128, 164)], Lighting.Brightness((int)Projectile.Center.X / 16, (int)Projectile.Center.Y / 16));
+            fancy?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [new(0, 39, 65), new(0, 73, 121), new(74, 128, 164)],
+                Lighting.Brightness((int)Projectile.Center.X / 16, (int)Projectile.Center.Y / 16));
         }
         PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.UnderProjectiles);
-        
         return false;
     }
 }

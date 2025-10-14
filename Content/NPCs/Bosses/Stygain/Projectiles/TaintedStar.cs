@@ -99,7 +99,7 @@ public class TaintedStar : ProjOwnedByNPC<StygainHeart>
             }
         }
     }
-    
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()

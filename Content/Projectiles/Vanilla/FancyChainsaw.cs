@@ -1,11 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 using Terraria.Enums;
 using Terraria.GameContent;
@@ -13,7 +9,6 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
 using static Microsoft.Xna.Framework.MathHelper;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla;
 
@@ -35,8 +30,6 @@ public class FancyChainsaw : ModProjectile
         Projectile.ignoreWater = true;
         Projectile.ownerHitCheck = true;
         Projectile.ownerHitCheckDistance = 700f;
-        Projectile.usesLocalNPCImmunity = true;
-        Projectile.localNPCHitCooldown = -1;
         Projectile.noEnchantmentVisuals = true;
         Projectile.friendly = true;
         Projectile.netImportant = true;
@@ -94,7 +87,8 @@ public class FancyChainsaw : ModProjectile
         if (Projectile.soundDelay <= 0 && Time > 10)
         {
             SoundID.Item22.Play(Projectile.Center, 1f, 0f, .05f);
-            SolidCollision(Rect(), .8f);
+            if (Owner.whoAmI == Main.myPlayer)
+                SolidCollision(Rect(), .8f);
             Projectile.soundDelay = (int)Clamp(30 - Chainsaw.useTime, 4, 100);
         }
         Projectile.Opacity = InverseLerp(0f, 10f, Time);

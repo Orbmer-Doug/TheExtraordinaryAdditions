@@ -50,10 +50,8 @@ public class HeavenForgedHoldout : BaseIdleHoldoutProjectile, ILocalizedModType,
 
         Projectile.Center = Center + PolarVector(35f - Recoil, Projectile.rotation) + PolarVector(10f * Dir * Owner.gravDir, Projectile.rotation - MathHelper.PiOver2);
 
-        if ((this.RunLocal() && Modded.SafeMouseLeft.Current) && Wait <= 0f && Owner.HasAmmo(Item))
+        if ((this.RunLocal() && Modded.SafeMouseLeft.Current) && Wait <= 0f && TryUseAmmo(out _, out _, out _, out _, out _))
         {
-            Owner.PickAmmo(Item, out int type, out float speed, out int dmg, out float kb, out int ammoID, Owner.IsAmmoFreeThisShot(Item, Owner.ChooseAmmo(Item), Owner.ChooseAmmo(Item).type));
-
             SoundID.Zombie103.Play(Tip, 1f, -.2f, .1f);
             Vector2 vel = Projectile.velocity.SafeNormalize(Vector2.Zero);
 

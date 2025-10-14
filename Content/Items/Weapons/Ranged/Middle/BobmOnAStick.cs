@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -11,10 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 public class BobmOnAStick : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BobmOnAStick);
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.ColorLocalization(new Color(163, 158, 0));
-    }
+
     public override void SetDefaults()
     {
         Item.DamageType = DamageClass.Generic;
@@ -34,6 +30,11 @@ public class BobmOnAStick : ModItem
         Item.shootSpeed = 0;
         Item.channel = true;
         Item.noUseGraphic = true;
+    }
+
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        tooltips.ColorLocalization(new Color(163, 158, 0));
     }
 
     public override bool CanUseItem(Player player)

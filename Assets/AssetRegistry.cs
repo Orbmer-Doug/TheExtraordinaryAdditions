@@ -47,7 +47,6 @@ public readonly struct AssetInfo<T>(T asset, string path)
 // And alternatively the only free magic circle maker i could reliably find:
 // https://kpierzynski.github.io/dnd_runes_gen/
 // Otherwise just use some alpha drawing on some texture editor or somethin
-// TODO: use free trail on epidemic sounds and take everything
 public class AssetRegistry : ModSystem
 {
     public const string TexturePath = "Assets/Textures";
@@ -60,9 +59,11 @@ public class AssetRegistry : ModSystem
     // Lazy-loaded main asset dictionaries
     public static readonly Dictionary<AdditionsTexture, LazyAsset<Texture2D>> Textures = [];
     public static readonly Dictionary<AdditionsSound, Lazy<AssetInfo<SoundStyle>>> Sounds = [];
+
+    // TODO: Consider making these lazy-loaded...
     public static readonly Dictionary<string, ManagedShader> Shaders = [];
     public static readonly Dictionary<string, ManagedScreenShader> Filters = [];
-    
+
     public static bool HasFinishedLoadingShaders { get; internal set; }
     public static bool HasFinishedLoading { get; internal set; }
 
@@ -149,8 +150,10 @@ public class AssetRegistry : ModSystem
             return;
 
         #region Shaders
-        IEnumerable<string> shaderLoadPaths = fileNames.Where(path => path.Contains(AutoloadDirectoryShaders) && !path.Contains("Compiler/") && (path.Contains(".xnb") || path.Contains(".fxc")));
-        IEnumerable<string> shaderFxPathsToCompile = fileNames.Where(path => path.Contains(AutoloadDirectoryShaders) && !path.Contains("Compiler/") && path.Contains(".fx") && !shaderLoadPaths.Contains(path.Replace(".fx", ".xnb")));
+        IEnumerable<string> shaderLoadPaths = fileNames.Where(path => path.Contains(AutoloadDirectoryShaders)
+        && !path.Contains("Compiler/") && (path.Contains(".xnb") || path.Contains(".fxc")));
+        IEnumerable<string> shaderFxPathsToCompile = fileNames.Where(path => path.Contains(AutoloadDirectoryShaders)
+        && !path.Contains("Compiler/") && path.Contains(".fx") && !shaderLoadPaths.Contains(path.Replace(".fx", ".xnb")));
 
         foreach (string path in shaderLoadPaths)
         {
@@ -168,8 +171,10 @@ public class AssetRegistry : ModSystem
         #endregion
 
         #region Filters
-        IEnumerable<string> filterLoadPaths = fileNames.Where(path => path.Contains(AutoloadDirectoryFilters) && !path.Contains("Compiler/") && (path.Contains(".xnb") || path.Contains(".fxc")));
-        IEnumerable<string> filterFxPathsToCompile = fileNames.Where(path => path.Contains(AutoloadDirectoryFilters) && !path.Contains("Compiler/") && path.Contains(".fx") && !filterLoadPaths.Contains(path.Replace(".fx", ".xnb")));
+        IEnumerable<string> filterLoadPaths = fileNames.Where(path => path.Contains(AutoloadDirectoryFilters)
+        && !path.Contains("Compiler/") && (path.Contains(".xnb") || path.Contains(".fxc")));
+        IEnumerable<string> filterFxPathsToCompile = fileNames.Where(path => path.Contains(AutoloadDirectoryFilters)
+        && !path.Contains("Compiler/") && path.Contains(".fx") && !filterLoadPaths.Contains(path.Replace(".fx", ".xnb")));
 
         foreach (string path in filterLoadPaths)
         {
@@ -231,7 +236,7 @@ public class AssetRegistry : ModSystem
     public static Texture2D InvisTex => GetTexture(AdditionsTexture.Invisible);
 
     /// <remarks>
-    /// In this context, the "name" must correspond with the file name of the shader, not including the path extension.
+    /// In this context, the "name" must correspond with the file name of the shader, not including the path extension
     /// </remarks>
     public static ManagedShader GetShader(string name) => Shaders[name];
 
@@ -243,23 +248,21 @@ public class AssetRegistry : ModSystem
 
     /// <inheritdoc cref="GetShader(string)"/>
     public static bool TryGetFilter(string name, out ManagedScreenShader filter) => Filters.TryGetValue(name, out filter);
-
-    public override void PostUpdateEverything()
-    {
-        if (Main.dedServ)
-            return;
-
-        foreach (ManagedScreenShader filter in Filters.Values)
-        {
-            filter.Deactivate();
-        }
-    }
 }
 
 #region the wall
 
 public enum AdditionsTexture
 {
+    #region Achievements
+    DefeatedAsterlin,
+    DefeatedAuroraGuard,
+    DefeatedSnail,
+    DefeatedStygain,
+    ObtainedCube,
+    ObtainedGenedies,
+    #endregion
+
     #region AsterlinBackgrounds
     Background_AstralInfection,
     Background_BEES,
@@ -575,6 +578,7 @@ public enum AdditionsTexture
     #endregion
     #region Placeable
     AngelsRage,
+    AsterlinRelic,
     FierceBattle,
     FlagPole,
     FrigidGale,
@@ -590,6 +594,7 @@ public enum AdditionsTexture
     SereneSatellite,
     SnailRoar,
     SpiderMusic,
+    StygainHeartRelic,
     StygainHeartTrophy,
     TechnicTransmitter,
     WereYouFoolin,
@@ -768,6 +773,7 @@ public enum AdditionsTexture
 
     #region NPCs
     #region BossBars
+    AsterlinBossbar,
     StygainBossbar,
     #endregion
     #region Bosses
@@ -780,9 +786,10 @@ public enum AdditionsTexture
     AsterlinAtlasVentGlow,
     AsterlinFacingForward,
     CyberneticSword,
-    FallingPillar,
+    FireballArrow,
     GodPiercingDart,
     JudgementHammer,
+    LightningNode,
     OverloadedLightDart,
     SeethingRockball,
     #endregion
@@ -823,6 +830,7 @@ public enum AdditionsTexture
     AuroraTurretBarrelGlow,
     AuroraTurretBase,
     AuroraTurretHead,
+    AuroraTurretHead_Head_Boss,
     GlacialShell,
     GlacialSpike,
     Glacier,
@@ -1012,9 +1020,7 @@ public enum AdditionsTexture
     TankHeadHoldout,
     TheSwarm,
     #endregion
-    AdvancedOnyxBlast,
     BowOfGreekFlamesHeld,
-    GreatJesterArrow,
     GreekBombArrow,
     HailfireShell,
     HallowedGreatbowHeld,
@@ -1069,6 +1075,7 @@ public enum AdditionsTexture
 
     #region Tiles
     AngelsRagePlaced,
+    AsterlinRelicPlaced,
     FierceBattlePlaced,
     FlagPolePlaced,
     FrigidGalePlaced,
@@ -1085,6 +1092,7 @@ public enum AdditionsTexture
     SereneSatellitePlaced,
     SnailRoarPlaced,
     SpiderMusicPlaced,
+    StygainHeartRelicPlaced,
     StygainHeartTrophyPlaced,
     TechnicTransmitterPlaced,
     WereYouFoolinPlaced,
@@ -1129,7 +1137,6 @@ public enum AdditionsTexture
 
     #region Buffs
     #region Buff
-    CrimsonBlessing,
     DesertsBlessing,
     EternalRest,
     SupremeWaterbreathing,
@@ -1139,7 +1146,6 @@ public enum AdditionsTexture
     AshyWater,
     AuroricCooldown,
     CorporealVaporization,
-    CrimsonBlessingCooldown,
     Curse,
     DentedBySpoon,
     Eclipsed,

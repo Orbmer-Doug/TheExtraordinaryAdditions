@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
-using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
@@ -8,7 +7,6 @@ using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using static Terraria.GameContent.Skies.StardustSky;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Early;
 
@@ -49,7 +47,7 @@ public class AmethystStaffHoldout : BaseIdleHoldoutProjectile
             Projectile.NewProj(tip, vel, Item.shoot, Item.damage, Item.knockBack, Owner.whoAmI);
             for (int i = 0; i < 12; i++)
                 ParticleRegistry.SpawnSparkParticle(tip, vel.RotatedByRandom(.5f) * Main.rand.NextFloat(.3f, .6f), Main.rand.Next(14, 25), Main.rand.NextFloat(.4f, .5f), Color.Purple);
-            SoundEngine.PlaySound(SoundID.Item43, tip);
+            SoundID.Item43.Play(tip);
 
             ShootDelay = Owner.HeldItem.useTime;
             this.Sync();
@@ -171,8 +169,7 @@ public class TopazStaffHoldout : BaseIdleHoldoutProjectile
             for (int i = 0; i < 12; i++)
                 ParticleRegistry.SpawnGlowParticle(pos, vel.RotatedByRandom(.5f) * Main.rand.NextFloat(.3f, .6f) * Completion,
                     Main.rand.Next(14, 25), Main.rand.NextFloat(15.4f, 20.5f) * Completion, Color.Orange);
-
-            SoundEngine.PlaySound(SoundID.Item43 with { Volume = .2f + Completion }, pos);
+            SoundID.Item43.Play(pos, .2f + Completion);
 
             ShootDelay = Owner.HeldItem.useTime;
             Charge = 0f;
@@ -273,7 +270,7 @@ public class SapphireStaffHoldout : BaseIdleHoldoutProjectile
             for (int i = 0; i < 12; i++)
                 ParticleRegistry.SpawnBloodParticle(pos, vel.RotatedByRandom(.4f) * Main.rand.NextFloat(.2f, .65f), Main.rand.Next(18, 28), Main.rand.NextFloat(.4f, .5f), Color.Blue);
 
-            SoundEngine.PlaySound(SoundID.Item43, pos);
+            SoundID.Item43.Play(pos);
 
             ShootDelay = Owner.HeldItem.useTime;
             Projectile.netUpdate = true;
@@ -361,7 +358,7 @@ public class EmeraldStaffHoldout : BaseIdleHoldoutProjectile
                 ParticleRegistry.SpawnBloomPixelParticle(pos, vel.RotatedByRandom(.5f) * Main.rand.NextFloat(.4f, .65f), Main.rand.Next(18, 30),
                     Main.rand.NextFloat(.4f, .5f), Color.Green, Color.LawnGreen);
 
-            SoundEngine.PlaySound(SoundID.Item43, pos);
+            SoundID.Item43.Play(pos);
 
             ShootDelay = Owner.HeldItem.useTime;
             Projectile.netUpdate = true;
@@ -449,7 +446,7 @@ public class AmberStaffHoldout : BaseIdleHoldoutProjectile
                 ParticleRegistry.SpawnDustParticle(pos, vel.RotatedByRandom(.4f) * Main.rand.NextFloat(.3f, .6f),
                     Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .5f), col, .14f, false, true);
 
-            SoundEngine.PlaySound(SoundID.Item43, pos);
+            SoundID.Item43.Play(pos);
 
             ShootDelay = Owner.HeldItem.useTime;
             Projectile.netUpdate = true;
@@ -543,7 +540,7 @@ public class RubyStaffHoldout : BaseIdleHoldoutProjectile
             Projectile.NewProj(pos, vel, Item.shoot, Item.damage, Item.knockBack, Owner.whoAmI);
             for (int i = 0; i < 12; i++)
                 ParticleRegistry.SpawnHeavySmokeParticle(pos, vel.RotatedByRandom(.5f) * Main.rand.NextFloat(.3f, .6f), Main.rand.Next(14, 25), Main.rand.NextFloat(.4f, .5f), Color.Red);
-            SoundEngine.PlaySound(SoundID.Item43, pos);
+            SoundID.Item43.Play(pos);
 
             ShootDelay = Owner.HeldItem.useTime;
             Projectile.netUpdate = true;
@@ -636,7 +633,7 @@ public class DiamondStaffHoldout : BaseIdleHoldoutProjectile
             for (int i = 0; i < 12; i++)
                 ParticleRegistry.SpawnSparkleParticle(pos, vel.RotatedByRandom(.5f) * Main.rand.NextFloat(.3f, .6f), Main.rand.Next(18, 30), Main.rand.NextFloat(.4f, .5f), Color.White, Color.LightCyan, 1.2f);
 
-            SoundEngine.PlaySound(SoundID.Item43, pos);
+            SoundID.Item43.Play(pos);
 
             ShootDelay = Owner.HeldItem.useTime;
             Projectile.netUpdate = true;

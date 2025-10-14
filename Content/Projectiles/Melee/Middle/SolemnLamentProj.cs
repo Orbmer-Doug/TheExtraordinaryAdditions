@@ -26,8 +26,8 @@ public class SolemnLamentProj : BaseHoldoutProjectile
         get => GunType == 0f;
         set => IsBlack.ToDirectionInt();
     }
-    public ref float Time => ref Projectile.Additions().ExtraAI[0];
-    public ref float Recoil => ref Projectile.Additions().ExtraAI[1];
+    public ref float Time => ref Projectile.AdditionsInfo().ExtraAI[0];
+    public ref float Recoil => ref Projectile.AdditionsInfo().ExtraAI[1];
 
     public int Firerate => Owner.HasBuff(ModContent.BuffType<EternalRest>()) ? 15 : 20;
     public override void Defaults()
@@ -140,7 +140,6 @@ public class SolemnLamentProj : BaseHoldoutProjectile
             Main.EntitySpriteDraw(white, pos - Main.screenPosition, null,
                 Projectile.GetAlpha(lightColor), Projectile.rotation + num, white.Size() / 2, Projectile.scale, spriteEffects, 0f);
         }
-
         return false;
     }
 }

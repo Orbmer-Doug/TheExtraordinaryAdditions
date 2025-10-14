@@ -1,14 +1,11 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.ID;
-using Terraria.Map;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Content.Items.Tools;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -28,7 +25,7 @@ public class BiomePointer : BaseIdleHoldoutProjectile
         Projectile.height = 30;
     }
 
-    public enum BlockToPointTo
+    public enum BlockToPointTo : ushort
     {
         Marble = TileID.Marble,
         Granite = TileID.Granite,
@@ -36,6 +33,7 @@ public class BiomePointer : BaseIdleHoldoutProjectile
         Hive = TileID.Hive,
         Shimmer = TileID.ShimmerBlock,
     }
+
     public BlockToPointTo Mode
     {
         get => (BlockToPointTo)Projectile.ai[0];

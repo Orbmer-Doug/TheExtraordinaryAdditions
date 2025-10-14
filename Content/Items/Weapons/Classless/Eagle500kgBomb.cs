@@ -2,13 +2,14 @@
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Late;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Classless;
 
 public class Eagle500kgBomb : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Eagle500kgBomb);
+
     public override void SetDefaults()
     {
         Item.width = Item.height = 32;
@@ -26,5 +27,6 @@ public class Eagle500kgBomb : ModItem
         Item.noUseGraphic = true;
         Item.noMelee = true;
     }
+
     public override bool CanShoot(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
 }

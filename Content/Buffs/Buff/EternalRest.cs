@@ -1,10 +1,8 @@
 ﻿using Terraria;
 using Terraria.ID;
-using Terraria.Localization;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Debuff;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Buffs.Buff;
 
@@ -22,7 +20,7 @@ public class EternalRest : ModBuff
 
     public override void Update(Player player, ref int buffIndex)
     {
-        player.Additions().EternalRested = true;
+        player.Additions().Buffs[GlobalPlayer.AdditionsBuff.EternalRested] = true;
         player.AddBuff(ModContent.BuffType<EternalRestCooldown>(), SecondsToFrames(30));
     }
 }

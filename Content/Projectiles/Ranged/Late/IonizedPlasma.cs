@@ -1,6 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Terraria;
-using Terraria.ID;
+﻿using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Common.Particles.Metaball;
 using TheExtraordinaryAdditions.Content.Buffs.Debuff;
@@ -19,7 +17,7 @@ public class IonizedPlasma : ModProjectile, ILocalizedModType, IModType
         Projectile.ignoreWater = true;
         Projectile.tileCollide = false;
         Projectile.DamageType = DamageClass.Ranged;
-        Projectile.penetrate = -1;
+        Projectile.penetrate = 10;
         Projectile.timeLeft = Lifetime;
         Projectile.usesIDStaticNPCImmunity = true;
         Projectile.idStaticNPCHitCooldown = 3;
@@ -42,6 +40,7 @@ public class IonizedPlasma : ModProjectile, ILocalizedModType, IModType
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
+        Projectile.damage = (int)(Projectile.damage * .85f);
         target.AddBuff(ModContent.BuffType<PlasmaIncineration>(), 300);
     }
 }

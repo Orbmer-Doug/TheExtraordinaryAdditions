@@ -1,14 +1,11 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Assets;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -18,6 +15,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
 public class RedMistHelmet : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.RedMistHelmet);
+
     public override void SetStaticDefaults()
     {
         ArmorIDs.Head.Sets.DrawHead[Item.headSlot] = false; // Don't draw the head at all. Used by Space Creature Mask
@@ -25,6 +23,7 @@ public class RedMistHelmet : ModItem
         ArmorIDs.Head.Sets.DrawFullHair[Item.headSlot] = false; // Draw all hair as normal. Used by Mime Mask, Sunglasses
         ArmorIDs.Head.Sets.DrawsBackHairWithoutHeadgear[Item.headSlot] = false;
     }
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(new Color(235, 64, 52));
@@ -38,6 +37,7 @@ public class RedMistHelmet : ModItem
         Item.rare = ModContent.RarityType<BloodWroughtRarity>();
         Item.defense = 23;
     }
+
     public const int AuraDamage = 300;
     public override void UpdateArmorSet(Player player)
     {
@@ -52,14 +52,14 @@ public class RedMistHelmet : ModItem
             CalUtils.AddCooldown(player, RedMistCooldown.ID, StygainAura.CooldownTime);
         }
 
-        player.Additions().RedMist = true;
+        player.GetModPlayer<RedMistPlayer>().Equipped = true;
     }
 
     public override bool IsArmorSet(Item head, Item body, Item legs)
     {
-        if (body.type == Mod.Find<ModItem>("MimicryChestplate").Type)
+        if (body.type == ModContent.ItemType<MimicryChestplate>())
         {
-            return legs.type == Mod.Find<ModItem>("MimicryLeggings").Type;
+            return legs.type == ModContent.ItemType<MimicryLeggings>();
         }
         return false;
     }
@@ -71,5 +71,29 @@ public class RedMistHelmet : ModItem
         player.GetAttackSpeed(DamageClass.Melee) += .08f;
         player.moveSpeed += 0.1f;
         player.statLifeMax2 += 20;
+    }
+}
+
+public sealed class RedMistPlayer : ModPlayer
+{
+    public bool Equipped;
+    public override void ResetEffects() => Equipped = false;
+
+    public override void ModifyHitByProjectile(Projectile proj, ref Player.HurtModifiers modifiers)
+    {
+        if (!Equipped)
+            return;
+
+        modifiers.Knockback *= 0.6f;
+        modifiers.KnockbackImmunityEffectiveness *= .15f;
+    }
+
+    public override void ModifyHitByNPC(NPC npc, ref Player.HurtModifiers modifiers)
+    {
+        if (!Equipped)
+            return;
+
+        modifiers.Knockback *= 0.6f;
+        modifiers.KnockbackImmunityEffectiveness *= .15f;
     }
 }

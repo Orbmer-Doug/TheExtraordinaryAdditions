@@ -57,7 +57,7 @@ public class EbonyNovaBlasterHeld : BaseIdleHoldoutProjectile
             AdditionsSound.ImpSmash.Play(Tip, .6f, 0f, .15f, 2, Name);
             Vector2 vel = Projectile.velocity.SafeNormalize(Vector2.Zero);
             if (this.RunLocal())
-                Projectile.NewProj(Tip, vel * 2f, ModContent.ProjectileType<EbonySnipe>(), Projectile.damage * 5, Projectile.knockBack, Owner.whoAmI);
+                Projectile.NewProj(Tip, vel * 2f, ModContent.ProjectileType<EbonySnipe>(), Projectile.damage, Projectile.knockBack, Owner.whoAmI);
             Recoil = 20f;
             Wait = WaitTime;
             this.Sync();

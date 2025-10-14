@@ -5,6 +5,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Utilities;
+using static Terraria.ModLoader.BackupIO;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
@@ -39,7 +40,7 @@ public class GoldenShowerHoldout : BaseIdleHoldoutProjectile
             Delay--;
 
         Vector2 pos = Projectile.Center + PolarVector(10f, Projectile.rotation);
-        if (Delay % item.useTime == item.useTime - 1 && this.RunLocal())
+        if (Delay % item.useTime == item.useTime - 1 && this.RunLocal() && TryUseMana(false))
         {
             Vector2 vel = Projectile.velocity;
 
@@ -49,7 +50,7 @@ public class GoldenShowerHoldout : BaseIdleHoldoutProjectile
         }
 
         int wait = item.useAnimation * 2;
-        if (Time % wait == wait - 1 && Modded.SafeMouseRight.Current && item.CheckManaBetter(Owner, item.mana, true) && !Modded.MouseLeft.Current && this.RunLocal())
+        if (Time % wait == wait - 1 && Modded.SafeMouseRight.Current && TryUseMana() && !Modded.MouseLeft.Current && this.RunLocal())
         {
             SoundEngine.PlaySound(SoundID.Item13, Projectile.Center);
 

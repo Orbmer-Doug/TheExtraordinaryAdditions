@@ -1,10 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -49,7 +47,7 @@ public class RemoteHoldout : BaseIdleHoldoutProjectile
         {
             SoundID.Item44.Play(Projectile.Center, 1f, 0f, .2f);
 
-            Vector2 pos = Projectile.Center - new Vector2(Main.rand.NextFloat(-Main.screenWidth / 3, Main.screenWidth / 3), 800f);
+            Vector2 pos = Projectile.Center - new Vector2(Main.rand.NextFloat(-Main.LogicCheckScreenWidth / 3, Main.LogicCheckScreenWidth / 3), 800f);
             Projectile.NewProj(pos, Vector2.Zero, ModContent.ProjectileType<LazerDrone>(), Projectile.damage, Projectile.knockBack, Owner.whoAmI);
             for (int i = 0; i < 7; i++)
                 ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 25, 0f, Vector2.One, 0f, .05f, Color.SkyBlue);
@@ -72,6 +70,7 @@ public class RemoteHoldout : BaseIdleHoldoutProjectile
 
         Time++;
     }
+
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D texture = Projectile.ThisProjectileTexture();

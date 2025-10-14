@@ -36,9 +36,7 @@ public class ProximityDart : ModProjectile
         if (Main.expertMode)
         {
             if (target.type >= NPCID.EaterofWorldsHead && target.type <= NPCID.EaterofWorldsTail)
-            {
                 modifiers.FinalDamage /= 5;
-            }
         }
     }
 
@@ -53,7 +51,7 @@ public class ProximityDart : ModProjectile
         after ??= new(4, () => Projectile.Center);
         after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 255));
 
-        // The projectile is in the midst of exploding during the last 3 updates.
+        // The projectile is in the midst of exploding during the last 3 updates
         if (this.RunLocal() && Projectile.timeLeft <= 3)
         {
             Projectile.tileCollide = false;
@@ -61,7 +59,6 @@ public class ProximityDart : ModProjectile
             // Set to transparent
             Projectile.Opacity = 0f;
 
-            // Change the hitbox size, centered about the original projectile center. This makes the projectile damage enemies during the explosion.
             Projectile.Resize(ExplosionWidthHeight, ExplosionWidthHeight);
 
             Projectile.damage = 25;
@@ -93,7 +90,6 @@ public class ProximityDart : ModProjectile
         Projectile.Resize(34, 14);
 
         // Finally, actually explode the tiles and walls
-        // Run this code only for the owner
         if (this.RunLocal())
         {
             int explosionRadius = 3;

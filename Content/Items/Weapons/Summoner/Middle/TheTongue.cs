@@ -1,11 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Middle;
@@ -13,6 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Middle;
 public class TheTongue : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TheTongue);
+
     public override void SetDefaults()
     {
         Item.rare = ItemRarityID.Pink;
@@ -34,6 +33,7 @@ public class TheTongue : ModItem
         Item.shootSpeed = 10f;
         Item.noUseGraphic = true;
     }
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(new Color(219, 195, 11));
@@ -44,6 +44,11 @@ public class TheTongue : ModItem
         return player.ownedProjectileCounts[Item.shoot] <= 0;
     }
 
+    public override bool MeleePrefix()
+    {
+        return true;
+    }
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
@@ -51,9 +56,5 @@ public class TheTongue : ModItem
         recipe.AddIngredient(ItemID.SoulofFright, 12);
         recipe.AddTile(TileID.MythrilAnvil);
         recipe.Register();
-    }
-    public override bool MeleePrefix()
-    {
-        return true;
     }
 }

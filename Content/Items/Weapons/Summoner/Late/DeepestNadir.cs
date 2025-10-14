@@ -8,7 +8,7 @@ using TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Early;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Summoner.Late;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
-using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Late;
 
@@ -18,7 +18,7 @@ public class DeepestNadir : ModItem
 
     public override void SetDefaults()
     {
-        Item.damage = 700;
+        Item.damage = 220;
         Item.width = Item.height = 4;
         Item.useTime = Item.useAnimation = 42;
         Item.UseSound = SoundID.Item152;
@@ -43,8 +43,12 @@ public class DeepestNadir : ModItem
         {
             player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI);
         }
-
         return false;
+    }
+
+    public override bool MeleePrefix()
+    {
+        return true;
     }
 
     public override void AddRecipes()
@@ -68,10 +72,5 @@ public class DeepestNadir : ModItem
         recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 5);
         recipe.AddTile(ModContent.TileType<CosmicAnvil>());
         recipe.Register();
-    }
-
-    public override bool MeleePrefix()
-    {
-        return true;
     }
 }

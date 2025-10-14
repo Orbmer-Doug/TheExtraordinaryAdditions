@@ -15,10 +15,12 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 public class BloodRay : ProjOwnedByNPC<StygainHeart>
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BloodRay);
+
     public override void SetStaticDefaults()
     {
         Main.projFrames[Projectile.type] = 4;
     }
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 24;
@@ -31,7 +33,7 @@ public class BloodRay : ProjOwnedByNPC<StygainHeart>
         CooldownSlot = ImmunityCooldownID.Bosses;
     }
 
-    public ref float Time => ref Projectile.Additions().ExtraAI[0];
+    public ref float Time => ref Projectile.AdditionsInfo().ExtraAI[0];
 
     private const int Lifetime = 400;
     public override void OnHitPlayer(Player target, Player.HurtInfo info)
@@ -41,7 +43,7 @@ public class BloodRay : ProjOwnedByNPC<StygainHeart>
 
     public override void SafeAI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunction, ColorFunction, null, 10);
         Lighting.AddLight(Projectile.Center, Color.DarkRed.ToVector3() * 1.2f * Projectile.Opacity);
         float bump = GetLerpBump(0f, 20f, Lifetime, Lifetime - 20f, Time);
@@ -112,7 +114,7 @@ public class BloodRay : ProjOwnedByNPC<StygainHeart>
     {
         void draw()
         {
-            if (trail == null || trail._disposed || cache == null)
+            if (trail == null || trail.Disposed || cache == null)
                 return;
             ManagedShader shader = ShaderRegistry.FadedStreak;
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.StreakMagma), 1);

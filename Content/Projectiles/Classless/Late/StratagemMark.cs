@@ -1,15 +1,11 @@
-﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Assets;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
-using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
 
@@ -45,10 +41,14 @@ public class StratagemMark : ModProjectile
             .Add(-1f, -.1f, 1f, MakePoly(4).InFunction)
             .Evaluate(Completion) * Dir);
     }
+
     public Player Owner => Main.player[Projectile.owner];
     public static readonly float CallInTime = SecondsToFrames(3.45f);
     public override void AI()
     {
+        if (trail == null || trail.Disposed)
+            trail = new(c => InverseLerp(0.015f, 0.09f, c) * 20f * InverseLerp(0f, 20f, GroundTime), (c, pos) => Color.Red * Fade, null, 40);
+
         if (Time < ThrowTime)
         {
             Projectile.tileCollide = false;
@@ -78,6 +78,7 @@ public class StratagemMark : ModProjectile
 
         Time++;
     }
+
     public float Fade => InverseLerp(0f, 15f, Projectile.timeLeft);
     public override bool ShouldUpdatePosition() => Time >= ThrowTime;
     public override bool OnTileCollide(Vector2 oldVelocity)
@@ -107,16 +108,19 @@ public class StratagemMark : ModProjectile
         }
     }
 
-    public ManualTrailPoints cache = new(40);
+    public OptimizedPrimitiveTrail trail;
+    public TrailPoints cache = new(40);
     public override bool PreDraw(ref Color lightColor)
     {
         if (GroundTime > 0f)
         {
             void draw()
             {
+                if (trail == null || trail.Disposed || cache == null)
+                    return;
+
                 ManagedShader shader = ShaderRegistry.SpecialLightningTrail;
                 shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DendriticNoise), 1);
-                OptimizedPrimitiveTrail trail = new(c => InverseLerp(0.015f, 0.09f, c) * 20f * InverseLerp(0f, 20f, GroundTime), (c, pos) => Color.Red * Fade, null, 40);
                 trail.DrawTrail(shader, cache.Points, 80);
             }
             PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);

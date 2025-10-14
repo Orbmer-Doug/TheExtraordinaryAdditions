@@ -26,19 +26,24 @@ public class CometBlast : ModProjectile, ILocalizedModType, IModType
         Projectile.tileCollide = false;
         Projectile.DamageType = DamageClass.Magic;
     }
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         Projectile.damage = (int)(Projectile.damage * 0.95);
     }
+
     public ref float SizeFactor => ref Projectile.ai[0];
 
     private List<Vector2> cache;
-    private ManualTrailPoints points = new(40);
+    private TrailPoints points = new(40);
     private const int Lifetime = 24;
     public float Completion => 1f - Utils.GetLerpValue(0f, Lifetime, Projectile.timeLeft);
     public float Radius => MakePoly(4).OutFunction.Evaluate(0f, 80f * SizeFactor, Completion);
     public override void AI()
     {
+        if (trail == null || trail.Disposed)
+            trail = new(WidthFunct, ColorFunct, null, 40);
+
         Lighting.AddLight(Projectile.Center, Color.CornflowerBlue.ToVector3() * 4f);
         if (Projectile.ai[2] == 0f)
         {
@@ -58,8 +63,6 @@ public class CometBlast : ModProjectile, ILocalizedModType, IModType
                 {
                     ParticleRegistry.SpawnHeavySmokeParticle(pos, vel * rand, lifetime, scale, Main.rand.NextBool() ? new Color(35, 119, 213) : new Color(30, 64, 128), .6f, true);
                 }
-
-                ParticleRegistry.SpawnSmokeParticle(pos, vel * rand * .9f, scale / 2, color, Color.DarkSlateBlue, 180);
             }
 
             Projectile.ai[2] = 1f;
@@ -106,12 +109,18 @@ public class CometBlast : ModProjectile, ILocalizedModType, IModType
         }
         points.SetPoints(cache);
     }
+
     private float WidthFunct(float c) => 18f * GetLerpBump(0f, .2f, 1f, .7f, Completion);
     private Color ColorFunct(SystemVector2 c, Vector2 position) => Color.Lerp(Color.White, Color.Cyan * 1.4f, Completion) * GetLerpBump(0f, .2f, 1f, .7f, Completion);
+
+    public OptimizedPrimitiveTrail trail;
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
         {
+            if (trail == null || trail.Disposed || points == null)
+                return;
+
             ManagedShader shader = ShaderRegistry.EnlightenedBeam;
 
             shader.TrySetParameter("time", Projectile.timeLeft * 0.01f);
@@ -119,7 +128,6 @@ public class CometBlast : ModProjectile, ILocalizedModType, IModType
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.StreakMagma), 1, SamplerState.LinearWrap);
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FractalNoise), 2, SamplerState.LinearWrap);
 
-            OptimizedPrimitiveTrail trail = new(WidthFunct, ColorFunct, null, 40);
             trail.DrawTrail(shader, points.Points, 300, true);
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);

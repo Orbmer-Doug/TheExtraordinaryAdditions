@@ -30,7 +30,7 @@ public class SewingNeedle : ModProjectile, ILocalizedModType, IModType
 
     public override void AI()
     {
-        if (trail == null || trail._disposed)
+        if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, null, 14);
 
         Projectile.Opacity = GetLerpBump(0f, 5f, 300f, 280f, Time);
@@ -97,7 +97,7 @@ public class SewingNeedle : ModProjectile, ILocalizedModType, IModType
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return Projectile.RotatingHitboxCollision(targetHitbox.TopLeft(), targetHitbox.Size(), null, Projectile.scale);
+        return targetHitbox.LineCollision(Projectile.BaseRotHitbox().Bottom, Projectile.BaseRotHitbox().Top, Projectile.width * Projectile.scale);
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
@@ -122,7 +122,7 @@ public class SewingNeedle : ModProjectile, ILocalizedModType, IModType
         }
 
         int slashCreatorID = ModContent.ProjectileType<SeamsCreator>();
-        if (Owner.ownedProjectileCounts[slashCreatorID] < 20)
+        if (Owner.ownedProjectileCounts[slashCreatorID] < 20 && this.RunLocal())
         {
             Projectile.NewProj(target.Center, Vector2.Zero, slashCreatorID, Projectile.damage, Projectile.knockBack, Projectile.owner, target.whoAmI, RandomRotation(), 0f);
         }
