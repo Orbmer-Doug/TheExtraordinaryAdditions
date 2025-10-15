@@ -21,9 +21,7 @@ public class AdditionsGlobalNPC : GlobalNPC
 
     #region Debuffs
     public bool DentedBySpoon;
-    public bool ashy = false;
     public int PlasmaIncineration;
-    public int CorporealVaporize;
     #endregion Debuffs
 
     #region Whip
@@ -66,7 +64,6 @@ public class AdditionsGlobalNPC : GlobalNPC
     {
         AdditionsGlobalNPC myClone = (AdditionsGlobalNPC)Clone(npc, npcClone);
         myClone.PlasmaIncineration = PlasmaIncineration;
-        myClone.CorporealVaporize = CorporealVaporize;
         myClone.VoidEnergy = VoidEnergy;
         myClone.Wavebreaked = Wavebreaked;
         myClone.Eclipsed = Eclipsed;
@@ -102,21 +99,12 @@ public class AdditionsGlobalNPC : GlobalNPC
             int Torrential = (int)180.0;
             ApplyDPSDebuff(Torrential, Torrential, ref damage);
         }
-
-        if (CorporealVaporize > 0)
-        {
-            int CorporealVaporize = 2000;
-            ApplyDPSDebuff(CorporealVaporize, CorporealVaporize, ref damage);
-        }
     }
 
     public override void PostAI(NPC npc)
     {
         if (PlasmaIncineration > 0)
             PlasmaIncineration--;
-
-        if (CorporealVaporize > 0)
-            CorporealVaporize--;
 
         if (VoidEnergy > 0)
             VoidEnergy--;
@@ -136,7 +124,6 @@ public class AdditionsGlobalNPC : GlobalNPC
 
     public override void ResetEffects(NPC npc)
     {
-        ashy = false;
         DentedBySpoon = false;
     }
 
@@ -191,27 +178,6 @@ public class AdditionsGlobalNPC : GlobalNPC
 
     public override void DrawEffects(NPC npc, ref Color drawColor)
     {
-        if (ashy)
-        {
-            if (Main.rand.Next(5) < 4)
-            {
-                int ash = Dust.NewDust(npc.position - new Vector2(2f, 2f), npc.width + 4, npc.height + 4, DustID.Ash, npc.velocity.X * 0.4f, npc.velocity.Y * 0.4f, 100, default, 1.5f);
-                Main.dust[ash].noGravity = true;
-                Dust ash2 = Main.dust[ash];
-                ash2.velocity *= 1.2f;
-                Main.dust[ash].velocity.Y -= 0.15f;
-                if (Main.rand.NextBool(4))
-                {
-                    Main.dust[ash].noGravity = false;
-                    Dust ash3 = Main.dust[ash];
-                    ash3.scale *= 0.5f;
-                }
-            }
-            drawColor.G = 130;
-            drawColor.R = 80;
-            drawColor.B = 67;
-        }
-
         if (Cursed > 0)
         {
             if (Main.rand.Next(5) < 4)
@@ -239,19 +205,6 @@ public class AdditionsGlobalNPC : GlobalNPC
             Lighting.AddLight(npc.position, Color.OrangeRed.ToVector3());
         }
 
-        if (CorporealVaporize > 0)
-        {
-            if (Main.rand.NextBool())
-            {
-                ParticleRegistry.SpawnSparkParticle(npc.Center + new Vector2(Main.rand.NextFloat(-npc.width / 2, npc.width / 2), Main.rand.NextFloat(-npc.height / 2, npc.height / 2)),
-                    new Vector2(0f, Main.rand.NextFloat(-20f, 20f)), Main.rand.Next(61, 73), Main.rand.NextFloat(0.2f, 0.5f), Main.rand.NextBool(7) ? Color.Wheat : Color.WhiteSmoke);
-            }
-            if (Main.rand.NextBool())
-            {
-                ParticleRegistry.SpawnSparkParticle(npc.Center, Main.rand.NextVector2Unit(0f, MathHelper.TwoPi) * Main.rand.NextFloat(7f, 9f), 32, 1f, Color.AntiqueWhite);
-            }
-        }
-
         if (VoidEnergy > 0)
         {
             if (Main.rand.Next(8) < 4)
@@ -272,6 +225,7 @@ public class AdditionsGlobalNPC : GlobalNPC
             drawColor.B = 86;
         }
     }
+
     public override bool PreDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
         Texture2D texture = TextureAssets.Npc[npc.type].Value;

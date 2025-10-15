@@ -134,12 +134,14 @@ public class DownpourHeld : BaseIdleHoldoutProjectile
                         {
                             Vector2 offset = Main.rand.NextVector2CircularLimited(60f, 60f, .6f, 1f);
                             Vector2 pos = arrowPos + offset;
-                            Vector2 vel = pos.SafeDirectionTo(Modded.mouseWorld + offset) * speed * Main.rand.NextFloat(.8f, 1.3f);
                             if (this.RunLocal())
+                            {
+                                Vector2 vel = pos.SafeDirectionTo(Modded.mouseWorld + offset) * speed * Main.rand.NextFloat(.8f, 1.3f);
                                 Projectile.NewProj(pos, vel, ModContent.ProjectileType<RainDrop>(), dmg / 3, kb / 3, Owner.whoAmI);
-                            ParticleRegistry.SpawnPulseRingParticle(pos, vel.SafeNormalize(Vector2.Zero), Main.rand.Next(20, 30), vel.ToRotation(), new(.5f, 1f), 0f, 30f, Color.CornflowerBlue);
-                            for (int j = 0; j < 6; j++)
-                                Dust.NewDustPerfect(pos, DustID.Water, vel.RotatedByRandom(.2f) * Main.rand.NextFloat(.4f, .8f), 0, default, Main.rand.NextFloat(1.5f, 1.9f)).noGravity = true;
+                                ParticleRegistry.SpawnPulseRingParticle(pos, vel.SafeNormalize(Vector2.Zero), Main.rand.Next(20, 30), vel.ToRotation(), new(.5f, 1f), 0f, 30f, Color.CornflowerBlue);
+                                for (int j = 0; j < 6; j++)
+                                    Dust.NewDustPerfect(pos, DustID.Water, vel.RotatedByRandom(.2f) * Main.rand.NextFloat(.4f, .8f), 0, default, Main.rand.NextFloat(1.5f, 1.9f)).noGravity = true;
+                            }
                         }
                         SoundEngine.PlaySound(SoundID.Item5 with { Volume = Main.rand.NextFloat(.9f, 1.2f), PitchVariance = .1f, Identifier = Name }, arrowPos);
 

@@ -178,7 +178,7 @@ public class ShroomiteDash : ModProjectile
         Owner.fullRotation = 0f;
     }
 
-    public float WidthFunct(float c) => OptimizedPrimitiveTrail.PyriformWidthFunct(c, 80f * trailWidth, 1f, .2f, .8f);
+    public float WidthFunct(float c) => OptimizedPrimitiveTrail.PyriformWidthFunct(c, 80f * trailWidth, 2.4f, .2f, .4f);
     public Color ColorFunct(SystemVector2 c, Vector2 position)
     {
         Color col = Color.Lerp(Color.Lerp(new Color(85, 89, 225), new Color(66, 180, 216), DashCompletion), new Color(99, 155, 255), c.X) * MathHelper.SmoothStep(1f, 0f, c.X);
@@ -223,7 +223,7 @@ public class ShroomiteDash : ModProjectile
                 shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Streak), 1, SamplerState.LinearWrap);
                 shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.SuperWavyPerlin), 2, SamplerState.LinearWrap);
 
-                trail.DrawTrail(shader, cache.Points);
+                trail.DrawTrail(shader, cache.Points, 100, true);
             }
             PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         }

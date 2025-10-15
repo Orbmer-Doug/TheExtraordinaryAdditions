@@ -49,7 +49,7 @@ public class Myceliumite : ModProjectile
     public Texture2D tex;
     public override void AI()
     {
-        if (Projectile.localAI[0] == 0f)
+        if (Projectile.AdditionsInfo().ExtraAI[0] == 0f)
         {
             // Weighted toward the homing version
             Variant = (MyceliumType)Main.rand.NextFromList(0, 0, 1, 2, 3);
@@ -59,7 +59,8 @@ public class Myceliumite : ModProjectile
                 Projectile.penetrate = 4;
             }
 
-            Projectile.localAI[0] = 1f;
+            Projectile.AdditionsInfo().ExtraAI[0] = 1f;
+            this.Sync();
         }
         Time++;
 

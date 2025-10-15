@@ -91,6 +91,3 @@ Technical:
 - Optimized most graphical occurences (e.g. trails behind swords, particles), there should be much less of a chance for your computer to explode
 - Screenshakes are now much more smooth and natural
 - Redid all unique item rarities and fixed some bugs pertaining to zoom
-
-Stats:
-

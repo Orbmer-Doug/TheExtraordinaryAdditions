@@ -62,7 +62,7 @@ public class HonedTesselesticLightning : ModProjectile
         return targetHitbox.CollisionFromPoints(points.Points, WidthFunct);
     }
 
-    public float WidthFunct(float c) => 40f * InverseLerp(1.5f, 0f, c) * Projectile.Opacity;
+    public float WidthFunct(float c) => 40f * Projectile.Opacity;
     public Color ColorFunct(SystemVector2 c, Vector2 pos) => MulticolorLerp(Completion, Color.White, Color.Cyan) * Projectile.Opacity;
     public TrailPoints points;
     public OptimizedPrimitiveTrail trail;

@@ -62,10 +62,6 @@ float4 PixelFunction(VertexShaderOutput input) : COLOR0
 {
     float2 coords = input.Coordinates;
     
-    // Adjust for horizontal rotation.
-    //if (uDirection == -1)
-      //  updatedCoords.y = 1 - updatedCoords.y;
-
     float overallAdjustedXCoord = lerp(-imageSize.x / overallImageSize.x, imageSize.x / overallImageSize.x, coords.x) + .5 * 0.5;    
     float overallAdjustedYCoord = lerp(-imageSize.y / overallImageSize.y, imageSize.y / overallImageSize.y, coords.y) + .5 * 0.5;
     float2 finalCoords = float2(overallAdjustedXCoord, overallAdjustedYCoord);

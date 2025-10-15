@@ -690,7 +690,7 @@ Mods: {
 				DisplayName: Fungal Satchel
 				Tooltip:
 					'''
-					Has a chance for critical strikes to release healing mushrooms
+					Every 5th critical strike releases a healing mushroom, up to 3
 					Emit a blue aura of light
 					'''
 			}
@@ -1094,11 +1094,6 @@ Mods: {
 				Tooltip: Bursting frantically with scorching heat
 			}
 
-			AshyWaterBalloon: {
-				DisplayName: Ashy Water Balloon
-				Tooltip: "'Filled with Calamitas bathwater'"
-			}
-
 			TortoiseShell: {
 				DisplayName: Tortoise Shell
 				Tooltip: Wait a second...
@@ -1134,16 +1129,6 @@ Mods: {
 
 			SmallGear: {
 				DisplayName: Small Gear
-				Tooltip: ""
-			}
-
-			TomeOfArchivalScripts: {
-				DisplayName: Tome of Archival Scripts
-				Tooltip: ""
-			}
-
-			WorldShatteredFragment: {
-				DisplayName: World Shattered Fragment
 				Tooltip: ""
 			}
 
@@ -1208,7 +1193,7 @@ Mods: {
 			}
 
 			BriefcaseOfBees: {
-				DisplayName: Briefcase Of Bees
+				DisplayName: Briefcase of Bees
 				Tooltip: now concludes the life and times of BEE
 			}
 
@@ -1308,15 +1293,6 @@ Mods: {
 					'''
 			}
 
-			SerratedTempest: {
-				DisplayName: Serrated Tempest
-				Tooltip:
-					'''
-					Swirl around a controllable tornado which pulls in enemies and releases darts
-					Darts home into the largest cluster of enemies
-					'''
-			}
-
 			SuperheatedPlasmaArray: {
 				DisplayName: Superheated Plasma Array
 				Tooltip: Torch enemies into melds of molten plasma
@@ -1334,7 +1310,7 @@ Mods: {
 
 			Acheron: {
 				DisplayName: Acheron
-				Tooltip: Raises piercing lances from the underworld that have a chance to explode into burning scythes.
+				Tooltip: Raises piercing lances from the underworld that have a chance to explode into burning scythes
 			}
 
 			Fireball: {
@@ -1528,7 +1504,7 @@ Mods: {
 
 			AlucardsSword: {
 				DisplayName: Alucards Sword
-				Tooltip: Throw out a sword that chases the cursor.
+				Tooltip: Throw out a sword that chases the cursor
 			}
 
 			Bergcrusher: {
@@ -1646,6 +1622,7 @@ Mods: {
 					'''
 					<left> to swing the sword for double damage and erupt bones on strike with enemies
 					Hold <right> to fire as a gun for ranged damage
+					The blade initally stabs upon <right>ing, embedding into struck enemies and exploding
 					'''
 			}
 
@@ -1806,7 +1783,7 @@ Mods: {
 			}
 
 			BowOfGreekFlames: {
-				DisplayName: Bow Of Greek Flames
+				DisplayName: Bow of Greek Flames
 				Tooltip: Fires a powerful cursed arrow that explodes in napalm
 			}
 
@@ -1937,7 +1914,7 @@ Mods: {
 
 			IchorWhip: {
 				DisplayName: Ichor Whip
-				Tooltip: Sprays foes in ichor.
+				Tooltip: Sprays foes in ichor
 			}
 
 			LokiShrine: {
@@ -2021,11 +1998,6 @@ Mods: {
 					'''
 			}
 
-			DevItem: {
-				DisplayName: Dev Item
-				Tooltip: ""
-			}
-
 			Eagle500kgBomb: {
 				DisplayName: Eagle 500kg Bomb
 				Tooltip: This is democracy!
@@ -2050,16 +2022,6 @@ Mods: {
 					Holding <right> charges the drones next shot up to catastrophic degrees
 					If not holding the remote, drones automatically fire at the closest target
 					'''
-			}
-
-			ExampleSwingItem: {
-				Tooltip: ""
-				DisplayName: Example Swing Item
-			}
-
-			ExampleWhipItem: {
-				DisplayName: Example Whip Item
-				Tooltip: ""
 			}
 
 			EbonyNovaBlaster: {
@@ -2087,11 +2049,6 @@ Mods: {
 
 			PaintCoveredCamera: {
 				DisplayName: Paint Covered Camera
-				Tooltip: ""
-			}
-
-			MinionBossSummonItem: {
-				DisplayName: Minion Boss Summon Item
 				Tooltip: ""
 			}
 
@@ -2134,6 +2091,21 @@ Mods: {
 				DisplayName: Asterlin Relic
 				Tooltip: ""
 			}
+
+			AsterlinMask: {
+				DisplayName: Asterlin Mask
+				Tooltip: ""
+			}
+
+			StygainMask: {
+				DisplayName: Stygain Mask
+				Tooltip: ""
+			}
+
+			StygainHeartMask: {
+				DisplayName: Stygain Heart Mask
+				Tooltip: ""
+			}
 		}
 
 		Content: {
@@ -2146,10 +2118,7 @@ Mods: {
 				Weapons: {
 					Summoner: {
 						Middle: {
-							OddMotherboard: {
-								DisplayName: Odd Motherboard
-								Tooltip: ""
-							}
+							
 						}
 					}
 				}
@@ -2235,7 +2204,7 @@ Mods: {
 				Bestiary: Blazing cores erupted from solar flares on stars given sentience
 			}
 
-			GodDummyNPC.DisplayName: God Dummy NPC
+			GodDummyNPC.DisplayName: God Dummy
 
 			TheGiantSnailFromAncientTimes: {
 				DisplayName: The Giant Snail From Ancient Times

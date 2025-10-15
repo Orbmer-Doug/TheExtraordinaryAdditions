@@ -47,6 +47,8 @@ public class TreasureBoxAsterlin : ModItem
         itemLoot.Add(ModContent.ItemType<LivingStarFlare>());
         itemLoot.AddRevBagAccessories();
 
+        itemLoot.Add(Asterlin.MaskID, 7);
+
         itemLoot.Add(ItemDropRule.CoinsBasedOnNPCValue(ModContent.NPCType<Asterlin>()));
     }
 }

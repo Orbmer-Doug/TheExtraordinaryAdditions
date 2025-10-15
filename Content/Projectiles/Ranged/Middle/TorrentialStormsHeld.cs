@@ -181,12 +181,14 @@ public class TorrentialStormsHeld : BaseIdleHoldoutProjectile
                         {
                             Vector2 offset = Main.rand.NextVector2CircularLimited(70f, 70f, .4f, 1f);
                             Vector2 posit = arrowPos + offset;
-                            Vector2 veloc = posit.SafeDirectionTo(Modded.mouseWorld + offset) * speed * Main.rand.NextFloat(.6f, 1.25f);
                             if (this.RunLocal())
+                            {
+                                Vector2 veloc = posit.SafeDirectionTo(Modded.mouseWorld + offset) * speed * Main.rand.NextFloat(.6f, 1.25f);
                                 Projectile.NewProj(posit, veloc, ModContent.ProjectileType<RainDrop>(), dmg / 3, kb / 3, Owner.whoAmI);
-                            ParticleRegistry.SpawnPulseRingParticle(posit, veloc.SafeNormalize(Vector2.Zero), Main.rand.Next(35, 50), veloc.ToRotation(), new(.5f, 1f), 0f, 30f, Color.CornflowerBlue);
-                            for (int j = 0; j < 12; j++)
-                                Dust.NewDustPerfect(posit, DustID.Water, veloc.RotatedByRandom(.2f) * Main.rand.NextFloat(.4f, .8f), 0, default, Main.rand.NextFloat(1.5f, 1.9f)).noGravity = true;
+                                ParticleRegistry.SpawnPulseRingParticle(posit, veloc.SafeNormalize(Vector2.Zero), Main.rand.Next(35, 50), veloc.ToRotation(), new(.5f, 1f), 0f, 30f, Color.CornflowerBlue);
+                                for (int j = 0; j < 12; j++)
+                                    Dust.NewDustPerfect(posit, DustID.Water, veloc.RotatedByRandom(.2f) * Main.rand.NextFloat(.4f, .8f), 0, default, Main.rand.NextFloat(1.5f, 1.9f)).noGravity = true;
+                            }
                         }
 
                         OldStringCompletion = StringCompletion;

@@ -277,6 +277,7 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
 
             Projectile vrp = Main.projectile[Projectile.NewProj(pos, vel, type, damage, kB, own, state, progress)];
             vrp.AdditionsInfo().ExtraAI[2] = (FullReticleProgress >= 1f).ToInt();
+            vrp.netUpdate = true;
 
             AdditionsSound shoot = new();
             switch (State)

@@ -21,13 +21,13 @@ public class SnowmanCannonHoldout : BaseIdleHoldoutProjectile
     }
     public ref float Time => ref Projectile.ai[0];
     private const float Offset = 30f;
-    public ref float OffsetLength => ref Projectile.localAI[0];
+    public ref float OffsetLength => ref Projectile.ai[1];
     public override void SafeAI()
     {
-        if (Projectile.localAI[1] == 0f)
+        if (Projectile.ai[2] == 0f)
         {
             OffsetLength = Offset;
-            Projectile.localAI[1] = 1f;
+            Projectile.ai[2] = 1f;
         }
 
         Vector2 right = Projectile.BaseRotHitbox().Right;

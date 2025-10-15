@@ -214,6 +214,7 @@ public class HorsemenDive : ModProjectile
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
+        Owner.GiveIFrames(7);
         ParticleRegistry.SpawnTwinkleParticle(Rect().Top, Vector2.Zero, 40, Vector2.One, Color.OrangeRed, 4);
         for (int i = 0; i < 20; i++)
         {

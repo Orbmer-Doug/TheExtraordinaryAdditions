@@ -1,9 +1,11 @@
-﻿using Terraria;
+﻿using System;
+using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
+using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Tools;
 
@@ -40,6 +42,8 @@ public class BriefcaseOfBees : ModItem
             int THEBEESHAVEMANIFESTED = NPC.NewNPC(Item.GetSource_FromAI(), (int)player.Center.X, (int)player.Center.Y, NPCID.Bee);
             Main.npc[THEBEESHAVEMANIFESTED].velocity = Main.rand.NextVector2CircularEdge(18f, 18f) * Main.rand.NextFloat(0f, 1f);
             Main.npc[THEBEESHAVEMANIFESTED].npcSlots = .1f;
+            if (Main.netMode == NetmodeID.MultiplayerClient)
+                NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, THEBEESHAVEMANIFESTED);
         }
         return true;
     }

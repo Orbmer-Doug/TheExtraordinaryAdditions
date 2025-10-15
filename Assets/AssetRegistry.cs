@@ -501,12 +501,6 @@ public enum AdditionsTexture
     AbsoluteGreathelm_Head,
     AbsoluteGreaves,
     AbsoluteGreaves_Legs,
-    AvatarDress,
-    AvatarDress_Body,
-    AvatarHorns,
-    AvatarHorns_Head,
-    AvatarLeggings,
-    AvatarLeggings_Legs,
     #endregion
     #region Middle
     BlueLeggings,
@@ -545,10 +539,20 @@ public enum AdditionsTexture
     SmallGear,
     #endregion
     #region Vanity
+    AsterlinMask,
+    AsterlinMask_Head,
+    AvatarDress,
+    AvatarDress_Body,
+    AvatarHorns,
+    AvatarHorns_Head,
+    AvatarLeggings,
+    AvatarLeggings_Legs,
     EclipsedOnesHat,
     EclipsedOnesHat_Head,
     EclipsedOnesLeggings,
     EclipsedOnesLeggings_Legs,
+    StygainHeartMask,
+    StygainHeartMask_Head,
     #endregion
     #endregion
     #region Materials

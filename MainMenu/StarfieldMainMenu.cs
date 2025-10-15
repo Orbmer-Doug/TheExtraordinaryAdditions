@@ -3,6 +3,7 @@ using ReLogic.Content;
 using System;
 using Terraria;
 using Terraria.ModLoader;
+using TheExtraordinaryAdditions.Core;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Systems;
@@ -13,7 +14,7 @@ public class StarfieldMainMenu : ModMenu
 {
     public override bool IsAvailable => true;
     public override string DisplayName => GetText(Name + ".Name").Value;
-    public override int Music => MusicLoader.GetMusicSlot(AssetRegistry.GetMusicPath(AdditionsSound.Protostar));
+    public override int Music => MusicLoader.GetMusicSlot(AdditionsMain.Instance, "Assets/Audio/Music/Protostar");
     public override Asset<Texture2D> Logo => ModContent.Request<Texture2D>("TheExtraordinaryAdditions/icon_menu");
 
     public OptimizedPrimitiveTrail LogoTrail;

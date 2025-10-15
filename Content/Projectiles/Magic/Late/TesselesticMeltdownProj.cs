@@ -147,8 +147,7 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
         if (this.RunLocal())
         {
             Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Owner.MountedCenter.SafeDirectionTo(Modded.mouseWorld), .4f);
-            if (Projectile.velocity != Projectile.oldVelocity)
-                this.Sync();
+            Projectile.netUpdate = true;
         }
         Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver4;
         Projectile.Center = Vector2.Lerp(Projectile.Center, Center - PolarVector(StaffLength / 2, Projectile.rotation - MathHelper.PiOver4), Utils.Remap(Time, 0f, 20f, .2f, .7f));
@@ -167,6 +166,7 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
             }
             this.Sync();
         }
+
         if (Time % (wait * 3) == (wait * 3 - 1))
         {
             Item.CheckManaBetter(Owner, 2, true);
@@ -218,8 +218,7 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
         if (this.RunLocal())
         {
             Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Center.SafeDirectionTo(Modded.mouseWorld), SubState == BeamState.Cast ? .3f : .7f);
-            if (Projectile.velocity != Projectile.oldVelocity)
-                this.Sync();
+            Projectile.netUpdate = true;
         }
 
         float dist = 0f;

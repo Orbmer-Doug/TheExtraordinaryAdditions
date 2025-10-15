@@ -7,20 +7,13 @@
 public static class ShaderRegistry
 {
     #region Filter Shorthands
-    public static ManagedScreenShader GenediesDistortion => AssetRegistry.GetFilter("GenediesDistortion");
-    public static ManagedScreenShader BlackHole => AssetRegistry.GetFilter("BlackHole");
     public static ManagedScreenShader GaussianBlur => AssetRegistry.GetFilter("GaussianBlur");
-    public static ManagedScreenShader ScreenShakeShader => AssetRegistry.GetFilter("ScreenShakeShader");
-    public static ManagedScreenShader ScreenShakeShader2 => AssetRegistry.GetFilter("ScreenShakeShader2");
-    public static ManagedScreenShader SwirlDistortion => AssetRegistry.GetFilter("SwirlDistortion");
-
     #endregion Filter Shorthands
 
     #region Shader Shorthands
     public static ManagedShader PixelatedSightLine => AssetRegistry.GetShader("PixelatedSightLine");
     public static ManagedShader SpreadTelegraph => AssetRegistry.GetShader("SpreadTelegraph");
     public static ManagedShader Swing => AssetRegistry.GetShader("Swing");
-    public static ManagedShader TexOverlay => AssetRegistry.GetShader("TexOverlay");
     public static ManagedShader Forcefield => AssetRegistry.GetShader("Forcefield");
     public static ManagedShader ForcefieldLimited => AssetRegistry.GetShader("ForcefieldLimited");
     public static ManagedShader ForcefieldUnique => AssetRegistry.GetShader("ForcefieldUnique");

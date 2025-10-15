@@ -111,10 +111,10 @@ public sealed partial class StygainHeart : ModNPC
         {
             if (this.RunServer())
                 NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<StygainRoar>(), 0, 0f, -1);
-            SoundEngine.PlaySound(SoundID.Roar with { Volume = 2f, Pitch = -.3f }, NPC.Center);
+            SoundID.Roar.Play(NPC.Center, 2f, -.3f);
 
             HasDonePhase2Drama = true;
-            AttackCycle = 0;
+            AttackCycle = -1;
             SelectNextAttack();
         }
     }
@@ -208,7 +208,7 @@ public sealed partial class StygainHeart : ModNPC
             }
 
             AdditionsSound.GaussBoomLittle.Play(NPC.Center);
-            SoundEngine.PlaySound(SoundID.Roar with { Volume = 1.5f, Pitch = -.3f }, NPC.Center);
+            SoundID.Roar.Play(NPC.Center, 1.9f, -.3f);
             NPC.Kill();
         }
     }

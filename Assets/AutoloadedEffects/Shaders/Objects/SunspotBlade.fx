@@ -26,7 +26,7 @@ VertexShaderOutput VertexShaderFunction(in VertexShaderInput input)
     
     output.Color = input.Color;
     output.TextureCoordinates = input.TextureCoordinates;
-
+    
     return output;
 }
 
@@ -38,7 +38,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
     float taper = lerp(0.85, 0.95, sin(coords.y * PI));
     float4 color = 1;
     
-    // Bias colors from white to the sample color near the edges.
+    // Bias colors from white to the sample color near the edges
     color = lerp(color, input.Color, smoothstep(0.95, 0.99, coords.x / taper));
     color = lerp(color, input.Color, smoothstep(0.25, 0.42, distance(coords.y, 0.5)));
     

@@ -74,15 +74,17 @@ public class LightSpirit : ModProjectile, ILocalizedModType, IModType
         SpriteBatch sb = Main.spriteBatch;
         Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.WavyNeurons);
 
+        Vector2 res = new(150f);
         ManagedShader shine = AssetRegistry.GetShader("RadialShineShader");
         shine.TrySetParameter("glowPower", .2f);
         shine.TrySetParameter("glowColor", Color.Goldenrod.ToVector4());
         shine.TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly * 1f);
+        shine.TrySetParameter("resolution", res);
 
         sb.EnterShaderRegionAlt();
         shine.Render("AutoloadPass", true, false);
 
-        sb.Draw(tex, ToTarget(Projectile.Center, new(150f)), null, Color.Gold * Projectile.Opacity, Projectile.rotation, tex.Size() * 0.5f, 0, 0f);
+        sb.Draw(tex, ToTarget(Projectile.Center, res), null, Color.Gold * Projectile.Opacity, Projectile.rotation, tex.Size() * 0.5f, 0, 0f);
 
         sb.ExitShaderRegion();
         return false;

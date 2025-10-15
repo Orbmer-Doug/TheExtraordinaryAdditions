@@ -16,7 +16,6 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
-// Lucille... i remember your PARADIGMS
 [AutoloadBossHead]
 public partial class Asterlin : ModNPC, IBossDowned
 {

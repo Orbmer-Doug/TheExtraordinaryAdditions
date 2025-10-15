@@ -58,25 +58,37 @@ public sealed class FungalSatchelPlayer : ModPlayer
 {
     public bool Equipped;
     public override void ResetEffects() => Equipped = false;
+    public int Counter;
+    public override void UpdateDead() => Counter = 0;
 
     public override void OnHitNPCWithItem(Item item, NPC target, NPC.HitInfo hit, int damageDone)
     {
+        if (!Equipped)
+            return;
+
         OnHitWithAnything(item, target, hit, damageDone);
     }
 
     public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
     {
+        if (!Equipped)
+            return;
+
         OnHitWithAnything(proj, target, hit, damageDone);
     }
 
     private void OnHitWithAnything(Entity entity, NPC target, NPC.HitInfo hit, int damageDone)
     {
-        if (Equipped && hit.Crit && Main.rand.NextBool() && Player.CountOwnerProjectiles(ModContent.ProjectileType<HealingFungus>()) <= 1)
+        if (hit.Crit)
+            Counter++;
+
+        if (Counter >= 5 && Player.CountOwnerProjectiles(ModContent.ProjectileType<HealingFungus>()) < 3)
         {
             Vector2 pos = target.RandAreaInEntity();
             Vector2 vel = Utility.GetHomingVelocity(pos, Player.Center, Player.velocity, 6f);
             if (Main.myPlayer == Player.whoAmI)
                 Player.NewPlayerProj(pos, vel, ModContent.ProjectileType<HealingFungus>(), 0, 0f, Player.whoAmI);
+            Counter = 0;
         }
     }
 }

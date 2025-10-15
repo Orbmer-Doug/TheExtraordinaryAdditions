@@ -136,8 +136,6 @@ public class TheGiantSnailFromAncientTimes : ModNPC
             ParticleRegistry.SpawnChromaticAberration(NPC.Center, 50, 1f, 5000f);
             ScreenShakeSystem.New(new(40f, 3f, 50000f), NPC.Center);
             AdditionsSound.WibtorNUKE.Play(NPC.Center, 1f, 0f, 0f, 1, Name, Terraria.Audio.PauseBehavior.PauseWithGame);
-            if (this.RunServer())
-                NPC.Shoot(NPC.Center, Vector2.UnitY, ModContent.ProjectileType<BloodBeacon>(), 1000000, 0f);
             for (int j = 0; j < 100; j++)
             {
                 ParticleRegistry.SpawnBloomLineParticle(NPC.Center, Main.rand.NextVector2Circular(40f, 40f), Main.rand.Next(30, 80), Main.rand.NextFloat(.8f, 1.6f), Color.Crimson);

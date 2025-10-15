@@ -85,6 +85,13 @@ public partial class Asterlin
     }
 
     public const string LocalizedKey = "NPCs.Asterlin.";
+
+    public static int MaskID
+    {
+        get;
+        private set;
+    }
+
     public static int RelicID
     {
         get;
@@ -96,6 +103,7 @@ public partial class Asterlin
         RelicAutoloader.Create(Mod, AssetRegistry.GetTexturePath(AdditionsTexture.AsterlinRelic),
             AssetRegistry.GetTexturePath(AdditionsTexture.AsterlinRelicPlaced), out int id);
         RelicID = id;
+        MaskID = MaskAutoloader.Create(Mod, AssetRegistry.GetTexturePath(AdditionsTexture.AsterlinMask), false);
 
         On_NPC.UpdateNPC += MoreUpdates;
         LoadGraphics();
@@ -159,6 +167,7 @@ public partial class Asterlin
             ModContent.ItemType<LivingStarFlare>(),
         ];
         normalRule.Add(CalamityStyle(NormalWeaponDropRateFraction, itemIDs));
+        normalRule.Add(MaskID, 10);
 
         npcLoot.Add(ModContent.ItemType<LockedCyberneticSword>(), 10);
         npcLoot.DefineConditionalDropSet(RevAndMaster).Add(RelicID);

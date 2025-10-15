@@ -26,7 +26,7 @@ float4 PixelShaderFunction(float2 coords : TEXCOORD0) : COLOR0
     float edgeGlowOpacity = pow(0.02 / distance(scaledDistance - edgeNoise * 0.091, 0.38), 3);
     float edgeCutoffOpacity = smoothstep(0.5, 0.49, scaledDistance);
     float4 glowColor = noise * edgeCutoffOpacity * float4(edgeColor, 1) * clamp(edgeGlowOpacity, 0, 3);
-
+    
     // White center calculations
     float whiteEdgeExpand = (1 - scale) * 0.39 + noise * (1 - scale) * 0.2;
     float whiteInterpolant = smoothstep(0.38, 0.34, scaledDistance) * smoothstep(whiteEdgeExpand - 0.01, whiteEdgeExpand, scaledDistance);

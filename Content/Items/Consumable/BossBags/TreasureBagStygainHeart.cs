@@ -51,6 +51,8 @@ public class TreasureBagStygainHeart : ModItem
         itemLoot.Add(ModContent.ItemType<HemoglobbedCapsule>());
         itemLoot.Add(ModContent.ItemType<LanceOfSanguineSteels>());
         itemLoot.Add(ModContent.ItemType<Exsanguination>());
+
+        itemLoot.Add(StygainHeart.MaskID, 7);
         itemLoot.AddRevBagAccessories();
 
         itemLoot.Add(ItemDropRule.CoinsBasedOnNPCValue(ModContent.NPCType<StygainHeart>()));

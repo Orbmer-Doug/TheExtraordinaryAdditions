@@ -39,7 +39,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
     float4 color = input.Color;
     float2 coords = input.TextureCoordinates;
 
-    // Read the fade map as a streak.
+    // Read the fade map as a streak
     float4 fadeMapColor = tex2D(streakTexture, float2(frac(coords.x * 2 + (globalTime + 1.57)), frac(coords.y * .8 + globalTime * 1.4)));
     fadeMapColor.r *= saturate(pow(coords.x, .1));
 

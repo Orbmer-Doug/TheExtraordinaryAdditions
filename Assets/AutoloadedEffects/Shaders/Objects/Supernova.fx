@@ -16,7 +16,6 @@ float InverseLerp(float from, float to, float x)
 
 float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 coords : TEXCOORD0) : COLOR0
 {
-    // Calculate noise values for the supernova.
     float2 noiseCoords1 = (coords - 0.5) * scale * 0.2 + 0.5 + float2(globalTime * 0.14, 0);
     float2 noiseCoords2 = (coords - 0.5) * scale * 0.32 + 0.5 + float2(globalTime * -0.08, 0);
     float2 noiseCoords3 = (coords - 0.5) * scale * 0.14 + 0.5 + float2(0, globalTime * -0.06);
@@ -24,7 +23,7 @@ float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 coords : TEXCOORD
     float4 noiseColor2 = tex2D(noiseTexture1, noiseCoords2) * float4(supernovaColor2, 1) * sampleColor * 1.5;
     float4 noiseColor3 = tex2D(noiseTexture2, frac(noiseCoords3)) * sampleColor;
     
-    // Calculate edge fade values. These are used to make the supernova naturally fade at those edges.
+    // Calculate edge fade values
     float2 edgeDistortion = tex2D(edgeDistortionNoise, noiseCoords1 * 2.5).rb * .0023;
     float distanceFromCenter = length(coords + edgeDistortion - 0.5) * 1.414;
     float distanceFade = InverseLerp(0.6, 0.39, distanceFromCenter);

@@ -101,8 +101,9 @@ public class FulgurSwing : BaseSwordSwing
                     Vector2 pos = Rect().Top;
                     if (this.RunLocal())
                     {
-                        FulgurZap chain = Main.projectile[Projectile.NewProj(pos, Vector2.Zero, ModContent.ProjectileType<FulgurZap>(), (int)(Projectile.damage * .28f), Projectile.knockBack / 4, Owner.whoAmI)].As<FulgurZap>();
-                        chain.End = target.RandAreaInEntity();
+                        Vector2 rand = target.RandAreaInEntity();
+                        FulgurZap chain = Main.projectile[Projectile.NewProj(pos, Vector2.Zero, ModContent.ProjectileType<FulgurZap>(),
+                            (int)(Projectile.damage * .28f), Projectile.knockBack / 4, Owner.whoAmI, ai1: rand.X, ai2: rand.Y)].As<FulgurZap>();
                         chain.Sync();
                     }
                     SoundID.DD2_LightningBugZap.Play(pos, 1f, -.1f, .1f);

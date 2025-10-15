@@ -1,4 +1,5 @@
 ﻿using CalamityMod.Items.Materials;
+using CalamityMod.NPCs.PlaguebringerGoliath;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -557,16 +558,17 @@ public sealed partial class StygainHeart : ModNPC, IBossDowned
     }
 
     public override void BossHeadRotation(ref float rotation) => rotation = NPC.rotation;
-    public override void BossHeadSpriteEffects(ref SpriteEffects spriteEffects) => spriteEffects = NPC.spriteDirection == 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+    public override void BossHeadSpriteEffects(ref SpriteEffects spriteEffects) 
+        => spriteEffects = NPC.spriteDirection == 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
 
-    public override void OnKill()
+    public override void OnKill() => AdditionsNetcode.SyncWorld();
+    
+    public override void BossLoot(ref int potionType) => potionType = ItemID.GreaterHealingPotion;
+    
+    public static int MaskID
     {
-        AdditionsNetcode.SyncWorld();
-    }
-
-    public override void BossLoot(ref int potionType)
-    {
-        potionType = ItemID.GreaterHealingPotion;
+        get;
+        private set;
     }
 
     public static int RelicID
@@ -580,6 +582,7 @@ public sealed partial class StygainHeart : ModNPC, IBossDowned
         RelicAutoloader.Create(Mod, AssetRegistry.GetTexturePath(AdditionsTexture.StygainHeartRelic),
             AssetRegistry.GetTexturePath(AdditionsTexture.StygainHeartRelicPlaced), out int id);
         RelicID = id;
+        MaskID = MaskAutoloader.Create(Mod, AssetRegistry.GetTexturePath(AdditionsTexture.StygainHeartMask), false);
     }
 
     public override void ModifyNPCLoot(NPCLoot npcLoot)
@@ -599,8 +602,9 @@ public sealed partial class StygainHeart : ModNPC, IBossDowned
             ModContent.ItemType<MimicryLeggings>()
         ];
         normalRule.Add(CalamityStyle(NormalWeaponDropRateFraction, itemIDs));
+        normalRule.Add(MaskID, 10);
         normalRule.Add(ModContent.ItemType<BloodOrb>(), 1, 200, 250);
-
+        
         npcLoot.Add(ModContent.ItemType<StygainHeartTrophy>(), 10);
         npcLoot.DefineConditionalDropSet(RevAndMaster).Add(RelicID);
         npcLoot.Add(ModContent.ItemType<StygianEyeball>(), 1);

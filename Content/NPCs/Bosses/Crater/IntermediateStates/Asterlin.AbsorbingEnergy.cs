@@ -19,7 +19,7 @@ public partial class Asterlin : ModNPC
     [AutomatedMethodInvoke]
     public void LoadStateTransitions_AbsorbingEnergy()
     {
-        StateMachine.RegisterTransition(AsterlinAIType.AbsorbingEnergy, new Dictionary<AsterlinAIType, float> { { AsterlinAIType.Tesselestic, 1f } }, false, () =>
+        StateMachine.RegisterTransition(AsterlinAIType.AbsorbingEnergy, AbsorbingEnery_PossibleStates, false, () =>
         {
             return FightStarted;
         },

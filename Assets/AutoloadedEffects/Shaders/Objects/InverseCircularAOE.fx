@@ -7,7 +7,7 @@ float brightness;
 float globalTime;
 
 
-float4 Recolor(float4 sampleColor : COLOR0, float2 coords : TEXCOORD0) : COLOR0
+float4 PixelShaderFunction(float4 sampleColor : COLOR0, float2 coords : TEXCOORD0) : COLOR0
 {
     float3 color = MainColor;
     
@@ -41,11 +41,10 @@ float4 Recolor(float4 sampleColor : COLOR0, float2 coords : TEXCOORD0) : COLOR0
     return finalColor * 1.5;
 }
 
-
 technique Technique1
 {
     pass AutoloadPass
     {
-        PixelShader = compile ps_2_0 Recolor();
+        PixelShader = compile ps_2_0 PixelShaderFunction();
     }
 }

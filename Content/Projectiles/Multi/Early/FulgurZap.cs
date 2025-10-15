@@ -27,9 +27,16 @@ public class FulgurZap : ModProjectile
     }
 
     public ref float Time => ref Projectile.ai[0];
-    public Vector2 End { get; set; }
-    public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(End);
-    public override void ReceiveExtraAI(BinaryReader reader) => End = reader.ReadVector2();
+    public Vector2 End
+    {
+        get => new(Projectile.ai[1], Projectile.ai[2]);
+        set
+        {
+            Projectile.ai[1] = value.X;
+            Projectile.ai[2] = value.Y;
+        }
+    }
+
     public float Completion => Animators.MakePoly(6f).OutFunction(InverseLerp(0f, Life, Time));
     public override bool ShouldUpdatePosition() => false;
     public override void AI()
@@ -41,6 +48,7 @@ public class FulgurZap : ModProjectile
         {
             points = new(100);
             points.SetPoints(GetBoltPoints(Projectile.Center, End, 10f, 10f));
+            Projectile.netUpdate = true;
         }
 
         Projectile.Opacity = 1f - Completion;

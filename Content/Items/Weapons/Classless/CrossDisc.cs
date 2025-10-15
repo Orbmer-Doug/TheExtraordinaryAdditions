@@ -1,6 +1,5 @@
 ﻿using CalamityMod.Items.Materials;
 using CalamityMod.Tiles.Furniture.CraftingStations;
-using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
@@ -19,8 +18,6 @@ public class CrossDisc : ModItem
     public override void SetStaticDefaults()
     {
         ItemID.Sets.ItemsThatAllowRepeatedRightClick[Item.type] = true;
-        ItemID.Sets.IgnoresEncumberingStone[Item.type] = true;
-        ItemID.Sets.CanBePlacedOnWeaponRacks[Item.type] = true;
     }
 
     public override void SetDefaults()
@@ -71,24 +68,13 @@ public class CrossDisc : ModItem
     {
         float brightness = Main.essScale * Utils.NextFloat(Main.rand, 0.002f, .006f);
         Lighting.AddLight(Item.Center, 122 * brightness, 253 * brightness, 255 * brightness);
-        if (Utils.NextBool(Main.rand, 10))
+        if (Utils.NextBool(Main.rand, 4))
         {
-            for (int i = 0; i < 3; i++)
-            {
-                Dust obj = Dust.NewDustDirect(Item.position, (int)(Item.width * Item.scale), (int)(Item.height * Item.scale * 0.6f), DustID.AncientLight, 0f, 0f, 0, Color.LightBlue, 1f);
-                obj.velocity = Vector2.Lerp(Utils.NextVector2Unit(Main.rand, 0f, MathHelper.TwoPi), -Vector2.UnitY, 0.5f) * Utils.NextFloat(Main.rand, 2.8f, 3.6f);
-                obj.scale *= Utils.NextFloat(Main.rand, 0.85f, 1.15f);
-                obj.fadeIn = 0.9f;
-                obj.noGravity = true;
-            }
+            Dust dust = Dust.NewDustPerfect(Item.RandAreaInEntity(), DustID.AncientLight,
+                -Vector2.UnitY.RotatedByRandom(.5f) * Main.rand.NextFloat(2.8f, 3.4f), 0, Color.LightBlue, Main.rand.NextFloat(.85f, 1.15f));
+            dust.fadeIn = .9f;
+            dust.noGravity = true;
         }
-    }
-
-    public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
-    {
-        float brightness = Main.essScale * Utils.NextFloat(Main.rand, 0.9f, 1.1f);
-        Lighting.AddLight(Item.Center, 1.2f * brightness, 0.4f * brightness, 0.8f);
-        return true;
     }
 
     public override bool CanShoot(Player player) => false;

@@ -1,25 +1,31 @@
-A medium-sized content mod to spice up any playthrough!
+The Extraordinary Additions
 
-New Bosses:
+A medium-sized content mod to spice up any playthrough!
+Originally was made for friends but now has evolved to something truly... extraordinary...
+
+New Bosses
 2 new challenging bosses to encounter
 
-Extended Weaponry:
-Numerous amounts of weapons and gadgets to obtain
+Extended Weaponry
+Numerous amounts of weapons, gadgets, and doohickeys to obtain
 along with neat reworks of some vanilla weapons!
 
 FAQ:
-1. Does this mod work with Boss Checklist? - hopefully (maybe)
-2. Is there any world generation to be aware of? - Yes, after DoG
-3. Do the bosses work in multiplayer? - pretty much, but expect some oddities
+Does this mod work with Boss Checklist? - yep!
+Is there any world generation to be aware of? - NO
+But does it work in multiplayer? - as best as can be!
 
 Everything unintentional is 100% unintentional :)
 
 Developed by:
-[c/47ff78:Orbmer Doug] - Owner/Programmer/Sprites
-[c/310666:SomeRandomMalePerson] - Sprites/Sounds/Music
-[c/580000:AshesPlus] - Occasional Sounds
+Orbmer Doug - Owner/Programmer/Sprites
+SomeRandomMalePerson - Sprites/Sounds/Music
+Ashes_Plus - Occasional Sounds/Promo Art/Video/Visonary
 
-Due Credits:
-- Infernum
-- Calamity
-- Particle Library
+Note
+The mod has no more content update plans.
+Why? I want to move on to helping other mods or to even pursue game development, rather than working on a random something for 2 years.
+Its aided a lot with my skills but I believe it is finally time to explore other things.
+Future updates are to only stay in compatibility with Terraria and Calamity or to fix any bugs.
+
+Hope you have just as much fun as we do!
