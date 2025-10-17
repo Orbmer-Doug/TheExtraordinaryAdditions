@@ -10,7 +10,7 @@ using TheExtraordinaryAdditions.Core.CrossCompatibility;
 
 namespace TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
-public class ToolModifier : GlobalItem
+public sealed class ToolModifier : GlobalItem
 {
     public override bool AppliesToEntity(Item entity, bool lateInstantiation)
     {

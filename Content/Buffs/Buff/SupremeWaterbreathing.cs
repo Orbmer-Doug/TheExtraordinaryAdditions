@@ -16,7 +16,7 @@ public class SupremeWaterbreathing : ModBuff
 
     public override void Update(Player player, ref int buffIndex)
     {
-        player.Additions().Buffs[GlobalPlayer.AdditionsBuff.BigOxygen] = true;
+        player.Additions().BigOxygen = true;
         player.breath = player.breathMax + 91;
     }
 }

@@ -351,33 +351,4 @@ public abstract class BaseSwordSwing : ModProjectile, ILocalizedModType, IModTyp
     /// Glue to the player
     /// </summary>
     public override bool ShouldUpdatePosition() => false;
-
-    public void Debug()
-    {
-        Texture2D pix = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
-        Vector2 orig = pix.Size() / 2f;
-        float size = 10f;
-
-        // Rotation differences
-        for (int i = 0; i <= 400; i += 10)
-        {
-            Vector2 pos = Projectile.Center + Projectile.rotation.ToRotationVector2() * i - Main.screenPosition;
-            Main.spriteBatch.Draw(pix, pos, null, Color.DarkRed, Projectile.rotation, orig, size, 0, 0f);
-
-            pos = Projectile.Center + (Projectile.rotation + SwordRotation).ToRotationVector2() * i - Main.screenPosition;
-            Main.spriteBatch.Draw(pix, pos, null, Color.LawnGreen, Projectile.rotation + SwordRotation, orig, size, 0, 0f);
-
-            pos = Projectile.Center + (Projectile.rotation - SwordRotation).ToRotationVector2() * i - Main.screenPosition;
-            Main.spriteBatch.Draw(pix, pos, null, Color.Blue, Projectile.rotation - SwordRotation, orig, size, 0, 0f);
-        }
-
-        // The hitbox
-        Main.spriteBatch.RenderRectangle(Rect());
-
-        // Sides
-        Main.spriteBatch.Draw(pix, Rect().Top - Main.screenPosition, null, Color.Purple, Projectile.rotation - SwordRotation, orig, size, 0, 0f);
-        Main.spriteBatch.Draw(pix, Rect().Bottom - Main.screenPosition, null, Color.Yellow, Projectile.rotation - SwordRotation, orig, size, 0, 0f);
-        Main.spriteBatch.Draw(pix, Rect().Left - Main.screenPosition, null, Color.Pink, Projectile.rotation - SwordRotation, orig, size, 0, 0f);
-        Main.spriteBatch.Draw(pix, Rect().Right - Main.screenPosition, null, Color.White, Projectile.rotation - SwordRotation, orig, size, 0, 0f);
-    }
 }

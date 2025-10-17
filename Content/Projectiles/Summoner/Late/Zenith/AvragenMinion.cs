@@ -68,11 +68,11 @@ public class AvragenMinion : ModProjectile
     {
         if (!Owner.active || Owner.dead)
         {
-            Modded.Minion[GlobalPlayer.AdditionsMinion.Avragen] = false;
+            Modded.Avragen = false;
             return;
         }
         Owner.AddBuff(ModContent.BuffType<AvragenPresence>(), 3600);
-        if (Modded.Minion[GlobalPlayer.AdditionsMinion.Avragen])
+        if (Modded.Avragen)
             Projectile.timeLeft = 2;
 
         Visuals();

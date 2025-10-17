@@ -19,8 +19,8 @@ public class LaserDrones : ModBuff
     {
         GlobalPlayer modded = player.GetModPlayer<GlobalPlayer>();
         if (player.ownedProjectileCounts[ModContent.ProjectileType<LazerDrone>()] > 0)
-            modded.Minion[GlobalPlayer.AdditionsMinion.LaserDrones] = true;
-        if (!modded.Minion[GlobalPlayer.AdditionsMinion.LaserDrones])
+            modded.LaserDrones = true;
+        if (!modded.LaserDrones)
         {
             player.DelBuff(buffIndex);
             buffIndex--;

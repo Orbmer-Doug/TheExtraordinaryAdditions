@@ -19,8 +19,8 @@ public class AvragenPresence : ModBuff
     {
         GlobalPlayer modded = player.GetModPlayer<GlobalPlayer>();
         if (player.ownedProjectileCounts[ModContent.ProjectileType<AvragenMinion>()] > 0)
-            modded.Minion[GlobalPlayer.AdditionsMinion.Avragen] = true;
-        if (!modded.Minion[GlobalPlayer.AdditionsMinion.Avragen])
+            modded.Avragen = true;
+        if (!modded.Avragen)
         {
             player.DelBuff(buffIndex);
             buffIndex--;

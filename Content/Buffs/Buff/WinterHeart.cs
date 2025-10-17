@@ -16,7 +16,7 @@ public class WinterHeart : ModBuff
 
     public override void Update(Player player, ref int buffIndex)
     {
-        player.GetModPlayer<GlobalPlayer>().Buffs[GlobalPlayer.AdditionsBuff.FrigidTonic] = true;
+        player.GetModPlayer<GlobalPlayer>().FrigidTonic = true;
         player.buffImmune[BuffID.Chilled] = true;
         player.endurance += 0.05f;
     }

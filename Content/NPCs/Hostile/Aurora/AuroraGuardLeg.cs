@@ -388,9 +388,9 @@ public class AuroraGuardLeg : Entity
 
             if (debugView)
             {
-                shoulder.SuperQuickDust(Color.Red);
-                grip.SuperQuickDust(Color.Yellow);
-                AdditionsDebug.DebugLine(shoulder, grip, Color.Blue);
+                //shoulder.SuperQuickDust(Color.Red);
+                //grip.SuperQuickDust(Color.Yellow);
+                //AdditionsDebug.DebugLine(shoulder, grip, Color.Blue);
             }
         }
         Vector2? trace = RaytraceTiles(shoulder, grip, true);
@@ -448,8 +448,8 @@ public class AuroraGuardLeg : Entity
             // Try tilting the grab position downwards until we find ground
             Vector2 tiltedGrabPosition = LegOrigin + toGrabPosition.RotatedBy(i * Direction / (float)iterations * angle) * Maxlength * 0.95f;
 
-            if (debugView)
-                tiltedGrabPosition.SuperQuickDust(Color.Green);
+            //if (debugView)
+              //  tiltedGrabPosition.SuperQuickDust(Color.Green);
 
             Vector2? trace = RaytraceTiles(LegOrigin, tiltedGrabPosition, true);
             bestGuess = trace.HasValue ? trace.Value.ToTileCoordinates() : null;
@@ -462,8 +462,8 @@ public class AuroraGuardLeg : Entity
             }
             else
             {
-                if (debugView)
-                    tiltedGrabPosition.SuperQuickDust(Color.White);
+                //if (debugView)
+                  //  tiltedGrabPosition.SuperQuickDust(Color.White);
 
                 tooClose = false;
             }
@@ -519,16 +519,16 @@ public class AuroraGuardLeg : Entity
                 {
                     potentialGrabPoints.Add(candidate);
 
-                    if (debugView)
-                        candidate.SuperQuickDust(Color.Red);
+                    //if (debugView)
+                      //  candidate.SuperQuickDust(Color.Red);
                 }
                 else
                     insideTilesPositions.Add(candidate);
                 lastInAir = false;
             }
 
-            if (debugView)
-                candidate.SuperQuickDust(Color.Blue);
+            //if (debugView)
+              //  candidate.SuperQuickDust(Color.Blue);
 
             if (!t.HasUnactuatedTile || (!Main.tileSolid[t.TileType] && !TileID.Sets.Platforms[t.TileType]))
                 lastInAir = true;

@@ -50,8 +50,8 @@ public class AdditionsHooks
                 return;
             }
 
-            // Replace ldc.r4 1 with ldc.r4 10
-            cursor.Next.Operand = 10f;
+            // Replace ldc.r4 1 with ldc.r4 2
+            cursor.Next.Operand = 2f;
         }
     }
 }

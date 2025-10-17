@@ -53,11 +53,11 @@ public class LivingStarFlareMinion : ModProjectile
     {
         if (!Owner.Available() && this.RunLocal())
         {
-            Modded.Minion[GlobalPlayer.AdditionsMinion.Flare] = false;
+            Modded.Flare = false;
             return;
         }
         Owner.AddBuff(ModContent.BuffType<LittleStar>(), 3600);
-        if (Modded.Minion[GlobalPlayer.AdditionsMinion.Flare])
+        if (Modded.Flare)
             Projectile.timeLeft = 2;
 
         if (Time == 0 && this.RunLocal())

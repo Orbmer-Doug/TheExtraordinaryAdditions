@@ -11,7 +11,7 @@ public static class ToolModifierUtils
 {
     public static Point GetTileTarget(Player player)
     {
-        return new Point(Player.tileTargetX, Player.tileTargetY);
+        return Main.SmartCursorWanted ? new Point(Main.SmartCursorX, Main.SmartCursorY) : new Point(Player.tileTargetX, Player.tileTargetY);
     }
 
     public static void Mine(Player player, Item tool, bool hammer = false, bool right = false, Point? overrideTileTarget = null)

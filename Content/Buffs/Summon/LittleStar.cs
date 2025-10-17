@@ -19,8 +19,8 @@ public class LittleStar : ModBuff
     {
         GlobalPlayer modded = player.GetModPlayer<GlobalPlayer>();
         if (player.ownedProjectileCounts[ModContent.ProjectileType<LivingStarFlareMinion>()] > 0)
-            modded.Minion[GlobalPlayer.AdditionsMinion.Flare] = true;
-        if (!modded.Minion[GlobalPlayer.AdditionsMinion.Flare])
+            modded.Flare = true;
+        if (!modded.Flare)
         {
             player.DelBuff(buffIndex);
             buffIndex--;

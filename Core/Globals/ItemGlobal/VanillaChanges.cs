@@ -251,7 +251,7 @@ public class VanillaChanges : GlobalItem
 
         bool damageClass = item.CountsAsClass<RangedDamageClass>() || item.CountsAsClass<MeleeDamageClass>()
             || item.CountsAsClass<MagicDamageClass>() || item.CountsAsClass<ThrowingDamageClass>() || item.CountsAsClass<SummonDamageClass>();
-        if (mod.Buffs[GlobalPlayer.AdditionsBuff.AridFlask] && damageClass && Main.rand.NextBool(4) && !item.channel && player.whoAmI == Main.myPlayer)
+        if (mod.AridFlask && damageClass && Main.rand.NextBool(4) && !item.channel && player.whoAmI == Main.myPlayer)
             Projectile.NewProjectile(source, position, velocity, ModContent.ProjectileType<SandBlast>(), DamageSoftCap(damage, 80), 1f, player.whoAmI, 0f, 0f, 0f);
         return true;
     }

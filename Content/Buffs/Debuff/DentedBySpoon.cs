@@ -21,7 +21,7 @@ public class DentedBySpoon : ModBuff
 
     public override void Update(Player player, ref int buffIndex)
     {
-        player.GetModPlayer<GlobalPlayer>().Buffs[GlobalPlayer.AdditionsBuff.DentedBySpoon] = true;
+        player.GetModPlayer<GlobalPlayer>().DentedBySpoon = true;
         player.statDefense *= .75f;
     }
 }

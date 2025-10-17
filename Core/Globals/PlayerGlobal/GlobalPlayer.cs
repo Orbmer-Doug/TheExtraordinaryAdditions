@@ -260,7 +260,7 @@ public sealed partial class GlobalPlayer : ModPlayer
         Vector2 randHitbox = Player.RandAreaInEntity();
         bool noShadow = drawInfo.shadow == 0f;
 
-        if (Buffs[AdditionsBuff.Overheat] && !Player.dead)
+        if (Overheat && !Player.dead)
         {
             if (Main.rand.NextBool(3) && noShadow)
             {
@@ -277,7 +277,7 @@ public sealed partial class GlobalPlayer : ModPlayer
             b *= 0.2f;
         }
 
-        if (Buffs[AdditionsBuff.DentedBySpoon])
+        if (DentedBySpoon)
         {
             g *= 0.75f;
             r *= 0.0f;
@@ -310,7 +310,7 @@ public sealed partial class GlobalPlayer : ModPlayer
     {
         Vector2 pos = new(drawInfo.Center.X - Main.screenPosition.X, drawInfo.Center.Y - Main.screenPosition.Y);
 
-        if (Buffs[AdditionsBuff.EternalRested])
+        if (EternalRested)
         {
             Texture2D glow = AssetRegistry.GetTexture(AdditionsTexture.GlowSoft);
             Vector2 origin = glow.Size() * .5f;

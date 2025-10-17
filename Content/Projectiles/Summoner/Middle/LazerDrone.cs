@@ -59,7 +59,7 @@ public class LazerDrone : ModProjectile
     {
         if (!Owner.Available() && this.RunLocal())
         {
-            Modded.Minion[GlobalPlayer.AdditionsMinion.LaserDrones] = false;
+            Modded.LaserDrones = false;
             return;
         }
 
@@ -68,7 +68,7 @@ public class LazerDrone : ModProjectile
             0, 90, 3, 2f, Projectile.ThisProjectileTexture().Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame)));
 
         Owner.AddBuff(ModContent.BuffType<LaserDrones>(), 3600);
-        if (Modded.Minion[GlobalPlayer.AdditionsMinion.LaserDrones])
+        if (Modded.LaserDrones)
             Projectile.timeLeft = 2;
 
         if (this.RunLocal())

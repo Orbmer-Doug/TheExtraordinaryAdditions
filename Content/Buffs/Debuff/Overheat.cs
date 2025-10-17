@@ -24,7 +24,7 @@ public class Overheat : ModBuff
         var modPlayer = player.GetModPlayer<LaserResource>();
         modPlayer.HeatRegenRate *= 6.5f;
 
-        player.GetModPlayer<GlobalPlayer>().Buffs[GlobalPlayer.AdditionsBuff.Overheat] = true;
+        player.GetModPlayer<GlobalPlayer>().Overheat = true;
 
         player.statLife -= Main.rand.NextBool(5) ? 1 : 0;
         if (player.statLife <= 0)

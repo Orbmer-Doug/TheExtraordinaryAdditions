@@ -11,6 +11,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Globals.ProjectileGlobal;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -69,7 +70,7 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
     public Vector2 Center => Owner.RotatedRelativePoint(Owner.MountedCenter);
 
     public const float ToolRotation = PiOver4;
-    public float Scale => 1f * Owner.GetAdjustedItemScale(Item);
+    public float Scale => 1.1f * Owner.GetAdjustedItemScale(Item);
     public int MaxTime => (int)(Item.useAnimation * Owner.pickSpeed * MaxUpdates / Owner.GetTotalAttackSpeed(Projectile.DamageType));
 
     public float SwingCompletion => InverseLerp(0f, MaxTime, Time, true);
@@ -189,7 +190,7 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
     public FancyAfterimages after;
     public sealed override void AI()
     {
-        if (this.RunLocal() && !Owner.Available())
+        if (this.RunLocal() && (!Owner.Available() || Item == null || (Item.pick <= 0 && Item.axe <= 0 && Item.hammer <= 0)))
         {
             Projectile.Kill();
             return;

@@ -155,7 +155,7 @@ public class AdditionsGlobalItem : GlobalItem
         GlobalPlayer modPlayer = player.GetModPlayer<GlobalPlayer>();
 
         if ((item.type == ItemID.Heart || item.type == ItemID.CandyApple || item.type == ItemID.CandyCane)
-            && modPlayer.Buffs[GlobalPlayer.AdditionsBuff.FrigidTonic])
+            && modPlayer.FrigidTonic)
         {
             player.statLife += 5;
             if (Main.myPlayer == player.whoAmI)

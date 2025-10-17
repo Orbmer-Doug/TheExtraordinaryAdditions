@@ -20,7 +20,7 @@ public class EternalRest : ModBuff
 
     public override void Update(Player player, ref int buffIndex)
     {
-        player.Additions().Buffs[GlobalPlayer.AdditionsBuff.EternalRested] = true;
+        player.Additions().EternalRested = true;
         player.AddBuff(ModContent.BuffType<EternalRestCooldown>(), SecondsToFrames(30));
     }
 }

@@ -16,7 +16,7 @@ public class SupremeBubbleLayer : PlayerDrawLayer
 
     public override bool GetDefaultVisibility(PlayerDrawSet drawInfo)
     {
-        if (drawInfo.drawPlayer.Additions().Buffs[GlobalPlayer.AdditionsBuff.BigOxygen])
+        if (drawInfo.drawPlayer.Additions().BigOxygen)
             return drawInfo.shadow == 0f;
         return false;
     }

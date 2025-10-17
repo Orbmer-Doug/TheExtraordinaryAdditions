@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace TheExtraordinaryAdditions.Assets.Audio;
@@ -65,6 +66,10 @@ public sealed class LoopedSoundManager : ModSystem
 
             // If the sound has been stopped, remove it
             if (s.HasBeenStopped)
+                shouldBeRemoved = true;
+
+            // Just in case
+            if (Main.gameMenu)
                 shouldBeRemoved = true;
 
             // If the sound will be removed, mark it as stopped

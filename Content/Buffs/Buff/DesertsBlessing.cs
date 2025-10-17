@@ -15,6 +15,6 @@ public class DesertsBlessing : ModBuff
 
     public override void Update(Player player, ref int buffIndex)
     {
-        player.Additions().Buffs[GlobalPlayer.AdditionsBuff.AridFlask] = true;
+        player.Additions().AridFlask = true;
     }
 }
