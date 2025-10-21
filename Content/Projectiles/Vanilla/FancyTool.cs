@@ -6,6 +6,7 @@ using Terraria;
 using Terraria.Enums;
 using Terraria.GameContent;
 using Terraria.GameContent.Shaders;
+using Terraria.GameInput;
 using Terraria.Graphics.Effects;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -272,34 +273,37 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
 
         if (SwingCompletion.BetweenNum(Wait + .3f, Swing, true) && !PlayedSound)
         {
-            bool ham = Item.hammer > 0;
-            ToolModifierUtils.Mine(Owner, Item, ham, ham && Modded.SafeMouseRight.Current);
-
-            if (Owner.whoAmI == Main.myPlayer && Item.createTile != -1)
+            if (Owner.whoAmI == Main.myPlayer)
             {
-                Point tile = ToolModifierUtils.GetTileTarget(Owner);
-                bool canPlace = false;
-                bool newObjectType = false;
-                bool? overrideCanPlace = null;
-                int? forcedRandom = null;
-                TileObject objectData = default(TileObject);
-                Owner.FigureOutWhatToPlace(Main.tile[tile], Item, out int tileToCreate, out int previewPlaceStyle, out overrideCanPlace, out forcedRandom);
-                PlantLoader.CheckAndInjectModSapling(tile.X, tile.Y, ref tileToCreate, ref previewPlaceStyle);
-                if (overrideCanPlace.HasValue)
-                    canPlace = overrideCanPlace.Value;
-                else if (!TileLoader.CanPlace(tile.X, tile.Y, tileToCreate))
-                    canPlace = false;
-                else if (TileObjectData.CustomPlace(tileToCreate, previewPlaceStyle) && tileToCreate != 82 && tileToCreate != 227)
+                bool ham = Item.hammer > 0;
+                ToolModifierUtils.Mine(Owner, Item, ham, ham && Modded.SafeMouseRight.Current);
+
+                if (Item.createTile != -1)
                 {
-                    newObjectType = true;
-                    canPlace = TileObject.CanPlace(tile.X, tile.Y, (ushort)tileToCreate, previewPlaceStyle, Owner.direction, out objectData, onlyCheck: false, forcedRandom);
+                    Point tile = ToolModifierUtils.GetTileTarget(Owner);
+                    bool canPlace = false;
+                    bool newObjectType = false;
+                    bool? overrideCanPlace = null;
+                    int? forcedRandom = null;
+                    TileObject objectData = default(TileObject);
+                    Owner.FigureOutWhatToPlace(Main.tile[tile], Item, out int tileToCreate, out int previewPlaceStyle, out overrideCanPlace, out forcedRandom);
+                    PlantLoader.CheckAndInjectModSapling(tile.X, tile.Y, ref tileToCreate, ref previewPlaceStyle);
+                    if (overrideCanPlace.HasValue)
+                        canPlace = overrideCanPlace.Value;
+                    else if (!TileLoader.CanPlace(tile.X, tile.Y, tileToCreate))
+                        canPlace = false;
+                    else if (TileObjectData.CustomPlace(tileToCreate, previewPlaceStyle) && tileToCreate != 82 && tileToCreate != 227)
+                    {
+                        newObjectType = true;
+                        canPlace = TileObject.CanPlace(tile.X, tile.Y, (ushort)tileToCreate, previewPlaceStyle, Owner.direction, out objectData, onlyCheck: false, forcedRandom);
+                    }
+                    else
+                        canPlace = Owner.PlaceThing_Tiles_BlockPlacementForAssortedThings(canPlace);
+                    if (canPlace)
+                        Owner.PlaceThing_Tiles_PlaceIt(newObjectType, objectData, tileToCreate);
+                    if (Main.netMode == NetmodeID.MultiplayerClient)
+                        NetMessage.SendData(MessageID.TileManipulation, -1, -1, null, 1, tile.X, tile.Y, tileToCreate, Item.placeStyle);
                 }
-                else
-                    canPlace = Owner.PlaceThing_Tiles_BlockPlacementForAssortedThings(canPlace);
-                if (canPlace)
-                    Owner.PlaceThing_Tiles_PlaceIt(newObjectType, objectData, tileToCreate);
-                if (Main.netMode == NetmodeID.MultiplayerClient)
-                    NetMessage.SendData(MessageID.TileManipulation, -1, -1, null, 1, tile.X, tile.Y, tileToCreate, Item.placeStyle);
             }
 
             Item.UseSound?.Play(Projectile.Center, 1f, 0f, .1f);

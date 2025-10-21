@@ -31,3 +31,7 @@ Its aided a lot with my skills but I believe it is finally time to explore other
 Future updates are to only stay in compatibility with Terraria and Calamity or to fix any bugs.
 
 Hope you have just as much fun as we do!
+
+Github: https://github.com/Orbmer-Doug/TheExtraordinaryAdditions
+
+Post issues you find here! https://github.com/Orbmer-Doug/TheExtraordinaryAdditions/issues

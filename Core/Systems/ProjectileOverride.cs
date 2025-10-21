@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Reflection;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Terraria;
 using Terraria.ID;
@@ -11,21 +12,18 @@ namespace TheExtraordinaryAdditions.Core.Systems;
 
 public abstract class ProjectileOverride
 {
-    internal static ProjectileOverride[] BehaviorOverrideSet;
-    public static IdDictionary Search = IdDictionary.Create<int, ProjectileOverride>();
-
+    internal static Dictionary<int, ProjectileOverride> BehaviorOverrideSet;
     internal static void LoadAll()
     {
-        BehaviorOverrideSet = new SetFactory(ContentSamples.ProjectilesByType.Count, "TheExtraordinaryAdditions/VanillaProjectileOverrides", Search).CreateCustomSet<ProjectileOverride>(null);
-
+        BehaviorOverrideSet = new Dictionary<int, ProjectileOverride>();
         foreach (Type type in GetEveryTypeDerivedFrom(typeof(ProjectileOverride), typeof(AdditionsMain).Assembly))
         {
-            if ((Activator.CreateInstance(type) as Projectile)?.ModProjectile == null && !AdditionsConfigServer.Instance.UseCustomAI)
+            if (!AdditionsConfigServer.Instance.UseCustomAI)
                 continue;
 
             ProjectileOverride instance = (ProjectileOverride)Activator.CreateInstance(type);
 
-            BehaviorOverrideSet[instance.ProjectileOverrideType] = instance;
+            BehaviorOverrideSet.Add(instance.ProjectileOverrideType, instance);
         }
     }
 

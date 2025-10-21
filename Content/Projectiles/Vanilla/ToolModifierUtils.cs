@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using Terraria;
+using Terraria.ModLoader;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla;
 
@@ -14,11 +15,10 @@ public static class ToolModifierUtils
         return Main.SmartCursorWanted ? new Point(Main.SmartCursorX, Main.SmartCursorY) : new Point(Player.tileTargetX, Player.tileTargetY);
     }
 
+    internal static MethodInfo MineMethod => typeof(Player).GetMethod("ItemCheck_UseMiningTools_ActuallyUseMiningTool", BindingFlags.NonPublic | BindingFlags.Instance);
+    internal static MethodInfo WallMethod => typeof(Player).GetMethod("ItemCheck_UseMiningTools_TryFindingWallToHammer", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Instance);
     public static void Mine(Player player, Item tool, bool hammer = false, bool right = false, Point? overrideTileTarget = null)
     {
-        if (player.whoAmI != Main.myPlayer)
-            return;
-
         if (tool.pick <= 0 && tool.axe <= 0 && tool.hammer <= 0)
             return;
 
@@ -29,7 +29,6 @@ public static class ToolModifierUtils
         if (!flag)
             return;
 
-        Type type = typeof(Player);
         Point tileTarget = GetTileTarget(player);
 
         object[] miningParams = new object[4];
@@ -37,8 +36,7 @@ public static class ToolModifierUtils
         miningParams[2] = overrideTileTarget.HasValue ? overrideTileTarget.Value.X : tileTarget.X;
         miningParams[3] = overrideTileTarget.HasValue ? overrideTileTarget.Value.Y : tileTarget.Y;
 
-        MethodInfo useTool = type.GetMethod("ItemCheck_UseMiningTools_ActuallyUseMiningTool", BindingFlags.NonPublic | BindingFlags.Instance);
-        useTool.Invoke(player, miningParams);
+        MineMethod.Invoke(player, miningParams);
 
         if (hammer)
         {
@@ -64,15 +62,13 @@ public static class ToolModifierUtils
                     // Try breaking walls
                     object[] wallCoords = new object[2];
 
-                    MethodInfo findWall = type.GetMethod("ItemCheck_UseMiningTools_TryFindingWallToHammer", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Instance);
-                    findWall.Invoke(player, wallCoords);
+                    WallMethod.Invoke(player, wallCoords);
 
                     int wallX = (int)wallCoords[0] + wx;
                     int wallY = (int)wallCoords[1] + wy;
 
                     // The usual method you would use for this checks for itemAnimation and toolTime, both of which are absent in this case AND IS WHY WE CANT PUBLICIZE IT
-                    MethodInfo canSmash = type.GetMethod("CanPlayerSmashWall", BindingFlags.Static | BindingFlags.Public | BindingFlags.Instance);
-                    bool wall = (bool)canSmash.Invoke(player, [wallX, wallY]);
+                    bool wall = Player.CanPlayerSmashWall(wallX, wallY);
 
                     Tile tile = Main.tile[wallX, wallY];
                     if (tile.WallType > 0 && (!tile.Active() ||

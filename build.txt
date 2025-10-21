@@ -1,10 +1,10 @@
 displayName = The Extraordinary Additions
 author = Orbmer Doug, SRMP, Ashes Plus
-version = 2.0.0
+version = 2.0.0.2
 modReferences = SubworldLibrary, CalamityMod@2.0.5
 sortAfter = CalamityMod, SubworldLibrary
 hideCode = true #Look at the github instead
 hideResources = false
 includeSource = false
 includePDB = true
-buildIgnore = *.csproj, *.user, obj\*, bin\*, .vs\*
+buildIgnore = *.dll, *.csproj, *.user, obj\*, bin\*, .vs\*
