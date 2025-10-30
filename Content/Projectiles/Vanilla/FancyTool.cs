@@ -271,7 +271,7 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
             }
         }
 
-        if (SwingCompletion.BetweenNum(Wait + .3f, Swing, true) && !PlayedSound)
+        if (SwingCompletion.BetweenNum(Wait + .3f, Swing, true) && !PlayedSound && Owner.controlUseItem)
         {
             if (Owner.whoAmI == Main.myPlayer)
             {

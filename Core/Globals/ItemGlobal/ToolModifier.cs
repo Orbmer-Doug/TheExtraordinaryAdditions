@@ -63,9 +63,11 @@ public sealed class ToolModifier : GlobalItem
         player.controlUseItem = false;
     }
 
+    public override bool Shoot(Item item, Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback) => false;
+
     public override void UseStyle(Item item, Player player, Rectangle heldItemFrame)
     {
-        if (Main.myPlayer == player.whoAmI && player.itemAnimation == player.itemAnimationMax && player.ownedProjectileCounts[item.shoot] == 0)
+        if (Main.myPlayer == player.whoAmI && player.itemAnimation == player.itemAnimationMax && player.ownedProjectileCounts[item.shoot] <= 0)
         {
             Projectile.NewProjectile(new EntitySource_ItemUse_WithAmmo(player, item, item.ammo),
                 player.Center, Vector2.Zero, item.shoot, item.damage, item.knockBack, player.whoAmI, 0f, 0f, 0f);

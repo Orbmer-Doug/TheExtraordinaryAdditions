@@ -1,2 +1,2 @@
-hopefully fixed some things for the vanilla changes
-and by srmp's command... updated frigid gale
+fixed an issue with sounds (especially waterfalls) multiplying to infinity... oops
+fixed hammers not correctly going through all tile states

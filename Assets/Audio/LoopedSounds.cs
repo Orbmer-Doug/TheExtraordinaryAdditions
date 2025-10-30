@@ -8,15 +8,15 @@ using Terraria.ModLoader;
 
 namespace TheExtraordinaryAdditions.Assets.Audio;
 
-public readonly struct AdditionsLoopedSound()
+public readonly struct AdditionsLoopedSound
 {
-    public AdditionsLoopedSound(SoundStyle style, Func<float> volume = null, Func<float> pitch = null) : this()
+    public AdditionsLoopedSound(SoundStyle style, Func<float> volume = null, Func<float> pitch = null)
     {
         Style = style with { MaxInstances = 0, PauseBehavior = PauseBehavior.PauseWithGame };
         Volume = volume ?? (() => 1f);
         Pitch = pitch ?? (() => 0f);
     }
-    public AdditionsLoopedSound(AdditionsSound sound, Func<float> volume = null, Func<float> pitch = null) : this()
+    public AdditionsLoopedSound(AdditionsSound sound, Func<float> volume = null, Func<float> pitch = null)
     {
         Style = AssetRegistry.GetSound(sound) with { MaxInstances = 0, PauseBehavior = PauseBehavior.PauseWithGame };
         Volume = volume ?? (() => 1f);
@@ -46,38 +46,35 @@ public sealed class LoopedSoundManager : ModSystem
 
     private static void UpdateLoopedSounds(On_SoundEngine.orig_Update orig)
     {
-        if (!SoundEngine.IsAudioSupported)
-            return;
-
-        if (loopedSounds.Count == 0)
-            return;
-
-        // Go through all looped sounds and perform automatic cleanup
-        loopedSounds.RemoveAll(s =>
+        if (SoundEngine.IsAudioSupported && loopedSounds.Count != 0)
         {
-            // If the sound was started but is no longer playing, restart it
-            bool shouldBeRemoved = false;
-            if (s.HasLoopSoundBeenStarted && !s.IsBeingPlayed)
-                s.Restart();
+            // Go through all looped sounds and perform automatic cleanup
+            loopedSounds.RemoveAll(s =>
+            {
+                // If the sound was started but is no longer playing, restart it
+                bool shouldBeRemoved = false;
+                if (s.HasLoopSoundBeenStarted && !s.IsBeingPlayed)
+                    s.Restart();
 
-            // If the sound's termination condition has been activated, remove the sound
-            if (s.TerminationCondition())
-                shouldBeRemoved = true;
+                // If the sound's termination condition has been activated, remove the sound
+                if (s.TerminationCondition())
+                    shouldBeRemoved = true;
 
-            // If the sound has been stopped, remove it
-            if (s.HasBeenStopped)
-                shouldBeRemoved = true;
+                // If the sound has been stopped, remove it
+                if (s.HasBeenStopped)
+                    shouldBeRemoved = true;
 
-            // Just in case
-            if (Main.gameMenu)
-                shouldBeRemoved = true;
+                // Just in case
+                if (Main.gameMenu)
+                    shouldBeRemoved = true;
 
-            // If the sound will be removed, mark it as stopped
-            if (shouldBeRemoved)
-                s.Stop();
+                // If the sound will be removed, mark it as stopped
+                if (shouldBeRemoved)
+                    s.Stop();
 
-            return shouldBeRemoved;
-        });
+                return shouldBeRemoved;
+            });
+        }
 
         orig();
     }
@@ -153,7 +150,7 @@ public sealed class LoopedSoundInstance
     public bool IsBeingPlayed => SoundEngine.TryGetActiveSound(LoopingSoundSlot, out _);
 
     /// <summary>
-    /// Do not use this constructor manually. Utilize <see cref="LoopedSoundManager.CreateNew(AdditionsLoopedSound, Func{bool})"/>
+    /// Do not use this constructor manually. Utilize <see cref="LoopedSoundManager.CreateNew(AdditionsLoopedSound, Func{bool}, Func{bool})"/>
     /// </summary>
     internal LoopedSoundInstance(AdditionsLoopedSound loopingSound, Func<bool> terminationCondition, Func<bool> activeCondition = null)
     {
@@ -165,7 +162,7 @@ public sealed class LoopedSoundInstance
     }
 
     /// <summary>
-    /// Do not use this constructor manually. Utilize <see cref="LoopedSoundManager.CreateNew(AdditionsLoopedSound, AdditionsLoopedSound, Func{bool})"/>
+    /// Do not use this constructor manually. Utilize <see cref="LoopedSoundManager.CreateNew(AdditionsLoopedSound, AdditionsLoopedSound, Func{bool}, Func{bool})"/>
     /// </summary>
     internal LoopedSoundInstance(AdditionsLoopedSound startingSound, AdditionsLoopedSound loopingSound, Func<bool> terminationCondition, Func<bool> activeCondition = null)
         : this(loopingSound, terminationCondition, activeCondition)
