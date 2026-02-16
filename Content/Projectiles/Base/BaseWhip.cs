@@ -23,7 +23,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Base;
 /// The derived class of all whips in the mod <br></br>
 /// Any <see cref="Projectile.ai"/> before 2 is taken
 /// </summary>
-public abstract class BaseWhip : ModProjectile, ILocalizedModType, IModType
+public abstract class BaseWhip : ModProjectile
 {
     #region Variables/Defaults
     public const int Samples = 50;
@@ -93,7 +93,7 @@ public abstract class BaseWhip : ModProjectile, ILocalizedModType, IModType
     {
         if (Time == 0f)
         {
-            Projectile.velocity = Owner.Center.SafeDirectionTo(Modded.mouseWorld);
+            Projectile.velocity = Owner.Center.SafeDirectionTo(Modded.MouseWorld);
             Projectile.netUpdate = true;
         }
 

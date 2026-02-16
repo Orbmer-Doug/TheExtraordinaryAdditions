@@ -53,7 +53,7 @@ public class PyroclasticHover : BaseIdleHoldoutProjectile
         Vector2 center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
         if (this.RunLocal())
         {
-            Projectile.velocity = center.SafeDirectionTo(Modded.mouseWorld);
+            Projectile.velocity = center.SafeDirectionTo(Modded.MouseWorld);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
             Projectile.spriteDirection = (Projectile.velocity.X > 0f).ToDirectionInt();
@@ -83,7 +83,10 @@ public class PyroclasticHover : BaseIdleHoldoutProjectile
 
         if (AppearCompletion >= 1f)
         {
-            MetaballRegistry.SpawnLavaMetaball(Projectile.Center, Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.2f) * 14f, SecondsToFrames(7), 120, Owner.whoAmI, Projectile.damage);
+            float vel = Collision.WetCollision(Projectile.Center, 1, 1) ? 8f : 14f;
+            MetaballRegistry.SpawnLavaMetaball(Projectile.Center,
+                Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.2f) * vel,
+                SecondsToFrames(7), 120, Owner.whoAmI, Projectile.damage);
             if (Time % 2 == 1)
                 Item.CheckManaBetter(Owner, 1, true);
         }

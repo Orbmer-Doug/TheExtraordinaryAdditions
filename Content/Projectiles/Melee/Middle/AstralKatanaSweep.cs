@@ -38,13 +38,13 @@ public class AstralKatanaSweep : BaseSwordSwing
 
     public bool Orange
     {
-        get => Projectile.AdditionsInfo().ExtraAI[7] == 1f;
+        get => (int)Projectile.AdditionsInfo().ExtraAI[7] == 1;
         set => Projectile.AdditionsInfo().ExtraAI[7] = value.ToInt();
     }
 
     public bool NoReset
     {
-        get => Projectile.AdditionsInfo().ExtraAI[8] == 1f;
+        get => (int)Projectile.AdditionsInfo().ExtraAI[8] == 1;
         set => Projectile.AdditionsInfo().ExtraAI[8] = value.ToInt();
     }
 
@@ -61,14 +61,6 @@ public class AstralKatanaSweep : BaseSwordSwing
         if (Orange)
             return -anim;
         return anim;
-    }
-
-    public override float SwingOffset()
-    {
-        if (Orange)
-            return base.SwingOffset();
-
-        return base.SwingOffset();
     }
 
     public override void Defaults()
@@ -104,6 +96,9 @@ public class AstralKatanaSweep : BaseSwordSwing
             AdditionsSound.MediumSwing.Play(Projectile.Center, .6f, 0f, .2f, 20, Name);
             PlayedSound = true;
         }
+        if (!Orange && (int)Time == (int)(MaxTime * .5f))
+            Projectile.NewProj(Center, Projectile.velocity * 9f, ModContent.ProjectileType<AstralKatanaSlice>(),
+                (int)(Projectile.damage * .75f), .4f, Projectile.owner);
 
         if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, (c) => Center.ToNumerics(), 25);
@@ -130,17 +125,17 @@ public class AstralKatanaSweep : BaseSwordSwing
         // Reset if still holding left, otherwise fade
         if (this.RunLocal() && SwingCompletion >= 1f)
         {
-            if (Modded.SafeMouseLeft.Current && VanishTime <= 0 && NoReset == false)
+            if (Modded.SafeMouseLeft.Current && VanishTime <= 0 && !NoReset)
             {
                 SwingDir = SwingDir == SwingDirection.Up ? SwingDirection.Down : SwingDirection.Up;
                 Initialized = false;
-                this.Sync();
             }
             else
             {
                 VanishTime++;
-                this.Sync();
             }
+
+            this.Sync();
         }
 
         CreateSparkles();
@@ -274,15 +269,16 @@ public class AstralKatanaSweep : BaseSwordSwing
         float bright = Brightness;
         float offset = RotationOffset;
         SpriteEffects effects = Effects;
-        void sword()
-        {
-            Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, null, Color.White * bright,
-                        Projectile.rotation + offset, origin, Projectile.scale, effects, 0f);
-        }
 
         LayeredDrawSystem.QueueDrawAction(sword, Orange ? PixelationLayer.UnderPlayers : PixelationLayer.OverPlayers);
         PixelationSystem.QueuePrimitiveRenderAction(draw, Orange ? PixelationLayer.UnderPlayers : PixelationLayer.OverPlayers);
         return false;
+
+        void sword()
+        {
+            Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, null, Color.White * bright,
+                Projectile.rotation + offset, origin, Projectile.scale, effects, 0f);
+        }
     }
 }
 
@@ -322,7 +318,12 @@ public class AstralKatanaThrow : ModProjectile
     }
     public ref float AccumulatedVel => ref Projectile.ai[1];
     public ref float EnemyID => ref Projectile.ai[2];
-    public ref float Time => ref Projectile.AdditionsInfo().ExtraAI[0];
+
+    public int Time
+    {
+        get => (int)Projectile.AdditionsInfo().ExtraAI[0];
+        set => Projectile.AdditionsInfo().ExtraAI[0] = value;
+    }
     public int Dir
     {
         get => (int)Projectile.AdditionsInfo().ExtraAI[1];
@@ -374,7 +375,7 @@ public class AstralKatanaThrow : ModProjectile
             Projectile.timeLeft = Lifetime;
             if (this.RunLocal())
             {
-                Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, center.SafeDirectionTo(Owner.Additions().mouseWorld), .3f);
+                Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, center.SafeDirectionTo(Owner.Additions().MouseWorld), .3f);
                 if (Projectile.velocity != Projectile.oldVelocity)
                     this.Sync();
             }
@@ -392,7 +393,7 @@ public class AstralKatanaThrow : ModProjectile
                 State = CurrentState.Thrown;
                 Time = 0;
                 if (this.RunLocal())
-                    Projectile.velocity = center.SafeDirectionTo(Owner.Additions().mouseWorld) * 6f;
+                    Projectile.velocity = center.SafeDirectionTo(Owner.Additions().MouseWorld) * 6f;
                 this.Sync();
             }
             return;
@@ -451,7 +452,7 @@ public class AstralKatanaThrow : ModProjectile
 
             if (this.RunLocal() && Modded.MouseRight.JustReleased)
             {
-                if (center.Distance(dest) > Main.LogicCheckScreenWidth * 2)
+                if (center.Distance(dest) > Main.LogicCheckScreenWidth)
                 {
                     Projectile.Kill();
                     return;

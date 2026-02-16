@@ -104,14 +104,14 @@ public class TheExingendies : ModProjectile, ILocalizedModType, IModType
 
         if (this.RunLocal())
         {
-            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, MainCenter.SafeDirectionTo(ModdedOwner.mouseWorld), Utils.Remap(ModdedOwner.mouseWorld.Distance(MainCenter), 0f, 200f, .04f, .16f));
+            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, MainCenter.SafeDirectionTo(ModdedOwner.MouseWorld), Utils.Remap(ModdedOwner.MouseWorld.Distance(MainCenter), 0f, 200f, .04f, .16f));
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
         Projectile.rotation = Projectile.velocity.ToRotation();
         Projectile.Center = MainCenter + PolarVector(BezierEase.Evaluate(0f, 80f, Completion), Projectile.rotation);
         ForwardRotation = MakePoly(3f).OutFunction.Evaluate(ForwardRotation,
-            Utils.Remap(ModdedOwner.mouseWorld.Distance(MainCenter), 0f, 200f, MathHelper.PiOver2, MathHelper.Pi), .01f);
+            Utils.Remap(ModdedOwner.MouseWorld.Distance(MainCenter), 0f, 200f, MathHelper.PiOver2, MathHelper.Pi), .01f);
 
         Owner.ChangeDir(Projectile.velocity.X.NonZeroSign());
         Owner.itemRotation = WrapAngle(Projectile.rotation);
@@ -169,17 +169,17 @@ public class TheExingendies : ModProjectile, ILocalizedModType, IModType
     {
         if (PhaseTimer % 10 == 9 && this.RunLocal())
         {
-            Projectile.NewProj(Projectile.Center, MainCenter.SafeDirectionTo(ModdedOwner.mouseWorld).RotatedByRandom(.6f) * Main.rand.NextFloat(10f, 20f),
+            Projectile.NewProj(Projectile.Center, MainCenter.SafeDirectionTo(ModdedOwner.MouseWorld).RotatedByRandom(.6f) * Main.rand.NextFloat(10f, 20f),
                 ModContent.ProjectileType<LuminescentChaser>(), (int)Owner.GetTotalDamage<GenericDamageClass>().ApplyTo(2000f), Projectile.knockBack, Owner.whoAmI);
             AdditionsSound.MagicHit.Play(Projectile.Center, .8f, 0f, .2f, 400, Name);
         }
 
         if (PhaseTimer % 40 == 39 && this.RunLocal())
         {
-            Projectile.NewProj(ModdedOwner.mouseWorld, Vector2.UnitY.RotatedByRandom(.67f),
+            Projectile.NewProj(ModdedOwner.MouseWorld, Vector2.UnitY.RotatedByRandom(.67f),
                 ModContent.ProjectileType<ScreenSplit>(), (int)Owner.GetTotalDamage<GenericDamageClass>().ApplyTo(7500f), Projectile.knockBack, Owner.whoAmI);
-            AdditionsSound.VirtueAttack.Play(ModdedOwner.mouseWorld, 1.4f, -.7f, 0f, 300, Name);
-            AdditionsSound.LargeWeaponFireDifferent.Play(ModdedOwner.mouseWorld, 1.3f, .5f, 0f, 300, Name);
+            AdditionsSound.VirtueAttack.Play(ModdedOwner.MouseWorld, 1.4f, -.7f, 0f, 300, Name);
+            AdditionsSound.LargeWeaponFireDifferent.Play(ModdedOwner.MouseWorld, 1.3f, .5f, 0f, 300, Name);
         }
 
         if (PhaseTimer >= SecondsToFrames(7))
@@ -193,15 +193,15 @@ public class TheExingendies : ModProjectile, ILocalizedModType, IModType
     {
         if (PhaseTimer % 12 == 11 && this.RunLocal())
         {
-            Projectile.NewProj(Projectile.Center, MainCenter.SafeDirectionTo(ModdedOwner.mouseWorld) * 14f,
+            Projectile.NewProj(Projectile.Center, MainCenter.SafeDirectionTo(ModdedOwner.MouseWorld) * 14f,
                 ModContent.ProjectileType<SpaceRip>(), (int)Owner.GetTotalDamage<GenericDamageClass>().ApplyTo(2000f), Projectile.knockBack, Owner.whoAmI);
         }
 
         if (PhaseTimer % (Constellation.Lifetime / 2) == (Constellation.Lifetime / 2 - 1) && this.RunLocal())
         {
-            Projectile.NewProj(ModdedOwner.mouseWorld, Vector2.UnitY.RotatedByRandom(.67f),
+            Projectile.NewProj(ModdedOwner.MouseWorld, Vector2.UnitY.RotatedByRandom(.67f),
                 ModContent.ProjectileType<Constellation>(), (int)Owner.GetTotalDamage<GenericDamageClass>().ApplyTo(1000f), Projectile.knockBack, Owner.whoAmI);
-            AdditionsSound.etherealChargeBoom2.Play(ModdedOwner.mouseWorld, 1f, 0f, .1f, 200, Name);
+            AdditionsSound.etherealChargeBoom2.Play(ModdedOwner.MouseWorld, 1f, 0f, .1f, 200, Name);
         }
 
         if (PhaseTimer >= SecondsToFrames(7))
@@ -221,7 +221,7 @@ public class TheExingendies : ModProjectile, ILocalizedModType, IModType
         }
 
         if (this.RunLocal() && PhaseTimer % 40 == 39)
-            Projectile.NewProj(Projectile.Center, MainCenter.SafeDirectionTo(ModdedOwner.mouseWorld) * 16f,
+            Projectile.NewProj(Projectile.Center, MainCenter.SafeDirectionTo(ModdedOwner.MouseWorld) * 16f,
                 ModContent.ProjectileType<HighSpeedDebris>(), (int)Owner.GetTotalDamage<GenericDamageClass>().ApplyTo(18000f), Projectile.knockBack, Owner.whoAmI);
 
         if (PhaseTimer >= SecondsToFrames(7))

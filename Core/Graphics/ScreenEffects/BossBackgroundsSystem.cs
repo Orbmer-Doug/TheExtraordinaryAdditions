@@ -39,21 +39,22 @@ public class BossBackgroundsSystem : ModSystem
 
         // Draw the fog if necessary.
         float fogInterpolant = Main.npc[stygianIndex].AdditionsInfo().ExtraAI[StygainHeart.FogInterpolantIndex];
-        if (fogInterpolant > 0f)
-        {
-            SpriteBatch sb = Main.spriteBatch;
+        if (!(fogInterpolant > 0f))
+            return;
+        SpriteBatch sb = Main.spriteBatch;
 
-            Texture2D noise = AssetRegistry.GetTexture(AdditionsTexture.DarkTurbulentNoise);
-            ManagedShader fog = AssetRegistry.GetShader("FogShader");
+        Texture2D noise = AssetRegistry.GetTexture(AdditionsTexture.DarkTurbulentNoise);
+        ManagedShader fog = AssetRegistry.GetShader("FogShader");
 
-            fog.TrySetParameter("opacity", fogInterpolant);
-            fog.TrySetParameter("time", Main.GlobalTimeWrappedHourly * .2f);
+        fog.TrySetParameter("opacity", fogInterpolant);
+        fog.TrySetParameter("time", Main.GlobalTimeWrappedHourly * .2f);
 
-            sb.End();
-            sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearWrap, DepthStencilState.None, Main.Rasterizer, fog.Effect, Main.GameViewMatrix.TransformationMatrix);
-            fog.Render();
-            sb.Draw(noise, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), null, Color.White * fogInterpolant, 0f, Vector2.Zero, 0, 0f);
-            sb.ExitShaderRegion();
-        }
+        sb.End();
+        sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearWrap, DepthStencilState.None, Main.Rasterizer, fog.Effect, Main.GameViewMatrix.TransformationMatrix);
+        fog.Render();
+        Point size = new(Main.graphics.GraphicsDevice.Viewport.Width,
+            Main.graphics.GraphicsDevice.Viewport.Height);
+        sb.Draw(noise, new Rectangle(0, 0, size.X, size.Y), null, Color.White * fogInterpolant, 0f, Vector2.Zero, 0, 0f);
+        sb.ExitShaderRegion();
     }
 }

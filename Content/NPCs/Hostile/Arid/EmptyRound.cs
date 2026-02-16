@@ -3,11 +3,9 @@ using Terraria.ModLoader;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Arid;
 
-public class EmptyRound : ModProjectile, ILocalizedModType, IModType
+public class EmptyRound : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.EmptyRound);
-    public int Time;
-
     public bool TouchedGrass;
 
     public override void SetDefaults()
@@ -22,20 +20,10 @@ public class EmptyRound : ModProjectile, ILocalizedModType, IModType
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = -1;
     }
-
-    public override void SetStaticDefaults()
-    {
-    }
-
-    public override bool PreDraw(ref Color lightColor)
-    {
-        return true;
-    }
-
+    
     public override void AI()
     {
         Projectile.extraUpdates = 0;
-        Time++;
         _ = Main.player[Projectile.owner];
         if (!TouchedGrass)
         {

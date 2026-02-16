@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Vanity;
@@ -30,21 +31,18 @@ public class AvatarHorns : ModItem
     {
         Item.width = 30;
         Item.height = 22;
-        Item.value = AdditionsGlobalItem.UniqueRarityPrice;
-        Item.rare = ItemRarityID.Cyan;
+        Item.value = AdditionsGlobalItem.RarityBlueBuyPrice;
+        Item.rare = ItemRarityID.Blue;
         Item.vanity = true;
     }
 
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        recipe.AddIngredient(ModContent.ItemType<DubiousPlating>(), 10);
-        recipe.AddIngredient(ModContent.ItemType<MysteriousCircuitry>(), 10);
-        recipe.AddIngredient(ItemID.SoulofFlight, 20);
-        recipe.AddIngredient(ModContent.ItemType<CoreofCalamity>(), 4);
-        recipe.AddIngredient(ModContent.ItemType<AscendantSpiritEssence>(), 5);
-        recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 5);
-        recipe.AddTile(ModContent.TileType<CosmicAnvil>());
+        recipe.AddIngredient(ModContent.ItemType<DubiousPlating>(), 3);
+        recipe.AddIngredient(ModContent.ItemType<MysteriousCircuitry>(), 2);
+        recipe.AddRecipeGroup(AdditionsRecipes.AnyIronBar, 5);
+        recipe.AddTile(TileID.Anvils);
         recipe.Register();
     }
 }

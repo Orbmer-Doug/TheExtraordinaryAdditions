@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CalamityMod;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -23,7 +24,7 @@ public class Fork : ModItem
         Item.knockBack = 1;
         Item.autoReuse = true;
         Item.damage = 25;
-        Item.DamageType = DamageClass.Melee;
+        Item.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
         Item.noMelee = true;
         Item.noUseGraphic = true;
         Item.shoot = ModContent.ProjectileType<ForkStab>();

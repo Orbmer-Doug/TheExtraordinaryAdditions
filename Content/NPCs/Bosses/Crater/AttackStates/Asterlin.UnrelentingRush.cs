@@ -86,7 +86,7 @@ public partial class Asterlin : ModNPC
                 {
                     case UnrelentingRush_States.MakePortal:
                         float homeAccuracy = Main.getGoodWorld ? 220f : 110f;
-                        Vector2 home = Utility.GetHomingVelocity(NPC.Center, Target.Position, Target.Velocity, homeAccuracy);
+                        Vector2 home = GetHomingVelocity(NPC.Center, Target.Position, Target.Velocity, homeAccuracy);
 
                         if (UnrelentingRush_DashTimer == 1)
                         {
@@ -95,7 +95,7 @@ public partial class Asterlin : ModNPC
                             spawnPos = spawnPos.ClampInWorld();
                             NPC.Center = spawnPos;
                             if (Main.masterMode)
-                                home = Utility.GetHomingVelocity(NPC.Center, Target.Position, Target.Velocity, homeAccuracy);
+                                home = GetHomingVelocity(NPC.Center, Target.Position, Target.Velocity, homeAccuracy);
 
                             Vector2 dir = spawnPos.SafeDirectionTo(Target.Center);
                             if (!Main.masterMode && !Main.getGoodWorld)

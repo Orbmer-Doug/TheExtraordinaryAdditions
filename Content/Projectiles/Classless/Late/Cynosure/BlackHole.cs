@@ -68,7 +68,7 @@ public class BlackHole : ModProjectile, ILocalizedModType, IModType, IHasScreenS
         // Give a slight delay as to give the black hole the emergence from the star
         if (Time > WaitTime && this.RunLocal())
         {
-            Vector2 target = Owner.Additions().mouseWorld;
+            Vector2 target = Owner.Additions().MouseWorld;
             Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(target) * MathF.Min(Projectile.Distance(target), 18f), .15f);
             Projectile.netUpdate = true;
         }

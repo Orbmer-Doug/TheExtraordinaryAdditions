@@ -99,7 +99,7 @@ public class ObsidianMaceProj : ModProjectile
         if (!Init)
         {
             after ??= new(10, () => Projectile.Center);
-            InitDir = Center.SafeDirectionTo(Modded.mouseWorld).X.NonZeroSign();
+            InitDir = Center.SafeDirectionTo(Modded.MouseWorld).X.NonZeroSign();
             Init = true;
             this.Sync();
         }
@@ -117,7 +117,7 @@ public class ObsidianMaceProj : ModProjectile
                     shouldOwnerHitCheck = true;
                     if (this.RunLocal())
                     {
-                        Vector2 unitVectorTowardsMouse = mountedCenter.DirectionTo(Modded.mouseWorld).SafeNormalize(Vector2.UnitX * Owner.direction);
+                        Vector2 unitVectorTowardsMouse = mountedCenter.DirectionTo(Modded.MouseWorld).SafeNormalize(Vector2.UnitX * Owner.direction);
                         Owner.ChangeDir(InitDir);
 
                         if (!Owner.channel)

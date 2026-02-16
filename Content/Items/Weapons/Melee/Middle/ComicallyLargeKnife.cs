@@ -1,4 +1,5 @@
-﻿using Terraria;
+﻿using CalamityMod;
+using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -22,7 +23,7 @@ public class ComicallyLargeKnife : ModItem
         Item.knockBack = .6f;
         Item.autoReuse = true;
         Item.damage = 180;
-        Item.DamageType = DamageClass.Melee;
+        Item.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
         Item.noMelee = true;
         Item.noUseGraphic = true;
         Item.shoot = ModContent.ProjectileType<KnifeStab>();

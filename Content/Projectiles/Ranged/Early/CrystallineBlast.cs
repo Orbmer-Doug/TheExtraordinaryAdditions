@@ -92,7 +92,7 @@ public class CrystallineBlast : ModProjectile
                 if (this.RunLocal())
                 {
                     float vel = 20f + Completion;
-                    Projectile.velocity = Projectile.SafeDirectionTo(Owner.Additions().mouseWorld) * vel;
+                    Projectile.velocity = Projectile.SafeDirectionTo(Owner.Additions().MouseWorld) * vel;
 
                     for (int i = 0; i < 12; i++)
                     {

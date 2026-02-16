@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -29,7 +30,7 @@ public class DecayingCutlery : ModItem
         Item.damage = 65;
         Item.knockBack = 2.5f;
         Item.noUseGraphic = true;
-        Item.DamageType = DamageClass.Melee;
+        Item.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
         Item.noMelee = true;
         Item.shootSpeed = 30f;
         Item.shoot = ModContent.ProjectileType<DecayingCutleryStab>();

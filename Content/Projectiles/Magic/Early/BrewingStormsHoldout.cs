@@ -32,8 +32,8 @@ public class BrewingStormsHoldout : BaseIdleHoldoutProjectile
     {
         if (this.RunLocal())
         {
-            float interpolant = Utils.GetLerpValue(5f, 20f, Projectile.Distance(Modded.mouseWorld), true);
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Modded.mouseWorld), interpolant);
+            float interpolant = Utils.GetLerpValue(5f, 20f, Projectile.Distance(Modded.MouseWorld), true);
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Modded.MouseWorld), interpolant);
             if (Projectile.oldVelocity != Projectile.velocity)
                 this.Sync();
         }
@@ -80,8 +80,8 @@ public class BrewingStormsHoldout : BaseIdleHoldoutProjectile
         }
         if (this.RunLocal() && Charge >= ChargeNeeded)
         {
-            Vector2 pos = Modded.mouseWorld - new Vector2(Main.rand.NextFloat(-200f, 200f), Main.screenHeight);
-            Vector2 vel = (Modded.mouseWorld - pos + Projectile.velocity * 7.5f).SafeNormalize(Vector2.UnitY) * 28f;
+            Vector2 pos = Modded.MouseWorld - new Vector2(Main.rand.NextFloat(-200f, 200f), Main.screenHeight);
+            Vector2 vel = (Modded.MouseWorld - pos + Projectile.velocity * 7.5f).SafeNormalize(Vector2.UnitY) * 28f;
             Projectile.NewProj(pos, vel, ModContent.ProjectileType<BrewingLightningStrike>(), (int)(Item.damage * 3f), 0f, Projectile.owner, vel.ToRotation(), Main.rand.Next(150), 0f);
 
             AdditionsSound.LightningStrike.Play(Owner.Center, 1f);

@@ -76,7 +76,7 @@ public class BookOfSkullsHoldout : BaseIdleHoldoutProjectile
 
         if (this.RunLocal())
         {
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Owner.RotatedRelativePoint(Owner.MountedCenter, false, true).SafeDirectionTo(Modded.mouseWorld), 1f);
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Owner.RotatedRelativePoint(Owner.MountedCenter, false, true).SafeDirectionTo(Modded.MouseWorld), 1f);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }

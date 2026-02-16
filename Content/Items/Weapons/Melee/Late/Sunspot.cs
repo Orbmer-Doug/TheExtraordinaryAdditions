@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.Linq;
+using CalamityMod;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
@@ -24,7 +25,7 @@ public class Sunspot : ModItem, ILocalizedModType, IModType
     public override void SetDefaults()
     {
         Item.damage = Damage;
-        Item.DamageType = DamageClass.MeleeNoSpeed;
+        Item.DamageType = ModContent.GetInstance<TrueMeleeNoSpeedDamageClass>();
         Item.width = 30;
         Item.height = 242;
         Item.useTime = 24;

@@ -680,7 +680,7 @@ public class DiamondBoltOverride : ProjectileOverride
         {
             if (Main.myPlayer == owner.whoAmI)
             {
-                proj.velocity = Vector2.SmoothStep(proj.velocity, proj.SafeDirectionTo(owner.Additions().mouseWorld) * proj.ai[1], .1f);
+                proj.velocity = Vector2.SmoothStep(proj.velocity, proj.SafeDirectionTo(owner.Additions().MouseWorld) * proj.ai[1], .1f);
                 if (proj.velocity != proj.oldVelocity)
                     proj.netUpdate = true;
             }

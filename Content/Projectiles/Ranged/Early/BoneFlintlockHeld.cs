@@ -31,7 +31,7 @@ public class BoneFlintlockHeld : BaseIdleHoldoutProjectile
     {
         if (this.RunLocal())
         {
-            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Center.SafeDirectionTo(Modded.mouseWorld), .4f);
+            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Center.SafeDirectionTo(Modded.MouseWorld), .4f);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
@@ -66,7 +66,7 @@ public class BoneFlintlockHeld : BaseIdleHoldoutProjectile
         int bomb = ModContent.ProjectileType<CalciumBomb>();
         if ((this.RunLocal() && Modded.SafeMouseRight.Current) && !CalUtils.HasCooldown(Owner, SkullBombCooldown.ID) && Owner.ownedProjectileCounts[bomb] <= 0 && Wait <= 0)
         {
-            Projectile.NewProj(Projectile.Center, Center.SafeDirectionTo(Modded.mouseWorld) * 10f, bomb, Projectile.damage * 2, Projectile.knockBack * 2f, Owner.whoAmI);
+            Projectile.NewProj(Projectile.Center, Center.SafeDirectionTo(Modded.MouseWorld) * 10f, bomb, Projectile.damage * 2, Projectile.knockBack * 2f, Owner.whoAmI);
             SoundID.Item1.Play(Projectile.Center);
             Wait = time;
             CalUtils.AddCooldown(Owner, SkullBombCooldown.ID, SecondsToFrames(1.5f));

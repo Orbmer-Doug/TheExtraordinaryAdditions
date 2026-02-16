@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -24,7 +25,7 @@ public class MeteorKatana : ModItem
         Item.UseSound = null;
         Item.value = AdditionsGlobalItem.RarityOrangeBuyPrice;
         Item.rare = ItemRarityID.Orange;
-        Item.DamageType = DamageClass.Melee;
+        Item.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
         Item.shoot = ModContent.ProjectileType<MeteorSwing>();
         Item.noMelee = true;
         Item.noUseGraphic = true;

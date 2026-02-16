@@ -70,7 +70,7 @@ public class BowOfGreekFlamesHeld : BaseIdleHoldoutProjectile
 
         if (this.RunLocal())
         {
-            Projectile.velocity = Center.SafeDirectionTo(Modded.mouseWorld);
+            Projectile.velocity = Center.SafeDirectionTo(Modded.MouseWorld);
             if (Projectile.velocity != Projectile.oldVelocity)
                 Projectile.netUpdate = true;
             Projectile.spriteDirection = (Projectile.velocity.X > 0f).ToDirectionInt();

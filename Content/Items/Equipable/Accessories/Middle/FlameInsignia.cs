@@ -60,7 +60,7 @@ public sealed class FlameInsigniaPlayer : ModPlayer
             }
         }
 
-        if (Player.Additions().GlobalTimer % 20f == 19f)
+        if (Player.Additions().GlobalTimer % 20 == 19)
         {
             List<NPC> targets = NPCTargeting.GetNPCsClosestToFarthest(new(Player.Center, radius, true));
             if (targets.Count != 0)
@@ -74,8 +74,7 @@ public sealed class FlameInsigniaPlayer : ModPlayer
 
                     if (i < 10)
                     {
-                        bool active = target.active && target != null;
-                        if (active && target.WithinRange(Player.Center, radius) && target.CanBeChasedBy(Player) && target.friendly == false)
+                        if (target.active && target.WithinRange(Player.Center, radius) && target.CanBeChasedBy(Player) && !target.friendly)
                         {
                             int dmg = (int)Player.GetTotalDamage(Player.GetBestClass()).ApplyTo(25);
                             float kb = 0f;

@@ -52,7 +52,7 @@ public class SunsplitHorizon : ModItem
         recipe.AddIngredient(ItemID.Flamethrower, 1);
         recipe.AddIngredient(ModContent.ItemType<PlasmaCore>(), 1);
         recipe.AddIngredient(ModContent.ItemType<DivineGeode>(), 10);
-        recipe.AddIngredient(ModContent.ItemType<CoreofHavoc>(), 12);
+        recipe.AddIngredient(ModContent.ItemType<EssenceofHavoc>(), 12);
         recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();
     }

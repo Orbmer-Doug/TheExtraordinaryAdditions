@@ -45,9 +45,9 @@ public class SnapcurveHeld : BaseIdleHoldoutProjectile
 
         if (this.RunLocal())
         {
-            float aimInterpolant = Utils.GetLerpValue(10f, 40f, Projectile.Distance(Owner.Additions().mouseWorld), true);
+            float aimInterpolant = Utils.GetLerpValue(10f, 40f, Projectile.Distance(Owner.Additions().MouseWorld), true);
             Vector2 oldVelocity = Projectile.velocity;
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Owner.Additions().mouseWorld), aimInterpolant);
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Owner.Additions().MouseWorld), aimInterpolant);
             if (Projectile.velocity != oldVelocity)
                 this.Sync();
         }

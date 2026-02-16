@@ -1,2 +1,17 @@
-fixed an issue with sounds (especially waterfalls) multiplying to infinity... oops
-fixed hammers not correctly going through all tile states
+Retiered Impure Astral Katanas to post 2 mechs, fixed its tooltip, added a projectile, and restricted the dash range a little more
+Fixed Rended Star and Technic Transmitter not having recipes
+Hopefully fixed Stygain Hearts fog zone not filling the whole screen
+Fixed the solar brand weapon tree being able to hurt friendly NPC's
+Meteor Staff now doesn't appear twice in the Reality Seamstress Glove recipe
+Removed Sangue and Starlight from Final Strikes recipe
+Fixed issue with Starless Sea not working if it was reforged with a speed modifier
+Fixed cross disc cursor showing up for everyone and made the meteors more accurate
+Significantly reduced cost of the Avatar vanity recipes and moved to pre-hardmode
+Fixed Cybernetic Rocket Gauntlet inputs working for everyone in multiplayer
+Pyroclastic Veil works better in multiplayer, only hits enemies it should, and is less effective underwater
+Made spawn chance for Fulmination Spirits more lenient and accurate
+Replaced Hollow Purple
+Reworked Hailfire
+Reworked Florescence Rounds
+
+Ported to Calamity v2.1

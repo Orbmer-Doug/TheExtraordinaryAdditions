@@ -62,7 +62,7 @@ public class GodDummy : ModItem
         else
         {
             if (NPC.CountNPCS(ModContent.NPCType<GodDummyNPC>()) < 25)
-                AdditionsNetcode.SpawnGodDummy(player.Additions().mouseWorld);
+                AdditionsNetcode.SpawnGodDummy(player.Additions().MouseWorld);
         }
 
         return true;

@@ -65,7 +65,7 @@ public class BergIcicle : ModProjectile
                     if (swing.Rect().Intersects(Projectile.RotHitbox()) && swing.AngularVelocity > .03f && swing.Time > 5)
                     {
                         Hit = true;
-                        Projectile.velocity = Projectile.Center.SafeDirectionTo(Modded.mouseWorld) * 14f;
+                        Projectile.velocity = Projectile.Center.SafeDirectionTo(Modded.MouseWorld) * 14f;
                         this.Sync();
                     }
                 }

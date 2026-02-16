@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using CalamityMod.NPCs.Abyss;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -102,13 +103,13 @@ public class MetaballSystem : ModSystem
 {
     public static MetaballSystem Instance => ModContent.GetInstance<MetaballSystem>();
     public const uint MaxMetaballs = 16384;
-    private static Metaball[] metaballs = new Metaball[MaxMetaballs];
-    private static ulong[] presenceMask = BitmaskUtils.CreateMask(MaxMetaballs);
-    public static BitmaskUtils.BitmaskEnumerable ActiveMetaballs => new BitmaskUtils.BitmaskEnumerable(presenceMask.AsSpan(0, presenceMask.Length), MaxMetaballs);
+    private static Metaball[] _metaballs = new Metaball[MaxMetaballs];
+    private static ulong[] _presenceMask = BitmaskUtils.CreateMask(MaxMetaballs);
+    public static BitmaskUtils.BitmaskEnumerable ActiveMetaballs => new BitmaskUtils.BitmaskEnumerable(_presenceMask.AsSpan(0, _presenceMask.Length), MaxMetaballs);
 
     // Metaballs work by having all the particles live on one render target, but this means other types can overpower another one since they both influence each other
     // So we make all types have their own
-    private static Dictionary<MetaballTypes, ManagedRenderTarget> typeRenderTargets = new();
+    private static Dictionary<MetaballTypes, ManagedRenderTarget> _typeRenderTargets = new();
     private ManagedShader _genericShader;
 
     public override void OnModLoad()
@@ -121,7 +122,7 @@ public class MetaballSystem : ModSystem
             // Initialize render targets for each metaball type
             foreach (MetaballTypes type in Enum.GetValues(typeof(MetaballTypes)))
             {
-                typeRenderTargets[type] = new ManagedRenderTarget(true, (w, h) => new RenderTarget2D(
+                _typeRenderTargets[type] = new ManagedRenderTarget(true, (w, h) => new RenderTarget2D(
                     Main.graphics.GraphicsDevice, w / 2, h / 2));
             }
 
@@ -142,9 +143,9 @@ public class MetaballSystem : ModSystem
             On_Main.DrawProjectiles -= DrawMetaballsProjectiles;
             On_Main.DrawNPCs -= DrawMetaballsBeforeNPCs;
             On_Main.DrawPlayers_AfterProjectiles -= DrawMetaballsOverPlayers;
-            foreach (ManagedRenderTarget target in typeRenderTargets.Values)
+            foreach (ManagedRenderTarget target in _typeRenderTargets.Values)
                 target?.Dispose();
-            typeRenderTargets.Clear();
+            _typeRenderTargets.Clear();
         });
     }
 
@@ -153,11 +154,11 @@ public class MetaballSystem : ModSystem
         if (Main.gamePaused || Main.dedServ)
             return;
 
-        int index = BitmaskUtils.AllocateIndex(presenceMask, MaxMetaballs);
+        int index = BitmaskUtils.AllocateIndex(_presenceMask, MaxMetaballs);
         if (index != -1)
         {
-            metaballs[index] = metaball;
-            metaballs[index].Init = new(metaball.Velocity, metaball.Scale, metaball.Opacity, metaball.Color, metaball.Size, metaball.Rotation);
+            _metaballs[index] = metaball;
+            _metaballs[index].Init = new(metaball.Velocity, metaball.Scale, metaball.Opacity, metaball.Color, metaball.Size, metaball.Rotation);
         }
     }
 
@@ -173,11 +174,11 @@ public class MetaballSystem : ModSystem
     {
         foreach (int index in ActiveMetaballs)
         {
-            ref Metaball m = ref metaballs[index];
+            ref Metaball m = ref _metaballs[index];
             m.Time++;
             if (!m.Active)
             {
-                BitmaskUtils.SetBit(presenceMask, index, false);
+                BitmaskUtils.SetBit(_presenceMask, index, false);
                 continue;
             }
 
@@ -240,24 +241,23 @@ public class MetaballSystem : ModSystem
 
                 if (m.Velocity != m.OldVelocity || collide)
                     def.OnCollision?.Invoke(ref m);
-                m.Position += m.Velocity;
             }
-            else
-                m.Position += m.Velocity;
+
+            m.Position += m.Velocity;
 
             def.Update?.Invoke(ref m);
             m.Hitbox = new((int)(m.Position.X - 2), (int)(m.Position.Y - 2), 4, 4);
         }
     }
 
-    private void RenderMetaballsToTarget()
+    private static void RenderMetaballsToTarget()
     {
         GraphicsDevice gd = Main.instance.GraphicsDevice;
 
         // Render each type to its own render target
         foreach (MetaballTypes type in Enum.GetValues(typeof(MetaballTypes)))
         {
-            ManagedRenderTarget target = typeRenderTargets[type];
+            ManagedRenderTarget target = _typeRenderTargets[type];
             gd.SetRenderTarget(target);
             gd.Clear(Color.Transparent);
 
@@ -273,7 +273,7 @@ public class MetaballSystem : ModSystem
 
             foreach (int index in ActiveMetaballs)
             {
-                Metaball metaball = metaballs[index];
+                Metaball metaball = _metaballs[index];
                 if (!metaball.Active || metaball.Type != type)
                     continue;
 
@@ -338,7 +338,7 @@ public class MetaballSystem : ModSystem
         bool hasMetaballs = false;
         foreach (int index in ActiveMetaballs)
         {
-            Metaball m = metaballs[index];
+            Metaball m = _metaballs[index];
             if (m.Active && MetaballRegistry.TypeDefinitions[(byte)m.Type].DrawLayer == layer)
             {
                 hasMetaballs = true;
@@ -370,7 +370,7 @@ public class MetaballSystem : ModSystem
             bool typeHasMetaballs = false;
             foreach (int index in ActiveMetaballs)
             {
-                Metaball m = metaballs[index];
+                Metaball m = _metaballs[index];
                 if (m.Active && m.Type == type)
                 {
                     typeHasMetaballs = true;
@@ -385,9 +385,9 @@ public class MetaballSystem : ModSystem
                 continue;
 
             ManagedShader shader = def.Shader == null ? _genericShader : AssetRegistry.GetShader(def.Shader.Name);
-            def.PrepareShader?.Invoke(shader, typeRenderTargets[type]);
-            shader.SetTexture(typeRenderTargets[type], 1, SamplerState.AnisotropicWrap);
-            Main.spriteBatch.Draw(typeRenderTargets[type], Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 2f, 0, 0f);
+            def.PrepareShader?.Invoke(shader, _typeRenderTargets[type]);
+            shader.SetTexture(_typeRenderTargets[type], 1, SamplerState.AnisotropicWrap);
+            Main.spriteBatch.Draw(_typeRenderTargets[type], Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 2f, 0, 0f);
         }
 
         if (resetSB)
@@ -401,7 +401,7 @@ public class MetaballSystem : ModSystem
     {
         foreach (int index in ActiveMetaballs)
         {
-            ref Metaball m = ref metaballs[index];
+            ref Metaball m = ref _metaballs[index];
             if (m.Active && m.Type == type)
                 modifier(ref m);
         }
@@ -472,7 +472,7 @@ public static class MetaballRegistry
     #endregion
 
     #region Lava
-    public struct LavaData
+    private struct LavaData
     {
         public bool Collided;
         public int Damage;
@@ -497,8 +497,19 @@ public static class MetaballRegistry
 
                 if (!m.GetCustomData<LavaData>().Collided)
                 {
-                    if (m.Velocity.Y < 20f)
-                        m.Velocity.Y += .24f;
+                    bool wet = Collision.WetCollision(m.Position, (int)m.Size.X, (int)m.Size.Y);
+                    float yvel = wet ? .12f : .24f;
+                    float maxYvel = wet ? 10f : 20f;
+                    if (m.Velocity.Y < maxYvel)
+                        m.Velocity.Y += yvel;
+                    m.Velocity = m.Velocity.ClampLength(0f, wet ? 20f : 40f);
+                    if (wet && m.Velocity.Y > maxYvel)
+                        m.Velocity.Y *= .9f;
+                    if (wet)
+                    {
+                        m.Velocity *= .989f;
+                        m.Time++;
+                    }
                 }
 
                 // do sticky
@@ -506,7 +517,13 @@ public static class MetaballRegistry
                 {
                     foreach (NPC npc in Main.ActiveNPCs)
                     {
-                        if (npc == null || npc.friendly || npc.immortal || npc.townNPC || npc.lifeMax <= 5)
+                        if (npc == null ||
+                            npc.friendly ||
+                            npc.immortal ||
+                            npc.townNPC ||
+                            npc.lifeMax <= 5 ||
+                            npc.dontTakeDamage ||
+                            npc.dontCountMe)
                             continue;
 
                         Rectangle rect = new((int)(m.Position.X - m.Size.X / 2), (int)(m.Position.Y - m.Size.Y / 2), (int)m.Size.X, (int)m.Size.Y);
@@ -518,6 +535,8 @@ public static class MetaballRegistry
                                 npc.StrikeNPC(info);
                                 npc.AddBuff(BuffID.OnFire, 180);
                                 npc.immune[data.Owner] = 20;
+                                NetMessage.SendStrikeNPC(npc, info, -1);
+                                npc.netUpdate = true;
                             }
 
                             if (!data.Sticking)
@@ -537,7 +556,7 @@ public static class MetaballRegistry
                         {
                             data.Sticking = false;
                         }
-                        if (data.Sticking)
+                        if (enemy != null && data.Sticking)
                         {
                             m.Velocity.Y = 0f;
                             m.Position = enemy.Center + data.EnemyOffset;

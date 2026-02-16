@@ -52,14 +52,14 @@ public class IcyShards : ModProjectile
             if (Time < (WaitTime - 10))
                 Projectile.rotation += dir * InverseLerp(WaitTime, 0f, Time) * .5f;
             else
-                Projectile.rotation = Projectile.rotation.SmoothAngleLerp(Projectile.AngleTo(Modded.mouseWorld) + MathHelper.PiOver2, .2f, .4f);
+                Projectile.rotation = Projectile.rotation.SmoothAngleLerp(Projectile.AngleTo(Modded.MouseWorld) + MathHelper.PiOver2, .2f, .4f);
         }
         else if (Time == WaitTime)
         {
             ParticleRegistry.SpawnPulseRingParticle(Projectile.RotHitbox().Bottom, Vector2.Zero, 10, Projectile.rotation - MathHelper.PiOver2, new(.3f, 1f), 0f, 40f, Color.SlateBlue);
             if (this.RunLocal())
             {
-                Projectile.velocity = Projectile.SafeDirectionTo(Modded.mouseWorld) * 15f;
+                Projectile.velocity = Projectile.SafeDirectionTo(Modded.MouseWorld) * 15f;
                 this.Sync();
             }
         }

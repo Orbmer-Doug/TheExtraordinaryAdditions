@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CalamityMod;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -27,7 +28,7 @@ public class Mimicry : ModItem
         Item.UseSound = null;
         Item.rare = ModContent.RarityType<BloodWroughtRarity>();
         Item.value = AdditionsGlobalItem.UniqueRarityPrice;
-        Item.DamageType = DamageClass.Melee;
+        Item.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
         Item.shoot = ModContent.ProjectileType<MimicrySlash>();
         Item.noMelee = true;
         Item.noUseGraphic = true;

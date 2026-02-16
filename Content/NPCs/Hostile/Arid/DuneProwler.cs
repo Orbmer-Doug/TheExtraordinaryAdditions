@@ -101,10 +101,10 @@ public class DuneProwler : ModNPC
     public ref float MoveDirectionTimer => ref NPC.AdditionsInfo().ExtraAI[1];
     public override void AI()
     {
-        float minSpeedForTurn = .1f;
-        float baseMaxSpeed = 2f;
-        float maxSpeedIncrease = 6f;
-        float speedIncreasePerFrame = 0.04f;
+        const float minSpeedForTurn = .1f;
+        const float baseMaxSpeed = 2f;
+        const float maxSpeedIncrease = 6f;
+        const float speedIncreasePerFrame = 0.04f;
 
         NPC.TargetClosest(true);
         Player target = Main.player[NPC.target];
@@ -134,11 +134,7 @@ public class DuneProwler : ModNPC
         bool forceJump = false;
         Rectangle playerHitbox;
         bool onGround = false;
-        bool wasVelocityXZero = false;
-        if (NPC.velocity.X == 0f)
-        {
-            wasVelocityXZero = true;
-        }
+        bool wasVelocityXZero = false || NPC.velocity.X == 0f;
         if (NPC.justHit)
         {
             wasVelocityXZero = false;

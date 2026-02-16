@@ -20,6 +20,8 @@ public class Exsanguination : ModItem
         Item.value = AdditionsGlobalItem.RarityPinkBuyPrice;
     }
 
+    public override bool CanShoot(Player player) => player.ownedProjectileCounts[Item.shoot] == 0;
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(new Color(235, 64, 52));

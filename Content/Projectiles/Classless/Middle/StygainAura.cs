@@ -83,7 +83,7 @@ public class StygainAura : ModProjectile
         if (StoredDamage >= 10000f)
         {
             Vector2 pos = Owner.Center + new Vector2(-4f * Owner.direction, -20f);
-            Vector2 vel = pos.SafeDirectionTo(Owner.Additions().mouseWorld).SafeNormalize(Vector2.Zero);
+            Vector2 vel = pos.SafeDirectionTo(Owner.Additions().MouseWorld).SafeNormalize(Vector2.Zero);
             for (float i = 1f; i > 0f; i -= .2f)
                 ParticleRegistry.SpawnPulseRingParticle(Owner.Center, vel * (14f * i), 40, vel.ToRotation(), new(.5f, 1f), 0f, i * 320f, Color.Crimson);
             if (this.RunLocal())

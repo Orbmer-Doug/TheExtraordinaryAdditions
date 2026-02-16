@@ -306,9 +306,9 @@ public class VanillaChanges : GlobalItem
 
         void DoShotAnimation(float amount)
         {
-            player.ChangeDir(Math.Sign((player.Additions().mouseWorld - player.Center).X));
+            player.ChangeDir(Math.Sign((player.Additions().MouseWorld - player.Center).X));
             float animProgress = 1f - player.itemTime / (float)player.itemTimeMax;
-            float rotation = (player.Center - player.Additions().mouseWorld).ToRotation() * player.gravDir + MathHelper.PiOver2;
+            float rotation = (player.Center - player.Additions().MouseWorld).ToRotation() * player.gravDir + MathHelper.PiOver2;
             if (animProgress < 0.4f)
             {
                 rotation += -amount * ((0.4f - animProgress) / 0.4f).Squared() * player.direction;
@@ -318,8 +318,8 @@ public class VanillaChanges : GlobalItem
 
         void AimArms()
         {
-            player.ChangeDir(Math.Sign((player.Additions().mouseWorld - player.Center).X));
-            float rotation = (player.Center - player.Additions().mouseWorld).ToRotation() * player.gravDir + MathHelper.PiOver2;
+            player.ChangeDir(Math.Sign((player.Additions().MouseWorld - player.Center).X));
+            float rotation = (player.Center - player.Additions().MouseWorld).ToRotation() * player.gravDir + MathHelper.PiOver2;
             player.SetCompositeArmFront(true, 0, rotation);
         }
     }
@@ -344,7 +344,7 @@ public class VanillaChanges : GlobalItem
 
         void HoldOut(float dist, Vector2 itemSize, Vector2 itemOrigin, float rot = MathHelper.PiOver2)
         {
-            player.ChangeDir(Math.Sign((player.Additions().mouseWorld - player.Center).X));
+            player.ChangeDir(Math.Sign((player.Additions().MouseWorld - player.Center).X));
             float itemRotation = player.compositeFrontArm.rotation + rot * player.gravDir;
             Vector2 itemPosition = player.MountedCenter + itemRotation.ToRotationVector2() * dist;
             CleanHoldStyle(player, itemRotation, itemPosition, itemSize, itemOrigin);

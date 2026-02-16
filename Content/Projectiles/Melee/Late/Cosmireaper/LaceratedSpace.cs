@@ -31,7 +31,7 @@ public class LaceratedSpace : ModProjectile, ILocalizedModType, IModType
 
     public bool MakingPoints
     {
-        get => Projectile.ai[0] == 1f;
+        get => (int)Projectile.ai[0] == 1;
         set => Projectile.ai[0] = value.ToInt();
     }
 

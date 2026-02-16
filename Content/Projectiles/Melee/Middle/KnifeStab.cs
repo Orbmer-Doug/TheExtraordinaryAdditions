@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.IO;
+using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -44,7 +45,7 @@ public class KnifeStab : ModProjectile
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = 1;
         Projectile.ownerHitCheck = true;
-        Projectile.DamageType = DamageClass.Melee;
+        Projectile.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
     }
     public Vector2 offset;
     public Vector2 stabVec;
@@ -89,7 +90,7 @@ public class KnifeStab : ModProjectile
                 {
                     if (this.RunLocal())
                     {
-                        Projectile.velocity = Owner.SafeDirectionTo(Owner.Additions().mouseWorld).RotatedByRandom(0.25f);
+                        Projectile.velocity = Utility.SafeDirectionTo(Owner, Owner.Additions().MouseWorld).RotatedByRandom(0.25f);
                         this.Sync();
                     }
                     stabVec = new Vector2(Main.rand.NextFloat(90, 150), 0);

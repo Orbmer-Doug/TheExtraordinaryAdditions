@@ -43,7 +43,7 @@ public class UnitCircle : ModProjectile
     {
         // Set position
         if (Time == 0f)
-            Projectile.Center = Owner.Additions().mouseWorld;
+            Projectile.Center = Owner.Additions().MouseWorld;
 
         // Increment timer
         Time++;

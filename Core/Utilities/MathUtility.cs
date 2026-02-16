@@ -641,8 +641,8 @@ public static partial class Utility
 
     public static bool FinalExtraUpdate(this Projectile proj) => proj.numUpdates == -1;
 
-    public static Rectangle MouseHitbox => new((int)Main.LocalPlayer.Additions().mouseWorld.X, (int)Main.LocalPlayer.Additions().mouseWorld.Y, 14, 14);
-    public static Rectangle MouseScreenHitbox => new((int)Main.LocalPlayer.Additions().mouseScreen.X, (int)Main.LocalPlayer.Additions().mouseScreen.Y, 14, 14);
+    public static Rectangle MouseHitbox => new((int)Main.LocalPlayer.Additions().MouseWorld.X, (int)Main.LocalPlayer.Additions().MouseWorld.Y, 14, 14);
+    public static Rectangle MouseScreenHitbox => new((int)Main.LocalPlayer.Additions().MouseScreen.X, (int)Main.LocalPlayer.Additions().MouseScreen.Y, 14, 14);
 
     public static Vector2 ClampToWorld(Vector2 position, bool tilePos = false)
     {

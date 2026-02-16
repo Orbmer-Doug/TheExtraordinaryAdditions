@@ -7,7 +7,7 @@ using Terraria.ModLoader;
 using Terraria.ObjectData;
 using TheExtraordinaryAdditions.Content.NPCs.Hostile.Arid;
 using TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
-using TheExtraordinaryAdditions.Content.NPCs.Hostile.Lightning;
+using TheExtraordinaryAdditions.Content.NPCs.Hostile.Fulgur;
 using TheExtraordinaryAdditions.Content.NPCs.Hostile.SolarGuardian;
 
 namespace TheExtraordinaryAdditions.Content.Tiles;

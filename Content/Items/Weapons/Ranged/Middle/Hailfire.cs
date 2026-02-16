@@ -30,7 +30,7 @@ public class Hailfire : ModItem
         Item.autoReuse = true;
         Item.useStyle = ItemUseStyleID.Shoot;
         Item.DamageType = DamageClass.Ranged;
-        Item.damage = 78;
+        Item.damage = 178;
         Item.knockBack = 2f;
         Item.noMelee = true;
         Item.shoot = ModContent.ProjectileType<HailfireHoldout>();

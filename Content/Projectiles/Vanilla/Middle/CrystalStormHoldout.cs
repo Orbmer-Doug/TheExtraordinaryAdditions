@@ -38,7 +38,7 @@ public class CrystalStormHoldout : BaseIdleHoldoutProjectile
 
         if (this.RunLocal())
         {
-            Projectile.velocity = Center.SafeDirectionTo(Modded.mouseWorld);
+            Projectile.velocity = Center.SafeDirectionTo(Modded.MouseWorld);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }

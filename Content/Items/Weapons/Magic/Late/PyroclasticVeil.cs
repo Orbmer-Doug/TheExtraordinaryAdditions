@@ -55,7 +55,7 @@ public class PyroclasticVeil : ModItem
     {
         Recipe recipe = CreateRecipe();
         recipe.AddIngredient(ModContent.ItemType<UnholyCore>(), 10);
-        recipe.AddIngredient(ModContent.ItemType<CoreofHavoc>(), 12);
+        recipe.AddIngredient(ModContent.ItemType<EssenceofHavoc>(), 12);
         recipe.AddIngredient(ModContent.ItemType<TomeOfHellfire>(), 1);
         recipe.AddIngredient(ModContent.ItemType<Fireball>(), 1);
         recipe.AddIngredient(ItemID.LunarBar, 8);

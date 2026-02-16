@@ -16,7 +16,7 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 public class AuroraGuardLeg : Entity
 {
     public float Maxlength;
-    public bool LatchedOn = false;
+    public bool LatchedOn;
 
     public AuroraGuardLeg PairedLeg;
     public AuroraGuardLeg SisterLeg;
@@ -31,10 +31,10 @@ public class AuroraGuardLeg : Entity
     public Vector2 LegTipGraphic;
     public Vector2 LegOriginGraphic;
 
-    public float GrabDelay = 0;
-    public float StepTimer = 0;
-    public float StrideTimer = 0;
-    public float FallTime = 0f;
+    public float GrabDelay;
+    public float StepTimer;
+    public float StrideTimer;
+    public float FallTime;
 
     /// <summary>
     /// The absolutely ideal grab position of the leg
@@ -54,21 +54,13 @@ public class AuroraGuardLeg : Entity
     /// <summary>
     /// The best grab tile we found
     /// </summary>
-    public Point? GrabTile
-    {
-        get
-        {
-            if (GrabPosition != null)
-                return GrabPosition.Value.ToTileCoordinates();
-            return null;
-        }
-    }
+    public Point? GrabTile => GrabPosition?.ToTileCoordinates();
 
     public float Foreleglength => 40.5f;
     public float Leglength => 96f;
 
-    public AuroraGuard turret;
-    public float BaseRotation;
+    public readonly AuroraGuard turret;
+    public readonly float BaseRotation;
 
     public bool PlayedStepEffects = true; // If it needs to play its stepping sound
     public float StepEffectForce = 1f; // Volume of the stepping sound when played. Amps up the longer the foot is left in the air
@@ -127,7 +119,6 @@ public class AuroraGuardLeg : Entity
         position = LegOrigin;
         Center = LegKnee;
 
-        int dir = turret.NPC.velocity.X.NonZeroSign();
         if (LeftSet)
             direction = -1;
         else
@@ -150,7 +141,7 @@ public class AuroraGuardLeg : Entity
                 if (StepEffectForce > 0.4f)
                 {
                     // Step sound volume scales with how long the leg has been out in the air
-                    float stepPitch = InverseLerp(300f, 1000f, LegTip.Distance(Main.LocalPlayer.Center), true) * .3f;
+                    float stepPitch = InverseLerp(300f, 1000f, LegTip.Distance(Main.LocalPlayer.Center)) * .3f;
                     float stepVolume = InverseLerp(0.5f, 1f, StepEffectForce);
                     AdditionsSound.LegStomp.Play(LegTip, stepVolume * .36f, stepPitch, .1f, 20);
                     Collision.HitTiles(LegTip, LegTip.SafeDirectionTo(turret.VisualCenter), 15, 15);

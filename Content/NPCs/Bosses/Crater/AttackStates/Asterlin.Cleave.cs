@@ -39,11 +39,9 @@ public partial class Asterlin : ModNPC
 
     public static int Cleave_MaxCycles => DifficultyBasedValue(6, 7, 8);
     public static int Cleave_HammerReelTime => DifficultyBasedValue(SecondsToFrames(1.4f), SecondsToFrames(1.2f), SecondsToFrames(1f), SecondsToFrames(.8f), SecondsToFrames(.6f));
-    public static int Cleave_HammerOutTime => SecondsToFrames(.2f);
     public static float Cleave_DownAcceleration => 15f;
     public static float Cleave_MaxDownSpeed => 116f;
     public static int Cleave_DartCount => DifficultyBasedValue(10, 12, 15, 16, 17, 20);
-    public static int Cleave_DartWaves => DifficultyBasedValue(1, 1, 2);
     public static int Cleave_PillarCount => 40;
     public static int Cleave_PillarWait => DifficultyBasedValue(30, 25, 20);
     public static float Cleave_PillarFallSpeed => DifficultyBasedValue(20f, 25f, 30f, 32f, 34f, 36f);
@@ -57,7 +55,7 @@ public partial class Asterlin : ModNPC
     }
     public bool Cleave_Diving
     {
-        get => ExtraAI[1] == 1;
+        get => (int)ExtraAI[1] == 1;
         set => ExtraAI[1] = value.ToInt();
     }
     public int Cleave_Wait
@@ -67,7 +65,7 @@ public partial class Asterlin : ModNPC
     }
     public bool Cleave_HitGround
     {
-        get => ExtraAI[3] == 1;
+        get => (int)ExtraAI[3] == 1;
         set => ExtraAI[3] = value.ToInt();
     }
     public int Cleave_ThrowTimer
@@ -86,7 +84,7 @@ public partial class Asterlin : ModNPC
             NPC.SmoothFlyNear(new Vector2(Target.Center.X + 100f * (NPC.Center.X > Target.Center.X).ToDirectionInt(), Target.Center.Y - 20f), .15f, .9f);
 
             float interpol = InverseLerp(0f, Cleave_ThrowTime, Cleave_ThrowTimer);
-            SetRightHandTarget(RightArm.RootPosition + PolarVector(400f, Utils.AngleLerp(-MathHelper.PiOver2, behind, Animators.MakePoly(5f).InFunction(interpol))));
+            SetRightHandTarget(RightArm.RootPosition + PolarVector(400f, (-MathHelper.PiOver2).AngleLerp(behind, Animators.MakePoly(5f).InFunction(interpol))));
 
             if (interpol >= 1 && Hammer != null)
             {
@@ -108,7 +106,7 @@ public partial class Asterlin : ModNPC
             NPC.SmoothFlyNear(new Vector2(Target.Center.X + Target.Velocity.ClampLength(0f, 50f).X * 20f,
                 Target.Center.Y - Animators.MakePoly(3f).InFunction.Evaluate(100f, 450f, interpol)), .15f, .9f);
 
-            float rot = Utils.AngleLerp(dir == 1 ? 0f : MathHelper.Pi, behind, Animators.MakePoly(3f).InOutFunction(interpol));
+            float rot = (dir == 1 ? 0f : MathHelper.Pi).AngleLerp(behind, Animators.MakePoly(3f).InOutFunction(interpol));
             SetRightHandTarget(RightArm.RootPosition + PolarVector(400f, rot));
 
             if (AITimer > (Cleave_HammerReelTime + 20))

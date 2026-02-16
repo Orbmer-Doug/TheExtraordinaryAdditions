@@ -43,7 +43,7 @@ public class AsterlinBossbar : ModBossBar
 
         Point barSize = new(456, 22);
         Point topLeftOffset = new(32, 24);
-        int frameCount = 6;
+        const int frameCount = 6;
 
         Rectangle bgFrame = barTexture.Frame(verticalFrames: frameCount, frameY: 3);
         Color bgColor = Color.White * 0.2f;

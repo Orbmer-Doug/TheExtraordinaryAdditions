@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.IO;
+using CalamityMod;
 using Terraria;
 using Terraria.Audio;
 using Terraria.Enums;
@@ -38,7 +39,7 @@ public class EtherealSwing : ModProjectile
         Projectile.penetrate = -1;
         Projectile.timeLeft = 2;
         Projectile.extraUpdates = 3;
-        Projectile.DamageType = DamageClass.Melee;
+        Projectile.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
         Projectile.noEnchantmentVisuals = true;
         Projectile.netImportant = true;
     }
@@ -84,6 +85,12 @@ public class EtherealSwing : ModProjectile
 
     public override void AI()
     {
+        if (!Owner.Available())
+        {
+            Projectile.Kill();
+            return;
+        }
+        
         if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, null, 50);
 
@@ -102,7 +109,7 @@ public class EtherealSwing : ModProjectile
 
         if (this.RunLocal())
         {
-            float target = Owner.MountedCenter.AngleTo(Modded.mouseWorld);
+            float target = Owner.MountedCenter.AngleTo(Modded.MouseWorld);
             Projectile.rotation = Projectile.rotation.AngleLerp(target, .005f);
             if (Projectile.rotation != Projectile.oldRot[1])
                 this.Sync();

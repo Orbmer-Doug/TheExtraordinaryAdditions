@@ -37,5 +37,6 @@ public class TechnicTransmitter : ModItem, ILocalizedModType, IModType
         recipe.AddIngredient(ItemID.Glass, 40);
         recipe.AddIngredient(ItemID.Wire, 120);
         recipe.AddTile(ModContent.TileType<CosmicAnvil>());
+        recipe.Register();
     }
 }

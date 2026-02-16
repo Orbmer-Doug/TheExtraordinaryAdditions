@@ -72,7 +72,7 @@ public class NothingThereHelmet : ModItem
         // Summon the teeth while counting down
         if (counter % 5f == 4f)
         {
-            Vector2 mouse = player.Additions().mouseWorld;
+            Vector2 mouse = player.Additions().MouseWorld;
             float rand = Main.rand.NextFloat(300f, 300f);
             Vector2 pos = mouse + Main.rand.NextVector2CircularEdge(rand, rand);
             Vector2 vel = pos.SafeDirectionTo(mouse) * Main.rand.NextFloat(10f, 20f);

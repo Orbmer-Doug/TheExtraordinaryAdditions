@@ -27,8 +27,8 @@ public class HellfireHoldout : BaseHoldoutProjectile
     {
         if (this.RunLocal())
         {
-            float interpolant = Utils.GetLerpValue(5f, 40f, Projectile.Distance(Owner.Additions().mouseWorld), true);
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Owner.Additions().mouseWorld), interpolant);
+            float interpolant = Utils.GetLerpValue(5f, 40f, Projectile.Distance(Owner.Additions().MouseWorld), true);
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Owner.Additions().MouseWorld), interpolant);
             if (Projectile.oldVelocity != Projectile.velocity)
                 this.Sync();
         }
@@ -51,7 +51,7 @@ public class HellfireHoldout : BaseHoldoutProjectile
             {
                 for (int i = 0; i < Main.rand.Next(3, 5); i++)
                 {
-                    Vector2 newVelocity = (Projectile.SafeDirectionTo(Owner.Additions().mouseWorld) * 15f).RotatedByRandom(Main.rand.NextFloat(.24f, .4f)) * Main.rand.NextFloat(.7f, 1.05f);
+                    Vector2 newVelocity = (Projectile.SafeDirectionTo(Owner.Additions().MouseWorld) * 15f).RotatedByRandom(Main.rand.NextFloat(.24f, .4f)) * Main.rand.NextFloat(.7f, 1.05f);
 
                     int type = ModContent.ProjectileType<HellishNapalm>();
                     Projectile.NewProj(Projectile.Center, newVelocity, type, Projectile.damage, Projectile.knockBack);

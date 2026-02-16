@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.IO;
+using CalamityMod;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -39,7 +40,7 @@ public class BirchStickLance : ModProjectile
         Projectile.tileCollide = false;
         Projectile.scale = 1f;
         Projectile.ownerHitCheck = true;
-        Projectile.DamageType = DamageClass.MeleeNoSpeed;
+        Projectile.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
         Projectile.noEnchantmentVisuals = true;
     }
 
@@ -101,7 +102,7 @@ public class BirchStickLance : ModProjectile
             cache?.Clear();
             PlayedSound = false;
             if (this.RunLocal())
-                Projectile.velocity = Center.SafeDirectionTo(Modded.mouseWorld);
+                Projectile.velocity = Center.SafeDirectionTo(Modded.MouseWorld);
             Time = 0f;
             Initialized = true;
             this.Sync();
@@ -223,7 +224,7 @@ public class BirchStickLance : ModProjectile
             Projectile.timeLeft = 200;
 
             Projectile.scale = InverseLerp(0f, 20f, Time);
-            Projectile.velocity = Center.SafeDirectionTo(Modded.mouseWorld);
+            Projectile.velocity = Center.SafeDirectionTo(Modded.MouseWorld);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }

@@ -135,7 +135,7 @@ public class EverbladedSwing : BaseSwordSwing
     {
         if (this.RunLocal())
         {
-            DesiredForwardAngle = Utils.Remap(Modded.mouseWorld.Distance(Owner.Center), 0f, screenHeight / 2, 0f, 1.5f);
+            DesiredForwardAngle = Utils.Remap(Modded.MouseWorld.Distance(Owner.Center), 0f, screenHeight / 2, 0f, 1.5f);
             ForwardAngle = SmoothStep(ForwardAngle, DesiredForwardAngle, .15f);
         }
 
@@ -355,7 +355,6 @@ public class EverbladedSwing : BaseSwordSwing
     public override bool PreDraw(ref Color lightColor)
     {
         // Determine the effects for drawing. These must be done here otherwise silly things WILL happen.
-        Vector2 origin;
         bool flip = SwingDir != SwingDirection.Up;
         if (Direction == -1)
             flip = SwingDir == SwingDirection.Up;
@@ -364,15 +363,11 @@ public class EverbladedSwing : BaseSwordSwing
 
         if (flip)
         {
-            origin = new Vector2(0, Tex.Height);
-
             RotationOffset = 0;
             Effects = SpriteEffects.None;
         }
         else
         {
-            origin = new Vector2(Tex.Width, Tex.Height);
-
             RotationOffset = PiOver2;
             Effects = SpriteEffects.FlipHorizontally;
         }

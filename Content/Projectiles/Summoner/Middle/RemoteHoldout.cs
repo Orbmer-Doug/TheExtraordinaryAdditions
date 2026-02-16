@@ -27,7 +27,7 @@ public class RemoteHoldout : BaseIdleHoldoutProjectile
     {
         if (this.RunLocal())
         {
-            Projectile.velocity = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true).SafeDirectionTo(Modded.mouseWorld);
+            Projectile.velocity = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true).SafeDirectionTo(Modded.MouseWorld);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }

@@ -261,7 +261,7 @@ public class GunGunSword : ModProjectile
         {
             if (this.RunLocal())
             {
-                Projectile.velocity = Center.SafeDirectionTo(Modded.mouseWorld);
+                Projectile.velocity = Center.SafeDirectionTo(Modded.MouseWorld);
                 this.Sync();
             }
             AdditionsSound.SnakeRocketOut.Play(Projectile.Center, .6f);
@@ -333,7 +333,7 @@ public class GunGunSword : ModProjectile
             {
                 if (this.RunLocal())
                 {
-                    Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Center.SafeDirectionTo(Modded.mouseWorld), .4f);
+                    Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Center.SafeDirectionTo(Modded.MouseWorld), .4f);
                     if (Projectile.velocity != Projectile.oldVelocity)
                         this.Sync();
                 }

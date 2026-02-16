@@ -7,9 +7,6 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Base;
 
-/// <summary>
-/// 
-/// </summary>
 public abstract class BaseHoldoutProjectile : ModProjectile, ILocalizedModType, IModType
 {
     public virtual void Defaults() { }
@@ -45,8 +42,8 @@ public abstract class BaseHoldoutProjectile : ModProjectile, ILocalizedModType, 
     }
     public SpriteEffects FixedDirection()
     {
-        SpriteEffects effects = Projectile.direction == -Owner.gravDir ? SpriteEffects.FlipVertically : SpriteEffects.None;
-        if (Owner.gravDir == -1 && Projectile.direction == -Owner.gravDir)
+        SpriteEffects effects = Projectile.direction == -(int)Owner.gravDir ? SpriteEffects.FlipVertically : SpriteEffects.None;
+        if ((int)Owner.gravDir == -1 && Projectile.direction == -(int)Owner.gravDir)
             effects |= SpriteEffects.FlipVertically;
         return effects;
     }
@@ -63,19 +60,17 @@ public abstract class BaseHoldoutProjectile : ModProjectile, ILocalizedModType, 
             DieEffect();
             return;
         }
-        else
-        {
-            Center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
-            Mouse = Modded.mouseWorld;
 
-            Projectile.timeLeft = 2;
-            Owner.heldProj = Projectile.whoAmI;
-            if (SetItemTime)
-                Owner.SetDummyItemTime(2);
-            SafeAI();
-            Projectile.spriteDirection = Projectile.direction;
-            Owner.itemRotation = MathHelper.WrapAngle(Projectile.velocity.ToRotation() * Projectile.direction);
-        }
+        Center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
+        Mouse = Modded.MouseWorld;
+
+        Projectile.timeLeft = 2;
+        Owner.heldProj = Projectile.whoAmI;
+        if (SetItemTime)
+            Owner.SetDummyItemTime(2);
+        SafeAI();
+        Projectile.spriteDirection = Projectile.direction;
+        Owner.itemRotation = MathHelper.WrapAngle(Projectile.velocity.ToRotation() * Projectile.direction);
     }
     public virtual void SafeAI() { }
     public virtual bool ShouldDie()

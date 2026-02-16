@@ -77,8 +77,6 @@ public class FinalStrike : ModItem
         recipe.AddIngredient(ModContent.ItemType<DecayingCutlery>(), 1);
         recipe.AddIngredient(ItemID.Gungnir, 1);
         recipe.AddIngredient(ItemID.NorthPole, 1);
-        recipe.AddIngredient(ItemID.PiercingStarlight, 1);
-        recipe.AddIngredient(ModContent.ItemType<Sangue>(), 1);
         recipe.AddIngredient(ItemID.DayBreak, 1);
         recipe.AddIngredient(ModContent.ItemType<AbyssalCurrents>(), 1);
         recipe.AddIngredient(ModContent.ItemType<CondereFulmina>(), 1);

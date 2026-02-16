@@ -5,6 +5,7 @@ using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.ModLoader.Utilities;
 using TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 using TheExtraordinaryAdditions.Content.Items.Placeable.Banners;
 using TheExtraordinaryAdditions.Core.Globals;
@@ -200,9 +201,9 @@ public class SolarGuardian : ModNPC
 
     public override float SpawnChance(NPCSpawnInfo spawnInfo)
     {
-        if (Main.hardMode && spawnInfo.Sky)
-            return 0.03f;
-        return 0f;
+        if (!spawnInfo.Player.ZoneSkyHeight || spawnInfo.PlayerSafe)
+            return 0f;
+        return SpawnCondition.Sky.Chance * .035f;
     }
 
     public override void OnHitPlayer(Player target, Player.HurtInfo hurtInfo)
@@ -218,12 +219,12 @@ public class SolarGuardian : ModNPC
             Dust o = Dust.NewDustDirect(NPC.position, NPC.width, NPC.height, DustID.OrangeTorch, hit.HitDirection * 2, hit.HitDirection * 2, 0, default(Color), 3f);
             o.noGravity = true;
         }
-        if (this.NPC.life <= 0)
+        if (NPC.life <= 0)
         {
             for (int j = 0; j < 70; j++)
             {
                 Dust obj = Dust.NewDustDirect(NPC.position, (int)(NPC.width * this.NPC.scale), (int)(NPC.height * this.NPC.scale * 0.6f), DustID.SolarFlare, hit.HitDirection * 3f, -1f, 0, default(Color), 6f);
-                obj.scale *= Utils.NextFloat(Main.rand, 0.85f, 1.15f);
+                obj.scale *= Main.rand.NextFloat(0.85f, 1.15f);
                 obj.fadeIn = 0.5f;
                 obj.noGravity = true;
             }

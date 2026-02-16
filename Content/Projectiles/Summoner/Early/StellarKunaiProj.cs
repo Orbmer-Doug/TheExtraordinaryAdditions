@@ -97,7 +97,7 @@ public class StellarKunaiProj : ModProjectile, ILocalizedModType, IModType
         {
             if (this.RunLocal())
             {
-                Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, center.SafeDirectionTo(Owner.Additions().mouseWorld), (1f - ChargeProgress) * .5f);
+                Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, center.SafeDirectionTo(Owner.Additions().MouseWorld), (1f - ChargeProgress) * .5f);
                 if (Projectile.velocity != Projectile.oldVelocity)
                     this.Sync();
             }

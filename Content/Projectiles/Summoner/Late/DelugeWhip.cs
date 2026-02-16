@@ -21,7 +21,7 @@ public class DelugeWhip : BaseWhip
         {
             if (this.RunLocal())
             {
-                int x = (int)MathHelper.Clamp((int)Projectile.Center.Distance(Modded.mouseWorld), 100, 700);
+                int x = (int)MathHelper.Clamp((int)Projectile.Center.Distance(Modded.MouseWorld), 100, 700);
                 Projectile.Size = new(x, (int)Utils.Remap(x, 100, 700, 80, 250));
                 this.Sync();
             }

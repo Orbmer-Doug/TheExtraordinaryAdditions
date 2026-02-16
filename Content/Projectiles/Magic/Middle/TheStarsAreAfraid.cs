@@ -94,7 +94,7 @@ public class TheStarsAreAfraid : ModProjectile
 
                 if (this.RunLocal())
                 {
-                    Projectile.velocity = Projectile.SafeDirectionTo(ModdedOwner.mouseWorld) * 12f;
+                    Projectile.velocity = Projectile.SafeDirectionTo(ModdedOwner.MouseWorld) * 12f;
                     this.Sync();
                 }
                 Projectile.extraUpdates = 2;
@@ -130,7 +130,7 @@ public class TheStarsAreAfraid : ModProjectile
         {
             if (this.RunLocal())
             {
-                Projectile.velocity = Projectile.Center.SafeDirectionTo(ModdedOwner.mouseWorld);
+                Projectile.velocity = Projectile.Center.SafeDirectionTo(ModdedOwner.MouseWorld);
                 if (Projectile.velocity != Projectile.oldVelocity)
                     this.Sync();
             }

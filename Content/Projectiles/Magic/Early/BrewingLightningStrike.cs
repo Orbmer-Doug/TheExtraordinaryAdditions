@@ -72,7 +72,7 @@ public class BrewingLightningStrike : ModProjectile, ILocalizedModType, IModType
         {
             if (this.RunLocal())
             {
-                StoredY = ModdedOwner.mouseWorld.Y;
+                StoredY = ModdedOwner.MouseWorld.Y;
             }
             Init = true;
             this.Sync();

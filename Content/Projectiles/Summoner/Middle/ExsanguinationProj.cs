@@ -22,13 +22,13 @@ public class ExsanguinationProj : BaseWhip
     public static readonly int TotalEmbedTime = SecondsToFrames(5);
     public bool AbleToHit
     {
-        get => Projectile.ai[2] == 1f;
+        get => (int)Projectile.ai[2] == 1;
         set => Projectile.ai[2] = value.ToInt();
     }
     public ref float ClickTimer => ref Projectile.AdditionsInfo().ExtraAI[0];
     public bool Embedded
     {
-        get => Projectile.AdditionsInfo().ExtraAI[1] == 1f;
+        get => (int)Projectile.AdditionsInfo().ExtraAI[1] == 1;
         set => Projectile.AdditionsInfo().ExtraAI[1] = value.ToInt();
     }
 
@@ -36,7 +36,6 @@ public class ExsanguinationProj : BaseWhip
     public NPC target;
     public ref float SavedCompletion => ref Projectile.AdditionsInfo().ExtraAI[2];
     public ref float EmbedTime => ref Projectile.AdditionsInfo().ExtraAI[3];
-
     public ref float LineBrightness => ref Projectile.AdditionsInfo().ExtraAI[4];
 
     public override bool? CanHitNPC(NPC target)

@@ -164,7 +164,7 @@ public class HorsemenDive : ModProjectile
         if (Time == 0f)
         {
             if (this.RunLocal())
-                Projectile.velocity = Center.SafeDirectionTo(Modded.mouseWorld);
+                Projectile.velocity = Center.SafeDirectionTo(Modded.MouseWorld);
 
             Start = Projectile.Center;
             Projectile.netUpdate = true;

@@ -41,7 +41,7 @@ public partial class Asterlin : ModNPC
     }
     public ref float Lightripper_InitialDirection => ref ExtraAI[2];
 
-    public static float Lightripper_BeamDelay => 11f;
+    public static int Lightripper_BeamDelay => 11;
     public static float Lightripper_FanOffset => 1.45f;
     public static int Lightripper_ReleaseRate => 2;
     public static int Lightripper_TotalBeams => DifficultyBasedValue(7, 8, 10, 11, 12, 14);
@@ -65,7 +65,7 @@ public partial class Asterlin : ModNPC
                     float offsetAngle = MathHelper.Lerp(-Lightripper_FanOffset, Lightripper_FanOffset, fanInterpolant);
                     Vector2 shootVelocity = (Lightripper_InitialDirection + offsetAngle).ToRotationVector2();
 
-                    if (this.RunServer() && AITimer % Lightripper_ReleaseRate == Lightripper_ReleaseRate - 1f)
+                    if (this.RunServer() && AITimer % Lightripper_ReleaseRate == Lightripper_ReleaseRate - 1)
                     {
                         int type = ModContent.ProjectileType<LightrippingBeam>();
                         NPC.NewNPCProj(RightHandPosition + shootVelocity.SafeNormalize(Vector2.Zero) * 100f, shootVelocity, type, HeavyAttackDamage, 0f);

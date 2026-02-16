@@ -89,6 +89,7 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
         Projectile.width = Projectile.height = 2;
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = 13;
+        Projectile.friendly = true;
     }
 
     public override bool ShouldDie() => false;
@@ -218,7 +219,7 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
         return targetHitbox.CollisionFromPoints(points.Points, c => 120f);
     }
 
-    public override bool? CanDamage() => Projectile.scale >= 1f;
+    public override bool? CanDamage() => Projectile.scale >= 1f ? null : false;
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {

@@ -13,14 +13,10 @@ public partial class Asterlin : ModNPC
     [AutomatedMethodInvoke]
     public void LoadStateTransitions_UnveilingZenith()
     {
-        StateMachine.RegisterTransition(AsterlinAIType.UnveilingZenith, new Dictionary<AsterlinAIType, float> { { AsterlinAIType.GabrielLeave, 1f } }, false, () =>
-        {
-            return AITimer >= UnveilingZenith_TotalTime && !Utility.AnyProjectile(ModContent.ProjectileType<BarrageBeam>());
-        });
-        StateMachine.RegisterTransition(AsterlinAIType.UnveilingZenith, new Dictionary<AsterlinAIType, float> { { AsterlinAIType.GetScrewed, 1f } }, false, () =>
-        {
-            return UnveilingZenith_CollapseTimer >= UnveilingZenith_StarCollapseTime;
-        });
+        StateMachine.RegisterTransition(AsterlinAIType.UnveilingZenith, new Dictionary<AsterlinAIType, float> { { AsterlinAIType.GabrielLeave, 1f } }, false, () 
+            => AITimer >= UnveilingZenith_TotalTime && !AnyProjectile(ModContent.ProjectileType<BarrageBeam>()));
+        StateMachine.RegisterTransition(AsterlinAIType.UnveilingZenith, new Dictionary<AsterlinAIType, float> { { AsterlinAIType.GetScrewed, 1f } }, false, ()
+            => UnveilingZenith_CollapseTimer >= UnveilingZenith_StarCollapseTime);
 
         StateMachine.RegisterStateEntryCallback(AsterlinAIType.UnveilingZenith, () =>
         {
@@ -34,7 +30,6 @@ public partial class Asterlin : ModNPC
     }
 
     public static int UnveilingZenith_StarCollapseTime => SecondsToFrames(.3f);
-    public static int UnveilingZenith_FlameReleaseRate => DifficultyBasedValue(SecondsToFrames(.4f), SecondsToFrames(.3f), SecondsToFrames(.25f), SecondsToFrames(.22f), SecondsToFrames(.2f), SecondsToFrames(.17f));
     public static int UnveilingZenith_BeamReleaseRate => DifficultyBasedValue(SecondsToFrames(.5f), SecondsToFrames(.4f), SecondsToFrames(.3f), SecondsToFrames(.25f), SecondsToFrames(.2f), SecondsToFrames(.2f));
     public static int UnveilingZenith_TotalTime => SecondsToFrames(20.8f);
     public static float UnveilingZenith_BlurAmount => .4f;
@@ -63,7 +58,7 @@ public partial class Asterlin : ModNPC
             {
                 if (this.RunServer())
                     NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<DisintegrationNova>(), Asterlin.SuperHeavyAttackDamage * 5, 100f);
-                foreach (Projectile p in Utility.AllProjectilesByID(ModContent.ProjectileType<ConvergentFireball>()))
+                foreach (Projectile p in AllProjectilesByID(ModContent.ProjectileType<ConvergentFireball>()))
                     p.Kill();
             }
         }
@@ -80,8 +75,8 @@ public partial class Asterlin : ModNPC
             }
         }
 
-        float velocity = 4f;
-        float amt = .1f;
+        const float velocity = 4f;
+        const float amt = .1f;
         Vector2 target = Target.Position + new Vector2(400f * (NPC.Center.X > Target.Center.X).ToDirectionInt(), Target.Velocity.Y * 15f);
         NPC.velocity = Vector2.SmoothStep(NPC.velocity, NPC.SafeDirectionTo(target) * MathF.Min(NPC.Center.Distance(target), velocity), amt);
 

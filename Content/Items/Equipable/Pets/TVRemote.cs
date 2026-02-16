@@ -28,8 +28,6 @@ public class TVRemote : ModItem, ILocalizedModType, IModType
     public override void UseStyle(Player player, Rectangle heldItemFrame)
     {
         if (player.whoAmI == Main.myPlayer && player.itemTime == 0)
-        {
-            player.AddBuff(Item.buffType, 3600, true, false);
-        }
+            player.AddBuff(Item.buffType, 3600);
     }
 }

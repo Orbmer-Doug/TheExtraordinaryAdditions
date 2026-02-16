@@ -67,7 +67,7 @@ public class AlucardsSwordThrow : ModProjectile, ILocalizedModType, IModType
         {
             if (this.RunLocal())
             {
-                Vector2 mouse = Owner.Additions().mouseWorld;
+                Vector2 mouse = Owner.Additions().MouseWorld;
                 float dist = Projectile.Distance(mouse);
                 float ratio = (1.45f - InverseLerp(0f, 1000f, dist)) * .25f;
                 Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.SafeDirectionTo(mouse) * MathHelper.Clamp(dist, MathHelper.Min(dist, 5f), 40f), ratio);

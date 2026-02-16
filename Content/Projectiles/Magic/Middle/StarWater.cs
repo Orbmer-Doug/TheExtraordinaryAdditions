@@ -83,7 +83,7 @@ public class StarWater : ModProjectile
             Projectile.Opacity = Completion;
             if (this.RunLocal())
             {
-                Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(ModdedOwner.mouseWorld + Offset) * 1.1f, .4f);
+                Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(ModdedOwner.MouseWorld + Offset) * 1.1f, .4f);
                 if (Projectile.velocity != Projectile.oldVelocity)
                     this.Sync();
             }

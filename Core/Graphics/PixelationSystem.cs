@@ -25,22 +25,18 @@ public enum PixelationLayer : byte
     Dusts = 1 << 7
 }
 
-public readonly struct DrawAction
+public readonly struct DrawAction(
+    Action renderAction,
+    BlendState blend,
+    bool isTexture,
+    ManagedShader effect = null,
+    string groupId = null)
 {
-    public readonly Action RenderAction { get; init; } // TODO: consider interface based system?
-    public readonly BlendState Blend { get; init; }
-    public readonly ManagedShader Shader { get; init; }
-    public readonly string GroupID { get; init; }
-    public readonly bool IsTexture { get; init; }
-
-    public DrawAction(Action renderAction, BlendState blend, bool isTexture, ManagedShader effect = null, string groupID = null)
-    {
-        RenderAction = renderAction;
-        Blend = blend;
-        Shader = effect;
-        GroupID = groupID != null ? string.Intern(groupID) : null;
-        IsTexture = isTexture;
-    }
+    public Action RenderAction { get; } = renderAction;
+    public BlendState Blend { get; } = blend;
+    public ManagedShader Shader { get; } = effect;
+    public string GroupID { get; } = groupId != null ? string.Intern(groupId) : null;
+    public bool IsTexture { get; } = isTexture;
 }
 
 public static class DrawActionGrouper
@@ -49,7 +45,7 @@ public static class DrawActionGrouper
     private static readonly Dictionary<BlendState, Dictionary<string, List<DrawAction>>> BlendGroupGroups = [];
     private static readonly Dictionary<BlendState, List<DrawAction>> BlendFallback = [];
     private static readonly List<DrawAction>[] GroupListPool = new List<DrawAction>[32];
-    private static int groupListPoolIndex = 0;
+    private static int _groupListPoolIndex = 0;
 
     static DrawActionGrouper()
     {
@@ -58,27 +54,31 @@ public static class DrawActionGrouper
             BlendGroupGroups[blend] = [];
             BlendFallback[blend] = [];
         }
+
         for (int i = 0; i < GroupListPool.Length; i++)
             GroupListPool[i] = [];
     }
 
     private static List<DrawAction> RentGroupList()
     {
-        if (groupListPoolIndex < GroupListPool.Length)
+        if (_groupListPoolIndex < GroupListPool.Length)
         {
-            List<DrawAction> list = GroupListPool[groupListPoolIndex++];
+            List<DrawAction> list = GroupListPool[_groupListPoolIndex++];
             list.Clear();
             return list;
         }
+
         return [];
     }
 
     private static void ResetGroupListPool()
     {
-        groupListPoolIndex = 0;
+        _groupListPoolIndex = 0;
     }
 
-    public static void GroupByBlendAndGroupId(ReadOnlySpan<DrawAction> primitiveActions, ReadOnlySpan<DrawAction> textureActions, Action<BlendState, Dictionary<string, List<DrawAction>>> processBlendGroup)
+    public static void GroupByBlendAndGroupId(ReadOnlySpan<DrawAction> primitiveActions,
+        ReadOnlySpan<DrawAction> textureActions,
+        Action<BlendState, Dictionary<string, List<DrawAction>>> processBlendGroup)
     {
         ResetGroupListPool();
 
@@ -89,6 +89,7 @@ public static class DrawActionGrouper
                 groupList.Clear();
             blendDict.Clear();
         }
+
         foreach (List<DrawAction> blendList in BlendFallback.Values)
             blendList.Clear();
 
@@ -109,6 +110,7 @@ public static class DrawActionGrouper
                     groupList = RentGroupList();
                     blendDict[action.GroupID] = groupList;
                 }
+
                 groupList.Add(action);
             }
             else
@@ -133,6 +135,7 @@ public static class DrawActionGrouper
             {
                 groupDict[UngroupedSentinel] = fallbackList;
             }
+
             if (groupDict.Count > 0)
                 processBlendGroup(blendEntry.Key, groupDict);
         }
@@ -148,12 +151,20 @@ public static class DrawActionGrouper
 [Autoload(Side = ModSide.Client)]
 public class PixelationSystem : ModSystem
 {
-    internal static readonly BlendState[] SupportedBlendStates = [BlendState.AlphaBlend, BlendState.Additive, BlendState.NonPremultiplied];
+    internal static readonly BlendState[] SupportedBlendStates =
+        [BlendState.AlphaBlend, BlendState.Additive, BlendState.NonPremultiplied];
+
     public static readonly int InitialCapacity = Main.maxProjectiles + Main.maxNPCs + (int)ParticleSystem.MaxParticles;
-    private static readonly Dictionary<PixelationLayer, Dictionary<BlendState, ManagedRenderTarget>> RenderTargetsByLayer = [];
+
+    private static readonly Dictionary<PixelationLayer, Dictionary<BlendState, ManagedRenderTarget>>
+        RenderTargetsByLayer = [];
+
     private static readonly Dictionary<PixelationLayer, List<DrawAction>> PrimitiveDrawActionsByLayer = [];
     private static readonly Dictionary<PixelationLayer, List<DrawAction>> TextureDrawActionsByLayer = [];
-    private static readonly RenderTargetInitializationAction PixelTargetInitializer = (width, height) => new RenderTarget2D(Main.instance.GraphicsDevice, width / 2, height / 2);
+
+    private static readonly RenderTargetInitializationAction PixelTargetInitializer = (width, height) =>
+        new RenderTarget2D(Main.instance.GraphicsDevice, width / 2, height / 2);
+
     public static bool CurrentlyRendering { get; private set; }
     private static PixelationLayer ActiveLayers;
 
@@ -189,8 +200,8 @@ public class PixelationSystem : ModSystem
             On_Main.DrawDust -= DrawTarget_Dusts;
 
             foreach (Dictionary<BlendState, ManagedRenderTarget> layerTargets in RenderTargetsByLayer.Values)
-                foreach (ManagedRenderTarget target in layerTargets.Values)
-                    target.Dispose();
+            foreach (ManagedRenderTarget target in layerTargets.Values)
+                target.Dispose();
             RenderTargetsByLayer.Clear();
         });
     }
@@ -244,7 +255,8 @@ public class PixelationSystem : ModSystem
         orig();
     }
 
-    private static void DrawToRenderTarget(PixelationLayer layer, List<DrawAction> primitiveDrawActions, List<DrawAction> textureDrawActions)
+    private static void DrawToRenderTarget(PixelationLayer layer, List<DrawAction> primitiveDrawActions,
+        List<DrawAction> textureDrawActions)
     {
         if (primitiveDrawActions.Count == 0 && textureDrawActions.Count == 0)
             return;
@@ -285,7 +297,8 @@ public class PixelationSystem : ModSystem
                         // Start a new batch for each texture action to respect GroupID
                         if (isSpriteBatchActive)
                             sb.End();
-                        sb.Begin(SpriteSortMode.Deferred, blend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, action.Shader?.Effect, Matrix.CreateScale(0.5f));
+                        sb.Begin(SpriteSortMode.Deferred, blend, SamplerState.PointClamp, DepthStencilState.None,
+                            RasterizerState.CullNone, action.Shader?.Effect, Matrix.CreateScale(0.5f));
                         isSpriteBatchActive = true;
                         action.Shader?.Render();
                         action.RenderAction();
@@ -297,6 +310,7 @@ public class PixelationSystem : ModSystem
                             sb.End();
                             isSpriteBatchActive = false;
                         }
+
                         action.RenderAction?.Invoke();
                     }
                 }
@@ -325,10 +339,13 @@ public class PixelationSystem : ModSystem
             target = new ManagedRenderTarget(true, PixelTargetInitializer, subjectToGarbageCollection: true);
             layerTargets[blend] = target;
         }
+
         return target;
     }
 
-    private static bool IsSupportedBlendState(BlendState blend) => blend == BlendState.AlphaBlend || blend == BlendState.Additive || blend == BlendState.NonPremultiplied;
+    private static bool IsSupportedBlendState(BlendState blend) => blend == BlendState.AlphaBlend ||
+                                                                   blend == BlendState.Additive ||
+                                                                   blend == BlendState.NonPremultiplied;
 
     /// <summary>
     /// Renders a primitive (e.g. a trail) in half-resolution on a specified draw layer.
@@ -337,7 +354,8 @@ public class PixelationSystem : ModSystem
     /// <param name="layer">What layer to be drawn at.</param>
     /// <param name="blendState">The desired blend state. Defaults to <see cref="BlendState.AlphaBlend"/>.</param>
     /// <exception cref="ArgumentException">If a invalid <paramref name="blendState"/> was inputted.</exception>
-    public static void QueuePrimitiveRenderAction(Action renderAction, PixelationLayer layer, BlendState blendState = null)
+    public static void QueuePrimitiveRenderAction(Action renderAction, PixelationLayer layer,
+        BlendState blendState = null)
     {
         ArgumentNullException.ThrowIfNull(renderAction);
         BlendState blend = blendState ?? BlendState.AlphaBlend;
@@ -362,7 +380,8 @@ public class PixelationSystem : ModSystem
     /// <param name="groupID">If a group is specified, then all of this group will be drawn together under one spritebatch. 
     /// <br></br>Leave null if you want logic like variables (e.g. a timer) specific to a projectile being passed into shader parameters to not effect all projectiles of that shader.</param>
     /// <exception cref="ArgumentException">If a invalid <paramref name="blendState"/> was inputted.</exception>
-    public static void QueueTextureRenderAction(Action renderAction, PixelationLayer layer, BlendState blendState = null, ManagedShader effect = null, string groupID = null)
+    public static void QueueTextureRenderAction(Action renderAction, PixelationLayer layer,
+        BlendState blendState = null, ManagedShader effect = null, string groupID = null)
     {
         ArgumentNullException.ThrowIfNull(renderAction);
         BlendState blend = blendState ?? BlendState.AlphaBlend;
@@ -379,6 +398,7 @@ public class PixelationSystem : ModSystem
     }
 
     #region Target Drawing
+
     private static void DrawTarget_NPCs(On_Main.orig_DoDraw_DrawNPCsOverTiles orig, Main self)
     {
         DrawTargetScaled(PixelationLayer.UnderNPCs);
@@ -400,7 +420,8 @@ public class PixelationSystem : ModSystem
         DrawTargetScaled(PixelationLayer.OverPlayers);
     }
 
-    private static void DrawTarget_HeldProj(On_PlayerDrawLayers.orig_DrawHeldProj orig, PlayerDrawSet drawinfo, Projectile proj)
+    private static void DrawTarget_HeldProj(On_PlayerDrawLayers.orig_DrawHeldProj orig, PlayerDrawSet drawinfo,
+        Projectile proj)
     {
         DrawTargetScaled(PixelationLayer.HeldProjectiles, endSB: true);
         orig(drawinfo, proj);
@@ -419,19 +440,22 @@ public class PixelationSystem : ModSystem
 
         foreach (BlendState blend in SupportedBlendStates)
         {
-            if (targets.TryGetValue(blend, out ManagedRenderTarget target) && !target.IsUninitialized)
-            {
-                if (endSB)
-                    sb.End();
-
-                sb.Begin(SpriteSortMode.Deferred, blend, SamplerState.PointClamp, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-                sb.Draw(target.Target, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 2f, 0, 0f);
+            if (!targets.TryGetValue(blend, out ManagedRenderTarget target) || target.IsUninitialized) 
+                continue;
+            
+            if (endSB)
                 sb.End();
 
-                if (endSB)
-                    sb.Begin(default, default, Main.DefaultSamplerState, default, RasterizerState.CullNone, default, Main.GameViewMatrix.TransformationMatrix);
-            }
+            sb.Begin(SpriteSortMode.Deferred, blend, SamplerState.PointClamp, DepthStencilState.None,
+                Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+            sb.Draw(target.Target, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 2f, 0, 0f);
+            sb.End();
+
+            if (endSB)
+                sb.Begin(default, default, Main.DefaultSamplerState, default, RasterizerState.CullNone, default,
+                    Main.GameViewMatrix.TransformationMatrix);
         }
     }
+
     #endregion
 }

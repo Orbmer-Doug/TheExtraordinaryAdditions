@@ -42,7 +42,7 @@ public class SuperheatedPlasmaArrayHoldout : ModProjectile, ILocalizedModType, I
 
         if (this.RunLocal())
         {
-            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, (Owner.Additions().mouseWorld - Owner.MountedCenter).SafeNormalize(Vector2.Zero) * Projectile.Size.Length() * .3f, 0.3f);
+            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, (Owner.Additions().MouseWorld - Owner.MountedCenter).SafeNormalize(Vector2.Zero) * Projectile.Size.Length() * .3f, 0.3f);
             if (Projectile.velocity != Projectile.oldVelocity)
                 Projectile.netUpdate = true;
         }
@@ -58,7 +58,7 @@ public class SuperheatedPlasmaArrayHoldout : ModProjectile, ILocalizedModType, I
 
         Projectile.Center = Owner.RotatedRelativePoint(Owner.MountedCenter) + Projectile.rotation.ToRotationVector2();
 
-        Vector2 tipOfGun = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.UnitY) * Owner.HeldItem.width * .5f;
+        Vector2 tipOfGun = Owner.direction == 1 ? Projectile.RotHitbox().Right : Projectile.RotHitbox().Left;
         if (Time < ChargeUpTime)
         {
             Vector2 pos = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.45f) * Main.rand.NextFloat(200f, 260f);

@@ -4,7 +4,7 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
 
-namespace TheExtraordinaryAdditions.Content.NPCs.BossesBars;
+namespace TheExtraordinaryAdditions.Content.NPCs.BossBars;
 
 public class StygainBossbar : ModBossBar
 {

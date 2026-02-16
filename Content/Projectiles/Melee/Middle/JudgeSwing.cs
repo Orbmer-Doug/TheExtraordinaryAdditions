@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.IO;
+using CalamityMod;
+using CalamityMod.Items.Weapons.Melee;
 using Terraria;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
@@ -42,6 +44,7 @@ public class JudgeSwing : BaseSwordSwing
     {
         // Check for tiles
         Projectile.ownerHitCheck = true;
+        Projectile.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
     }
 
     public override void SafeInitialize()
@@ -205,196 +208,258 @@ public class JudgeSwing : BaseSwordSwing
 
 public class JudgeSpear : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Execution);
+    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GabesSpear);
+
+    public Vector2 Size = new Vector2(30, 126);
+    public Vector2 Top => Projectile.Center + PolarVector(Size.Y / 2, Projectile.rotation - PiOver2);
+    public Vector2 Bottom => Projectile.Center - PolarVector(Size.Y / 2, Projectile.rotation - PiOver2);
     public override void SetDefaults()
     {
-        Projectile.Size = new(34, 144);
+        Projectile.Size = new(10);
+        Projectile.friendly = Projectile.ignoreWater = Projectile.usesLocalNPCImmunity = true;
+        Projectile.hostile = false;
+        Projectile.tileCollide = false;
+        Projectile.timeLeft = 200;
+        Projectile.localNPCHitCooldown = -1;
+        Projectile.penetrate = 1;
+        Projectile.stopsDealingDamageAfterPenetrateHits = true;
+        Projectile.DamageType = DamageClass.MeleeNoSpeed;
+    }
+    public int Time
+    {
+        get => (int)Projectile.ai[0];
+        set => Projectile.ai[0] = value;
+    }
+    public ref float OldArmRot => ref Projectile.ai[1];
+    public bool Thrown
+    {
+        get => (int)Projectile.ai[2] == 1;
+        set => Projectile.ai[2] = value.ToInt();
+    }
+    public int FadeTime
+    {
+        get => (int)Projectile.AdditionsInfo().ExtraAI[0];
+        set => Projectile.AdditionsInfo().ExtraAI[0] = value;
+    }
+    public bool Hit
+    {
+        get => (int)Projectile.AdditionsInfo().ExtraAI[1] == 1;
+        set => Projectile.AdditionsInfo().ExtraAI[1] = value.ToInt();
+    }
+    
+    public float MeleeSpeed => Owner.GetTotalAttackSpeed(DamageClass.MeleeNoSpeed);
+    public int ReelTime => (int)(20 / MeleeSpeed);
+    public static readonly int ThrowTime = SecondsToFrames(4);
+    
+    public Player Owner => Main.player[Projectile.owner];
+    public GlobalPlayer Modded => Owner.Additions();
+    public Vector2 Center => Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
+
+    public override void AI()
+    {
+        Projectile.Opacity = InverseLerp(0, 10, Time);
+        if (!Thrown)
+        {
+            DoReel();
+        }
+        else
+        {
+            DoThrow();
+        }
+
+        Time++;
+    }
+    
+    public void DoReel()
+    {
+        float completion = InverseLerp(0f, ReelTime, Time);
+        if (!Owner.Available())
+        {
+            Projectile.Kill();
+            return;
+        }
+        if (this.RunLocal())
+        {
+            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Center.SafeDirectionTo(Modded.MouseWorld), .9f);
+            if (Projectile.velocity != Projectile.oldVelocity)
+                this.Sync();
+        }
+        Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver2;
+        
+        Projectile.timeLeft = 22;
+        Owner.SetDummyItemTime(2);
+        Owner.heldProj = Projectile.whoAmI;
+        Owner.ChangeDir(Projectile.direction);
+
+        float vel = Projectile.velocity.ToRotation();
+        float reelAnim = MakePoly(3f).InOutFunction.Evaluate(vel, vel - (1.3f * Projectile.direction * Owner.gravDir), completion);
+        Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, reelAnim);
+        OldArmRot = reelAnim;
+        Projectile.Center = Owner.GetFrontHandPositionImproved() + Vector2.UnitY * Owner.gfxOffY;
+
+        if (this.RunLocal() && completion >= 1f)
+        {
+            SoundID.Item1.Play(Projectile.Center, 1.4f, .1f, .2f);
+            Time = 0;
+            Thrown = true;
+            Projectile.MaxUpdates = 2;
+            Projectile.timeLeft = Projectile.MaxUpdates * ThrowTime;
+            Projectile.velocity = Utility.SafeDirectionTo(Projectile, Modded.MouseWorld) * 20f;
+            this.Sync();
+        }
+    }
+
+    public void DoThrow()
+    {
+        after ??= new(10, () => Projectile.Center);
+        float fade = InverseLerp(30f, 0f, FadeTime);
+        after.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One,
+            fade, Projectile.rotation, 0, 0, 1, 0f));
+        if (Time < 30)
+        {
+            Owner.SetDummyItemTime(2);
+            Owner.ChangeDir(Projectile.direction);
+            float throwCompletion = InverseLerp(0f, 30, Time);
+            float rot = OldArmRot + (Pi * Projectile.direction * Owner.gravDir);
+            float anim = Animators.MakePoly(6f).OutFunction.Evaluate(OldArmRot, rot, throwCompletion);
+            Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, anim);
+            this.Sync();
+        }
+
+        if (Hit)
+            fadeAway();
+        else if (Collision.SolidCollision(Top, 10, 10))
+        {
+            HitEffects();
+            fadeAway();
+        }
+        if (FadeTime >= 30)
+            Projectile.Kill();
+        return;
+
+        void fadeAway()
+        {
+            Projectile.Opacity = 0f;
+            Projectile.velocity *= .8f;
+            FadeTime++;
+        }
+    }
+
+    public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+    {
+        HitEffects();
+    }
+
+    private void HitEffects()
+    {
+        if (Hit) 
+            return;
+        
+        if (this.RunLocal())
+            Projectile.NewProj(Projectile.RotHitbox().Top, Vector2.Zero, ModContent.ProjectileType<JudgeKaboom>(),
+                (int)(Projectile.damage * .5f), 1f, Projectile.owner);
+        AdditionsSound.GenericExplo.Play(Top, .6f, 0f, .2f, 20);
+        Hit = true;
+        this.Sync();
+    }
+
+    public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+    {
+        return targetHitbox.LineCollision(Bottom, Top, Size.X);
+    }
+
+    public FancyAfterimages after;
+    public override bool PreDraw(ref Color lightColor)
+    {
+        Texture2D texture = Projectile.ThisProjectileTexture();
+        Vector2 drawPosition = Projectile.Center - Main.screenPosition;
+        Vector2 size = texture.Size();
+        Color col = Color.Lerp(Color.Yellow with { A = 0 } * Projectile.Opacity, Projectile.GetAlpha(lightColor), Projectile.Opacity);
+        
+        float fade = InverseLerp(30f, 0f, FadeTime);
+        after?.DrawFancyAfterimages(texture, [Color.DarkOrange, Color.Orange, Color.Gold], fade);
+        Main.EntitySpriteDraw(texture, drawPosition, null,
+            col, Projectile.rotation, size / 2, Projectile.scale, 0);
+
+        return false;
+    }
+}
+
+public class JudgeKaboom : ModProjectile
+{
+    public override string Texture => AssetRegistry.Invis;
+
+    private const int Lifetime = 55;
+    public override void SetDefaults()
+    {
+        Projectile.scale = 0f;
         Projectile.friendly = Projectile.ignoreWater = Projectile.usesLocalNPCImmunity = true;
         Projectile.hostile = Projectile.tileCollide = false;
-        Projectile.timeLeft = 200;
+        Projectile.timeLeft = Lifetime;
         Projectile.localNPCHitCooldown = -1;
         Projectile.penetrate = -1;
         Projectile.DamageType = DamageClass.MeleeNoSpeed;
     }
 
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
-    public Vector2 Center => Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
-    public ref float Time => ref Projectile.ai[0];
-    public List<Vector2> TelePositions = [];
-    public Vector2 Start;
-    public Vector2 TeleEnd;
-    public Vector2 End;
-    public override void SendExtraAI(BinaryWriter writer)
-    {
-        writer.WriteVector2(Start);
-        writer.WriteVector2(TeleEnd);
-        writer.WriteVector2(End);
-    }
-    public override void ReceiveExtraAI(BinaryReader reader)
-    {
-        Start = reader.ReadVector2();
-        TeleEnd = reader.ReadVector2();
-        End = reader.ReadVector2();
-    }
 
-    public const int TeleTime = 50;
-    public const int DiveTime = 40;
-    public const int FadeTime = 30;
-    public enum SpearState
+    public int Time
     {
-        Teleport,
-        Wait,
-        Dive,
-        Fade,
+        get => (int)Projectile.ai[0];
+        set => Projectile.ai[0] = value;
     }
+    public int TimeOffset
+    {
+        get => (int)Projectile.ai[1];
+        set => Projectile.ai[1] = value;
+    } 
 
-    public SpearState State
-    {
-        get => (SpearState)Projectile.ai[1];
-        set => Projectile.ai[1] = (int)value;
-    }
-    public ref float ImageOpacity => ref Projectile.ai[2];
     public override void AI()
     {
-        Owner.heldProj = Projectile.whoAmI;
-        Owner.SetDummyItemTime(2);
-        if (State != SpearState.Fade)
-            Owner.velocity = Vector2.Zero;
-
-        int dir = Projectile.velocity.X.NonZeroSign();
-        switch (State)
+        if (Time == 0)
         {
-            case SpearState.Teleport:
-                Start = Center;
-                ImageOpacity = 0f;
-                AdditionsSound.GabrielTeleport.Play(Center, 1f);
-                Projectile.rotation = MathHelper.Pi;
-                if (this.RunLocal())
-                {
-                    Projectile.velocity = Center.SafeDirectionTo(Modded.mouseWorld);
-                    TeleEnd = Modded.mouseWorld.ClampInCircle(Center, 700f);
-                }
-
-                dir = Projectile.velocity.X.NonZeroSign();
-                Projectile.spriteDirection = dir;
-
-                Vector2 end = TeleEnd + Vector2.UnitY * 600f;
-                Vector2? tile = RaytraceTiles(TeleEnd, end);
-                if (tile.HasValue)
-                    End = tile.Value - Vector2.UnitY * Owner.height;
-                else
-                    End = end;
-                if (End.X == 0f)
-                    End = end;
-
-                TelePositions = Center.GetLaserControlPoints(TeleEnd, 20);
-                Owner.Teleport(TeleEnd, -1);
-                NetMessage.SendData(MessageID.TeleportEntity, -1, -1, null, 0, Owner.whoAmI, TeleEnd.X, TeleEnd.Y, -1);
-
-                State = SpearState.Wait;
-                Time = 0f;
-                this.Sync();
-                break;
-            case SpearState.Wait:
-                ImageOpacity = InverseLerp(0f, TeleTime, Time);
-                if ((int)Time == TeleTime / 2)
-                    AdditionsSound.GabrielTelegraph.Play(Center, 1f);
-
-                Projectile.Opacity = InverseLerp(0f, 10f, Time);
-                if (Time >= TeleTime)
-                {
-                    AdditionsSound.GabrielSwing.Play(Center, 2f, 0f);
-                    Time = 0f;
-                    State = SpearState.Dive;
-                    this.Sync();
-                }
-                break;
-            case SpearState.Dive:
-                Owner.Center = Vector2.Lerp(TeleEnd, End, MakePoly(6f).OutFunction(InverseLerp(0f, DiveTime / 2, Time)));
-                if (Time >= DiveTime)
-                {
-                    Time = 0f;
-                    State = SpearState.Fade;
-                    this.Sync();
-                }
-                this.Sync();
-                break;
-            case SpearState.Fade:
-                Projectile.Opacity = InverseLerp(FadeTime, 0f, Time);
-                if (Time >= FadeTime)
-                {
-                    Projectile.Kill();
-                }
-                break;
+            TimeOffset = Main.rand.Next(0, 360);
+            
+            ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero,
+                40, 0f, Vector2.One, 0f, 280f, Color.White * .68f);
+            for (int i = 0; i < 30; i++)
+            {
+                ParticleRegistry.SpawnBloomLineParticle(Projectile.Center,
+                    Main.rand.NextVector2CircularLimited(20f, 20f, .4f, 1f),
+                    Main.rand.Next(12, 20), Main.rand.NextFloat(.4f, .9f), Color.White);
+            }
         }
 
-        Owner.SetFrontHandBetter(0, dir < 0 ? MathHelper.Pi : 0f);
-        Owner.SetBackHandBetter(0, (dir < 0 ? MathHelper.Pi : 0f) + (.6f * dir));
-        Owner.ChangeDir(dir);
-        Projectile.Center = Owner.GetFrontHandPositionImproved() + Vector2.UnitY * 40f;
+        Projectile.scale = MakePoly(5f).OutFunction.Evaluate(Time, 0,
+            90, 0f, 190f);
+        Lighting.AddLight(Projectile.Center, Color.Yellow.ToVector3() * InverseLerp(0, Lifetime, Projectile.timeLeft) * 2f);
         Time++;
     }
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return targetHitbox.LineCollision(Projectile.BaseRotHitbox().Bottom, Projectile.BaseRotHitbox().Top, Projectile.width);
-    }
-
-    public override bool ShouldUpdatePosition() => false;
-    public override bool? CanDamage() => State == SpearState.Dive ? null : false;
-    public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
-    {
-        Vector2 pos = Projectile.BaseRotHitbox().Top;
-        for (int i = 0; i < 6; i++)
-        {
-            ParticleRegistry.SpawnBloodStreakParticle(pos, Vector2.UnitY.RotatedByRandom(.3f) * Main.rand.NextFloat(2f, 5f), Main.rand.Next(30, 40), Main.rand.NextFloat(.5f, .9f), Color.DarkRed);
-        }
-        for (int i = 0; i < 40; i++)
-        {
-            ParticleRegistry.SpawnBloodParticle(pos, -Vector2.UnitY.RotatedByRandom(.6f) * Main.rand.NextFloat(7f, 12f), Main.rand.Next(50, 90), Main.rand.NextFloat(.6f, 1.2f), Color.DarkRed);
-        }
-    }
-
-    public override void Load()
-    {
-        On_LegacyPlayerRenderer.DrawPlayerFull += PlayerAfterImages;
-    }
-
-    public override void Unload()
-    {
-        On_LegacyPlayerRenderer.DrawPlayerFull -= PlayerAfterImages;
-    }
-
-    private static void PlayerAfterImages(On_LegacyPlayerRenderer.orig_DrawPlayerFull orig, LegacyPlayerRenderer self, Terraria.Graphics.Camera camera, Player player)
-    {
-        int type = ModContent.ProjectileType<JudgeSpear>();
-        if (player.ownedProjectileCounts[type] > 0 && Utility.FindProjectile(out Projectile spear, type, player.whoAmI))
-        {
-            JudgeSpear judge = spear.As<JudgeSpear>();
-
-            SpriteBatch spriteBatch = camera.SpriteBatch;
-            SamplerState samplerState = camera.Sampler;
-            if (player.mount.Active && player.fullRotation != 0f)
-            {
-                samplerState = LegacyPlayerRenderer.MountedSamplerState;
-            }
-
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, samplerState, DepthStencilState.None, camera.Rasterizer, null, camera.GameViewMatrix.TransformationMatrix);
-            for (int i = 0; i < judge.TelePositions.Count; i++)
-            {
-                Vector2 pos = judge.TelePositions[i];
-                self.DrawPlayer(camera, player, pos, player.fullRotation, player.fullRotationOrigin, MathHelper.Lerp(.6f, 20f, judge.ImageOpacity) * InverseLerp(judge.TelePositions.Count, 0f, i), 1f);
-            }
-            spriteBatch.End();
-        }
-
-        orig.Invoke(self, camera, player);
+        return CircularHitboxCollision(Projectile.Center, Projectile.scale, targetHitbox);
     }
 
     public override bool PreDraw(ref Color lightColor)
     {
-        Projectile.DrawBaseProjectile(lightColor);
+        void render()
+        {
+            Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
+            Texture2D noise = AssetRegistry.GetTexture(AdditionsTexture.DarkRidgeNoise);
+            float opacity = InverseLerp(0, Lifetime, Projectile.timeLeft);
+            ManagedShader shader = AssetRegistry.GetShader("GabrielExplosion");
+            shader.TrySetParameter("sides", 8);
+            shader.TrySetParameter("opacity", opacity);
+            shader.TrySetParameter("time", Time * .01f + TimeOffset);
+            shader.TrySetParameter("col1", new Vector3(1f, 0.885f, 0f));
+            shader.TrySetParameter("col2", new Vector3(1f, 0.515f, 0f));
+            shader.SetTexture(noise, 1, SamplerState.LinearWrap);
+            shader.Render();
+            Main.spriteBatch.DrawBetter(tex,
+                Projectile.Center, null, Color.White, 0f, Vector2.One / 2, Projectile.scale);
+        }
+        PixelationSystem.QueueTextureRenderAction(render, PixelationLayer.UnderProjectiles, BlendState.AlphaBlend, AssetRegistry.GetShader("GabrielExplosion"));
         return false;
     }
 }

@@ -56,7 +56,7 @@ public class AuroricShield : ModProjectile
         {
             if (this.RunLocal())
             {
-                Projectile.velocity = center.SafeDirectionTo(Owner.Additions().mouseWorld);
+                Projectile.velocity = center.SafeDirectionTo(Owner.Additions().MouseWorld);
                 this.Sync();
             }
         }

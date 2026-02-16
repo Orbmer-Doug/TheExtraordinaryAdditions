@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -26,7 +27,7 @@ public class EtherealClaymore : ModItem
         Item.knockBack = 1f;
         Item.autoReuse = true;
         Item.damage = 450;
-        Item.DamageType = DamageClass.Melee;
+        Item.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
         Item.noMelee = true;
         Item.noUseGraphic = true;
         Item.shootSpeed = 10;

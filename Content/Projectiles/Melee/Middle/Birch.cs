@@ -1,7 +1,9 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
+using CalamityMod;
 using Terraria;
 using Terraria.ID;
+using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Systems;
@@ -14,6 +16,11 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 public class Birch : BaseSwordSwing
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BirchTree);
+
+    public override void Defaults()
+    {
+        Projectile.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
+    }
 
     public override float Animation()
     {

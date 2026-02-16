@@ -87,8 +87,8 @@ public class SangueSpin : ModProjectile
 
                 if (this.RunLocal())
                 {
-                    Projectile.velocity = Vector2.Lerp(Projectile.velocity, Center.SafeDirectionTo(Modded.mouseWorld), .1f);
-                    Dist = MathHelper.Clamp(Center.Distance(Modded.mouseWorld), 150f, 1000f);
+                    Projectile.velocity = Vector2.Lerp(Projectile.velocity, Center.SafeDirectionTo(Modded.MouseWorld), .1f);
+                    Dist = MathHelper.Clamp(Center.Distance(Modded.MouseWorld), 150f, 1000f);
                     if (Projectile.velocity != Projectile.oldVelocity)
                         this.Sync();
                 }

@@ -196,7 +196,7 @@ public class HeavenForgedSwing : BaseSwordSwing
             {
                 for (int a = -1; a <= 1; a += 2)
                 {
-                    Vector2 target = Modded.mouseWorld;
+                    Vector2 target = Modded.MouseWorld;
                     position = Owner.Center - new Vector2(Main.rand.NextFloat(100f, Main.screenWidth / 2) * Owner.direction, 600f * a);
                     position.Y -= 40 * i;
 

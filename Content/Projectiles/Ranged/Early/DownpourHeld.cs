@@ -69,7 +69,7 @@ public class DownpourHeld : BaseIdleHoldoutProjectile
             trail = new(c => 2f, (c, pos) => new Color(143, 152, 203) * Lighting.Brightness(pos.ToTileCoordinates().X, pos.ToTileCoordinates().Y), null, MaxPoints);
         if (this.RunLocal())
         {
-            Projectile.velocity = Center.SafeDirectionTo(Modded.mouseWorld);
+            Projectile.velocity = Center.SafeDirectionTo(Modded.MouseWorld);
             if (Projectile.velocity != Projectile.oldVelocity)
                 Projectile.netUpdate = true;
             Projectile.spriteDirection = (Projectile.velocity.X > 0f).ToDirectionInt();
@@ -136,7 +136,7 @@ public class DownpourHeld : BaseIdleHoldoutProjectile
                             Vector2 pos = arrowPos + offset;
                             if (this.RunLocal())
                             {
-                                Vector2 vel = pos.SafeDirectionTo(Modded.mouseWorld + offset) * speed * Main.rand.NextFloat(.8f, 1.3f);
+                                Vector2 vel = pos.SafeDirectionTo(Modded.MouseWorld + offset) * speed * Main.rand.NextFloat(.8f, 1.3f);
                                 Projectile.NewProj(pos, vel, ModContent.ProjectileType<RainDrop>(), dmg / 3, kb / 3, Owner.whoAmI);
                                 ParticleRegistry.SpawnPulseRingParticle(pos, vel.SafeNormalize(Vector2.Zero), Main.rand.Next(20, 30), vel.ToRotation(), new(.5f, 1f), 0f, 30f, Color.CornflowerBlue);
                                 for (int j = 0; j < 6; j++)

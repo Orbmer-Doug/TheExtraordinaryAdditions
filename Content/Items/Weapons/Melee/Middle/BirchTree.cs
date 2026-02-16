@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CalamityMod;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -23,7 +24,7 @@ public class BirchTree : ModItem
         Item.useStyle = ItemUseStyleID.Shoot;
         Item.knockBack = 18;
         Item.damage = 600;
-        Item.DamageType = DamageClass.Melee;
+        Item.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
         Item.shoot = ModContent.ProjectileType<Birch>();
         Item.noUseGraphic = Item.noMelee = Item.autoReuse = true;
     }

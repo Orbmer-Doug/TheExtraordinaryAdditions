@@ -67,7 +67,7 @@ public class CannonHoldout : ModProjectile, ILocalizedModType, IModType
 
         else if (MoveInIntervals <= 0f && this.RunLocal())
         {
-            Vector2 newVelocity = Owner.Additions().mouseWorld - Center;
+            Vector2 newVelocity = Owner.Additions().MouseWorld - Center;
 
             Tile target = Main.tile[tileTargetX, tileTargetY];
             if (target.HasTile)

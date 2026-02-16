@@ -63,7 +63,7 @@ public class EpidemicSpear : ModProjectile
         if (this.RunLocal() && Owner.Additions().MouseRight.Current == false && Time >= TotalCharge && !Released)
         {
             Projectile.extraUpdates = 2;
-            Projectile.velocity = Projectile.SafeDirectionTo(Owner.Additions().mouseWorld) * 15f;
+            Projectile.velocity = Projectile.SafeDirectionTo(Owner.Additions().MouseWorld) * 15f;
             AdditionsSound.etherealLoose.Play(Projectile.Center, 1.2f, -.3f);
 
             Released = true;

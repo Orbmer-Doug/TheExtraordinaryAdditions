@@ -22,7 +22,7 @@ using TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Middle;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
-using TheExtraordinaryAdditions.Content.NPCs.BossesBars;
+using TheExtraordinaryAdditions.Content.NPCs.BossBars;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;

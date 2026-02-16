@@ -146,8 +146,8 @@ public class FinalStrikeHoldout : ModProjectile
         // Aim the spear
         if (this.RunLocal())
         {
-            float aimInterpolant = Utils.GetLerpValue(5f, 25f, Center.Distance(Modded.mouseWorld), true);
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Center.SafeDirectionTo(Modded.mouseWorld), aimInterpolant);
+            float aimInterpolant = Utils.GetLerpValue(5f, 25f, Center.Distance(Modded.MouseWorld), true);
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Center.SafeDirectionTo(Modded.MouseWorld), aimInterpolant);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
@@ -246,7 +246,7 @@ public class FinalStrikeHoldout : ModProjectile
         float ratio = MakePoly(2).InFunction(InverseLerp(0f, waitTime / 2, StateTime));
         cache ??= new(40);
 
-        Vector2 dir = Projectile.Center.SafeDirectionTo(Modded.mouseWorld);
+        Vector2 dir = Projectile.Center.SafeDirectionTo(Modded.MouseWorld);
         if (this.RunLocal())
         {
             Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, dir, ratio);
@@ -304,7 +304,7 @@ public class FinalStrikeHoldout : ModProjectile
             Projectile.numHits = 0;
             StateTime = 0f;
             if (this.RunLocal())
-                Projectile.velocity = Center.SafeDirectionTo(Modded.mouseWorld).RotatedByRandom(.15f);
+                Projectile.velocity = Center.SafeDirectionTo(Modded.MouseWorld).RotatedByRandom(.15f);
             Init = true;
             this.Sync();
         }

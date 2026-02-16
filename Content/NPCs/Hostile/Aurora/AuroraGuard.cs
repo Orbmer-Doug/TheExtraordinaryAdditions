@@ -15,7 +15,7 @@ using TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
 using TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 using TheExtraordinaryAdditions.Content.Items.Placeable.Banners;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
-using TheExtraordinaryAdditions.Content.NPCs.Hostile.AuroraTurret;
+using TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 using TheExtraordinaryAdditions.Core;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Globals;
@@ -30,7 +30,7 @@ using static TheExtraordinaryAdditions.Core.Graphics.Animators;
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 
 [AutoloadBossHead]
-public partial class AuroraGuard : ModNPC, IBossDowned
+public class AuroraGuard : ModNPC, IBossDowned
 {
     #region Defaults/Variables
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AuroraTurretHead);
@@ -73,11 +73,10 @@ public partial class AuroraGuard : ModNPC, IBossDowned
 
     public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
     {
-        bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[]
-        {
-                BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Snow,
+        bestiaryEntry.Info.AddRange([
+            BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Snow,
                 new FlavorTextBestiaryInfoElement(this.GetLocalizedValue("Bestiary"))
-        });
+        ]);
     }
 
     public enum AttackState
@@ -293,7 +292,7 @@ public partial class AuroraGuard : ModNPC, IBossDowned
 
     public override void AI()
     {
-        PlayerTargeting.SearchForTarget(NPC, NPC.GetTargetData());
+        NPC.SearchForTarget(NPC.GetTargetData());
 
         SpeedMultiplier = 1f;
         HijackIntoDeathAnim();
@@ -379,7 +378,7 @@ public partial class AuroraGuard : ModNPC, IBossDowned
             }
         }
 
-        SelectNextAttack(GlacierIndex >= 0 && GlacierIndex < Main.maxNPCs && Main.npc[GlacierIndex].ai[3] == 1, AttackState.Awaken);
+        SelectNextAttack(GlacierIndex >= 0 && GlacierIndex < Main.maxNPCs && (int)Main.npc[GlacierIndex].ai[3] == 1, AttackState.Awaken);
     }
 
     public Rectangle GlacierHitbox => GlacierPosition.ToRectangle(132, 180);

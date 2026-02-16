@@ -40,17 +40,14 @@ public class TheRebar : ModItem
 
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
-        Projectile.NewProjectile((IEntitySource)(object)source, position, velocity, ModContent.ProjectileType<Rebar>(), damage, knockback, player.whoAmI, 0f, 0f, 0f);
+        Projectile.NewProjectile(source, position, velocity, ModContent.ProjectileType<Rebar>(), damage, knockback, player.whoAmI, 0f, 0f, 0f);
         return false;
     }
 
     public override void ModifyShootStats(Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
     {
-        Vector2 muzzleOffset = Vector2.Normalize(velocity) * 25f;
-
-        if (Collision.CanHit(position, 0, 0, position + muzzleOffset, 7, 0))
-        {
-            position += muzzleOffset;
-        }
+        Vector2 offset = Vector2.Normalize(velocity) * 25f;
+        if (Collision.CanHit(position, 0, 0, position + offset, 7, 0))
+            position += offset;
     }
 }

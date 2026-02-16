@@ -25,8 +25,11 @@ public class GlacialSpike : ProjOwnedByNPC<AuroraGuard>
         Projectile.penetrate = -1;
     }
 
-    public ref float Time => ref Projectile.ai[0];
-    public float Interpolant => InverseLerp(0f, AuroraGuard.TimeToRise, Time);
+    public int Time
+    {
+        get => (int)Projectile.ai[0];
+        set => Projectile.ai[0] = value;
+    }
     public Vector2 SavedPos;
     public Vector2 GroundPos;
     public override void SendAI(BinaryWriter writer)

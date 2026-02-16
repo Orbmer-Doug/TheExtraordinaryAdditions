@@ -211,7 +211,7 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
             {
                 PlayedSound = false;
 
-                Projectile.velocity = Center.SafeDirectionTo(Modded.mouseWorld);
+                Projectile.velocity = Center.SafeDirectionTo(Modded.MouseWorld);
                 Direction = Projectile.velocity.X.NonZeroSign();
                 InitialAngle = SwingOffset();
                 InitialMouseAngle = Projectile.velocity.ToRotation();

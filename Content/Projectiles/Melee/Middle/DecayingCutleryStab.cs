@@ -101,7 +101,7 @@ public class DecayingCutleryStab : ModProjectile
             Hit = false;
             Projectile.ResetLocalNPCHitImmunity();
             Time = 0f;
-            Projectile.velocity = Center.SafeDirectionTo(Modded.mouseWorld).RotatedByRandom(StabCounter == 4 ? 0f : .15f);
+            Projectile.velocity = Center.SafeDirectionTo(Modded.MouseWorld).RotatedByRandom(StabCounter == 4 ? 0f : .15f);
             Init = true;
             Projectile.netUpdate = true;
         }

@@ -200,7 +200,7 @@ public class CosmireapHoldout : ModProjectile
 
             if (this.RunLocal())
             {
-                Projectile.velocity = center.SafeDirectionTo(Modded.mouseWorld);
+                Projectile.velocity = center.SafeDirectionTo(Modded.MouseWorld);
                 if (Projectile.velocity != Projectile.oldVelocity)
                     this.Sync();
             }
@@ -342,7 +342,7 @@ public class CosmireapHoldout : ModProjectile
             CurrentVelocity = 40f;
             Projectile.tileCollide = true;
             if (this.RunLocal())
-                Projectile.velocity = Projectile.SafeDirectionTo(Owner.Additions().mouseWorld) * 30f;
+                Projectile.velocity = Projectile.SafeDirectionTo(Owner.Additions().MouseWorld) * 30f;
 
             AdditionsSound.etherealSwordSwoosh.Play(Projectile.Center, 2f, 0f, .2f);
             this.Sync();
@@ -350,7 +350,7 @@ public class CosmireapHoldout : ModProjectile
         CurrentVelocity *= .99f;
         if (this.RunLocal())
         {
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Owner.Additions().mouseWorld) * CurrentVelocity, .2f);
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Owner.Additions().MouseWorld) * CurrentVelocity, .2f);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
@@ -443,7 +443,7 @@ public class CosmireapHoldout : ModProjectile
                 Projectile.timeLeft = 300;
                 NPCIndex = 0;
                 if (this.RunLocal())
-                    Projectile.velocity = Projectile.SafeDirectionTo(Owner.Additions().mouseWorld) * 30f;
+                    Projectile.velocity = Projectile.SafeDirectionTo(Owner.Additions().MouseWorld) * 30f;
                 AdditionsSound.etherealThrow.Play(Projectile.Center, 1.1f);
                 ImpactInit = true;
                 this.Sync();
@@ -475,7 +475,7 @@ public class CosmireapHoldout : ModProjectile
             after ??= new(ProjectileID.Sets.TrailCacheLength[Type], () => Projectile.Center);
             Returning = false;
             if (this.RunLocal())
-                dir = Owner.SafeDirectionTo(Owner.Additions().mouseWorld);
+                dir = Owner.SafeDirectionTo(Owner.Additions().MouseWorld);
             Projectile.timeLeft = (int)ThrowOutTime + 1;
 
             AdditionsSound.etherealRelease.Play(Projectile.Center, 1.4f, 0f, .2f);

@@ -20,7 +20,12 @@ public class StarlessHoldout : BaseIdleHoldoutProjectile
         Projectile.height = 48;
         Projectile.DamageType = DamageClass.Magic;
     }
-    public ref float Time => ref Projectile.ai[0];
+
+    public int Time
+    {
+        get => (int)Projectile.ai[0];
+        set => Projectile.ai[0] = value;
+    }
     public bool Released
     {
         get => Projectile.ai[1] == 1f;
@@ -34,8 +39,8 @@ public class StarlessHoldout : BaseIdleHoldoutProjectile
     {
         if (this.RunLocal())
         {
-            float interpolant = Utils.GetLerpValue(5f, 20f, Projectile.Distance(Modded.mouseWorld), true);
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Modded.mouseWorld), interpolant);
+            float interpolant = Utils.GetLerpValue(5f, 20f, Projectile.Distance(Modded.MouseWorld), true);
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Modded.MouseWorld), interpolant);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
@@ -72,7 +77,7 @@ public class StarlessHoldout : BaseIdleHoldoutProjectile
                     if (proj.HasValue)
                     {
                         Projectile projectile = Main.projectile[CurrentLances[i].Value];
-                        if (projectile != null && projectile.active && projectile.owner == Owner.whoAmI && projectile.ai[2] == 0 && projectile.ai[0] >= TheStarsAreAfraid.ChargeTime)
+                        if (projectile is { active: true } && projectile.owner == Owner.whoAmI && projectile.ai[2] == 0 && projectile.ai[0] >= TheStarsAreAfraid.ChargeTime)
                         {
                             CurrentLances[i] = null;
                             projectile.ai[2] = 1;
@@ -87,15 +92,13 @@ public class StarlessHoldout : BaseIdleHoldoutProjectile
             }
 
             Offset = (Offset + .01f) % MathHelper.TwoPi;
-            Time++;
         }
         else
         {
             int type = ModContent.ProjectileType<StarWater>();
             int amt = Owner.CountOwnerProjectiles(type);
 
-            float wait = Item.useTime * .1f;
-            if (Time % wait == wait - 1 && amt < 30 && TryUseMana())
+            if (Time % 10 == 9 && amt < 30 && TryUseMana())
             {
                 StarWater water = Main.projectile[Projectile.NewProj(Owner.Center, Vector2.Zero, type,
                     Projectile.damage, Projectile.knockBack, Owner.whoAmI)].As<StarWater>();
@@ -110,7 +113,7 @@ public class StarlessHoldout : BaseIdleHoldoutProjectile
                 foreach (Projectile proj in waters)
                 {
                     StarWater water = proj.As<StarWater>();
-                    if (water != null && !water.Released && water.Completion >= 1f && water.Projectile.owner == Owner.whoAmI)
+                    if (water is { Released: false, Completion: >= 1f } && water.Projectile.owner == Owner.whoAmI)
                     {
                         proj.ai[1] = 1f; // Release
                         proj.netUpdate = true;
@@ -120,15 +123,16 @@ public class StarlessHoldout : BaseIdleHoldoutProjectile
                 Released = true;
                 this.Sync();
             }
-            Time++;
         }
 
-        if (this.RunLocal() && !Modded.MouseLeft.Current)
-        {
-            Released = false;
-            this.Sync();
-        }
+        Time++;
+
+        if (!this.RunLocal() || Modded.MouseLeft.Current) 
+            return;
+        Released = false;
+        this.Sync();
     }
+    
     public override bool? CanDamage() => false;
     public override bool? CanCutTiles() => false;
     public override bool PreDraw(ref Color lightColor)

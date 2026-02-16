@@ -500,6 +500,5 @@ public static class Animators
 
         return q1 * (float)Math.Cos(theta) + q2_ * (float)Math.Sin(theta);
     }
-
     #endregion Quaternion
 }

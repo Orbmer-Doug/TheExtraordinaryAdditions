@@ -52,7 +52,7 @@ public class SplinteredBone : ModProjectile
         {
             Projectile.velocity = Vector2.Zero;
         }
-
+        
         Projectile.StickyProjAI(15);
         Time++;
     }

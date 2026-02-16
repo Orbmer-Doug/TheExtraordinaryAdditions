@@ -74,7 +74,7 @@ public class Comet : ModProjectile
     {
         if (!Init && this.RunLocal())
         {
-            StoredY = Owner.Additions().mouseWorld.Y;
+            StoredY = Owner.Additions().MouseWorld.Y;
             WidthInterpolant = 1f;
             Projectile.scale = Main.rand.NextFloat(.4f, 1f);
             Projectile.Size = new(50f * Projectile.scale);

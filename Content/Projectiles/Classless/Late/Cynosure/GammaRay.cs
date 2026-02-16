@@ -55,8 +55,8 @@ public class GammaRay : ModProjectile
         if (this.RunLocal())
         {
             Vector2 center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
-            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, center.SafeDirectionTo(Owner.Additions().mouseWorld),
-                Utils.Remap(Owner.Additions().mouseWorld.Distance(center), 0f, 200f, .04f, .16f));
+            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, center.SafeDirectionTo(Owner.Additions().MouseWorld),
+                Utils.Remap(Owner.Additions().MouseWorld.Distance(center), 0f, 200f, .04f, .16f));
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }

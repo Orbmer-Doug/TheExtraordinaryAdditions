@@ -68,8 +68,8 @@ public class TankHeadHoldout : BaseIdleHoldoutProjectile
 
         if (this.RunLocal())
         {
-            float interpolant = Utils.GetLerpValue(5f, 40f, Projectile.Distance(Modded.mouseWorld), true);
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Modded.mouseWorld), interpolant);
+            float interpolant = Utils.GetLerpValue(5f, 40f, Projectile.Distance(Modded.MouseWorld), true);
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Modded.MouseWorld), interpolant);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
@@ -89,7 +89,7 @@ public class TankHeadHoldout : BaseIdleHoldoutProjectile
 
         float speed = 5f;
 
-        Vector2 direction = Projectile.SafeDirectionTo(Modded.mouseWorld);
+        Vector2 direction = Projectile.SafeDirectionTo(Modded.MouseWorld);
         Vector2 vel = direction * speed;
 
         Projectile.scale = 1f;

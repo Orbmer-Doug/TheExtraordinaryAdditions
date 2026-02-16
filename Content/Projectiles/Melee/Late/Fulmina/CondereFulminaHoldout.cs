@@ -53,7 +53,7 @@ public class CondereFulminaHoldout : ModProjectile
     public ref float TotalTime => ref Projectile.AdditionsInfo().ExtraAI[1];
 
     public Vector2 Tip => Projectile.RotHitbox().TopRight;
-    public Vector2 Center => Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
+    public Vector2 Center => Owner.RotatedRelativePoint(Owner.MountedCenter);
     public int Dir => Projectile.velocity.X.NonZeroSign();
 
     public override void SetStaticDefaults()
@@ -84,7 +84,7 @@ public class CondereFulminaHoldout : ModProjectile
             case FulminaState.Aiming:
                 if (this.RunLocal())
                 {
-                    Projectile.velocity = Center.SafeDirectionTo(Modded.mouseWorld);
+                    Projectile.velocity = Center.SafeDirectionTo(Modded.MouseWorld);
                     if (Projectile.velocity != Projectile.oldVelocity)
                         this.Sync();
                 }
@@ -180,7 +180,7 @@ public class CondereFulminaHoldout : ModProjectile
                     Time = 0f;
 
                     Projectile.MaxUpdates = 2;
-                    Projectile.velocity = Projectile.Center.SafeDirectionTo(Modded.mouseWorld) * (Charge == FulminaCharge.First || Charge == FulminaCharge.Second ? 22f : 34f);
+                    Projectile.velocity = Projectile.Center.SafeDirectionTo(Modded.MouseWorld) * (Charge == FulminaCharge.First || Charge == FulminaCharge.Second ? 22f : 34f);
                     this.Sync();
                 }
                 break;

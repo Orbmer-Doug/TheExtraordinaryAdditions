@@ -25,10 +25,10 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Base;
 /// <summary>
 /// Creates a new held sword projectile <br></br>
 /// The derived class of all swords in the mod <br></br>
-/// Any <see cref="AdditionsGlobalProjectile.ExtraAI"/> at and before 6 is taken and all of <see cref="Projectile.ai"/>
+/// Any <see cref="AdditionsProjectileInfo.ExtraAI"/> at and before 6 is taken and all of <see cref="Projectile.ai"/>
 /// </summary>
 /// Tip: bring up desmos scientific and use round(sqrt(width^2 + height^2)) to get accurate sizes (cause the sprites usually diagonal) 
-public abstract class BaseSwordSwing : ModProjectile, ILocalizedModType, IModType
+public abstract class BaseSwordSwing : ModProjectile
 {
     #region Variables
     public enum SwingDirection : sbyte
@@ -47,7 +47,7 @@ public abstract class BaseSwordSwing : ModProjectile, ILocalizedModType, IModTyp
     public ref float TimeStop => ref Projectile.ai[1];
     public bool PlayedSound
     {
-        get => Projectile.ai[2] == 1f;
+        get => (int)Projectile.ai[2] == 1;
         set => Projectile.ai[2] = value.ToInt();
     }
     public ref float VanishTime => ref ProjInfo.ExtraAI[0];
@@ -55,7 +55,7 @@ public abstract class BaseSwordSwing : ModProjectile, ILocalizedModType, IModTyp
     public ref float RotationOffset => ref ProjInfo.ExtraAI[2];
     public bool Initialized
     {
-        get => ProjInfo.ExtraAI[3] == 1f;
+        get => (int)ProjInfo.ExtraAI[3] == 1;
         set => ProjInfo.ExtraAI[3] = value.ToInt();
     }
     public ref float InitialMouseAngle => ref ProjInfo.ExtraAI[4];
@@ -136,8 +136,6 @@ public abstract class BaseSwordSwing : ModProjectile, ILocalizedModType, IModTyp
 
     /// <summary>
     /// The rotating hitbox of this sword. Likely need this to be tweaked for each sword.
-    /// <br></br>
-    /// Defaults to the one for <see cref="ExampleSwing"/>
     /// </summary>
     /// <returns></returns>
     public virtual RotatedRectangle Rect()
@@ -295,7 +293,7 @@ public abstract class BaseSwordSwing : ModProjectile, ILocalizedModType, IModTyp
             {
                 PlayedSound = false;
 
-                Projectile.velocity = Center.SafeDirectionTo(Modded.mouseWorld);
+                Projectile.velocity = Center.SafeDirectionTo(Modded.MouseWorld);
                 Direction = Projectile.velocity.X.NonZeroSign();
                 InitialAngle = SwingOffset();
                 InitialMouseAngle = Projectile.velocity.ToRotation();

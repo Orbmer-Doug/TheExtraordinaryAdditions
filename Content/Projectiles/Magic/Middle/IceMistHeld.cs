@@ -33,7 +33,7 @@ public class IceMistHeld : BaseIdleHoldoutProjectile
 
         if (this.RunLocal())
         {
-            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Center.SafeDirectionTo(Modded.mouseWorld), .6f);
+            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Center.SafeDirectionTo(Modded.MouseWorld), .6f);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }

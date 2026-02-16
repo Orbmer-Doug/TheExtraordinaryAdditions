@@ -88,7 +88,7 @@ public class GarciaShotgunHoldout : BaseIdleHoldoutProjectile
         if ((this.RunLocal() && Modded.SafeMouseLeft.Current) && Wait <= 0 && TryUseAmmo(out int type, out float speed, out int dmg, out float kb, out int ammo))
         {
             Vector2 pos = Projectile.RotHitbox().Right + PolarVector(2f * Dir, Projectile.rotation - MathHelper.PiOver2);
-            Vector2 vel = Center.SafeDirectionTo(Modded.mouseWorld) * MathHelper.Clamp(speed, Item.shootSpeed, Item.shootSpeed * 2);
+            Vector2 vel = Center.SafeDirectionTo(Modded.MouseWorld) * MathHelper.Clamp(speed, Item.shootSpeed, Item.shootSpeed * 2);
 
             if (this.RunLocal())
             {

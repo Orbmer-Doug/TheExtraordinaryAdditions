@@ -66,9 +66,9 @@ public class CrossDisc : ModItem
 
     public override void PostUpdate()
     {
-        float brightness = Main.essScale * Utils.NextFloat(Main.rand, 0.002f, .006f);
+        float brightness = Main.essScale * Main.rand.NextFloat(0.002f, .006f);
         Lighting.AddLight(Item.Center, 122 * brightness, 253 * brightness, 255 * brightness);
-        if (Utils.NextBool(Main.rand, 4))
+        if (Main.rand.NextBool(4))
         {
             Dust dust = Dust.NewDustPerfect(Item.RandAreaInEntity(), DustID.AncientLight,
                 -Vector2.UnitY.RotatedByRandom(.5f) * Main.rand.NextFloat(2.8f, 3.4f), 0, Color.LightBlue, Main.rand.NextFloat(.85f, 1.15f));

@@ -64,6 +64,8 @@ public class VRP : ModProjectile
     public GlobalPlayer Modded => Owner.Additions();
     public override void AI()
     {
+        if (Time == 0)
+            this.Sync();
         if (State == Element.Neutral)
         {
             Texture2D bigNeutral = AssetRegistry.GetTexture(AdditionsTexture.VRPNeutral);

@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using System;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
@@ -24,17 +25,7 @@ public class TorrentialCleave : BaseSwordSwing
     public override float SwingAngle => (Pi * 9f) / 13f;
     public override float SwordRotation => PiOver2;
 
-    public float IdealSize
-    {
-        get
-        {
-            if (State != TorrentialSwings.HeavyDown)
-            {
-                return 1f;
-            }
-            return 1.4f;
-        }
-    }
+    public float IdealSize => State != TorrentialSwings.HeavyDown ? 1f : 1.4f;
 
     public enum TorrentialSwings
     {
@@ -96,8 +87,6 @@ public class TorrentialCleave : BaseSwordSwing
             if (State == TorrentialSwings.HeavyDown)
             {
                 AdditionsSound.HeavySwordSwing.Play(Projectile.Center, 2.6f, -.3f, .1f);
-                if (this.RunLocal())
-                    Projectile.NewProj(Center, Projectile.velocity * 7f, ModContent.ProjectileType<OceanSlash>(), Projectile.damage, Projectile.knockBack, Owner.whoAmI);
             }
             else
                 AdditionsSound.HeavySwordSwing.Play(Projectile.Center, 1.6f, 0f, .1f);
@@ -131,16 +120,22 @@ public class TorrentialCleave : BaseSwordSwing
         {
             if (Modded.SafeMouseLeft.Current && VanishTime <= 0)
             {
-                State = State == TorrentialSwings.Up ? TorrentialSwings.Down : State == TorrentialSwings.Down ? TorrentialSwings.Up2 : State == TorrentialSwings.Up2 ? TorrentialSwings.HeavyDown : TorrentialSwings.Up;
+                State = State switch
+                {
+                    TorrentialSwings.Up => TorrentialSwings.Down,
+                    TorrentialSwings.Down => TorrentialSwings.Up2,
+                    TorrentialSwings.Up2 => TorrentialSwings.HeavyDown,
+                    _ => TorrentialSwings.Up
+                };
                 SwingDir = (State == TorrentialSwings.Up || State == TorrentialSwings.Up2) ? SwingDirection.Up : SwingDirection.Down;
                 Initialized = false;
-                this.Sync();
             }
             else
             {
                 VanishTime++;
-                this.Sync();
             }
+
+            this.Sync();
         }
     }
 
@@ -154,7 +149,7 @@ public class TorrentialCleave : BaseSwordSwing
             Vector2 vel = SwordDir.RotatedByRandom(.31f) * Main.rand.NextFloat(4f, 17f);
             int life = Main.rand.Next(50, 60);
             float scale = Main.rand.NextFloat(.8f, 1.4f);
-            Color smokeColor = MulticolorLerp(Utils.NextFloat(Main.rand), AbyssalCurrents.BrackishPalette);
+            Color smokeColor = MulticolorLerp(Main.rand.NextFloat(), AbyssalCurrents.BrackishPalette);
             smokeColor = Color.Lerp(smokeColor, Color.Gray, 0.55f);
 
             ParticleRegistry.SpawnMistParticle(start, vel, scale, smokeColor, smokeColor * -.5f, 190);
@@ -170,6 +165,9 @@ public class TorrentialCleave : BaseSwordSwing
         else
             AdditionsSound.IkeSwordGroundHit.Play(start, 1.1f, 0f, .1f, 10, Name);
 
+        Projectile.NewProj(npc.Center, Vector2.Zero, ModContent.ProjectileType<TorrentialStrikeSpawner>(),
+            Projectile.damage, 0f, Projectile.owner, npc.whoAmI, 0, big ? 5 : 10);
+        
         ScreenShakeSystem.New(new(big ? .6f : .4f, .3f, 1400f), start);
         npc.velocity += SwordDir * Item.knockBack * npc.knockBackResist;
         TimeStop = StopTime;
@@ -214,14 +212,7 @@ public class TorrentialCleave : BaseSwordSwing
         if (Direction == -1)
             flip = SwingDir == SwingDirection.Up;
 
-        if (flip)
-        {
-            Effects = SpriteEffects.None;
-        }
-        else
-        {
-            Effects = SpriteEffects.FlipHorizontally;
-        }
+        Effects = flip ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
 
         void draw()
         {
@@ -238,9 +229,160 @@ public class TorrentialCleave : BaseSwordSwing
             trail.DrawTrail(shader, old.Points);
         }
 
-        Main.spriteBatch.Draw(Tex, Projectile.Center - Main.screenPosition, null, lightColor,
+        Main.spriteBatch.Draw(Tex, Projectile.Center - Main.screenPosition, null, Color.Cyan with { A = 0 },
             Projectile.rotation, origin, Projectile.scale, Effects, 0f);
+        Main.spriteBatch.Draw(Tex, Projectile.Center - Main.screenPosition, null, lightColor,
+            Projectile.rotation, origin, Clamp(Projectile.scale, 0f, 1f), Effects, 0f);
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.OverProjectiles);
+        return false;
+    }
+}
+
+public class TorrentialStrikeSpawner : ModProjectile
+{
+    public override string Texture => AssetRegistry.Invis;
+    public override void SetDefaults()
+    {
+        Projectile.hostile = 
+            Projectile.friendly = 
+            Projectile.tileCollide = false;
+        Projectile.timeLeft = 31;
+        Projectile.noEnchantmentVisuals = Projectile.ignoreWater = true;
+    }
+
+    public int Index
+    {
+        get => (int)Projectile.ai[0];
+        set => Projectile.ai[0] = value;
+    }
+    public int Time
+    {
+        get => (int)Projectile.ai[1];
+        set => Projectile.ai[1] = value;
+    }
+    public int Wait
+    {
+        get => (int)Projectile.ai[2];
+        set => Projectile.ai[2] = value;
+    }
+    
+    public NPC Target => Main.npc?[Index];
+    public override void AI()
+    {
+        if (Target is not { active: true })
+        {
+            Projectile.Kill();
+            return;
+        }
+
+        Projectile.Center = Target.Center;
+
+        if (Time % Wait == Wait - 1)
+        {
+            float size = MathF.Max(Target.Size.X, Target.Size.Y);
+            Vector2 pos = Target.Center + Main.rand.NextVector2CircularLimited(size + 200f, size + 200f, .85f, 1f);
+            Vector2 vel = GetHomingVelocity(pos, Target.RandAreaInEntity(), Target.velocity, Main.rand.NextFloat(20f, 30f));
+            Projectile.NewProj(pos, vel, ModContent.ProjectileType<TorrentialStrike>(), (int)(Projectile.damage * .1f),
+                0f, Projectile.owner);
+            for (int i = 0; i < 35; i++)
+            {
+                Color darkColor = MulticolorLerp(Main.rand.NextFloat(), AbyssalCurrents.BrackishPalette);
+                darkColor = Color.Lerp(darkColor, Color.Gray, 0.35f);
+                Color brightColor = MulticolorLerp(Main.rand.NextFloat(), AbyssalCurrents.BrackishPalette);
+
+                ParticleRegistry.SpawnBloomPixelParticle(pos, Main.rand.NextVector2Circular(4f, 4f),
+                    Main.rand.Next(30, 40), Main.rand.NextFloat(.3f, .6f), darkColor, brightColor, null, 1.25f);
+                ParticleRegistry.SpawnSquishyPixelParticle(pos, Main.rand.NextVector2Circular(12f, 12f),
+                    Main.rand.Next(70, 90), Main.rand.NextFloat(3.2f, 4.1f), brightColor, darkColor, 5, false, false,
+                    Main.rand.NextFloat(-.3f, .3f));
+            }
+
+            AdditionsSound.etherealReleaseA.Play(pos, .8f, -.1f, .2f, 20);
+        }
+        
+        Time++;
+    }
+
+    public override bool PreDraw(ref Color lightColor) => false;
+}
+
+public class TorrentialStrike : ModProjectile
+{
+    public override string Texture => AssetRegistry.Invis;
+
+    public override void SetDefaults()
+    {
+        Projectile.Size = new(40);
+        Projectile.penetrate = 1;
+        Projectile.localNPCHitCooldown = -1;
+        Projectile.hostile = 
+                Projectile.tileCollide = false;
+        Projectile.usesLocalNPCImmunity =
+            Projectile.noEnchantmentVisuals =
+                Projectile.friendly =
+                    Projectile.ignoreWater =
+                        Projectile.stopsDealingDamageAfterPenetrateHits = true;
+        Projectile.MaxUpdates = 1;
+        Projectile.timeLeft = 200;
+    }
+
+    private const int MaxFadeTime = 30;
+    public int FadeTime
+    {
+        get => (int)Projectile.ai[0];
+        set => Projectile.ai[0] = value;
+    }
+
+    public bool Hit
+    {
+        get => (int)Projectile.ai[1] == 1;
+        set => Projectile.ai[1] = value.ToInt();
+    }
+    
+    public override void AI()
+    {
+        if (trail == null || trail.Disposed)
+            trail = new(WidthFunct, ColorFunct, null, 20);
+        points.Update(Projectile.Center);
+        if (Hit)
+        {
+            if (FadeTime >= MaxFadeTime)
+            {
+                Projectile.Kill();
+            }
+            Projectile.velocity *= .85f;
+            FadeTime++;
+        }
+    }
+
+    public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+    {
+        if (!Hit)
+            Hit = true;
+    }
+
+    public float WidthFunct(float c) => OptimizedPrimitiveTrail.PyriformWidthFunct(c, Projectile.width);
+
+    public Color ColorFunct(SystemVector2 c, Vector2 pos)
+    {
+        float fade = InverseLerp(MaxFadeTime, 0, FadeTime);
+        return AbyssalCurrents.BrackishPalette[0] * (1 - c.X) * fade * 2f;
+    }
+    
+    public OptimizedPrimitiveTrail trail;
+    public TrailPoints points = new(20);
+    public override bool PreDraw(ref Color lightColor)
+    {
+        void render()
+        {
+            if (trail == null || trail.Disposed || points == null)
+                return;
+            
+            ManagedShader shader = ShaderRegistry.WaterCurrent;
+            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DendriticNoiseZoomedOut), 1);
+            trail.DrawTrail(shader, points.Points, 100, true);
+        }
+        PixelationSystem.QueuePrimitiveRenderAction(render, PixelationLayer.OverProjectiles);
         return false;
     }
 }

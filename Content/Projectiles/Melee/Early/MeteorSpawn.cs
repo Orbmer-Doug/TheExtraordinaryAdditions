@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
+using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -36,7 +37,7 @@ public class MeteorSpawn : ModProjectile, ILocalizedModType, IModType
         Projectile.timeLeft *= 5;
         Projectile.penetrate = -1;
         Projectile.tileCollide = false;
-        Projectile.DamageType = DamageClass.MeleeNoSpeed;
+        Projectile.DamageType = ModContent.GetInstance<TrueMeleeNoSpeedDamageClass>();
     }
 
     public Player Owner => Main.player[Projectile.owner];
@@ -48,7 +49,7 @@ public class MeteorSpawn : ModProjectile, ILocalizedModType, IModType
     public ref float FireTimer => ref Projectile.ai[2];
     public bool Fire
     {
-        get => Projectile.AdditionsInfo().ExtraAI[0] == 1f;
+        get => (int)Projectile.AdditionsInfo().ExtraAI[0] == 1;
         set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
 
@@ -59,11 +60,11 @@ public class MeteorSpawn : ModProjectile, ILocalizedModType, IModType
             Projectile.frame = Main.rand.Next(0, 4);
 
             float offsetAngle = Main.rand.NextFloat(MathHelper.TwoPi);
-            int projectileCount = 20;
-            float projectileSpread = projectileCount;
-            for (int i = 0; i < projectileCount; i++)
+            const int count = 20;
+            float spread = count;
+            for (int i = 0; i < count; i++)
             {
-                Vector2 shootVelocity = (MathHelper.TwoPi * i / projectileSpread + offsetAngle).ToRotationVector2() * 3f * Main.rand.NextFloat(0.83f);
+                Vector2 shootVelocity = (MathHelper.TwoPi * i / spread + offsetAngle).ToRotationVector2() * 3f * Main.rand.NextFloat(0.83f);
                 ParticleRegistry.SpawnHeavySmokeParticle(Projectile.Center, shootVelocity, 50, Main.rand.NextFloat(.6f, 1.1f), FireColor, .45f, true);
                 ParticleRegistry.SpawnGlowParticle(Projectile.Center, shootVelocity * .4f, 40, Main.rand.NextFloat(20f, 40f), FireColor, 1.4f);
             }
@@ -87,7 +88,7 @@ public class MeteorSpawn : ModProjectile, ILocalizedModType, IModType
             if (FireTimer.BetweenNum(1f, 10f))
             {
                 if (this.RunLocal())
-                    Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Modded.mouseWorld) * -11f, .25f);
+                    Projectile.velocity = Vector2.Lerp(Projectile.velocity, Utility.SafeDirectionTo(Projectile, Modded.MouseWorld) * -11f, .25f);
                 this.Sync();
             }
 
@@ -95,7 +96,7 @@ public class MeteorSpawn : ModProjectile, ILocalizedModType, IModType
             if (FireTimer.BetweenNum(10f, 12f))
             {
                 if (this.RunLocal())
-                    Projectile.velocity = Projectile.SafeDirectionTo(Modded.mouseWorld) * 20f;
+                    Projectile.velocity = Utility.SafeDirectionTo(Projectile, Modded.MouseWorld) * 20f;
                 this.Sync();
             }
             points.Update(Projectile.Center + Projectile.velocity);
@@ -125,7 +126,7 @@ public class MeteorSpawn : ModProjectile, ILocalizedModType, IModType
         float time = SecondsToFrames(11f);
         float cycle = Modded.GlobalTimer % time / time * MathF.Tau;
         float offset = MathF.Tau * InverseLerp(0f, total, index);
-        Vector2 dest = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true) + GetPointOnRotatedEllipse(200f, 120f, offset + cycle, cycle * 4f);
+        Vector2 dest = Owner.RotatedRelativePoint(Owner.MountedCenter) + GetPointOnRotatedEllipse(200f, 120f, offset + cycle, cycle * 4f);
         Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.Center.SafeDirectionTo(dest) * MathHelper.Min(Projectile.Center.Distance(dest), 20f), .22f);
     }
 
@@ -144,7 +145,7 @@ public class MeteorSpawn : ModProjectile, ILocalizedModType, IModType
                 40, 1f, Color.Lerp(Color.OrangeRed, Color.DarkOrange, Main.rand.NextFloat(.5f, .7f)));
         }
 
-        Projectile.ExpandHitboxBy(120);
+        Utility.ExpandHitboxBy(Projectile, 120);
         Projectile.penetrate = -1;
         Projectile.Damage();
     }
@@ -166,11 +167,10 @@ public class MeteorSpawn : ModProjectile, ILocalizedModType, IModType
     {
         void draw()
         {
-            if (trail != null && !trail.Disposed && points != null)
-            {
-                ManagedShader shader = ShaderRegistry.StandardPrimitiveShader;
-                trail.DrawTrail(shader, points.Points);
-            }
+            if (trail == null || trail.Disposed || points == null) 
+                return;
+            ManagedShader shader = ShaderRegistry.StandardPrimitiveShader;
+            trail.DrawTrail(shader, points.Points);
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 

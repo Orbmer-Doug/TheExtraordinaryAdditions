@@ -49,18 +49,23 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
 
     private static void ChangeCursor(On_Main.orig_DrawInterface_36_Cursor orig)
     {
-        if (Utility.FindProjectile(out Projectile p, ModContent.ProjectileType<CrossDiscHoldout>(), Main.myPlayer))
+        if (FindProjectile(out Projectile p, ModContent.ProjectileType<CrossDiscHoldout>(), Main.myPlayer))
         {
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.SamplerStateForCursor, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
+            if (p.owner == Main.myPlayer)
+            {
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.SamplerStateForCursor,
+                    DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
 
-            Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.CursorMelee);
-            GlobalPlayer player = Main.LocalPlayer.Additions();
-            if (player.SafeMouseLeft.Current && Main.LocalPlayer.ownedProjectileCounts[ModContent.ProjectileType<CrossSwing>()] <= 0)
-                tex = AssetRegistry.GetTexture(AdditionsTexture.CursorRanged);
+                Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.CursorMelee);
+                GlobalPlayer player = Main.LocalPlayer.Additions();
+                if (player.SafeMouseLeft.Current &&
+                    Main.LocalPlayer.ownedProjectileCounts[ModContent.ProjectileType<CrossSwing>()] <= 0)
+                    tex = AssetRegistry.GetTexture(AdditionsTexture.CursorRanged);
 
-            Main.spriteBatch.Draw(tex, new Vector2(Main.mouseX + 1, Main.mouseY + 1), null, Color.White, 0f,
-                new Vector2(.5f) * tex.Size(), Main.cursorScale * 1.1f, SpriteEffects.None, 0f);
+                Main.spriteBatch.Draw(tex, new Vector2(Main.mouseX + 1, Main.mouseY + 1), null, Color.White, 0f,
+                    new Vector2(.5f) * tex.Size(), Main.cursorScale * 1.1f, SpriteEffects.None, 0f);
+            }
         }
         else
             orig();
@@ -137,7 +142,7 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
 
         if (this.RunLocal())
         {
-            Projectile.velocity = Projectile.SafeDirectionTo(Modded.mouseWorld).SafeNormalize(Vector2.Zero) * 5f;
+            Projectile.velocity = Projectile.SafeDirectionTo(Modded.MouseWorld).SafeNormalize(Vector2.Zero) * 5f;
             if (Projectile.velocity != Projectile.oldVelocity)
                 Projectile.netUpdate = true;
         }
@@ -202,7 +207,7 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
         int swingType = ModContent.ProjectileType<CrossSwing>();
         if (Modded.SafeMouseRight.JustPressed && Owner.ownedProjectileCounts[swingType] <= 0 && this.RunLocal())
         {
-            Vector2 velocity = Projectile.SafeDirectionTo(Modded.mouseWorld);
+            Vector2 velocity = Projectile.SafeDirectionTo(Modded.MouseWorld);
 
             // Make the swing
             Projectile swing = Main.projectile[Projectile.NewProj(Center, velocity, swingType,
@@ -230,7 +235,7 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
         // Apply a decrease in accuracy the faster the cursor is spinning
         ReticleCounter = MathHelper.Clamp(ReticleCounter - (MathF.Abs(MathHelper.WrapAngle(Projectile.oldRot[0] - Projectile.oldRot[1])) * 5f), 0f, MaxCharge);
 
-        if (Modded.SafeMouseLeft.Current && this.RunLocal())
+        if (this.RunLocal() && Modded.SafeMouseLeft.Current)
         {
             Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, Projectile.rotation);
 
@@ -246,7 +251,7 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
             ReticleWait = 30f;
             this.Sync();
         }
-        else if (!Modded.SafeMouseLeft.Current && this.RunLocal())
+        else if (this.RunLocal() && !Modded.SafeMouseLeft.Current)
         {
             if (ReticleWait > 0f)
             {
@@ -262,10 +267,10 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
         if (BallCooldown > 0f)
             BallCooldown--;
 
-        if (Modded.SafeMouseLeft.JustReleased && this.RunLocal())
+        if (this.RunLocal() && Modded.SafeMouseLeft.JustReleased)
         {
             Vector2 pos = Center;
-            Vector2 vel = Center.SafeDirectionTo(Modded.mouseWorld)
+            Vector2 vel = Center.SafeDirectionTo(Modded.MouseWorld)
                 .RotatedByRandom(Spread) * 5f;
 
             int type = ModContent.ProjectileType<VRP>();
@@ -307,6 +312,8 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
                     if (FullReticleProgress >= 1f)
                         shoot = AdditionsSound.WaveBallThrowCharged;
                     break;
+                default:
+                    break;
             }
             shoot.Play(Projectile.Center, 1f, 0f, .2f, 20, Name);
 
@@ -325,6 +332,8 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
                     break;
                 case Element.Wave:
                     ElementPlayer.ElementalResourceCurrent += 3;
+                    break;
+                default:
                     break;
             }
 
@@ -349,7 +358,7 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
     public override bool PreDraw(ref Color lightColor)
     {
         Vector2 screenPos = Main.screenPosition;
-        if ((Modded.SafeMouseLeft.Current || ReticleWait > 0f) && Owner.ownedProjectileCounts[ModContent.ProjectileType<CrossSwing>()] <= 0)
+        if (this.RunLocal() && (Modded.SafeMouseLeft.Current || ReticleWait > 0f) && Owner.ownedProjectileCounts[ModContent.ProjectileType<CrossSwing>()] <= 0)
         {
             float opacity = ReticleWait < 29f ? .3f : 1f;
             int frame = (int)(FullReticleProgress * 3f);
@@ -378,7 +387,7 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
 
             Rectangle frame2 = chargedReticle.Frame(1, 4, 0, frame);
             Vector2 orig2 = frame2.Size() * .5f;
-            Main.EntitySpriteDraw(chargedReticle, Modded.mouseWorld - screenPos, frame2, Color.White * opacity, 0f, orig2, 1f, 0);
+            Main.EntitySpriteDraw(chargedReticle, Modded.MouseWorld - screenPos, frame2, Color.White * opacity, 0f, orig2, 1f, 0);
         }
 
         return false;

@@ -57,8 +57,7 @@ public class ConvergentFireball : ProjOwnedByNPC<Asterlin>
             () => -.2f), () => AdditionsLoopedSound.ProjectileNotActive(Projectile), () => Projectile.active);
         flame?.Update(Projectile.Center);
 
-        Player playerTarget = null;
-        PlayerTargeting.FindNearestPlayer(Projectile.Center, out playerTarget);
+        PlayerTargeting.FindNearestPlayer(Projectile.Center, out var playerTarget);
 
         if (Time < ScaleUpTime)
         {

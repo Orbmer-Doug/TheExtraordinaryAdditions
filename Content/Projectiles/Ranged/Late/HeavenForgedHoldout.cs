@@ -35,7 +35,7 @@ public class HeavenForgedHoldout : BaseIdleHoldoutProjectile, ILocalizedModType,
 
         if (this.RunLocal())
         {
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Center.SafeDirectionTo(Modded.mouseWorld), .2f);
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Center.SafeDirectionTo(Modded.MouseWorld), .2f);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }

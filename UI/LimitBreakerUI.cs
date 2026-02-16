@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Terraria;
+using Terraria.ID;
 using Terraria.UI;
 using TheExtraordinaryAdditions.Core.Globals;
 
@@ -16,6 +17,9 @@ public class LimitBreakerUI : SmartUIState
     public override void Draw(SpriteBatch spriteBatch)
     {
         Player player = Main.LocalPlayer;
+        if (player == null || !player.active || player.HeldItem.type != ItemID.BreakerBlade)
+            return;
+        
         float interpolant = player.Additions().CurrentLimit;
 
         Texture2D bar = AssetRegistry.GetTexture(AdditionsTexture.LimitBreakerBar);

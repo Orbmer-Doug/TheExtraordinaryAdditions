@@ -113,9 +113,9 @@ public class HellsToothpickHeld : ModProjectile
 
         if (this.RunLocal())
         {
-            float aimInterpolant = Utils.GetLerpValue(5f, 25f, Owner.Distance(Owner.Additions().mouseWorld), true);
+            float aimInterpolant = Utils.GetLerpValue(5f, 25f, Owner.Distance(Owner.Additions().MouseWorld), true);
             Vector2 oldVelocity = Projectile.velocity;
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Owner.SafeDirectionTo(Owner.Additions().mouseWorld), aimInterpolant);
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Owner.SafeDirectionTo(Owner.Additions().MouseWorld), aimInterpolant);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
@@ -154,7 +154,7 @@ public class HellsToothpickHeld : ModProjectile
             float animationCompletion = Utils.GetLerpValue(0f, WaitUntilMax, Held, true);
             float value = Utils.Remap(Held, 0f, WaitUntilMax, 1f, 4f, true);
 
-            Vector2 vel = Projectile.SafeDirectionTo(Owner.Additions().mouseWorld) * 5f * value;
+            Vector2 vel = Projectile.SafeDirectionTo(Owner.Additions().MouseWorld) * 5f * value;
 
             Vector2 pos = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.UnitY) * Item.height * .68f;
             int type = ModContent.ProjectileType<HellFlame>();

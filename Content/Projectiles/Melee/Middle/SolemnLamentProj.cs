@@ -58,7 +58,7 @@ public class SolemnLamentProj : BaseHoldoutProjectile
         Vector2 center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
         if (this.RunLocal())
         {
-            Projectile.velocity = center.SafeDirectionTo(Modded.mouseWorld);
+            Projectile.velocity = center.SafeDirectionTo(Modded.MouseWorld);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
             Projectile.spriteDirection = Projectile.velocity.X.NonZeroSign();

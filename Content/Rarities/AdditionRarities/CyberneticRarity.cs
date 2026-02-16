@@ -18,7 +18,7 @@ public class CyberneticRarity : ModRarity
 
         if (Main.rand.NextBool())
             CustomRaritySystem.Spawn(ref TechyList, new RarityHolosquare(rect.RandomRectangle(),
-                -Vector2.UnitY * Main.rand.NextFloat(2f, 4f), Main.rand.Next(30, 60),
+                -Vector2.UnitY * Main.rand.NextFloat(1f, 3f), Main.rand.Next(30, 60),
                 Main.rand.NextFloat(.5f, .9f), Color.Lerp(Color.Cyan, Color.DeepSkyBlue, Main.rand.NextFloat()), 1f, Main.rand.NextFloat(1.8f, 3f)));
 
         if (Main.rand.NextBool(14))

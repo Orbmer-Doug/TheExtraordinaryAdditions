@@ -146,7 +146,7 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
     {
         if (this.RunLocal())
         {
-            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Owner.MountedCenter.SafeDirectionTo(Modded.mouseWorld), .4f);
+            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Owner.MountedCenter.SafeDirectionTo(Modded.MouseWorld), .4f);
             Projectile.netUpdate = true;
         }
         Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver4;
@@ -159,7 +159,7 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
             if (this.RunLocal())
             {
                 int type = ModContent.ProjectileType<TesselesticLightning>();
-                Vector2 pos = Modded.mouseWorld.ClampOutCircle(Center, StaffLength / 2).ClampInCircle(Center, 1000f);
+                Vector2 pos = Modded.MouseWorld.ClampOutCircle(Center, StaffLength / 2).ClampInCircle(Center, 1000f);
                 TesselesticLightning tess = Main.projectile[Projectile.NewProj(TipOfStaff, Projectile.velocity,
                     type, Projectile.damage, Projectile.knockBack, Owner.whoAmI, 0f, pos.X, pos.Y)].As<TesselesticLightning>();
                 tess.MainColor = HeatColor;
@@ -217,7 +217,7 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
 
         if (this.RunLocal())
         {
-            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Center.SafeDirectionTo(Modded.mouseWorld), SubState == BeamState.Cast ? .3f : .7f);
+            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Center.SafeDirectionTo(Modded.MouseWorld), SubState == BeamState.Cast ? .3f : .7f);
             Projectile.netUpdate = true;
         }
 

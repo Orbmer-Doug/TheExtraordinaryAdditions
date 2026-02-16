@@ -36,7 +36,7 @@ public sealed class BarrageBeamManager : ModSystem
     public static ManagedRenderTarget BeamRenderTarget;
     public static ManagedRenderTarget PortalRenderTarget;
 
-    public static readonly List<BarrageBeam> ActiveBeams = new();
+    public static readonly List<BarrageBeam> ActiveBeams = [];
 
     public const int CylinderWidthSegments = 16;
     public const int CylinderHeightSegments = 20;
@@ -196,14 +196,19 @@ public sealed class BarrageBeamManager : ModSystem
             Vector3 end = start + Vector3.Transform(Vector3.UnitX, Rotation) * beam.LaserbeamLength;
 
             // Fill beam vertices
-            FillCylinderVertices(beam.Projectile.scale, RotationMatrix, (Golden ? Color.Gold : new Color(28, 225, 255)) * beam.Projectile.Opacity, start, end, beamVertices.AsSpan(i * NumVertices, NumVertices), CylinderWidthSegments, CylinderHeightSegments);
+            FillCylinderVertices(beam.Projectile.scale, RotationMatrix,
+                (Golden ? Color.Gold : new Color(28, 225, 255)) * beam.Projectile.Opacity, start, end,
+                beamVertices.AsSpan(i * NumVertices, NumVertices), CylinderWidthSegments, CylinderHeightSegments);
 
             // Fill bloom vertices
             for (int b = 0; b < NumBloomLayers; b++)
             {
                 float scaleFactor = 1f + (b + 1) * 0.2f;
                 float alpha = 0.5f / (b + 1);
-                FillCylinderVertices(beam.Projectile.scale, RotationMatrix, (Golden ? Color.Goldenrod : Color.DeepSkyBlue) with { A = 0 } * alpha * beam.Projectile.Opacity, start, end, bloomVertices.AsSpan((i * NumBloomLayers + b) * BloomNumVertices, BloomNumVertices), BloomWidthSegments, BloomHeightSegments, scaleFactor);
+                FillCylinderVertices(beam.Projectile.scale, RotationMatrix,
+                    (Golden ? Color.Goldenrod : Color.DeepSkyBlue) with { A = 0 } * alpha * beam.Projectile.Opacity,
+                    start, end, bloomVertices.AsSpan((i * NumBloomLayers + b) * BloomNumVertices, BloomNumVertices),
+                    BloomWidthSegments, BloomHeightSegments, scaleFactor);
             }
 
             // Fill portal vertices
@@ -252,7 +257,9 @@ public sealed class BarrageBeamManager : ModSystem
         bloomShader.Effect.CurrentTechnique.Passes[ManagedShader.DefaultPassName].Apply();
         device.SetVertexBuffer(BatchBloomVertexBuffer);
         device.Indices = BloomIndices;
-        device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, BloomNumVertices * ActiveBeams.Count * NumBloomLayers, 0, BloomNumIndices * ActiveBeams.Count * NumBloomLayers / 3);
+        device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0,
+            BloomNumVertices * ActiveBeams.Count * NumBloomLayers, 0,
+            BloomNumIndices * ActiveBeams.Count * NumBloomLayers / 3);
 
         // Draw main beam
         ManagedShader shader = AssetRegistry.GetShader("AsterlinDeathrayShader");
@@ -264,7 +271,8 @@ public sealed class BarrageBeamManager : ModSystem
         shader.Effect.CurrentTechnique.Passes[ManagedShader.DefaultPassName].Apply();
         device.SetVertexBuffer(BatchBeamVertexBuffer);
         device.Indices = CylinderIndices;
-        device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, NumVertices * ActiveBeams.Count, 0, NumIndices * ActiveBeams.Count / 3);
+        device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, NumVertices * ActiveBeams.Count, 0,
+            NumIndices * ActiveBeams.Count / 3);
 
         device.SetRenderTarget(null);
         device.SetVertexBuffer(null);

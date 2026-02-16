@@ -47,7 +47,7 @@ public class FrostyIcicle : ModProjectile
         {
             if (this.RunLocal())
             {
-                Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.SafeDirectionTo(Owner.Additions().mouseWorld), .2f);
+                Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.SafeDirectionTo(Owner.Additions().MouseWorld), .2f);
                 if (Projectile.velocity != Projectile.oldVelocity)
                     this.Sync();
             }

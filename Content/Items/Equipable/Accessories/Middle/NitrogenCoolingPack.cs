@@ -1,6 +1,7 @@
 ﻿using CalamityMod.Items.Materials;
 using CalamityMod.Items.Placeables;
 using System.Collections.Generic;
+using CalamityMod.Items.Placeables.FurnitureVoid;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -47,9 +48,9 @@ public class NitrogenCoolingPack : ModItem, ILocalizedModType
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        recipe.AddIngredient(ModContent.ItemType<Voidstone>(), 75);
+        recipe.AddIngredient(ModContent.ItemType<SmoothVoidstone>(), 75);
         recipe.AddIngredient(ModContent.ItemType<CryonicBar>(), 10);
-        recipe.AddIngredient(ModContent.ItemType<CoreofEleum>(), 8);
+        recipe.AddIngredient(ModContent.ItemType<EssenceofEleum>(), 8);
         recipe.AddTile(TileID.MythrilAnvil);
         recipe.Register();
     }

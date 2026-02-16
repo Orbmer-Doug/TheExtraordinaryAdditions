@@ -124,7 +124,7 @@ public class AbyssalCurrentsHoldout : ModProjectile, IHasScreenShader
 
         if (this.RunLocal())
         {
-            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Center.SafeDirectionTo(Modded.mouseWorld), .6f);
+            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Center.SafeDirectionTo(Modded.MouseWorld), .6f);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
@@ -143,7 +143,7 @@ public class AbyssalCurrentsHoldout : ModProjectile, IHasScreenShader
             State = AbyssalState.Throw;
             Projectile.MaxUpdates = 2;
             Projectile.timeLeft = Projectile.MaxUpdates * ThrowTime;
-            Projectile.velocity = Projectile.SafeDirectionTo(Modded.mouseWorld) * 30f;
+            Projectile.velocity = Projectile.SafeDirectionTo(Modded.MouseWorld) * 30f;
             this.Sync();
         }
     }
@@ -189,7 +189,7 @@ public class AbyssalCurrentsHoldout : ModProjectile, IHasScreenShader
         {
             if (this.RunLocal())
             {
-                Projectile.velocity = Projectile.SafeDirectionTo(Modded.mouseWorld);
+                Projectile.velocity = Projectile.SafeDirectionTo(Modded.MouseWorld);
             }
             Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver4;
             this.Sync();
@@ -210,7 +210,7 @@ public class AbyssalCurrentsHoldout : ModProjectile, IHasScreenShader
         {
             Time = 0;
             State = AbyssalState.Chase;
-            Projectile.velocity = Projectile.SafeDirectionTo(Modded.mouseWorld) * 10f;
+            Projectile.velocity = Projectile.SafeDirectionTo(Modded.MouseWorld) * 10f;
             this.Sync();
         }
     }
@@ -239,7 +239,7 @@ public class AbyssalCurrentsHoldout : ModProjectile, IHasScreenShader
 
         if (this.RunLocal() && Modded.MouseRight.Current && BackTime <= 0)
         {
-            Vector2 dest = Modded.mouseWorld;
+            Vector2 dest = Modded.MouseWorld;
             bool away = Vector2.Dot(Projectile.Center.SafeDirectionTo(dest), Projectile.velocity) < 0f;
             Vector2 force = Projectile.Center.SafeDirectionTo(dest) * (MathF.Min(Projectile.Distance(dest), 15f) * (away ? 1.8f : 1f));
             Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, force, .1f);

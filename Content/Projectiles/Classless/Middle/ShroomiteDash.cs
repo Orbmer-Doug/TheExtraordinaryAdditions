@@ -56,7 +56,7 @@ public class ShroomiteDash : ModProjectile
 
     public override void AI()
     {
-        Vector2 mouse = Owner.Additions().mouseWorld;
+        Vector2 mouse = Owner.Additions().MouseWorld;
         Time++;
 
         if (!HitEnemy)

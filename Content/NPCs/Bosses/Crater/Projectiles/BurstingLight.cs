@@ -24,8 +24,6 @@ public class BurstingLight : ProjOwnedByNPC<Asterlin>
         CooldownSlot = ImmunityCooldownID.Bosses;
     }
 
-    public const int MaxDist = 1000;
-    public const int BurstTime = 40;
     public int TotalTime => 18 + Asterlin.RotatedDicing_TelegraphTime;
     public float TeleCompletion => (float)Asterlin.RotatedDicing_TelegraphTime / TotalTime;
 

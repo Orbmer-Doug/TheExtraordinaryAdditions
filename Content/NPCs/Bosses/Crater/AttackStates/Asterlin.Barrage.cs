@@ -25,7 +25,7 @@ public partial class Asterlin : ModNPC
 
     public static int Barrage_AttackTime => SecondsToFrames(8f);
     public static int Barrage_FadeTime => SecondsToFrames(.8f);
-    public static int Barrage_BeamRate => DifficultyBasedValue(30, 14, 12, 10, 8, 6);
+    public static int Barrage_BeamRate => DifficultyBasedValue(30, 14, 13, 12, 10, 8);
     public static int Barrage_HoverTime => 40;
     public static int Barrage_BeamExpandTime => 44;
     public static int Barrage_BeamTime => 130;

@@ -576,11 +576,6 @@ public class GlassFocusedSniper : ProjOwnedByNPC<GlassPiercer>
         Projectile.ignoreWater = true;
     }
 
-    public int NPCIndex
-    {
-        get => (int)Projectile.ai[0];
-        set => Projectile.ai[0] = value;
-    }
     public int Time
     {
         get => (int)Projectile.ai[1];

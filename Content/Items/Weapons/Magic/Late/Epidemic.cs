@@ -58,9 +58,8 @@ public class Epidemic : ModItem
         recipe.AddIngredient(ModContent.ItemType<VirulentEntrapment>(), 1);
         recipe.AddIngredient(ItemID.Stinger, 6);
         recipe.AddIngredient(ItemID.Vine, 3);
-        recipe.AddIngredient(ItemID.JungleSpores, 14);
+        recipe.AddIngredient(ItemID.JungleSpores, 16);
         recipe.AddIngredient(ItemID.MudBlock, 400);
-        recipe.AddIngredient(ModContent.ItemType<MurkyPaste>(), 4);
         recipe.AddIngredient(ModContent.ItemType<UelibloomBar>(), 10);
         recipe.AddTile(TileID.Bookcases);
         recipe.Register();

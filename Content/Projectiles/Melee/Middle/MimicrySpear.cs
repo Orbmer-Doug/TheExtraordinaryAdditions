@@ -57,7 +57,7 @@ public class MimicrySpear : ModProjectile
         if (Modded.MouseRight.Current && !Start)
         {
             if (this.RunLocal())
-                Projectile.velocity = Vector2.Lerp(Projectile.velocity, Owner.SafeDirectionTo(Owner.Additions().mouseWorld), .5f);
+                Projectile.velocity = Vector2.Lerp(Projectile.velocity, Owner.SafeDirectionTo(Owner.Additions().MouseWorld), .5f);
 
             Offset = MakePoly(3).InOutFunction.Evaluate(55f, 31f, InverseLerp(0f, timeReeling, Time));
             Projectile.friendly = false;
@@ -89,7 +89,7 @@ public class MimicrySpear : ModProjectile
                     Projectile.friendly = true;
 
                     if (this.RunLocal())
-                        Projectile.velocity = Owner.SafeDirectionTo(Owner.Additions().mouseWorld);
+                        Projectile.velocity = Owner.SafeDirectionTo(Owner.Additions().MouseWorld);
 
                     // Update the hitbox for visuals
                     Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver4;

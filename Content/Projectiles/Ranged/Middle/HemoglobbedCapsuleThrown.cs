@@ -89,8 +89,8 @@ public class HemoglobbedCapsuleThrown : ModProjectile
 
         if (this.RunLocal())
         {
-            float aimInterpolant = Utils.GetLerpValue(5f, 25f, Owner.Distance(Modded.mouseWorld), true);
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Owner.SafeDirectionTo(Modded.mouseWorld), aimInterpolant);
+            float aimInterpolant = Utils.GetLerpValue(5f, 25f, Owner.Distance(Modded.MouseWorld), true);
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Owner.SafeDirectionTo(Modded.MouseWorld), aimInterpolant);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }

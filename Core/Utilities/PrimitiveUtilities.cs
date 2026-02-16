@@ -110,9 +110,6 @@ public static partial class Utility
         float widthStep = 1f / widthSegments;
         float heightStep = 1f / heightSegments;
 
-        Vector3 direction = Vector3.Normalize(end - start);
-        float length = Vector3.Distance(start, end);
-
         int vertexOffset = vertexStartOffset;
 
         for (int side = 0; side < 2; side++)
@@ -212,7 +209,7 @@ public static partial class Utility
         Matrix rotation = Matrix.CreateFromQuaternion(quaternion) * Matrix.CreateRotationZ(startRot);
         Matrix scale = Matrix.CreateScale(size);
         Matrix vertexMatrix = rotation * scale * view;
-        if (horizontalDir == -1f)
+        if (horizontalDir == -1)
             vertexMatrix = Matrix.CreateReflection(new Plane(Vector3.UnitX, 1f)) * Matrix.CreateRotationZ(PiOver2) * vertexMatrix;
 
         return vertexMatrix;
@@ -233,7 +230,7 @@ public static partial class Utility
 
         view *= Matrix.CreateTranslation(0f, -height, 0f); // Adjust for Y being down
         view *= Matrix.CreateRotationZ(Pi); // Flip to match orientation
-        if (Main.LocalPlayer.gravDir == -1f)
+        if ((int)Main.LocalPlayer.gravDir == -1)
             view *= Matrix.CreateScale(1f, -1f, 1f);
         view *= zoomScaleMatrix;
 
@@ -249,7 +246,7 @@ public static partial class Utility
         Matrix rotation = Matrix.CreateFromQuaternion(quaternion) * Matrix.CreateRotationZ(startRot);
         Matrix scale = Matrix.CreateScale(size);
         Matrix objectMatrix = rotation * scale;
-        if (horizontalDir == -1f)
+        if (horizontalDir == -1)
             objectMatrix = Matrix.CreateReflection(new Plane(Vector3.UnitX, 1f)) * Matrix.CreateRotationZ(MathHelper.PiOver2) * objectMatrix;
 
         return objectMatrix * world * view * projection;

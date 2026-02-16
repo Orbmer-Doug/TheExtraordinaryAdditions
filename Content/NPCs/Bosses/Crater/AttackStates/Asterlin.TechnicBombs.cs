@@ -85,7 +85,7 @@ public partial class Asterlin : ModNPC
                 if (!valid)
                 {
                     Projectile close = ProjectileTargeting.GetClosestProjectile(new(Target.Center, 5000, false, type));
-                    CurrentBombTargetIndex = close == null ? 0 : close.whoAmI;
+                    CurrentBombTargetIndex = close?.whoAmI ?? 0;
                     if (close != null)
                     {
                         bombTarget = Main.projectile?[CurrentBombTargetIndex];
@@ -109,7 +109,7 @@ public partial class Asterlin : ModNPC
                     // If the reticle gets too close everything freaks out
                     ReticlePosition = ReticlePosition.ClampOutCircle(Gun.Projectile.Center, 100f);
 
-                    SetLeftHandTarget(LeftArm.RootPosition + PolarVector(400f, Utils.AngleLerp(MathHelper.PiOver2 + (.1f * Direction), -MathHelper.PiOver2, Animators.MakePoly(3f).OutFunction(InverseLerp(0f, 40f, AITimer)))));
+                    SetLeftHandTarget(LeftArm.RootPosition + PolarVector(400f, (MathHelper.PiOver2 + (.1f * Direction)).AngleLerp(-MathHelper.PiOver2, Animators.MakePoly(3f).OutFunction(InverseLerp(0f, 40f, AITimer)))));
                     SetRightHandTarget(RightArm.RootPosition + Gun.Projectile.velocity.SafeNormalize(Vector2.Zero) * 400f);
                 }
 

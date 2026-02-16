@@ -66,9 +66,9 @@ public class ShaderParticleSystem : ModSystem
     public static ShaderParticleSystem Instance => ModContent.GetInstance<ShaderParticleSystem>();
     public const uint MaxShaderParticles = 16384;
     private static ShaderParticle[] particles = new ShaderParticle[MaxShaderParticles];
-    private static ulong[] presenceMask = BitmaskUtils.CreateMask(MaxShaderParticles);
+    private static readonly ulong[] presenceMask = BitmaskUtils.CreateMask(MaxShaderParticles);
     public static BitmaskUtils.BitmaskEnumerable ActiveShaderParticles => new BitmaskUtils.BitmaskEnumerable(presenceMask.AsSpan(0, presenceMask.Length), MaxShaderParticles);
-    private static Dictionary<ShaderParticleTypes, ManagedRenderTarget> typeRenderTargets = new();
+    private static readonly Dictionary<ShaderParticleTypes, ManagedRenderTarget> typeRenderTargets = new();
 
     public override void OnModLoad()
     {

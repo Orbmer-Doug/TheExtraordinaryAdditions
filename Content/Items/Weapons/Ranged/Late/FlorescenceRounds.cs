@@ -19,7 +19,7 @@ public class FlorescenceRounds : ModItem
 
     public override void SetDefaults()
     {
-        Item.damage = 3;
+        Item.damage = 18;
         Item.DamageType = DamageClass.Ranged;
         Item.width = 8;
         Item.height = 8;

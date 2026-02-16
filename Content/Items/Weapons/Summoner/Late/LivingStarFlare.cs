@@ -42,7 +42,7 @@ public class LivingStarFlare : ModItem
 
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
-        Projectile.NewProjectile(source, player.Additions().mouseWorld, Utils.NextVector2Circular(Main.rand, 2f, 2f), Item.shoot, damage, knockback, player.whoAmI, 0f, 0f, 0f);
+        Projectile.NewProjectile(source, player.Additions().MouseWorld, Utils.NextVector2Circular(Main.rand, 2f, 2f), Item.shoot, damage, knockback, player.whoAmI, 0f, 0f, 0f);
         return false;
     }
 

@@ -65,7 +65,7 @@ public partial class Asterlin : ModNPC
     public static int Tesselestic_FadeDuration => SecondsToFrames(.4f);
     public void DoBehavior_Tesselestic()
     {
-        Vector2 ideal = Utility.GetHomingVelocity(NPC.Center, Target.Center, Target.Velocity, 20f);
+        Vector2 ideal = GetHomingVelocity(NPC.Center, Target.Center, Target.Velocity, 20f);
         Vector2 destination = new(Target.Center.X + 300f * (NPC.Center.X > Target.Center.X).ToDirectionInt(), Target.Center.Y - 140f);
         NPC.SmoothFlyNear(destination, .2f, .9f);
 

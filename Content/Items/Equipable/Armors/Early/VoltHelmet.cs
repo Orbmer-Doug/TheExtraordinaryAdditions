@@ -4,7 +4,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Debuff;
 using TheExtraordinaryAdditions.Content.Items.Materials.Early;
-using TheExtraordinaryAdditions.Content.NPCs.Hostile.Lightning;
+using TheExtraordinaryAdditions.Content.NPCs.Hostile.Fulgur;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
@@ -50,7 +50,7 @@ public class VoltHelmet : ModItem, ILocalizedModType, IModType
         {
             player.AddBuff(ModContent.BuffType<FulminationCooldown>(), SecondsToFrames(15));
             AdditionsSound.LightningStrike.Play(player.Center, 1f, 0f, .2f);
-            Projectile bolt = Main.projectile[player.NewPlayerProj(player.Center, player.Center.SafeDirectionTo(player.Additions().mouseWorld) * 10f, ModContent.ProjectileType<LightningVolt>(), 100, 1f, player.whoAmI)];
+            Projectile bolt = Main.projectile[player.NewPlayerProj(player.Center, player.Center.SafeDirectionTo(player.Additions().MouseWorld) * 10f, ModContent.ProjectileType<LightningVolt>(), 100, 1f, player.whoAmI)];
             bolt.friendly = true;
             bolt.hostile = false;
             bolt.penetrate = 6;

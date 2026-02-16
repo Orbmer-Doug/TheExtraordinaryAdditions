@@ -7,13 +7,14 @@ using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.ModLoader.Utilities;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Early;
 using TheExtraordinaryAdditions.Content.Items.Materials.Early;
 using TheExtraordinaryAdditions.Content.Items.Placeable.Banners;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Early;
 using TheExtraordinaryAdditions.Core.Utilities;
 
-namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Lightning;
+namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Fulgur;
 
 public class FulminationSpirit : ModNPC
 {
@@ -82,9 +83,9 @@ public class FulminationSpirit : ModNPC
 
     public override float SpawnChance(NPCSpawnInfo spawnInfo)
     {
-        if (spawnInfo.Sky)
-            return 0.09f;
-        return 0f;
+        if (!spawnInfo.Player.ZoneSkyHeight || spawnInfo.PlayerSafe)
+            return 0f;
+        return SpawnCondition.Sky.Chance * .115f;
     }
 
     public override void FindFrame(int frameHeight)

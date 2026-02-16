@@ -101,7 +101,7 @@ public class CyberneticSwing : ModProjectile
 
         if (Time == 0f)
         {
-            Projectile.velocity = Center.SafeDirectionTo(ModdedOwner.mouseWorld);
+            Projectile.velocity = Center.SafeDirectionTo(ModdedOwner.MouseWorld);
             Projectile.netUpdate = true;
         }
 
@@ -187,7 +187,7 @@ public class CyberneticSwing : ModProjectile
                 AdditionsSound.harpoonStop.Play(Projectile.Center, .9f, 0f, .1f, 10, Name);
                 ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 30, 0f, Vector2.One, 0f, 200f, Color.Cyan);
                 float speed = proj.velocity.Length();
-                proj.velocity = proj.SafeDirectionTo(ModdedOwner.mouseWorld) * speed;
+                proj.velocity = proj.SafeDirectionTo(ModdedOwner.MouseWorld) * speed;
                 proj.ProjDamageMod().ParriedTimer = SecondsToFrames(3);
                 proj.netUpdate = true;
 

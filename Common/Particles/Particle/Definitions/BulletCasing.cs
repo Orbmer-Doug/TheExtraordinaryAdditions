@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
+using Terraria.ID;
 
 namespace TheExtraordinaryAdditions.Common.Particles;
 
@@ -23,28 +24,27 @@ public partial class ParticleRegistry
                 {
                     ref BulletCasingParticleData custom = ref p.GetCustomData<BulletCasingParticleData>();
                     p.Velocity.Y = MathHelper.Clamp(p.Velocity.Y + .2f, -22f, 22f);
-                    float HeatInterpolant = 1f - InverseLerp(0f, 100f, p.Time);
-                    Color HeatColor = Color.Lerp(Color.Chocolate * .9f, Color.Chocolate * 2f, HeatInterpolant);
-
+                    float interpol = 1f - InverseLerp(0f, 80f, p.Time);
+                    Color heatColor = Color.Lerp(Color.Chocolate * .9f, Color.Chocolate * 2f, interpol);
+                    
                     p.Rotation += p.Velocity.Length() * custom.RotAmt;
                     p.Opacity = InverseLerp(p.Lifetime, p.Lifetime - 20f, p.Time);
-                    Lighting.AddLight(p.Position, HeatColor.ToVector3() * HeatInterpolant);
+                    Lighting.AddLight(p.Position, heatColor.ToVector3() * interpol);
                 },
                 draw: static (ref ParticleData p, SpriteBatch sb) =>
                 {
                     Texture2D texture = TypeDefinitions[(byte)ParticleTypes.BulletCasing].Texture;
                     sb.DrawBetter(texture, p.Position, null, Lighting.GetColor(p.Position.ToTileCoordinates()) * p.Opacity, p.Rotation, texture.Size() / 2, p.Scale, 0);
 
-                    float HeatInterpolant = 1f - InverseLerp(0f, 100f, p.Time);
-                    Color HeatColor = Color.Lerp(Color.Chocolate * .9f, Color.Chocolate * 2f, HeatInterpolant);
-                    if (HeatInterpolant > 0f)
+                    float interpol = 1f - InverseLerp(0f, 80f, p.Time);
+                    Color heatColor = Color.Lerp(Color.Chocolate * .9f, Color.Chocolate * 2f, interpol);
+                    if (!(interpol > 0f)) 
+                        return;
+                    const int amt = 4;
+                    for (int i = 0; i < amt; i++)
                     {
-                        const int amt = 20;
-                        for (int i = 0; i < amt; i++)
-                        {
-                            Vector2 offset = (MathHelper.TwoPi * i / amt).ToRotationVector2() * (HeatInterpolant * 3f) - Main.screenPosition;
-                            sb.DrawBetter(texture, p.Position + offset, null, HeatColor with { A = 40 } * HeatInterpolant * .95f, p.Rotation, texture.Size() / 2, p.Scale, 0);
-                        }
+                        Vector2 offset = (MathHelper.TwoPi * i / amt).ToRotationVector2() * (interpol * 3f);
+                        sb.DrawBetter(texture, p.Position + offset, null, heatColor with { A = 10 } * interpol * .95f, p.Rotation, texture.Size() / 2, p.Scale, 0);
                     }
                 },
                 drawType: DrawTypes.Manual,

@@ -59,10 +59,8 @@ public class TheGiantSnailFromAncientTimes : ModNPC
 
     public override void OnHitByProjectile(Projectile projectile, NPC.HitInfo hit, int damageDone)
     {
-        if (projectile.type == ModContent.ProjectileType<Grub>() && projectile.active && projectile is not null)
-        {
+        if (projectile.type == ModContent.ProjectileType<Grub>() && projectile.active)
             NPC.Kill();
-        }
     }
 
     public ref float Timer => ref NPC.ai[0];
@@ -97,7 +95,7 @@ public class TheGiantSnailFromAncientTimes : ModNPC
             AdditionsSound.PETER.Play(NPC.Center, .6f, 0f, .3f, 0);
             Vector2 direction = (target.Center - NPC.Center).SafeNormalize(Vector2.UnitX);
             int damage = DifficultyBasedValue(30, 50, 65, 69, 80);
-            float speed = 10f;
+            const float speed = 10f;
             if (this.RunServer())
                 NPC.NewNPCProj(NPC.Center, direction.RotatedByRandom(.5f) * speed, ModContent.ProjectileType<ParmaJawn>(), damage, 1f);
             NPC.netUpdate = true;

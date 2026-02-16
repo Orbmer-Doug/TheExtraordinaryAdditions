@@ -78,7 +78,7 @@ public class SillyPinkSwing : BaseSwordSwing
             case SillyState.Reel:
                 if (this.RunLocal())
                 {
-                    Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Center.SafeDirectionTo(Modded.mouseWorld), .3f);
+                    Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Center.SafeDirectionTo(Modded.MouseWorld), .3f);
                     if (Projectile.velocity != Projectile.oldVelocity)
                         this.Sync();
                 }

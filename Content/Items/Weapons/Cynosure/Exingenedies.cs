@@ -1,9 +1,9 @@
-﻿using CalamityMod.Items;
-using CalamityMod.Items.Materials;
+﻿using CalamityMod.Items.Materials;
 using CalamityMod.Tiles.Furniture.CraftingStations;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using CalamityMod.Items.Placeables;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -136,17 +136,18 @@ public class Exingenedies : ModItem
 
     public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
     {
-        void draw()
-        {
-            Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
-            Main.spriteBatch.Draw(tex, Item.position - Main.screenPosition, null, Color.White, 0f, tex.Size() / 2f, 500f, 0, 0f);
-        }
         ManagedShader shader = AssetRegistry.GetShader("GenediesFlame");
         shader.TrySetParameter("Time", Main.GlobalTimeWrappedHourly);
         shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.MeltNoise), 0, SamplerState.AnisotropicWrap);
 
         ScreenShaderUpdates.QueueDrawAction(draw, BlendState.AlphaBlend, shader);
         return false;
+
+        void draw()
+        {
+            Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
+            Main.spriteBatch.Draw(tex, Item.position - Main.screenPosition, null, Color.White, 0f, tex.Size() / 2f, 500f, 0, 0f);
+        }
     }
 
     public override void PostUpdate()

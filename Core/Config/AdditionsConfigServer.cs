@@ -19,7 +19,7 @@ public class AdditionsConfigServer : ModConfig
 
     [BackgroundColor(80, 250, 187, 192)]
     [SliderColor(42, 222, 162)]
-    [DefaultValue(true)]
+    [DefaultValue(false)]
     [ReloadRequired]
     public bool ToolOverhaul { get; set; }
 }

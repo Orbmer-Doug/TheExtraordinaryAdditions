@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using CalamityMod;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
@@ -35,6 +36,7 @@ public class MeteorSwing : BaseSwordSwing
     {
         // Check for tiles
         Projectile.ownerHitCheck = true;
+        Projectile.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
     }
 
     public override void SafeInitialize()

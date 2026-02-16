@@ -86,7 +86,7 @@ public class GaussBallisticWarheadHoldout : BaseIdleHoldoutProjectile
         else if (!Maxxed)
             ChargeTime = MathHelper.Clamp(ChargeTime - 3f, 0f, ChargeNeeded);
 
-        if (ChargeTime == ChargeNeeded - 1f)
+        if (ChargeTime == ChargeNeeded - 1)
         {
             ParticleRegistry.SpawnPulseRingParticle(Right, Projectile.velocity.SafeNormalize(Vector2.Zero),
                 50, Projectile.rotation, new(.4f, 1f), 0f, 210f, Color.GreenYellow * 1.4f, true);
@@ -99,7 +99,7 @@ public class GaussBallisticWarheadHoldout : BaseIdleHoldoutProjectile
             this.Sync();
         }
 
-        if ((this.RunLocal() && Modded.SafeMouseLeft.Current) && Time < ShootWait)
+        if (this.RunLocal() && Owner.HasAmmo(Item) && Modded.SafeMouseLeft.Current && Time < ShootWait)
             Time++;
         else
             Time = MathHelper.SmoothStep(Time, 0f, .3f);
@@ -112,7 +112,7 @@ public class GaussBallisticWarheadHoldout : BaseIdleHoldoutProjectile
 
         if (!Lock)
         {
-            if (NPCTargeting.TryGetClosestNPC(new(Modded.mouseWorld, 800), out NPC target))
+            if (NPCTargeting.TryGetClosestNPC(new(Modded.MouseWorld, 800), out NPC target))
                 Target = target;
             ReticleRot = (ReticleRot + .05f) % MathHelper.TwoPi;
         }
@@ -145,11 +145,8 @@ public class GaussBallisticWarheadHoldout : BaseIdleHoldoutProjectile
             }
         }
 
-        if (Time >= ShootWait)
+        if (Time >= ShootWait && TryUseAmmo(out _, out float speed, out int damage, out float knockback, out _))
         {
-            Owner.PickAmmo(Owner.HeldItem, out int num, out float speed,
-                out int damage, out float knockback, out int usedItemAmmoId, false);
-
             if (this.RunLocal())
             {
                 Vector2 vel = Projectile.velocity.SafeNormalize(Vector2.Zero) * speed * (Maxxed ? 1.5f : 1f);

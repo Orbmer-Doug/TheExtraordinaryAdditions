@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CalamityMod;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -18,7 +19,7 @@ public class BirchStick : ModItem
     {
         Item.width = 106;
         Item.height = 98;
-        Item.DamageType = DamageClass.Melee;
+        Item.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
         Item.damage = 20;
         Item.crit = 8;
         Item.channel = true;

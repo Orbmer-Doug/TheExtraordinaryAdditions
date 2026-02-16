@@ -64,7 +64,7 @@ public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
     }
 
     public override bool? CanCutTiles() => false;
-    public Vector2 MouseWorld => Owner.Additions().mouseWorld;
+    public Vector2 MouseWorld => Owner.Additions().MouseWorld;
 
     public override void AI()
     {

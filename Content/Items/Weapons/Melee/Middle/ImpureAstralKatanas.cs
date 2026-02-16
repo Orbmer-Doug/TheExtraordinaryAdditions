@@ -26,7 +26,7 @@ public class ImpureAstralKatanas : ModItem
         Item.useStyle = ItemUseStyleID.Shoot;
         Item.knockBack = 2f;
         Item.autoReuse = true;
-        Item.damage = 140;
+        Item.damage = 130;
         Item.DamageType = DamageClass.Melee;
         Item.shoot = ModContent.ProjectileType<AstralKatanaSweep>();
         Item.noMelee = true;
@@ -54,19 +54,16 @@ public class ImpureAstralKatanas : ModItem
             player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI);
             Main.projectile[player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI)].As<AstralKatanaSweep>().Orange = true;
         }
-
         return false;
     }
 
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
+        recipe.AddIngredient(ItemID.AdamantiteBar, 10);
         recipe.AddIngredient(ModContent.ItemType<MeteorKatana>(), 1);
         recipe.AddIngredient(ModContent.ItemType<TitanHeart>(), 2);
         recipe.AddIngredient(ModContent.ItemType<StarblightSoot>(), 35);
-        recipe.AddIngredient(ItemID.SoulofMight, 10);
-        recipe.AddIngredient(ItemID.SoulofSight, 10);
-        recipe.AddIngredient(ItemID.SoulofFright, 10);
         recipe.AddTile(TileID.MythrilAnvil);
         recipe.Register();
     }

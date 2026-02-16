@@ -18,7 +18,7 @@ public class CondensedSoulMass : ProjOwnedByNPC<Asterlin>
     public ref float Time => ref Projectile.ai[0];
     public bool Touched
     {
-        get => Projectile.ai[1] == 1;
+        get => (int)Projectile.ai[1] == 1;
         set => Projectile.ai[1] = value.ToInt();
     }
     public int PlayerIndex

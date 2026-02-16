@@ -6,7 +6,7 @@ using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
 
-namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.AuroraTurret;
+namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 
 public class GlacialShell : ProjOwnedByNPC<AuroraGuard>
 {

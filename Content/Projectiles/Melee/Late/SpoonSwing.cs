@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using CalamityMod;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Debuff;
@@ -18,6 +19,11 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
 public class SpoonSwing : BaseSwordSwing
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TheSpoon);
+
+    public override void Defaults()
+    {
+        Projectile.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
+    }
 
     public enum SpoonState
     {

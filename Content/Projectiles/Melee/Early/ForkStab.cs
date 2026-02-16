@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.IO;
+using CalamityMod;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -65,7 +66,7 @@ public class ForkStab : ModProjectile
     {
         Projectile.friendly = true;
         Projectile.hostile = false;
-        Projectile.DamageType = DamageClass.Melee;
+        Projectile.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
         Projectile.tileCollide = false;
         Projectile.width = Projectile.height = 64;
         Projectile.penetrate = -1;
@@ -101,7 +102,7 @@ public class ForkStab : ModProjectile
                 {
                     if (this.RunLocal())
                     {
-                        Projectile.velocity = Owner.SafeDirectionTo(Owner.Additions().mouseWorld).RotatedByRandom(0.25f);
+                        Projectile.velocity = Utility.SafeDirectionTo(Owner, Owner.Additions().MouseWorld).RotatedByRandom(0.25f);
                         this.Sync();
                     }
                     stabVec = new Vector2(Main.rand.NextFloat(90, 150), 0);

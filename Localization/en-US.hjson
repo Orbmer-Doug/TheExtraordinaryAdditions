@@ -403,6 +403,14 @@ Mods: {
 			qwer.DisplayName: qwer
 			LightningNode.DisplayName: Lightning Node
 			Node.DisplayName: Node
+			AstralKatanaSlice.DisplayName: Astral Katana Slice
+			JudgeKaboom.DisplayName: Judge Kaboom
+			TorrentialStrike.DisplayName: Torrential Strike
+			TorrentialStrikeSpawner.DisplayName: Torrential Strike Spawner
+			WavePound.DisplayName: Wave Pound
+			MoonBlades.DisplayName: Moon Blades
+			MoonPortal.DisplayName: Moon Portal
+			HailfireRockets.DisplayName: Hailfire Rockets
 		}
 
 		Keybinds: {
@@ -1279,11 +1287,6 @@ Mods: {
 					'''
 			}
 
-			HollowPurple: {
-				DisplayName: Hollow Purple
-				Tooltip: The cursed technique
-			}
-
 			RealitySeamstressesGlove: {
 				DisplayName: Reality Seamstresses Glove
 				Tooltip:
@@ -1469,7 +1472,7 @@ Mods: {
 				Tooltip:
 					'''
 					A plasma latticed greatsword donned with a incinerating flame to melt down any and all it touches
-					Hold down Left Click to charge the blade and lunge, releasing multiple homing fireballs and extending the blade momentarily for big damage
+					Releases high explosive fireballs
 					'''
 			}
 
@@ -1489,7 +1492,11 @@ Mods: {
 
 			TorrentialTides: {
 				DisplayName: Torrential Tides
-				Tooltip: ""
+				Tooltip:
+					'''
+					Hits ignore all armor and summon multiple strikes
+					Every fourth swing is stronger
+					'''
 			}
 
 			TripleKatanas: {
@@ -1551,7 +1558,7 @@ Mods: {
 				Tooltip:
 					'''
 					Material of the astral landscape in a weaponized and impure form
-					Rains exploding stars from the sky on hit
+					Releases a cutting slice
 					'''
 			}
 
@@ -1662,7 +1669,7 @@ Mods: {
 
 			ObsidianRound: {
 				DisplayName: Obsidian Round
-				Tooltip: Quick going but quick falling ammunition which pierces 1 enemy
+				Tooltip: ""
 			}
 
 			AlchemicCyclone: {
@@ -1686,12 +1693,7 @@ Mods: {
 
 			FlorescenceRounds: {
 				DisplayName: Florescence Rounds
-				Tooltip:
-					'''
-					Extraordinary ammunition that homes in and pounces on targets. 
-					The faster the target is going the longer the bullet last and the faster the speed
-					This buff only works when it is within homing distance of the target
-					'''
+				Tooltip: Short lived ammunition that homes in to the mouse after hitting something
 			}
 
 			GaussBallisticWarheadLauncher: {
@@ -1794,12 +1796,7 @@ Mods: {
 
 			Hailfire: {
 				DisplayName: Hailfire
-				Tooltip:
-					'''
-					Fire burst of grenade shells that stick to everything with a max of 6 out at a time
-					The longer they are left the larger the explosion and damage. They max out after 5 seconds.
-					<right> to explode grenade shells
-					'''
+				Tooltip: <right> to cause all active shots to burst into fragments
 			}
 
 			HallowedGreatbow: {
@@ -2106,6 +2103,11 @@ Mods: {
 				DisplayName: Stygain Heart Mask
 				Tooltip: ""
 			}
+
+			DeusExMachina: {
+				DisplayName: Deus Ex Machina
+				Tooltip: '''"That's about it!"'''
+			}
 		}
 
 		Content: {
@@ -2230,6 +2232,7 @@ Mods: {
 				Headers: {
 					Graphical: Graphical
 					UI: UI
+					goop: goop Header
 				}
 
 				VisualIntensity: {

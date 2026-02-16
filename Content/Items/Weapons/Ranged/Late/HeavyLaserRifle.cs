@@ -70,7 +70,7 @@ public class HeavyLaserRifle : ModItem
         recipe.AddIngredient(ItemID.LunarBar, 14);
         recipe.AddIngredient(ItemID.Wire, 120);
         recipe.AddIngredient(ItemID.Glass, 30);
-        recipe.AddIngredient(ModContent.ItemType<CoreofSunlight>(), 12);
+        recipe.AddIngredient(ModContent.ItemType<EssenceofSunlight>(), 12);
         recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();
     }

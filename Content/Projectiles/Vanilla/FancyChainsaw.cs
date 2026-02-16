@@ -65,7 +65,7 @@ public class FancyChainsaw : ModProjectile
         Vector2 center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
         if (this.RunLocal())
         {
-            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, center.SafeDirectionTo(Modded.mouseWorld), .7f);
+            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, center.SafeDirectionTo(Modded.MouseWorld), .7f);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }

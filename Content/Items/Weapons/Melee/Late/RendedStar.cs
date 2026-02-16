@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using CalamityMod.Items.Materials;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -45,5 +46,14 @@ public class RendedStar : ModItem
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
         return false;
+    }
+
+    public override void AddRecipes()
+    {
+        Recipe recipe = CreateRecipe();
+        recipe.AddIngredient(ModContent.ItemType<Sunspot>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 5);
+        recipe.AddIngredient(ModContent.ItemType<EssenceofHavoc>(), 12);
+        recipe.Register();
     }
 }

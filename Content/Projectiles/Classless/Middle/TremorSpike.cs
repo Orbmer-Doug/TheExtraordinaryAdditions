@@ -55,7 +55,7 @@ public class TremorSpike : ModProjectile
         if (Projectile.localAI[0] == 0f)
         {
             Wait = Main.rand.NextFloat(10f, 16f);
-            MousePos = ModdedOwner.mouseWorld;
+            MousePos = ModdedOwner.MouseWorld;
             Projectile.localAI[0] = 1f;
             Projectile.netUpdate = true;
         }

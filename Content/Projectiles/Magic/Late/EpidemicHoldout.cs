@@ -37,8 +37,8 @@ public class EpidemicHoldout : BaseIdleHoldoutProjectile
 
         if (this.RunLocal())
         {
-            float interpolant = Utils.GetLerpValue(5f, 40f, Projectile.Distance(Modded.mouseWorld), true);
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Modded.mouseWorld), interpolant);
+            float interpolant = Utils.GetLerpValue(5f, 40f, Projectile.Distance(Modded.MouseWorld), true);
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Modded.MouseWorld), interpolant);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
@@ -78,7 +78,7 @@ public class EpidemicHoldout : BaseIdleHoldoutProjectile
             if (this.RunLocal() && LeftCounter % wait == wait - 1f && Owner.HeldItem.CheckManaBetter(Owner, 8, true))
             {
                 AdditionsSound.WaterSpell.Play(Projectile.Center, 1f, 0f, 0f, 0);
-                Projectile.NewProj(Projectile.Center, Projectile.SafeDirectionTo(Modded.mouseWorld) * 15f, ModContent.ProjectileType<EpidemicLob>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
+                Projectile.NewProj(Projectile.Center, Projectile.SafeDirectionTo(Modded.MouseWorld) * 15f, ModContent.ProjectileType<EpidemicLob>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
             }
             LeftCounter++;
         }

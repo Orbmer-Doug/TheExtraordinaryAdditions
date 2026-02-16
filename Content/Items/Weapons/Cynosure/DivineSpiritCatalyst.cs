@@ -50,7 +50,7 @@ public class DivineSpiritCatalyst : ModItem
 
     public override void PostUpdate()
     {
-        float brightness = Main.essScale * Utils.NextFloat(Main.rand, 0.9f, 1.1f);
+        float brightness = Main.essScale * Main.rand.NextFloat(0.9f, 1.1f);
         Lighting.AddLight(Item.Center, 0.94f * brightness, 0.95f * brightness, 0.56f * brightness);
     }
 
@@ -67,7 +67,7 @@ public class DivineSpiritCatalyst : ModItem
             float drawPositionOffset = num * baseScale * 8f;
             for (int i = 0; i < 3; i++)
             {
-                Vector2 drawPosition = baseDrawPosition + Utils.ToRotationVector2(MathHelper.TwoPi * i / 8f) * drawPositionOffset;
+                Vector2 drawPosition = baseDrawPosition + (MathHelper.TwoPi * i / 8f).ToRotationVector2() * drawPositionOffset;
                 spriteBatch.Draw(TextureAssets.Item[this.Item.type].Value, drawPosition, (Rectangle?)frame, drawColor, 0f, Vector2.Zero, baseScale, 0, 0f);
             }
         }
@@ -75,9 +75,9 @@ public class DivineSpiritCatalyst : ModItem
 
     public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
     {
-        float brightness = Main.essScale * Utils.NextFloat(Main.rand, 0.9f, 1.1f);
+        float brightness = Main.essScale * Main.rand.NextFloat(0.9f, 1.1f);
         Lighting.AddLight(Item.Center, 1.2f * brightness, 0.4f * brightness, 0.8f);
-        Rectangle frame = Utils.Frame(TextureAssets.Item[this.Item.type].Value, 1, 6, 0, 0, 0, 0);
+        Rectangle frame = TextureAssets.Item[this.Item.type].Value.Frame(1, 6, 0, 0, 0, 0);
         DrawBackAfterimage(spriteBatch, Item.position - Main.screenPosition, frame, scale);
         return true;
     }
@@ -85,17 +85,17 @@ public class DivineSpiritCatalyst : ModItem
     public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
     {
         Item.velocity.X = 0f;
-        DrawBackAfterimage(spriteBatch, position - Utils.Size(frame) * 0.5f, frame, scale);
+        DrawBackAfterimage(spriteBatch, position - frame.Size() * 0.5f, frame, scale);
         return true;
     }
 
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        recipe.AddIngredient(ModContent.ItemType<FinalStrike>(), 1);
-        recipe.AddIngredient(ModContent.ItemType<UnparalleledCoalescence>(), 1);
-        recipe.AddIngredient(ModContent.ItemType<RealitySeamstressesGlove>(), 1);
-        recipe.AddIngredient(ModContent.ItemType<DeepestNadir>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<FinalStrike>());
+        recipe.AddIngredient(ModContent.ItemType<UnparalleledCoalescence>());
+        recipe.AddIngredient(ModContent.ItemType<RealitySeamstressesGlove>());
+        recipe.AddIngredient(ModContent.ItemType<DeepestNadir>());
         recipe.AddTile(ModContent.TileType<DraedonsForge>());
         recipe.Register();
     }

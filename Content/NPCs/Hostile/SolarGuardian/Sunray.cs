@@ -9,7 +9,7 @@ using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.SolarGuardian;
 
-public class Sunray : ModProjectile, ILocalizedModType, IModType
+public class Sunray : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
 

@@ -21,28 +21,18 @@ public class HailfireShell : ModProjectile
 
     public override void SetDefaults()
     {
-        Projectile.width = 22;
-        Projectile.height = 56;
+        Projectile.width = 14;
+        Projectile.height = 14;
         Projectile.friendly = true;
         Projectile.tileCollide = true;
         Projectile.DamageType = DamageClass.Ranged;
         Projectile.extraUpdates = 0;
-        Projectile.timeLeft = 10000;
+        Projectile.timeLeft = 900;
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = -1;
-        Projectile.penetrate = -1;
-        Projectile.hide = true;
+        Projectile.penetrate = 1;
     }
 
-    private Vector2 offset;
-    public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(offset);
-    public override void ReceiveExtraAI(BinaryReader reader) => offset = reader.ReadVector2();
-    
-    public bool Stuck
-    {
-        get => Projectile.ai[2] == 1f;
-        set => Projectile.ai[2] = value.ToInt();
-    }
     public bool HitGround
     {
         get => Projectile.AdditionsInfo().ExtraAI[0] == 1f;
@@ -50,142 +40,202 @@ public class HailfireShell : ModProjectile
     }
 
     public ref float Time => ref Projectile.AdditionsInfo().ExtraAI[5];
-    public ref float Blink => ref Projectile.AdditionsInfo().ExtraAI[6];
-    public ref float EnemyID => ref Projectile.ai[1];
-
-    public static readonly float MaxTime = SecondsToFrames(5f);
 
     public override void AI()
     {
+        if (Projectile.velocity.Y < 16f)
+            Projectile.velocity.Y += .5f;
+
+        Projectile.FacingUp();
+
         after ??= new(7, () => Projectile.Center);
+        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0,
+            255, 0, 0f, null, false, .4f));
 
-        // Increment
-        if (Time < MaxTime)
-            Time++;
-
-        // Make the beeps
-        if (Time % 60f == 59f)
+        if (this.RunLocal() && Owner.Additions().SafeMouseRight.JustPressed)
         {
-            AdditionsSound.WarningBeep.Play(Projectile.Center, .8f, 0f, .2f);
-            Blink = 10f;
-        }
-
-        // Stick to enemies if necessary
-        if (Stuck)
-        {
-            NPC target = Main.npc[(int)EnemyID];
-
-            if (target == null || target.active == false)
-                return;
-
-            if (!target.active)
+            for (int i = 0; i < 12; i++)
             {
-                if (Projectile.timeLeft > 5)
-                    Projectile.timeLeft = 5;
+                Vector2 pos = Projectile.RandAreaInEntity();
+                Vector2 vel = Projectile.velocity.RotatedByRandom(.3f) * Main.rand.NextFloat(.5f, 1.4f);
+                int type = ModContent.ProjectileType<HailfireRockets>();
+                Projectile.NewProj(pos, vel,
+                    type, (int)(Projectile.damage * .25f),
+                    Projectile.knockBack * .4f, Owner.whoAmI);
 
-                Projectile.velocity = Vector2.Zero;
+                for (int j = 0; j < 5; j++)
+                {
+                    ParticleRegistry.SpawnSparkParticle(pos, vel.RotatedByRandom(.4f) * Main.rand.NextFloat(.3f, 1.4f),
+                        Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .6f),
+                        Color.Chocolate.Lerp(Color.OrangeRed, Main.rand.NextFloat(0f, .4f)) * 4f, true);
+                    
+                    ParticleRegistry.SpawnGlowParticle(Projectile.Center, Vector2.Zero, 14, Main.rand.NextFloat(20f, 40f), Color.OrangeRed, 1.4f);
+                }
+
+                SoundID.NPCHit4.Play(Projectile.Center, .6f, .3f, .1f);
             }
-            else
-            {
-                Projectile.timeLeft = 120;
-                Projectile.position = target.position + offset;
-            }
-        }
 
-        // Otherwise fall when not in ground
-        else if (!HitGround)
-        {
-            Projectile.velocity.Y = MathHelper.Clamp(Projectile.velocity.Y + .28f, -20f, 20f);
-            Projectile.FacingUp();
-        }
-        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 255, 0, 0f, null, false, .4f));
-
-        if (Owner.Additions().SafeMouseRight.JustPressed && this.RunLocal())
             Projectile.Kill();
-
-        if (Blink > 0f)
-        {
-            Lighting.AddLight(Projectile.Center, Color.Red.ToVector3() * .7f);
-            Blink--;
         }
-
-        Projectile.damage = (int)Utils.Remap(Projectile.damage, 0f, MaxTime, 0f, Projectile.originalDamage * 3f);
-    }
-
-    public override void OnKill(int timeLeft)
-    {
-        ScreenShakeSystem.New(new(Utils.Remap(Time, 0f, MaxTime, 0f, .4f), .4f), Projectile.Center);
-
-        AdditionsSound.crosscodeExplosion.Play(Projectile.Center, .8f, 0f, .1f, 10, Name);
-
-        if (this.RunLocal())
-            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<HailfireExplosion>(), Projectile.damage, 0f, Projectile.owner, (int)(Time * 1.2f), 0f);
     }
 
     public override bool? CanHitNPC(NPC target) => !HitGround;
+
     public override bool OnTileCollide(Vector2 oldVelocity)
     {
-        Projectile.Center += oldVelocity * 2f;
-        Projectile.velocity = Vector2.Zero;
-
-        if (!HitGround)
-        {
-            SoundEngine.PlaySound(SoundID.Dig with { Pitch = -.25f, Volume = .9f }, Projectile.Center);
-            Collision.HitTiles(Projectile.Center, oldVelocity, Projectile.width, Projectile.height);
-            HitGround = true;
-        }
-
-        return false;
+        Collision.HitTiles(Projectile.Center, oldVelocity, Projectile.width, Projectile.height);
+        Boom();
+        return true;
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        // Set the sticking variables
-        if (Stuck == false && target.life > 0)
-        {
-            Projectile.friendly = false;
-            Projectile.tileCollide = false;
-            EnemyID = target.whoAmI;
-            offset = Projectile.position - target.position;
-            offset -= Projectile.velocity;
-
-            Stuck = true;
-        }
+        Boom();
     }
 
-    public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
+    private void Boom()
     {
-        if (Projectile.ai[1] < 0f)
-        {
-            behindNPCsAndTiles.Add(index);
-        }
-        else
-        {
-            Projectile.hide = false;
-        }
+        AdditionsSound.crosscodeExplosion.Play(Projectile.Center, .8f, 0f, .1f, 10, Name);
+        if (this.RunLocal())
+            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<HailfireExplosion>(),
+                Projectile.damage, Projectile.knockBack, Projectile.owner, 1f);
     }
 
-    public FancyAfterimages after;
+    private FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D texture = Projectile.ThisProjectileTexture();
         SpriteEffects direction = Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
-        Color drawCol = Blink > 0f ? Projectile.GetAlpha(Color.Red with { A = 255 }) : Projectile.GetAlpha(lightColor);
+        Color drawCol = Projectile.GetAlpha(lightColor);
         after?.DrawFancyAfterimages(texture, [lightColor]);
-        Main.spriteBatch.DrawBetter(texture, Projectile.Center, null, drawCol, Projectile.rotation, texture.Size() * 0.5f, Projectile.scale, direction);
-
-        Main.spriteBatch.EnterShaderRegion();
-        Texture2D telegraphBase = AssetRegistry.InvisTex;
-        ManagedShader circle = ShaderRegistry.CircularAoETelegraph;
-        float interpolant = InverseLerp(0f, MaxTime, Time);
-        circle.TrySetParameter("opacity", interpolant * .67f);
-        circle.TrySetParameter("color", Color.Lerp(Color.DarkRed, Color.Red, MathF.Pow(Sin01(Main.GlobalTimeWrappedHourly * 2f), 2)) * interpolant);
-        circle.TrySetParameter("secondColor", Color.Lerp(Color.DarkOrange, Color.OrangeRed, interpolant));
-        circle.Render();
-
-        Main.spriteBatch.DrawBetterRect(telegraphBase, ToTarget(Projectile.Center, Vector2.One * Time * 1.2f), null, Color.White, 0f, telegraphBase.Size() / 2f);
-        Main.spriteBatch.ExitShaderRegion();
+        Main.spriteBatch.DrawBetter(texture, Projectile.Center, null, drawCol, Projectile.rotation,
+            texture.Size() * 0.5f, Projectile.scale, direction);
 
         return false;
+    }
+}
+
+public class HailfireRockets : ModProjectile
+{
+    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.HailfireRocket);
+
+    public override void SetDefaults()
+    {
+        Projectile.Size = new(8);
+        Projectile.friendly = true;
+        Projectile.hostile = false;
+        Projectile.friendly = true;
+        Projectile.penetrate = 1;
+        Projectile.usesLocalNPCImmunity = true;
+        Projectile.localNPCHitCooldown = -1;
+    }
+
+    public int Time
+    {
+        get => (int)Projectile.ai[0];
+        set => Projectile.ai[0] = value;
+    }
+
+    public const int TimeNeeded = 20;
+
+    public override void AI()
+    {
+        after ??= new(12, () => Projectile.Center);
+        after.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, .8f, Projectile.rotation));
+
+        if (Time >= TimeNeeded)
+        {
+            Projectile.MaxUpdates = 2;
+        }
+        Projectile.velocity *= 1.02f;
+        Projectile.FacingUp();
+        Projectile.velocity.Y = MathHelper.Clamp(Projectile.velocity.Y + .45f, -30f, 30f);
+
+        Time++;
+    }
+
+    public override void OnKill(int timeLeft)
+    {
+        AdditionsSound.crosscodeExplosion.Play(Projectile.Center, .4f, .3f, .2f, 30, "small");
+        if (this.RunLocal())
+            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<HailfireExplosion>(),
+                Projectile.damage, Projectile.knockBack, Projectile.owner, .3f);
+    }
+
+    public override bool? CanDamage() => null;
+
+    private FancyAfterimages after;
+
+    public override bool PreDraw(ref Color lightColor)
+    {
+        Texture2D tex = Projectile.ThisProjectileTexture();
+        after?.DrawFancyAfterimages(tex, [lightColor], InverseLerp(TimeNeeded, TimeNeeded + 40, Time));
+        Main.spriteBatch.DrawBetter(tex, Projectile.Center, null, lightColor * Projectile.Opacity, Projectile.rotation,
+            tex.Size() / 2, 1f);
+        return false;
+    }
+}
+
+public class HailfireExplosion : ModProjectile
+{
+    public override string Texture => AssetRegistry.Invis;
+
+    public ref float RadiusInterpolant => ref Projectile.ai[0];
+
+    public int Time
+    {
+        get => (int)Projectile.ai[1];
+        set => Projectile.ai[1] = value;
+    }
+
+    public float Radius => 90f * RadiusInterpolant;
+
+    public override void SetDefaults()
+    {
+        Projectile.width = 1;
+        Projectile.height = 1;
+        Projectile.friendly = true;
+        Projectile.ignoreWater = false;
+        Projectile.tileCollide = false;
+        Projectile.penetrate = -1;
+        Projectile.timeLeft = 20;
+        Projectile.DamageType = DamageClass.Ranged;
+        Projectile.usesLocalNPCImmunity = true;
+        Projectile.localNPCHitCooldown = -1;
+        Projectile.netImportant = true;
+    }
+
+    public override void AI()
+    {
+        if (Time == 0)
+        {
+            for (int i = 0; i < (int)MathHelper.Lerp(30, 100, RadiusInterpolant); i++)
+            {
+                Vector2 pos = Projectile.Center;
+                Vector2 vel = (Main.rand.NextVector2Circular(2f, 2f) + Main.rand.NextVector2Circular(12f, 12f)) *
+                              RadiusInterpolant;
+                Color color = Color.OrangeRed.Lerp(Color.Red, Main.rand.NextFloat(0f, .4f));
+                int life = Main.rand.Next(30, 40);
+                float scale = Main.rand.NextFloat(.7f, 1.2f) * RadiusInterpolant;
+                ParticleRegistry.SpawnGlowParticle(pos, vel * .2f, life / 2, scale * 115f, color.Lerp(Color.White, .3f),
+                    .9f);
+                
+                ParticleRegistry.SpawnSparkParticle(pos, vel * 2f, life / 3, scale * .8f, color);
+                
+                ParticleRegistry.SpawnSquishyPixelParticle(pos, vel * Main.rand.NextFloat(.5f, .9f), life * 3, scale * 2f, color, Color.Chocolate, 5, false, true);
+
+                if (i % 3 == 2)
+                    ParticleRegistry.SpawnCloudParticle(pos, vel * .3f - Vector2.UnitY * Main.rand.NextFloat(0f, 4f), Color.DarkGray, color, life, scale * 50f,
+                        Main.rand.NextFloat(.6f, 1.1f));
+            }
+        }
+
+        Time++;
+    }
+
+    public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+    {
+        return CircularHitboxCollision(Projectile.Center, Radius, targetHitbox);
     }
 }

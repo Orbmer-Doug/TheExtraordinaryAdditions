@@ -73,7 +73,7 @@ public class LazerDrone : ModProjectile
 
         if (this.RunLocal())
         {
-            Projectile.rotation = Projectile.Center.SafeDirectionTo(Modded.mouseWorld).ToRotation();
+            Projectile.rotation = Projectile.Center.SafeDirectionTo(Modded.MouseWorld).ToRotation();
             if (Projectile.rotation != Projectile.oldRot[1])
                 this.Sync();
         }

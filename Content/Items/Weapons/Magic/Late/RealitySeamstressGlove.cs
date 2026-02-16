@@ -109,7 +109,6 @@ public class RealitySeamstressesGlove : ModItem, ILocalizedModType, IModType
     {
         Recipe recipe = CreateRecipe();
         recipe.AddIngredient(ModContent.ItemType<BrewingStorms>(), 1);
-        recipe.AddIngredient(ItemID.MeteorStaff, 1);
         recipe.AddIngredient(ModContent.ItemType<Acheron>(), 1);
         recipe.AddIngredient(ItemID.FairyQueenMagicItem, 1);
         recipe.AddIngredient(ModContent.ItemType<StarlessSea>(), 1);

@@ -35,11 +35,10 @@ public class BandOfSunrays : ModItem
         player.GetModPlayer<BandOfSunraysPlayer>().Equipped = true;
         if (player.whoAmI == Main.myPlayer)
         {
-            IEntitySource source = player.GetSource_ItemUse(Item, null);
             if (player.ownedProjectileCounts[ModContent.ProjectileType<LightSpirit>()] == 0)
             {
                 StatModifier totalDamage = player.GetTotalDamage(player.GetBestClass());
-                int damage = (int)((StatModifier)totalDamage).ApplyTo(150f);
+                int damage = (int)totalDamage.ApplyTo(150f);
                 for (int i = 0; i < 3; i++)
                 {
                     Projectile star = Main.projectile[player.NewPlayerProj(player.Center, Vector2.Zero, ModContent.ProjectileType<LightSpirit>(), damage,
@@ -61,7 +60,7 @@ public class BandOfSunrays : ModItem
     {
         Recipe recipe = CreateRecipe();
         recipe.AddIngredient(ModContent.ItemType<WrithingLight>(), 3);
-        recipe.AddIngredient(ItemID.Shackle, 1);
+        recipe.AddIngredient(ItemID.Shackle);
         recipe.AddTile(TileID.MythrilAnvil);
         recipe.Register();
     }

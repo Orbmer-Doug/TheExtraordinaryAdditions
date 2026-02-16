@@ -70,7 +70,7 @@ public class TorrentialStormsHeld : BaseIdleHoldoutProjectile
 
         if (this.RunLocal())
         {
-            Projectile.velocity = Center.SafeDirectionTo(Modded.mouseWorld);
+            Projectile.velocity = Center.SafeDirectionTo(Modded.MouseWorld);
             if (Projectile.velocity != Projectile.oldVelocity)
                 Projectile.netUpdate = true;
             Projectile.spriteDirection = (Projectile.velocity.X > 0f).ToDirectionInt();
@@ -183,7 +183,7 @@ public class TorrentialStormsHeld : BaseIdleHoldoutProjectile
                             Vector2 posit = arrowPos + offset;
                             if (this.RunLocal())
                             {
-                                Vector2 veloc = posit.SafeDirectionTo(Modded.mouseWorld + offset) * speed * Main.rand.NextFloat(.6f, 1.25f);
+                                Vector2 veloc = posit.SafeDirectionTo(Modded.MouseWorld + offset) * speed * Main.rand.NextFloat(.6f, 1.25f);
                                 Projectile.NewProj(posit, veloc, ModContent.ProjectileType<RainDrop>(), dmg / 3, kb / 3, Owner.whoAmI);
                                 ParticleRegistry.SpawnPulseRingParticle(posit, veloc.SafeNormalize(Vector2.Zero), Main.rand.Next(35, 50), veloc.ToRotation(), new(.5f, 1f), 0f, 30f, Color.CornflowerBlue);
                                 for (int j = 0; j < 12; j++)

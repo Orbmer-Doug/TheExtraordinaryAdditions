@@ -6,7 +6,7 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
 
-namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Lightning;
+namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Fulgur;
 
 public class LightningVolt : ModProjectile
 {

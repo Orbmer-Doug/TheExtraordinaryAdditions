@@ -50,13 +50,13 @@ public partial class ParticleRegistry
                         {
                             Vector2 old = oldPos[i];
                             float completion = 1f - InverseLerp(0f, custom.TrailLength, i);
-                            sb.DrawBetter(bloom, old, null, p.Color * p.Opacity * completion, p.Rotation, bloom.Size() / 2, scale * 0.14f * completion, 0);
+                            sb.DrawBetter(bloom, old, null, custom.BloomColor * p.Opacity * completion, p.Rotation, bloom.Size() / 2, scale * 0.14f * completion, 0);
                             sb.DrawBetter(texture, old, null, p.Color * p.Opacity, p.Rotation, orig, scale * 7 * completion, 0);
                         }
                     }
                     else
                     {
-                        sb.DrawBetter(bloom, p.Position, null, p.Color * p.Opacity, p.Rotation, bloom.Size() / 2, scale * 0.14f, 0);
+                        sb.DrawBetter(bloom, p.Position, null, custom.BloomColor * p.Opacity, p.Rotation, bloom.Size() / 2, scale * 0.14f, 0);
                         sb.DrawBetter(texture, p.Position, null, p.Color * p.Opacity, p.Rotation, orig, scale * 7, 0);
                     }
                 },

@@ -65,7 +65,7 @@ public class AntiMatterCannon : ModItem
         recipe.AddIngredient(ItemID.SniperRifle, 1);
         recipe.AddIngredient(ItemID.FragmentSolar, 12);
         recipe.AddIngredient(ItemID.LunarBar, 30);
-        recipe.AddIngredient(ModContent.ItemType<CoreofSunlight>(), 12);
+        recipe.AddIngredient(ModContent.ItemType<EssenceofSunlight>(), 12);
         recipe.AddIngredient(ModContent.ItemType<DivineGeode>(), 14);
         recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();

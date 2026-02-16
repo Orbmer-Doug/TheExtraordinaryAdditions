@@ -374,8 +374,8 @@ public class KatanaSweep : ModProjectile
         if (!Init)
         {
             if (this.RunLocal())
-                Projectile.velocity = Center.SafeDirectionTo(Modded.mouseWorld);
-            Projectile.rotation = Center.AngleTo(Modded.mouseScreen) + PiOver4;
+                Projectile.velocity = Center.SafeDirectionTo(Modded.MouseWorld);
+            Projectile.rotation = Center.AngleTo(Modded.MouseScreen) + PiOver4;
 
             InitialStart = Owner.Center;
 

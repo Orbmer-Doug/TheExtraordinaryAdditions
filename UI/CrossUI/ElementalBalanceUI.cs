@@ -301,7 +301,7 @@ public class ElementalBalanceUI : SmartUIState
                     break;
             }
 
-            Main.EntitySpriteDraw(Overload, new Vector2(Main.screenWidth / 2, Main.screenHeight / 2) + pos, frame, Color.White * opacity, rotation, frame.Size() * .5f, 1f, fx);
+            Main.EntitySpriteDraw(Overload, new Vector2(width / 2, height / 2) + pos, frame, Color.White * opacity, rotation, frame.Size() * .5f, 1f, fx);
         }
         Main.spriteBatch.End();
         Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, Main.Rasterizer, null, Matrix.Identity);

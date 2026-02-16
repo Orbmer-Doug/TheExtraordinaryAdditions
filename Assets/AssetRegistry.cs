@@ -158,15 +158,11 @@ public class AssetRegistry : ModSystem
         foreach (string path in shaderLoadPaths)
         {
             string shaderName = Path.GetFileNameWithoutExtension(path);
-            string clearedPath = Path.Combine(Path.GetDirectoryName(path), shaderName).Replace(@"\", @"/").Replace($"{mod.Name}.", string.Empty);
+            string clearedPath = Path.Combine(Path.GetDirectoryName(path), shaderName)
+                .Replace($"{mod.Name}.", string.Empty)
+                .Replace(@"\", @"/");
             Ref<Effect> shader = new(mod.Assets.Request<Effect>(clearedPath, AssetRequestMode.ImmediateLoad).Value);
             SetShader(shaderName, shader);
-        }
-
-        foreach (string path in shaderFxPathsToCompile)
-        {
-            string fxPath = mod.Name + "\\" + Path.Combine(Path.GetDirectoryName(path), Path.GetFileName(path)).Replace(@"\", @"/");
-            ShaderRecompilationMonitor.CompilingFiles.Enqueue(new(Path.Combine(Main.SavePath, "ModSources", fxPath), false));
         }
         #endregion
 
@@ -179,16 +175,12 @@ public class AssetRegistry : ModSystem
         foreach (string path in filterLoadPaths)
         {
             string filterName = Path.GetFileNameWithoutExtension(path);
-            string clearedPath = Path.Combine(Path.GetDirectoryName(path), filterName).Replace(@"\", @"/").Replace($"{mod.Name}.", string.Empty);
+            string clearedPath = Path.Combine(Path.GetDirectoryName(path), filterName)
+                .Replace($"{mod.Name}.", string.Empty)
+                .Replace(@"\", @"/");
             Ref<Effect> filter = new(mod.Assets.Request<Effect>(clearedPath, AssetRequestMode.ImmediateLoad).Value);
 
             SetFilter(filterName, filter);
-        }
-
-        foreach (string path in filterFxPathsToCompile)
-        {
-            string fxPath = mod.Name + "\\" + Path.Combine(Path.GetDirectoryName(path), Path.GetFileName(path)).Replace(@"\", @"/");
-            ShaderRecompilationMonitor.CompilingFiles.Enqueue(new(Path.Combine(Main.SavePath, "ModSources", fxPath), true));
         }
         #endregion
         HasFinishedLoadingShaders = true;
@@ -633,8 +625,8 @@ public enum AdditionsTexture
     #endregion
     #region Late
     CometStorm,
+    DeusExMachina,
     Epidemic,
-    HollowPurple,
     PyroclasticVeil,
     RealitySeamstressesGlove,
     SuperheatedPlasmaArray,
@@ -917,6 +909,7 @@ public enum AdditionsTexture
     ArmageddonCircle,
     CometStormHoldout,
     EpidemicCircle,
+    MoonBlade,
     #endregion
     #region Middle
     FallingHail,
@@ -952,7 +945,7 @@ public enum AdditionsTexture
     AlucardsSwordThrow_Glow,
     CryingEye,
     DecayingCutleryStab,
-    Execution,
+    GabesSpear,
     HolyCross,
     JusticeIsSplendorW,
     SolemButterflyGrief,
@@ -1027,6 +1020,7 @@ public enum AdditionsTexture
     BowOfGreekFlamesHeld,
     GreekBombArrow,
     HailfireShell,
+    HailfireRocket,
     HallowedGreatbowHeld,
     MartianCapsule,
     ShotgunBullet,
@@ -1322,6 +1316,7 @@ public enum AdditionsSound
     LargeSniperFire,
     LargeWeaponFire,
     LargeWeaponFireDifferent,
+    MachinaBlast,
     MediumExplosion,
     MetalBoom,
     MeteorImpact,
@@ -1610,6 +1605,7 @@ public enum AdditionsSound
     GabrielTelegraph,
     GabrielTeleport,
     GabrielWeaponBreak,
+    GenericExplo,
     harpoonStop,
     PipIdle,
     PlasticHit,

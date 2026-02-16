@@ -58,7 +58,7 @@ public class CryogenicSpaceCanister : ModItem
         Recipe recipe = CreateRecipe();
         recipe.AddIngredient(ItemID.LunarBar, 10);
         recipe.AddIngredient(ModContent.ItemType<CryonicBar>(), 12);
-        recipe.AddIngredient(ModContent.ItemType<CoreofEleum>(), 15);
+        recipe.AddIngredient(ModContent.ItemType<EssenceofEleum>(), 15);
         recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();
     }

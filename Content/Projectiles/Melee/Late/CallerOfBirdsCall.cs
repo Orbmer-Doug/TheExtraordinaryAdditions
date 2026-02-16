@@ -37,7 +37,7 @@ public class CallerOfBirdsCall : BaseHoldoutProjectile
 
         if (this.RunLocal() && Time % 4 == 3)
         {
-            Vector2 target = Owner.Additions().mouseWorld;
+            Vector2 target = Owner.Additions().MouseWorld;
             for (int i = 0; i < 2; i++)
             {
                 Vector2 position = Owner.Center - new Vector2(Main.rand.NextFloat(401) * Owner.direction, 800f);

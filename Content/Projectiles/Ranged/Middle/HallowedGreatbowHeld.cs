@@ -71,7 +71,7 @@ public class HallowedGreatbowHeld : BaseIdleHoldoutProjectile
             trail = new(c => 2f, (c, pos) => Color.White, null, MaxPoints);
         if (this.RunLocal())
         {
-            Projectile.velocity = Center.SafeDirectionTo(Modded.mouseWorld);
+            Projectile.velocity = Center.SafeDirectionTo(Modded.MouseWorld);
             if (Projectile.velocity != Projectile.oldVelocity)
                 Projectile.netUpdate = true;
             Projectile.spriteDirection = (Projectile.velocity.X > 0f).ToDirectionInt();

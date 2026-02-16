@@ -19,10 +19,8 @@ public partial class Asterlin : ModNPC
     [AutomatedMethodInvoke]
     public void LoadStateTransitions_AbsorbingEnergy()
     {
-        StateMachine.RegisterTransition(AsterlinAIType.AbsorbingEnergy, AbsorbingEnery_PossibleStates, false, () =>
-        {
-            return FightStarted;
-        },
+        StateMachine.RegisterTransition(AsterlinAIType.AbsorbingEnergy, AbsorbingEnery_PossibleStates, false, () 
+                => FightStarted,
         () =>
         {
             NPC.Opacity = 1;
@@ -88,7 +86,7 @@ public partial class Asterlin : ModNPC
         // idk wtf is causing it or why and i couldn't find any references to what could be in tmods code (UpdateNPC_Inner and UpdateNetworkCode were checked, no fruits)
         if (Main.netMode != NetmodeID.SinglePlayer)
         {
-            if (Utility.CountProjectiles(type) > 1)
+            if (CountProjectiles(type) > 1)
             {
                 Projectile closest = null;
                 int who = int.MinValue;
@@ -112,7 +110,7 @@ public partial class Asterlin : ModNPC
         }
     }
 
-    private void AbsorbingEnergy_RemoveAnyMasses()
+    private static void AbsorbingEnergy_RemoveAnyMasses()
     {
         int type = ModContent.ProjectileType<CondensedSoulMass>();
         foreach (Projectile proj in Main.ActiveProjectiles)
@@ -130,7 +128,7 @@ public partial class Asterlin : ModNPC
     {
         void draw()
         {
-            if (!Utility.FindProjectile(out Projectile mass, ModContent.ProjectileType<CondensedSoulMass>()))
+            if (!FindProjectile(out Projectile mass, ModContent.ProjectileType<CondensedSoulMass>()))
                 return;
 
             for (int i = 0; i < absorb.Length; i++)

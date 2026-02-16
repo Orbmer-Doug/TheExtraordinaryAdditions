@@ -48,7 +48,7 @@ public class SanguineSteelsHoldout : BaseHoldoutProjectile
         Projectile.Opacity = InverseLerp(0f, FadeIn, Time) * InverseLerp(40f, 0f, Fade);
         if (this.RunLocal())
         {
-            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Center.SafeDirectionTo(Modded.mouseWorld), .2f);
+            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Center.SafeDirectionTo(Modded.MouseWorld), .2f);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }

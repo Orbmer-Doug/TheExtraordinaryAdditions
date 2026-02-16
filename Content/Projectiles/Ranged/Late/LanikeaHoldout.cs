@@ -53,7 +53,7 @@ public class LanikeaHoldout : BaseIdleHoldoutProjectile
 
         if (this.RunLocal())
         {
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Center.SafeDirectionTo(Modded.mouseWorld), .3f);
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Center.SafeDirectionTo(Modded.MouseWorld), .3f);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
@@ -71,7 +71,7 @@ public class LanikeaHoldout : BaseIdleHoldoutProjectile
 
         if (FullChargeProgress >= 1f && Main.rand.NextBool())
         {
-            Vector2 direction = Owner.MountedCenter.SafeDirectionTo(Modded.mouseWorld);
+            Vector2 direction = Owner.MountedCenter.SafeDirectionTo(Modded.MouseWorld);
             ParticleRegistry.SpawnSparkleParticle(Tip, Projectile.velocity.RotatedByRandom(MathHelper.Pi / 4.6f) * Main.rand.NextFloat(3f, 8f), 32, 1f, Color.Beige, Color.Wheat, 1.3f);
         }
 

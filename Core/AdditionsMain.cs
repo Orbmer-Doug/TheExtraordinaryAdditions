@@ -35,12 +35,12 @@ public class AdditionsMain : Mod
     public override void Load()
     {
         DoneLoading = false;
-
-        SetLoadingText("Loading shaders...");
-        AssetRegistry.LoadShaders(this);
-
+        
         SetLoadingText("Setting up shader recompilation monitor...");
         ShaderRecompilationMonitor.LoadForMod(this);
+        
+        SetLoadingText("Loading shaders...");
+        AssetRegistry.LoadShaders(this);
 
         SetLoadingText("Initializing screen shaders...");
         Main.QueueMainThreadAction(() =>

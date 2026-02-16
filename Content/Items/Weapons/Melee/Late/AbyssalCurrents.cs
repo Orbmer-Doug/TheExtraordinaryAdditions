@@ -1,6 +1,7 @@
 ﻿using CalamityMod.Items.Materials;
 using CalamityMod.Items.Placeables;
 using System.Collections.Generic;
+using CalamityMod.Items.Placeables.FurnitureVoid;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -87,7 +88,7 @@ public class AbyssalCurrents : ModItem
         Recipe recipe = CreateRecipe();
         recipe.AddIngredient(ItemID.RazorbladeTyphoon, 1);
         recipe.AddIngredient(ModContent.ItemType<Lumenyl>(), 18);
-        recipe.AddIngredient(ModContent.ItemType<Voidstone>(), 150);
+        recipe.AddIngredient(ModContent.ItemType<SmoothVoidstone>(), 150);
         recipe.AddIngredient(ItemID.LunarBar, 10);
         recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();

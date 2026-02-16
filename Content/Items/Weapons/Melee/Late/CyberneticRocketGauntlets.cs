@@ -52,7 +52,7 @@ public class CyberneticRocketGauntlets : ModItem
 
     public override void HoldItem(Player player)
     {
-        if (Main.mouseItem.IsAir && player.ownedProjectileCounts[Item.shoot] <= 0)
+        if (player.whoAmI == Main.myPlayer && Main.mouseItem.IsAir && player.ownedProjectileCounts[Item.shoot] <= 0)
         {
             GlobalPlayer gp = player.Additions();
             CyberneticPlayer cyber = player.GetModPlayer<CyberneticPlayer>();
@@ -95,7 +95,7 @@ public class CyberneticRocketGauntlets : ModItem
         if (state != null)
         {
             CyberneticSwing swing = Main.projectile[Projectile.NewProjectile(new EntitySource_ItemUse_WithAmmo(player, Item, Item.ammo),
-                player.Center, player.Center.SafeDirectionTo(player.Additions().mouseWorld),
+                player.Center, player.Center.SafeDirectionTo(player.Additions().MouseWorld),
                 Item.shoot, Item.damage, Item.knockBack, Main.myPlayer, 0f, 0f, 0f)].As<CyberneticSwing>();
             swing.State = state.Value;
 

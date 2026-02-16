@@ -73,6 +73,8 @@ public class SolarBrandSword : BaseIdleHoldoutProjectile
         Projectile.ownerHitCheck = true;
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = 10;
+        Projectile.friendly = true;
+        Projectile.hostile = false;
     }
 
     public Vector2 Tip => Projectile.Center + PolarVector(98, Projectile.rotation - PiOver2);
@@ -186,7 +188,7 @@ public class SolarBrandSword : BaseIdleHoldoutProjectile
         return targetHitbox.LineCollision(Base, Tip, Projectile.width);
     }
 
-    public override bool? CanDamage() => Projectile.scale >= 1f;
+    public override bool? CanDamage() => Projectile.scale >= 1f ? null : false;
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {

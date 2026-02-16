@@ -20,15 +20,15 @@ public partial class GlobalPlayer
     /// <summary>
     /// Captures the last 15 positions of the players cursor
     /// </summary>
-    public Vector2[] oldMouseWorld = new Vector2[15];
+    public Vector2[] OldMouseWorld = new Vector2[15];
 
-    public Vector2 mouseWorld;
-    public Vector2 mouseScreen;
+    public Vector2 MouseWorld;
+    public Vector2 MouseScreen;
 
     /// <summary>
     /// The larger this number is the more "fast" the mouse is going
     /// </summary>
-    public float oldMouseWorldDistance;
+    public float OldMouseWorldDistance;
 
     public bool CanUseMouseButton => !Main.mapFullscreen
         && !Player.mouseInterface && !PlayerInput.WritingText && Main.hasFocus;
@@ -57,22 +57,23 @@ public partial class GlobalPlayer
                 trigger.Current.MouseMiddle && CanUseMouseButton,
                 trigger.JustReleased.MouseMiddle && CanUseMouseButton);
 
-            mouseScreen = new Vector2(PlayerInput.MouseX, PlayerInput.MouseY);
-            Vector2 transform = Vector2.Transform(mouseScreen, Matrix.Invert(Main.GameViewMatrix?.ZoomMatrix ?? Matrix.Identity));
-            mouseWorld = transform + Main.screenPosition + (Main.screenPosition - Main.screenLastPosition);
-            if (Player.gravDir == -1f)
-                mouseWorld.Y = Main.screenPosition.Y + (Main.screenPosition - Main.screenLastPosition).Y + Main.screenHeight - transform.Y;
+            MouseScreen = new Vector2(PlayerInput.MouseX, PlayerInput.MouseY);
+            Vector2 transform = Vector2.Transform(MouseScreen, Matrix.Invert(Main.GameViewMatrix?.ZoomMatrix ?? Matrix.Identity));
+            MouseWorld = transform + Main.screenPosition + (Main.screenPosition - Main.screenLastPosition);
+            if ((int)Player.gravDir == -1)
+                MouseWorld.Y = Main.screenPosition.Y + (Main.screenPosition - Main.screenLastPosition).Y + Main.screenHeight - transform.Y;
 
-            if (oldMouseWorld == null)
+            if (OldMouseWorld == null)
             {
-                for (int i = 0; i < oldMouseWorld.Length; i++)
-                    oldMouseWorld[i] = mouseWorld;
+                OldMouseWorld = new Vector2[15];
+                for (int i = 0; i < 15; i++)
+                    OldMouseWorld[i] = MouseWorld;
             }
-            for (int j = oldMouseWorld.Length - 1; j > 0; j--)
-                oldMouseWorld[j] = oldMouseWorld[j - 1];
-            oldMouseWorld[0] = mouseWorld;
+            for (int j = OldMouseWorld.Length - 1; j > 0; j--)
+                OldMouseWorld[j] = OldMouseWorld[j - 1];
+            OldMouseWorld[0] = MouseWorld;
 
-            oldMouseWorldDistance = Vector2.Distance(oldMouseWorld[0], oldMouseWorld[^1]) / oldMouseWorld.Length;
+            OldMouseWorldDistance = Vector2.Distance(OldMouseWorld[0], OldMouseWorld[^1]) / OldMouseWorld.Length;
         }
     }
 }

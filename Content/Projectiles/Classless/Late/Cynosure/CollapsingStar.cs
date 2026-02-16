@@ -111,7 +111,7 @@ public class CollapsingStar : ModProjectile, ILocalizedModType, IModType, IHasSc
             if (this.RunLocal())
             {
                 Vector2 center = Owner.RotatedRelativePoint(Owner.MountedCenter);
-                Vector2 dest = center + PolarVector(Projectile.width * .45f, center.AngleTo(ModdedOwner.mouseWorld));
+                Vector2 dest = center + PolarVector(Projectile.width * .45f, center.AngleTo(ModdedOwner.MouseWorld));
                 Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(dest) * MathF.Min(Projectile.Distance(dest), 20f), 0.07f);
                 if (Projectile.velocity != Projectile.oldVelocity)
                     this.Sync();

@@ -28,7 +28,7 @@ public class JudgeOfHellsArmaments : ModItem
         Item.width = 98;
         Item.height = 16;
         Item.scale = 1f;
-        Item.UseSound = SoundID.Item1;
+        Item.UseSound = null;
         Item.rare = ItemRarityID.Master;
         Item.value = AdditionsGlobalItem.RarityRedBuyPrice;
         Item.DamageType = DamageClass.Melee;
@@ -49,8 +49,7 @@ public class JudgeOfHellsArmaments : ModItem
     {
         if (player.altFunctionUse == ItemAlternativeFunctionID.ActivatedAndUsed)
         {
-            player.NewPlayerProj(position, velocity, ModContent.ProjectileType<JudgeSpear>(), damage * 2, knockback, player.whoAmI);
-            CalUtils.AddCooldown(player, ChaosState.ID, SecondsToFrames(5));
+            player.NewPlayerProj(position, velocity, ModContent.ProjectileType<JudgeSpear>(), damage, knockback, player.whoAmI);
             return false;
         }
         else if (player.altFunctionUse == ItemAlternativeFunctionID.None)
@@ -62,8 +61,7 @@ public class JudgeOfHellsArmaments : ModItem
         return false;
     }
 
-    public override bool AltFunctionUse(Player player) 
-        => Collision.CanHitLine(player.Center, 20, 20, player.Additions().mouseWorld, 8, 8) && !CalUtils.HasCooldown(player, ChaosState.ID);
+    public override bool AltFunctionUse(Player player) => true;
 
     public override bool CanShoot(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
 

@@ -50,7 +50,7 @@ public class FunnyRock : ModProjectile
             Owner.SetDummyItemTime(50);
             if (this.RunLocal())
             {
-                Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Owner.RotatedRelativePoint(Owner.MountedCenter, false, true).SafeDirectionTo(Owner.Additions().mouseWorld), .8f);
+                Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Owner.RotatedRelativePoint(Owner.MountedCenter, false, true).SafeDirectionTo(Owner.Additions().MouseWorld), .8f);
             }
             Owner.ChangeDir(Dir);
             float rot = ThrowDisplacement();
