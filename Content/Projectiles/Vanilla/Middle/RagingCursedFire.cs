@@ -3,6 +3,7 @@ using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
@@ -21,7 +22,7 @@ public class RagingCursedFire : ModProjectile
         Projectile.penetrate = 2;
         Projectile.tileCollide = true;
         Projectile.ignoreWater = false;
-        Projectile.timeLeft = SecondsToFrames(6);
+        Projectile.timeLeft = CalUtils.SecondsToFrames(6);
     }
 
     public ref float Time => ref Projectile.ai[0];

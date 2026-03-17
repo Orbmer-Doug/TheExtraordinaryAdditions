@@ -9,6 +9,7 @@ using TheExtraordinaryAdditions.Content.Projectiles.Classless.Late;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 using TheExtraordinaryAdditions.UI.LaserUI;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Late;
 
@@ -66,7 +67,7 @@ public class CryogenicSpaceCanister : ModItem
 
 public sealed class CryogenicSpaceCanisterPlayer : ModPlayer
 {
-    public static readonly int TimeForCryogenic = SecondsToFrames(10);
+    public static readonly int TimeForCryogenic = CalUtils.SecondsToFrames(10);
 
     public bool Equipped;
     public override void ResetEffects() => Equipped = false;

@@ -4,7 +4,7 @@ using TheExtraordinaryAdditions.Core.DataStructures;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
-public partial class Asterlin : ModNPC
+public partial class Asterlin
 {
     public RandomPushdownAutomata<EntityAIState<AsterlinAIType>, AsterlinAIType> StateMachine;
 
@@ -13,17 +13,8 @@ public partial class Asterlin : ModNPC
     /// </summary>
     public AsterlinAIType CurrentState
     {
-        get
-        {
-            if (StateMachine == null)
-                return AsterlinAIType.AbsorbingEnergy;
-            return StateMachine.CurrentState.Identifier;
-        }
-        set
-        {
-            if (StateMachine != null)
-                StateMachine.StateStack.Push(StateMachine.StateRegistry[value]);
-        }
+        get => StateMachine == null ? AsterlinAIType.AbsorbingEnergy : StateMachine.CurrentState.Identifier;
+        set => StateMachine?.StateStack.Push(StateMachine.StateRegistry[value]);
     }
 
     /// <summary>
@@ -31,17 +22,8 @@ public partial class Asterlin : ModNPC
     /// </summary>
     public int AITimer
     {
-        get
-        {
-            if (StateMachine == null)
-                return 0;
-            return StateMachine.CurrentState.Time;
-        }
-        set
-        {
-            if (StateMachine != null)
-                StateMachine.CurrentState.Time = value;
-        }
+        get => StateMachine == null ? 0 : StateMachine.CurrentState.Time;
+        set => StateMachine?.CurrentState.Time = value;
     }
 
     public void LoadStates()
@@ -69,19 +51,23 @@ public partial class Asterlin : ModNPC
 
             if (LifeRatio <= Phase2LifeRatio && !DonePhase2Transition)
                 return AsterlinAIType.EnterPhase2;
-            if (DonePhase2Transition)
-                return originalState;
-
+            
             return originalState;
         },
         finalState =>
         {
-            if (finalState == AsterlinAIType.EnterPhase2)
-                DonePhase2Transition = true;
-            if (finalState == AsterlinAIType.EnterPhase3)
-                DonePhase3Transition = true;
-            if (finalState == AsterlinAIType.DesperationDrama)
-                DoneDesperationTransition = true;
+            switch (finalState)
+            {
+                case AsterlinAIType.EnterPhase2:
+                    DonePhase2Transition = true;
+                    break;
+                case AsterlinAIType.EnterPhase3:
+                    DonePhase3Transition = true;
+                    break;
+                case AsterlinAIType.DesperationDrama:
+                    DoneDesperationTransition = true;
+                    break;
+            }
         });
 
         // Load state transitions

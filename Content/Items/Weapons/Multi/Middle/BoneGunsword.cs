@@ -59,9 +59,9 @@ public class BoneGunsword : ModItem
         return false;
     }
 
-    public override bool MeleePrefix() => true;
+    public override bool MeleePrefix() => false;
 
-    public override bool RangedPrefix() => true;
+    public override bool RangedPrefix() => false;
 
     public override void AddRecipes()
     {

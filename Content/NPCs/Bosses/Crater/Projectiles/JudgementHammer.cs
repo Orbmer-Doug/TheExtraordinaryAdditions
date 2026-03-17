@@ -8,6 +8,7 @@ using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
@@ -72,7 +73,7 @@ public class JudgementHammer : ProjOwnedByNPC<Asterlin>
 
     public RotatedRectangle Rect()
     {
-        return new(100f, Projectile.Center, Projectile.Center + (Projectile.rotation - MathHelper.PiOver4).ToRotationVector2() * 148f);
+        return new(100f, Projectile.Center, Projectile.Center + (Projectile.rotation - PiOver4).ToRotationVector2() * 148f);
     }
 
     public override void SafeAI()
@@ -81,7 +82,7 @@ public class JudgementHammer : ProjOwnedByNPC<Asterlin>
         {
             Projectile.timeLeft = 400;
             Projectile.Center = ModOwner.RightHandPosition;
-            Projectile.rotation = ModOwner.RightArm.RootPosition.AngleTo(ModOwner.RightHandPosition) + MathHelper.PiOver4;
+            Projectile.rotation = ModOwner.RightArm.RootPosition.AngleTo(ModOwner.RightHandPosition) + PiOver4;
             Direction = -ModOwner.Direction;
         }
         else
@@ -90,7 +91,7 @@ public class JudgementHammer : ProjOwnedByNPC<Asterlin>
             after.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, 1f, Projectile.rotation, Effects, 0, 2, 0f, null, false, 0f));
             Projectile.VelocityBasedRotation(.01f);
             Projectile.velocity.X *= .991f;
-            Projectile.velocity.Y = MathHelper.Clamp(Projectile.velocity.Y + .3f, -40f, 40f);
+            Projectile.velocity.Y = Clamp(Projectile.velocity.Y + .3f, -40f, 40f);
         }
 
         Projectile.Center = Projectile.Center.ClampInWorld();
@@ -134,7 +135,7 @@ public class JudgementHammer : ProjOwnedByNPC<Asterlin>
         {
             for (int i = 0; i < 8; i++)
             {
-                Vector2 offset = ((MathHelper.TwoPi * InverseLerp(0f, 8, i) + Main.GlobalTimeWrappedHourly * Utils.Remap(j, 0, 3, 4f, 1.8f)).ToRotationVector2() * Utils.Remap(j, 0, 3, 5f, 25f));
+                Vector2 offset = ((TwoPi * InverseLerp(0f, 8, i) + Main.GlobalTimeWrappedHourly * Utils.Remap(j, 0, 3, 4f, 1.8f)).ToRotationVector2() * Utils.Remap(j, 0, 3, 5f, 25f));
                 Color color = MulticolorLerp(InverseLerp(0f, 3, j), Color.PaleGoldenrod, Color.Gold, Color.DarkGoldenrod) with { A = 0 } * ReelCompletion * Utils.Remap(j, 0, 3, .9f, .3f);
                 Main.spriteBatch.Draw(tex, Projectile.Center + offset - Main.screenPosition, null, color,
                 Projectile.rotation + RotationOffset, origin, Projectile.scale, Effects, 0f);

@@ -1,21 +1,26 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
+using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 
 public class HemoglobTelegraph : ProjOwnedByNPC<StygainHeart>
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.DrawScreenCheckFluff[Projectile.type] = 4500;
     }
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 1;
@@ -43,8 +48,10 @@ public class HemoglobTelegraph : ProjOwnedByNPC<StygainHeart>
 
             val = Main.rand.NextFloat(StygainHeart.BarrierSize, StygainHeart.BarrierSize * 8);
             pos = Projectile.Center + Main.rand.NextVector2CircularEdge(val, val);
-            ParticleRegistry.SpawnGlowParticle(pos, vel.RotatedByRandom(.2f), life, scale * 80f, col, Main.rand.NextFloat(.7f, 1.1f));
+            ParticleRegistry.SpawnGlowParticle(pos, vel.RotatedByRandom(.2f), life, scale * 80f, col,
+                Main.rand.NextFloat(.7f, 1.1f));
         }
+
         Time++;
     }
 
@@ -59,7 +66,8 @@ public class HemoglobTelegraph : ProjOwnedByNPC<StygainHeart>
         ManagedShader circle = ShaderRegistry.InverseCircularAOE;
         circle.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FractalNoise), 1, SamplerState.LinearWrap);
 
-        Color main = Color.Lerp(Color.MediumVioletRed, Color.PaleVioletRed, 0.7f * (float)Math.Pow(Sin01(Main.GlobalTimeWrappedHourly), 3.0));
+        Color main = Color.Lerp(Color.MediumVioletRed, Color.PaleVioletRed,
+            0.7f * (float)Math.Pow(Sin01(Main.GlobalTimeWrappedHourly), 3.0));
         Color outer = Color.Lerp(Color.MediumVioletRed, Color.White, 0.4f);
 
         circle.TrySetParameter("MainColor", main.ToVector3());
@@ -70,13 +78,14 @@ public class HemoglobTelegraph : ProjOwnedByNPC<StygainHeart>
         circle.Render();
 
         Vector2 drawPosition = Projectile.Center - Main.screenPosition;
-        Main.EntitySpriteDraw(telegraphBase, drawPosition, null, Color.White, 0f, telegraphBase.Size() / 2f, StygainHeart.BarrierSize * 8, 0, 0f);
+        Main.EntitySpriteDraw(telegraphBase, drawPosition, null, Color.White, 0f, telegraphBase.Size() / 2f,
+            StygainHeart.BarrierSize * 8, 0);
 
         sb.ExitShaderRegion();
 
         // Draw evenly spaced arrows to emphasize to potentially offscreen players where to go
         // Otherwise they may just see fog appear and kaboom
-        const int Count = 16;
+        const int count = 16;
         Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.HemoglobTeleArrow);
         Vector2 orig = tex.Size() / 2;
 
@@ -84,16 +93,19 @@ public class HemoglobTelegraph : ProjOwnedByNPC<StygainHeart>
         float prog = timer / TeleTime;
 
         // The amount of rays
-        for (int i = 0; i < Count; i++)
+        for (int i = 0; i < count; i++)
         {
             // Fluctuate in size
-            float size = 2.5f + Utils.GetLerpValue(0.8f, 1f, Cos01(i / Count + Main.GlobalTimeWrappedHourly * -(float)Math.PI), clamped: true) * 0.15f;
+            float size = 2.5f + Utils.GetLerpValue(0.8f, 1f,
+                Cos01(i / count + Main.GlobalTimeWrappedHourly * -(float)Math.PI), clamped: true) * 0.15f;
 
             // The distance apart to multiply by
             for (int k = 1; k <= 4; k++)
             {
-                Vector2 pos = Projectile.Center + (MathHelper.TwoPi * i / Count).ToRotationVector2() * ((-(StygainHeart.BarrierSize + 64) + Animators.BezierEase(timer) * 64) * k);
-                Color col = Color.Crimson * (float)Math.Sin(prog * MathHelper.TwoPi * 4 - i) * (float)Math.Sin(prog * MathHelper.Pi);
+                Vector2 pos = Projectile.Center + (MathHelper.TwoPi * i / count).ToRotationVector2() *
+                    ((-(StygainHeart.BarrierSize + 64) + Animators.BezierEase(timer) * 64) * k);
+                Color col = Color.Crimson * (float)Math.Sin(prog * MathHelper.TwoPi * 4 - i) *
+                            (float)Math.Sin(prog * MathHelper.Pi);
 
                 // Point to the end
                 float rot = pos.SafeDirectionTo(Projectile.Center).ToRotation();
@@ -101,6 +113,7 @@ public class HemoglobTelegraph : ProjOwnedByNPC<StygainHeart>
                 sb.Draw(tex, pos - Main.screenPosition, null, col, rot, orig, size, 0, 0);
             }
         }
+
         return false;
     }
 }

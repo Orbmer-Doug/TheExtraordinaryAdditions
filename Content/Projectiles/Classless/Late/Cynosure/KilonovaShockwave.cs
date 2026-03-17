@@ -11,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.Cynosure;
 
 public class KilonovaShockwave : ModProjectile
 {
-    public static readonly float Lifetime = SecondsToFrames(1.9f);
+    public static readonly float Lifetime = CalUtils.SecondsToFrames(1.9f);
     public ref float Radius => ref Projectile.ai[1];
     public static Color DetermineExplosionColor()
     {
@@ -54,7 +54,7 @@ public class KilonovaShockwave : ModProjectile
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return CircularHitboxCollision(Projectile.Center, Radius * 0.5f, targetHitbox);
+        return CalUtils.CircularHitboxCollision(Projectile.Center, Radius * 0.5f, targetHitbox);
     }
 
     public override bool PreDraw(ref Color lightColor)
@@ -64,13 +64,13 @@ public class KilonovaShockwave : ModProjectile
         Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.FlameMap2);
         DrawData explosionDrawData = new(tex, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), Color.White * Projectile.Opacity);
 
-        ManagedShader shockwaveShader = ShaderRegistry.LightShockwave;
-        shockwaveShader.TrySetParameter("mainColor", DetermineExplosionColor().ToVector3());
-        shockwaveShader.TrySetParameter("screenSize", Main.ScreenSize.ToVector2());
-        shockwaveShader.TrySetParameter("explosionDistance", Radius * Projectile.scale * 0.5f);
-        shockwaveShader.TrySetParameter("projPosition", Projectile.Center - Main.screenPosition);
-        shockwaveShader.TrySetParameter("shockwaveOpacity", Projectile.Opacity * .4f);
-        shockwaveShader.Render();
+        ManagedShader wave = ShaderRegistry.LightShockwave;
+        wave.TrySetParameter("mainColor", DetermineExplosionColor().ToVector3());
+        wave.TrySetParameter("screenSize", Main.ScreenSize.ToVector2());
+        wave.TrySetParameter("explosionDistance", Radius * Projectile.scale * 0.5f);
+        wave.TrySetParameter("projPosition", Projectile.Center - Main.screenPosition);
+        wave.TrySetParameter("shockwaveOpacity", Projectile.Opacity * .4f);
+        wave.Render();
         explosionDrawData.Draw(Main.spriteBatch);
 
         Main.spriteBatch.ResetToDefault();

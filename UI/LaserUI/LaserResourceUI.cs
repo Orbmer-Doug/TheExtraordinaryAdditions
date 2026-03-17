@@ -6,6 +6,7 @@ using Terraria.UI;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.UI.LaserUI;
 

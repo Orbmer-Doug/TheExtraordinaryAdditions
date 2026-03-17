@@ -6,6 +6,7 @@ using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 
@@ -29,8 +30,8 @@ public class StygainAura : ModProjectile
     public ref float Radius => ref Projectile.ai[0];
     public ref float Time => ref Projectile.ai[1];
     public ref float StoredDamage => ref Projectile.ai[2];
-    private static readonly float TotalTime = SecondsToFrames(3);
-    public static readonly int CooldownTime = SecondsToFrames(10);
+    private static readonly float TotalTime = CalUtils.SecondsToFrames(3);
+    public static readonly int CooldownTime = CalUtils.SecondsToFrames(10);
     public float Completion => InverseLerp(0f, 30f, Time) * InverseLerp(TotalTime, TotalTime - 20f, Time);
     public override void AI()
     {
@@ -93,7 +94,7 @@ public class StygainAura : ModProjectile
         }
     }
 
-    public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => CircularHitboxCollision(Projectile.Center, Radius + 75, targetHitbox);
+    public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => CalUtils.CircularHitboxCollision(Projectile.Center, Radius + 75, targetHitbox);
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints points = new(40);

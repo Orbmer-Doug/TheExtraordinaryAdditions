@@ -6,6 +6,7 @@ using TheExtraordinaryAdditions.Content.Buffs.Debuff;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Late;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Late;
 
@@ -89,7 +90,7 @@ public sealed class AshersWhiteTiePlayer : ModPlayer
             if (Player.statLife > Player.statLifeMax2)
                 Player.statLife = Player.statLifeMax2;
 
-            Player.AddBuff(ModContent.BuffType<TheTiesCooldown>(), SecondsToFrames(270));
+            Player.AddBuff(ModContent.BuffType<TheTiesCooldown>(), CalUtils.SecondsToFrames(270));
             return false;
         }
 

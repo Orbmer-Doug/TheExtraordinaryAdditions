@@ -20,32 +20,32 @@ public class NPCDrops : GlobalNPC
         switch (npc.type)
         {
             case NPCID.RuneWizard:
-                npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<Fireball>(), 1, 1, 1));
+                npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<Fireball>()));
                 break;
             case NPCID.Paladin:
                 npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<MythicScrap>(), 1, 6, 12));
                 break;
             case NPCID.Turtle | NPCID.SeaTurtle | NPCID.TurtleJungle:
-                npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<TortoiseShell>(), 17, 1, 1));
+                npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<TortoiseShell>(), 17));
                 break;
             case NPCID.MoonLordCore:
-                npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<AshersWhiteTie>(), 1, 1, 1));
+                npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<AshersWhiteTie>()));
                 break;
             case NPCID.RedDevil:
-                npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<FlameInsignia>(), 8, 1, 1));
+                npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<FlameInsignia>(), 8));
                 break;
             case NPCID.MartianSaucerCore:
-                npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<CrumpledBlueprint>(), 4, 1, 1));
+                npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<CrumpledBlueprint>(), 4));
                 break;
             case NPCID.Mothron:
-                npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<EclipsedDuo>(), 4, 1, 1));
+                npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<EclipsedDuo>(), 4));
                 break;
             case NPCID.RustyArmoredBonesAxe | NPCID.RustyArmoredBonesFlail | NPCID.RustyArmoredBonesSword | NPCID.RustyArmoredBonesSwordNoArmor:
-                npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<Threadripper>(), 8, 1, 1));
-                npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<WitheredShredder>(), 8, 1, 1));
+                npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<Threadripper>(), 8));
+                npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<WitheredShredder>(), 8));
                 break;
             case NPCID.WallofFlesh:
-                npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<HellsToothpick>(), 3, 1, 1));
+                npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<HellsToothpick>(), 3));
                 break;
             case NPCID.BloodJelly | NPCID.BlueJellyfish | NPCID.GreenJellyfish | NPCID.PinkJellyfish:
                 npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<JellyfishSnack>(), 40));

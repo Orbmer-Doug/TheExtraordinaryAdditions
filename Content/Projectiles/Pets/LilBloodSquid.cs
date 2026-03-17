@@ -6,6 +6,7 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Summon;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Pets;
 

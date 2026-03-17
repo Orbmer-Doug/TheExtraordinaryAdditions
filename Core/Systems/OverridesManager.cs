@@ -22,9 +22,9 @@ public class OverrideSystemHooks : ModSystem
 {
     public override void Load()
     {
-        MonoModHooks.Add(OverrideHooksManager.SetDefaultsMethod, OverrideSystemHooks.SetDefaultsDetourMethod);
-        MonoModHooks.Add(OverrideHooksManager.OnHitNPCMethod, OverrideSystemHooks.OnHitNPCDetourMethod);
-        MonoModHooks.Add(OverrideHooksManager.ModifyHitNPCMethod, OverrideSystemHooks.ModifyHitNPCDetourMethod);
+        MonoModHooks.Add(OverrideHooksManager.SetDefaultsMethod, SetDefaultsDetourMethod);
+        MonoModHooks.Add(OverrideHooksManager.OnHitNPCMethod, OnHitNPCDetourMethod);
+        MonoModHooks.Add(OverrideHooksManager.ModifyHitNPCMethod, ModifyHitNPCDetourMethod);
     }
 
     internal static void SetDefaultsDetourMethod(OverrideHooksManager.Orig_SetDefaultsDelegate orig, Projectile projectile, bool createModProjectile = true)

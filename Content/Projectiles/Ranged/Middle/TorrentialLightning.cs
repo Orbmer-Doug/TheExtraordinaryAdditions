@@ -5,6 +5,7 @@ using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 
@@ -54,7 +55,7 @@ public class TorrentialLightning : ModProjectile
             foreach (Line line in list)
             {
                 int width = 8;
-                if (new Rectangle((int)line.a.X - width / 2, (int)line.a.Y - width / 2, width, width).Intersects(targetHitbox))
+                if (new Rectangle((int)line.A.X - width / 2, (int)line.A.Y - width / 2, width, width).Intersects(targetHitbox))
                     return true;
             }
         }

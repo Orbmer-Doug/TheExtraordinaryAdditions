@@ -47,14 +47,12 @@ public readonly struct AssetInfo<T>(T asset, string path)
 // And alternatively the only free magic circle maker i could reliably find:
 // https://kpierzynski.github.io/dnd_runes_gen/
 // Otherwise just use some alpha drawing on some texture editor or somethin
-public class AssetRegistry : ModSystem
+public sealed class AssetRegistry : ModSystem
 {
     public const string TexturePath = "Assets/Textures";
     public const string AudioPath = "Assets/Audio";
     public const string AutoloadDirectoryShaders = "AutoloadedEffects/Shaders";
     public const string AutoloadDirectoryFilters = "AutoloadedEffects/Filters";
-    public const string AutoloadedPrefix = "TheExtraordinaryAdditions/Assets/AutoloadedContent/";
-    public const string UIPrefix = "TheExtraordinaryAdditions/UI/";
 
     // Lazy-loaded main asset dictionaries
     public static readonly Dictionary<AdditionsTexture, LazyAsset<Texture2D>> Textures = [];
@@ -98,7 +96,7 @@ public class AssetRegistry : ModSystem
         {
             string name = Path.GetFileNameWithoutExtension(path).Replace($"{mod.Name}.", string.Empty);
             string clearedPath = $"{mod.Name}/{path.Replace(".rawimg", "")}";
-            if (Enum.TryParse<AdditionsTexture>(name, out AdditionsTexture texture))
+            if (Enum.TryParse(name, out AdditionsTexture texture))
             {
                 Textures[texture] = LazyAsset<Texture2D>.FromPath(clearedPath, AssetRequestMode.ImmediateLoad);
             }
@@ -112,9 +110,9 @@ public class AssetRegistry : ModSystem
         {
             string name = Path.GetFileNameWithoutExtension(path).Replace($"{mod.Name}.", string.Empty);
             string clearedPath = $"{mod.Name}/{Path.Combine(Path.GetDirectoryName(path), name).Replace(@"\", "/")}";
-            if (Enum.TryParse<AdditionsSound>(name, out AdditionsSound sound))
+            if (Enum.TryParse(name, out AdditionsSound sound))
             {
-                SoundType type = clearedPath.Contains("Music") ? SoundType.Music : clearedPath.Contains("Ambient") ? SoundType.Sound : SoundType.Sound;
+                SoundType type = clearedPath.Contains("Music") ? SoundType.Music : SoundType.Sound;
                 Sounds[sound] = new Lazy<AssetInfo<SoundStyle>>(() =>
                     new AssetInfo<SoundStyle>(new SoundStyle(clearedPath, type), clearedPath));
             }
@@ -152,8 +150,6 @@ public class AssetRegistry : ModSystem
         #region Shaders
         IEnumerable<string> shaderLoadPaths = fileNames.Where(path => path.Contains(AutoloadDirectoryShaders)
         && !path.Contains("Compiler/") && (path.Contains(".xnb") || path.Contains(".fxc")));
-        IEnumerable<string> shaderFxPathsToCompile = fileNames.Where(path => path.Contains(AutoloadDirectoryShaders)
-        && !path.Contains("Compiler/") && path.Contains(".fx") && !shaderLoadPaths.Contains(path.Replace(".fx", ".xnb")));
 
         foreach (string path in shaderLoadPaths)
         {
@@ -169,8 +165,6 @@ public class AssetRegistry : ModSystem
         #region Filters
         IEnumerable<string> filterLoadPaths = fileNames.Where(path => path.Contains(AutoloadDirectoryFilters)
         && !path.Contains("Compiler/") && (path.Contains(".xnb") || path.Contains(".fxc")));
-        IEnumerable<string> filterFxPathsToCompile = fileNames.Where(path => path.Contains(AutoloadDirectoryFilters)
-        && !path.Contains("Compiler/") && path.Contains(".fx") && !filterLoadPaths.Contains(path.Replace(".fx", ".xnb")));
 
         foreach (string path in filterLoadPaths)
         {
@@ -441,7 +435,6 @@ public enum AdditionsTexture
     TreasureBagStygainHeart,
     TreasureBoxAsterlin,
     #endregion
-    AridFlask,
     FrigidTonic,
     SupremeWaterbreathingPotion,
     #endregion

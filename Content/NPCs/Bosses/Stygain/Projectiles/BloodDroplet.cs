@@ -4,6 +4,7 @@ using Terraria.Audio;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 
@@ -14,7 +15,7 @@ public class BloodDroplet : ProjOwnedByNPC<StygainHeart>
     public override void SetDefaults()
     {
         Projectile.width =
-        Projectile.height = 12;
+            Projectile.height = 12;
         Projectile.friendly = false;
         Projectile.hostile = true;
         Projectile.tileCollide = false;
@@ -44,11 +45,15 @@ public class BloodDroplet : ProjOwnedByNPC<StygainHeart>
     {
         for (int i = 0; i < 10; i++)
         {
-            ParticleRegistry.SpawnBloodParticle(Projectile.Center, -Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(1.5f) * Main.rand.NextFloat(2f, 6f),
+            ParticleRegistry.SpawnBloodParticle(Projectile.Center,
+                -Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(1.5f) * Main.rand.NextFloat(2f, 6f),
                 Main.rand.Next(20, 30), Main.rand.NextFloat(.1f, .3f), Color.DarkRed);
-            Dust.NewDustPerfect(Projectile.RandAreaInEntity(), DustID.Blood, Projectile.velocity * Main.rand.NextFloat(), 0, default, Main.rand.NextFloat(.5f, 1f));
+            Dust.NewDustPerfect(Projectile.RandAreaInEntity(), DustID.Blood,
+                Projectile.velocity * Main.rand.NextFloat(), 0, default, Main.rand.NextFloat(.5f, 1f));
         }
-        SoundEngine.PlaySound(SoundID.SplashWeak with { MaxInstances = 0, Volume = .4f, Pitch = .1f }, Projectile.Center);
+
+        SoundEngine.PlaySound(SoundID.SplashWeak with { MaxInstances = 0, Volume = .4f, Pitch = .1f },
+            Projectile.Center);
     }
 
     public override bool PreDraw(ref Color lightColor)
@@ -59,7 +64,8 @@ public class BloodDroplet : ProjOwnedByNPC<StygainHeart>
         Color color = Projectile.GetAlpha(Color.Red);
         float squish = MathHelper.Clamp(Projectile.velocity.Length() / 10f * 3f, .1f, 3f);
 
-        Main.EntitySpriteDraw(texture, drawPosition, frame, color, Projectile.rotation, new(frame.X / 2f, frame.Y), new Vector2(1f, 1f * squish) * .1f, 0, 0);
+        Main.EntitySpriteDraw(texture, drawPosition, frame, color, Projectile.rotation, new(frame.X / 2f, frame.Y),
+            new Vector2(1f, 1f * squish) * .1f, 0);
         return false;
     }
 }

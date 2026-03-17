@@ -9,6 +9,7 @@ using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
@@ -31,7 +32,7 @@ public class SillyPinkSwing : BaseSwordSwing
     public int ReelTime => (int)(80f / MeleeSpeed);
     public const int RecoilTime = 30;
     public override int SwingTime => 40;
-    public override float SwingAngle => (3 * MathHelper.Pi / 2) / 2;
+    public override float SwingAngle => (3 * Pi / 2) / 2;
     public float ReelCompletion => InverseLerp(0f, ReelTime, Time);
 
     public RotatedRectangle HeadRect()
@@ -87,7 +88,7 @@ public class SillyPinkSwing : BaseSwordSwing
 
                 if (ReelCompletion >= 1f && !Modded.MouseLeft.Current && this.RunLocal())
                 {
-                    Time = 0f;
+                    Time = 0;
                     State = SillyState.Swing;
                     Projectile.rotation = SwingOffset();
                     this.Sync();
@@ -160,7 +161,7 @@ public class SillyPinkSwing : BaseSwordSwing
         if (this.RunLocal())
             Projectile.CreateFriendlyExplosion(pos, Vector2.One * 120f * Projectile.scale, Projectile.damage / 2, Projectile.knockBack / 2f, 2, 9);
 
-        Time = 0f;
+        Time = 0;
         State = SillyState.Recoil;
         this.Sync();
     }

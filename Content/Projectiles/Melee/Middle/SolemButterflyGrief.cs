@@ -46,7 +46,7 @@ public class SolemButterflyGrief : ModProjectile, ILocalizedModType, IModType
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        target.AddBuff(ModContent.BuffType<Curse>(), SecondsToFrames(1));
+        target.AddBuff(ModContent.BuffType<Curse>(), CalUtils.SecondsToFrames(1));
     }
 
     public override bool PreDraw(ref Color lightColor)

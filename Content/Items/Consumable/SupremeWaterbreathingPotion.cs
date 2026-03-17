@@ -36,7 +36,7 @@ public class SupremeWaterbreathingPotion : ModItem
         Item.rare = ItemRarityID.Orange;
         Item.value = AdditionsGlobalItem.RarityWhiteBuyPrice;
         Item.buffType = ModContent.BuffType<SupremeWaterbreathing>();
-        Item.buffTime = SecondsToFrames(260);
+        Item.buffTime = CalUtils.SecondsToFrames(260);
     }
     public override void AddRecipes()
     {

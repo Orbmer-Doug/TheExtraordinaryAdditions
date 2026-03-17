@@ -9,6 +9,7 @@ using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Early;
 
@@ -88,7 +89,7 @@ public class MeteorSpawn : ModProjectile, ILocalizedModType, IModType
             if (FireTimer.BetweenNum(1f, 10f))
             {
                 if (this.RunLocal())
-                    Projectile.velocity = Vector2.Lerp(Projectile.velocity, Utility.SafeDirectionTo(Projectile, Modded.MouseWorld) * -11f, .25f);
+                    Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Modded.MouseWorld) * -11f, .25f);
                 this.Sync();
             }
 
@@ -96,7 +97,7 @@ public class MeteorSpawn : ModProjectile, ILocalizedModType, IModType
             if (FireTimer.BetweenNum(10f, 12f))
             {
                 if (this.RunLocal())
-                    Projectile.velocity = Utility.SafeDirectionTo(Projectile, Modded.MouseWorld) * 20f;
+                    Projectile.velocity = Projectile.SafeDirectionTo(Modded.MouseWorld) * 20f;
                 this.Sync();
             }
             points.Update(Projectile.Center + Projectile.velocity);
@@ -123,7 +124,7 @@ public class MeteorSpawn : ModProjectile, ILocalizedModType, IModType
     {
         Projectile.AI_GetMyGroupIndex(out var index, out var total);
 
-        float time = SecondsToFrames(11f);
+        float time = CalUtils.SecondsToFrames(11f);
         float cycle = Modded.GlobalTimer % time / time * MathF.Tau;
         float offset = MathF.Tau * InverseLerp(0f, total, index);
         Vector2 dest = Owner.RotatedRelativePoint(Owner.MountedCenter) + GetPointOnRotatedEllipse(200f, 120f, offset + cycle, cycle * 4f);
@@ -132,7 +133,7 @@ public class MeteorSpawn : ModProjectile, ILocalizedModType, IModType
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        target.AddBuff(BuffID.OnFire, SecondsToFrames(Main.rand.NextFloat(2f, 3f)));
+        target.AddBuff(BuffID.OnFire, CalUtils.SecondsToFrames(Main.rand.NextFloat(2f, 3f)));
         Projectile.Kill();
     }
 
@@ -145,7 +146,7 @@ public class MeteorSpawn : ModProjectile, ILocalizedModType, IModType
                 40, 1f, Color.Lerp(Color.OrangeRed, Color.DarkOrange, Main.rand.NextFloat(.5f, .7f)));
         }
 
-        Utility.ExpandHitboxBy(Projectile, 120);
+        Projectile.ExpandHitboxBy(120);
         Projectile.penetrate = -1;
         Projectile.Damage();
     }

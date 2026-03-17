@@ -12,6 +12,8 @@ using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using Utils = Terraria.Utils;
 
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Late.Zenith;
@@ -36,25 +38,32 @@ public class FinalStrikeHoldout : ModProjectile
         get => (FinalStrikeState)Projectile.ai[0];
         set => Projectile.ai[0] = (int)value;
     }
-    public ref float StateTime => ref Projectile.ai[1];
-    public ref float Counter => ref Projectile.ai[2];
+
+    public int StateTime
+    {
+        get => (int)Projectile.ai[1];
+        set => Projectile.ai[1] = value;
+    }
+
+    public float Counter
+    {
+        get => (int)Projectile.ai[2];
+        set => Projectile.ai[2] = value;
+    }
 
     public bool Init
     {
-        get => Projectile.AdditionsInfo().ExtraAI[0] == 1f;
+        get => (int)Projectile.AdditionsInfo().ExtraAI[0] == 1;
         set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
+
     public ref float Time => ref Projectile.AdditionsInfo().ExtraAI[1];
     public ref float VanishTime => ref Projectile.AdditionsInfo().ExtraAI[2];
+
     public bool Vanish
     {
-        get => Projectile.AdditionsInfo().ExtraAI[3] == 1f;
+        get => (int)Projectile.AdditionsInfo().ExtraAI[3] == 1;
         set => Projectile.AdditionsInfo().ExtraAI[3] = value.ToInt();
-    }
-    public int PortalIndex
-    {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[4];
-        set => Projectile.AdditionsInfo().ExtraAI[4] = value;
     }
 
     public ref float DivineFormInterpolant => ref Projectile.localAI[0];
@@ -97,6 +106,7 @@ public class FinalStrikeHoldout : ModProjectile
                 DoBehavior_Stab();
                 break;
         }
+
         if (CurrentState != FinalStrikeState.Aim)
             Projectile.rotation = Projectile.velocity.ToRotation() + PiOver4;
 
@@ -104,13 +114,14 @@ public class FinalStrikeHoldout : ModProjectile
         Time++;
     }
 
-    public Vector2 Center => Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
-    private static readonly int shootDelay = SecondsToFrames(2.4f);
+    public Vector2 Center => Owner.RotatedRelativePoint(Owner.MountedCenter);
+    private static readonly int shootDelay = CalUtils.SecondsToFrames(2.4f);
+
     public void DoBehavior_Aim()
     {
         float animationCompletion = InverseLerp(0f, shootDelay, StateTime);
         DivineFormInterpolant = MakePoly(3).InFunction(animationCompletion);
-        Projectile.Opacity = Animators.MakePoly(3f).InFunction(InverseLerp(0f, 12f, Time));
+        Projectile.Opacity = MakePoly(3f).InFunction(InverseLerp(0f, 12f, Time));
 
         int frequency = 5;
         if (animationCompletion.BetweenNum(.33f, .66f, true))
@@ -118,19 +129,22 @@ public class FinalStrikeHoldout : ModProjectile
         if (animationCompletion.BetweenNum(.66f, 1f, true))
             frequency = 1;
 
-        if (StateTime % frequency == frequency - 1f)
+        if (StateTime % frequency == frequency - 1)
         {
             Vector2 pos = TipOfSpear + Main.rand.NextVector2Circular(150f, 150f);
             int life = Main.rand.Next(90, 120);
             float size = Main.rand.NextFloat(.3f, .6f);
-            ParticleRegistry.SpawnBloomPixelParticle(pos, Vector2.Zero, life, size, Color.Wheat, Color.AntiqueWhite, TipOfSpear, 1f, 7, false);
+            ParticleRegistry.SpawnBloomPixelParticle(pos, Vector2.Zero, life, size, Color.Wheat, Color.AntiqueWhite,
+                TipOfSpear, 1f, 7);
         }
 
-        // Play a magic sound when the spear is ready to fire
         if (StateTime == shootDelay)
         {
             for (int i = 0; i < 40; i++)
-                ParticleRegistry.SpawnSquishyPixelParticle(TipOfSpear, Main.rand.NextVector2CircularLimited(10f, 10f, .5f, 1f), Main.rand.Next(90, 150), Main.rand.NextFloat(.9f, 1.6f), Color.AntiqueWhite, Color.Wheat, 9, false, false, Main.rand.NextFloat(-.1f, .1f));
+                ParticleRegistry.SpawnSquishyPixelParticle(TipOfSpear,
+                    Main.rand.NextVector2CircularLimited(10f, 10f, .5f, 1f), Main.rand.Next(90, 150),
+                    Main.rand.NextFloat(.9f, 1.6f), Color.AntiqueWhite, Color.Wheat, 9, false, false,
+                    Main.rand.NextFloat(-.1f, .1f));
             AdditionsSound.spearCharge.Play(Owner.Center, 1f, 0f, .1f, 1, Name);
         }
 
@@ -141,25 +155,28 @@ public class FinalStrikeHoldout : ModProjectile
             Vector2 sparkVelocity = Projectile.velocity.RotatedByRandom(.35f) * speed;
             ParticleRegistry.SpawnSparkParticle(TipOfSpear, sparkVelocity, Main.rand.Next(40, 50), scale, Color.Wheat);
         }
+
         Lighting.AddLight(TipOfSpear, Color.AntiqueWhite.ToVector3() * animationCompletion * 1.4f);
 
         // Aim the spear
         if (this.RunLocal())
         {
             float aimInterpolant = Utils.GetLerpValue(5f, 25f, Center.Distance(Modded.MouseWorld), true);
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Center.SafeDirectionTo(Modded.MouseWorld), aimInterpolant);
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Center.SafeDirectionTo(Modded.MouseWorld),
+                aimInterpolant);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
 
-        // Stick to the player.
+        // Stick to the player
         Projectile.rotation = Projectile.velocity.ToRotation() + PiOver4;
         Owner.ChangeDir((Projectile.velocity.X > 0f).ToDirectionInt());
         float frontArmRotation = Projectile.rotation - PiOver4 - animationCompletion * Owner.direction * 0.74f;
         if (Owner.direction == 1)
             frontArmRotation += Pi;
 
-        Projectile.Center = Center + (frontArmRotation + PiOver2).ToRotationVector2() * Projectile.scale * 27f + Projectile.velocity * Projectile.scale;
+        Projectile.Center = Center + (frontArmRotation + PiOver2).ToRotationVector2() * Projectile.scale * 27f +
+                            Projectile.velocity * Projectile.scale;
 
         Owner.heldProj = Projectile.whoAmI;
         Owner.SetDummyItemTime(2);
@@ -175,22 +192,22 @@ public class FinalStrikeHoldout : ModProjectile
         Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, frontArmRotation);
         OldArmRot = frontArmRotation;
 
-        if (this.RunLocal() && !Owner.channel)
+        if (!this.RunLocal() || Owner.channel)
+            return;
+
+        if (StateTime >= shootDelay)
         {
-            if (StateTime >= shootDelay)
-            {
-                AdditionsSound.pierce.Play(Projectile.Center, 1f, 0f, .2f);
+            AdditionsSound.pierce.Play(Projectile.Center, 1f, 0f, .2f);
 
-                StateTime = 0f;
-                CurrentState = FinalStrikeState.Fire;
-                Projectile.netUpdate = true;
+            StateTime = 0;
+            CurrentState = FinalStrikeState.Fire;
+            Projectile.netUpdate = true;
 
-                Projectile.velocity *= heldItem.shootSpeed;
-                return;
-            }
-
-            Projectile.Kill();
+            Projectile.velocity *= heldItem.shootSpeed;
+            return;
         }
+
+        Projectile.Kill();
     }
 
     public void DoBehavior_Fire()
@@ -209,22 +226,23 @@ public class FinalStrikeHoldout : ModProjectile
 
         if (StateTime % 5f == 0f)
         {
-            IEntitySource source = Projectile.GetSource_FromThis(null);
+            IEntitySource source = Projectile.GetSource_FromThis();
             int damage = (int)(Projectile.damage * .5f);
             float off = ToRadians(10f);
 
             for (int i = 0; i < 2; i++)
             {
                 Vector2 pos = TipOfSpear;
-                float scale = 1.8f;
+                const float scale = 1.8f;
                 Color col1 = Color.AntiqueWhite;
 
                 Vector2 perturbedSpeed = new Vector2((0f - Projectile.velocity.X) / 3f,
-                    (0f - Projectile.velocity.Y) / 3f).RotatedBy((double)Lerp(0f - off, off, i / (2 - 1)), default);
+                    (0f - Projectile.velocity.Y) / 3f).RotatedBy(Lerp(0f - off, off, i / (2f - 1)));
                 for (int j = 0; j < 2; j++)
                 {
                     if (this.RunLocal())
-                        Projectile.NewProjectile(source, Projectile.Center, perturbedSpeed * 1.2f, ModContent.ProjectileType<Streaks>(), damage, 0f, Projectile.owner, 0f, 0f, 0f);
+                        Projectile.NewProjectile(source, Projectile.Center, perturbedSpeed * 1.2f,
+                            ModContent.ProjectileType<Streaks>(), damage, 0f, Projectile.owner);
 
                     for (int p = 0; p < 2; p++)
                     {
@@ -239,12 +257,13 @@ public class FinalStrikeHoldout : ModProjectile
         Projectile.spriteDirection = 1;
     }
 
-    public const float waitTime = 180f;
-    public float WaitCompletion => InverseLerp(0f, waitTime, StateTime);
+    public const float WaitTime = 180f;
+    public float WaitCompletion => InverseLerp(0f, WaitTime, StateTime);
+
     public void DoBehavior_Wait()
     {
-        float ratio = MakePoly(2).InFunction(InverseLerp(0f, waitTime / 2, StateTime));
-        cache ??= new(40);
+        float ratio = MakePoly(2).InFunction(InverseLerp(0f, WaitTime / 2, StateTime));
+        Cache ??= new(40);
 
         Vector2 dir = Projectile.Center.SafeDirectionTo(Modded.MouseWorld);
         if (this.RunLocal())
@@ -253,20 +272,18 @@ public class FinalStrikeHoldout : ModProjectile
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
-        cache.SetPoints(Projectile.RotHitbox().BottomLeft.GetLaserControlPoints(Projectile.RotHitbox().BottomLeft + Projectile.velocity.SafeNormalize(Vector2.Zero) * WaitCompletion * 2500f, 40));
 
-        Projectile portal = Main.projectile?[PortalIndex] ?? null;
-        if (portal != null)
-        {
-            Projectile.Center = Vector2.Lerp(Projectile.Center, portal.Center, .5f);
-            portal.timeLeft = 20;
-        }
+        Cache.SetPoints(Projectile.RotHitbox().BottomLeft.GetLaserControlPoints(
+            Projectile.RotHitbox().BottomLeft +
+            Projectile.velocity.SafeNormalize(Vector2.Zero) * WaitCompletion * 2500f, 40));
+
         Projectile.timeLeft = 300;
         Projectile.extraUpdates = 3;
 
-        if (StateTime > waitTime)
+        if (StateTime > WaitTime)
         {
-            ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 20, 0f, Vector2.One, 0f, .4f, Color.AntiqueWhite, true);
+            ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 20, 0f, Vector2.One, 0f, .4f,
+                Color.AntiqueWhite, true);
             Projectile.velocity *= 16f;
             Projectile.MaxUpdates = 8;
             AdditionsSound.IkeFinal.Play(Projectile.Center, 1f, -.2f, .1f);
@@ -284,27 +301,31 @@ public class FinalStrikeHoldout : ModProjectile
             int life = Main.rand.Next(30, 40);
             float scale = Main.rand.NextFloat(.5f, .9f);
             Color col = Color.Wheat.Lerp(Color.AntiqueWhite, Main.rand.NextFloat(.2f, 5f));
-            ParticleRegistry.SpawnSparkParticle(TipOfSpear + Main.rand.NextVector2Circular(10f, 10f), vel, life, scale, col);
-            ParticleRegistry.SpawnSparkleParticle(TipOfSpear, vel, life, scale, col, Color.Wheat, 1.2f, Main.rand.NextFloat(-.2f, .2f));
+            ParticleRegistry.SpawnSparkParticle(TipOfSpear + Main.rand.NextVector2Circular(10f, 10f), vel, life, scale,
+                col);
+            ParticleRegistry.SpawnSparkleParticle(TipOfSpear, vel, life, scale, col, Color.Wheat, 1.2f,
+                Main.rand.NextFloat(-.2f, .2f));
         }
+
         Lighting.AddLight(TipOfSpear, Color.AntiqueWhite.ToVector3() * 2.3f);
     }
 
-    public Vector2 offset;
-    public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(offset);
-    public override void ReceiveExtraAI(BinaryReader reader) => offset = reader.ReadVector2();
-    
-    public float Completion => InverseLerp(0f, 18f, StateTime);
+    public Vector2 Offset;
+    public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(Offset);
+    public override void ReceiveExtraAI(BinaryReader reader) => Offset = reader.ReadVector2();
+
+    public float Completion => InverseLerp(0f, 14f, StateTime);
     public float Bump => GetLerpBump(.1f, .55f, 1f, .85f, Completion);
+
     public void DoBehavior_Stab()
     {
         if (!Init)
         {
             Projectile.ResetLocalNPCHitImmunity();
             Projectile.numHits = 0;
-            StateTime = 0f;
+            StateTime = 0;
             if (this.RunLocal())
-                Projectile.velocity = Center.SafeDirectionTo(Modded.MouseWorld).RotatedByRandom(.15f);
+                Projectile.velocity = Center.SafeDirectionTo(Modded.MouseWorld).RotatedByRandom(.09f);
             Init = true;
             this.Sync();
         }
@@ -336,11 +357,11 @@ public class FinalStrikeHoldout : ModProjectile
 
         if (StateTime == 0f)
         {
-            AdditionsSound.etherealSwordAttackBasic3.Play(TipOfSpear, Main.rand.NextFloat(1f, 1.5f), 0f, .2f, 0, Name);
+            AdditionsSound.etherealSwordAttackBasic3.Play(TipOfSpear, Main.rand.NextFloat(.8f, 1f), 0f, .2f, 0, Name);
         }
 
         float pierce = new PiecewiseCurve()
-            .Add(-20f, 70f, .6f, MakePoly(7).OutFunction)
+            .Add(-20f, 80f, .6f, MakePoly(7).OutFunction)
             .Add(70f, -20f, 1f, MakePoly(3).OutFunction)
             .Evaluate(Completion);
         Lighting.AddLight(TipOfSpear, Color.AntiqueWhite.ToVector3() * Bump * 1.4f);
@@ -355,51 +376,87 @@ public class FinalStrikeHoldout : ModProjectile
         float width = 12f * Projectile.scale;
         Vector2 start = Projectile.Center;
         Vector2 end = start + Projectile.velocity.SafeNormalize(Vector2.Zero) * length;
-        return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.Center, end, width, ref collisionPoint);
+        return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.Center, end,
+            width, ref collisionPoint);
     }
 
     public float WidthFunct(float c)
     {
         return 11f * WaitCompletion;
     }
+
     public Color ColorFunct(SystemVector2 c, Vector2 position)
     {
-        return Color.White * SmoothStep(1f, 0f, c.X) * InverseLerp(waitTime, waitTime - 24f, StateTime);
+        return Color.White * SmoothStep(1f, 0f, c.X) * InverseLerp(WaitTime, WaitTime - 24f, StateTime);
     }
 
-    public TrailPoints cache;
+    public TrailPoints Cache;
+
     public void DrawTele()
     {
-        if (CurrentState == FinalStrikeState.Wait)
+        if (CurrentState != FinalStrikeState.Wait)
+            return;
+
+        void Draw()
         {
-            void draw()
-            {
-                ManagedShader shader = ShaderRegistry.SideStreakTrail;
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WavyBlotchNoise), 1);
-                OptimizedPrimitiveTrail line = new(WidthFunct, ColorFunct, null, 40);
-                line.DrawTrail(shader, cache.Points, 50);
-            }
-            PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
+            ManagedShader shader = ShaderRegistry.SideStreakTrail;
+            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WavyBlotchNoise), 1);
+            OptimizedPrimitiveTrail line = new(WidthFunct, ColorFunct, null, 40);
+            line.DrawTrail(shader, Cache.Points, 50);
         }
+
+        PixelationSystem.QueuePrimitiveRenderAction(Draw, PixelationLayer.UnderProjectiles);
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        AdditionsSound.MediumExplosion.Play(TipOfSpear, 1.2f, 0f, .2f);
-        Projectile.damage = (int)MathF.Max(500f, Projectile.damage * 0.91f);
-
-        if (CurrentState != FinalStrikeState.DivinePierce)
+        if (CurrentState == FinalStrikeState.Stab)
         {
-            Vector2 pos;
-            if (CheckLinearCollision(Projectile.RotHitbox().TopRight, Projectile.RotHitbox().BottomLeft, target.Hitbox, out Vector2 start, out Vector2 end))
-                pos = start;
-            else
-                pos = TipOfSpear;
-
-            ScreenShakeSystem.New(new(CurrentState == FinalStrikeState.Fire ? 1f : .2f, CurrentState == FinalStrikeState.Fire ? .5f : .1f), pos);
-
-            Vector2 splatterDirection = CurrentState == FinalStrikeState.Stab ? Projectile.velocity * Main.rand.NextFloat(6f, 14f) : Projectile.velocity / 2;
             for (int i = 0; i < 20; i++)
+            {
+                Vector2 pos = TipOfSpear + Main.rand.NextVector2Circular(5f, 5f);
+                Vector2 vel = Main.rand.NextVector2Circular(5f, 5f);
+                ParticleRegistry.SpawnBloomPixelParticle(pos,
+                    vel, Main.rand.Next(20, 40), Main.rand.NextFloat(.4f, .7f),
+                    Color.AntiqueWhite, Color.White, null, 1.2f, 7);
+            }
+
+            if (this.RunLocal())
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    Vector2 end = TipOfSpear + Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.4f) *
+                        Main.rand.NextFloat(300f, 600f);
+                    Projectile.NewProj(TipOfSpear, Vector2.Zero, ModContent.ProjectileType<DivineLightning>(),
+                        (int)(Projectile.damage * 4.25f), 0f, Owner.whoAmI, ai1: end.X, ai2: end.Y);
+                }
+            }
+
+            ParticleRegistry.SpawnFlash(TipOfSpear, 30, .3f, 300f);
+            ParticleRegistry.SpawnBlurParticle(TipOfSpear, 30, .2f, 200f);
+            
+            ScreenShakeSystem.New(new ScreenShake(.2f, .1f), TipOfSpear);
+
+            AdditionsSound.etherealSharpImpact.Play(TipOfSpear, 1.3f, -.1f, .3f, 12);
+        }
+        else
+        {
+            AdditionsSound.MediumExplosion.Play(TipOfSpear, 1.2f, 0f, .2f);
+            Projectile.damage = (int)MathF.Max(500f, Projectile.damage * 0.91f);
+            Vector2 pos = CheckLinearCollision(Projectile.RotHitbox().TopRight, Projectile.RotHitbox().BottomLeft,
+                target.Hitbox,
+                out Vector2 start, out _)
+                ? start
+                : TipOfSpear;
+
+            ScreenShakeSystem.New(
+                new(CurrentState == FinalStrikeState.Fire ? 1f : .2f,
+                    CurrentState == FinalStrikeState.Fire ? .5f : .1f), pos);
+
+            Vector2 splatterDirection = CurrentState == FinalStrikeState.Stab
+                ? Projectile.velocity * Main.rand.NextFloat(6f, 14f)
+                : Projectile.velocity / 2;
+            for (int i = 0; i < 10; i++)
             {
                 int life = Main.rand.Next(55, 70);
                 float scale = Main.rand.NextFloat(1.7f, Main.rand.NextFloat(3.3f, 5.5f)) * 0.85f;
@@ -409,70 +466,22 @@ public class FinalStrikeHoldout : ModProjectile
 
                 ParticleRegistry.SpawnSparkParticle(pos, vel, life, scale, col);
                 ParticleRegistry.SpawnSparkParticle(pos, vel * 1.5f, 80, scale * .7f, Color.AntiqueWhite);
-                if (i % 4 == 3)
-                    ParticleRegistry.SpawnLightningArcParticle(pos, vel.SafeNormalize(Vector2.Zero) * Main.rand.NextFloat(90f, 300f), Main.rand.Next(20, 40), 1.5f, Color.White);
             }
-        }
-        else
-        {
-            target.velocity += Projectile.velocity.SafeNormalize(Vector2.Zero) * 40f * target.knockBackResist;
-
-            for (int i = 0; i < 180; i++)
-            {
-                int life = Main.rand.Next(50, 90);
-                float scale = Main.rand.NextFloat(1.5f, 2.4f);
-                Color col = Color.Wheat.Lerp(Color.AntiqueWhite, Main.rand.NextFloat(.2f, .7f));
-                Vector2 vel = Main.rand.NextVector2Circular(80f, 80f);
-                ParticleRegistry.SpawnSparkParticle(TipOfSpear, vel, life, scale, col);
-                ParticleRegistry.SpawnSquishyPixelParticle(TipOfSpear, vel, life * 2, scale * 3f, col, Color.Wheat, Main.rand.NextByte(2, 6), false, false, Main.rand.NextFloat(-.09f, .09f));
-                ParticleRegistry.SpawnSquishyPixelParticle(TipOfSpear, vel * 2, life * 2, scale * 2f, col, Color.Wheat);
-                ParticleRegistry.SpawnGlowParticle(TipOfSpear, vel * 1.6f, life / 2, scale, col);
-            }
-
-            float off = RandomRotation();
-            for (int i = 0; i < 6; i++)
-            {
-                Vector2 end = TipOfSpear + (TwoPi * InverseLerp(0f, 6f, i) + off).ToRotationVector2() * Main.rand.NextFloat(1000f, 2000f);
-                Projectile.NewProj(TipOfSpear, Vector2.Zero, ModContent.ProjectileType<DivineLightning>(),
-                    Projectile.damage / 4, 0f, Owner.whoAmI, ai1: end.X, ai2: end.Y);
-            }
-
-            Projectile.CreateFriendlyExplosion(TipOfSpear, new(600f), Projectile.damage / 3, 0f, 10, 9);
-            AdditionsSound.LightningExplosion.Play(TipOfSpear, 1.4f, 0f, .2f, 1, Name);
-            ScreenShakeSystem.New(new(2f, 2f, 1700f), Projectile.Center);
-            ParticleRegistry.SpawnFlash(Projectile.Center, 30, .4f, 6000f);
-            ParticleRegistry.SpawnBlurParticle(Projectile.Center, 30, .2f, 4000f);
-            Projectile.Kill();
-        }
-
-        if (CurrentState == FinalStrikeState.Stab && Projectile.numHits <= 0)
-        {
-            ref int counter = ref Owner.GetModPlayer<FinalStrikePlayer>().Counter;
-            if (this.RunLocal() && counter >= 10)
-            {
-                PortalIndex = Projectile.NewProj(TipOfSpear, Vector2.Zero, ModContent.ProjectileType<DeicidePortal>(), 0, 0f, Projectile.owner);
-                counter = 0;
-            }
-            counter++;
         }
     }
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
     {
-        if (CurrentState == FinalStrikeState.DivinePierce)
-        {
-            modifiers.FinalDamage *= 60;
-            modifiers.Knockback *= 30;
-            modifiers.SetCrit();
-            modifiers.ScalingArmorPenetration += 1;
-        }
+        if (CurrentState != FinalStrikeState.Stab)
+            return;
+        modifiers.ScalingArmorPenetration += 1;
     }
 
     public override bool? CanDamage()
     {
         if (CurrentState == FinalStrikeState.Stab)
             return Completion.BetweenNum(0f, .7f) ? null : false;
-        return CurrentState == FinalStrikeState.Aim || CurrentState == FinalStrikeState.Wait ? false : null;
+        return CurrentState is FinalStrikeState.Aim or FinalStrikeState.Wait ? false : null;
     }
 
     public void DrawBackglow()
@@ -484,7 +493,8 @@ public class FinalStrikeHoldout : ModProjectile
             backglowWidth = 0f;
 
         Color backglowColor = Color.AntiqueWhite;
-        backglowColor = Color.Lerp(backglowColor, Color.NavajoWhite, Utils.GetLerpValue(0.7f, 1f, DivineFormInterpolant, true) * 0.56f) * 0.4f;
+        backglowColor = Color.Lerp(backglowColor, Color.NavajoWhite,
+            Utils.GetLerpValue(0.7f, 1f, DivineFormInterpolant, true) * 0.56f) * 0.4f;
         backglowColor.A = (byte)(20 * Projectile.Opacity);
 
         Texture2D glowmaskTexture = Projectile.ThisProjectileTexture();
@@ -494,25 +504,27 @@ public class FinalStrikeHoldout : ModProjectile
         for (int i = 0; i < 10; i++)
         {
             Vector2 drawOffset = (TwoPi * i / 10f).ToRotationVector2() * backglowWidth;
-            sb.Draw(glowmaskTexture, drawPosition + drawOffset, frame, backglowColor * Projectile.Opacity, Projectile.rotation, origin, Projectile.scale, 0, 0f);
+            sb.Draw(glowmaskTexture, drawPosition + drawOffset, frame, backglowColor * Projectile.Opacity,
+                Projectile.rotation, origin, Projectile.scale, 0, 0f);
         }
 
-        if (CurrentState != FinalStrikeState.Stab)
+        if (CurrentState == FinalStrikeState.Stab)
+            return;
+
+        Vector2 offsets = new Vector2(0f, Projectile.gfxOffY) - Main.screenPosition;
+        float auraRotation = Projectile.velocity.ToRotation() + PiOver4;
+        Vector2 drawStartOuter = offsets + Projectile.Center + Projectile.velocity;
+        Vector2 spinPoint = -Vector2.UnitY * 6f * DivineFormInterpolant;
+        float time = Main.GlobalTimeWrappedHourly;
+        float rotation = TwoPi * time / 3f;
+        float opacity = .85f * DivineFormInterpolant;
+        for (int i = 0; i < 6; i++)
         {
-            Vector2 offsets = new Vector2(0f, Projectile.gfxOffY) - Main.screenPosition;
-            float auraRotation = Projectile.velocity.ToRotation() + PiOver4;
-            Vector2 drawStartOuter = offsets + Projectile.Center + Projectile.velocity;
-            Vector2 spinPoint = -Vector2.UnitY * 6f * DivineFormInterpolant;
-            float time = Main.GlobalTimeWrappedHourly;
-            float rotation = TwoPi * time / 3f;
-            float opacity = .85f * DivineFormInterpolant;
-            for (int i = 0; i < 6; i++)
-            {
-                Vector2 spinStart = drawStartOuter + spinPoint.RotatedBy((double)(rotation - (float)Math.PI * i / 3f), default);
-                Color glowAlpha = Projectile.GetAlpha(backglowColor * Projectile.Opacity);
-                glowAlpha.A = (byte)Projectile.alpha;
-                sb.Draw(glowmaskTexture, spinStart, frame, glowAlpha * opacity, auraRotation, origin, Projectile.scale, 0, 0f);
-            }
+            Vector2 spinStart = drawStartOuter + spinPoint.RotatedBy(rotation - (float)Math.PI * i / 3f);
+            Color glowAlpha = Projectile.GetAlpha(backglowColor * Projectile.Opacity);
+            glowAlpha.A = (byte)Projectile.alpha;
+            sb.Draw(glowmaskTexture, spinStart, frame, glowAlpha * opacity, auraRotation, origin, Projectile.scale,
+                0, 0f);
         }
     }
 
@@ -524,7 +536,8 @@ public class FinalStrikeHoldout : ModProjectile
         Vector2 origin = frame.Size() * 0.5f;
 
         DrawTele();
-        Main.spriteBatch.Draw(spearTexture, drawPosition, frame, Color.White * Projectile.Opacity, Projectile.rotation, origin, Projectile.scale, 0, 0f);
+        Main.spriteBatch.Draw(spearTexture, drawPosition, frame, Color.White * Projectile.Opacity, Projectile.rotation,
+            origin, Projectile.scale, 0, 0f);
         if (CurrentState != FinalStrikeState.Stab)
             DrawBackglow();
 
@@ -543,6 +556,7 @@ public class FinalStrikeHoldout : ModProjectile
                 Main.spriteBatch.Draw(flare, target, null, Color.AntiqueWhite, rot, orig, 0, 0f);
             }
         }
+
         PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.OverProjectiles, BlendState.Additive);
 
         return false;

@@ -17,10 +17,8 @@ namespace TheExtraordinaryAdditions.Content.World.Subworlds;
 
 public class CloudedCrater : Subworld
 {
-    public class CloudedCraterPass : GenPass
+    public class CloudedCraterPass() : GenPass("Terrain", 1f)
     {
-        public CloudedCraterPass() : base("Terrain", 1f) { }
-
         public override void ApplyPass(GenerationProgress progress, GameConfiguration configuration)
         {
             // Set the progress text

@@ -5,6 +5,7 @@ using TheExtraordinaryAdditions.Assets.Audio;
 using TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using static TheExtraordinaryAdditions.Content.Projectiles.Magic.Late.TesselesticMeltdownProj;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
@@ -25,7 +26,7 @@ public class TheTesselesticMeltdown : ProjOwnedByNPC<Asterlin>
 
     public RotatedRectangle Rect()
     {
-        return new(36, Projectile.Center, Projectile.Center + PolarVector(TesselesticMeltdownProj.StaffLength, Projectile.rotation - MathHelper.PiOver4));
+        return new(36, Projectile.Center, Projectile.Center + PolarVector(StaffLength, Projectile.rotation - MathHelper.PiOver4));
     }
     public Vector2 TipOfStaff => Rect().Top;
     public int Dir => ModOwner.Direction;

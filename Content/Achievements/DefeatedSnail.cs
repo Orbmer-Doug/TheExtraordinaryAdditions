@@ -2,6 +2,7 @@
 using Terraria.Achievements;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Misc;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Achievements;
 

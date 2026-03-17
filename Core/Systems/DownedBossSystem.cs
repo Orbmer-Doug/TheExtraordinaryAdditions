@@ -31,19 +31,24 @@ public class BossDownedSaveSystem : ModSystem
         downedRegistry.AddRange((List<string>)tag.GetList<string>(nameof(downedRegistry)));
     }
 
-    public static void SetDefeatState<BossType>(bool isDefeated) where BossType : ModNPC
+    public static void SetDefeatState<TBossType>(bool isDefeated) where TBossType : ModNPC
     {
-        string bossName = ModContent.GetModNPC(ModContent.NPCType<BossType>()).Name;
-        if (isDefeated && !downedRegistry.Contains(bossName))
-            downedRegistry.Add(bossName);
-        if (!isDefeated)
-            downedRegistry.Remove(bossName);
+        string bossName = ModContent.GetModNPC(ModContent.NPCType<TBossType>()).Name;
+        switch (isDefeated)
+        {
+            case true when !downedRegistry.Contains(bossName):
+                downedRegistry.Add(bossName);
+                break;
+            case false:
+                downedRegistry.Remove(bossName);
+                break;
+        }
 
         AdditionsNetcode.SyncBossDefeats(Main.myPlayer);
     }
 
-    public static bool HasDefeated<BossType>() where BossType : ModNPC =>
-        downedRegistry.Contains(ModContent.GetModNPC(ModContent.NPCType<BossType>()).Name);
+    public static bool HasDefeated<TBossType>() where TBossType : ModNPC =>
+        downedRegistry.Contains(ModContent.GetModNPC(ModContent.NPCType<TBossType>()).Name);
 }
 
 public interface IBossDowned { }
@@ -52,11 +57,12 @@ public class GlobalBossDefeatMarker : GlobalNPC
 {
     public override void OnKill(NPC npc)
     {
-        if (npc.ModNPC is not null and IBossDowned downed && !BossDownedSaveSystem.downedRegistry.Contains(npc.ModNPC.Name))
-        {
-            string bossName = ModContent.GetModNPC(npc.type).Name;
-            BossDownedSaveSystem.downedRegistry.Add(bossName);
-            AdditionsNetcode.SyncBossDefeats(Main.myPlayer);
-        }
+        if (npc.ModNPC is not IBossDowned ||
+            BossDownedSaveSystem.downedRegistry.Contains(npc.ModNPC.Name)) 
+            return;
+        
+        string bossName = ModContent.GetModNPC(npc.type).Name;
+        BossDownedSaveSystem.downedRegistry.Add(bossName);
+        AdditionsNetcode.SyncBossDefeats(Main.myPlayer);
     }
 }

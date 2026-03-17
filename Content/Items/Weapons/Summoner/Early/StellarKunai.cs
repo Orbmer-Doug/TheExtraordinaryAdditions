@@ -33,7 +33,7 @@ public class StellarKunai : ModItem
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
-        Utility.ColorLocalization(tooltips, Color.CornflowerBlue);
+        CoreUtils.ColorLocalization(tooltips, Color.CornflowerBlue);
     }
 
     public override bool CanUseItem(Player player)

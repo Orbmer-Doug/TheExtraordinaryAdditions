@@ -26,7 +26,6 @@ public class ManagedRenderTarget : IDisposable
     internal RenderTargetInitializationAction InitializationAction
     {
         get;
-        private set;
     }
 
     /// <summary>

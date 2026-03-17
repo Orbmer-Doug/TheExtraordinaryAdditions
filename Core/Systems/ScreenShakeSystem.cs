@@ -56,8 +56,8 @@ public sealed class ScreenShakeSystem : ModSystem
             EndTime = StartTime + style.LengthInSeconds;
         }
 
-        public readonly float TimeLeft => MathF.Max(0f, EndTime - TimeSystem.RenderTime);
-        public readonly float Progress => Style.LengthInSeconds > 0f ? MathHelper.Clamp((TimeSystem.RenderTime - StartTime) / Style.LengthInSeconds, 0f, 1f) : 1f;
+        public float TimeLeft => MathF.Max(0f, EndTime - TimeSystem.RenderTime);
+        public float Progress => Style.LengthInSeconds > 0f ? MathHelper.Clamp((TimeSystem.RenderTime - StartTime) / Style.LengthInSeconds, 0f, 1f) : 1f;
     }
 
     public static readonly float ScreenShakeStrength = AdditionsConfigClient.Instance.ScreenshakePower;
@@ -99,15 +99,15 @@ public sealed class ScreenShakeSystem : ModSystem
         static float GetValueWithSeed(int seed, float x)
         {
             noise!.SetSeed(seed);
-            return noise!.GetNoise(x, 0f);
+            return noise.GetNoise(x, 0f);
         }
 
         float time = TimeSystem.RenderTime;
 
         // Basic 2D
-        const float FrequencyScale = 14.0f;
+        const float frequencyScale = 14.0f;
 
-        noise.SetFrequency(FrequencyScale);
+        noise.SetFrequency(frequencyScale);
         noise.SetNoiseType(FastNoiseLite.NoiseType.Perlin);
 
         Vector2 result = new(

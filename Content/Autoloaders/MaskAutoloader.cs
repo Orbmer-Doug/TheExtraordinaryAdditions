@@ -26,7 +26,7 @@ public static class MaskAutoloader
         public AutoloadableMask(string texturePath, bool permitDefaultHeadDrawing)
         {
             string name = Path.GetFileName(texturePath);
-            this.drawHead = permitDefaultHeadDrawing;
+            drawHead = permitDefaultHeadDrawing;
             this.texturePath = texturePath;
             this.name = name;
         }

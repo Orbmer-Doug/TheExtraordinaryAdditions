@@ -1,12 +1,14 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using CalamityMod;
 using Terraria;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 
@@ -17,7 +19,7 @@ public class HemoglobBarrier : ProjOwnedByNPC<StygainHeart>
     public ref float CurrentWidth => ref Projectile.ai[0];
     public bool FadeOut
     {
-        get => Projectile.ai[1] == 1f;
+        get => (int)Projectile.ai[1] == 1;
         set => Projectile.ai[1] = value.ToInt();
     }
 
@@ -77,7 +79,7 @@ public class HemoglobBarrier : ProjOwnedByNPC<StygainHeart>
                 ParticleRegistry.SpawnBloomLineParticle(player.RotHitbox().RandomPoint(), Vector2.UnitY * -Main.rand.NextFloat(2f, 5f),
                     Main.rand.Next(10, 20), Main.rand.NextFloat(.3f, .6f), Color.DarkRed);
 
-                Vector2 edge = ClosestPointOnCircle(player.Center, Projectile.Center, StygainHeart.BarrierSize, true);
+                Vector2 edge = ClosestPointOnCircle(player.Center, Projectile.Center, StygainHeart.BarrierSize);
                 foreach (Vector2 point in edge.GetLaserControlPoints(player.Center, 30))
                 {
                     ParticleRegistry.SpawnGlowParticle(point, player.Center.SafeDirectionTo(edge) * Main.rand.NextFloat(1f, 3f),
@@ -95,7 +97,7 @@ public class HemoglobBarrier : ProjOwnedByNPC<StygainHeart>
                 Projectile.Kill();
         }
 
-        if (Projectile.ai[2] == 1)
+        if ((int)Projectile.ai[2] == 1)
         {
             this.Sync();
             Projectile.ai[2] = 0;

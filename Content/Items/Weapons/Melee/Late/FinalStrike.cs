@@ -1,6 +1,7 @@
 ﻿using CalamityMod.Items.Materials;
 using CalamityMod.Tiles.Furniture.CraftingStations;
 using System.Collections.Generic;
+using CalamityMod;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -21,7 +22,7 @@ public class FinalStrike : ModItem
     {
         Item.width = 138;
         Item.height = 140;
-        Item.damage = 400;
+        Item.damage = 370;
         Item.noMelee = true;
         Item.noUseGraphic = true;
         Item.channel = true;
@@ -46,24 +47,31 @@ public class FinalStrike : ModItem
 
     public override bool CanUseItem(Player player)
     {
-        if (Utility.FindProjectile(out Projectile spear, Item.shoot, player.whoAmI))
+        if (FindProjectile(out Projectile spear, Item.shoot, player.whoAmI))
         {
             if ((int)spear.ai[0] == (int)FinalStrikeHoldout.FinalStrikeState.Aim)
                 return false;
         }
+
         return true;
     }
 
     public override bool AltFunctionUse(Player player) => true;
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback)
     {
         if (player.altFunctionUse != 2)
         {
-            Projectile.NewProjectile(source, position, velocity, ModContent.ProjectileType<FinalStrikeHoldout>(), damage, knockback, player.whoAmI);
+            Projectile.NewProjectile(source, position, velocity, ModContent.ProjectileType<FinalStrikeHoldout>(),
+                damage, knockback, player.whoAmI);
             return false;
         }
-        Projectile spear = Main.projectile[Projectile.NewProjectile(source, position, velocity, ModContent.ProjectileType<FinalStrikeHoldout>(), damage * 2, knockback, player.whoAmI)];
+
+        Projectile spear =
+            Main.projectile[
+                Projectile.NewProjectile(source, position, velocity, ModContent.ProjectileType<FinalStrikeHoldout>(),
+                    damage * 2, knockback, player.whoAmI)];
         spear.As<FinalStrikeHoldout>().CurrentState = FinalStrikeHoldout.FinalStrikeState.Stab;
 
         return false;
@@ -72,14 +80,14 @@ public class FinalStrike : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        recipe.AddIngredient(ItemID.Spear, 1);
-        recipe.AddIngredient(ItemID.DarkLance, 1);
-        recipe.AddIngredient(ModContent.ItemType<DecayingCutlery>(), 1);
-        recipe.AddIngredient(ItemID.Gungnir, 1);
-        recipe.AddIngredient(ItemID.NorthPole, 1);
-        recipe.AddIngredient(ItemID.DayBreak, 1);
-        recipe.AddIngredient(ModContent.ItemType<AbyssalCurrents>(), 1);
-        recipe.AddIngredient(ModContent.ItemType<CondereFulmina>(), 1);
+        recipe.AddIngredient(ItemID.Spear);
+        recipe.AddIngredient(ItemID.DarkLance);
+        recipe.AddIngredient(ModContent.ItemType<DecayingCutlery>());
+        recipe.AddIngredient(ItemID.Gungnir);
+        recipe.AddIngredient(ItemID.NorthPole);
+        recipe.AddIngredient(ItemID.DayBreak);
+        recipe.AddIngredient(ModContent.ItemType<AbyssalCurrents>());
+        recipe.AddIngredient(ModContent.ItemType<CondereFulmina>());
         recipe.AddIngredient(ModContent.ItemType<AscendantSpiritEssence>(), 10);
         recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 7);
         recipe.AddTile(ModContent.TileType<CosmicAnvil>());

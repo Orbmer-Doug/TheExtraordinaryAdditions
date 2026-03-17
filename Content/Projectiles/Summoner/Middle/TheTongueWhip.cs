@@ -10,6 +10,8 @@ using TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
 
@@ -59,7 +61,7 @@ public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
     {
         List<Vector2> points = [];
         foreach (VerletSimulatedSegment segment in Segments)
-            points.Add(segment.position);
+            points.Add(segment.Position);
         return targetHitbox.CollisionFromPoints(points, Projectile.height);
     }
 
@@ -79,7 +81,7 @@ public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
                 VerletSimulatedSegment segment = new(Projectile.Center + Vector2.UnitY * 5f * i);
                 Segments.Add(segment);
             }
-            Segments[0].locked = true;
+            Segments[0].Locked = true;
             Init = true;
             this.Sync();
         }
@@ -101,37 +103,37 @@ public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
 
         if (Segments != null)
         {
-            Segments[0].oldPosition = Segments[0].position;
-            Segments[0].position = Projectile.Center;
+            Segments[0].OldPosition = Segments[0].Position;
+            Segments[0].Position = Projectile.Center;
             Segments = VerletSimulatedSegment.SimpleSimulation(Segments, 10f);
 
-            float dest = Owner.AngleTo(Segments.Last().position);
+            float dest = Owner.AngleTo(Segments.Last().Position);
             Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, dest);
             Owner.SetBackHandBetter(Player.CompositeArmStretchAmount.Full, dest);
-            Owner.ChangeDir((Segments.Last().position.X > Owner.Center.X).ToDirectionInt());
+            Owner.ChangeDir((Segments.Last().Position.X > Owner.Center.X).ToDirectionInt());
 
             if (Timer % 3f == 0f)
             {
-                Vector2 pos = Segments[Main.rand.Next(0, SegmentCount)].position;
+                Vector2 pos = Segments[Main.rand.Next(0, SegmentCount)].Position;
                 Dust.NewDust(pos, Projectile.width, Projectile.height, DustID.Water);
             }
 
-            Vector2 dir = Segments.Last().position - Owner.Center;
+            Vector2 dir = Segments.Last().Position - Owner.Center;
             if (dir.Length() > 380f * Owner.whipRangeMultiplier)
             {
                 Vector2 maxDist = Owner.Center + Utils.SafeNormalize(dir, Vector2.One) * 380f * Owner.whipRangeMultiplier;
-                Segments.Last().position = maxDist;
+                Segments.Last().Position = maxDist;
             }
             else
             {
                 if (this.RunLocal())
                 {
-                    Segments.Last().position = Vector2.Lerp(Segments.Last().position, MouseWorld, .1f);
+                    Segments.Last().Position = Vector2.Lerp(Segments.Last().Position, MouseWorld, .1f);
                     this.Sync();
                 }
             }
 
-            Vector2 delta = Segments.Last().position - Segments.Last().oldPosition;
+            Vector2 delta = Segments.Last().Position - Segments.Last().OldPosition;
             float centrifugalForce = Math.Clamp(delta.Length() * 2f, 0f, 130f) / 130f;
             Projectile.damage = (int)(Owner.HeldItem.damage * centrifugalForce * 2f);
 
@@ -144,14 +146,14 @@ public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        Vector2 pos = ClosestOutOfList(target.Center, out int index, Segments.Select(x => x.position).ToArray());
-        Vector2 val = Segments[index].position - Segments[index].oldPosition;
+        Vector2 pos = ClosestOutOfList(target.Center, out int index, Segments.Select(x => x.Position).ToArray());
+        Vector2 val = Segments[index].Position - Segments[index].OldPosition;
 
         float centrifugalForce = Math.Clamp(val.Length() * 2f, 0f, 130f) / 130f;
         if (centrifugalForce > 0.2f)
         {
             float power = InverseLerp(0f, SegmentCount, index);
-            Vector2 vel = (Segments[index].position - Segments[index].oldPosition).ClampLength(0f, 8f) * power;
+            Vector2 vel = (Segments[index].Position - Segments[index].OldPosition).ClampLength(0f, 8f) * power;
 
             if (index == Segments.Count - 1)
             {
@@ -187,8 +189,8 @@ public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
     {
-        Vector2 pos = ClosestOutOfList(target.Center, out int index, Segments.Select(x => x.position).ToArray());
-        Vector2 val = Segments[index].position - Segments[index].oldPosition;
+        Vector2 pos = ClosestOutOfList(target.Center, out int index, Segments.Select(x => x.Position).ToArray());
+        Vector2 val = Segments[index].Position - Segments[index].OldPosition;
         float centrifugalForce = Math.Clamp(val.Length() * 2f, 0f, 130f) / 130f;
         float power = InverseLerp(0f, SegmentCount, index);
         modifiers.FinalDamage *= power * (centrifugalForce + .5f);
@@ -200,12 +202,12 @@ public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
         Texture2D tongueTex = Projectile.ThisProjectileTexture();
 
         // Collect chain draw positions.
-        Vector2[] bezierPoints = Segments.Select(x => x.position).ToArray();
+        Vector2[] bezierPoints = Segments.Select(x => x.Position).ToArray();
         BezierCurves bezierCurve = new(bezierPoints);
 
         // Calculate squish vectors based on how fast the tongue is moving and how far it is from the player
-        Vector2 val = Segments.Last().position - Segments.Last().oldPosition;
-        float stretchFactor = MathHelper.Clamp(Segments.Last().position.Distance(Owner.Center) / MouseWorld.Distance(Owner.Center), .5f, 1f);
+        Vector2 val = Segments.Last().Position - Segments.Last().OldPosition;
+        float stretchFactor = MathHelper.Clamp(Segments.Last().Position.Distance(Owner.Center) / MouseWorld.Distance(Owner.Center), .5f, 1f);
         if (!this.RunLocal())
             stretchFactor = 1f;
         float centrifugalForce = Math.Clamp(val.Length() * 2f - 10f, 0f, 130f) / 150f;
@@ -214,7 +216,7 @@ public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
         Vector2 scale = new(1f, 1f * stretchFactor);
         scale *= centrifugalSquish;
 
-        int totalChains = (int)(Vector2.Distance(Segments.First().position, Segments.Last().position) / innerTongueTex.Height / scale.Length()) / 2;
+        int totalChains = (int)(Vector2.Distance(Segments.First().Position, Segments.Last().Position) / innerTongueTex.Height / scale.Length()) / 2;
         totalChains = (int)MathHelper.Clamp(totalChains, 30f, 1200f);
         for (int i = 0; i < totalChains - 1; i++)
         {
@@ -233,11 +235,11 @@ public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
     public override void SendExtraAI(BinaryWriter writer)
     {
         if (Segments != null)
-            writer.WriteVector2(Segments.Last().position);
+            writer.WriteVector2(Segments.Last().Position);
     }
     public override void ReceiveExtraAI(BinaryReader reader)
     {
         if (Segments != null)
-            Segments.Last().position = reader.ReadVector2();
+            Segments.Last().Position = reader.ReadVector2();
     }
 }

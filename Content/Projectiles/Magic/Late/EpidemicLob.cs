@@ -1,9 +1,11 @@
 ﻿using System.IO;
+using CalamityMod;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Common.Particles.Shader;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
 
@@ -12,15 +14,20 @@ public class EpidemicLob : ModProjectile
     public override string Texture => AssetRegistry.Invis;
     private bool HitTarget
     {
-        get => Projectile.ai[0] == 1f;
+        get => (int)Projectile.ai[0] == 1;
         set => Projectile.ai[0] = value.ToInt();
     }
     private bool HitGround
     {
-        get => Projectile.AdditionsInfo().ExtraAI[0] == 1f;
+        get => (int)Projectile.AdditionsInfo().ExtraAI[0] == 1;
         set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
-    private ref float Timer => ref Projectile.ai[1];
+
+    private int Timer
+    {
+        get => (int)Projectile.ai[1];
+        set => Projectile.ai[1] = value;
+    }
     private ref float Counter => ref Projectile.AdditionsInfo().ExtraAI[1];
     public ref float EnemyID => ref Projectile.ai[2];
 
@@ -32,7 +39,7 @@ public class EpidemicLob : ModProjectile
         Projectile.ignoreWater = true;
         Projectile.DamageType = DamageClass.Magic;
         Projectile.penetrate = -1;
-        Projectile.timeLeft = SecondsToFrames(4);
+        Projectile.timeLeft = CalUtils.SecondsToFrames(4);
 
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = 8;
@@ -43,23 +50,23 @@ public class EpidemicLob : ModProjectile
     public override void ReceiveExtraAI(BinaryReader reader) => offset = reader.ReadVector2();
     private const int FadeIn = 15;
 
-    public static readonly int Charge = SecondsToFrames(2);
+    public static readonly int Charge = CalUtils.SecondsToFrames(2);
     public override void AI()
     {
         Lighting.AddLight(Projectile.Center, Color.Olive.ToVector3() * Projectile.scale);
 
-        float fadeInter = Utils.GetLerpValue(0f, FadeIn, Timer, true);
+        float fadeInter = Terraria.Utils.GetLerpValue(0f, FadeIn, Timer, true);
         float inter = InverseLerp(0f, Charge, Counter, true);
         Projectile.scale = fadeInter * (1f - inter);
 
         ShaderParticleRegistry.SpawnEpidemicParticle(Projectile.Center, Main.rand.NextVector2Circular(1f, 1f) * Projectile.scale, Projectile.scale * 50f);
 
-        if (Timer % FadeIn == FadeIn - 1f)
+        if (Timer % FadeIn == FadeIn - 1)
         {
-            int amt = 20;
+            const int amt = 20;
             for (int i = 0; i < amt; i++)
             {
-                Vector2 vel = Utility.GetPointOnRotatedEllipse(3f, 8f, Projectile.velocity.ToRotation(), Utils.Remap(i, 0, amt, 0f, MathHelper.TwoPi));
+                Vector2 vel = GetPointOnRotatedEllipse(3f, 8f, Projectile.velocity.ToRotation(), Terraria.Utils.Remap(i, 0, amt, 0f, MathHelper.TwoPi));
                 Vector2 pos = Projectile.Center + vel;
                 ShaderParticleRegistry.SpawnEpidemicParticle(pos, vel * Projectile.scale, Projectile.scale * 40f);
             }
@@ -163,10 +170,10 @@ public class EpidemicLob : ModProjectile
         {
             Vector2 vel = Projectile.Center.SafeDirectionTo(Projectile.Center + Main.rand.NextVector2CircularEdge(200f, 200f));
 
-            const int Amt = 80;
-            for (int i = 0; i < Amt; i++)
+            const int amt = 80;
+            for (int i = 0; i < amt; i++)
             {
-                float interpolant = InverseLerp(0, Amt, i);
+                float interpolant = InverseLerp(0, amt, i);
 
                 Vector2 pos = Vector2.Lerp(Projectile.Center, Projectile.Center + vel * 350f, interpolant);
 
@@ -178,7 +185,7 @@ public class EpidemicLob : ModProjectile
         AdditionsSound.etherealChargeBoom2.Play(Projectile.Center, 1f, -.2f, 0f, 20, Name);
         Projectile.friendly = true;
         Projectile.penetrate = -1;
-        Projectile.ExpandHitboxBy(350, 350);
+        Projectile.ExpandHitboxBy(350);
         Projectile.Damage();
     }
 }

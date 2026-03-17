@@ -14,6 +14,7 @@ using TheExtraordinaryAdditions.Content.Projectiles.Magic.Late.Zenith;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Late;
 
@@ -28,20 +29,17 @@ public class RealitySeamstressesGlove : ModItem, ILocalizedModType, IModType
 
     public override void SetDefaults()
     {
-        Item.damage = 1500;
+        Item.damage = 1750;
         Item.DamageType = DamageClass.Magic;
         Item.noUseGraphic = true;
-        Item.channel = true;
-        Item.mana = 10;
-        Item.width = 60;
-        Item.height = 63;
-        Item.useTime = 25;
-        Item.useAnimation = 25;
+        Item.mana = 1;
+        Item.width = Item.height = 30;
+        Item.useTime = Item.useAnimation = 25;
         Item.useStyle = ItemUseStyleID.Shoot;
         Item.noMelee = true;
         Item.knockBack = 5f;
-        Item.shootSpeed = 9f;
-        Item.shoot = ModContent.ProjectileType<SeamstressMagic>();
+        Item.shootSpeed = 5f;
+        Item.shoot = ModContent.ProjectileType<SeamstressDraw>();
         Item.value = AdditionsGlobalItem.LegendaryRarityPrice;
         Item.rare = ModContent.RarityType<LegendaryRarity>();
     }
@@ -101,7 +99,7 @@ public class RealitySeamstressesGlove : ModItem, ILocalizedModType, IModType
 
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
     {
-        Projectile.NewProjectile((IEntitySource)(object)source, position, velocity, Item.shoot, damage, knockback, player.whoAmI, 0f, 0f, 0f);
+        Projectile.NewProjectile(source, position, velocity, Item.shoot, damage, knockback, player.whoAmI, 0f, 0f, 0f);
         return false;
     }
 

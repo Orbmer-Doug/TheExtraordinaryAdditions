@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.CrossCode;
 
@@ -32,6 +33,7 @@ public class ShockLightning : ModProjectile
     public override bool ShouldUpdatePosition() => false;
 
     public ref float Time => ref Projectile.ai[0];
+
     public Vector2 End
     {
         get => new(Projectile.ai[1], Projectile.ai[2]);
@@ -46,7 +48,8 @@ public class ShockLightning : ModProjectile
     {
         if (Time == 0f)
         {
-            ParticleRegistry.SpawnFlash(Projectile.Center - Vector2.UnitY * Projectile.height / 2, 40, .8f, Projectile.height);
+            ParticleRegistry.SpawnFlash(Projectile.Center - Vector2.UnitY * Projectile.height / 2, 40, .8f,
+                Projectile.height);
             ParticleRegistry.SpawnFlash(End, 30, .5f, Projectile.height);
             Projectile.velocity = Main.rand.NextBool() ? Vector2.UnitX : -Vector2.UnitX;
         }
@@ -63,7 +66,7 @@ public class ShockLightning : ModProjectile
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D shock = Projectile.ThisProjectileTexture();
-        Rectangle frame = shock.Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame, 0, 0);
+        Rectangle frame = shock.Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame);
 
         Vector2 drawPos = Projectile.Center;
         Vector2 projDirToEnd = End.MoveTowards(drawPos, 24f) - drawPos;
@@ -74,7 +77,8 @@ public class ShockLightning : ModProjectile
 
         while (lengthRemainingToDraw > 0f)
         {
-            Main.spriteBatch.Draw(shock, drawPos - Main.screenPosition, frame, Color.White, rot, frame.Size() / 2, 1f, Projectile.direction.ToSpriteDirection(), 0f);
+            Main.spriteBatch.Draw(shock, drawPos - Main.screenPosition, frame, Color.White, rot, frame.Size() / 2, 1f,
+                Projectile.direction.ToSpriteDirection(), 0f);
 
             drawPos += normalized * segmentLength;
             lengthRemainingToDraw -= segmentLength;

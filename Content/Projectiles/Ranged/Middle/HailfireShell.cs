@@ -11,6 +11,7 @@ using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 
@@ -236,6 +237,6 @@ public class HailfireExplosion : ModProjectile
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return CircularHitboxCollision(Projectile.Center, Radius, targetHitbox);
+        return CalUtils.CircularHitboxCollision(Projectile.Center, Radius, targetHitbox);
     }
 }

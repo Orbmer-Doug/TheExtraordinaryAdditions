@@ -4,6 +4,7 @@ using Terraria.ID;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
 
@@ -35,7 +36,7 @@ public class IchorWhipProjectile : BaseWhip
                 Main.rand.Next(70, 90), Main.rand.NextFloat(.8f, 1.5f), Color.Gold, Color.Yellow, 3, true, true);
         }
 
-        target.AddBuff(BuffID.Ichor, (int)(SecondsToFrames(5) * Convert01To010(GetCompletion())));
+        target.AddBuff(BuffID.Ichor, (int)(CalUtils.SecondsToFrames(5) * Convert01To010(GetCompletion())));
         Projectile.damage = (int)(Projectile.damage * .75f);
     }
 

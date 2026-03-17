@@ -4,6 +4,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Early;
 
@@ -19,12 +20,11 @@ public class HealingFungus : ModProjectile
         Projectile.tileCollide = true;
         Projectile.ignoreWater = false;
         Projectile.penetrate = -1;
-        Projectile.timeLeft = SecondsToFrames(8);
+        Projectile.timeLeft = CalUtils.SecondsToFrames(8);
     }
 
     public override bool? CanDamage() => false;
     public ref float Time => ref Projectile.ai[0];
-    public Player Owner => Main.player[Projectile.owner];
     public FancyAfterimages fancy;
     public override void AI()
     {
@@ -43,7 +43,7 @@ public class HealingFungus : ModProjectile
         // Heal effects
         foreach (Player player in Main.ActivePlayers)
         {
-            if (player.active && !player.dead && player != null && player.Hitbox.Intersects(Projectile.Hitbox))
+            if (player.active && !player.dead && player.Hitbox.Intersects(Projectile.Hitbox))
             {
                 player.Heal(Main.rand.Next(3, 6));
                 Projectile.Kill();

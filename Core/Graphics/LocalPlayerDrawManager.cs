@@ -11,42 +11,23 @@ namespace TheExtraordinaryAdditions.Core.Graphics;
 [Autoload(Side = ModSide.Client)]
 public class LocalPlayerDrawManager : ModSystem
 {
-    public static Vector2 CacheDrawOffset
-    {
-        get;
-        private set;
-    }
+    public static Vector2 CacheDrawOffset { get; private set; }
 
-    public static bool UseTargetDrawer
-    {
-        get;
-        private set;
-    }
+    public static bool UseTargetDrawer { get; private set; }
 
-    public static ManagedRenderTarget PlayerTarget
-    {
-        get;
-        private set;
-    }
+    public static ManagedRenderTarget PlayerTarget { get; private set; }
 
-    public static Action ShaderDrawAction
-    {
-        get;
-        set;
-    }
+    public static Action ShaderDrawAction { get; set; }
 
-    public static Func<bool> StopCondition
-    {
-        get;
-        set;
-    }
+    public static Func<bool> StopCondition { get; set; }
 
     public override void OnModLoad()
     {
         On_LegacyPlayerRenderer.DrawPlayerFull += DrawWithTargetIfNecessary;
         On_PlayerDrawLayers.DrawPlayer_TransformDrawData += DrawCachesWithTargetOffset;
         RenderTargetManager.RenderTargetUpdateLoopEvent += PrepareDrawTarget;
-        Main.QueueMainThreadAction(() => PlayerTarget = new(false, (width, height) => new(Main.instance.GraphicsDevice, 512, 512)));
+        Main.QueueMainThreadAction(() =>
+            PlayerTarget = new(false, (_, _) => new(Main.instance.GraphicsDevice, 512, 512)));
     }
 
     private void PrepareDrawTarget()
@@ -86,10 +67,12 @@ public class LocalPlayerDrawManager : ModSystem
         if (drawPlayer.mount.Active && drawPlayer.fullRotation != 0f)
             samplerState = LegacyPlayerRenderer.MountedSamplerState;
 
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, samplerState, DepthStencilState.None, camera.Rasterizer, null, Matrix.Identity);
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, samplerState, DepthStencilState.None,
+            camera.Rasterizer, null, Matrix.Identity);
     }
 
-    private static void DrawWithTargetIfNecessary(On_LegacyPlayerRenderer.orig_DrawPlayerFull orig, LegacyPlayerRenderer self, Camera camera, Player drawPlayer)
+    private static void DrawWithTargetIfNecessary(On_LegacyPlayerRenderer.orig_DrawPlayerFull orig,
+        LegacyPlayerRenderer self, Camera camera, Player drawPlayer)
     {
         // Use the player render target instead of manual drawing if a draw action is necessary
         bool stopEffect = StopCondition?.Invoke() ?? true;
@@ -107,7 +90,8 @@ public class LocalPlayerDrawManager : ModSystem
             ShaderDrawAction.Invoke();
             ShaderDrawAction = null;
 
-            Main.spriteBatch.Draw(PlayerTarget, drawPlayer.Center - Main.screenPosition, null, Color.White, 0f, PlayerTarget.Size() * 0.5f, 1f, 0, 0f);
+            Main.spriteBatch.Draw(PlayerTarget, drawPlayer.Center - Main.screenPosition, null, Color.White, 0f,
+                PlayerTarget.Size() * 0.5f, 1f, 0, 0f);
             Main.spriteBatch.End();
             return;
         }
@@ -115,14 +99,15 @@ public class LocalPlayerDrawManager : ModSystem
         orig(self, camera, drawPlayer);
     }
 
-    private static void DrawCachesWithTargetOffset(On_PlayerDrawLayers.orig_DrawPlayer_TransformDrawData orig, ref PlayerDrawSet drawinfo)
+    private static void DrawCachesWithTargetOffset(On_PlayerDrawLayers.orig_DrawPlayer_TransformDrawData orig,
+        ref PlayerDrawSet drawinfo)
     {
         orig(ref drawinfo);
         if (Main.gameMenu || drawinfo.drawPlayer.whoAmI != Main.myPlayer || !UseTargetDrawer)
             return;
 
         for (int i = 0; i < drawinfo.DustCache.Count; i++)
-            Main.dust[drawinfo.DustCache[i]].position -= CacheDrawOffset;
+            Main.dust[i].position -= CacheDrawOffset;
 
         for (int i = 0; i < drawinfo.GoreCache.Count; i++)
             Main.gore[drawinfo.GoreCache[i]].position -= CacheDrawOffset;

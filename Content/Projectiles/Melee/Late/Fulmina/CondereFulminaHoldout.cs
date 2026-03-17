@@ -6,6 +6,7 @@ using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Late.Fulmina;
 
@@ -205,8 +206,8 @@ public class CondereFulminaHoldout : ModProjectile
                         for (int j = 0; j < 3; j++)
                         {
                             float comp = InverseLerp(0f, 3, j);
-                            Vector2 dir = -Projectile.velocity.RotatedBy(MathHelper.Lerp(.5f, 0f, comp) * i) * MathHelper.Lerp(.4f, .8f, comp);
-                            float scale = MathHelper.Lerp(1.1f, 2f, comp);
+                            Vector2 dir = -Projectile.velocity.RotatedBy(Lerp(.5f, 0f, comp) * i) * Lerp(.4f, .8f, comp);
+                            float scale = Lerp(1.1f, 2f, comp);
                             ParticleRegistry.SpawnSparkParticle(Tip, dir, 40, scale, Color.DeepSkyBlue);
                         }
                     }

@@ -23,13 +23,13 @@ public class Seams : ModProjectile, ILocalizedModType, IModType
         Projectile.timeLeft = MaxTime;
         Projectile.MaxUpdates = 2;
         Projectile.usesLocalNPCImmunity = true;
-        Projectile.localNPCHitCooldown = Projectile.MaxUpdates * 12;
+        Projectile.localNPCHitCooldown = -1;
         Projectile.noEnchantmentVisuals = true;
         Projectile.stopsDealingDamageAfterPenetrateHits = true;
     }
 
     public ref float Time => ref Projectile.ai[0];
-    public const int MaxTime = 35;
+    public const int MaxTime = 25;
     public const int MaxWidth = 1400;
     public float Interpolant => InverseLerp(0f, MaxTime, Time);
     public Point Size;

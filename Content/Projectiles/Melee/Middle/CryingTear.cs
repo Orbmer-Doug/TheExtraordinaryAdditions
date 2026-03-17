@@ -1,8 +1,10 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using CalamityMod;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
@@ -15,7 +17,7 @@ public class CryingTear : ModProjectile
         Projectile.hostile = false;
         Projectile.friendly = true;
         Projectile.tileCollide = true;
-        Projectile.timeLeft = SecondsToFrames(3);
+        Projectile.timeLeft = CalUtils.SecondsToFrames(3);
         Projectile.DamageType = DamageClass.MeleeNoSpeed;
         Projectile.penetrate = 1;
     }

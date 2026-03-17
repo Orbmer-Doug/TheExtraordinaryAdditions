@@ -14,10 +14,10 @@ public class AdditionsNPCInfo : GlobalNPC
     {
         if (lateInstantiation)
         {
-            if (entity.ModNPC == null || entity.type < NPCID.Count || entity.ModNPC.Mod != AdditionsMain.Instance || entity.ModNPC.Mod.Name != AdditionsMain.Instance.Name)
-                return false;
-            return true;
+            return entity.ModNPC != null && entity.type >= NPCID.Count && entity.ModNPC.Mod == AdditionsMain.Instance &&
+                   entity.ModNPC.Mod.Name == AdditionsMain.Instance.Name;
         }
+
         return false;
     }
 

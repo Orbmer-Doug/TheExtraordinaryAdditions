@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
+using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -16,6 +17,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.CrossCode
 public class CrossDiscHoldout : BaseIdleHoldoutProjectile
 {
     #region Defaults
+
     public override string Texture => AssetRegistry.Invis;
     public override int IntendedProjectileType => ModContent.ProjectileType<CrossDiscHoldout>();
     public override int AssociatedItemID => ModContent.ItemType<CrossDisc>();
@@ -33,18 +35,12 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
 
     public override void Load()
     {
-        Main.QueueMainThreadAction(() =>
-        {
-            On_Main.DrawInterface_36_Cursor += ChangeCursor;
-        });
+        Main.QueueMainThreadAction(() => { On_Main.DrawInterface_36_Cursor += ChangeCursor; });
     }
 
     public override void Unload()
     {
-        Main.QueueMainThreadAction(() =>
-        {
-            On_Main.DrawInterface_36_Cursor -= ChangeCursor;
-        });
+        Main.QueueMainThreadAction(() => { On_Main.DrawInterface_36_Cursor -= ChangeCursor; });
     }
 
     private static void ChangeCursor(On_Main.orig_DrawInterface_36_Cursor orig)
@@ -70,6 +66,7 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
         else
             orig();
     }
+
     #endregion Defaults
 
     #region Definitions
@@ -129,12 +126,15 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
     public ElementalBalance ElementPlayer => Owner.GetModPlayer<ElementalBalance>();
     public const int BigBollCooldown = 20;
     public const int BollCooldown = 15;
+
     #endregion Definitions
 
     #region AI
+
     public override void SafeAI()
     {
-        if (Item.ModItem is not CrossDisc || Item.type != ModContent.ItemType<CrossDisc>() || Owner.dead || !Owner.active)
+        if (Item.ModItem is not CrossDisc || Item.type != ModContent.ItemType<CrossDisc>() || Owner.dead ||
+            !Owner.active)
         {
             Projectile.Kill();
             return;
@@ -151,11 +151,13 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
             SwingCooldown--;
 
         #region Held
+
         Projectile.rotation = Projectile.velocity.ToRotation();
         Projectile.owner = Owner.whoAmI;
         Owner.ChangeDir((Projectile.velocity.X > 0f).ToDirectionInt());
         Projectile.Center = Center;
         Owner.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.Full, 0f);
+
         #endregion Held
 
         ElementalBalanceUI.visible = true;
@@ -164,6 +166,7 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
         int mode = (int)Projectile.ai[0];
 
         #region Idle Effects
+
         Owner.GetModPlayer<CrossDiscPlayer>().Element = State;
 
         // this adds in the overload on the circuit if used too much
@@ -171,7 +174,7 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
         {
             ElementalBalance.OverloadSound.Play(Owner.Center, 1.5f, -.2f);
             State = Element.Neutral;
-            ElementPlayer.CircuitOverload = SecondsToFrames(30);
+            ElementPlayer.CircuitOverload = CalUtils.SecondsToFrames(30);
             this.Sync();
         }
 
@@ -201,9 +204,11 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
                 ElementalAmount = 7;
                 break;
         }
+
         #endregion Idle Effects
 
         #region Shoot Effects
+
         int swingType = ModContent.ProjectileType<CrossSwing>();
         if (Modded.SafeMouseRight.JustPressed && Owner.ownedProjectileCounts[swingType] <= 0 && this.RunLocal())
         {
@@ -219,6 +224,7 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
             SwingCooldown = Item.useTime;
             this.Sync();
         }
+
         #endregion Shoot Effects
 
         // Handle Virtual Ricochet Projectile behaviors
@@ -226,14 +232,18 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
             VRPBehavior();
     }
 
-    public static readonly float MaxCharge = SecondsToFrames(.9f);
+    public static readonly float MaxCharge = CalUtils.SecondsToFrames(.9f);
     public float ReticleProgress => InverseLerp(0f, MaxCharge, ReticleCounter);
     public float FullReticleProgress => InverseLerp(BigBollCooldown, BigBollCooldown * 2, FullReticleCounter);
     public float Spread => MathHelper.PiOver4 * (1f - ReticleProgress);
+
     private void VRPBehavior()
     {
         // Apply a decrease in accuracy the faster the cursor is spinning
-        ReticleCounter = MathHelper.Clamp(ReticleCounter - (MathF.Abs(MathHelper.WrapAngle(Projectile.oldRot[0] - Projectile.oldRot[1])) * 5f), 0f, MaxCharge);
+        ReticleCounter =
+            MathHelper.Clamp(
+                ReticleCounter - (MathF.Abs(MathHelper.WrapAngle(Projectile.oldRot[0] - Projectile.oldRot[1])) * 5f),
+                0f, MaxCharge);
 
         if (this.RunLocal() && Modded.SafeMouseLeft.Current)
         {
@@ -315,6 +325,7 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
                 default:
                     break;
             }
+
             shoot.Play(Projectile.Center, 1f, 0f, .2f, 20, Name);
 
             switch (State)
@@ -352,13 +363,15 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
     #endregion AI
 
     #region Drawing
+
     public static readonly Texture2D normalReticle = AssetRegistry.GetTexture(AdditionsTexture.Reticle1);
     public static readonly Texture2D chargedReticle = AssetRegistry.GetTexture(AdditionsTexture.Reticle2);
 
     public override bool PreDraw(ref Color lightColor)
     {
         Vector2 screenPos = Main.screenPosition;
-        if (this.RunLocal() && (Modded.SafeMouseLeft.Current || ReticleWait > 0f) && Owner.ownedProjectileCounts[ModContent.ProjectileType<CrossSwing>()] <= 0)
+        if (this.RunLocal() && (Modded.SafeMouseLeft.Current || ReticleWait > 0f) &&
+            Owner.ownedProjectileCounts[ModContent.ProjectileType<CrossSwing>()] <= 0)
         {
             float opacity = ReticleWait < 29f ? .3f : 1f;
             int frame = (int)(FullReticleProgress * 3f);
@@ -378,20 +391,25 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
                 int maxDist = FullReticleProgress >= 1f ? 1000 : 500;
                 for (int i = 0; i < maxDist; i += 100)
                 {
-                    Vector2 pos = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedBy(Spread) * i;
-                    Main.spriteBatch.Draw(normalReticle, pos - screenPos, dotFrame, Color.White * opacity, 0f, dotFrame.Size() / 2, 1f, 0, 0f);
+                    Vector2 pos = Projectile.Center +
+                                  Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedBy(Spread) * i;
+                    Main.spriteBatch.Draw(normalReticle, pos - screenPos, dotFrame, Color.White * opacity, 0f,
+                        dotFrame.Size() / 2, 1f, 0, 0f);
                     pos = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedBy(-Spread) * i;
-                    Main.spriteBatch.Draw(normalReticle, pos - screenPos, dotFrame, Color.White * opacity, 0f, dotFrame.Size() / 2, 1f, 0, 0f);
+                    Main.spriteBatch.Draw(normalReticle, pos - screenPos, dotFrame, Color.White * opacity, 0f,
+                        dotFrame.Size() / 2, 1f, 0, 0f);
                 }
             }
 
             Rectangle frame2 = chargedReticle.Frame(1, 4, 0, frame);
             Vector2 orig2 = frame2.Size() * .5f;
-            Main.EntitySpriteDraw(chargedReticle, Modded.MouseWorld - screenPos, frame2, Color.White * opacity, 0f, orig2, 1f, 0);
+            Main.EntitySpriteDraw(chargedReticle, Modded.MouseWorld - screenPos, frame2, Color.White * opacity, 0f,
+                orig2, 1f, 0);
         }
 
         return false;
     }
+
     #endregion Drawing
 }
 
@@ -400,6 +418,7 @@ public sealed class CrossDiscPlayer : ModPlayer
     public Element Element;
 
     public bool DiscHeld => Player.HeldItem.ModItem is CrossDisc;
+
     public override void ResetEffects()
     {
         if (!DiscHeld)

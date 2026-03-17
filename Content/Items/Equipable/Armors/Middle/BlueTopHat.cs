@@ -8,6 +8,7 @@ using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
 
@@ -76,7 +77,7 @@ public class BlueTopHat : ModItem
             }
 
             SoundEngine.PlaySound(SoundID.Item167 with { Pitch = -.2f, Volume = 1.4f }, player.Center);
-            CalUtils.AddCooldown(player, MyceliumiteCooldown.ID, SecondsToFrames(15));
+            CalUtils.AddCooldown(player, MyceliumiteCooldown.ID, CalUtils.SecondsToFrames(15));
         }
     }
 

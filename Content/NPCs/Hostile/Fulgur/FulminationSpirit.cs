@@ -13,6 +13,7 @@ using TheExtraordinaryAdditions.Content.Items.Materials.Early;
 using TheExtraordinaryAdditions.Content.Items.Placeable.Banners;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Early;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Fulgur;
 
@@ -38,24 +39,27 @@ public class FulminationSpirit : ModNPC
         NPC.npcSlots = 1f;
         NPC.width = 92;
         NPC.height = 96;
-        if (!Main.hardMode)
+        switch (Main.hardMode)
         {
-            NPC.damage = 40;
-            NPC.defense = 4;
-            NPC.lifeMax = 600;
+            case false:
+                NPC.damage = 40;
+                NPC.defense = 4;
+                NPC.lifeMax = 600;
+                break;
+            case true:
+                NPC.damage = 50;
+                NPC.defense = 8;
+                NPC.lifeMax = 1200;
+                break;
         }
-        if (Main.hardMode)
-        {
-            NPC.damage = 50;
-            NPC.defense = 8;
-            NPC.lifeMax = 1200;
-        }
+
         if (NPC.downedPlantBoss)
         {
             NPC.damage = 60;
             NPC.defense = 16;
             NPC.lifeMax = 1700;
         }
+
         NPC.knockBackResist = 0f;
         NPC.value = Item.buyPrice(0, 0, 80, 50);
         NPC.noGravity = true;
@@ -64,21 +68,14 @@ public class FulminationSpirit : ModNPC
         NPC.DeathSound = SoundID.NPCDeath39;
         Banner = NPC.type;
         BannerItem = ModContent.ItemType<FulminationSpiritBanner>();
-
-        NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers()
-        {
-            Velocity = 2f, // Draws the NPC in the bestiary as if its walking +2 tiles in the x direction
-            Direction = -1 // -1 is left and 1 is right.
-        };
     }
 
     public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
     {
         bestiaryEntry.Info.AddRange([
-                BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Sky,
-                new FlavorTextBestiaryInfoElement(this.GetLocalizedValue("Bestiary"))
-            ]);
-
+            BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Sky,
+            new FlavorTextBestiaryInfoElement(this.GetLocalizedValue("Bestiary"))
+        ]);
     }
 
     public override float SpawnChance(NPCSpawnInfo spawnInfo)
@@ -95,11 +92,13 @@ public class FulminationSpirit : ModNPC
         NPC.frame.Y = (int)NPC.frameCounter * frameHeight;
     }
 
-    public static int VoltDamage => !Main.hardMode ? DifficultyBasedValue(26, 52, 78) : DifficultyBasedValue(70, 140, 210);
+    public static int VoltDamage =>
+        !Main.hardMode ? DifficultyBasedValue(26, 52, 78) : DifficultyBasedValue(70, 140, 210);
+
     public static int FireWait => DifficultyBasedValue(90, 70, 60);
-    public static int StartFindingTarget => SecondsToFrames(3);
-    public static int MaxFindingTargetTime => SecondsToFrames(6);
-    public static int FindingTargetWait => SecondsToFrames(4);
+    public static int StartFindingTarget => CalUtils.SecondsToFrames(3);
+    public static int MaxFindingTargetTime => CalUtils.SecondsToFrames(6);
+    public static int FindingTargetWait => CalUtils.SecondsToFrames(4);
     public static float MaxSpeed => 7f;
     public static float BounceFactor => 0.7f;
     public static float MaxDistanceForSpeedBoost => 600f;
@@ -109,11 +108,13 @@ public class FulminationSpirit : ModNPC
         get => (int)NPC.ai[0];
         set => NPC.ai[0] = value;
     }
+
     public int FireTime
     {
         get => (int)NPC.ai[1];
         set => NPC.ai[1] = value;
     }
+
     public int CantHitTimer
     {
         get => (int)NPC.ai[2];
@@ -166,6 +167,7 @@ public class FulminationSpirit : ModNPC
                 int realDir = float.IsNegative(MathF.Cos(NPC.AngleTo(target.Center + target.velocity))) ? -1 : 1;
                 dir = dir.RotatedBy(.95f * (NPC.Center.Y > target.Center.Y).ToDirectionInt() * realDir);
             }
+
             if (CantHitTimer > (StartFindingTarget + MaxFindingTargetTime))
                 CantHitTimer = -FindingTargetWait; // Give some time to fly back to try again
         }
@@ -182,7 +184,7 @@ public class FulminationSpirit : ModNPC
         else if (NPC.velocity.Y > dir.Y)
             NPC.velocity.Y -= acceleration;
 
-        float pushForce = .2f;
+        const float pushForce = .2f;
         foreach (NPC npc in Main.ActiveNPCs)
         {
             if (npc.type != Type || npc.whoAmI == NPC.whoAmI)
@@ -203,7 +205,9 @@ public class FulminationSpirit : ModNPC
             }
         }
 
-        NPC.rotation = NPC.rotation.AngleLerp(finding ? NPC.velocity.ToRotation() : NPC.AngleTo(target.Center + target.velocity), .2f);
+        NPC.rotation =
+            NPC.rotation.AngleLerp(finding ? NPC.velocity.ToRotation() : NPC.AngleTo(target.Center + target.velocity),
+                .2f);
         NPC.spriteDirection = float.IsNegative(MathF.Cos(NPC.rotation)) ? -1 : 1;
 
         // Push away if too close on same axis
@@ -219,15 +223,18 @@ public class FulminationSpirit : ModNPC
                 NPC.NewNPCProj(NPC.Center, vel * 10f, ModContent.ProjectileType<LightningVolt>(), VoltDamage, 0f);
             for (int i = 0; i < 14; i++)
             {
-                ParticleRegistry.SpawnSparkParticle(NPC.Center, vel.RotatedByRandom(.5f) * Main.rand.NextFloat(7f, 15f), Main.rand.Next(30, 45), Main.rand.NextFloat(.9f, 1.4f), Color.Purple);
+                ParticleRegistry.SpawnSparkParticle(NPC.Center, vel.RotatedByRandom(.5f) * Main.rand.NextFloat(7f, 15f),
+                    Main.rand.Next(30, 45), Main.rand.NextFloat(.9f, 1.4f), Color.Purple);
             }
+
             FireTime = 0;
             NPC.netUpdate = true;
         }
+
         FireTime++;
 
         Vector2 tilePosition = NPC.Center / 16f;
-        if (!WorldGen.SolidTile((int)tilePosition.X, (int)tilePosition.Y, false))
+        if (!WorldGen.SolidTile((int)tilePosition.X, (int)tilePosition.Y))
         {
             Lighting.AddLight((int)tilePosition.X, (int)tilePosition.Y, 0.5f, 0f, 0.5f);
         }
@@ -268,32 +275,36 @@ public class FulminationSpirit : ModNPC
         }
 
         if (((NPC.velocity.X > 0f && NPC.oldVelocity.X < 0f) || (NPC.velocity.X < 0f && NPC.oldVelocity.X > 0f) ||
-             (NPC.velocity.Y > 0f && NPC.oldVelocity.Y < 0f) || (NPC.velocity.Y < 0f && NPC.oldVelocity.Y > 0f)) && !NPC.justHit)
+             (NPC.velocity.Y > 0f && NPC.oldVelocity.Y < 0f) || (NPC.velocity.Y < 0f && NPC.oldVelocity.Y > 0f)) &&
+            !NPC.justHit)
         {
             NPC.netUpdate = true;
         }
+
         Time++;
     }
 
     public override void ModifyNPCLoot(NPCLoot npcLoot)
     {
         npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<ShockCatalyst>(), 1, 4, 10));
-        npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<FulminicEye>(), 8, 1, 1));
-        npcLoot.DefineConditionalDropSet(DropHelper.PostSkele(true)).Add(ItemDropRule.Common(ModContent.ItemType<BrewingStorms>(), 9));
+        npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<FulminicEye>(), 8));
+        npcLoot.DefineConditionalDropSet(DropHelper.PostSkele())
+            .Add(ItemDropRule.Common(ModContent.ItemType<BrewingStorms>(), 9));
     }
 
     public override void OnHitPlayer(Player target, Player.HurtInfo hurtInfo)
     {
         if (hurtInfo.Damage > 0)
         {
-            target.AddBuff(BuffID.Electrified, 180, true, false);
+            target.AddBuff(BuffID.Electrified, 180);
         }
 
         for (int i = 0; i < 30; i++)
         {
             float offsetAngle = Main.rand.NextFloat(MathHelper.TwoPi);
             Vector2 shootVelocity = (MathHelper.TwoPi * i / 10f + offsetAngle).ToRotationVector2() * 9f;
-            Dust dust = Dust.NewDustPerfect(target.Center, DustID.WitherLightning, shootVelocity, default, default, 1.6f);
+            Dust dust = Dust.NewDustPerfect(target.Center, DustID.WitherLightning, shootVelocity, default, default,
+                1.6f);
             dust.noGravity = true;
         }
 
@@ -303,17 +314,22 @@ public class FulminationSpirit : ModNPC
     public override void HitEffect(NPC.HitInfo hit)
     {
         for (int i = 0; i < 6; i++)
-            Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.WitherLightning, hit.HitDirection, -1f, 0, default, 1f);
+            Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.WitherLightning, hit.HitDirection, -1f);
 
         if (NPC.life > 0)
             return;
 
         for (int i = 0; i < 25; i++)
-            ParticleRegistry.SpawnLightningArcParticle(NPC.RandAreaInEntity(), Main.rand.NextVector2CircularLimited(120f, 120f, .6f, 1.1f), Main.rand.Next(38, 46), Main.rand.NextFloat(.5f, .9f), Color.Purple);
+            ParticleRegistry.SpawnLightningArcParticle(NPC.RandAreaInEntity(),
+                Main.rand.NextVector2CircularLimited(120f, 120f, .6f, 1.1f), Main.rand.Next(38, 46),
+                Main.rand.NextFloat(.5f, .9f), Color.Purple);
 
         for (int i = 0; i < 10; i++)
         {
-            Dust lightning = Main.dust[Dust.NewDust(new Vector2(NPC.position.X, NPC.position.Y), NPC.width, NPC.height, DustID.WitherLightning, 0f, 0f, 100, default, 3f)];
+            Dust lightning =
+                Main.dust[
+                    Dust.NewDust(new Vector2(NPC.position.X, NPC.position.Y), NPC.width, NPC.height,
+                        DustID.WitherLightning, 0f, 0f, 100, default, 3f)];
             lightning.velocity *= 5f;
         }
     }

@@ -3,6 +3,8 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
@@ -18,7 +20,7 @@ public class InfernalBlast : ModProjectile, ILocalizedModType, IModType
         Projectile.ignoreWater = false;
         Projectile.tileCollide = false;
         Projectile.penetrate = -1;
-        Projectile.timeLeft = SecondsToFrames(2);
+        Projectile.timeLeft = CalUtils.SecondsToFrames(2);
         Projectile.DamageType = DamageClass.Magic;
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = 25;
@@ -57,6 +59,6 @@ public class InfernalBlast : ModProjectile, ILocalizedModType, IModType
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return CircularHitboxCollision(Projectile.Center, Projectile.Size.Length() * 0.5f, targetHitbox);
+        return CalUtils.CircularHitboxCollision(Projectile.Center, Projectile.Size.Length() * 0.5f, targetHitbox);
     }
 }

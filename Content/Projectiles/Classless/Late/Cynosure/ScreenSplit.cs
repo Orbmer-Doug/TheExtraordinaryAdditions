@@ -53,7 +53,7 @@ public class ScreenSplit : ModProjectile, IHasScreenShader
     public override bool? CanCutTiles() => false;
 
     public ManagedScreenShader Shader { get; private set; }
-    public bool HasShader { get; private set; } = false;
+    public bool HasShader { get; private set; }
     public void InitializeShader()
     {
         Shader = ScreenShaderPool.GetShader("GenediesScreenSplit");

@@ -1,9 +1,11 @@
-﻿using Terraria;
+﻿using CalamityMod;
+using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Summon;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
 
@@ -74,7 +76,7 @@ public class IztMinion : ModProjectile
                 // Its funny when there is a bunch of enemies because they start to run down the chain individually
                 if (HitTime <= 0)
                 {
-                    Projectile.velocity = Vector2.Lerp(Projectile.velocity, Utility.SafeDirectionTo(Projectile.Center, target.Center) * 32f, 0.02f);
+                    Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.Center.SafeDirectionTo(target.Center) * 32f, 0.02f);
                     ParticleRegistry.SpawnGlowParticle(Projectile.RandAreaInEntity(), -Projectile.velocity * Main.rand.NextFloat(.4f, .6f), 16, Main.rand.NextFloat(.09f, .2f), Color.Gold);
                 }
             }

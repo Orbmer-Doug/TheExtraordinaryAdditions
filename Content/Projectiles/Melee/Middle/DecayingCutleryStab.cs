@@ -1,15 +1,19 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using CalamityMod;
 using Terraria;
 using Terraria.Audio;
 using Terraria.Enums;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using Utils = Terraria.Utils;
 
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
@@ -286,15 +290,21 @@ public class DecayingCutleryStab : ModProjectile
         if (StabCounter == 4 && Completion < .2f)
             return false;
 
-        Main.spriteBatch.SetBlendState(BlendState.Additive);
-        Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.LensStar);
-        Vector2 scale = new Vector2(.2f, .1f) * Projectile.scale * 1.4f;
-        Vector2 pos = Rect.Right + Projectile.velocity.SafeNormalize(Vector2.Zero) * 5f - Main.screenPosition;
-        float opacity = StabCounter == 4 ? InverseLerp(.1f, .15f, InverseLerp(0.056f, 0.1f, AngularVel)) : GetLerpBump(0f, .7f, 1f, .3f, Completion);
-        Main.EntitySpriteDraw(tex, pos, null, Color.Gold * opacity * 3f, Rect.Rotation, tex.Size() / 2, scale * opacity * 1.4f, 0);
-        Main.spriteBatch.ResetBlendState();
+        PixelationSystem.QueueTextureRenderAction(star, PixelationLayer.OverPlayers, BlendState.Additive);
 
         return false;
+
+        void star()
+        {
+            Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.LensStar);
+            Vector2 scale = new Vector2(.2f, .1f) * Projectile.scale * 1.4f;
+            Vector2 pos = Rect.Right + Projectile.velocity.SafeNormalize(Vector2.Zero) * 12f - Main.screenPosition;
+            float opacity = StabCounter == 4
+                ? InverseLerp(.1f, .15f, InverseLerp(0.056f, 0.1f, AngularVel))
+                : GetLerpBump(0f, .7f, 1f, .3f, Completion);
+            Main.EntitySpriteDraw(tex, pos, null, Color.Gold * opacity * 3f, Rect.Rotation, tex.Size() / 2,
+                scale * opacity * 1.4f, 0);
+        }
     }
 
     public override void OnKill(int timeLeft)

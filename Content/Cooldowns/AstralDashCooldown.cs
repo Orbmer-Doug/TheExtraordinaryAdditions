@@ -2,6 +2,7 @@
 using Terraria;
 using Terraria.Localization;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Cooldowns;
 

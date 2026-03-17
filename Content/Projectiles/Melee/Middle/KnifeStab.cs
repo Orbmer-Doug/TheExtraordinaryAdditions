@@ -8,6 +8,7 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
@@ -90,7 +91,7 @@ public class KnifeStab : ModProjectile
                 {
                     if (this.RunLocal())
                     {
-                        Projectile.velocity = Utility.SafeDirectionTo(Owner, Owner.Additions().MouseWorld).RotatedByRandom(0.25f);
+                        Projectile.velocity = Owner.SafeDirectionTo(Owner.Additions().MouseWorld).RotatedByRandom(0.25f);
                         this.Sync();
                     }
                     stabVec = new Vector2(Main.rand.NextFloat(90, 150), 0);
@@ -150,7 +151,7 @@ public class KnifeStab : ModProjectile
     {
         Vector2 start = Projectile.Center;
         Vector2 end = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero) * Projectile.width * .5f * Projectile.scale;
-        Utils.PlotTileLine(start, end, 14f * Projectile.scale, DelegateMethods.CutTiles);
+        Terraria.Utils.PlotTileLine(start, end, 14f * Projectile.scale, DelegateMethods.CutTiles);
     }
 
     public readonly int[] ObliteratableTypes = [NPCID.CaveBat, NPCID.GiantBat, NPCID.IceBat, NPCID.IlluminantBat,

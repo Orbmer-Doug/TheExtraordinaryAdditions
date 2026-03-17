@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
+using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -7,6 +8,7 @@ using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.CrossCode.CrossDiscHoldout;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.CrossCode;
 
@@ -27,7 +29,8 @@ public class VRP : ModProjectile
     {
         Projectile.timeLeft = 1200;
         Projectile.DamageType = DamageClass.Generic;
-        Projectile.friendly = Projectile.ignoreWater = Projectile.noEnchantmentVisuals = Projectile.usesLocalNPCImmunity = Projectile.tileCollide = true;
+        Projectile.friendly = Projectile.ignoreWater = Projectile.noEnchantmentVisuals =
+            Projectile.usesLocalNPCImmunity = Projectile.tileCollide = true;
         Projectile.hostile = false;
         Projectile.aiStyle = 0;
         Projectile.CritChance = 0;
@@ -41,27 +44,33 @@ public class VRP : ModProjectile
         get => (Element)Projectile.ai[0];
         set => Projectile.ai[0] = (float)value;
     }
+
     public ref float Completion => ref Projectile.ai[1];
+
     public int Bounces
     {
         get => (int)Projectile.ai[2];
         set => Projectile.ai[2] = value;
     }
+
     public ref float Time => ref Projectile.AdditionsInfo().ExtraAI[0];
+
     public bool TileDeath
     {
-        get => Projectile.AdditionsInfo().ExtraAI[1] == 1f;
+        get => (int)Projectile.AdditionsInfo().ExtraAI[1] == 1;
         set => Projectile.AdditionsInfo().ExtraAI[1] = value.ToInt();
     }
+
     public bool Charged
     {
-        get => Projectile.AdditionsInfo().ExtraAI[2] == 1f;
+        get => (int)Projectile.AdditionsInfo().ExtraAI[2] == 1;
         set => Projectile.AdditionsInfo().ExtraAI[2] = value.ToInt();
     }
+
     public int MaxBounces => Charged ? 4 : 1;
 
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
+
     public override void AI()
     {
         if (Time == 0)
@@ -70,7 +79,8 @@ public class VRP : ModProjectile
         {
             Texture2D bigNeutral = AssetRegistry.GetTexture(AdditionsTexture.VRPNeutral);
             after ??= new(5, () => Projectile.Center);
-            after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 0, 0, 0, bigNeutral.Frame(1, 4, 0, Projectile.frame), false, 0f));
+            after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation,
+                0, 0, 0, 0, bigNeutral.Frame(1, 4, 0, Projectile.frame)));
         }
 
         Projectile.FacingUp();
@@ -81,14 +91,16 @@ public class VRP : ModProjectile
 
             if (Time % 3 == 2)
             {
-                ParticleRegistry.SpawnCrossCodeBoll(Projectile.Center, Projectile.rotation, ParticleRegistry.CrosscodeBollType.Trail, State);
+                ParticleRegistry.SpawnCrossCodeBoll(Projectile.Center, Projectile.rotation,
+                    ParticleRegistry.CrosscodeBollType.Trail, State);
             }
         }
 
         Time++;
     }
 
-    public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
+    public override bool TileCollideStyle(ref int width, ref int height, ref bool fallThrough,
+        ref Vector2 hitboxCenterFrac)
     {
         fallThrough = true;
         return true;
@@ -98,14 +110,18 @@ public class VRP : ModProjectile
     {
         if (Bounces >= MaxBounces || !Charged)
         {
-            ParticleRegistry.SpawnCrossCodeBoll(Projectile.Center, ClampToCardinalDirection(oldVelocity).ToRotation() + MathHelper.PiOver2, ParticleRegistry.CrosscodeBollType.DieWallBig, State);
+            ParticleRegistry.SpawnCrossCodeBoll(Projectile.Center,
+                ClampToCardinalDirection(oldVelocity).ToRotation() + MathHelper.PiOver2,
+                ParticleRegistry.CrosscodeBollType.DieWallBig, State);
             TileDeath = true;
             Projectile.Kill();
             return false;
         }
 
         Bounces++;
-        ParticleRegistry.SpawnCrossCodeBoll(Projectile.Center, ClampToCardinalDirection(oldVelocity).ToRotation() + MathHelper.PiOver2, ParticleRegistry.CrosscodeBollType.DieWallSmall, State);
+        ParticleRegistry.SpawnCrossCodeBoll(Projectile.Center,
+            ClampToCardinalDirection(oldVelocity).ToRotation() + MathHelper.PiOver2,
+            ParticleRegistry.CrosscodeBollType.DieWallSmall, State);
         if (Math.Abs(Projectile.velocity.X - oldVelocity.X) > float.Epsilon)
             Projectile.velocity.X = -oldVelocity.X;
         if (Math.Abs(Projectile.velocity.Y - oldVelocity.Y) > float.Epsilon)
@@ -215,15 +231,14 @@ public class VRP : ModProjectile
             case Element.Neutral:
                 break;
             case Element.Cold:
-                target.AddBuff(BuffID.Frostburn, SecondsToFrames(3));
-                target.AddBuff(BuffID.Frostburn2, SecondsToFrames(3));
+                target.AddBuff(BuffID.Frostburn, CalUtils.SecondsToFrames(3));
+                target.AddBuff(BuffID.Frostburn2, CalUtils.SecondsToFrames(3));
                 break;
             case Element.Heat:
-                target.AddBuff(BuffID.OnFire, SecondsToFrames(3));
-                target.AddBuff(BuffID.OnFire3, SecondsToFrames(3));
+                target.AddBuff(BuffID.OnFire, CalUtils.SecondsToFrames(3));
+                target.AddBuff(BuffID.OnFire3, CalUtils.SecondsToFrames(3));
                 break;
             case Element.Shock:
-                break;
             case Element.Wave:
                 break;
         }
@@ -240,13 +255,15 @@ public class VRP : ModProjectile
         if (Projectile.numHits <= 0)
         {
             if (!TileDeath)
-                ParticleRegistry.SpawnCrossCodeBoll(Projectile.Center, 0f, ParticleRegistry.CrosscodeBollType.Die, State);
+                ParticleRegistry.SpawnCrossCodeBoll(Projectile.Center, 0f, ParticleRegistry.CrosscodeBollType.Die,
+                    State);
             AdditionsSound.crosscodeBallDie.Play(Projectile.Center, 1f, 0f, .1f, 20, Name);
         }
     }
 
     private static readonly Texture2D Bloom = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D bigNeutral = AssetRegistry.GetTexture(AdditionsTexture.VRPNeutral);
@@ -263,7 +280,8 @@ public class VRP : ModProjectile
         Color col = Projectile.GetAlpha(Color.White);
 
         Main.spriteBatch.SetBlendState(BlendState.Additive);
-        Main.EntitySpriteDraw(Bloom, Projectile.Center - Main.screenPosition, null, Color.White * .5f, 0f, Bloom.Size() * .5f, .3f, 0);
+        Main.EntitySpriteDraw(Bloom, Projectile.Center - Main.screenPosition, null, Color.White * .5f, 0f,
+            Bloom.Size() * .5f, .3f, 0);
         Main.spriteBatch.ResetBlendState();
 
         if (!Charged)
@@ -287,36 +305,28 @@ public class VRP : ModProjectile
                     smolFrame = 4;
                     break;
             }
+
             Rectangle framed = smoll.Frame(1, 5, 0, smolFrame);
             Vector2 orig1 = framed.Size() * .5f;
-            Main.EntitySpriteDraw(smoll, drawPos, framed, col, rot, orig1, sca, direction, 0f);
+            Main.EntitySpriteDraw(smoll, drawPos, framed, col, rot, orig1, sca, direction);
         }
 
         if (Charged)
         {
-            Texture2D tex = bigNeutral;
-            switch (State)
+            Texture2D tex = State switch
             {
-                case Element.Neutral:
-                    tex = bigNeutral;
-                    break;
-                case Element.Cold:
-                    tex = bigIce;
-                    break;
-                case Element.Heat:
-                    tex = bigFire;
-                    break;
-                case Element.Shock:
-                    tex = bigShock;
-                    break;
-                case Element.Wave:
-                    tex = bigWave;
-                    break;
-            }
+                Element.Neutral => bigNeutral,
+                Element.Cold => bigIce,
+                Element.Heat => bigFire,
+                Element.Shock => bigShock,
+                Element.Wave => bigWave,
+                _ => bigNeutral
+            };
+
             Rectangle framed = tex.Frame(1, 4, 0, Projectile.frame);
             Vector2 orig1 = framed.Size() * .5f;
             after?.DrawFancyAfterimages(tex, [col * .2f], Projectile.Opacity);
-            Main.EntitySpriteDraw(tex, drawPos, framed, col, rot, orig1, sca, direction, 0f);
+            Main.EntitySpriteDraw(tex, drawPos, framed, col, rot, orig1, sca, direction);
         }
 
         return false;

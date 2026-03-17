@@ -52,7 +52,7 @@ public class TremorGreathelm : ModItem
 
                 SoundID.NPCHit42.Play(player.Center, 1f, 0f, .1f);
             }
-            CalUtils.AddCooldown(player, TremorCooldown.ID, SecondsToFrames(5));
+            CalUtils.AddCooldown(player, TremorCooldown.ID, CalUtils.SecondsToFrames(5));
         }
 
         player.aggro += 400;

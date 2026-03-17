@@ -9,6 +9,8 @@ using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late.Zenith;
 
@@ -72,7 +74,7 @@ public class ExtraordinaryHyperBlast : ModProjectile, ILocalizedModType, IModTyp
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return CircularHitboxCollision(Projectile.Center, (int)Radius + 75, targetHitbox);
+        return CalUtils.CircularHitboxCollision(Projectile.Center, (int)Radius + 75, targetHitbox);
     }
 
     private List<Vector2> cache;

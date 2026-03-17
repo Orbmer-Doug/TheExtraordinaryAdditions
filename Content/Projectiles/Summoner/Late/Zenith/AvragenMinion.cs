@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Summon;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using Utils = Terraria.Utils;
 
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Late.Avia;
@@ -38,7 +41,7 @@ public class AvragenMinion : ModProjectile
         Projectile.minion = true;
     }
 
-    public static readonly float CycleTime = SecondsToFrames(3f);
+    public static readonly float CycleTime = CalUtils.SecondsToFrames(3f);
     public enum AvraPhases
     {
         CurvedBeam,
@@ -93,15 +96,15 @@ public class AvragenMinion : ModProjectile
             {
                 if (targets.Count >= 3)
                 {
-                    if (Phase == AvraPhases.ConsumingVortexes && PhaseTimer >= SecondsToFrames(3f))
+                    if (Phase == AvraPhases.ConsumingVortexes && PhaseTimer >= CalUtils.SecondsToFrames(3f))
                         ChangeState(AvraPhases.DaggerBarrage);
-                    else if (Phase == AvraPhases.DaggerBarrage && PhaseTimer >= SecondsToFrames(6f))
+                    else if (Phase == AvraPhases.DaggerBarrage && PhaseTimer >= CalUtils.SecondsToFrames(6f))
                         ChangeState(AvraPhases.ConsumingVortexes);
                 }
                 else
                 {
                     Cycling = true;
-                    if (PhaseTimer >= SecondsToFrames(3f))
+                    if (PhaseTimer >= CalUtils.SecondsToFrames(3f))
                     {
                         CycleToNextPhase();
                     }

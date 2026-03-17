@@ -10,7 +10,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
 /// Utilities that help with positioning, fields, etc.
-public partial class Asterlin : ModNPC
+public partial class Asterlin
 {
     public const int AngledWidth = 128;
     public const int TotalHeight = 278;
@@ -35,8 +35,7 @@ public partial class Asterlin : ModNPC
                 continue;
 
             // Check if its a projectile owned from asterlin
-            ProjOwnedByNPC<Asterlin> owned = projectile.ModProjectile as ProjOwnedByNPC<Asterlin>;
-            if (owned == null)
+            if (projectile.ModProjectile is not ProjOwnedByNPC<Asterlin>)
                 continue;
 
             // Search through the types

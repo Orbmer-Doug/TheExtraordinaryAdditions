@@ -15,6 +15,7 @@ using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
@@ -111,7 +112,7 @@ public class JudgeSwing : BaseSwordSwing
             }
             else
             {
-                foreach (Projectile p in Utility.AllProjectilesFromOwner(Type, Owner))
+                foreach (Projectile p in AllProjectilesFromOwner(Type, Owner))
                 {
                     JudgeSwing swing = p.As<JudgeSwing>();
                     swing.VanishTime++;
@@ -249,7 +250,7 @@ public class JudgeSpear : ModProjectile
     
     public float MeleeSpeed => Owner.GetTotalAttackSpeed(DamageClass.MeleeNoSpeed);
     public int ReelTime => (int)(20 / MeleeSpeed);
-    public static readonly int ThrowTime = SecondsToFrames(4);
+    public static readonly int ThrowTime = CalUtils.SecondsToFrames(4);
     
     public Player Owner => Main.player[Projectile.owner];
     public GlobalPlayer Modded => Owner.Additions();
@@ -284,7 +285,7 @@ public class JudgeSpear : ModProjectile
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
-        Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver2;
+        Projectile.rotation = Projectile.velocity.ToRotation() + PiOver2;
         
         Projectile.timeLeft = 22;
         Owner.SetDummyItemTime(2);
@@ -304,7 +305,7 @@ public class JudgeSpear : ModProjectile
             Thrown = true;
             Projectile.MaxUpdates = 2;
             Projectile.timeLeft = Projectile.MaxUpdates * ThrowTime;
-            Projectile.velocity = Utility.SafeDirectionTo(Projectile, Modded.MouseWorld) * 20f;
+            Projectile.velocity = Projectile.SafeDirectionTo(Modded.MouseWorld) * 20f;
             this.Sync();
         }
     }
@@ -321,7 +322,7 @@ public class JudgeSpear : ModProjectile
             Owner.ChangeDir(Projectile.direction);
             float throwCompletion = InverseLerp(0f, 30, Time);
             float rot = OldArmRot + (Pi * Projectile.direction * Owner.gravDir);
-            float anim = Animators.MakePoly(6f).OutFunction.Evaluate(OldArmRot, rot, throwCompletion);
+            float anim = MakePoly(6f).OutFunction.Evaluate(OldArmRot, rot, throwCompletion);
             Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, anim);
             this.Sync();
         }
@@ -438,7 +439,7 @@ public class JudgeKaboom : ModProjectile
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return CircularHitboxCollision(Projectile.Center, Projectile.scale, targetHitbox);
+        return CalUtils.CircularHitboxCollision(Projectile.Center, Projectile.scale, targetHitbox);
     }
 
     public override bool PreDraw(ref Color lightColor)

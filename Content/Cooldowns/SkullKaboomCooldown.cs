@@ -2,6 +2,7 @@
 using Terraria;
 using Terraria.ID;
 using Terraria.Localization;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Cooldowns;
 

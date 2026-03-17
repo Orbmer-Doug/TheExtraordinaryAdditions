@@ -7,7 +7,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Tools;
 
-public class PortableDONTTOUCHME : ModItem, ILocalizedModType, IModType
+public class PortableDONTTOUCHME : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.PortableDONTTOUCHME);
     public override void SetStaticDefaults()

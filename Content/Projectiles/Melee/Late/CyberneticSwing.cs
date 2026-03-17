@@ -12,7 +12,10 @@ using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
+using static CalamityMod.CalamityUtils;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
 
@@ -146,7 +149,7 @@ public class CyberneticSwing : ModProjectile
 
         if (HitTarget)
         {
-            Dist = Animators.MakePoly(3f).InOutFunction.Evaluate(OldDist, Projectile.width, InverseLerp(0f, ReelTime, Reel));
+            Dist = MakePoly(3f).InOutFunction.Evaluate(OldDist, Projectile.width, InverseLerp(0f, ReelTime, Reel));
             Reel++;
         }
         else
@@ -173,7 +176,7 @@ public class CyberneticSwing : ModProjectile
             Projectile.Kill();
         }
 
-        if (!CalUtils.HasCooldown(Owner, CyberneticParryCooldown.ID))
+        if (!Owner.HasCooldown(CyberneticParryCooldown.ID))
         {
             foreach (Projectile proj in Main.ActiveProjectiles)
             {
@@ -188,7 +191,7 @@ public class CyberneticSwing : ModProjectile
                 ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 30, 0f, Vector2.One, 0f, 200f, Color.Cyan);
                 float speed = proj.velocity.Length();
                 proj.velocity = proj.SafeDirectionTo(ModdedOwner.MouseWorld) * speed;
-                proj.ProjDamageMod().ParriedTimer = SecondsToFrames(3);
+                proj.ProjDamageMod().ParriedTimer = CalUtils.SecondsToFrames(3);
                 proj.netUpdate = true;
 
                 HitTarget = true;
@@ -334,18 +337,14 @@ public class CyberneticSwing : ModProjectile
 
     public override void OnKill(int timeLeft)
     {
-        if (State == SwingState.Parry && !HitTarget && !CalUtils.HasCooldown(Owner, CyberneticParryCooldown.ID))
-            CalUtils.AddCooldown(Owner, CyberneticParryCooldown.ID, SecondsToFrames(4));
+        if (State == SwingState.Parry && !HitTarget && !Owner.HasCooldown(CyberneticParryCooldown.ID))
+            Owner.AddCooldown(CyberneticParryCooldown.ID, CalUtils.SecondsToFrames(4));
     }
 
     public float WidthFunct(float c) => MathHelper.SmoothStep(Projectile.height, 0f, c);
     public Color ColorFunct(SystemVector2 c, Vector2 pos)
     {
-        float opac = Projectile.Opacity;
-        if (State == SwingState.SMASH || State == SwingState.Uppercut)
-            opac *= InverseLerp(0.016f, 0.07f, MathF.Abs(MathHelper.WrapAngle(Dist - OldDist)));
-
-        return MulticolorLerp(c.X, Color.White, Color.LightCyan, Color.Cyan, Color.DarkCyan, Color.DarkSlateBlue) * Projectile.Opacity;
+        return CoreUtils.MulticolorLerp(c.X, Color.White, Color.LightCyan, Color.Cyan, Color.DarkCyan, Color.DarkSlateBlue) * Projectile.Opacity;
     }
     public SystemVector2 OffsetFunct(float c) => Center.ToNumerics();
 
@@ -373,15 +372,15 @@ public class CyberneticSwing : ModProjectile
 
         if (State == SwingState.LightningPunch)
         {
-            effects = Projectile.direction == -Owner.gravDir ? SpriteEffects.FlipVertically : SpriteEffects.None;
-            if (Owner.gravDir == -1 && Projectile.direction == -Owner.gravDir)
+            effects = Projectile.direction == -(int)Owner.gravDir ? SpriteEffects.FlipVertically : SpriteEffects.None;
+            if ((int)Owner.gravDir == -1 && Projectile.direction == -(int)Owner.gravDir)
                 effects |= SpriteEffects.FlipVertically;
         }
 
         if (State == SwingState.Parry)
         {
-            effects = (Projectile.direction == 1 && Owner.gravDir == 1) ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
-            if (Owner.gravDir == -1 && Projectile.direction == -1)
+            effects = (Projectile.direction == 1 && (int)Owner.gravDir == 1) ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+            if ((int)Owner.gravDir == -1 && Projectile.direction == -1)
                 effects |= SpriteEffects.FlipHorizontally;
         }
 
@@ -398,11 +397,11 @@ public class CyberneticSwing : ModProjectile
                 effects |= SpriteEffects.FlipHorizontally;
         }
 
-        bool miss = (State == SwingState.Parry && CalUtils.HasCooldown(Owner, CyberneticParryCooldown.ID));
+        bool miss = (State == SwingState.Parry && Owner.HasCooldown(CyberneticParryCooldown.ID));
         Projectile.DrawProjectileBackglow((miss ? Color.Red : Color.Cyan) * .5f * Projectile.Opacity, 2f, 0, 8, effects);
         Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(miss ? Color.Red : Color.White), rotation, origin, Projectile.scale, effects, 0f);
 
-        if (State == SwingState.Parry && !CalUtils.HasCooldown(Owner, CyberneticParryCooldown.ID))
+        if (State == SwingState.Parry && !Owner.HasCooldown(CyberneticParryCooldown.ID))
         {
             ManagedShader shader = AssetRegistry.GetShader("ForcefieldLimited");
             shader.TrySetParameter("direction", Projectile.velocity.ToRotation());
@@ -450,7 +449,7 @@ public class CyberneticBlast : ModProjectile
         if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, null, 40);
 
-        Radius = (int)Animators.MakePoly(4f).OutFunction.Evaluate(0f, 100f, Completion);
+        Radius = (int)MakePoly(4f).OutFunction.Evaluate(0f, 100f, Completion);
         for (int i = 0; i < 40; i++)
             points.SetPoint(i, Projectile.Center + Vector2.One.RotatedBy(i / (float)(40 - 1) * (MathF.Tau + float.Epsilon)) * Radius);
 
@@ -459,17 +458,17 @@ public class CyberneticBlast : ModProjectile
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return Utility.CircularHitboxCollision(Projectile.Center, Radius, targetHitbox);
+        return CircularHitboxCollision(Projectile.Center, Radius, targetHitbox);
     }
 
     public float WidthFunct(float c)
     {
-        return Animators.MakePoly(3f).InFunction.Evaluate(20f, 0f, Completion);
+        return MakePoly(3f).InFunction.Evaluate(20f, 0f, Completion);
     }
 
     public Color ColorFunct(SystemVector2 c, Vector2 pos)
     {
-        return MulticolorLerp(Completion, Color.White, Color.Cyan, Color.DarkCyan) * InverseLerp(0f, 5f, Time) * Animators.MakePoly(2f).OutFunction.Evaluate(1f, 0f, Completion);
+        return CoreUtils.MulticolorLerp(Completion, Color.White, Color.Cyan, Color.DarkCyan) * InverseLerp(0f, 5f, Time) * MakePoly(2f).OutFunction.Evaluate(1f, 0f, Completion);
     }
 
     public OptimizedPrimitiveTrail trail;
@@ -536,7 +535,7 @@ public class CyberDart : ModProjectile
         AdditionsSound.etherealSmallHit.Play(Projectile.Center, .7f, 0f, .2f);
         for (int i = 0; i < 20; i++)
         {
-            ParticleRegistry.SpawnGlowParticle(Projectile.Center, Vector2.Zero, (int)Utils.Remap(i, 0, 20, 20, 50), Utils.Remap(i, 0, 20, 30f, 60f), Color.DeepSkyBlue);
+            ParticleRegistry.SpawnGlowParticle(Projectile.Center, Vector2.Zero, (int)Terraria.Utils.Remap(i, 0, 20, 20, 50), Terraria.Utils.Remap(i, 0, 20, 30f, 60f), Color.DeepSkyBlue);
             ParticleRegistry.SpawnTechyHolosquareParticle(Projectile.Center + Main.rand.NextVector2Circular(10, 10), -Projectile.velocity.RotatedByRandom(.2f) * Main.rand.NextFloat(.2f, .5f), Main.rand.Next(30, 40), Main.rand.NextFloat(.4f, .8f), Color.Cyan);
         }
         Projectile.velocity *= 0;
@@ -549,7 +548,7 @@ public class CyberDart : ModProjectile
         else
             return MathHelper.Lerp(Projectile.width, 0f, InverseLerp(.3f, 1f, c)) * Projectile.scale;
     }
-    public Color ColorFunct(SystemVector2 c, Vector2 pos) => Color.DeepSkyBlue * Utils.Remap(Projectile.Opacity, 0f, 1f, c.X, MathHelper.Clamp(c.X + 1, 0, 1));
+    public Color ColorFunct(SystemVector2 c, Vector2 pos) => Color.DeepSkyBlue * Terraria.Utils.Remap(Projectile.Opacity, 0f, 1f, c.X, MathHelper.Clamp(c.X + 1, 0, 1));
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints points = new(15);
@@ -595,7 +594,7 @@ public class CyberPierce : ModProjectile
         Vector2 c1 = Projectile.Center + PolarVector(50f, Projectile.rotation - MathHelper.PiOver2);
         Vector2 c2 = Projectile.Center + PolarVector(80f, Projectile.rotation);
         Vector2 c3 = Projectile.Center + PolarVector(50f, Projectile.rotation + MathHelper.PiOver2);
-        points = Animators.CatmullRomSpline([c1, c2, c3], 30);
+        points = CatmullRomSpline([c1, c2, c3], 30);
         foreach (Vector2 pos in CollectionsMarshal.AsSpan(points))
         {
             ParticleRegistry.SpawnTechyHolosquareParticle(pos, pos.SafeDirectionTo(Projectile.Center - Projectile.rotation.ToRotationVector2() * 10f) * 4f,

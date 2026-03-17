@@ -9,9 +9,10 @@ namespace TheExtraordinaryAdditions.Core.DataStructures;
 /// <summary>
 /// Describes a rotatable 2D-rectangle.
 /// </summary>
-public struct RotatedRectangle
+public struct RotatedRectangle : IEquatable<RotatedRectangle>
 {
     #region Constructors
+
     public RotatedRectangle(int x, int y, int width, int height, float rotation)
     {
         X = x;
@@ -41,101 +42,51 @@ public struct RotatedRectangle
         X = (int)(start.X - Width / 2f + rot.X);
         Y = (int)(start.Y - Height / 2f + rot.Y);
     }
+
     #endregion Constructors
 
     #region Public Fields
+
     public int X;
     public int Y;
     public int Width;
     public int Height;
     public float Rotation;
+
     #endregion Public Fields
 
     #region Public Properties
-    public readonly Vector2 Size
-    {
-        get
-        {
-            return new(Width, Height);
-        }
-    }
 
-    public readonly Vector2 Center
-    {
-        get
-        {
-            return new Vector2(X, Y) + Size / 2;
-        }
-    }
+    public readonly Vector2 Size => new(Width, Height);
 
-    public readonly Vector2 Position
-    {
-        get
-        {
-            return Center + PolarVector(Width / 2, Rotation + MathHelper.Pi) + PolarVector(Height / 2, Rotation - MathHelper.PiOver2);
-        }
-    }
+    public readonly Vector2 Center => new Vector2(X, Y) + Size / 2;
 
-    public readonly Vector2 Top
-    {
-        get
-        {
-            return Center + PolarVector(Height / 2, Rotation - MathHelper.PiOver2);
-        }
-    }
+    public readonly Vector2 Position => Center + PolarVector(Width / 2f, Rotation + MathHelper.Pi) +
+                                        PolarVector(Height / 2f, Rotation - MathHelper.PiOver2);
 
-    public readonly Vector2 TopRight
-    {
-        get
-        {
-            return Center + PolarVector(Height / 2, Rotation - MathHelper.PiOver2) + PolarVector(Width / 2, Rotation);
-        }
-    }
+    public readonly Vector2 Top => Center + PolarVector(Height / 2f, Rotation - MathHelper.PiOver2);
 
-    public readonly Vector2 Bottom
-    {
-        get
-        {
-            return Center + PolarVector(Height / 2, Rotation + MathHelper.PiOver2);
-        }
-    }
+    public readonly Vector2 TopRight => Center + PolarVector(Height / 2f, Rotation - MathHelper.PiOver2) +
+                                        PolarVector(Width / 2f, Rotation);
 
-    public readonly Vector2 BottomLeft
-    {
-        get
-        {
-            return Center + PolarVector(Height / 2, Rotation + MathHelper.PiOver2) + PolarVector(Width / 2, Rotation + MathHelper.Pi);
-        }
-    }
+    public readonly Vector2 Bottom => Center + PolarVector(Height / 2f, Rotation + MathHelper.PiOver2);
 
-    public readonly Vector2 BottomRight
-    {
-        get
-        {
-            return Center + PolarVector(Height / 2, Rotation + MathHelper.PiOver2) + PolarVector(Width / 2, Rotation);
-        }
-    }
+    public readonly Vector2 BottomLeft => Center + PolarVector(Height / 2f, Rotation + MathHelper.PiOver2) +
+                                          PolarVector(Width / 2f, Rotation + MathHelper.Pi);
 
-    public readonly Vector2 Left
-    {
-        get
-        {
-            return Center + PolarVector(Width / 2, Rotation + MathHelper.Pi);
-        }
-    }
+    public readonly Vector2 BottomRight => Center + PolarVector(Height / 2f, Rotation + MathHelper.PiOver2) +
+                                           PolarVector(Width / 2f, Rotation);
 
-    public readonly Vector2 Right
-    {
-        get
-        {
-            return Center + PolarVector(Width / 2, Rotation);
-        }
-    }
+    public readonly Vector2 Left => Center + PolarVector(Width / 2f, Rotation + MathHelper.Pi);
+
+    public readonly Vector2 Right => Center + PolarVector(Width / 2f, Rotation);
 
     #endregion Public Properties
 
     #region Public Methods
+
     #region Positioning
+
     public void SetCenter(Vector2 position)
     {
         Vector2 currentCenter = Center;
@@ -199,7 +150,9 @@ public struct RotatedRectangle
         X = (int)(X + offset.X);
         Y = (int)(Y + offset.Y);
     }
+
     #endregion Positioning Methods
+
     public Vector2 ClampPoint(Vector2 point)
     {
         // Transform point to local space
@@ -258,38 +211,44 @@ public struct RotatedRectangle
         float tEnter = float.NegativeInfinity;
         float tExit = float.PositiveInfinity;
 
-        // Check X constraints
-        if (DLocal.X > 0)
+        switch (DLocal.X)
         {
-            tEnter = Math.Max(tEnter, (minX - ALocal.X) / DLocal.X);
-            tExit = Math.Min(tExit, (maxX - ALocal.X) / DLocal.X);
-        }
-        else if (DLocal.X < 0)
-        {
-            tEnter = Math.Max(tEnter, (maxX - ALocal.X) / DLocal.X);
-            tExit = Math.Min(tExit, (minX - ALocal.X) / DLocal.X);
-        }
-        else // DLocal.X == 0
-        {
-            if (ALocal.X < minX || ALocal.X > maxX)
-                return null;
+            // Check X constraints
+            case > 0:
+                tEnter = Math.Max(tEnter, (minX - ALocal.X) / DLocal.X);
+                tExit = Math.Min(tExit, (maxX - ALocal.X) / DLocal.X);
+                break;
+            case < 0:
+                tEnter = Math.Max(tEnter, (maxX - ALocal.X) / DLocal.X);
+                tExit = Math.Min(tExit, (minX - ALocal.X) / DLocal.X);
+                break;
+            // DLocal.X == 0
+            default:
+            {
+                if (ALocal.X < minX || ALocal.X > maxX)
+                    return null;
+                break;
+            }
         }
 
-        // Check Y constraints
-        if (DLocal.Y > 0)
+        switch (DLocal.Y)
         {
-            tEnter = Math.Max(tEnter, (minY - ALocal.Y) / DLocal.Y);
-            tExit = Math.Min(tExit, (maxY - ALocal.Y) / DLocal.Y);
-        }
-        else if (DLocal.Y < 0)
-        {
-            tEnter = Math.Max(tEnter, (maxY - ALocal.Y) / DLocal.Y);
-            tExit = Math.Min(tExit, (minY - ALocal.Y) / DLocal.Y);
-        }
-        else // DLocal.Y == 0
-        {
-            if (ALocal.Y < minY || ALocal.Y > maxY)
-                return null;
+            // Check Y constraints
+            case > 0:
+                tEnter = Math.Max(tEnter, (minY - ALocal.Y) / DLocal.Y);
+                tExit = Math.Min(tExit, (maxY - ALocal.Y) / DLocal.Y);
+                break;
+            case < 0:
+                tEnter = Math.Max(tEnter, (maxY - ALocal.Y) / DLocal.Y);
+                tExit = Math.Min(tExit, (minY - ALocal.Y) / DLocal.Y);
+                break;
+            // DLocal.Y == 0
+            default:
+            {
+                if (ALocal.Y < minY || ALocal.Y > maxY)
+                    return null;
+                break;
+            }
         }
 
         // Clip to the line segment's range [0, LLocal]
@@ -349,11 +308,13 @@ public struct RotatedRectangle
             minDist = distRight;
             closestLocal = projRight;
         }
+
         if (distTop < minDist)
         {
             minDist = distTop;
             closestLocal = projTop;
         }
+
         if (distBottom < minDist)
         {
             closestLocal = projBottom;
@@ -430,11 +391,9 @@ public struct RotatedRectangle
             points = [];
             return false;
         }
-        else
-        {
-            points = list;
-            return true;
-        }
+
+        points = list;
+        return true;
     }
 
     /// <summary>
@@ -465,7 +424,8 @@ public struct RotatedRectangle
 
                 // Check if the tile is solid
                 Tile tile = Main.tile[tilePoint.X, tilePoint.Y];
-                bool solid = tile != null && tile.HasTile && Main.tileSolid[tile.TileType] && !Main.tileSolidTop[tile.TileType];
+                bool solid = tile != null && tile.HasTile && Main.tileSolid[tile.TileType] &&
+                             !Main.tileSolidTop[tile.TileType];
                 if (acceptTopSurfaces)
                     solid |= Main.tileSolidTop[tile.TileType] && tile.TileFrameY == 0;
                 if (solid)
@@ -535,16 +495,22 @@ public struct RotatedRectangle
                 _ => Vector2.Zero
             };
         }
-        else
-        {
-            Vector2 randLeft = Vector2.Lerp(Position, BottomLeft, Main.rand.NextFloat());
-            Vector2 randRight = Vector2.Lerp(TopRight, BottomRight, Main.rand.NextFloat());
-            return Vector2.Lerp(randLeft, randRight, Main.rand.NextFloat());
-        }
+
+        Vector2 randLeft = Vector2.Lerp(Position, BottomLeft, Main.rand.NextFloat());
+        Vector2 randRight = Vector2.Lerp(TopRight, BottomRight, Main.rand.NextFloat());
+        return Vector2.Lerp(randLeft, randRight, Main.rand.NextFloat());
     }
+
+    public bool Equals(RotatedRectangle other)
+    {
+        return X == other.X && Y == other.Y && Width == other.Width && Height == other.Height &&
+               Rotation.Equals(other.Rotation);
+    }
+
     #endregion Public Methods
 
     #region Public Static Methods
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static RotatedRectangle Max(RotatedRectangle value1, RotatedRectangle value2)
     {
@@ -589,9 +555,11 @@ public struct RotatedRectangle
     {
         return !(a == b);
     }
+
     #endregion Public Static Methods
 
     #region Overrides
+
     public override readonly bool Equals(object obj)
     {
         return (obj is RotatedRectangle rectangle) && this == rectangle;
@@ -606,5 +574,6 @@ public struct RotatedRectangle
     {
         return $"[Position: {Position}, Width: {Width}, Height: {Height}, Current Rotation: {Rotation}]";
     }
+
     #endregion
 }

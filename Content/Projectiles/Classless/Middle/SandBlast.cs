@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using CalamityMod;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
@@ -54,7 +55,7 @@ public class SandBlast : ModProjectile
         SoundID.Item14.Play(Projectile.Center, .9f, -.1f);
         Projectile.ExpandHitboxBy(32);
 
-        int amount = 36;
+        const int amount = 36;
         for (int i = 0; i < amount; i++)
         {
             Vector2 pos = (Vector2.Normalize(Projectile.velocity) * new Vector2(Projectile.width / 2f, Projectile.height) * 0.75f)

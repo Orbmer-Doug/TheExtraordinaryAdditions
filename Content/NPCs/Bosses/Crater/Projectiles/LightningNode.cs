@@ -1,7 +1,10 @@
 ﻿using System;
+using CalamityMod;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
@@ -27,16 +30,19 @@ public class LightningNode : ProjOwnedByNPC<Asterlin>
         get => (int)Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
+
     public bool Channeling
     {
-        get => Projectile.ai[1] == 1;
+        get => (int)Projectile.ai[1] == 1;
         set => Projectile.ai[1] = value.ToInt();
     }
+
     public bool ChosePosition
     {
-        get => Projectile.ai[2] == 1;
+        get => (int)Projectile.ai[2] == 1;
         set => Projectile.ai[2] = value.ToInt();
     }
+
     public ref float OrbitOffsetAngle => ref Projectile.AdditionsInfo().ExtraAI[0];
     public ref float OrbitSquish => ref Projectile.AdditionsInfo().ExtraAI[1];
     public ref float OrbitRadius => ref Projectile.AdditionsInfo().ExtraAI[2];
@@ -63,12 +69,11 @@ public class LightningNode : ProjOwnedByNPC<Asterlin>
             {
                 Projectile.AI_GetMyGroupIndex(out int index, out int group);
                 float indexInterpol = InverseLerp(0f, group, index);
-                float radiusInterpolant = indexInterpol * 0.85f + MathF.Sqrt(Main.rand.NextFloat()) * 0.15f;
                 OrbitOffsetAngle = RandomRotation();
 
-                float dist = Owner.Distance(Target.Center);
+                float dist = 100f;
                 float rand = Main.rand.NextFloat(50f, 1000f);
-                OrbitRadius = MathHelper.Lerp(dist, dist + rand, indexInterpol);
+                OrbitRadius = MathHelper.Lerp(dist, dist + 500f, indexInterpol);
                 OrbitSquish = Main.rand.NextFloat(0.75f, 1f);
 
                 ChosePosition = true;
@@ -77,9 +82,10 @@ public class LightningNode : ProjOwnedByNPC<Asterlin>
         }
         else
         {
-            OrbitOffsetAngle += (MathHelper.TwoPi / OrbitRadius * Asterlin.Tesselestic_NodeRotationAmt
-                * InverseLerp(Asterlin.Tesselestic_FireTime, 0f, ModOwner.Tesselestic_AttackTime))
-                * (Owner.Center.X > Target.Center.X).ToDirectionInt();
+            OrbitOffsetAngle += MathHelper.TwoPi / OrbitRadius * Asterlin.Tesselestic_NodeRotationAmt
+                                                               * InverseLerp(Asterlin.Tesselestic_FireTime, 0f,
+                                                                   ModOwner.Tesselestic_AttackTime)
+                                                               * (Owner.Center.X > Target.Center.X).ToDirectionInt();
 
             if (ChosePosition)
             {
@@ -89,10 +95,11 @@ public class LightningNode : ProjOwnedByNPC<Asterlin>
         }
 
         Vector2 offset = OrbitOffsetAngle.ToRotationVector2() * OrbitRadius * new Vector2(1f, OrbitSquish);
-        Vector2 target = ModOwner.Staff.TipOfStaff + offset;
+        Vector2 target = ModOwner.Target.Center + offset;
         Projectile.SmoothFlyNear(target, Projectile.Opacity * 0.04f, .12f);
 
-        Projectile p = ProjectileTargeting.GetClosestProjectile(new(Projectile.Center, 2000, false, Type, [Projectile]));
+        Projectile p =
+            ProjectileTargeting.GetClosestProjectile(new(Projectile.Center, 2000, false, Type, [Projectile]));
         if (p != null)
             Projectile.rotation = Projectile.rotation.AngleLerp(Projectile.AngleTo(p.Center), .2f);
 

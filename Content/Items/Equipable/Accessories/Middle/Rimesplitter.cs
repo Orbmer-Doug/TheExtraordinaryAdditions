@@ -41,7 +41,7 @@ public class Rimesplitter : ModItem, ILocalizedModType, IModType
             {
                 int dmg = (int)player.GetTotalDamage(DamageClass.Generic).ApplyTo(500f);
                 Projectile p = Main.projectile[Projectile.NewProjectile(player.GetSource_ItemUse(Item, null), player.Center, Vector2.One, type, dmg, 10f, player.whoAmI, 0f, 0f, 0f)];
-                player.AddBuff(ModContent.BuffType<AuroricCooldown>(), SecondsToFrames(5));
+                player.AddBuff(ModContent.BuffType<AuroricCooldown>(), CalUtils.SecondsToFrames(5));
             }
         }
     }

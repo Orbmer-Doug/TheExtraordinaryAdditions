@@ -7,6 +7,7 @@ using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.CrossCode;
 
@@ -29,6 +30,7 @@ public class ScarletMeteor : ModProjectile, ILocalizedModType, IModType
     public SlotId Whoosh;
     public OptimizedPrimitiveTrail trail;
     public TrailPoints cache;
+
     public override void AI()
     {
         if (Time > 20f)
@@ -36,19 +38,24 @@ public class ScarletMeteor : ModProjectile, ILocalizedModType, IModType
         Projectile.Opacity = InverseLerp(0f, 20f, Time);
 
         if (trail == null || trail.Disposed)
-            trail = new(c => Projectile.width, (c, pos) => Color.OrangeRed * MathHelper.SmoothStep(1f, 0f, c.X) * Projectile.Opacity, null, 10);
+            trail = new(c => Projectile.width,
+                (c, _) => Color.OrangeRed * MathHelper.SmoothStep(1f, 0f, c.X) * Projectile.Opacity, null, 10);
         cache ??= new(10);
         cache.Update(Projectile.Center + Projectile.velocity);
 
-        if (SoundEngine.TryGetActiveSound(Whoosh, out var t) && t.IsPlaying)
+        if (SoundEngine.TryGetActiveSound(Whoosh, out ActiveSound t) && t.IsPlaying)
             t.Position = Projectile.Center;
         else
             Whoosh = AdditionsSound.HeatMeteorFall.Play(Projectile.Center, .5f, 0f, .1f, 20);
 
-        ParticleRegistry.SpawnHeavySmokeParticle(Projectile.RotHitbox().RandomPoint(), -Projectile.velocity * Main.rand.NextFloat(.2f, .5f),
-            Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .7f), Color.OrangeRed.Lerp(Color.Chocolate, Main.rand.NextFloat(.3f, .6f)) * Projectile.Opacity);
-        ParticleRegistry.SpawnSparkleParticle(Projectile.RotHitbox().RandomPoint(), -Projectile.velocity * Main.rand.NextFloat(.7f, 1.4f), Main.rand.Next(15, 25),
-            Main.rand.NextFloat(.3f, .4f), Color.OrangeRed * Projectile.Opacity, Color.Chocolate * Projectile.Opacity, Main.rand.NextFloat(.7f, 1.7f), Main.rand.NextFloat(-.2f, .2f));
+        ParticleRegistry.SpawnHeavySmokeParticle(Projectile.RotHitbox().RandomPoint(),
+            -Projectile.velocity * Main.rand.NextFloat(.2f, .5f),
+            Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .7f),
+            Color.OrangeRed.Lerp(Color.Chocolate, Main.rand.NextFloat(.3f, .6f)) * Projectile.Opacity);
+        ParticleRegistry.SpawnSparkleParticle(Projectile.RotHitbox().RandomPoint(),
+            -Projectile.velocity * Main.rand.NextFloat(.7f, 1.4f), Main.rand.Next(15, 25),
+            Main.rand.NextFloat(.3f, .4f), Color.OrangeRed * Projectile.Opacity, Color.Chocolate * Projectile.Opacity,
+            Main.rand.NextFloat(.7f, 1.7f), Main.rand.NextFloat(-.2f, .2f));
 
         Projectile.VelocityBasedRotation();
         Time++;
@@ -65,11 +72,11 @@ public class ScarletMeteor : ModProjectile, ILocalizedModType, IModType
             {
                 Vector2 vel = (MathHelper.TwoPi * InverseLerp(0f, 4, i) + off).ToRotationVector2();
                 Projectile.NewProj(Projectile.Center, vel, ModContent.ProjectileType<ScarletMeteorExplosion>(),
-                    Projectile.damage / 4, Projectile.knockBack / 4f, Projectile.owner, 0f, 0f, 0f);
+                    Projectile.damage / 4, Projectile.knockBack / 4f, Projectile.owner);
             }
         }
     }
-    
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -79,6 +86,7 @@ public class ScarletMeteor : ModProjectile, ILocalizedModType, IModType
 
             trail.DrawTrail(ShaderRegistry.StandardPrimitiveShader, cache.Points, 30);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 
         Projectile.DrawBaseProjectile(Color.White * Projectile.Opacity);

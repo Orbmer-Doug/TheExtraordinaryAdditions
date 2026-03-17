@@ -2,6 +2,7 @@
 using ReLogic.Content;
 using System;
 using System.IO;
+using CalamityMod;
 using Terraria;
 using Terraria.Enums;
 using Terraria.GameContent;
@@ -20,6 +21,7 @@ using static Microsoft.Xna.Framework.MathHelper;
 using static System.MathF;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
 using SwingDirection = TheExtraordinaryAdditions.Content.Projectiles.Base.BaseSwordSwing.SwingDirection;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla;
 
@@ -310,11 +312,7 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
             PlayedSound = true;
         }
 
-        bool side = false;
-        if (Direction == 1 && SwingDir == SwingDirection.Down)
-            side = true;
-        else if (Direction == -1 && SwingDir == SwingDirection.Up)
-            side = true;
+        bool side = Direction == 1 && SwingDir == SwingDirection.Down || Direction == -1 && SwingDir == SwingDirection.Up;
         RotationOffset = side ? 0f : PiOver2;
         Effects = side ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
 

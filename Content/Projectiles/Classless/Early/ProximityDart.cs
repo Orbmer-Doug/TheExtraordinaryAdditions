@@ -3,6 +3,8 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Early;
 
@@ -55,8 +57,6 @@ public class ProximityDart : ModProjectile
         if (this.RunLocal() && Projectile.timeLeft <= 3)
         {
             Projectile.tileCollide = false;
-
-            // Set to transparent
             Projectile.Opacity = 0f;
 
             Projectile.Resize(ExplosionWidthHeight, ExplosionWidthHeight);
@@ -85,14 +85,12 @@ public class ProximityDart : ModProjectile
             ParticleRegistry.SpawnBloomPixelParticle(Projectile.Center, Main.rand.NextVector2Circular(7f, 7f), Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .7f), Color.OrangeRed, Color.White, null, 1.2f, 5);
             ParticleRegistry.SpawnHeavySmokeParticle(Projectile.Center, Main.rand.NextVector2Circular(3f, 3f), Main.rand.Next(20, 50), Main.rand.NextFloat(.4f, .6f), Color.OrangeRed, Main.rand.NextFloat(.6f, 1.2f));
         }
-
-        // Reset size to normal width and height.
         Projectile.Resize(34, 14);
 
         // Finally, actually explode the tiles and walls
         if (this.RunLocal())
         {
-            int explosionRadius = 3;
+            const int explosionRadius = 3;
             int minTileX = (int)(Projectile.Center.X / 16f - explosionRadius);
             int maxTileX = (int)(Projectile.Center.X / 16f + explosionRadius);
             int minTileY = (int)(Projectile.Center.Y / 16f - explosionRadius);

@@ -5,6 +5,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Early;
 
@@ -108,7 +109,7 @@ public class HellishNapalm : ModProjectile, ILocalizedModType, IModType
             HitTarget = true;
         }
 
-        target.AddBuff(BuffID.OnFire, SecondsToFrames(2), false);
+        target.AddBuff(BuffID.OnFire, CalUtils.SecondsToFrames(2), false);
     }
 
     public override bool OnTileCollide(Vector2 oldVelocity)
@@ -123,6 +124,6 @@ public class HellishNapalm : ModProjectile, ILocalizedModType, IModType
 
     public override void OnHitPlayer(Player target, Player.HurtInfo info)
     {
-        target.AddBuff(BuffID.OnFire, SecondsToFrames(2), false);
+        target.AddBuff(BuffID.OnFire, CalUtils.SecondsToFrames(2), false);
     }
 }

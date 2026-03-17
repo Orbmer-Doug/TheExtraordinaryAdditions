@@ -14,32 +14,31 @@ public sealed class ToolModifier : GlobalItem
 {
     public override bool AppliesToEntity(Item entity, bool lateInstantiation)
     {
-        if (AdditionsConfigServer.Instance.ToolOverhaul == false)
+        if (!AdditionsConfigServer.Instance.ToolOverhaul)
             return false;
 
-        if (lateInstantiation)
+        if (!lateInstantiation) 
+            return false;
+        
+        if (!(ItemID.Sets.IsChainsaw[entity.type] || ItemID.Sets.IsDrill[entity.type]))
         {
-            if (!(ItemID.Sets.IsChainsaw[entity.type] || ItemID.Sets.IsDrill[entity.type]))
-            {
-                if (entity.channel == true)
-                    return false;
-            }
-
-            bool allowedType = true;
-            if (ModReferences.Fables != null)
-            {
-                if (ModReferences.Fables.TryFind("MarniteObliterator", out ModItem fabmar) && entity.type == fabmar.Type)
-                    allowedType = false;
-                if (ModReferences.Fables.TryFind("MarniteDeconstructor", out ModItem fabobl) && entity.type == fabobl.Type)
-                    allowedType = false;
-            }
-            if (entity.type == ItemID.ButchersChainsaw || entity.type == ItemID.LaserDrill ||
-                entity.type == ItemID.ChlorophyteJackhammer || entity.type == ModContent.ItemType<MarniteObliterator>() || entity.type == ModContent.ItemType<MarniteDeconstructor>())
-                allowedType = false;
-
-            return (entity.pick > 0 || entity.axe > 0 || entity.hammer > 0) && allowedType;
+            if (entity.channel)
+                return false;
         }
-        return false;
+
+        bool allowedType = true;
+        if (ModReferences.Fables != null)
+        {
+            if (ModReferences.Fables.TryFind("MarniteObliterator", out ModItem fabmar) && entity.type == fabmar.Type)
+                allowedType = false;
+            if (ModReferences.Fables.TryFind("MarniteDeconstructor", out ModItem fabobl) && entity.type == fabobl.Type)
+                allowedType = false;
+        }
+        if (entity.type == ItemID.ButchersChainsaw || entity.type == ItemID.LaserDrill ||
+            entity.type == ItemID.ChlorophyteJackhammer || entity.type == ModContent.ItemType<MarniteObliterator>() || entity.type == ModContent.ItemType<MarniteDeconstructor>())
+            allowedType = false;
+
+        return (entity.pick > 0 || entity.axe > 0 || entity.hammer > 0) && allowedType;
     }
 
     public override void SetDefaults(Item item)
@@ -70,7 +69,7 @@ public sealed class ToolModifier : GlobalItem
         if (Main.myPlayer == player.whoAmI && player.itemAnimation == player.itemAnimationMax && player.ownedProjectileCounts[item.shoot] <= 0)
         {
             Projectile.NewProjectile(new EntitySource_ItemUse_WithAmmo(player, item, item.ammo),
-                player.Center, Vector2.Zero, item.shoot, item.damage, item.knockBack, player.whoAmI, 0f, 0f, 0f);
+                player.Center, Vector2.Zero, item.shoot, item.damage, item.knockBack, player.whoAmI);
         }
     }
 

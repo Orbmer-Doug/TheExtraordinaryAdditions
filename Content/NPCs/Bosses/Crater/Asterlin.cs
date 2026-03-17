@@ -17,10 +17,10 @@ using TheExtraordinaryAdditions.Core.Utilities;
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
 [AutoloadBossHead]
-public partial class Asterlin : ModNPC, IBossDowned
+public sealed partial class Asterlin : IBossDowned
 {
     #region Enums
-    public enum AsterlinAIType : int
+    public enum AsterlinAIType : byte
     {
         // pondering the orb
         AbsorbingEnergy,
@@ -79,7 +79,7 @@ public partial class Asterlin : ModNPC, IBossDowned
 
     public bool FightStarted
     {
-        get => NPC.ai[0] == 1f;
+        get => (int)NPC.ai[0] == 1;
         set => NPC.ai[0] = value.ToInt();
     }
 
@@ -89,17 +89,17 @@ public partial class Asterlin : ModNPC, IBossDowned
 
     public bool DonePhase2Transition
     {
-        get => ExtraAI[11] == 1f;
+        get => (int)ExtraAI[11] == 1;
         set => ExtraAI[11] = value.ToInt();
     }
     public bool DonePhase3Transition
     {
-        get => ExtraAI[12] == 1f;
+        get => (int)ExtraAI[12] == 1;
         set => ExtraAI[12] = value.ToInt();
     }
     public bool DoneDesperationTransition
     {
-        get => ExtraAI[13] == 1f;
+        get => (int)ExtraAI[13] == 1;
         set => ExtraAI[13] = value.ToInt();
     }
     public ref float HeatDistortionArea => ref ExtraAI[14];
@@ -142,7 +142,7 @@ public partial class Asterlin : ModNPC, IBossDowned
         // Pick a target if the current one is invalid
         bool invalidTargetIndex = Target.Invalid;
         if (invalidTargetIndex || !NPC.WithinRange(Target.Center, 4600f))
-            PlayerTargeting.SearchForTarget(NPC, Target);
+            NPC.SearchForTarget(Target);
         Target = NPC.GetTargetData();
         if (NPC.HasValidTarget && Target.Type == NPCTargetType.Player)
             PlayerTarget = Main.player[NPC.target];
@@ -186,12 +186,12 @@ public partial class Asterlin : ModNPC, IBossDowned
         int idealHeight = (int)(NPC.scale * 278f);
         if (idealWidth != oldWidth)
         {
-            NPC.position.X += NPC.width / 2;
-            NPC.position.Y += NPC.height / 2;
+            NPC.position.X += NPC.width / 2f;
+            NPC.position.Y += NPC.height / 2f;
             NPC.width = idealWidth;
             NPC.height = idealHeight;
-            NPC.position.X -= NPC.width / 2;
-            NPC.position.Y -= NPC.height / 2;
+            NPC.position.X -= NPC.width / 2f;
+            NPC.position.Y -= NPC.height / 2f;
         }
 
         // Disable damage when invisible
@@ -216,9 +216,7 @@ public partial class Asterlin : ModNPC, IBossDowned
 
     public override bool ModifyCollisionData(Rectangle victimHitbox, ref int immunityCooldownSlot, ref MultipliableFloat damageMultiplier, ref Rectangle npcHitbox)
     {
-        if (RotatedHitbox.Intersects(victimHitbox))
-            return true;
-        return false;
+        return RotatedHitbox.Intersects(victimHitbox);
     }
 
     public override bool CheckDead()

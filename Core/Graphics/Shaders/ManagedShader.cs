@@ -12,38 +12,35 @@ namespace TheExtraordinaryAdditions.Core.Graphics.Shaders;
 public sealed class ManagedShader : IDisposable
 {
     /// <summary>
-    /// A managed copy of all parameter data. Used to minimize excess SetValue calls, in cases where the value aren't actually being changed.
+    /// A managed copy of all parameter data
+    /// Used to minimize excess SetValue calls, in cases where the value aren't actually being changed
     /// </summary>
-    internal readonly Dictionary<string, object> parameterCache;
+    internal readonly Dictionary<string, object> ParameterCache;
 
     /// <summary>
-    /// The identifying name of this shader.
+    /// The identifying name of this shader
     /// </summary>
     public readonly string Name;
 
     /// <summary>
-    /// The shader reference underlying this wrapper.
+    /// The shader reference underlying this wrapper
     /// </summary>
     public readonly Ref<Effect> Shader;
 
     public Effect Effect => Shader.Value;
 
     /// <summary>
-    /// Whether this shader is disposed.
+    /// Whether this shader is disposed
     /// </summary>
-    public bool Disposed
-    {
-        get;
-        private set;
-    }
+    public bool Disposed { get; private set; }
 
     /// <summary>
-    /// The standard parameter name prefix for texture sizes.
+    /// The standard parameter name prefix for texture sizes
     /// </summary>
     public const string TextureSizeParameterPrefix = "textureSize";
 
     /// <summary>
-    /// The standard pass name when autoloading shaders.
+    /// The standard pass name when autoloading shaders
     /// </summary>
     public const string DefaultPassName = "AutoloadPass";
 
@@ -51,58 +48,42 @@ public sealed class ManagedShader : IDisposable
     {
         Shader = shader;
         Name = name;
-
-        // Initialize the parameter cache.
-        parameterCache = [];
+        ParameterCache = [];
     }
 
     internal bool ParameterIsCachedAsValue(string parameterName, object value)
     {
-        // If the parameter cache has not registered this parameter yet, that means it can't have changed, because there's nothing to compare against.
-        // In this case, initialize the parameter in the cache for later.
-        if (!parameterCache.TryGetValue(parameterName, out object parameter))
+        // If the parameter cache has not registered this parameter yet, that means it can't have changed, because there's nothing to compare against
+        if (!ParameterCache.TryGetValue(parameterName, out object parameter))
             return false;
 
         return parameter?.Equals(value) ?? false;
     }
 
     /// <summary>
-    /// Resets the cache of parameters for this shader. Should be used in contexts where the underlying shader used by this can be changed in contexts that do not respect the cache.
+    /// Attempts to send parameter data to the GPU for the shader to use
     /// </summary>
-    /// 
-    /// <remarks>
-    /// An example of this being useful could when be having this shader shared with a screen shader, which supplies its values directly and without the <see cref="TrySetParameter(string, object)"/> wrapper.
-    /// </remarks>
-    public void ResetCache() => parameterCache.Clear();
-
-    /// <summary>
-    /// Attempts to send parameter data to the GPU for the shader to use.
-    /// </summary>
-    /// <param name="parameterName">The name of the parameter. This must correspond with the parameter name in the shader.</param>
-    /// <param name="value">The value to supply to the parameter.</param>
+    /// <param name="parameterName">The name of the parameter. This must correspond with the parameter name in the shader</param>
+    /// <param name="value">The value to supply to the parameter</param>
     public bool TrySetParameter(string parameterName, object value)
     {
-        // Shaders do not work on servers. If this method is called on one, terminate it immediately.
+        // Shaders do not work on servers
         if (Main.netMode == NetmodeID.Server)
             return false;
 
-        // Check if the parameter even exists. If it doesn't, obviously do nothing else.
+        // Check if the parameter even exists
         EffectParameter parameter = Effect.Parameters[parameterName];
         if (parameter is null)
             return false;
 
-        // Check if the parameter value is already cached as the supplied value. If it is, don't waste resources informing the GPU of
-        // parameter data, since nothing relevant has changed.
         if (ParameterIsCachedAsValue(parameterName, value))
             return false;
 
-        // Store the value in the cache.
-        parameterCache[parameterName] = value;
+        // Store the value in the cache
+        ParameterCache[parameterName] = value;
 
-        // Unfortunately, there is no simple type upon which singles, integers, matrices, etc. can be converted in order to be sent to the GPU, and there is no
-        // super easy solution for checking a parameter's expected type. FNA just messes with pointers under the hood and tosses back exceptions if that doesn't work.
-        // Unless something neater arises, this switch expression will do, I suppose.
-
+        // There isn't really a good way to sent stuff over to the GPU due to no simple type numbers can be converted to
+        // So until something better appears this switch will do
         try
         {
             switch (value)
@@ -164,41 +145,40 @@ public sealed class ManagedShader : IDisposable
         }
         catch
         {
-            AdditionsMain.Instance.Logger.Error($"ruh roh the shader {Name} tried to set a parameter with an unsupported type of {value.GetType().Name}");
+            AdditionsMain.Instance.Logger.Error(
+                $"ruh roh the shader {Name} tried to set a parameter with an unsupported type of {value.GetType().Name}");
             return false;
         }
     }
 
     /// <summary>
-    /// Sets a texture at a given index for this shader to use. Typically, index 0 is populated with whatever was passed into a <see cref="SpriteBatch"/>.Draw call.
+    /// Sets a texture at a given index for this shader to use <br></br>
+    /// Remember, index 0 may be populated with whatever was passed into a <see cref="SpriteBatch"/>.Draw call
     /// </summary>
-    /// <param name="texture">The texture to supply.</param>
-    /// <param name="textureIndex">The index to place the texture in.</param>
-    /// <param name="samplerStateOverride">Which sampler should be used for the texture.</param>
+    /// <param name="texture">The texture to supply</param>
+    /// <param name="textureIndex">The index to place the texture in</param>
+    /// <param name="samplerStateOverride">Which sampler should be used for the texture</param>
     public void SetTexture(Texture2D texture, int textureIndex, SamplerState samplerStateOverride = null)
     {
-        // Shaders do not work on servers. If this method is called on one, terminate it immediately.
+        // Shaders do not work on servers
         if (Main.dedServ)
             return;
 
-        // Try to send texture sizes as parameters. Such parameters are optional, and no penalty is incurred if a shader decides that it doesn't need that data.
+        // Try to send texture sizes as parameters
         TrySetParameter($"{TextureSizeParameterPrefix}{textureIndex}", texture.Size());
 
-        // Grab the graphics device and send the texture to it.
-        var gd = Main.instance.GraphicsDevice;
+        // Grab the graphics device and send the texture to it
+        GraphicsDevice gd = Main.instance.GraphicsDevice;
         gd.Textures[textureIndex] = texture;
         if (samplerStateOverride is not null)
             gd.SamplerStates[textureIndex] = samplerStateOverride;
     }
 
-
-    public Matrix? Matrix;
-
     /// <summary>
-    /// Prepares the shader for drawing.
+    /// Prepares the shader for drawing
     /// </summary>
-    /// <param name="passName">The pass to apply.</param>
-    public void Render(string passName = DefaultPassName, bool pixelated = true, bool commonParams = true)
+    public void Render(string passName = DefaultPassName, bool pixelated = true, bool commonParams = true,
+        Matrix? matrix = null)
     {
         // Shaders do not work on servers. If this method is called on one, terminate it immediately.
         if (Main.dedServ || Disposed)
@@ -208,33 +188,40 @@ public sealed class ManagedShader : IDisposable
         {
             TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly);
         }
-        UpdateProjectiveMatrices(pixelated);
+
+        if (matrix == null)
+            UpdateProjectiveMatrices(pixelated);
+        else
+        {
+            TrySetParameter("transformMatrix", matrix.Value);
+        }
 
         Effect.CurrentTechnique.Passes[passName].Apply();
-        if (Matrix.HasValue)
-            Matrix = null;
     }
 
     public void UpdateProjectiveMatrices(bool pixelated = true)
     {
-        Matrix transform;
+        Matrix world;
+        Matrix view;
+        Matrix projection;
 
-        if (!Matrix.HasValue)
-        {
-            Matrix world;
-            Matrix view;
-            Matrix projection;
-
-            if (pixelated)
-                GetPixelated2DMatrices(out world, out projection, out view);
-            else
-                Get2DMatrices(out world, out projection, out view);
-            transform = world * view * projection;
-        }
+        if (pixelated)
+            GetPixelated2DMatrices(out world, out projection, out view);
         else
-            transform = Matrix.Value;
+            Get2DMatrices(out world, out projection, out view);
+        Matrix transform = world * view * projection;
 
         TrySetParameter("transformMatrix", transform);
+    }
+
+    ~ManagedShader()
+    {
+        if (Disposed)
+            return;
+
+        Disposed = true;
+        Effect.Dispose();
+        ParameterCache.Clear();
     }
 
     public void Dispose()
@@ -244,7 +231,7 @@ public sealed class ManagedShader : IDisposable
 
         Disposed = true;
         Effect.Dispose();
-        parameterCache.Clear();
+        ParameterCache.Clear();
         GC.SuppressFinalize(this);
     }
 }

@@ -9,22 +9,21 @@ using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
-public partial class Asterlin : ModNPC
+public partial class Asterlin
 {
     public static readonly Dictionary<AsterlinAIType, float> Barrage_PossibleStates =
         new Dictionary<AsterlinAIType, float> { { AsterlinAIType.Swings, 1f }, { AsterlinAIType.RotatedDicing, .6f } };
+
     [AutomatedMethodInvoke]
     public void LoadStateTransitions_Barrage()
     {
-        StateMachine.RegisterTransition(AsterlinAIType.Barrage, Barrage_PossibleStates, false, () =>
-        {
-            return AITimer >= Barrage_TotalTime && !AnyProjectile(ModContent.ProjectileType<BarrageBeam>());
-        });
+        StateMachine.RegisterTransition(AsterlinAIType.Barrage, Barrage_PossibleStates, false,
+            () => AITimer >= Barrage_TotalTime && !AnyProjectile(ModContent.ProjectileType<BarrageBeam>()));
         StateMachine.RegisterStateBehavior(AsterlinAIType.Barrage, DoBehavior_Barrage);
     }
 
-    public static int Barrage_AttackTime => SecondsToFrames(8f);
-    public static int Barrage_FadeTime => SecondsToFrames(.8f);
+    public static int Barrage_AttackTime => CalUtils.SecondsToFrames(8f);
+    public static int Barrage_FadeTime => CalUtils.SecondsToFrames(.8f);
     public static int Barrage_BeamRate => DifficultyBasedValue(30, 14, 13, 12, 10, 8);
     public static int Barrage_HoverTime => 40;
     public static int Barrage_BeamExpandTime => 44;
@@ -49,13 +48,15 @@ public partial class Asterlin : ModNPC
                 if (AITimer % Barrage_BeamRate == (Barrage_BeamRate - 1))
                 {
                     if (this.RunServer())
-                        NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<BarrageBeam>(), MediumAttackDamage, 0f);
+                        NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<BarrageBeam>(),
+                            MediumAttackDamage, 0f);
                 }
 
                 if (AITimer % (Barrage_BeamRate * 2) == (Barrage_BeamRate * 2 - 1))
                 {
                     if (this.RunServer())
-                        NPC.NewNPCProj(NPC.Center, Main.rand.NextVector2Circular(40f, 40f), ModContent.ProjectileType<DartBomb>(), MediumAttackDamage, 0f);
+                        NPC.NewNPCProj(NPC.Center, Main.rand.NextVector2Circular(40f, 40f),
+                            ModContent.ProjectileType<DartBomb>(), MediumAttackDamage, 0f);
                 }
             }
         }
@@ -73,14 +74,15 @@ public partial class Asterlin : ModNPC
 
         void orb()
         {
-            float factor = InverseLerp(0f, 40f, AITimer) * Animators.MakePoly(3f).OutFunction(InverseLerp(Barrage_AttackTime, Barrage_AttackTime - 60, AITimer));
+            float factor = InverseLerp(0f, 40f, AITimer) * Animators.MakePoly(3f)
+                .OutFunction(InverseLerp(Barrage_AttackTime, Barrage_AttackTime - 60, AITimer));
             Vector2 size = new Vector2(40) * factor;
             Texture2D pixel = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
             Vector2 scale = size / pixel.Size() * 1.2f;
-            Color draw = Color.Cyan;
             Vector2 pixelOrig = pixel.Size() * 0.5f;
             Main.spriteBatch.DrawBetter(pixel, NPC.Center, null, new Color(12, 76, 229), 0f, pixelOrig, scale, 0);
         }
+
         PixelationSystem.QueueTextureRenderAction(orb, PixelationLayer.OverNPCs, null, shader);
     }
 }

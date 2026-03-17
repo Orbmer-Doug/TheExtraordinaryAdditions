@@ -9,10 +9,12 @@ using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
 
-public class SanguineLance : ModProjectile, ILocalizedModType, IModType
+public class SanguineLance : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SanguineLance);
     private const int StartingLife = 200;
@@ -86,7 +88,6 @@ public class SanguineLance : ModProjectile, ILocalizedModType, IModType
             {
                 Projectile.Opacity = InverseLerp(0f, 30f, Timer);
                 AccumulatedVel += Projectile.velocity.Length() * 0.05f;
-                Projectile.velocity *= .995f;
             }
             Projectile.rotation = Projectile.velocity.ToRotation();
 
@@ -161,7 +162,7 @@ public class SanguineLance : ModProjectile, ILocalizedModType, IModType
         {
             if (i < 4)
                 ParticleRegistry.SpawnBloodStreakParticle(pos, Projectile.velocity.SafeNormalize(Vector2.Zero),
-                    Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .5f), Color.DarkRed);
+                    Main.rand.Next(30, 45), Main.rand.NextFloat(.4f, .5f), Color.DarkRed);
             ParticleRegistry.SpawnGlowParticle(pos, Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.3f) * Main.rand.NextFloat(4f, 9f),
                 Main.rand.Next(30, 50), Main.rand.NextFloat(20f, 30f), Color.DarkRed, .8f);
         }

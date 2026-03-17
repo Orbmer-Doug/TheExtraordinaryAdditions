@@ -8,6 +8,7 @@ using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
@@ -88,7 +89,7 @@ public class SangueSpin : ModProjectile
                 if (this.RunLocal())
                 {
                     Projectile.velocity = Vector2.Lerp(Projectile.velocity, Center.SafeDirectionTo(Modded.MouseWorld), .1f);
-                    Dist = MathHelper.Clamp(Center.Distance(Modded.MouseWorld), 150f, 1000f);
+                    Dist = Clamp(Center.Distance(Modded.MouseWorld), 150f, 1000f);
                     if (Projectile.velocity != Projectile.oldVelocity)
                         this.Sync();
                 }
@@ -124,11 +125,11 @@ public class SangueSpin : ModProjectile
                 if (comp > .8f)
                     Projectile.rotation = Projectile.rotation.SmoothAngleLerp(OldRot, .3f, .4f);
                 else
-                    Projectile.rotation += MathHelper.Lerp(0f, .5f, lerper) * Dir;
+                    Projectile.rotation += Lerp(0f, .5f, lerper) * Dir;
 
                 if (!Main.dedServ)
                 {
-                    Vector2 dir = (Projectile.rotation - SwordRot - MathHelper.PiOver2 * -Dir).ToRotationVector2() * Main.rand.NextFloat(2f, 9f);
+                    Vector2 dir = (Projectile.rotation - SwordRot - PiOver2 * -Dir).ToRotationVector2() * Main.rand.NextFloat(2f, 9f);
                     ParticleRegistry.SpawnBloomPixelParticle(Rect().RandomPoint(), dir, Main.rand.Next(30, 50), Main.rand.NextFloat(.4f, .7f), Color.DarkRed, Color.Crimson, null, 2f);
                     for (int i = 0; i < 2; i++)
                         ParticleRegistry.SpawnHeavySmokeParticle(Rect().RandomPoint(), dir * .7f, Main.rand.Next(20, 40), Main.rand.NextFloat(.6f, 1.1f), Color.DarkRed, .8f);
@@ -165,7 +166,7 @@ public class SangueSpin : ModProjectile
         for (int i = 0; i < 20; i++)
         {
             Vector2 pos = target.RandAreaInEntity();
-            Vector2 vel = (Projectile.rotation - SwordRot + MathHelper.PiOver2 * Dir).ToRotationVector2() * Main.rand.NextFloat(2f, 9f);
+            Vector2 vel = (Projectile.rotation - SwordRot + PiOver2 * Dir).ToRotationVector2() * Main.rand.NextFloat(2f, 9f);
             int life = Main.rand.Next(40, 50);
             float scale = Main.rand.NextFloat(.5f, .8f);
             ParticleRegistry.SpawnBloodParticle(pos, vel * 1.4f, life * 2, scale, Color.DarkRed);

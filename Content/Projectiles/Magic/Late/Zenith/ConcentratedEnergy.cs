@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
+using CalamityMod;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -8,10 +9,12 @@ using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Late.Zenith;
 
-public class ConcentratedEnergy : ModProjectile, ILocalizedModType, IModType
+public class ConcentratedEnergy : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ConcentratedEnergy);
 
@@ -27,6 +30,7 @@ public class ConcentratedEnergy : ModProjectile, ILocalizedModType, IModType
         Projectile.tileCollide = false;
         Projectile.localNPCHitCooldown = 10;
         Projectile.usesLocalNPCImmunity = true;
+        Projectile.Opacity = 0f;
     }
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
@@ -41,7 +45,12 @@ public class ConcentratedEnergy : ModProjectile, ILocalizedModType, IModType
         set => Projectile.ai[0] = value.ToInt();
     }
 
-    public ref float Time => ref Projectile.ai[1];
+    public int Time
+    {
+        get => (int)Projectile.ai[1];
+        set => Projectile.ai[1] = value;
+    }
+    
     public override void AI()
     {
         if (trail == null || trail.Disposed)
@@ -49,13 +58,13 @@ public class ConcentratedEnergy : ModProjectile, ILocalizedModType, IModType
 
         Lighting.AddLight(Projectile.Center, Color.Fuchsia.ToVector3() * 1.2f * Projectile.scale);
 
-        if (Time > SecondsToFrames(.5f) && HasHitTarget == false)
+        if (Time > CalUtils.SecondsToFrames(.5f) && !HasHitTarget)
         {
-            if (NPCTargeting.TryGetClosestNPC(new(Projectile.Center, 800, false, true), out NPC target))
+            if (NPCTargeting.TryGetClosestNPC(new(Projectile.Center, 1400, false, true), out NPC target))
                 Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.SafeDirectionTo(target.Center) * 30f, .22f);
         }
 
-        if (HasHitTarget == true)
+        if (HasHitTarget)
         {
             int type = (Projectile.identity % 2f == 0f).ToDirectionInt();
             Projectile.velocity = Projectile.velocity.RotatedBy(MathHelper.Pi / 120f * type) * 0.9f;
@@ -64,7 +73,8 @@ public class ConcentratedEnergy : ModProjectile, ILocalizedModType, IModType
         }
         else
         {
-            Projectile.Opacity = Projectile.scale = InverseLerp(0f, 20f, Projectile.timeLeft);
+            Projectile.Opacity = Projectile.scale = Animators.MakePoly(2f).InFunction(InverseLerp(0f, 15f, Time)) *
+                                                    InverseLerp(0f, 20f, Projectile.timeLeft);
         }
         Projectile.FacingRight();
 

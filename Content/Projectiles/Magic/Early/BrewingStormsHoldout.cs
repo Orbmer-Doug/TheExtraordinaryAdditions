@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using CalamityMod;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -6,6 +7,8 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Early;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Early;
 
@@ -26,7 +29,7 @@ public class BrewingStormsHoldout : BaseIdleHoldoutProjectile
 
     public ref float Time => ref Projectile.ai[0];
     public ref int Charge => ref Owner.GetModPlayer<BrewingStormsPlayer>().Counter;
-    public static readonly int ChargeNeeded = SecondsToFrames(15);
+    public static readonly int ChargeNeeded = CalUtils.SecondsToFrames(15);
     public float Completion => Utils.GetLerpValue(0f, ChargeNeeded, Charge, true);
     public override void SafeAI()
     {

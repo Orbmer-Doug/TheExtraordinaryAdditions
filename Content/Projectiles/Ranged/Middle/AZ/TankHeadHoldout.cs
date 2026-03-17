@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using CalamityMod;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.Audio;
 using Terraria.Enums;
@@ -8,6 +9,8 @@ using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle.AZ;
 
@@ -60,7 +63,7 @@ public class TankHeadHoldout : BaseIdleHoldoutProjectile
     {
         if (Projectile.localAI[0] == 0f)
         {
-            Cooldown = SecondsToFrames(5f);
+            Cooldown = CalUtils.SecondsToFrames(5f);
             Projectile.localAI[0] = 1f;
         }
         if (Owner.dead || !Owner.active)
@@ -159,7 +162,7 @@ public class TankHeadHoldout : BaseIdleHoldoutProjectile
                 {
                     // grubulon
                     // grubmageddon
-                    Cooldown = SecondsToFrames(5f);
+                    Cooldown = CalUtils.SecondsToFrames(5f);
                     SoundEngine.PlaySound(SoundID.Item11 with { Pitch = -.5f, Volume = 1.3f }, tipOfGun);
                     type = ModContent.ProjectileType<Grub>();
                     damage = Projectile.damage / 15;
@@ -206,7 +209,7 @@ public class TankHeadHoldout : BaseIdleHoldoutProjectile
             if (Counter > 60f)
             {
                 if (State == BeeState)
-                    Cooldown = SecondsToFrames(3f);
+                    Cooldown = CalUtils.SecondsToFrames(3f);
                 Projectile.frameCounter = 0;
                 Firing = 0f;
                 Counter = 0f;

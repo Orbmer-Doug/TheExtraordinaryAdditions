@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using CalamityMod;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -18,7 +19,11 @@ public class VaporizingStar : ProjOwnedByNPC<Asterlin>
         Fire,
     }
 
-    public ref float Timer => ref Projectile.ai[0];
+    public int Timer
+    {
+        get => (int)Projectile.ai[0];
+        set => Projectile.ai[0] = value;
+    }
 
     public StateType CurrentState
     {
@@ -38,7 +43,7 @@ public class VaporizingStar : ProjOwnedByNPC<Asterlin>
         set => Projectile.AdditionsInfo().ExtraAI[0] = value;
     }
 
-    public static readonly float GrowTime = SecondsToFrames(1.4f);
+    public static readonly float GrowTime = CalUtils.SecondsToFrames(1.4f);
 
     public override string Texture => AssetRegistry.Invis;
 
@@ -60,7 +65,6 @@ public class VaporizingStar : ProjOwnedByNPC<Asterlin>
     public override void SafeAI()
     {
         Vector2 targetPos = Target.Center + new Vector2(350f * TypeOf, -400f);
-        float totalTime = GrowTime + LaserWait * Asterlin.Disintegration_TotalShots;
 
         switch (CurrentState)
         {

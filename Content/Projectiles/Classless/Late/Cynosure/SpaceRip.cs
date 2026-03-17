@@ -25,7 +25,8 @@ public class SpaceRip : ModProjectile
 
     public override void AI()
     {
-        MetaballRegistry.SpawnGenediesMetaball(Projectile.Center, Main.rand.NextVector2Circular(5f, 5f), Main.rand.Next(50, 70), Main.rand.Next(360, 460));
+        MetaballRegistry.SpawnGenediesMetaball(Projectile.Center, Main.rand.NextVector2Circular(5f, 5f),
+            Main.rand.Next(50, 70), Main.rand.Next(360, 460));
         Time++;
     }
 }

@@ -44,17 +44,15 @@ public class AbsoluteCoreplate : ModItem, ILocalizedModType, IModType
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        recipe.AddIngredient(ItemID.CrimsonScalemail, 1);
         recipe.AddIngredient(ModContent.ItemType<VoltChestplate>(), 1);
         recipe.AddIngredient(ModContent.ItemType<SpecteriteChestPiece>(), 1);
         recipe.AddIngredient(ModContent.ItemType<BlueTuxedo>(), 1);
         recipe.AddIngredient(ModContent.ItemType<TremorPlating>(), 1);
         recipe.AddIngredient(ItemID.SolarFlareBreastplate, 1);
-        recipe.AddIngredient(ModContent.ItemType<CoreofCalamity>(), 4);
         recipe.AddIngredient(ModContent.ItemType<GalacticaSingularity>(), 7);
-        recipe.AddIngredient(ModContent.ItemType<LifeAlloy>(), 5);
+        recipe.AddIngredient(ModContent.ItemType<LifeAlloy>(), 3);
         recipe.AddIngredient(ModContent.ItemType<RuinousSoul>(), 5);
-        recipe.AddIngredient(ModContent.ItemType<AscendantSpiritEssence>(), 5);
+        recipe.AddIngredient(ModContent.ItemType<AscendantSpiritEssence>(), 3);
         recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 14);
         recipe.AddTile(ModContent.TileType<CosmicAnvil>());
         recipe.Register();

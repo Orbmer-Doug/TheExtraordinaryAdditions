@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Terraria;
 using Terraria.ID;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
@@ -13,7 +12,7 @@ using static TheExtraordinaryAdditions.Core.Graphics.Animators;
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 
 // Largely designed off of the legs of Crabulon in Calamity Fables
-public class AuroraGuardLeg : Entity
+public sealed class AuroraGuardLeg : Entity
 {
     public float Maxlength;
     public bool LatchedOn;
@@ -21,8 +20,8 @@ public class AuroraGuardLeg : Entity
     public AuroraGuardLeg PairedLeg;
     public AuroraGuardLeg SisterLeg;
 
-    public bool FrontPair;
-    public bool LeftSet;
+    public readonly bool FrontPair;
+    public readonly bool LeftSet;
 
     public Vector2 LegOrigin;
     public Vector2 LegKnee;
@@ -56,24 +55,28 @@ public class AuroraGuardLeg : Entity
     /// </summary>
     public Point? GrabTile => GrabPosition?.ToTileCoordinates();
 
-    public float Foreleglength => 40.5f;
-    public float Leglength => 96f;
+    public static float Foreleglength => 40.5f;
+    public static float Leglength => 96f;
 
-    public readonly AuroraGuard turret;
+    public readonly AuroraGuard Turret;
     public readonly float BaseRotation;
 
     public bool PlayedStepEffects = true; // If it needs to play its stepping sound
-    public float StepEffectForce = 1f; // Volume of the stepping sound when played. Amps up the longer the foot is left in the air
+
+    public float
+        StepEffectForce =
+            1f; // Volume of the stepping sound when played. Amps up the longer the foot is left in the air
+
     public int Direction => LeftSet ? -1 : 1;
     public float SisterInfluence => SisterLeg.LatchedOn ? SisterLeg.StepTimer : 1;
-    public NPC NPC => turret.NPC;
+    public NPC NPC => Turret.NPC;
 
     public AuroraGuardLeg(AuroraGuard turret, bool frontPair, bool leftSet, float baseRotation)
     {
-        this.turret = turret;
-        this.FrontPair = frontPair;
-        this.LeftSet = leftSet;
-        this.BaseRotation = baseRotation;
+        this.Turret = turret;
+        FrontPair = frontPair;
+        LeftSet = leftSet;
+        BaseRotation = baseRotation;
 
         LegOrigin = GetLegOrigin();
         LegKnee = LegOrigin + Vector2.UnitY * Foreleglength;
@@ -84,25 +87,25 @@ public class AuroraGuardLeg : Entity
         ForelimbAsset = AssetRegistry.GetTexture(AdditionsTexture.AuroraLimbStart);
         LimbAsset = AssetRegistry.GetTexture(AdditionsTexture.AuroraLimbEnd);
 
-        forelegSpriteOrigin = new Vector2(6, 6);
+        ForelegSpriteOrigin = new Vector2(6, 6);
 
         if (leftSet)
-            forelegSpriteOrigin.Y = ForelimbAsset.Height - forelegSpriteOrigin.Y;
+            ForelegSpriteOrigin.Y = ForelimbAsset.Height - ForelegSpriteOrigin.Y;
 
-        legSpriteOrigin = new Vector2(8, 24);
+        LegSpriteOrigin = new Vector2(8, 24);
 
         if (leftSet)
-            legSpriteOrigin.Y = LimbAsset.Height - legSpriteOrigin.Y;
+            LegSpriteOrigin.Y = LimbAsset.Height - LegSpriteOrigin.Y;
     }
 
     public void Update()
     {
-        NPC owner = turret.NPC;
+        NPC owner = Turret.NPC;
         Maxlength = Leglength + Foreleglength;
         Vector2 legDirection = (BaseRotation + owner.rotation).ToRotationVector2();
 
         LegOrigin = GetLegOrigin();
-        LegOriginGraphic = LegOrigin + Vector2.UnitY * turret.VerticalVisualOffset;
+        LegOriginGraphic = LegOrigin + Vector2.UnitY * Turret.VerticalVisualOffset;
 
         // Check if the leg is latched onto something based on if its close enough to the grab position
         LatchedOn = false;
@@ -113,7 +116,7 @@ public class AuroraGuardLeg : Entity
         }
 
         UpdateDesiredGrabPosition(legDirection);
-        bool frontSet = Math.Sign(turret.NPC.velocity.X) == Direction;
+        bool frontSet = Math.Sign(Turret.NPC.velocity.X) == Direction;
 
         width = height = (int)Maxlength;
         position = LegOrigin;
@@ -144,11 +147,12 @@ public class AuroraGuardLeg : Entity
                     float stepPitch = InverseLerp(300f, 1000f, LegTip.Distance(Main.LocalPlayer.Center)) * .3f;
                     float stepVolume = InverseLerp(0.5f, 1f, StepEffectForce);
                     AdditionsSound.LegStomp.Play(LegTip, stepVolume * .36f, stepPitch, .1f, 20);
-                    Collision.HitTiles(LegTip, LegTip.SafeDirectionTo(turret.VisualCenter), 15, 15);
+                    Collision.HitTiles(LegTip, LegTip.SafeDirectionTo(Turret.VisualCenter), 15, 15);
 
                     // Screenshake if big enough
                     ScreenShakeSystem.New(new(stepVolume * .03f, .3f), LegTip);
                 }
+
                 PlayedStepEffects = true;
             }
 
@@ -178,7 +182,8 @@ public class AuroraGuardLeg : Entity
 
                     // When falling, flail legs around a point
                     Vector2 fallingPosition = DesiredGrabPosition - Vector2.UnitY * 100f;
-                    Vector2 fallPositionOffset = new((float)Math.Sin(Main.GlobalTimeWrappedHourly * 20f) * 40f, 21f + (float)Math.Sin(Main.GlobalTimeWrappedHourly * 30f) * 70f);
+                    Vector2 fallPositionOffset = new((float)Math.Sin(Main.GlobalTimeWrappedHourly * 20f) * 40f,
+                        21f + (float)Math.Sin(Main.GlobalTimeWrappedHourly * 30f) * 70f);
                     fallingPosition += fallPositionOffset;
 
                     // Back set of legs is a bit more retracted towards the center
@@ -189,7 +194,8 @@ public class AuroraGuardLeg : Entity
                     fallingPosition.X -= DesiredGrabPositionVelocityXOffset;
 
                     // Move towards the falling leg position
-                    LegTip = Vector2.SmoothStep(LegTip, fallingPosition, Animators.MakePoly(3f).OutFunction(Min(1f, FallTime / 8f) * 0.1f));
+                    LegTip = Vector2.SmoothStep(LegTip, fallingPosition,
+                        MakePoly(3f).OutFunction(Min(1f, FallTime / 8f) * 0.1f));
 
                     // Entirely lose your previous grab position if falling for too long
                     if (FallTime > 10f)
@@ -222,7 +228,7 @@ public class AuroraGuardLeg : Entity
                 else
                 {
                     // Move faster towards the tip if the leg has been falling for a while
-                    float moveSpeed = (10f + InverseLerp(20f, 40f, FallTime) * 15f);
+                    float moveSpeed = 10f + InverseLerp(20f, 40f, FallTime) * 15f;
                     LegTip = LegTip.MoveTowards(GrabPosition.Value, moveSpeed);
                     LegTip.Y -= 4.5f * InverseLerp(0f, 50f, Math.Abs(LegTip.X - GrabPosition.Value.X));
                 }
@@ -259,12 +265,13 @@ public class AuroraGuardLeg : Entity
             LegTipGraphic = LegOriginGraphic + LegOriginGraphic.DirectionTo(LegTipGraphic) * Maxlength;
     }
 
-    public float DesiredGrabPositionVelocityXOffset => (Math.Abs(NPC.velocity.X) > 2f && (NPC.velocity.X * Direction < 0)) ?
-        NPC.velocity.X.NonZeroSign() * 150f : 0f;
+    public float DesiredGrabPositionVelocityXOffset =>
+        Math.Abs(NPC.velocity.X) > 2f && NPC.velocity.X * Direction < 0 ? NPC.velocity.X.NonZeroSign() * 150f : 0f;
 
     public void UpdateDesiredGrabPosition(Vector2 legDirection)
     {
-        DesiredGrabPosition = NPC.Center + (legDirection * 1.25f + Vector2.UnitY).SafeNormalize(Vector2.UnitY) * Maxlength * 0.9f;
+        DesiredGrabPosition = NPC.Center +
+                              (legDirection * 1.25f + Vector2.UnitY).SafeNormalize(Vector2.UnitY) * Maxlength * 0.9f;
 
         // Offset grab positions sideways
         DesiredGrabPosition += Vector2.UnitX * 90f * Direction;
@@ -279,14 +286,15 @@ public class AuroraGuardLeg : Entity
 
     public Vector2 GetLegOrigin()
     {
-        float x = false ? (FrontPair ? 46f : 32f) * (LeftSet ? -1 : 1) : (FrontPair ? 70f : 46f) * (LeftSet ? -1 : 1);
-        float y = false ? (FrontPair ? 7f : 20f) : (FrontPair ? 5f : -11f);
+        float x = (FrontPair ? 70f : 46f) * (LeftSet ? -1 : 1);
+        float y = FrontPair ? 5f : -11f;
         Vector2 offset = new Vector2(x / 2, y);
 
-        return turret.NPC.Center + offset;
+        return Turret.NPC.Center + offset;
     }
 
     #region Check if leg should release
+
     public bool ShouldReleaseLeg(bool frontSet, out bool noDelay)
     {
         noDelay = false;
@@ -304,11 +312,11 @@ public class AuroraGuardLeg : Entity
         float minExtensionTreshold = 0.26f - SisterInfluence * 0.16f;
 
         float tooFarUnderTreshold = (0.25f + SisterInfluence * 0.75f) * 40f;
-        float maxHeightTreshold = 30f;
+        const float maxHeightTreshold = 30f;
 
         float extension = LegTip.Distance(LegOrigin);
 
-        if (LegTip.Distance(GrabPosition.Value) > Maxlength)
+        if (GrabPosition != null && LegTip.Distance(GrabPosition.Value) > Maxlength)
             return true;
 
         // Ungrip when extended too far out
@@ -316,7 +324,7 @@ public class AuroraGuardLeg : Entity
             return true;
 
         // Ungrip when the leg is too compressed
-        else if (extension < Maxlength * minExtensionTreshold)
+        if (extension < Maxlength * minExtensionTreshold)
         {
             noDelay = true;
             return true;
@@ -324,17 +332,14 @@ public class AuroraGuardLeg : Entity
 
         // Ungrip when the leg is too far behind and should take a new step forward
         // Either immediately if part of the front set of legs, or if the step timer is over (to avoid back legs rapid fire)
-        else if ((LegOrigin.X - LegTip.X) * Direction > tooFarUnderTreshold && (frontSet || StepTimer <= 0))
+        if ((LegOrigin.X - LegTip.X) * Direction > tooFarUnderTreshold && (frontSet || StepTimer <= 0))
         {
             noDelay = true;
             return true;
         }
 
         // Ungrip when the leg is too far above the turret and too close to the turret
-        else if (LegOrigin.Y - LegTip.Y > maxHeightTreshold && (LegTip.X - LegOrigin.X) * Direction < Maxlength * 0.2f)
-            return true;
-
-        return false;
+        return LegOrigin.Y - LegTip.Y > maxHeightTreshold && (LegTip.X - LegOrigin.X) * Direction < Maxlength * 0.2f;
     }
 
     public void ReleaseGrip()
@@ -347,9 +352,11 @@ public class AuroraGuardLeg : Entity
         GrabPosition = null;
         LatchedOn = false;
     }
+
     #endregion
 
     #region Grab Position Scanning
+
     private void FindGrabPos(bool debugView = false)
     {
         // Dont grab if in delay period
@@ -359,15 +366,15 @@ public class AuroraGuardLeg : Entity
             return;
         }
 
-        bool frontSet = Math.Sign(turret.NPC.velocity.X) == Direction;
+        bool frontSet = Math.Sign(Turret.NPC.velocity.X) == Direction;
 
         // The position tracing from the shoulder to the desired grab position
         Vector2 shoulder = LegOrigin;
         Vector2 grip = DesiredGrabPosition;
         if (frontSet)
         {
-            shoulder.X += turret.NPC.velocity.X * 40f;
-            grip.X += turret.NPC.velocity.X * 10f;
+            shoulder.X += Turret.NPC.velocity.X * 40f;
+            grip.X += Turret.NPC.velocity.X * 10f;
             grip.Y -= 20f;
 
             // Clamp distances
@@ -384,8 +391,9 @@ public class AuroraGuardLeg : Entity
                 //AdditionsDebug.DebugLine(shoulder, grip, Color.Blue);
             }
         }
+
         Vector2? trace = RaytraceTiles(shoulder, grip, true);
-        Point? fromShoulderGuess = trace.HasValue ? trace.Value.ToTileCoordinates() : null;
+        Point? fromShoulderGuess = trace?.ToTileCoordinates();
         Point? bestGuess = null;
         bool tooClose = false;
 
@@ -437,13 +445,15 @@ public class AuroraGuardLeg : Entity
         while (i < iterations && bestGuess == null)
         {
             // Try tilting the grab position downwards until we find ground
-            Vector2 tiltedGrabPosition = LegOrigin + toGrabPosition.RotatedBy(i * Direction / (float)iterations * angle) * Maxlength * 0.95f;
+            Vector2 tiltedGrabPosition = LegOrigin +
+                                         toGrabPosition.RotatedBy(i * Direction / (float)iterations * angle) *
+                                         Maxlength * 0.95f;
 
             //if (debugView)
-              //  tiltedGrabPosition.SuperQuickDust(Color.Green);
+            //  tiltedGrabPosition.SuperQuickDust(Color.Green);
 
             Vector2? trace = RaytraceTiles(LegOrigin, tiltedGrabPosition, true);
-            bestGuess = trace.HasValue ? trace.Value.ToTileCoordinates() : null;
+            bestGuess = trace?.ToTileCoordinates();
 
             // Cant grab if the resulting grip location would be too close
             if (bestGuess.HasValue && TileToGripPoint(bestGuess.Value).Distance(LegOrigin) < Maxlength * 0.45f)
@@ -454,10 +464,11 @@ public class AuroraGuardLeg : Entity
             else
             {
                 //if (debugView)
-                  //  tiltedGrabPosition.SuperQuickDust(Color.White);
+                //  tiltedGrabPosition.SuperQuickDust(Color.White);
 
                 tooClose = false;
             }
+
             i++;
         }
 
@@ -477,11 +488,11 @@ public class AuroraGuardLeg : Entity
         Vector2 origin = LegOrigin;
 
         // If the turret is moving
-        if (Math.Abs(turret.NPC.velocity.X) > 2f)
+        if (Math.Abs(Turret.NPC.velocity.X) > 2f)
         {
             // Move the check for the pair of legs that is being dragged a bit ahead
-            if (turret.NPC.velocity.X * Direction < 0)
-                origin.X += turret.NPC.velocity.X.NonZeroSign() * 90f;
+            if (Turret.NPC.velocity.X * Direction < 0)
+                origin.X += Turret.NPC.velocity.X.NonZeroSign() * 90f;
 
             // Make the radius for the pair of legs that is moving forward a bit bigger, but not bigger than the max leg length
             else
@@ -503,7 +514,8 @@ public class AuroraGuardLeg : Entity
             Point candidate = tiltedGrabPosition.ToTileCoordinates();
             Tile t = Main.tile[candidate];
 
-            if (t.HasUnactuatedTile && Main.tileSolid[t.TileType] || (Main.tileSolidTop[t.TileType] && t.TileFrameY == 0))
+            if (t.HasUnactuatedTile && Main.tileSolid[t.TileType] ||
+                (Main.tileSolidTop[t.TileType] && t.TileFrameY == 0))
             {
                 // If we find a solid tile and we were previously in the air, thats a potential new step candidate
                 if (lastInAir)
@@ -511,15 +523,16 @@ public class AuroraGuardLeg : Entity
                     potentialGrabPoints.Add(candidate);
 
                     //if (debugView)
-                      //  candidate.SuperQuickDust(Color.Red);
+                    //  candidate.SuperQuickDust(Color.Red);
                 }
                 else
                     insideTilesPositions.Add(candidate);
+
                 lastInAir = false;
             }
 
             //if (debugView)
-              //  candidate.SuperQuickDust(Color.Blue);
+            //  candidate.SuperQuickDust(Color.Blue);
 
             if (!t.HasUnactuatedTile || (!Main.tileSolid[t.TileType] && !TileID.Sets.Platforms[t.TileType]))
                 lastInAir = true;
@@ -529,7 +542,7 @@ public class AuroraGuardLeg : Entity
 
         if (potentialGrabPoints.Count > 0)
             return potentialGrabPoints.OrderBy(RadialPosScanRating).Last();
-        else if (insideTilesPositions.Count > 0)
+        if (insideTilesPositions.Count > 0)
             return insideTilesPositions.OrderBy(RadialPosScanRating).Last();
 
         return null;
@@ -551,19 +564,20 @@ public class AuroraGuardLeg : Entity
             idealAngleStart.X += (LegOrigin.X - idealAngleStart.X) * 2;
         float idealAngle = LegOrigin.AngleTo(idealAngleStart);
 
-        float idealGrabHeightBias = 0.2f + 0.8f * InverseLerp(100f, 10f, Math.Abs(turret.FloorPosition.Y - worldPos.Y));
+        float idealGrabHeightBias = 0.2f + 0.8f * InverseLerp(100f, 10f, Math.Abs(Turret.FloorPosition.Y - worldPos.Y));
 
         // Platforms with a close enough Y position are penalized to prevent from grabbing onto platforms that are going through itself
         float closePlatformScoreReduction = 0f;
         if (Main.tileSolidTop[Main.tile[p].TileType])
             closePlatformScoreReduction += InverseLerp(16f, 80f, LegOrigin.Y - worldPos.Y);
 
-        return (1 - Math.Abs(angle - idealAngle) / PiOver2) * InverseLerp(0, Maxlength * 0.85f, length) * idealGrabHeightBias - closePlatformScoreReduction;
+        return (1 - Math.Abs(angle - idealAngle) / PiOver2) * InverseLerp(0, Maxlength * 0.85f, length) *
+            idealGrabHeightBias - closePlatformScoreReduction;
     }
 
     private void ConfirmGrabPosition(Point potentialGrabPosition)
     {
-        if (GrabPosition == null || RateGripPoint(potentialGrabPosition) > RateGripPoint(GrabTile.Value))
+        if (GrabTile != null && (GrabPosition == null || RateGripPoint(potentialGrabPosition) > RateGripPoint(GrabTile.Value)))
         {
             Vector2 attachPoint = TileToGripPoint(potentialGrabPosition);
 
@@ -579,12 +593,13 @@ public class AuroraGuardLeg : Entity
     {
         Tile t = Main.tile[tilePosition];
         Vector2 tileWorldCoordinates = tilePosition.ToWorldCoordinates();
-        Rectangle aroundTile = RectangleFromVectors(tileWorldCoordinates - Vector2.One * 9f, tileWorldCoordinates + Vector2.One * 9f);
-        if (t.IsHalfBlock || t.Slope != SlopeType.Solid)
-        {
-            aroundTile.Y += 8;
-            aroundTile.Height -= 8;
-        }
+        Rectangle aroundTile = RectangleFromVectors(tileWorldCoordinates - Vector2.One * 9f,
+            tileWorldCoordinates + Vector2.One * 9f);
+        if (!t.IsHalfBlock && t.Slope == SlopeType.Solid)
+            return LegOrigin.ClampInRect(aroundTile);
+        
+        aroundTile.Y += 8;
+        aroundTile.Height -= 8;
 
         return LegOrigin.ClampInRect(aroundTile);
     }
@@ -611,26 +626,30 @@ public class AuroraGuardLeg : Entity
             releaseScore /= 100f;
         }
 
-        int direction = LeftSet ? -1 : 1;
-        if ((LegTip.X - turret.NPC.Center.X).NonZeroSign() != direction)
+        if ((LegTip.X - Turret.NPC.Center.X).NonZeroSign() != (LeftSet ? -1 : 1))
             releaseScore *= 100f;
 
         return releaseScore;
     }
+
     #endregion
 
     #region Drawing
+
     internal readonly Texture2D ForelimbAsset;
     internal readonly Texture2D LimbAsset;
 
-    public readonly Vector2 forelegSpriteOrigin;
-    public readonly Vector2 legSpriteOrigin;
+    public readonly Vector2 ForelegSpriteOrigin;
+    public readonly Vector2 LegSpriteOrigin;
 
     public void Draw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
         SpriteEffects flip = LeftSet ? SpriteEffects.FlipVertically : SpriteEffects.None;
-        spriteBatch.Draw(ForelimbAsset, LegOriginGraphic - screenPos, null, drawColor, LegOriginGraphic.AngleTo(LegKnee), forelegSpriteOrigin, turret.NPC.scale, flip, 0);
-        spriteBatch.Draw(LimbAsset, LegKnee - screenPos, null, drawColor, LegKnee.AngleTo(LegTipGraphic), legSpriteOrigin, turret.NPC.scale, flip, 0);
+        spriteBatch.Draw(ForelimbAsset, LegOriginGraphic - screenPos, null, drawColor,
+            LegOriginGraphic.AngleTo(LegKnee), ForelegSpriteOrigin, Turret.NPC.scale, flip, 0);
+        spriteBatch.Draw(LimbAsset, LegKnee - screenPos, null, drawColor, LegKnee.AngleTo(LegTipGraphic),
+            LegSpriteOrigin, Turret.NPC.scale, flip, 0);
     }
+
     #endregion
 }

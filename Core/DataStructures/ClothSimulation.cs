@@ -25,8 +25,8 @@ public class ClothSimulation : IDisposable
         public Vector2 Position { get; set; }
         public Vector2 PreviousPosition { get; set; }
         public Vector2 InitialPosition { get; set; }
-        public bool IsPinned { get; set; }
-        public List<int> StickIndices { get; init; }
+        public bool IsPinned { get; }
+        public List<int> StickIndices { get; }
         public bool IsSelected { get; set; }
 
         public Point(Vector2 position, bool isPinned)
@@ -48,12 +48,12 @@ public class ClothSimulation : IDisposable
 
     private record struct Triangle(int V0, int V1, int V2, int[] StickIndices)
     {
-        public bool IsActive { get; set; } = true;
+        public bool IsActive { get; init; } = true;
     }
 
-    private readonly List<Point> _points = new();
-    private readonly List<Stick> _sticks = new();
-    private readonly List<Triangle> _triangles = new();
+    private readonly List<Point> _points = [];
+    private readonly List<Stick> _sticks = [];
+    private readonly List<Triangle> _triangles = [];
     private readonly int _gridWidth;
     private readonly int _gridHeight;
     private readonly Vector2[] _initialOffsets;
@@ -62,8 +62,8 @@ public class ClothSimulation : IDisposable
     private Vector2 _previousMousePosition;
     private bool _leftButtonDown;
     private bool _rightButtonDown;
-    private float _cursorSize = 30f;
-    private readonly float _hysteresisFactor = 1.1f;
+    private const float _cursorSize = 30f;
+    private const float _hysteresisFactor = 1.1f;
     private static DynamicIndexBuffer Indices;
     private static DynamicVertexBuffer Vertices;
 
@@ -160,55 +160,55 @@ public class ClothSimulation : IDisposable
 
         Main.QueueMainThreadAction(() =>
         {
-            Indices = new(Main.instance.GraphicsDevice, IndexElementSize.SixteenBits, _indices.Length, BufferUsage.None);
-            Vertices = new(Main.instance.GraphicsDevice, typeof(VertexPositionColorTexture), _gridWidth * _gridHeight, BufferUsage.WriteOnly);
+            Indices = new(Main.instance.GraphicsDevice, IndexElementSize.SixteenBits, _indices.Length,
+                BufferUsage.None);
+            Vertices = new(Main.instance.GraphicsDevice, typeof(VertexPositionColorTexture), _gridWidth * _gridHeight,
+                BufferUsage.WriteOnly);
         });
     }
 
     public void Update(Vector2 position, float radians = 0f, Vector2? pivot = null, Vector2? velocity = null)
     {
-        Vector2 anchor = position; // Anchor is in world coordinates
-        pivot ??= anchor;
+        pivot ??= position;
         velocity ??= Vector2.Zero;
 
         float deltaTime = TimeSystem.LogicDeltaTime;
-        float drag = 0.01f;
+        const float drag = 0.01f;
         Vector2 gravity = new Vector2(0, 980f); // 9.8m/s^2
-        float elasticity = 10f;
+        const float elasticity = 10f;
 
         // Apply velocity to non-pinned points
         Parallel.For(0, _points.Count, i =>
         {
             Point point = _points[i];
-            if (!point.IsPinned)
-            {
-                point.Position += velocity.Value;
-                point.PreviousPosition += velocity.Value;
-                _points[i] = point;
-            }
+            if (point.IsPinned) 
+                return;
+            
+            point.Position += velocity.Value;
+            point.PreviousPosition += velocity.Value;
+            _points[i] = point;
         });
 
         // Update pinned points to follow anchor with rotation around pivot
         for (int x = 0; x < _gridWidth; x++)
         {
-            int index = x; // Top row (y=0)
-            Point point = _points[index];
-            if (point.IsPinned)
-            {
-                // Rotate offset relative to pivot
-                Vector2 offset = _initialOffsets[x];
-                Vector2 relativeToPivot = offset - (pivot.Value - anchor);
-                float cosTheta = MathF.Cos(radians);
-                float sinTheta = MathF.Sin(radians);
-                Vector2 rotatedOffset = new Vector2(
-                    relativeToPivot.X * cosTheta - relativeToPivot.Y * sinTheta,
-                    relativeToPivot.X * sinTheta + relativeToPivot.Y * cosTheta
-                );
-                point.InitialPosition = anchor + rotatedOffset + (pivot.Value - anchor);
-                point.Position = point.InitialPosition;
-                point.PreviousPosition = point.InitialPosition; // Prevent velocity
-                _points[index] = point;
-            }
+            Point point = _points[x];
+            if (!point.IsPinned) 
+                continue;
+            
+            // Rotate offset relative to pivot
+            Vector2 offset = _initialOffsets[x];
+            Vector2 relativeToPivot = offset - (pivot.Value - position);
+            float cosTheta = MathF.Cos(radians);
+            float sinTheta = MathF.Sin(radians);
+            Vector2 rotatedOffset = new Vector2(
+                relativeToPivot.X * cosTheta - relativeToPivot.Y * sinTheta,
+                relativeToPivot.X * sinTheta + relativeToPivot.Y * cosTheta
+            );
+            point.InitialPosition = position + rotatedOffset + (pivot.Value - position);
+            point.Position = point.InitialPosition;
+            point.PreviousPosition = point.InitialPosition; // Prevent velocity
+            _points[x] = point;
         }
 
         // Update mouse input
@@ -225,6 +225,7 @@ public class ClothSimulation : IDisposable
             point.IsSelected = false;
             _points[i] = point;
         }
+
         for (int i = 0; i < _sticks.Count; i++)
         {
             if (_sticks[i].IsActive)
@@ -243,7 +244,9 @@ public class ClothSimulation : IDisposable
             // Check if point is selected by mouse with hysteresis
             Vector2 mouseDir = point.Position - _mousePosition;
             float distSquared = mouseDir.LengthSquared();
-            float threshold = point.IsSelected ? _cursorSize * _cursorSize * _hysteresisFactor : _cursorSize * _cursorSize;
+            float threshold = point.IsSelected
+                ? _cursorSize * _cursorSize * _hysteresisFactor
+                : _cursorSize * _cursorSize;
             point.IsSelected = distSquared < threshold;
 
             // Update sticks selection state if either point is selected
@@ -251,10 +254,7 @@ public class ClothSimulation : IDisposable
             {
                 if (_sticks[stickIndex].IsActive)
                 {
-                    lock (_sticks)
-                    {
-                        _sticks[stickIndex] = _sticks[stickIndex] with { IsSelected = true };
-                    }
+                    _sticks[stickIndex] = _sticks[stickIndex] with { IsSelected = true };
                 }
             }
 
@@ -283,19 +283,14 @@ public class ClothSimulation : IDisposable
                 {
                     if (_sticks[stickIndex].IsActive)
                     {
-                        lock (_sticks)
+                        _sticks[stickIndex] = _sticks[stickIndex] with { IsActive = false };
+
+                        for (int t = 0; t < _triangles.Count; t++)
                         {
-                            _sticks[stickIndex] = _sticks[stickIndex] with { IsActive = false };
-                        }
-                        lock (_triangles)
-                        {
-                            for (int t = 0; t < _triangles.Count; t++)
+                            Triangle triangle = _triangles[t];
+                            if (triangle.IsActive && triangle.StickIndices.Contains(stickIndex))
                             {
-                                Triangle triangle = _triangles[t];
-                                if (triangle.IsActive && triangle.StickIndices.Contains(stickIndex))
-                                {
-                                    _triangles[t] = triangle with { IsActive = false };
-                                }
+                                _triangles[t] = triangle with { IsActive = false };
                             }
                         }
                     }
@@ -304,7 +299,7 @@ public class ClothSimulation : IDisposable
 
             // Verlet integration
             Vector2 newPos = point.Position + (point.Position - point.PreviousPosition) * (1f - drag) +
-                         gravity * (1f - drag) * deltaTime * deltaTime;
+                             gravity * (1f - drag) * deltaTime * deltaTime;
             point.PreviousPosition = point.Position;
             point.Position = newPos;
 
@@ -330,6 +325,7 @@ public class ClothSimulation : IDisposable
                 p0.Position += offset;
                 _points[stick.P0Index] = p0;
             }
+
             if (!p1.IsPinned)
             {
                 p1.Position -= offset;
@@ -351,7 +347,8 @@ public class ClothSimulation : IDisposable
                 {
                     Position = new Vector3(point.Position, 0f),
                     Color = point.IsSelected ? Color.Red : Color.White,
-                    TextureCoordinate = new Vector2((float)(i % _gridWidth) / (_gridWidth - 1), (float)(i / _gridWidth) / (_gridHeight - 1))
+                    TextureCoordinate = new Vector2((float)(i % _gridWidth) / (_gridWidth - 1),
+                        (float)(i / _gridWidth) / (_gridHeight - 1))
                 };
             }
 
@@ -366,6 +363,7 @@ public class ClothSimulation : IDisposable
                     activeIndices.Add((short)triangle.V2);
                 }
             }
+
             _indices = activeIndices.ToArray();
 
             if (_indices.Length <= 0)
@@ -396,10 +394,12 @@ public class ClothSimulation : IDisposable
             gd.SetVertexBuffer(null);
             gd.Indices = null;
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderPlayers);
     }
 
     private bool _disposed;
+
     public void Dispose()
     {
         if (_disposed)
@@ -422,8 +422,7 @@ public class ClothSimulationTiles : IDisposable
         public Vector2 Position { get; set; }
         public Vector2 PreviousPosition { get; set; }
         public Vector2 InitialPosition { get; set; }
-        public bool IsPinned { get; set; }
-        public List<int> StickIndices { get; init; }
+        public bool IsPinned { get; }
 
         public Point(Vector2 position, bool isPinned)
         {
@@ -431,23 +430,22 @@ public class ClothSimulationTiles : IDisposable
             PreviousPosition = position;
             InitialPosition = position;
             IsPinned = isPinned;
-            StickIndices = new List<int>(2);
         }
     }
 
     public record struct Stick(int P0Index, int P1Index, float Length)
     {
-        public bool IsActive { get; set; } = true;
+        public bool IsActive { get; } = true;
     }
 
-    private record struct Triangle(int V0, int V1, int V2, int[] StickIndices)
+    private record struct Triangle(int V0, int V1, int V2)
     {
-        public bool IsActive { get; set; } = true;
+        public bool IsActive { get; } = true;
     }
 
-    public readonly List<Point> Points = new();
-    public readonly List<Stick> Sticks = new();
-    private readonly List<Triangle> _triangles = new();
+    public readonly List<Point> Points = [];
+    public readonly List<Stick> Sticks = [];
+    private readonly List<Triangle> _triangles = [];
     public readonly int GridWidth;
     public readonly int GridHeight;
     public float Spacing;
@@ -491,8 +489,6 @@ public class ClothSimulationTiles : IDisposable
                 Stick stick = new Stick(index, index + 1, Spacing * 0.8f);
                 stickIndexMap[(index, index + 1)] = Sticks.Count;
                 Sticks.Add(stick);
-                Points[index].StickIndices.Add(Sticks.Count - 1);
-                Points[index + 1].StickIndices.Add(Sticks.Count - 1);
             }
         }
 
@@ -505,8 +501,6 @@ public class ClothSimulationTiles : IDisposable
                 Stick stick = new Stick(index, index + gridWidth, Spacing);
                 stickIndexMap[(index, index + gridWidth)] = Sticks.Count;
                 Sticks.Add(stick);
-                Points[index].StickIndices.Add(Sticks.Count - 1);
-                Points[index + gridWidth].StickIndices.Add(Sticks.Count - 1);
             }
         }
 
@@ -522,17 +516,8 @@ public class ClothSimulationTiles : IDisposable
                 int bottomLeft = topLeft + gridWidth;
                 int bottomRight = bottomLeft + 1;
 
-                int[] stickIndices1 = new int[3];
-                stickIndices1[0] = stickIndexMap.GetValueOrDefault((topLeft, bottomLeft), -1);
-                stickIndices1[1] = stickIndexMap.GetValueOrDefault((bottomLeft, topRight), -1);
-                stickIndices1[2] = stickIndexMap.GetValueOrDefault((topLeft, topRight), -1);
-                _triangles.Add(new Triangle(topLeft, bottomLeft, topRight, stickIndices1));
-
-                int[] stickIndices2 = new int[3];
-                stickIndices2[0] = stickIndexMap.GetValueOrDefault((topRight, bottomLeft), -1);
-                stickIndices2[1] = stickIndexMap.GetValueOrDefault((bottomLeft, bottomRight), -1);
-                stickIndices2[2] = stickIndexMap.GetValueOrDefault((topRight, bottomRight), -1);
-                _triangles.Add(new Triangle(topRight, bottomLeft, bottomRight, stickIndices2));
+                _triangles.Add(new Triangle(topLeft, bottomLeft, topRight));
+                _triangles.Add(new Triangle(topRight, bottomLeft, bottomRight));
 
                 _indices[indexCount++] = (short)topLeft;
                 _indices[indexCount++] = (short)bottomLeft;
@@ -545,19 +530,20 @@ public class ClothSimulationTiles : IDisposable
 
         Main.QueueMainThreadAction(() =>
         {
-            Indices = new(Main.instance.GraphicsDevice, IndexElementSize.SixteenBits, _indices.Length, BufferUsage.None);
-            Vertices = new(Main.instance.GraphicsDevice, typeof(VertexPositionColorTexture), GridWidth * GridHeight, BufferUsage.WriteOnly);
+            Indices = new(Main.instance.GraphicsDevice, IndexElementSize.SixteenBits, _indices.Length,
+                BufferUsage.None);
+            Vertices = new(Main.instance.GraphicsDevice, typeof(VertexPositionColorTexture), GridWidth * GridHeight,
+                BufferUsage.WriteOnly);
         });
     }
 
     public void Update(Vector2 entityPos, float radians = 0f, Vector2? pivot = null, Vector2? velocity = null)
     {
         Vector2 anchor = Position;
-        pivot ??= anchor;
         velocity ??= Vector2.Zero;
 
         float deltaTime = TimeSystem.LogicDeltaTime;
-        float drag = 0.01f;
+        const float drag = 0.01f;
 
         // Apply velocity and offset to all points
         Parallel.For(0, Points.Count, i =>
@@ -574,6 +560,7 @@ public class ClothSimulationTiles : IDisposable
                 point.Position = anchor + localPos; // Keep pinned points at anchor
                 point.PreviousPosition = point.Position;
             }
+
             Points[i] = point;
         });
 
@@ -597,13 +584,14 @@ public class ClothSimulationTiles : IDisposable
 
             float interpol = 120f * MathHelper.Clamp(MathF.Abs(Main.windSpeedCurrent), 0f, 1f);
             Vector2 windForce = new Vector2(
-                x: ((MathF.Cos(Main.GlobalTimeWrappedHourly * 25f + point.Position.X * 0.4f + point.Position.Y * 0.09f) * 0.5f + 0.076f)
-                + (Main.windSpeedCurrent * 9f * (float)Main.dayRate)) * interpol * .5f,
-                 y: MathF.Cos(Main.GlobalTimeWrappedHourly * -4.6f + point.Position.X * 0.03f) * interpol * 9f);
+                x: (MathF.Cos(Main.GlobalTimeWrappedHourly * 25f + point.Position.X * 0.4f +
+                              point.Position.Y * 0.09f) * 0.5f + 0.076f
+                                                               + Main.windSpeedCurrent * 9f * (float)Main.dayRate) * interpol * .5f,
+                y: MathF.Cos(Main.GlobalTimeWrappedHourly * -4.6f + point.Position.X * 0.03f) * interpol * 9f);
 
             Vector2 localPos = point.Position - anchor;
             Vector2 newLocalPos = localPos + (localPos - (point.PreviousPosition - anchor)) * (1f - drag) +
-                                windForce * (1f - drag) * deltaTime * deltaTime;
+                                  windForce * (1f - drag) * deltaTime * deltaTime;
             point.PreviousPosition = point.Position;
             point.Position = newLocalPos + anchor;
 
@@ -613,29 +601,29 @@ public class ClothSimulationTiles : IDisposable
         // Update constraints
         for (int iter = 0; iter < 1; iter++)
         {
-            for (int i = 0; i < Sticks.Count; i++)
+            foreach (Stick stick in Sticks)
             {
-                Stick stick = Sticks[i];
                 if (!stick.IsActive)
                     continue;
 
                 Point p0 = Points[stick.P0Index];
                 Point p1 = Points[stick.P1Index];
-                Vector2 diff = (p0.Position - anchor) - (p1.Position - anchor); // Local difference
+                Vector2 diff = p0.Position - anchor - (p1.Position - anchor); // Local difference
                 float dist = diff.Length();
                 float diffFactor = dist > 0 ? (stick.Length - dist) / dist : 0f;
                 Vector2 offset = diff * diffFactor * 0.5f;
 
                 if (!p0.IsPinned)
                 {
-                    p0.Position = (p0.Position - anchor) + offset + anchor;
+                    p0.Position = p0.Position - anchor + offset + anchor;
                     Points[stick.P0Index] = p0;
                 }
-                if (!p1.IsPinned)
-                {
-                    p1.Position = (p1.Position - anchor) - offset + anchor;
-                    Points[stick.P1Index] = p1;
-                }
+
+                if (p1.IsPinned) 
+                    continue;
+                
+                p1.Position = p1.Position - anchor - offset + anchor;
+                Points[stick.P1Index] = p1;
             }
         }
     }
@@ -670,13 +658,14 @@ public class ClothSimulationTiles : IDisposable
         List<short> activeIndices = new List<short>(_triangles.Count * 3);
         foreach (Triangle triangle in _triangles)
         {
-            if (triangle.IsActive)
-            {
-                activeIndices.Add((short)triangle.V0);
-                activeIndices.Add((short)triangle.V1);
-                activeIndices.Add((short)triangle.V2);
-            }
+            if (!triangle.IsActive) 
+                continue;
+            
+            activeIndices.Add((short)triangle.V0);
+            activeIndices.Add((short)triangle.V1);
+            activeIndices.Add((short)triangle.V2);
         }
+
         _indices = activeIndices.ToArray();
 
         if (_indices.Length <= 0)
@@ -688,10 +677,11 @@ public class ClothSimulationTiles : IDisposable
         GraphicsDevice gd = Main.instance.GraphicsDevice;
 
         Matrix world = Matrix.CreateTranslation(drawOffset.X, drawOffset.Y, 0f);
-        Matrix projection = Matrix.CreateOrthographicOffCenter(0f, Main.instance.GraphicsDevice.Viewport.Width, Main.instance.GraphicsDevice.Viewport.Height, 0f, -1f, 1f);
+        Matrix projection = Matrix.CreateOrthographicOffCenter(0f, Main.instance.GraphicsDevice.Viewport.Width,
+            Main.instance.GraphicsDevice.Viewport.Height, 0f, -1f, 1f);
 
         ManagedShader clothShader = AssetRegistry.GetShader("ClothShader");
-        clothShader.TrySetParameter("size", new Vector2(GridWidth / 2, GridHeight));
+        clothShader.TrySetParameter("size", new Vector2(GridWidth / 2f, GridHeight));
         clothShader.TrySetParameter("transformMatrix", world * projection);
         clothShader.SetTexture(texture, 1, SamplerState.PointClamp);
         clothShader.Effect.CurrentTechnique.Passes[ManagedShader.DefaultPassName].Apply();
@@ -700,11 +690,14 @@ public class ClothSimulationTiles : IDisposable
         BlendState prevBlend = gd.BlendState;
         Viewport prevViewport = gd.Viewport;
         Rectangle prevScissor = gd.ScissorRectangle;
+        
         gd.RasterizerState = RasterizerState.CullNone;
         gd.BlendState = BlendState.AlphaBlend;
         gd.SetVertexBuffer(Vertices);
         gd.Indices = Indices;
+        
         gd.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, vertices.Length, 0, _indices.Length / 3);
+        
         gd.RasterizerState = prevRasterizer;
         gd.BlendState = prevBlend;
         gd.Viewport = prevViewport;
@@ -714,6 +707,7 @@ public class ClothSimulationTiles : IDisposable
     }
 
     private bool _disposed;
+
     public void Dispose()
     {
         if (_disposed)

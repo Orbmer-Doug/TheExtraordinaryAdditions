@@ -9,6 +9,7 @@ using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
@@ -157,7 +158,7 @@ public class HorsemenDive : ModProjectile
     public int Dir => Projectile.velocity.X.NonZeroSign();
     public RotatedRectangle Rect()
     {
-        return new(Width * Projectile.scale, Projectile.Center, Projectile.Center + PolarVector(76f * Projectile.scale, Projectile.rotation - MathHelper.PiOver4));
+        return new(Width * Projectile.scale, Projectile.Center, Projectile.Center + PolarVector(76f * Projectile.scale, Projectile.rotation - PiOver4));
     }
     public override void AI()
     {
@@ -184,7 +185,7 @@ public class HorsemenDive : ModProjectile
         if (Time < WaitTime)
         {
             float comp = InverseLerp(0f, WaitTime, Time);
-            Projectile.rotation = MathHelper.PiOver4 + Projectile.velocity.ToRotation() - MathHelper.PiOver2 * MakePoly(3f).InOutFunction.Evaluate(1f, 0f, comp) * Dir * Owner.gravDir;
+            Projectile.rotation = PiOver4 + Projectile.velocity.ToRotation() - PiOver2 * MakePoly(3f).InOutFunction.Evaluate(1f, 0f, comp) * Dir * Owner.gravDir;
         }
         else if (Time == WaitTime)
             SoundID.Item73.Play(Projectile.Center, 1.1f, -.2f, 0f, null, 20, Name);
@@ -195,7 +196,7 @@ public class HorsemenDive : ModProjectile
 
             for (int i = 0; i < 2; i++)
             {
-                Dust d = Dust.NewDustPerfect(Rect().RandomPoint(), DustID.Torch, -(Projectile.rotation - MathHelper.PiOver4).ToRotationVector2() * Main.rand.NextFloat(2f, 8f),
+                Dust d = Dust.NewDustPerfect(Rect().RandomPoint(), DustID.Torch, -(Projectile.rotation - PiOver4).ToRotationVector2() * Main.rand.NextFloat(2f, 8f),
                     0, default, Main.rand.NextFloat(1.7f, 2.1f));
                 d.noGravity = true;
             }
@@ -206,7 +207,7 @@ public class HorsemenDive : ModProjectile
             if (Projectile.Opacity <= 0f)
                 Projectile.Kill();
         }
-        Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, Projectile.rotation - MathHelper.PiOver4);
+        Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, Projectile.rotation - PiOver4);
         Projectile.Center = Owner.GetFrontHandPositionImproved();
 
         Time++;

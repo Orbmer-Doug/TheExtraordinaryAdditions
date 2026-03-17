@@ -5,7 +5,7 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Projectiles.Melee.Late.Cosmireaper;
+using TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -29,7 +29,7 @@ public class Cosmireaper : ModItem
         Item.value = AdditionsGlobalItem.UniqueRarityPrice;
         Item.rare = ModContent.RarityType<UniqueRarity>();
         Item.autoReuse = false;
-        Item.shoot = ModContent.ProjectileType<CosmireapHoldout>();
+        Item.shoot = ModContent.ProjectileType<CosmireapSweep>();
         Item.shootSpeed = 1f;
         Item.useTurn = false;
         Item.channel = true;
@@ -41,22 +41,25 @@ public class Cosmireaper : ModItem
         tooltips.ColorLocalization(ColorSwap(Color.MediumPurple * 1.1f, Color.PaleVioletRed, 4f));
     }
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type,
+        int damage, float knockback)
     {
-        player.NewPlayerProj(position, Vector2.Zero, type, damage, knockback, player.whoAmI);
-        return false;
-    }
-
-    public override bool CanUseItem(Player player)
-    {
-        if (Utility.FindProjectile(out Projectile scythe, Item.shoot, player.whoAmI))
+        if (player.altFunctionUse == ItemAlternativeFunctionID.ActivatedAndUsed)
         {
-            if (!scythe.As<CosmireapHoldout>().Released || scythe.As<CosmireapHoldout>().State == CosmireapHoldout.States.Impact)
-                return false;
+            player.NewPlayerProj(player.Center, Vector2.Zero, ModContent.ProjectileType<CosmireapThrow>(), damage, knockback);
+            return false;
         }
-        return true;
+        
+        return base.Shoot(player, source, position, velocity, type, damage, knockback);
     }
 
+    public override bool AltFunctionUse(Player player)
+    {
+        return CanShoot(player) && player.ownedProjectileCounts[ModContent.ProjectileType<LaceratedSpace>()] <= 0;
+    }
+    
+    public override bool CanShoot(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0 && player.ownedProjectileCounts[ModContent.ProjectileType<CosmireapThrow>()] <= 0;
+    
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();

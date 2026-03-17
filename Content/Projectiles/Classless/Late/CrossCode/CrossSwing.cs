@@ -8,6 +8,7 @@ using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.UI.CrossUI;
 using static TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.CrossCode.CrossDiscHoldout;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.CrossCode;
 
@@ -15,6 +16,7 @@ public class CrossSwing : BaseSwordSwing
 {
     public override string Texture => AssetRegistry.Invis;
     public ElementalBalance ElementPlayer => Owner.GetModPlayer<ElementalBalance>();
+
     public Element State
     {
         get => (Element)Projectile.AdditionsInfo().ExtraAI[7];
@@ -26,6 +28,7 @@ public class CrossSwing : BaseSwordSwing
         get => (int)Projectile.AdditionsInfo().ExtraAI[8];
         set => Projectile.AdditionsInfo().ExtraAI[8] = value;
     }
+
     public bool Spin => SwingCounter >= 3;
 
     public override void Defaults()
@@ -43,7 +46,7 @@ public class CrossSwing : BaseSwordSwing
         if (Spin)
             return Animators.Exp(2.5f).OutFunction.Evaluate(Time, 0f, MaxTime, -1f, 5f);
 
-        return Animators.Exp(2f).OutFunction.Evaluate(Time, 0f, MaxTime, -1f, 1f);
+        return Animators.Exp().OutFunction.Evaluate(Time, 0f, MaxTime, -1f, 1f);
     }
 
     public override void SafeInitialize()
@@ -59,23 +62,29 @@ public class CrossSwing : BaseSwordSwing
                 case Element.Cold:
                     for (int a = 0; a < 5; a++)
                     {
-                        Vector2 newVelocity = Center.SafeDirectionTo(Modded.MouseWorld).RotatedByRandom(MathHelper.ToRadians(12)) * 12f;
+                        Vector2 newVelocity = Center.SafeDirectionTo(Modded.MouseWorld)
+                            .RotatedByRandom(MathHelper.ToRadians(12)) * 12f;
 
                         newVelocity *= 1f - Main.rand.NextFloat(0.3f);
 
-                        Projectile.NewProj(Center, newVelocity, ModContent.ProjectileType<BouncyIcicle>(), Projectile.damage / 3, Projectile.knockBack / 9, Projectile.owner);
+                        Projectile.NewProj(Center, newVelocity, ModContent.ProjectileType<BouncyIcicle>(),
+                            Projectile.damage / 3, Projectile.knockBack / 9, Projectile.owner);
                     }
+
                     break;
                 case Element.Heat:
-                    Vector2 target = ClosestPointOnLineSegment(Modded.MouseWorld, Center - Vector2.UnitX * Main.LogicCheckScreenWidth / 2, Center + Vector2.UnitX * Main.LogicCheckScreenWidth / 2);
-                    Vector2 pos;
+                    Vector2 target = ClosestPointOnLineSegment(Modded.MouseWorld,
+                        Center - Vector2.UnitX * Main.LogicCheckScreenWidth / 2,
+                        Center + Vector2.UnitX * Main.LogicCheckScreenWidth / 2);
                     for (int i = 0; i < 2; i++)
                     {
-                        pos = target - new Vector2(Main.rand.NextFloat(-40f, 40f), 800f);
+                        Vector2 pos = target - new Vector2(Main.rand.NextFloat(-40f, 40f), 800f);
                         pos.Y -= 200 * i;
                         Vector2 vel = Vector2.UnitY.RotatedByRandom(.3f) * Main.rand.NextFloat(4f, 10f);
-                        Projectile.NewProj(pos, vel, ModContent.ProjectileType<ScarletMeteor>(), Projectile.damage, Projectile.knockBack / 2, Owner.whoAmI);
+                        Projectile.NewProj(pos, vel, ModContent.ProjectileType<ScarletMeteor>(), Projectile.damage,
+                            Projectile.knockBack / 2, Owner.whoAmI);
                     }
+
                     break;
                 case Element.Shock:
 
@@ -83,9 +92,12 @@ public class CrossSwing : BaseSwordSwing
                 case Element.Wave:
                     for (int i = 0; i < 4; i++)
                     {
-                        Projectile.NewProj(Center, Center.SafeDirectionTo(Modded.MouseWorld).RotatedByRandom(.6f) * Main.rand.NextFloat(10f, 12f),
+                        Projectile.NewProj(Center,
+                            Center.SafeDirectionTo(Modded.MouseWorld).RotatedByRandom(.6f) *
+                            Main.rand.NextFloat(10f, 12f),
                             ModContent.ProjectileType<WaveSiphon>(), Projectile.damage / 5, 0f, Projectile.owner);
                     }
+
                     break;
             }
         }
@@ -96,7 +108,7 @@ public class CrossSwing : BaseSwordSwing
     public override void SafeAI()
     {
         if (trail == null || trail.Disposed)
-            trail = new(WidthFunct, ColorFunct, (c) => Center.ToNumerics(), 20);
+            trail = new(WidthFunct, ColorFunct, _ => Center.ToNumerics(), 20);
 
         Owner.ChangeDir(Direction);
 
@@ -136,6 +148,7 @@ public class CrossSwing : BaseSwordSwing
                         sound = AdditionsSound.WaveSweepMassive;
                     break;
             }
+
             sound.Play(Projectile.Center, 1.2f, 0f, .2f, 10, Name);
 
             PlayedSound = true;
@@ -196,20 +209,25 @@ public class CrossSwing : BaseSwordSwing
 
                 if (this.RunLocal())
                 {
-                    ShockLightning shock = Main.projectile[Projectile.NewProj(npc.Center - Vector2.UnitY * 800f, Vector2.Zero,
-                        ModContent.ProjectileType<ShockLightning>(), Projectile.damage / 2, 0f, Projectile.owner)].As<ShockLightning>();
+                    ShockLightning shock = Main.projectile[Projectile.NewProj(npc.Center - Vector2.UnitY * 800f,
+                            Vector2.Zero,
+                            ModContent.ProjectileType<ShockLightning>(), Projectile.damage / 2, 0f, Projectile.owner)]
+                        .As<ShockLightning>();
                     shock.End = npc.Center;
                     shock.Sync();
                 }
+
                 break;
             case Element.Wave:
                 AdditionsSound.WaveHitMedium.Play(Projectile.Center, 1.1f, 0f, .2f);
                 break;
         }
+
         ParticleRegistry.SpawnCrossCodeHit(start, ParticleRegistry.CrosscodeHitType.Medium, State);
     }
 
     public float WidthFunct(float c) => 120f * Projectile.scale;
+
     public Color ColorFunct(SystemVector2 c, Vector2 pos)
     {
         float opacity = InverseLerp(0.018f, 0.05f, AngularVelocity);
@@ -239,6 +257,7 @@ public class CrossSwing : BaseSwordSwing
 
     public TrailPoints points = new(20);
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -280,6 +299,7 @@ public class CrossSwing : BaseSwordSwing
 
             trail.DrawTrail(shader, points.Points, 100, true);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 
         return false;

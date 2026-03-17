@@ -2,9 +2,9 @@
 
 namespace TheExtraordinaryAdditions.Core.DataStructures;
 
-public class BezierCurves(params Vector2[] controls)
+public readonly struct BezierCurves(params Vector2[] controls)
 {
-    public Vector2[] ControlPoints = controls;
+    public readonly Vector2[] ControlPoints = controls;
 
     public Vector2 Evaluate(float interpolant)
     {
@@ -18,12 +18,10 @@ public class BezierCurves(params Vector2[] controls)
 
         float perStep = 1f / (amount - 1);
 
-        var points = new List<Vector2>();
+        List<Vector2> points = [];
 
         for (int i = 0; i < amount; i++)
-        {
             points.Add(Evaluate(perStep * i));
-        }
 
         return points;
     }
@@ -39,11 +37,7 @@ public class BezierCurves(params Vector2[] controls)
             }
             points = nextPoints;
         }
-        if (points.Length <= 1)
-        {
-            return Vector2.Zero;
-        }
-        return Vector2.Lerp(points[0], points[1], T);
+        return points.Length <= 1 ? Vector2.Zero : Vector2.Lerp(points[0], points[1], T);
     }
 
     public Vector2 this[int x]

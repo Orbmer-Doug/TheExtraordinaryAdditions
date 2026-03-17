@@ -7,6 +7,7 @@ using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
@@ -40,9 +41,9 @@ public class GaussBallisticWarheadHoldout : BaseIdleHoldoutProjectile
         Projectile.DamageType = DamageClass.Ranged;
     }
 
-    public static readonly float ChargeNeeded = SecondsToFrames(5f);
+    public static readonly float ChargeNeeded = CalUtils.SecondsToFrames(5f);
     public float ChargeCompletion => InverseLerp(0f, ChargeNeeded, ChargeTime);
-    public float ShootWait => Maxxed ? SecondsToFrames(2.5f) : SecondsToFrames(1.5f);
+    public float ShootWait => Maxxed ? CalUtils.SecondsToFrames(2.5f) : CalUtils.SecondsToFrames(1.5f);
     public Vector2 Right => Projectile.Center + PolarVector(73f, Projectile.rotation) + PolarVector(10f * Projectile.direction * Owner.gravDir, Projectile.rotation - MathHelper.PiOver2);
     public ref bool Lock => ref Owner.GetModPlayer<GaussGlobalPlayer>().Lock;
     public override void SafeAI()
@@ -197,7 +198,7 @@ public class GaussBallisticWarheadHoldout : BaseIdleHoldoutProjectile
         float rotation = Projectile.rotation + (Projectile.spriteDirection == -1 ? MathHelper.Pi : 0f);
         Vector2 origin = frame.Size() * 0.5f;
         SpriteEffects effects = Projectile.direction.ToSpriteDirection();
-        float shake = Utils.Remap(Time, 0f, ShootWait, 0f, Maxxed ? 11f : 8f, true);
+        float shake = Terraria.Utils.Remap(Time, 0f, ShootWait, 0f, Maxxed ? 11f : 8f, true);
         position += Main.rand.NextVector2Circular(shake, shake);
         Color col = Projectile.GetAlpha(lightColor);
 
@@ -262,7 +263,7 @@ public class GaussGlobalNPC : GlobalNPC
     {
         if (!BeingTargeted)
             LockIn = 0;
-        if (Utility.FindProjectile(out Projectile p, ModContent.ProjectileType<GaussBallisticWarheadHoldout>()))
+        if (FindProjectile(out Projectile p, ModContent.ProjectileType<GaussBallisticWarheadHoldout>()))
         {
             if (p.As<GaussBallisticWarheadHoldout>().Target != npc)
                 BeingTargeted = false;

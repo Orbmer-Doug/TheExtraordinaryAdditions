@@ -11,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
 public class GaussShockwave : ModProjectile
 {
-    public static readonly float Lifetime = SecondsToFrames(.5f);
+    public static readonly float Lifetime = CalUtils.SecondsToFrames(.5f);
     public ref float Radius => ref Projectile.ai[1];
     public static Color DetermineExplosionColor()
     {
@@ -52,7 +52,7 @@ public class GaussShockwave : ModProjectile
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return CircularHitboxCollision(Projectile.Center, Radius * 0.5f, targetHitbox);
+        return CalUtils.CircularHitboxCollision(Projectile.Center, Radius * 0.5f, targetHitbox);
     }
 
     public override bool PreDraw(ref Color lightColor)

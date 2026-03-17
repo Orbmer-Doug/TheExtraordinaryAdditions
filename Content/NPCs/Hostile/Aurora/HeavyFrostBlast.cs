@@ -1,8 +1,10 @@
-﻿using Terraria;
+﻿using CalamityMod;
+using Terraria;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
 using static TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora.AuroraGuard;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 
@@ -10,6 +12,7 @@ public class HeavyFrostBlast : ProjOwnedByNPC<AuroraGuard>
 {
     public override string Texture => AssetRegistry.Invis;
     public const int Lifetime = 80;
+
     public override void SetDefaults()
     {
         Projectile.Size = new(20f);
@@ -24,6 +27,7 @@ public class HeavyFrostBlast : ProjOwnedByNPC<AuroraGuard>
     }
 
     public ref float Time => ref Projectile.ai[0];
+
     public override void SafeAI()
     {
         float interpolant = InverseLerp(0f, Lifetime, Time);
@@ -35,7 +39,8 @@ public class HeavyFrostBlast : ProjOwnedByNPC<AuroraGuard>
         {
             int life = (int)(30 + (size * 10));
             ParticleRegistry.SpawnHeavySmokeParticle(Projectile.RandAreaInEntity(), Vector2.Zero, life, size * 3f, col);
-            ParticleRegistry.SpawnCloudParticle(Projectile.RandAreaInEntity(), Vector2.Zero, col, Color.DarkViolet, life - 9, size * .1f, Main.rand.NextFloat(.5f, .8f), Main.rand.NextByte(0, 2));
+            ParticleRegistry.SpawnCloudParticle(Projectile.RandAreaInEntity(), Vector2.Zero, col, Color.DarkViolet,
+                life - 9, size * .1f, Main.rand.NextFloat(.5f, .8f), Main.rand.NextByte(0, 2));
         }
 
         foreach (Player player in Main.ActivePlayers)
@@ -45,6 +50,7 @@ public class HeavyFrostBlast : ProjOwnedByNPC<AuroraGuard>
                 player.velocity += Projectile.velocity * .82f / Projectile.MaxUpdates;
             }
         }
+
         Time++;
     }
 

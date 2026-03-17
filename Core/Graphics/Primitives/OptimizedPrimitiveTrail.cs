@@ -34,16 +34,13 @@ public readonly struct Vertex2D(SystemVector2 position, Color color, SystemVecto
 
     public static readonly VertexDeclaration VertexDeclaration = VertexDeclaration2D;
 
-    VertexDeclaration IVertexType.VertexDeclaration
-    {
-        get => VertexDeclaration;
-    }
+    VertexDeclaration IVertexType.VertexDeclaration => VertexDeclaration;
 
     public readonly SystemVector2 position = position;
     public readonly Color color = color;
     public readonly SystemVector2 texCoord = texCoord;
 
-    public override readonly string ToString()
+    public override string ToString()
     {
         return $"[Position at: {position}, Colored with: {color}, Coord of :{texCoord}]";
     }
@@ -63,7 +60,7 @@ public sealed class TrailPoints
 
     public TrailPoints(int max)
     {
-        ArgumentOutOfRangeException.ThrowIfNegative(max, nameof(max));
+        ArgumentOutOfRangeException.ThrowIfNegative(max);
 
         trailBuffer = new Vector2[max];
         count = max;
@@ -168,12 +165,12 @@ public sealed class TrailPoints
 public sealed class TrailCleaner : ModSystem
 {
     public static TrailCleaner Instance => ModContent.GetInstance<TrailCleaner>();
-    public List<OptimizedPrimitiveTrail> trails = [];
+    public List<OptimizedPrimitiveTrail> Trails = [];
     private int cleanCounter;
 
     public override void PostUpdateEverything()
     {
-        if (trails.Count == 0)
+        if (Trails.Count == 0)
             return;
 
         if (cleanCounter++ < 10)
@@ -181,9 +178,9 @@ public sealed class TrailCleaner : ModSystem
         cleanCounter = 0;
 
         int writeIndex = 0;
-        for (int readIndex = 0; readIndex < trails.Count; readIndex++)
+        for (int readIndex = 0; readIndex < Trails.Count; readIndex++)
         {
-            OptimizedPrimitiveTrail trail = trails[readIndex];
+            OptimizedPrimitiveTrail trail = Trails[readIndex];
             if (trail == null || trail.Disposed)
                 continue;
 
@@ -194,12 +191,12 @@ public sealed class TrailCleaner : ModSystem
                 continue;
             }
 
-            trails[writeIndex] = trail;
+            Trails[writeIndex] = trail;
             writeIndex++;
         }
 
-        if (writeIndex < trails.Count)
-            trails.RemoveRange(writeIndex, trails.Count - writeIndex);
+        if (writeIndex < Trails.Count)
+            Trails.RemoveRange(writeIndex, Trails.Count - writeIndex);
     }
 }
 
@@ -271,7 +268,7 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
             PrecomputeIndices(maxTrailPoints);
         }
 
-        TrailCleaner.Instance.trails.Add(this);
+        TrailCleaner.Instance.Trails.Add(this);
         FailedTicks = 10;
     }
     #endregion
@@ -489,11 +486,12 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
     /// <param name="totalTrailPoints">Increase for smoothness</param>
     /// <param name="smooth">Set to true for greater smoothness</param>
     /// <param name="pixelated">Is this trail pixelated?</param>
-    public void DrawTrail(ManagedShader effect, ReadOnlySpan<Vector2> originalPositions, int totalTrailPoints = -1, bool smooth = false, bool pixelated = true)
+    /// <param name="matrix">Customize the world-view-projection matrix</param>
+    public void DrawTrail(ManagedShader effect, ReadOnlySpan<Vector2> originalPositions, int totalTrailPoints = -1, bool smooth = false, bool pixelated = true, Matrix? matrix = null)
     {
         if (Main.dedServ)
             return;
-        if (originalPositions == null || originalPositions.Length < 2 || Utility.ContainsInvalidPoint(originalPositions) || Utility.AllPointsEqual(originalPositions))
+        if (originalPositions == null || originalPositions.Length < 2 || originalPositions.ContainsInvalidPoint() || originalPositions.AllPointsEqual())
             return;
 
         int effectiveTotalPoints = totalTrailPoints > 0 ? totalTrailPoints : _maxTrailPoints;
@@ -515,7 +513,7 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
         // Clear potentially stale data
         Array.Clear(_verticesBuffer, 0, _verticesBuffer.Length);
         int trailVertexCount = GetVerticesFromTrailPoints(_trailPointsBuffer.AsSpan(0, pointCount),
-            _verticesBuffer.AsSpan(0, (pointCount) * 2), null);
+            _verticesBuffer.AsSpan(0, (pointCount) * 2));
 
         if (trailVertexCount < 3)
             return;
@@ -532,7 +530,7 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
         device.BlendState = BlendState.AlphaBlend;
 
         // Apply effect
-        effect.Render(ManagedShader.DefaultPassName, pixelated);
+        effect.Render(ManagedShader.DefaultPassName, pixelated, true, matrix);
 
         // Draw trail body
         int trailIndexCount = (pointCount - 1) * 6;
@@ -577,19 +575,12 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
 
         if (getFirstPoint)
         {
-            if (pointCount < 2) // Not enough points to smooth
-                return convertedPositions[0].FromNumerics(); // Just return the first input point
-
             // For a smooth start, average the first two vertices
             return ((tempVertices[0].position + tempVertices[1].position) * 0.5f).FromNumerics();
         }
-        else
-        {
-            if (vertexCount < 2)
-                return tempPoints[pointCount - 1].FromNumerics();
 
-            return ((tempVertices[vertexCount - 1].position + tempVertices[vertexCount - 2].position) * 0.5f).FromNumerics();
-        }
+        return vertexCount < 2 ? tempPoints[pointCount - 1].FromNumerics() :
+            ((tempVertices[vertexCount - 1].position + tempVertices[vertexCount - 2].position) * 0.5f).FromNumerics();
     }
 
     public void Dispose()

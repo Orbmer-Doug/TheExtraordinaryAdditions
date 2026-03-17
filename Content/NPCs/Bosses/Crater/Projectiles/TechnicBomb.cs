@@ -7,6 +7,7 @@ using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
@@ -178,10 +179,10 @@ public class TechnicBlast : ProjOwnedByNPC<Asterlin>
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return Utility.CircularHitboxCollision(Projectile.Center, Radius, targetHitbox);
+        return CalUtils.CircularHitboxCollision(Projectile.Center, Radius, targetHitbox);
     }
 
-    public float WidthFunct(float c) => 30f * Utils.Remap(Time, 0f, MaxTime, 1f, 0f);
+    public float WidthFunct(float c) => 30f * Terraria.Utils.Remap(Time, 0f, MaxTime, 1f, 0f);
     public Color ColorFunct(SystemVector2 c, Vector2 pos) => MulticolorLerp(InverseLerp(0f, MaxTime, Time), Color.White, Color.LightCyan, Color.Cyan, Color.DarkCyan);
 
     public OptimizedPrimitiveTrail trail;

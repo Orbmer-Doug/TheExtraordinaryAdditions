@@ -10,6 +10,7 @@ using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Early;
 
@@ -48,7 +49,7 @@ public class VoltHelmet : ModItem, ILocalizedModType, IModType
 
         if (player.whoAmI == Main.myPlayer && AdditionsKeybinds.SetBonusHotKey.JustPressed && !player.HasBuff(ModContent.BuffType<FulminationCooldown>()))
         {
-            player.AddBuff(ModContent.BuffType<FulminationCooldown>(), SecondsToFrames(15));
+            player.AddBuff(ModContent.BuffType<FulminationCooldown>(), CalUtils.SecondsToFrames(15));
             AdditionsSound.LightningStrike.Play(player.Center, 1f, 0f, .2f);
             Projectile bolt = Main.projectile[player.NewPlayerProj(player.Center, player.Center.SafeDirectionTo(player.Additions().MouseWorld) * 10f, ModContent.ProjectileType<LightningVolt>(), 100, 1f, player.whoAmI)];
             bolt.friendly = true;

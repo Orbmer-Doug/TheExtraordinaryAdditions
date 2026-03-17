@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
+using TheExtraordinaryAdditions.Common.Particles.Particle;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using static TheExtraordinaryAdditions.Core.Graphics.ManagedRenderTarget;
 using Vector2 = Microsoft.Xna.Framework.Vector2;

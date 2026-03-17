@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using CalamityMod;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
@@ -8,30 +9,37 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
-public partial class Asterlin : ModNPC
+public partial class Asterlin
 {
     [AutomatedMethodInvoke]
     public void LoadStateTransitions_UnveilingZenith()
     {
-        StateMachine.RegisterTransition(AsterlinAIType.UnveilingZenith, new Dictionary<AsterlinAIType, float> { { AsterlinAIType.GabrielLeave, 1f } }, false, () 
-            => AITimer >= UnveilingZenith_TotalTime && !AnyProjectile(ModContent.ProjectileType<BarrageBeam>()));
-        StateMachine.RegisterTransition(AsterlinAIType.UnveilingZenith, new Dictionary<AsterlinAIType, float> { { AsterlinAIType.GetScrewed, 1f } }, false, ()
-            => UnveilingZenith_CollapseTimer >= UnveilingZenith_StarCollapseTime);
+        StateMachine.RegisterTransition(AsterlinAIType.UnveilingZenith,
+            new Dictionary<AsterlinAIType, float> { { AsterlinAIType.GabrielLeave, 1f } }, false, ()
+                => AITimer >= UnveilingZenith_TotalTime && !AnyProjectile(ModContent.ProjectileType<BarrageBeam>()));
+        StateMachine.RegisterTransition(AsterlinAIType.UnveilingZenith,
+            new Dictionary<AsterlinAIType, float> { { AsterlinAIType.GetScrewed, 1f } }, false, ()
+                => UnveilingZenith_CollapseTimer >= UnveilingZenith_StarCollapseTime);
 
         StateMachine.RegisterStateEntryCallback(AsterlinAIType.UnveilingZenith, () =>
         {
             foreach (Player player in Main.ActivePlayers)
             {
                 if (this.RunServer())
-                    NPC.NewNPCProj(player.Center - Vector2.UnitY * 400f, Main.rand.NextVector2Circular(10f, 10f), ModContent.ProjectileType<ConvergentFireball>(), 0, 0f, 0f, 0f, 0f, 0f, 0f);
+                    NPC.NewNPCProj(player.Center - Vector2.UnitY * 400f, Main.rand.NextVector2Circular(10f, 10f),
+                        ModContent.ProjectileType<ConvergentFireball>(), 0, 0f);
             }
         });
         StateMachine.RegisterStateBehavior(AsterlinAIType.UnveilingZenith, DoBehavior_UnveilingZenith);
     }
 
-    public static int UnveilingZenith_StarCollapseTime => SecondsToFrames(.3f);
-    public static int UnveilingZenith_BeamReleaseRate => DifficultyBasedValue(SecondsToFrames(.5f), SecondsToFrames(.4f), SecondsToFrames(.3f), SecondsToFrames(.25f), SecondsToFrames(.2f), SecondsToFrames(.2f));
-    public static int UnveilingZenith_TotalTime => SecondsToFrames(20.8f);
+    public static int UnveilingZenith_StarCollapseTime => CalUtils.SecondsToFrames(.3f);
+
+    public static int UnveilingZenith_BeamReleaseRate => DifficultyBasedValue(CalUtils.SecondsToFrames(.5f),
+        CalUtils.SecondsToFrames(.4f), CalUtils.SecondsToFrames(.3f), CalUtils.SecondsToFrames(.25f),
+        CalUtils.SecondsToFrames(.2f), CalUtils.SecondsToFrames(.2f));
+
+    public static int UnveilingZenith_TotalTime => CalUtils.SecondsToFrames(20.8f);
     public static float UnveilingZenith_BlurAmount => .4f;
 
     public int UnveilingZenith_CurrentAmount
@@ -57,7 +65,8 @@ public partial class Asterlin : ModNPC
             if (UnveilingZenith_CollapseTimer >= UnveilingZenith_StarCollapseTime)
             {
                 if (this.RunServer())
-                    NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<DisintegrationNova>(), Asterlin.SuperHeavyAttackDamage * 5, 100f);
+                    NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<DisintegrationNova>(),
+                        SuperHeavyAttackDamage * 5, 100f);
                 foreach (Projectile p in AllProjectilesByID(ModContent.ProjectileType<ConvergentFireball>()))
                     p.Kill();
             }
@@ -77,8 +86,10 @@ public partial class Asterlin : ModNPC
 
         const float velocity = 4f;
         const float amt = .1f;
-        Vector2 target = Target.Position + new Vector2(400f * (NPC.Center.X > Target.Center.X).ToDirectionInt(), Target.Velocity.Y * 15f);
-        NPC.velocity = Vector2.SmoothStep(NPC.velocity, NPC.SafeDirectionTo(target) * MathF.Min(NPC.Center.Distance(target), velocity), amt);
+        Vector2 target = Target.Position + new Vector2(400f * (NPC.Center.X > Target.Center.X).ToDirectionInt(),
+            Target.Velocity.Y * 15f);
+        NPC.velocity = Vector2.SmoothStep(NPC.velocity,
+            NPC.SafeDirectionTo(target) * MathF.Min(NPC.Center.Distance(target), velocity), amt);
 
         SetRightHandTarget(RightArm.RootPosition + PolarVector(400f, -MathHelper.PiOver2));
     }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using CalamityMod;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
@@ -12,6 +13,7 @@ using TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 using TheExtraordinaryAdditions.Core.Netcode;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Core.Globals.NPCGlobal;
 
@@ -20,16 +22,20 @@ public class AdditionsGlobalNPC : GlobalNPC
     public override bool InstancePerEntity => true;
 
     #region Debuffs
+
     public bool DentedBySpoon;
     public int PlasmaIncineration;
+
     #endregion Debuffs
 
     #region Whip
+
     public int VoidEnergy;
     public int Eclipsed;
     public int Wavebreaked;
     public int StarKunai;
     public int Cursed;
+
     #endregion Whip
 
     public delegate void EditSpawnRateDelegate(Player player, ref int spawnRate, ref int maxSpawns);
@@ -90,14 +96,14 @@ public class AdditionsGlobalNPC : GlobalNPC
 
         if (PlasmaIncineration > 0)
         {
-            int PlasmaIncineration = (int)250.0;
-            ApplyDPSDebuff(PlasmaIncineration, PlasmaIncineration, ref damage);
+            const int plasmaIncineration = (int)250.0;
+            ApplyDPSDebuff(plasmaIncineration, plasmaIncineration, ref damage);
         }
 
         if (Wavebreaked > 0)
         {
-            int Torrential = (int)180.0;
-            ApplyDPSDebuff(Torrential, Torrential, ref damage);
+            const int torrential = (int)180.0;
+            ApplyDPSDebuff(torrential, torrential, ref damage);
         }
     }
 
@@ -132,7 +138,6 @@ public class AdditionsGlobalNPC : GlobalNPC
         if (projectile.npcProj || projectile.trap || !projectile.IsMinionOrSentryRelated)
             return;
 
-        Player owner = Main.player[projectile.owner];
         ref AddableFloat scaling = ref modifiers.ScalingBonusDamage;
 
         if (Eclipsed > 0)
@@ -182,25 +187,30 @@ public class AdditionsGlobalNPC : GlobalNPC
         {
             if (Main.rand.Next(5) < 4)
             {
-                Color curseColor = MulticolorLerp(Main.rand.NextFloat(0.2f, 0.8f), Color.Black, new Color(16, 0, 89), new Color(21, 0, 74));
+                Color curseColor = MulticolorLerp(Main.rand.NextFloat(0.2f, 0.8f), Color.Black, new Color(16, 0, 89),
+                    new Color(21, 0, 74));
                 float scale = Main.rand.NextFloat(.47f, .61f);
                 float rot = MathHelper.ToRadians(3f);
                 Vector2 pos = Main.rand.NextVector2FromRectangle(npc.Hitbox);
                 Vector2 vel = Main.rand.NextVector2CircularEdge(2f, 2f);
-                ParticleRegistry.SpawnHeavySmokeParticle(pos, vel, Main.rand.Next(10, 40), scale, curseColor, .6f, true, rot);
+                ParticleRegistry.SpawnHeavySmokeParticle(pos, vel, Main.rand.Next(10, 40), scale, curseColor, .6f, true,
+                    rot);
             }
         }
 
         if (PlasmaIncineration > 0)
         {
-            Color fireColor = MulticolorLerp(Main.rand.NextFloat(0.2f, 0.8f), Color.Red, Color.OrangeRed, Color.IndianRed, Color.DarkRed, Color.OrangeRed * 1.2f, Color.OrangeRed * 1.6f);
+            Color fireColor = MulticolorLerp(Main.rand.NextFloat(0.2f, 0.8f), Color.Red, Color.OrangeRed,
+                Color.IndianRed, Color.DarkRed, Color.OrangeRed * 1.2f, Color.OrangeRed * 1.6f);
             Vector2 vel = Vector2.UnitY.RotatedByRandom(0.69) * Main.rand.NextFloat(1f, 1.2f);
             vel.Y -= 6f;
             float scale = Main.rand.NextFloat(.47f, .6f);
             int lifetime = 10 + Main.rand.Next(10, 40);
 
-            ParticleRegistry.SpawnHeavySmokeParticle(npc.RandAreaInEntity(), vel, lifetime, scale, fireColor, .325f, true, .05f);
-            ParticleRegistry.SpawnHeavySmokeParticle(npc.RandAreaInEntity(), vel * .2f, lifetime, scale * 1.1f, fireColor, .385f, true, .1f);
+            ParticleRegistry.SpawnHeavySmokeParticle(npc.RandAreaInEntity(), vel, lifetime, scale, fireColor, .325f,
+                true, .05f);
+            ParticleRegistry.SpawnHeavySmokeParticle(npc.RandAreaInEntity(), vel * .2f, lifetime, scale * 1.1f,
+                fireColor, .385f, true, .1f);
 
             Lighting.AddLight(npc.position, Color.OrangeRed.ToVector3());
         }
@@ -209,12 +219,15 @@ public class AdditionsGlobalNPC : GlobalNPC
         {
             if (Main.rand.Next(8) < 4)
             {
-                Color fireColor = MulticolorLerp(Main.rand.NextFloat(0.2f, 0.8f), Color.Black, new Color(16, 0, 89), new Color(21, 0, 74));
+                Color fireColor = MulticolorLerp(Main.rand.NextFloat(0.2f, 0.8f), Color.Black, new Color(16, 0, 89),
+                    new Color(21, 0, 74));
                 float scale = Main.rand.NextFloat(.47f, .61f);
                 float rot = MathHelper.ToRadians(3f);
                 Vector2 pos = Main.rand.NextVector2FromRectangle(npc.Hitbox);
-                ParticleRegistry.SpawnHeavySmokeParticle(pos, new Vector2(0f, Main.rand.NextFloat(-6f, 6f)), 10 + Main.rand.Next(10, 40), scale, fireColor, 1.2f, true, rot);
-                ParticleRegistry.SpawnHeavySmokeParticle(pos, new Vector2(Main.rand.NextFloat(-6f, 6f), 0f), 10 + Main.rand.Next(10, 40), scale, fireColor, 1.4f, true, rot);
+                ParticleRegistry.SpawnHeavySmokeParticle(pos, new Vector2(0f, Main.rand.NextFloat(-6f, 6f)),
+                    10 + Main.rand.Next(10, 40), scale, fireColor, 1.2f, true, rot);
+                ParticleRegistry.SpawnHeavySmokeParticle(pos, new Vector2(Main.rand.NextFloat(-6f, 6f), 0f),
+                    10 + Main.rand.Next(10, 40), scale, fireColor, 1.4f, true, rot);
             }
         }
 
@@ -228,8 +241,6 @@ public class AdditionsGlobalNPC : GlobalNPC
 
     public override bool PreDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
-        Texture2D texture = TextureAssets.Npc[npc.type].Value;
-
         if (Eclipsed > 0)
         {
             spriteBatch.SetBlendState(BlendState.Additive);
@@ -237,7 +248,8 @@ public class AdditionsGlobalNPC : GlobalNPC
             float properBloomSize = bloomTexture.Height / (float)bloomTexture.Height;
             Color color = Color.Lerp(Color.OrangeRed, Color.Gray, (float)MathF.Sin(Main.GlobalTimeWrappedHourly * 2f));
             Vector2 sparkCenter = npc.Center - Main.screenPosition;
-            Main.EntitySpriteDraw(bloomTexture, sparkCenter, null, color * 0.6f, 0f, bloomTexture.Size() / 2f, 2f * properBloomSize / 2, 0, 0f);
+            Main.EntitySpriteDraw(bloomTexture, sparkCenter, null, color * 0.6f, 0f, bloomTexture.Size() / 2f,
+                2f * properBloomSize / 2, 0, 0f);
             spriteBatch.ResetBlendState();
         }
 
@@ -273,6 +285,7 @@ public class AdditionsGlobalNPC : GlobalNPC
                     SuperBloodMoonSystem.SuperBloodMoon = true;
                     AdditionsNetcode.SyncAdditionsBloodMoon(Main.myPlayer);
                 }
+
                 break;
         }
     }

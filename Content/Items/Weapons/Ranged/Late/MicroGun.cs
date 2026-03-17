@@ -13,6 +13,7 @@ using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
 
@@ -58,7 +59,7 @@ public class MicroGun : ModItem
     {
         if (Utils.NextFloat(Main.rand) > 0.95f)
         {
-            return player.ownedProjectileCounts[this.Item.shoot] > 0;
+            return player.ownedProjectileCounts[Item.shoot] > 0;
         }
         return false;
     }

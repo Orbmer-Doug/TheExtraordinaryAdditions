@@ -14,6 +14,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.Cynosure;
 public class GammaRay : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetStaticDefaults()
     {
         // Since its big we need to make sure it doesn't get cut off
@@ -39,6 +40,7 @@ public class GammaRay : ModProjectile
     public Player Owner => Main.player[Projectile.owner];
     public override bool ShouldUpdatePosition() => false;
     public LoopedSoundInstance sound;
+
     public override void AI()
     {
         if (trail == null || trail.Disposed)
@@ -47,15 +49,17 @@ public class GammaRay : ModProjectile
             trail2 = new(WidthFunct, ColorFunct, null, Amt);
 
         // Update the ominous hum
-        sound ??= LoopedSoundManager.CreateNew(new(AdditionsSound.sunAura, () => Projectile.Opacity * .5f, () => -.5f), () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
+        sound ??= LoopedSoundManager.CreateNew(new(AdditionsSound.sunAura, () => Projectile.Opacity * .5f, () => -.5f),
+            () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
         sound?.Update(Projectile.Center);
 
         // Position and angle relative to genedies
         TheExingendies gen = ProjOwner.As<TheExingendies>();
         if (this.RunLocal())
         {
-            Vector2 center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
-            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, center.SafeDirectionTo(Owner.Additions().MouseWorld),
+            Vector2 center = Owner.RotatedRelativePoint(Owner.MountedCenter);
+            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity,
+                center.SafeDirectionTo(Owner.Additions().MouseWorld),
                 Utils.Remap(Owner.Additions().MouseWorld.Distance(center), 0f, 200f, .04f, .16f));
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
@@ -63,27 +67,34 @@ public class GammaRay : ModProjectile
 
         // Fade away if necessary
         if (gen == null || !Owner.Available() || ProjOwner == null ||
-            (ProjOwner.owner == Owner.whoAmI && (ProjOwner.active == false || gen.Phase != TheExingendies.States.ActiveGalacticNucleus || gen.RayWait == true || gen.Completion != 1f)))
+            (ProjOwner.owner == Owner.whoAmI && (!ProjOwner.active ||
+                                                 gen.Phase != TheExingendies.States.ActiveGalacticNucleus ||
+                                                 gen.RayWait == true || gen.Completion != 1f)))
         {
             Fade++;
             if (Fade > 20f)
                 Projectile.Kill();
         }
+
         if (ProjOwner != null && ProjOwner.owner == Owner.whoAmI)
             Projectile.Center = ProjOwner.Center;
 
         // Update graphics
-        RayLength = MathF.Max(20f, Animators.Circ.OutFunction.Evaluate(0f, Main.screenHeight * 5, InverseLerp(0f, ExpandTime, Time))
+        RayLength = MathF.Max(20f,
+            Animators.Circ.OutFunction.Evaluate(0f, Main.screenHeight * 5, InverseLerp(0f, ExpandTime, Time))
             * Animators.MakePoly(3f).InOutFunction(InverseLerp(20f, 0f, Fade)));
         Projectile.Opacity = Animators.MakePoly(2f).InOutFunction.Evaluate(RayLength, 20f, 50f, 0f, 1f);
-        points.SetPoints(Projectile.Center.GetLaserControlPoints(Projectile.Center + Projectile.velocity * RayLength, Amt));
-        points2.SetPoints(Projectile.Center.GetLaserControlPoints(Projectile.Center - Projectile.velocity * RayLength, Amt));
+        points.SetPoints(
+            Projectile.Center.GetLaserControlPoints(Projectile.Center + Projectile.velocity * RayLength, Amt));
+        points2.SetPoints(
+            Projectile.Center.GetLaserControlPoints(Projectile.Center - Projectile.velocity * RayLength, Amt));
         Time++;
     }
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return targetHitbox.CollisionFromPoints(points.Points, WidthFunct) || targetHitbox.CollisionFromPoints(points2.Points, WidthFunct);
+        return targetHitbox.CollisionFromPoints(points.Points, WidthFunct) ||
+               targetHitbox.CollisionFromPoints(points2.Points, WidthFunct);
     }
 
     public const int Amt = 400;
@@ -93,7 +104,10 @@ public class GammaRay : ModProjectile
     public OptimizedPrimitiveTrail trail2;
 
     public float WidthFunct(float c) => Animators.MakePoly(1.6f).OutFunction.Evaluate(2f, 1000f, c);
-    public Color ColorFunct(SystemVector2 c, Vector2 pos) => MulticolorLerp(c.X, Color.DarkBlue, new Color(50, 200, 220), new Color(120, 140, 220)) * Projectile.Opacity;
+
+    public Color ColorFunct(SystemVector2 c, Vector2 pos) =>
+        MulticolorLerp(c.X, Color.DarkBlue, new Color(50, 200, 220), new Color(120, 140, 220)) * Projectile.Opacity;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -103,10 +117,12 @@ public class GammaRay : ModProjectile
 
             ManagedShader ray = AssetRegistry.GetShader("GammaRay");
             ray.TrySetParameter("time", Time * .2f);
-            ray.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DarkTurbulentNoise), 1, SamplerState.AnisotropicWrap);
+            ray.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DarkTurbulentNoise), 1,
+                SamplerState.AnisotropicWrap);
             trail.DrawTrail(ray, points.Points, Amt, true, false);
             trail2.DrawTrail(ray, points2.Points, Amt, true, false);
         }
+
         LayeredDrawSystem.QueueDrawAction(draw, PixelationLayer.Dusts);
         return true;
     }

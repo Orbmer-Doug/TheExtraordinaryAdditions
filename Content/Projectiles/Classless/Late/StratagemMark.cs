@@ -43,7 +43,7 @@ public class StratagemMark : ModProjectile
     }
 
     public Player Owner => Main.player[Projectile.owner];
-    public static readonly float CallInTime = SecondsToFrames(3.45f);
+    public static readonly float CallInTime = CalUtils.SecondsToFrames(3.45f);
     public override void AI()
     {
         if (trail == null || trail.Disposed)

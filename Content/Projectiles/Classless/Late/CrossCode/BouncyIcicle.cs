@@ -5,6 +5,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.CrossCode;
 
@@ -43,7 +44,7 @@ public class BouncyIcicle : ModProjectile
         if (Projectile.velocity.Length() < 30f)
             Projectile.velocity *= 1.015f;
         
-        if (Projectile.ai[0]++ % 2 == 1)
+        if ((int)Projectile.ai[0]++ % 2 == 1)
             ParticleRegistry.SpawnMistParticle(Projectile.Center, Projectile.velocity * Main.rand.NextFloat(.2f, .5f), Main.rand.NextFloat(.4f, .8f), Color.DarkBlue, Color.DarkSlateBlue, 190);
 
         Projectile.FacingRight();
@@ -93,7 +94,7 @@ public class BouncyIcicle : ModProjectile
 
         Vector2 drawPosition = Projectile.Center - Main.screenPosition;
         SpriteEffects direction = Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
-        Main.EntitySpriteDraw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), Projectile.rotation, texture.Size() * 0.5f, Projectile.scale, direction, 0);
+        Main.EntitySpriteDraw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), Projectile.rotation, texture.Size() * 0.5f, Projectile.scale, direction);
         return false;
     }
 }

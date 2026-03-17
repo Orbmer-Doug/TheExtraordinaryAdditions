@@ -85,7 +85,7 @@ public sealed class FungalSatchelPlayer : ModPlayer
         if (Counter >= 5 && Player.CountOwnerProjectiles(ModContent.ProjectileType<HealingFungus>()) < 3)
         {
             Vector2 pos = target.RandAreaInEntity();
-            Vector2 vel = Utility.GetHomingVelocity(pos, Player.Center, Player.velocity, 6f);
+            Vector2 vel = GetHomingVelocity(pos, Player.Center, Player.velocity, 6f);
             if (Main.myPlayer == Player.whoAmI)
                 Player.NewPlayerProj(pos, vel, ModContent.ProjectileType<HealingFungus>(), 0, 0f, Player.whoAmI);
             Counter = 0;

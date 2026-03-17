@@ -1,17 +1,18 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Graphics;
 using System;
+using CalamityMod;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
 
 namespace TheExtraordinaryAdditions.Core.Utilities;
 
-public static partial class Utility
+public static class SpriteBatchUtils
 {
     public static Rectangle GetFrameRectangle(Point size, int frameX, int startY = 0, int startX = 0)
     {
-        int x = startX + (frameX * size.X);
+        int x = startX + frameX * size.X;
         return new Rectangle(x, startY, size.X, size.Y);
     }
 
@@ -44,11 +45,11 @@ public static partial class Utility
                 Vector2 drawPosition = baseDrawPosition + new Vector2(x, y);
                 if (x != 0 || y != 0)
                 {
-                    DynamicSpriteFontExtensionMethods.DrawString(sb, font, text, drawPosition, border, rotation, default, scale, 0, 0f);
+                    sb.DrawString(font, text, drawPosition, border, rotation, default, scale, 0, 0f);
                 }
             }
         }
-        DynamicSpriteFontExtensionMethods.DrawString(sb, font, text, baseDrawPosition, main, rotation, default, scale, 0, 0f);
+        sb.DrawString(font, text, baseDrawPosition, main, rotation, default, scale, 0, 0f);
     }
 
     public static void DrawBetterRect(this SpriteBatch sb, Texture2D tex, Rectangle rect, Rectangle? source, Color color, float rot, Vector2 orig, SpriteEffects fx = SpriteEffects.None, bool subtract = false) =>
@@ -72,40 +73,15 @@ public static partial class Utility
         sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearWrap, DepthStencilState.None, DefaultRasterizerScreenCull, null, Main.GameViewMatrix.TransformationMatrix);
     }
 
-    public static void EnterShaderRegion(this SpriteBatch sb, BlendState newBlendState = null, Effect effect = null)
-    {
-        sb.End();
-        sb.Begin(SpriteSortMode.Immediate, newBlendState ?? BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, effect, Main.GameViewMatrix.TransformationMatrix);
-    }
-
     public static void ExitShaderRegion(this SpriteBatch sb)
     {
         sb.End();
         sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
     }
 
-    public static void SetBlendState(this SpriteBatch sb, BlendState blendState)
-    {
-        sb.End();
-        sb.Begin(SpriteSortMode.Deferred, blendState, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-    }
-
     public static void ResetBlendState(this SpriteBatch sb)
     {
         sb.SetBlendState(BlendState.AlphaBlend);
-    }
-
-    /// <summary>
-    /// Resets a sprite batch with a desired <see cref="BlendState"/>. The <see cref="SpriteSortMode"/> is specified as <see cref="SpriteSortMode.Deferred"/>. If <see cref="SpriteSortMode.Immediate"/> is needed, use <see cref="PrepareForShaders"/> instead.
-    /// <br></br>
-    /// Like any sprite batch resetting function, use this sparingly. Overusage (such as performing this operation multiple times per frame) will lead to significantly degraded performance on weaker systems.
-    /// </summary>
-    /// <param name="sb">The sprite batch.</param>
-    /// <param name="newBlendState">The desired blend state.</param>
-    public static void UseBlendState(this SpriteBatch sb, BlendState newBlendState)
-    {
-        sb.End();
-        sb.Begin(SpriteSortMode.Deferred, newBlendState, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
     }
 
     /// <summary>
@@ -149,23 +125,17 @@ public static partial class Utility
         sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.UIScaleMatrix);
     }
 
-    private static RasterizerState cullClockwiseAndScreen;
-
-    private static RasterizerState cullCounterclockwiseAndScreen;
-
-    private static RasterizerState cullOnlyScreen;
-
     public static RasterizerState CullClockwiseAndScreen
     {
         get
         {
-            if (cullClockwiseAndScreen is null)
-            {
-                cullClockwiseAndScreen = RasterizerState.CullClockwise;
-                cullClockwiseAndScreen.ScissorTestEnable = true;
-            }
+            if (field is not null) 
+                return field;
+            
+            field = RasterizerState.CullClockwise;
+            field.ScissorTestEnable = true;
 
-            return cullClockwiseAndScreen;
+            return field;
         }
     }
 
@@ -173,13 +143,13 @@ public static partial class Utility
     {
         get
         {
-            if (cullCounterclockwiseAndScreen is null)
-            {
-                cullCounterclockwiseAndScreen = RasterizerState.CullCounterClockwise;
-                cullCounterclockwiseAndScreen.ScissorTestEnable = true;
-            }
+            if (field is not null)
+                return field;
+            
+            field = RasterizerState.CullCounterClockwise;
+            field.ScissorTestEnable = true;
 
-            return cullCounterclockwiseAndScreen;
+            return field;
         }
     }
 
@@ -187,16 +157,16 @@ public static partial class Utility
     {
         get
         {
-            if (cullOnlyScreen is null)
-            {
-                cullOnlyScreen = RasterizerState.CullNone;
-                cullOnlyScreen.ScissorTestEnable = true;
-            }
+            if (field is not null) 
+                return field;
+            
+            field = RasterizerState.CullNone;
+            field.ScissorTestEnable = true;
 
-            return cullOnlyScreen;
+            return field;
         }
     }
-    public static RasterizerState DefaultRasterizerScreenCull => Main.gameMenu || Main.LocalPlayer.gravDir == 1f ? CullCounterclockwiseAndScreen : CullClockwiseAndScreen;
+    public static RasterizerState DefaultRasterizerScreenCull => Main.gameMenu || (int)Main.LocalPlayer.gravDir == 1 ? CullCounterclockwiseAndScreen : CullClockwiseAndScreen;
 
     public static void SwapToRenderTarget(this RenderTarget2D renderTarget, Color? flushColor = null)
     {
@@ -217,11 +187,11 @@ public static partial class Utility
     public static bool DrawTreasureBagInWorld(Item item, SpriteBatch spriteBatch, float rotation, float scale, int whoAmI)
     {
         Texture2D texture = TextureAssets.Item[item.type].Value;
-        Rectangle frame = Utils.Frame(texture, 1, 1, 0, 0, 0, 0);
+        Rectangle frame = texture.Frame();
         if (Main.itemAnimations[item.type] != null)
             frame = Main.itemAnimations[item.type].GetFrame(texture, Main.itemFrameCounter[whoAmI]);
         
-        Vector2 frameOrigin = Utils.Size(frame) * 0.5f;
+        Vector2 frameOrigin = frame.Size() * 0.5f;
         Vector2 offset = default;
         offset.ToWorldCoordinates(item.width / 2 - frameOrigin.X, item.height - frame.Height);
         Vector2 drawPos = item.position - Main.screenPosition + frameOrigin + offset;
@@ -232,13 +202,13 @@ public static partial class Utility
         time = time * 0.5f + 0.5f;
         for (int j = 0; j < 4; j++)
         {
-            Vector2 pulseOffset = Utils.RotatedBy(Vector2.UnitY, (double)((j / 4f + localTime) * (MathHelper.Pi * 2f)), default) * time * 8f;
-            spriteBatch.Draw(texture, drawPos + pulseOffset, (Rectangle?)frame, new Color(90, 70, 255, 50), rotation, frameOrigin, scale, 0, 0f);
+            Vector2 pulseOffset = Vector2.UnitY.RotatedBy((j / 4f + localTime) * (MathHelper.Pi * 2f)) * time * 8f;
+            spriteBatch.Draw(texture, drawPos + pulseOffset, frame, new Color(90, 70, 255, 50), rotation, frameOrigin, scale, 0, 0f);
         }
         for (int i = 0; i < 3; i++)
         {
-            Vector2 pulseOffset2 = Utils.RotatedBy(Vector2.UnitY, (double)((i / 3f + localTime) * (MathHelper.Pi * 2f)), default) * time * 4f;
-            spriteBatch.Draw(texture, drawPos + pulseOffset2, (Rectangle?)frame, new Color(140, 120, 255, 77), rotation, frameOrigin, scale, 0, 0f);
+            Vector2 pulseOffset2 = Vector2.UnitY.RotatedBy((i / 3f + localTime) * (MathHelper.Pi * 2f)) * time * 4f;
+            spriteBatch.Draw(texture, drawPos + pulseOffset2, frame, new Color(140, 120, 255, 77), rotation, frameOrigin, scale, 0, 0f);
         }
         return true;
     }
@@ -261,20 +231,7 @@ public static partial class Utility
     {
         wantedScale = Math.Max(scale, wantedScale * Main.inventoryScale);
         position += drawOffset * wantedScale;
-        spriteBatch.Draw(texture, position, (Rectangle?)frame, drawColor, 0f, origin, wantedScale, 0, 0f);
-    }
-
-    public static Rectangle GetCurrentFrame(this Item item, ref int frame, ref int frameCounter, int frameDelay, int frameAmt, bool frameCounterUp = true)
-    {
-        if (frameCounter >= frameDelay)
-        {
-            frameCounter = -1;
-            frame = (frame != frameAmt - 1) ? (frame + 1) : 0;
-        }
-        if (frameCounterUp)
-            frameCounter++;
-
-        return new Rectangle(0, item.height * frame, item.width, item.height);
+        spriteBatch.Draw(texture, position, frame, drawColor, 0f, origin, wantedScale, 0, 0f);
     }
 
     /// <summary>
@@ -285,7 +242,7 @@ public static partial class Utility
         Texture2D texture = overrideTex ?? projectile.ThisProjectileTexture();
         Rectangle frame = texture.Frame(1, Main.projFrames[projectile.type], 0, projectile.frame);
         Vector2 drawPosition = projectile.Center - Main.screenPosition;
-        Main.EntitySpriteDraw(texture, drawPosition, frame, projectile.GetAlpha(color), projectile.rotation, frame.Size() / 2f, projectile.scale, fx, 0);
+        Main.EntitySpriteDraw(texture, drawPosition, frame, projectile.GetAlpha(color), projectile.rotation, frame.Size() / 2f, projectile.scale, fx);
     }
 
     public static void DrawProjectileBackglow(this Projectile projectile, Color backglowColor, float backglowArea, byte alpha = 0,
@@ -293,7 +250,7 @@ public static partial class Utility
     {
         Texture2D texture = overrideTexture ?? TextureAssets.Projectile[projectile.type].Value;
 
-        frame ??= texture.Frame(1, Main.projFrames[projectile.type], 0, projectile.frame, 0, 0);
+        frame ??= texture.Frame(1, Main.projFrames[projectile.type], 0, projectile.frame);
 
         Vector2 drawPosition = projectile.Center - Main.screenPosition;
         Vector2 origin = orig ?? frame.Value.Size() * 0.5f;

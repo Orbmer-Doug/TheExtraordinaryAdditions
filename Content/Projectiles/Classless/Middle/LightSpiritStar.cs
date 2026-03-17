@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
+using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -21,7 +22,7 @@ public class LightSpiritStar : ModProjectile, ILocalizedModType, IModType
         Projectile.tileCollide = false;
         Projectile.DamageType = DamageClass.Summon;
         Projectile.penetrate = 1;
-        Projectile.timeLeft = SecondsToFrames(3);
+        Projectile.timeLeft = CalUtils.SecondsToFrames(3);
         Projectile.scale = 1f;
     }
 

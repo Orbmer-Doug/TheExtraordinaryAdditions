@@ -41,7 +41,7 @@ public class DelugeWhip : BaseWhip
     {
         if (index > (WhipPoints.Count - 3))
         {
-            target.AddBuff(ModContent.BuffType<Wavebroken>(), SecondsToFrames(4));
+            target.AddBuff(ModContent.BuffType<Wavebroken>(), CalUtils.SecondsToFrames(4));
         }
 
         Projectile.damage = (int)(Projectile.damage * .8f);

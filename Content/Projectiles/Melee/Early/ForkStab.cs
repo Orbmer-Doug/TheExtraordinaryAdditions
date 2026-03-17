@@ -10,6 +10,7 @@ using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Early;
 
@@ -102,7 +103,7 @@ public class ForkStab : ModProjectile
                 {
                     if (this.RunLocal())
                     {
-                        Projectile.velocity = Utility.SafeDirectionTo(Owner, Owner.Additions().MouseWorld).RotatedByRandom(0.25f);
+                        Projectile.velocity = Owner.SafeDirectionTo(Owner.Additions().MouseWorld).RotatedByRandom(0.25f);
                         this.Sync();
                     }
                     stabVec = new Vector2(Main.rand.NextFloat(90, 150), 0);

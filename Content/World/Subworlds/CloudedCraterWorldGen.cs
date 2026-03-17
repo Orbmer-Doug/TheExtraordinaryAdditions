@@ -31,7 +31,7 @@ public static class CloudedCraterWorldGen
     {
         int center = Main.maxTilesX / 2; // World center X
         float r = Main.maxTilesX / 2f; // Half world width
-        float flatRadius = CenterWidth / 2f; // Flat area radius
+        const float flatRadius = CenterWidth / 2f; // Flat area radius
         float a = (CenterSurfaceY - EdgeSurfaceY) / (r - flatRadius) / (r - flatRadius); // Quadratic coefficient
         int seed = WorldGen.genRand.Next(999999999);
 
@@ -78,11 +78,11 @@ public static class CloudedCraterWorldGen
         // Find the surface at spawnX
         for (int y = 0; y < Main.maxTilesY; y++)
         {
-            if (Main.tile[spawnX, y].HasTile)
-            {
-                spawnY = y - 1; // Spawn just above surface
-                break;
-            }
+            if (!Main.tile[spawnX, y].HasTile) 
+                continue;
+            
+            spawnY = y - 1; // Spawn just above surface
+            break;
         }
 
         Main.spawnTileX = spawnX;
@@ -110,7 +110,7 @@ public static class CloudedCraterWorldGen
             }
         }
 
-        WorldGen.PlaceTile(pos.X, pos.Y, ModContent.TileType<TechnicTransmitterPlaced>(), true, false, -1);
+        WorldGen.PlaceTile(pos.X, pos.Y, ModContent.TileType<TechnicTransmitterPlaced>(), true);
     }
 
     public static void SmoothenWorld()

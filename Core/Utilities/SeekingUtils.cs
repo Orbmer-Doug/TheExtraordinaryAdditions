@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using CalamityMod;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -14,7 +15,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Core.Utilities;
 
-public static partial class Utility
+public static class SeekingUtils
 {
     /// <summary>
     /// Calculates the velocity needed for a chaser to intercept a target, accounting for the target's velocity
@@ -74,11 +75,11 @@ public static partial class Utility
             otherProjs.Add(other);
         }
 
-        if (sort)
-        {
-            List<Projectile> possible = otherProjs.DistinctBy(n => n.Distance(proj.Center)).ToList();
-            possible.Sort((a, b) => Vector2.Distance(a.Center, proj.Center) > Vector2.Distance(b.Center, proj.Center) ? 1 : -1);
-        }
+        if (!sort) 
+            return otherProjs;
+        
+        otherProjs = otherProjs.DistinctBy(n => n.Distance(proj.Center)).ToList();
+        otherProjs.Sort((a, b) => Vector2.Distance(a.Center, proj.Center) > Vector2.Distance(b.Center, proj.Center) ? 1 : -1);
 
         return otherProjs;
     }
@@ -87,16 +88,16 @@ public static partial class Utility
     {
         foreach (Projectile proj in Main.ActiveProjectiles)
         {
-            if (projectileIDs.Contains(proj.type))
+            if (!projectileIDs.Contains(proj.type)) 
+                continue;
+            
+            if (setToInactive)
             {
-                if (setToInactive)
-                {
-                    proj.active = false;
-                    proj.netUpdate = true;
-                }
-                else
-                    proj.Kill();
+                proj.active = false;
+                proj.netUpdate = true;
             }
+            else
+                proj.Kill();
         }
     }
 
@@ -200,20 +201,6 @@ public static partial class Utility
         }
     }
 
-    public static bool IsAnEnemy(this NPC npc, bool allowStatues = true)
-    {
-        if (npc == null || !npc.active || npc.townNPC || npc.friendly)
-            return false;
-        if (!allowStatues && npc.SpawnedFromStatue)
-            return false;
-        if (npc.lifeMax <= 5 || npc.damage <= 5 && npc.lifeMax <= 3000)
-            return false;
-        if (npc.type == NPCID.TargetDummy || npc.lifeMax > 25000000)
-            return false;
-
-        return true;
-    }
-
     public static bool IsEater(this NPC target) => target.type >= NPCID.EaterofWorldsHead && target.type <= NPCID.EaterofWorldsTail;
 
     public static bool IsDestroyer(this NPC target) => target.type >= NPCID.TheDestroyer && target.type <= NPCID.TheDestroyerTail;
@@ -238,7 +225,7 @@ public static partial class Utility
     {
         foreach (NPC npc in Main.ActiveNPCs)
         {
-            if (npc is null || npc.active == false)
+            if (npc is null || !npc.active)
                 continue;
             if (npc.boss || npc.IsEater())
                 return true;
@@ -399,19 +386,17 @@ public static class NPCTargeting
             float distSquared = Vector2.DistanceSquared(origin, npc.Center);
             if (data.BossPriority && (npc.boss || npc.type == NPCID.WallofFleshEye))
             {
-                if (distSquared < minBossDistSquared || distSquared == minBossDistSquared && npc.whoAmI < closestBoss?.whoAmI)
-                {
-                    minBossDistSquared = distSquared;
-                    closestBoss = npc;
-                }
+                if (!(distSquared < minBossDistSquared) &&
+                    (Math.Abs(distSquared - minBossDistSquared) > .01f || !(npc.whoAmI < closestBoss?.whoAmI))) continue;
+                minBossDistSquared = distSquared;
+                closestBoss = npc;
             }
             else
             {
-                if (distSquared < minNonBossDistSquared || distSquared == minNonBossDistSquared && npc.whoAmI < closestNonBoss?.whoAmI)
-                {
-                    minNonBossDistSquared = distSquared;
-                    closestNonBoss = npc;
-                }
+                if (!(distSquared < minNonBossDistSquared) &&
+                    (Math.Abs(distSquared - minNonBossDistSquared) > .01f || !(npc.whoAmI < closestNonBoss?.whoAmI))) continue;
+                minNonBossDistSquared = distSquared;
+                closestNonBoss = npc;
             }
         }
 
@@ -421,9 +406,7 @@ public static class NPCTargeting
     public static bool TryGetClosestNPC(NPCSeekingData data, out NPC target)
     {
         target = GetClosestNPC(data);
-        if (!target.CanHomeInto())
-            return false;
-        return true;
+        return target.CanHomeInto();
     }
 
     public static List<NPC> GetNPCsFarthestToClosest(NPCSeekingData data)
@@ -473,19 +456,18 @@ public static class NPCTargeting
             float distSquared = Vector2.DistanceSquared(origin, npc.Center);
             if (data.BossPriority && (npc.boss || npc.type == NPCID.WallofFleshEye))
             {
-                if (distSquared > maxBossDistSquared || distSquared == maxBossDistSquared && npc.whoAmI < farthestBoss?.whoAmI)
-                {
-                    maxBossDistSquared = distSquared;
-                    farthestBoss = npc;
-                }
+                if (!(distSquared > maxBossDistSquared) &&
+                    (Math.Abs(distSquared - maxBossDistSquared) > .01f || !(npc.whoAmI < farthestBoss?.whoAmI))) continue;
+                maxBossDistSquared = distSquared;
+                farthestBoss = npc;
             }
             else
             {
-                if (distSquared > maxNonBossDistSquared || distSquared == maxNonBossDistSquared && npc.whoAmI < farthestNonBoss?.whoAmI)
-                {
-                    maxNonBossDistSquared = distSquared;
-                    farthestNonBoss = npc;
-                }
+                if (!(distSquared > maxNonBossDistSquared) &&
+                    (!(Math.Abs(distSquared - maxNonBossDistSquared) < .01f) ||
+                     !(npc.whoAmI < farthestNonBoss?.whoAmI))) continue;
+                maxNonBossDistSquared = distSquared;
+                farthestNonBoss = npc;
             }
         }
 
@@ -508,19 +490,17 @@ public static class NPCTargeting
 
             if (data.BossPriority && (npc.boss || npc.type == NPCID.WallofFleshEye))
             {
-                if (npc.life > maxBossHealth || npc.life == maxBossHealth && npc.whoAmI < strongestBoss?.whoAmI)
-                {
-                    maxBossHealth = npc.life;
-                    strongestBoss = npc;
-                }
+                if (npc.life <= maxBossHealth &&
+                    (npc.life != maxBossHealth || !(npc.whoAmI < strongestBoss?.whoAmI))) continue;
+                maxBossHealth = npc.life;
+                strongestBoss = npc;
             }
             else
             {
-                if (npc.life > maxNonBossHealth || npc.life == maxNonBossHealth && npc.whoAmI < strongestNonBoss?.whoAmI)
-                {
-                    maxNonBossHealth = npc.life;
-                    strongestNonBoss = npc;
-                }
+                if (npc.life <= maxNonBossHealth &&
+                    (npc.life != maxNonBossHealth || !(npc.whoAmI < strongestNonBoss?.whoAmI))) continue;
+                maxNonBossHealth = npc.life;
+                strongestNonBoss = npc;
             }
         }
 
@@ -543,19 +523,17 @@ public static class NPCTargeting
 
             if (data.BossPriority && (npc.boss || npc.type == NPCID.WallofFleshEye))
             {
-                if (npc.life < minBossHealth || npc.life == minBossHealth && npc.whoAmI < weakestBoss?.whoAmI)
-                {
-                    minBossHealth = npc.life;
-                    weakestBoss = npc;
-                }
+                if (npc.life >= minBossHealth &&
+                    (npc.life != minBossHealth || !(npc.whoAmI < weakestBoss?.whoAmI))) continue;
+                minBossHealth = npc.life;
+                weakestBoss = npc;
             }
             else
             {
-                if (npc.life < minNonBossHealth || npc.life == minNonBossHealth && npc.whoAmI < weakestNonBoss?.whoAmI)
-                {
-                    minNonBossHealth = npc.life;
-                    weakestNonBoss = npc;
-                }
+                if (npc.life >= minNonBossHealth &&
+                    (npc.life != minNonBossHealth || !(npc.whoAmI < weakestNonBoss?.whoAmI))) continue;
+                minNonBossHealth = npc.life;
+                weakestNonBoss = npc;
             }
         }
 
@@ -566,8 +544,8 @@ public static class NPCTargeting
     {
         Vector2 origin = data.Origin;
         float radiusSquared = data.Radius * data.Radius;
-        List<NPC> bosses = new();
-        List<NPC> nonBosses = new();
+        List<NPC> bosses = [];
+        List<NPC> nonBosses = [];
 
         foreach (NPC npc in Main.ActiveNPCs)
         {
@@ -586,7 +564,7 @@ public static class NPCTargeting
 
         NPC bestNPC = null;
         int maxNeighbors = -1;
-        float clusterRadiusSquared = 100f * 100f;
+        const float clusterRadiusSquared = 100f * 100f;
 
         foreach (NPC npc in validNPCs)
         {
@@ -631,7 +609,7 @@ public static class NPCTargeting
 
         NPC bestLastNPC = null;
         int maxInLine = 0;
-        float tolerance = 50f;
+        const float tolerance = 50f;
 
         for (int i = 0; i < validNPCs.Count; i++)
         {
@@ -836,7 +814,7 @@ public static class ProjectileTargeting
 
         Projectile bestProj = null;
         int maxNeighbors = -1;
-        float clusterRadiusSquared = 100f * 100f;
+        const float clusterRadiusSquared = 100f * 100f;
 
         foreach (Projectile proj in validProjectiles)
         {
@@ -972,7 +950,7 @@ public static class PlayerTargeting
         if (!target.Invalid)
             return;
 
-        NPCUtils.TargetSearchResults targetSearchResults = NPCUtils.SearchForTarget(npc, NPCUtils.TargetSearchFlag.NPCs | NPCUtils.TargetSearchFlag.Players);
+        NPCUtils.TargetSearchResults targetSearchResults = NPCUtils.SearchForTarget(npc);
 
         if (!targetSearchResults.FoundTarget)
             return;

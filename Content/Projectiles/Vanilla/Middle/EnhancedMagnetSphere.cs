@@ -1,12 +1,15 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using CalamityMod;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
@@ -112,8 +115,8 @@ public class EnhancedMagnetSphere : ModProjectile
             for (int i = 0; i < lightning.Count; i++)
             {
                 Line line = lightning[i];
-                ends.Add(line.a);
-                ends.Add(line.b);
+                ends.Add(line.A);
+                ends.Add(line.B);
             }
             final.SetPoints(ends);
 

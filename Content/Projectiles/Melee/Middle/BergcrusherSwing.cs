@@ -10,6 +10,7 @@ using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
@@ -53,8 +54,8 @@ public class BergcrusherSwing : BaseSwordSwing
 
     public RotatedRectangle BladeRect()
     {
-        Vector2 start = Rect().Bottom + PolarVector(53f, Projectile.rotation) + PolarVector(47f, Projectile.rotation - MathHelper.PiOver2);
-        Vector2 end = start + PolarVector(66f, Projectile.rotation) + PolarVector(62f, Projectile.rotation - MathHelper.PiOver2);
+        Vector2 start = Rect().Bottom + PolarVector(53f, Projectile.rotation) + PolarVector(47f, Projectile.rotation - PiOver2);
+        Vector2 end = start + PolarVector(66f, Projectile.rotation) + PolarVector(62f, Projectile.rotation - PiOver2);
         return new RotatedRectangle(66f, start, end);
     }
 

@@ -47,7 +47,9 @@ public sealed class FancyAfterimages
         count = head = 0;
     }
 
-    public void DrawFancySwordAfterimages(Texture2D tex, Vector2 center, Color[] colors, Vector2 origin, SpriteEffects fx = SpriteEffects.None, float rotOff = 0f, float overallOpacity = 1f, float overallScale = 1f, float colorInterpolantOffset = 0f)
+    public void DrawFancySwordAfterimages(Texture2D tex, Vector2 center, Color[] colors, Vector2 origin,
+        SpriteEffects fx = SpriteEffects.None, float rotOff = 0f, float overallOpacity = 1f, float overallScale = 1f,
+        float colorInterpolantOffset = 0f, Rectangle? frame = null)
     {
         if (count == 0)
             return;
@@ -59,18 +61,23 @@ public sealed class FancyAfterimages
             float interpolant = 1f - InverseLerp(0f, count, i);
             float prev = afterimage.rot + rotOff;
             Vector2 scale = afterimage.scale * MathF.Min(1f, overallScale);
-            Color color = (colors.Length == 1 ? colors[0] : MulticolorLerp(interpolant + colorInterpolantOffset, colors))
-                with
-            { A = (byte)(afterimage.alpha * afterimage.opacity) } * interpolant * afterimage.opacity * overallOpacity;
+            Color color =
+                (colors.Length == 1 ? colors[0] : MulticolorLerp(interpolant + colorInterpolantOffset, colors))
+                    with
+                    {
+                        A = (byte)(afterimage.alpha * afterimage.opacity)
+                    } * interpolant * afterimage.opacity * overallOpacity;
 
-            Main.spriteBatch.Draw(tex, center - Main.screenPosition, null, color, prev, origin, scale, fx, 0f);
+            Main.spriteBatch.Draw(tex, center - Main.screenPosition, frame, color, prev, origin, scale, fx, 0f);
 
             if (afterimage.glowCount > 0)
             {
                 for (int j = 0; j < afterimage.glowCount; j++)
                 {
-                    Vector2 glowOffset = (MathHelper.TwoPi * j / afterimage.glowCount).ToRotationVector2() * afterimage.glowArea;
-                    Main.spriteBatch.Draw(tex, center + glowOffset - Main.screenPosition, null, color, prev, origin, scale, fx, 0f);
+                    Vector2 glowOffset = (MathHelper.TwoPi * j / afterimage.glowCount).ToRotationVector2() *
+                                         afterimage.glowArea;
+                    Main.spriteBatch.Draw(tex, center + glowOffset - Main.screenPosition, frame, color, prev, origin,
+                        scale, fx, 0f);
                 }
             }
 
@@ -78,7 +85,8 @@ public sealed class FancyAfterimages
         }
     }
 
-    public void DrawFancyAfterimages(Texture2D tex, Color[] colors, float overallOpacity = 1f, float overallScale = 1f, float colorInterpolantOffset = 0f, bool target = false, bool forceRot = false)
+    public void DrawFancyAfterimages(Texture2D tex, Color[] colors, float overallOpacity = 1f, float overallScale = 1f,
+        float colorInterpolantOffset = 0f, bool target = false, bool forceRot = false)
     {
         if (count == 0)
             return;
@@ -97,9 +105,11 @@ public sealed class FancyAfterimages
             Rectangle? frame = afterimage.frame;
             Color color = MulticolorLerp(interpolant + colorInterpolantOffset, colors)
                 with
-            { A = (byte)(afterimage.alpha * afterimage.opacity) } * interpolant * afterimage.opacity * overallOpacity;
+                {
+                    A = (byte)(afterimage.alpha * afterimage.opacity)
+                } * interpolant * afterimage.opacity * overallOpacity;
             float rotation = forceRot ? buffer[0].rot : afterimage.rot;
-            Vector2 origin = (frame.HasValue ? frame.Value.Size() : tex.Size()) / 2f;
+            Vector2 origin = (frame?.Size() ?? tex.Size()) / 2f;
             Vector2 scale = afterimage.scale * overallScale;
             if (afterimage.scaleOut)
                 scale *= interpolant;
@@ -115,60 +125,58 @@ public sealed class FancyAfterimages
             {
                 for (int j = 0; j < afterimage.glowCount; j++)
                 {
-                    Vector2 glowOffset = (MathHelper.TwoPi * j / afterimage.glowCount).ToRotationVector2() * afterimage.glowArea;
+                    Vector2 glowOffset = (MathHelper.TwoPi * j / afterimage.glowCount).ToRotationVector2() *
+                                         afterimage.glowArea;
 
                     if (target)
-                        Main.spriteBatch.Draw(tex, ToTarget(pos + glowOffset, scale), frame, color, rotation, origin, spriteEffects, 0f);
+                        Main.spriteBatch.Draw(tex, ToTarget(pos + glowOffset, scale), frame, color, rotation, origin,
+                            spriteEffects, 0f);
                     else
-                        Main.spriteBatch.Draw(tex, pos + glowOffset, frame, color, rotation, origin, scale, spriteEffects, 0f);
+                        Main.spriteBatch.Draw(tex, pos + glowOffset, frame, color, rotation, origin, scale,
+                            spriteEffects, 0f);
                 }
             }
 
             idx = (idx - 1 + maxAfterimages) % maxAfterimages;
         }
     }
-    
-    public readonly struct Afterimage
-    {
-        public Afterimage(Vector2 pos, Vector2 scale, float opacity, float rot,
-            SpriteEffects fx = SpriteEffects.None, byte alpha = 0, int glowCount = 0,
-            float glowArea = 0f, Rectangle? frame = null, bool scaleOut = false, float closenessInterpolant = 0f)
-        {
-            this.pos = pos;
-            this.scale = scale;
-            this.opacity = opacity;
-            this.rot = rot;
-            this.fx = fx;
-            this.alpha = alpha;
-            this.frame = frame;
-            this.glowCount = glowCount;
-            this.glowArea = glowArea;
-            this.scaleOut = scaleOut;
-            this.closenessInterpolant = closenessInterpolant;
-        }
 
-        public readonly Vector2 pos;
-        public readonly Vector2 scale;
-        public readonly float opacity;
+    public readonly struct Afterimage(
+        Vector2 pos,
+        Vector2 scale,
+        float opacity,
+        float rot,
+        SpriteEffects fx = SpriteEffects.None,
+        byte alpha = 0,
+        int glowCount = 0,
+        float glowArea = 0f,
+        Rectangle? frame = null,
+        bool scaleOut = false,
+        float closenessInterpolant = 0f)
+    {
+        public readonly Vector2 pos = pos;
+        public readonly Vector2 scale = scale;
+        public readonly float opacity = opacity;
 
         /// <summary>
         /// The alpha of this afterimage. Gets brighter the closer to 0.
         /// </summary>
-        public readonly byte alpha;
-        public readonly float rot;
-        public readonly SpriteEffects fx;
-        public readonly Rectangle? frame;
-        public readonly int glowCount;
-        public readonly float glowArea;
+        public readonly byte alpha = alpha;
+
+        public readonly float rot = rot;
+        public readonly SpriteEffects fx = fx;
+        public readonly Rectangle? frame = frame;
+        public readonly int glowCount = glowCount;
+        public readonly float glowArea = glowArea;
 
         /// <summary>
         /// How close this afterimage should come to the center
         /// </summary>
-        public readonly float closenessInterpolant;
+        public readonly float closenessInterpolant = closenessInterpolant;
 
         /// <summary>
         /// Should this afterimage scale-out along the trail?
         /// </summary>
-        public readonly bool scaleOut;
+        public readonly bool scaleOut = scaleOut;
     }
 }

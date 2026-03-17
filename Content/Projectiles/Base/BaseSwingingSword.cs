@@ -2,23 +2,18 @@
 using System;
 using System.IO;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.Enums;
 using Terraria.GameContent.Shaders;
 using Terraria.Graphics.Effects;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Globals.ProjectileGlobal;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
-using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 using static System.MathF;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Base;
 
@@ -31,6 +26,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Base;
 public abstract class BaseSwordSwing : ModProjectile
 {
     #region Variables
+
     public enum SwingDirection : sbyte
     {
         Down = 1,
@@ -39,48 +35,58 @@ public abstract class BaseSwordSwing : ModProjectile
 
     public AdditionsProjectileInfo ProjInfo => Projectile.AdditionsInfo();
     public Texture2D Tex => Projectile.ThisProjectileTexture();
-    public ref float Time => ref Projectile.ai[0];
+
+    public int Time
+    {
+        get => (int)Projectile.ai[0];
+        set => Projectile.ai[0] = value;
+    }
 
     /// <summary>
     /// Hitlag
     /// </summary>
     public ref float TimeStop => ref Projectile.ai[1];
+
     public bool PlayedSound
     {
         get => (int)Projectile.ai[2] == 1;
         set => Projectile.ai[2] = value.ToInt();
     }
+
     public ref float VanishTime => ref ProjInfo.ExtraAI[0];
     public ref float OverallTime => ref ProjInfo.ExtraAI[1];
     public ref float RotationOffset => ref ProjInfo.ExtraAI[2];
+
     public bool Initialized
     {
         get => (int)ProjInfo.ExtraAI[3] == 1;
         set => ProjInfo.ExtraAI[3] = value.ToInt();
     }
+
     public ref float InitialMouseAngle => ref ProjInfo.ExtraAI[4];
     public ref float InitialAngle => ref ProjInfo.ExtraAI[5];
+
     public SwingDirection SwingDir
     {
         get => (SwingDirection)ProjInfo.ExtraAI[6];
         set => ProjInfo.ExtraAI[6] = (int)value;
     }
+
     public float[] OldRotations = new float[5];
+
     public SpriteEffects Effects
     {
         get => (SpriteEffects)Projectile.spriteDirection;
         set => Projectile.spriteDirection = (int)value;
     }
+
     public int Direction
     {
         get => Projectile.direction;
         set => Projectile.direction = value;
     }
-    public virtual int MaxUpdates
-    {
-        get;
-        set;
-    } = 3;
+
+    public virtual int MaxUpdates { get; set; } = 3;
 
     public Player Owner => Main.player[Projectile.owner];
     public GlobalPlayer Modded => Owner.Additions();
@@ -117,7 +123,7 @@ public abstract class BaseSwordSwing : ModProjectile
     /// </summary>
     public float AngularVelocity => Abs(WrapAngle(Projectile.rotation - OldRotations[1]));
 
-    public float SwingCompletion => InverseLerp(0f, MaxTime, Time, true);
+    public float SwingCompletion => InverseLerp(0f, MaxTime, Time);
     public Vector2 SwordDir;
 
     /// <summary>
@@ -131,7 +137,8 @@ public abstract class BaseSwordSwing : ModProjectile
 
     public virtual float SwingOffset()
     {
-        return SwordRotation + InitialMouseAngle + SwingAngle * Animation() * (SwingDir != SwingDirection.Up).ToDirectionInt() * Direction;
+        return SwordRotation + InitialMouseAngle +
+               SwingAngle * Animation() * (SwingDir != SwingDirection.Up).ToDirectionInt() * Direction;
     }
 
     /// <summary>
@@ -142,30 +149,48 @@ public abstract class BaseSwordSwing : ModProjectile
     {
         float width = MathF.Min(Tex?.Height ?? 1, Tex?.Width ?? 1) / 3 * Projectile.scale;
         float height = Sqrt((Tex?.Height ?? 1).Squared() + (Tex?.Width ?? 1).Squared()) * Projectile.scale;
-        return new(width, Projectile.Center, Projectile.Center + PolarVector(height, Projectile.rotation - SwordRotation));
+        return new(width, Projectile.Center,
+            Projectile.Center + PolarVector(height, Projectile.rotation - SwordRotation));
     }
+
     #endregion
 
     #region Netwerking
+
     public sealed override void SendExtraAI(BinaryWriter writer)
     {
         writer.Write((sbyte)Projectile.direction);
-        writer.Write((float)Projectile.rotation);
+        writer.Write(Projectile.rotation);
         writer.Write((sbyte)Projectile.spriteDirection);
         WriteExtraAI(writer);
     }
+
     public sealed override void ReceiveExtraAI(BinaryReader reader)
     {
-        Projectile.direction = (sbyte)reader.ReadSByte();
-        Projectile.rotation = (float)reader.ReadSingle();
-        Projectile.spriteDirection = (sbyte)reader.ReadSByte();
+        Projectile.direction = reader.ReadSByte();
+        Projectile.rotation = reader.ReadSingle();
+        Projectile.spriteDirection = reader.ReadSByte();
         GetExtraAI(reader);
     }
-    public virtual void WriteExtraAI(BinaryWriter writer) { }
-    public virtual void GetExtraAI(BinaryReader reader) { }
+
+    public virtual void WriteExtraAI(BinaryWriter writer)
+    {
+    }
+
+    public virtual void GetExtraAI(BinaryReader reader)
+    {
+    }
+
     #endregion
-    public virtual void Defaults() { }
-    public virtual void StaticDefaults() { }
+
+    public virtual void Defaults()
+    {
+    }
+
+    public virtual void StaticDefaults()
+    {
+    }
+
     public sealed override void SetStaticDefaults()
     {
         ProjectileID.Sets.TrailCacheLength[Type] = 5;
@@ -176,6 +201,7 @@ public abstract class BaseSwordSwing : ModProjectile
         ProjectileID.Sets.CanDistortWater[Type] = false; // Manual
         StaticDefaults();
     }
+
     public sealed override void SetDefaults()
     {
         Projectile.DamageType = DamageClass.MeleeNoSpeed;
@@ -258,8 +284,14 @@ public abstract class BaseSwordSwing : ModProjectile
             PlayerHitEffects(target.RotHitbox().RandomPoint(), target.RotHitbox().RandomPoint(), target, info);
     }
 
-    public virtual void NPCHitEffects(in Vector2 start, in Vector2 end, NPC npc, NPC.HitInfo hit) { }
-    public virtual void PlayerHitEffects(in Vector2 position, in Vector2 end, Player player, Player.HurtInfo info) { }
+    public virtual void NPCHitEffects(in Vector2 start, in Vector2 end, NPC npc, NPC.HitInfo hit)
+    {
+    }
+
+    public virtual void PlayerHitEffects(in Vector2 position, in Vector2 end, Player player, Player.HurtInfo info)
+    {
+    }
+
     #endregion
 
     public sealed override void AI()
@@ -297,7 +329,7 @@ public abstract class BaseSwordSwing : ModProjectile
                 Direction = Projectile.velocity.X.NonZeroSign();
                 InitialAngle = SwingOffset();
                 InitialMouseAngle = Projectile.velocity.ToRotation();
-                Time = 0f;
+                Time = 0;
 
                 this.Sync();
                 Initialized = true;
@@ -305,7 +337,8 @@ public abstract class BaseSwordSwing : ModProjectile
         }
 
         SafeAI();
-        SwordDir = (Projectile.rotation - SwordRotation + PiOver2).ToRotationVector2() * (SwingDir != SwingDirection.Up).ToDirectionInt() * Direction;
+        SwordDir = (Projectile.rotation - SwordRotation + PiOver2).ToRotationVector2() *
+                   (SwingDir != SwingDirection.Up).ToDirectionInt() * Direction;
 
         if (!Main.dedServ)
             ProduceWaterRipples();
@@ -324,7 +357,7 @@ public abstract class BaseSwordSwing : ModProjectile
     public void ProduceWaterRipples()
     {
         WaterShaderData water = (WaterShaderData)Filters.Scene["WaterDistortion"].GetShader();
-        float power = 12f;
+        const float power = 12f;
         float waveSine = 1f * (float)Math.Sin(Main.GlobalTimeWrappedHourly * 20f);
         Vector2 size = Projectile.Size / 2f;
         Vector2 ripplePos = Rect().Center;
@@ -332,9 +365,13 @@ public abstract class BaseSwordSwing : ModProjectile
         water.QueueRipple(ripplePos, waveData, size, RippleShape.Square, SwordDir.ToRotation());
     }
 
-    public virtual void SafeInitialize() { }
+    public virtual void SafeInitialize()
+    {
+    }
 
-    public virtual void SafeAI() { }
+    public virtual void SafeAI()
+    {
+    }
 
     /// <summary>
     /// Defaults to just killing the projectile
@@ -342,7 +379,6 @@ public abstract class BaseSwordSwing : ModProjectile
     public virtual void KillEffect()
     {
         Projectile.Kill();
-        return;
     }
 
     /// <summary>

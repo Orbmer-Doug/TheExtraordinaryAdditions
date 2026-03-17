@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -17,6 +18,8 @@ using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
 
@@ -223,7 +226,7 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        target.AddBuff(ModContent.BuffType<PlasmaIncineration>(), SecondsToFrames(6));
+        target.AddBuff(ModContent.BuffType<PlasmaIncineration>(), CalUtils.SecondsToFrames(6));
         if (AngularDamageFactor > 0.1f)
         {
             AdditionsSound.etherealHit1.Play(target.Center, 1.2f, 0f, .16f);

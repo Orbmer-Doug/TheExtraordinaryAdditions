@@ -20,7 +20,9 @@ public class StarfieldMainMenu : ModMenu
     public OptimizedPrimitiveTrail LogoTrail;
     public TrailPoints Points;
     public static int jumpscare;
-    public override bool PreDrawLogo(SpriteBatch spriteBatch, ref Vector2 logoDrawCenter, ref float logoRotation, ref float logoScale, ref Color drawColor)
+
+    public override bool PreDrawLogo(SpriteBatch spriteBatch, ref Vector2 logoDrawCenter, ref float logoRotation,
+        ref float logoScale, ref Color drawColor)
     {
         if (!AssetRegistry.HasFinishedLoadingShaders)
             return false;
@@ -48,11 +50,14 @@ public class StarfieldMainMenu : ModMenu
         spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, null, Main.UIScaleMatrix);
         Texture2D pixel = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
         shader.Render();
-        spriteBatch.Draw(pixel, new Rectangle(scrWidth / 2, scrHeight / 2, scrWidth, scrHeight), null, Color.White, 0f, pixel.Size() / 2, 0, 0f);
+        spriteBatch.Draw(pixel, new Rectangle(scrWidth / 2, scrHeight / 2, scrWidth, scrHeight), null, Color.White, 0f,
+            pixel.Size() / 2, 0, 0f);
         spriteBatch.End();
         spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, Main.UIScaleMatrix);
 
-        Point pos = Main.alreadyGrabbingSunOrMoon ? Main.MouseScreen.ToPoint() : new((int)logoDrawCenter.X, (int)logoDrawCenter.Y);
+        Point pos = Main.alreadyGrabbingSunOrMoon
+            ? Main.MouseScreen.ToPoint()
+            : new((int)logoDrawCenter.X, (int)logoDrawCenter.Y);
         RotatedRectangle iconHitbox = new(pos.X - width / 2, pos.Y - height / 2, width, height, logoRotation);
         Rectangle mouseHitbox = new((int)Main.MouseScreen.X, (int)Main.MouseScreen.Y, 14, 14);
 
@@ -62,14 +67,17 @@ public class StarfieldMainMenu : ModMenu
             Points.Update(Main.MouseScreen);
 
             ManagedShader streak = ShaderRegistry.SideStreakTrail;
-            streak.Matrix = Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, -1, 1);
             streak.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.CausticNoise), 1, SamplerState.LinearWrap);
-            LogoTrail = new(c => width, (c, pos) =>
+            LogoTrail = new(_ => width, (c, _) =>
             {
-                Color col = MulticolorLerp(c.X + Main.GlobalTimeWrappedHourly, new(232, 242, 255), new(146, 192, 239), new(107, 162, 229), new(94, 126, 181));
-                return (WorldGen.remixWorldGen ? new Color(byte.MaxValue - col.R, byte.MaxValue - col.G, byte.MaxValue - col.B) : col) * MathHelper.SmoothStep(1f, 0f, c.X);
+                Color col = MulticolorLerp(c.X + Main.GlobalTimeWrappedHourly, new(232, 242, 255), new(146, 192, 239),
+                    new(107, 162, 229), new(94, 126, 181));
+                return (WorldGen.remixWorldGen
+                    ? new Color(byte.MaxValue - col.R, byte.MaxValue - col.G, byte.MaxValue - col.B)
+                    : col) * MathHelper.SmoothStep(1f, 0f, c.X);
             }, null, 40);
-            LogoTrail.DrawTrail(streak, Points.Points, 1000, true, false);
+            LogoTrail.DrawTrail(streak, Points.Points, 1000, true, false,
+                Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, -1, 1));
 
             Main.alreadyGrabbingSunOrMoon = true;
         }
@@ -84,7 +92,9 @@ public class StarfieldMainMenu : ModMenu
         if (WorldGen.remixWorldGen)
         {
             spriteBatch.End();
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, Main.Rasterizer, AssetRegistry.GetShader("NegativeOverlay").Effect, Main.UIScaleMatrix);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp,
+                DepthStencilState.None, Main.Rasterizer, AssetRegistry.GetShader("NegativeOverlay").Effect,
+                Main.UIScaleMatrix);
         }
 
         Texture2D tex = Logo.Value;
@@ -95,6 +105,7 @@ public class StarfieldMainMenu : ModMenu
             tex = AssetRegistry.GetTexture(AdditionsTexture.TheGiantSnailFromAncientTimes);
             logoScale *= 6f;
         }
+
         if (jumpscare > 0)
             jumpscare--;
         int logoWidth = tex.Width;
@@ -105,7 +116,8 @@ public class StarfieldMainMenu : ModMenu
         if (WorldGen.remixWorldGen)
         {
             spriteBatch.End();
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, Main.Rasterizer, null, Main.UIScaleMatrix);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp,
+                DepthStencilState.None, Main.Rasterizer, null, Main.UIScaleMatrix);
         }
 
         if (Main.starGame)
@@ -118,7 +130,8 @@ public class StarfieldMainMenu : ModMenu
                     continue;
 
                 star.rotation += (MathF.Abs(star.fallSpeed.X) + MathF.Abs(star.fallSpeed.Y)) * .009f;
-                spriteBatch.Draw(texture, star.position, null, star.falling ? Color.White : Main.DiscoColor, star.rotation, texture.Size() / 2, star.scale * star.twinkle * Main.ForcedMinimumZoom, 0, 0f);
+                spriteBatch.Draw(texture, star.position, null, star.falling ? Color.White : Main.DiscoColor,
+                    star.rotation, texture.Size() / 2, star.scale * star.twinkle * Main.ForcedMinimumZoom, 0, 0f);
             }
         }
 

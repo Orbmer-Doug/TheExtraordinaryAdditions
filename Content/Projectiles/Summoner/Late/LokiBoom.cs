@@ -4,6 +4,8 @@ using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Late;
 
@@ -52,6 +54,6 @@ public class LokiBoom : ModProjectile, ILocalizedModType, IModType
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return CircularHitboxCollision(Projectile.Center, Projectile.Size.Length() * .5f, targetHitbox);
+        return CalUtils.CircularHitboxCollision(Projectile.Center, Projectile.Size.Length() * .5f, targetHitbox);
     }
 }

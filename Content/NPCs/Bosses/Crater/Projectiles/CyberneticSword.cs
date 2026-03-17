@@ -14,6 +14,8 @@ using static Microsoft.Xna.Framework.MathHelper;
 using static System.MathF;
 using static TheExtraordinaryAdditions.Content.Projectiles.Base.BaseSwordSwing;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
@@ -22,33 +24,50 @@ public class CyberneticSword : ProjOwnedByNPC<Asterlin>
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CyberneticSword);
 
     #region Variables
+
     public Texture2D Tex => Projectile.ThisProjectileTexture();
-    public ref float Time => ref Projectile.ai[0];
-    public ref float OverallTime => ref Projectile.ai[1];
+    public int Time
+    {
+        get => (int)Projectile.ai[0];
+        set => Projectile.ai[0] = value;
+    }
+    public int OverallTime
+    {
+        get => (int)Projectile.ai[1];
+        set => Projectile.ai[1] = value;
+    }
+
     public bool PlayedSound
     {
-        get => Projectile.ai[2] == 1f;
+        get => (int)Projectile.ai[2] == 1;
         set => Projectile.ai[2] = value.ToInt();
     }
+
     public ref float VanishTime => ref Projectile.AdditionsInfo().ExtraAI[0];
     public ref float RotationOffset => ref Projectile.AdditionsInfo().ExtraAI[1];
+
     public bool Initialized
     {
-        get => Projectile.AdditionsInfo().ExtraAI[2] == 1f;
+        get => (int)Projectile.AdditionsInfo().ExtraAI[2] == 1;
         set => Projectile.AdditionsInfo().ExtraAI[2] = value.ToInt();
     }
+
     public ref float InitialMouseAngle => ref Projectile.AdditionsInfo().ExtraAI[3];
+
     public SwingDirection SwingDir
     {
         get => (SwingDirection)Projectile.AdditionsInfo().ExtraAI[4];
         set => Projectile.AdditionsInfo().ExtraAI[4] = (int)value;
     }
+
     public float[] OldRotations = new float[5];
+
     public SpriteEffects Effects
     {
         get => (SpriteEffects)Projectile.spriteDirection;
         set => Projectile.spriteDirection = (int)value;
     }
+
     public int Direction
     {
         get => Projectile.direction;
@@ -61,14 +80,14 @@ public class CyberneticSword : ProjOwnedByNPC<Asterlin>
 
     public static readonly float SwordRotation = PiOver4;
     public static readonly float SwingAngle = TwoPi / 3f;
-    public int MaxTime => (int)(Asterlin.Swings_SwingSpeed * MaxUpdates);
+    public int MaxTime => Asterlin.Swings_SwingSpeed * MaxUpdates;
 
     /// <summary>
     /// The difference in rotation based on the last frame.
     /// </summary>
     public float AngularVelocity => Abs(WrapAngle(Projectile.rotation - OldRotations[1]));
 
-    public float SwingCompletion => InverseLerp(0f, MaxTime, Time, true);
+    public float SwingCompletion => InverseLerp(0f, MaxTime, Time);
     public Vector2 SwordDir;
 
     /// <summary>
@@ -81,28 +100,34 @@ public class CyberneticSword : ProjOwnedByNPC<Asterlin>
 
     public float SwingOffset()
     {
-        return InitialMouseAngle + SwingAngle * Animation() * (SwingDir != SwingDirection.Up).ToDirectionInt() * Direction;
+        return InitialMouseAngle +
+               SwingAngle * Animation() * (SwingDir != SwingDirection.Up).ToDirectionInt() * Direction;
     }
 
     public RotatedRectangle Rect()
     {
-        return new(44f * Projectile.scale, Projectile.Center, Projectile.Center + PolarVector(194f * Projectile.scale, Projectile.rotation));
+        return new(44f * Projectile.scale, Projectile.Center,
+            Projectile.Center + PolarVector(194f * Projectile.scale, Projectile.rotation));
     }
+
     #endregion
 
     #region Netwerking
+
     public override void SendAI(BinaryWriter writer)
     {
         writer.Write((sbyte)Projectile.direction);
-        writer.Write((float)Projectile.rotation);
+        writer.Write(Projectile.rotation);
         writer.Write((sbyte)Projectile.spriteDirection);
     }
+
     public override void ReceiveAI(BinaryReader reader)
     {
-        Projectile.direction = (sbyte)reader.ReadSByte();
-        Projectile.rotation = (float)reader.ReadSingle();
-        Projectile.spriteDirection = (sbyte)reader.ReadSByte();
+        Projectile.direction = reader.ReadSByte();
+        Projectile.rotation = reader.ReadSingle();
+        Projectile.spriteDirection = reader.ReadSByte();
     }
+
     #endregion
 
     public sealed override void SetStaticDefaults()
@@ -169,10 +194,13 @@ public class CyberneticSword : ProjOwnedByNPC<Asterlin>
         for (int i = 0; i < 5; i++)
         {
             Vector2 vel = SwordDir.RotatedByRandom(.5f) * Main.rand.NextFloat(9f, 12f);
-            ParticleRegistry.SpawnBloodStreakParticle(start, vel.SafeNormalize(Vector2.Zero), 30, Main.rand.NextFloat(.4f, .6f), Color.Crimson);
+            ParticleRegistry.SpawnBloodStreakParticle(start, vel.SafeNormalize(Vector2.Zero), 30,
+                Main.rand.NextFloat(.4f, .6f), Color.Crimson);
         }
+
         AdditionsSound.RoySpecial2.Play(start, .6f, 0f, .3f);
     }
+
     #endregion
 
     public override void SafeAI()
@@ -198,7 +226,7 @@ public class CyberneticSword : ProjOwnedByNPC<Asterlin>
             Projectile.velocity = Center.SafeDirectionTo(ModOwner.Target.Center);
             Direction = Projectile.velocity.X.NonZeroSign();
             InitialMouseAngle = Projectile.velocity.ToRotation();
-            Time = 0f;
+            Time = 0;
 
             this.Sync();
             Initialized = true;
@@ -208,7 +236,8 @@ public class CyberneticSword : ProjOwnedByNPC<Asterlin>
         Projectile.timeLeft = 200;
         ModOwner.SetDirection(-Direction);
         Projectile.rotation = SwingOffset();
-        ModOwner.SetRightHandTarget(ModOwner.RightArm.RootPosition + PolarVector(ModOwner.AngledRightArmLength, Projectile.rotation));
+        ModOwner.SetRightHandTarget(ModOwner.RightArm.RootPosition +
+                                    PolarVector(ModOwner.AngledRightArmLength, Projectile.rotation));
 
         if (SwingCompletion >= .5f && !PlayedSound)
         {
@@ -224,12 +253,14 @@ public class CyberneticSword : ProjOwnedByNPC<Asterlin>
                 for (int j = 0; j < Asterlin.Swings_DartAmount; j++)
                 {
                     float completion = InverseLerp(0f, Asterlin.Swings_DartAmount - 1, j);
-                    float angle = initDir + MathHelper.Lerp(-maxRad / 2, maxRad / 2, completion) + angleOffset + off;
+                    float angle = initDir + Lerp(-maxRad / 2, maxRad / 2, completion) + angleOffset + off;
                     Vector2 pos = Owner.Center + PolarVector(dist, angle);
                     Vector2 vel = PolarVector(10f, angle);
                     if (this.RunServer())
-                        SpawnProjectile(pos, vel * speed, ModContent.ProjectileType<GodPiercingDart>(), Asterlin.LightAttackDamage, 0f);
+                        SpawnProjectile(pos, vel * speed, ModContent.ProjectileType<GodPiercingDart>(),
+                            Asterlin.LightAttackDamage, 0f);
                 }
+
                 angleOffset = maxRad / (2 * (Asterlin.Swings_DartAmount - 1));
                 speed /= 2;
             }
@@ -240,7 +271,7 @@ public class CyberneticSword : ProjOwnedByNPC<Asterlin>
         }
 
         if (trail == null || trail.Disposed)
-            trail = new(WidthFunct, ColorFunct, (c) => Center.ToNumerics(), 25);
+            trail = new(WidthFunct, ColorFunct, _ => Center.ToNumerics(), 25);
 
         old.Update(Rect().Bottom + PolarVector(140f, Projectile.rotation) + Owner.velocity - Center);
 
@@ -276,16 +307,18 @@ public class CyberneticSword : ProjOwnedByNPC<Asterlin>
         {
             for (int i = 0; i < 2; i++)
             {
-                Vector2 pos = Vector2.Lerp(Rect().Bottom + PolarVector(16f, Projectile.rotation), Rect().Top, Main.rand.NextFloat());
+                Vector2 pos = Vector2.Lerp(Rect().Bottom + PolarVector(16f, Projectile.rotation), Rect().Top,
+                    Main.rand.NextFloat());
                 Vector2 vel = -SwordDir * Main.rand.NextFloat(4f, 8f);
                 int life = Main.rand.Next(19, 25);
                 float scale = Main.rand.NextFloat(.4f, .8f);
                 Color color = ColorFunct(new(0f, Main.rand.NextFloat()), Vector2.Zero);
-                ParticleRegistry.SpawnTechyHolosquareParticle(pos, vel, life, scale, color, 1f);
+                ParticleRegistry.SpawnTechyHolosquareParticle(pos, vel, life, scale, color);
             }
         }
 
-        SwordDir = (Projectile.rotation + PiOver2).ToRotationVector2() * (SwingDir != SwingDirection.Up).ToDirectionInt() * Direction;
+        SwordDir = (Projectile.rotation + PiOver2).ToRotationVector2() *
+                   (SwingDir != SwingDirection.Up).ToDirectionInt() * Direction;
 
         Time++;
         OverallTime++;
@@ -298,6 +331,7 @@ public class CyberneticSword : ProjOwnedByNPC<Asterlin>
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints old = new(25);
+
     public float WidthFunct(float c)
     {
         return SmoothStep(1f, 0f, c) * 137f * Projectile.scale;
@@ -342,11 +376,11 @@ public class CyberneticSword : ProjOwnedByNPC<Asterlin>
             shader.TrySetParameter("secondaryColor", Color.Cyan.ToVector3());
             shader.TrySetParameter("tertiaryColor", Color.DarkCyan.ToVector3());
             shader.TrySetParameter("flip", !flip);
-            trail.DrawTrail(shader, old.Points, 400, true, true);
+            trail.DrawTrail(shader, old.Points, 400, true);
         }
 
         Main.spriteBatch.Draw(Tex, Projectile.Center - Main.screenPosition, null, Color.White,
-                    Projectile.rotation + RotationOffset, origin, Projectile.scale, Effects, 0f);
+            Projectile.rotation + RotationOffset, origin, Projectile.scale, Effects, 0f);
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.OverNPCs);
         return false;
     }

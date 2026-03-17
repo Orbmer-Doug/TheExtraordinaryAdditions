@@ -7,6 +7,8 @@ using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Late;
 
@@ -28,19 +30,22 @@ public class _500kg : ModProjectile
 
     public bool HitGround
     {
-        get => Projectile.ai[0] == 1f;
+        get => (int)Projectile.ai[0] == 1;
         set => Projectile.ai[0] = value.ToInt();
     }
+
     public ref float Timer => ref Projectile.ai[1];
     public const int TimeBeforeBoom = 120;
     public TrailPoints cache;
     public OptimizedPrimitiveTrail trail;
+
     public override void AI()
     {
         cache ??= new(20);
         cache.Update(Projectile.Center);
         if (trail == null || trail.Disposed)
-            trail = new(c => Projectile.height, (c, pos) => Color.WhiteSmoke * MathHelper.SmoothStep(1f, 0f, c.X), null, 20);
+            trail = new(c => Projectile.height, (c, pos) => Color.WhiteSmoke * MathHelper.SmoothStep(1f, 0f, c.X), null,
+                20);
 
         if (HitGround)
         {
@@ -75,16 +80,19 @@ public class _500kg : ModProjectile
         return Projectile.timeLeft < 2;
     }
 
-    public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
+    public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs,
+        List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
     {
         behindNPCsAndTiles.Add(index);
     }
 
     public const int Size = 1000;
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         float fallOff = Utils.Remap(Size - target.Distance(Projectile.Center) * 2, 0f, Size, 0.05f, 1f);
-        target.velocity += Projectile.Center.SafeDirectionTo(target.Center) * Projectile.knockBack * fallOff * (target.knockBackResist * .9f);
+        target.velocity += Projectile.Center.SafeDirectionTo(target.Center) * Projectile.knockBack * fallOff *
+                           (target.knockBackResist * .9f);
     }
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
@@ -112,17 +120,22 @@ public class _500kg : ModProjectile
             Color color = Color.OrangeRed.Lerp(Color.Chocolate, Main.rand.NextFloat(.3f, .6f));
 
             ParticleRegistry.SpawnGlowParticle(pos, vel, life, scale * 150f, color);
-            ParticleRegistry.SpawnGlowParticle(pos, vel * 1.2f, life + 20, scale * 100f, color, Main.rand.NextFloat(.6f, 1.1f), true);
+            ParticleRegistry.SpawnGlowParticle(pos, vel * 1.2f, life + 20, scale * 100f, color,
+                Main.rand.NextFloat(.6f, 1.1f), true);
 
-            ParticleRegistry.SpawnCloudParticle(pos, vel, color, Color.Transparent, life, scale, Main.rand.NextFloat(.7f, 1.5f));
-            ParticleRegistry.SpawnCloudParticle(pos, vel * 1.6f, color, Color.Transparent, life - 10, scale - .1f, Main.rand.NextFloat(.7f, 1.2f));
+            ParticleRegistry.SpawnCloudParticle(pos, vel, color, Color.Transparent, life, scale,
+                Main.rand.NextFloat(.7f, 1.5f));
+            ParticleRegistry.SpawnCloudParticle(pos, vel * 1.6f, color, Color.Transparent, life - 10, scale - .1f,
+                Main.rand.NextFloat(.7f, 1.2f));
 
             ParticleRegistry.SpawnSquishyLightParticle(pos, vel * 4f, life / 2, scale, color * 1.4f);
-            ParticleRegistry.SpawnSquishyLightParticle(pos, vel * 6f, life / 3, scale * 1.3f, color * 1.8f, Main.rand.NextFloat(.5f, 1f), 1.2f);
+            ParticleRegistry.SpawnSquishyLightParticle(pos, vel * 6f, life / 3, scale * 1.3f, color * 1.8f,
+                Main.rand.NextFloat(.5f, 1f), 1.2f);
 
             ParticleRegistry.SpawnDustParticle(pos, vel * 5f, life / 2, scale * 1.2f, color, .2f, true, true);
 
-            Dust.NewDustPerfect(Projectile.Center, DustID.Stone, vel * 2.1f, 0, default, Main.rand.NextFloat(.9f, 1.5f));
+            Dust.NewDustPerfect(Projectile.Center, DustID.Stone, vel * 2.1f, 0, default,
+                Main.rand.NextFloat(.9f, 1.5f));
             Dust.NewDustPerfect(Projectile.Center, DustID.Dirt, vel * 2.2f, 0, default, Main.rand.NextFloat(.9f, 1.5f));
         }
 
@@ -140,7 +153,8 @@ public class _500kg : ModProjectile
 
         Texture2D texture = Projectile.ThisProjectileTexture();
         Vector2 drawPosition = Projectile.Center - Main.screenPosition;
-        Main.EntitySpriteDraw(texture, drawPosition, null, lightColor, Projectile.rotation, texture.Size() * 0.5f, Projectile.scale, 0, 0);
+        Main.EntitySpriteDraw(texture, drawPosition, null, lightColor, Projectile.rotation, texture.Size() * 0.5f,
+            Projectile.scale, 0, 0);
         return false;
     }
 }

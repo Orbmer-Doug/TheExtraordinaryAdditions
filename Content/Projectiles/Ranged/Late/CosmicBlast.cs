@@ -1,9 +1,11 @@
 ﻿using System.IO;
+using CalamityMod;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
@@ -76,7 +78,7 @@ public class CosmicBlast : ModProjectile, IHasScreenShader
     }
 
     public ref float Time => ref Projectile.ai[0];
-    public static readonly int Life = SecondsToFrames(.9f);
+    public static readonly int Life = CalUtils.SecondsToFrames(.9f);
     public override void AI()
     {
         if (!HasShader)

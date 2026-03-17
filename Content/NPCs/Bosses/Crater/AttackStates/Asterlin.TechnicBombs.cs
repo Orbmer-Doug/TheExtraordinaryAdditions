@@ -1,51 +1,58 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using CalamityMod;
 using Terraria;
+using Terraria.Enums;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
-public partial class Asterlin : ModNPC
+public partial class Asterlin
 {
     public static readonly Dictionary<AsterlinAIType, float> TechnicBombBarrage_PossibleStates =
         new Dictionary<AsterlinAIType, float> { { AsterlinAIType.Cleave, 1f }, { AsterlinAIType.Hyperbeam, .6f } };
+
     [AutomatedMethodInvoke]
     public void LoadStateTransitions_TechnicBombBarrage()
     {
-        StateMachine.RegisterTransition(AsterlinAIType.TechnicBombBarrage, TechnicBombBarrage_PossibleStates, false, () =>
-        {
-            return AITimer >= TechnicBombBarrage_TotalTime;
-        });
+        StateMachine.RegisterTransition(AsterlinAIType.TechnicBombBarrage, TechnicBombBarrage_PossibleStates, false,
+            () => AITimer >= TechnicBombBarrage_TotalTime);
         StateMachine.RegisterStateEntryCallback(AsterlinAIType.TechnicBombBarrage, () =>
         {
             if (this.RunServer())
-                NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<TheTechnicBlitzripper>(), Asterlin.MediumAttackDamage, 0f);
+                NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<TheTechnicBlitzripper>(),
+                    MediumAttackDamage, 0f);
             ReticlePosition = Target.Center - Vector2.UnitY * 200f;
         });
         StateMachine.RegisterStateBehavior(AsterlinAIType.TechnicBombBarrage, DoBehavior_TechnicBombBarrage);
     }
 
-    public static int TechnicBombBarrage_FireTime => SecondsToFrames(15f);
-    public static int TechnicBombBarrage_WaitTime => SecondsToFrames(1f);
+    public static int TechnicBombBarrage_FireTime => CalUtils.SecondsToFrames(15f);
+    public static int TechnicBombBarrage_WaitTime => CalUtils.SecondsToFrames(1f);
     public static int TechnicBombBarrage_TotalTime => TechnicBombBarrage_FireTime + TechnicBombBarrage_WaitTime;
     public static int TechnicBombBarrage_BombReleaseRate => DifficultyBasedValue(30, 28, 27, 25, 24, 21);
+
     public int TechnicBombBarrage_FadeTimer
     {
         get => (int)ExtraAI[0];
         set => ExtraAI[0] = value;
     }
+
     public ref float TechnicBombBarrage_RotationStart => ref ExtraAI[1];
     public ref float TechnicBombBarrage_RotationDir => ref ExtraAI[2];
+
     public int CurrentBombTargetIndex
     {
         get => (int)ExtraAI[3];
         set => ExtraAI[3] = value;
     }
+
     public Vector2 ReticlePosition
     {
         get => new(ExtraAI[4], ExtraAI[5]);
@@ -70,7 +77,9 @@ public partial class Asterlin : ModNPC
 
         if (AITimer < TechnicBombBarrage_FireTime)
         {
-            Vector2 target = Target.Center + (Target.Velocity * 5f) + PolarVector(MathHelper.Lerp(400f, 500f, Sin01(AITimer * .1f)), TechnicBombBarrage_RotationStart + (AITimer * .01f * TechnicBombBarrage_RotationDir));
+            Vector2 target = Target.Center + (Target.Velocity * 5f) + PolarVector(
+                MathHelper.Lerp(400f, 500f, Sin01(AITimer * .1f)),
+                TechnicBombBarrage_RotationStart + (AITimer * .01f * TechnicBombBarrage_RotationDir));
             NPC.velocity = Vector2.SmoothStep(NPC.Center, target, .1f) - NPC.Center;
 
             if (AITimer < 30f)
@@ -80,7 +89,7 @@ public partial class Asterlin : ModNPC
             else
             {
                 int type = ModContent.ProjectileType<TechnicBomb>();
-                Projectile bombTarget = Main.projectile?[CurrentBombTargetIndex] ?? null;
+                Projectile bombTarget = Main.projectile?[CurrentBombTargetIndex];
                 bool valid = bombTarget != null && bombTarget.active && bombTarget.type == type;
                 if (!valid)
                 {
@@ -91,38 +100,60 @@ public partial class Asterlin : ModNPC
                         bombTarget = Main.projectile?[CurrentBombTargetIndex];
                         valid = true;
                     }
+
                     NPC.netUpdate = true;
                 }
 
                 if (Gun != null)
                 {
-                    if (valid)
+                    // asterlin has had enough
+                    if (Target.Type == NPCTargetType.NPC)
                     {
-                        if (bombTarget != null)
+                        ReticlePosition = Target.Center;
+                        Gun?.Shoot();
+                    }
+                    else
+                    {
+                        if (valid)
                         {
-                            ReticlePosition = Vector2.SmoothStep(ReticlePosition, bombTarget.Center, Utils.Remap(ReticlePosition.Distance(bombTarget.Center), 0f, 400f, .24f, .14f));
-                            if (ReticlePosition.WithinRange(bombTarget.Center, 100f))
-                                Gun?.Shoot();
+                            if (bombTarget != null)
+                            {
+                                ReticlePosition = Vector2.SmoothStep(ReticlePosition, bombTarget.Center,
+                                    Utils.Remap(ReticlePosition.Distance(bombTarget.Center), 0f, 400f, .24f,
+                                        .14f));
+                                if (ReticlePosition.WithinRange(bombTarget.Center, 100f))
+                                    Gun?.Shoot();
+                            }
                         }
                     }
 
                     // If the reticle gets too close everything freaks out
                     ReticlePosition = ReticlePosition.ClampOutCircle(Gun.Projectile.Center, 100f);
 
-                    SetLeftHandTarget(LeftArm.RootPosition + PolarVector(400f, (MathHelper.PiOver2 + (.1f * Direction)).AngleLerp(-MathHelper.PiOver2, Animators.MakePoly(3f).OutFunction(InverseLerp(0f, 40f, AITimer)))));
-                    SetRightHandTarget(RightArm.RootPosition + Gun.Projectile.velocity.SafeNormalize(Vector2.Zero) * 400f);
+                    SetLeftHandTarget(LeftArm.RootPosition + PolarVector(400f,
+                        (MathHelper.PiOver2 + (.1f * Direction)).AngleLerp(-MathHelper.PiOver2,
+                            Animators.MakePoly(3f).OutFunction(InverseLerp(0f, 40f, AITimer)))));
+                    SetRightHandTarget(RightArm.RootPosition +
+                                       Gun.Projectile.velocity.SafeNormalize(Vector2.Zero) * 400f);
                 }
 
                 if (AITimer % TechnicBombBarrage_BombReleaseRate == (TechnicBombBarrage_BombReleaseRate - 1))
                 {
-                    Vector2 home = Utility.GetHomingVelocity(LeftHandPosition, Target.Center, Target.Velocity, Main.rand.NextFloat(22f, 34f));
+                    Vector2 home = GetHomingVelocity(LeftHandPosition, Target.Center, Target.Velocity,
+                        Main.rand.NextFloat(22f, 34f));
                     if (this.RunServer())
-                        NPC.NewNPCProj(LeftHandPosition, home, ModContent.ProjectileType<TechnicBomb>(), Asterlin.MediumAttackDamage, 0f);
+                        NPC.NewNPCProj(LeftHandPosition, home, ModContent.ProjectileType<TechnicBomb>(),
+                            MediumAttackDamage, 0f);
 
                     for (int i = 0; i < 18; i++)
                     {
-                        ParticleRegistry.SpawnTechyHolosquareParticle(LeftHandPosition, home.RotatedByRandom(.4f) * Main.rand.NextFloat(.1f, .8f), Main.rand.Next(40, 60), Main.rand.NextFloat(.8f, 1.3f), Color.DeepSkyBlue, .8f, 1.1f);
-                        ParticleRegistry.SpawnTechyHolosquareParticle(LeftHandPosition, Main.rand.NextVector2Circular(3f, 3f) + Main.rand.NextVector2Circular(4f, 4f), Main.rand.Next(40, 60), Main.rand.NextFloat(1.2f, 1.6f), Color.DeepSkyBlue.Lerp(Color.Cyan, Main.rand.NextFloat(0f, .4f)), .8f, 1.1f);
+                        ParticleRegistry.SpawnTechyHolosquareParticle(LeftHandPosition,
+                            home.RotatedByRandom(.4f) * Main.rand.NextFloat(.1f, .8f), Main.rand.Next(40, 60),
+                            Main.rand.NextFloat(.8f, 1.3f), Color.DeepSkyBlue, .8f, 1.1f);
+                        ParticleRegistry.SpawnTechyHolosquareParticle(LeftHandPosition,
+                            Main.rand.NextVector2Circular(3f, 3f) + Main.rand.NextVector2Circular(4f, 4f),
+                            Main.rand.Next(40, 60), Main.rand.NextFloat(1.2f, 1.6f),
+                            Color.DeepSkyBlue.Lerp(Color.Cyan, Main.rand.NextFloat(0f, .4f)), .8f, 1.1f);
                     }
                 }
             }
@@ -139,9 +170,12 @@ public partial class Asterlin : ModNPC
         void draw()
         {
             float size = 340f;
-            Main.spriteBatch.Draw(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise), ToTarget(LeftHandPosition - new Vector2(size / 2), new Vector2(size)), Color.White);
+            Main.spriteBatch.Draw(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise),
+                ToTarget(LeftHandPosition - new Vector2(size / 2), new Vector2(size)), Color.White);
         }
-        float interpol = InverseLerp(0f, 30f, AITimer) * (1f - InverseLerp(0f, TechnicBombBarrage_WaitTime, TechnicBombBarrage_FadeTimer));
+
+        float interpol = InverseLerp(0f, 30f, AITimer) *
+                         (1f - InverseLerp(0f, TechnicBombBarrage_WaitTime, TechnicBombBarrage_FadeTimer));
         ManagedShader shader = AssetRegistry.GetShader("RadialTelegraph");
         shader.TrySetParameter("direction", LeftHandPosition.AngleTo(Target.Center));
         shader.TrySetParameter("angle", MathHelper.PiOver4 * interpol);
@@ -151,7 +185,8 @@ public partial class Asterlin : ModNPC
 
     public void TechnicBombBarrage_DrawReticle()
     {
-        float interpol = InverseLerp(0f, 30f, AITimer) * (1f - InverseLerp(0f, TechnicBombBarrage_WaitTime, TechnicBombBarrage_FadeTimer));
+        float interpol = InverseLerp(0f, 30f, AITimer) *
+                         (1f - InverseLerp(0f, TechnicBombBarrage_WaitTime, TechnicBombBarrage_FadeTimer));
 
         Main.spriteBatch.SetBlendState(BlendState.Additive);
         Texture2D line = AssetRegistry.GetTexture(AdditionsTexture.DimTrail);
@@ -162,10 +197,13 @@ public partial class Asterlin : ModNPC
             {
                 float rot = MathHelper.TwoPi * InverseLerp(0f, 4, i) + MathHelper.PiOver4;
                 Vector2 offset = rot.ToRotationVector2() * MathHelper.Lerp(0f, 10f, Sin01(Main.GameUpdateCount * .1f));
-                Main.spriteBatch.DrawBetterRect(line, ToTarget(ReticlePosition + offset, new Vector2(56, 208)), null, Color.Cyan * .8f * interpol, rot - MathHelper.PiOver2, lineOrig);
-                Main.spriteBatch.DrawBetterRect(line, ToTarget(ReticlePosition + offset, new Vector2(56, 208) / 2), null, Color.LightCyan * interpol, rot - MathHelper.PiOver2, lineOrig);
+                Main.spriteBatch.DrawBetterRect(line, ToTarget(ReticlePosition + offset, new Vector2(56, 208)), null,
+                    Color.Cyan * .8f * interpol, rot - MathHelper.PiOver2, lineOrig);
+                Main.spriteBatch.DrawBetterRect(line, ToTarget(ReticlePosition + offset, new Vector2(56, 208) / 2),
+                    null, Color.LightCyan * interpol, rot - MathHelper.PiOver2, lineOrig);
             }
         }
+
         Main.spriteBatch.ResetBlendState();
 
         ManagedShader shader = AssetRegistry.GetShader("ForcefieldLimited");
@@ -177,7 +215,8 @@ public partial class Asterlin : ModNPC
 
         Main.spriteBatch.EnterShaderRegion(BlendState.Additive, shader.Effect);
         shader.Render();
-        Main.spriteBatch.Draw(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise), ToTarget(ReticlePosition - new Vector2(size / 2), new Vector2(size)), Color.White);
+        Main.spriteBatch.Draw(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise),
+            ToTarget(ReticlePosition - new Vector2(size / 2), new Vector2(size)), Color.White);
         Main.spriteBatch.ExitShaderRegion();
     }
 }

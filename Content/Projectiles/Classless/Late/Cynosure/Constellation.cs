@@ -5,6 +5,7 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.Cynosure;
 
@@ -28,7 +29,7 @@ public class Constellation : ModProjectile
     public ref float Time => ref Projectile.ai[0];
     public bool MainProj
     {
-        get => Projectile.ai[1] == 1f;
+        get => (int)Projectile.ai[1] == 1;
         set => Projectile.ai[1] = value.ToInt();
     }
     public List<Projectile> Others = [];
@@ -45,8 +46,8 @@ public class Constellation : ModProjectile
             Projectile.Opacity = 0f;
             if (!MainProj)
             {
-                const float MinDistance = 30f;
-                const int MaxAttempts = 10;
+                const float minDistance = 30f;
+                const int maxAttempts = 10;
 
                 Others.Add(Projectile);
 
@@ -59,7 +60,7 @@ public class Constellation : ModProjectile
                     int attempts = 0;
 
                     // Attempt to not spawn too close together
-                    while (attempts < MaxAttempts && !validPosition)
+                    while (attempts < maxAttempts && !validPosition)
                     {
                         // Make the position
                         newPosition = Projectile.Center + PolarVector(Main.rand.NextFloat(100f, 400f), RandomRotation());
@@ -68,7 +69,7 @@ public class Constellation : ModProjectile
                         // Check distance to all the other stars
                         foreach (Projectile other in Others)
                         {
-                            if (Vector2.Distance(newPosition, other.Center) < MinDistance)
+                            if (Vector2.Distance(newPosition, other.Center) < minDistance)
                             {
                                 validPosition = false;
                                 break;
@@ -156,12 +157,12 @@ public class Constellation : ModProjectile
                     Vector2 end = nextProj.Center;
                     Vector2 tangent = start.SafeDirectionTo(end) * start.Distance(end);
                     float rotation = tangent.ToRotation();
-                    const float ImageThickness = 8;
-                    float thicknessScale = 1f / ImageThickness;
+                    const float imageThickness = 8;
+                    const float thicknessScale = 1f / imageThickness;
                     Vector2 middleOrigin = new(0, horiz.Height / 2f);
                     Vector2 middleScale = new(start.Distance(end) / horiz.Width, thicknessScale);
                     Color col = Color.White * Animators.MakePoly(2f).OutFunction.Evaluate(Time, Lifetime, Lifetime - FadeTime, 0f, 1f) * InverseLerp(0f, 10f, Time);
-                    Main.spriteBatch.DrawBetter(horiz, start, null, col, rotation, middleOrigin, middleScale, SpriteEffects.None);
+                    Main.spriteBatch.DrawBetter(horiz, start, null, col, rotation, middleOrigin, middleScale);
                 }
             }
 

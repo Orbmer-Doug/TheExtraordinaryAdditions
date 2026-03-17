@@ -9,6 +9,8 @@ using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
+using static CalamityMod.CalamityUtils;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
@@ -34,7 +36,7 @@ public class ConvergentFireball : ProjOwnedByNPC<Asterlin>
         set => Projectile.ai[2] = value.ToInt();
     }
 
-    public static readonly int ScaleUpTime = SecondsToFrames(1f);
+    public static readonly int ScaleUpTime = CalUtils.SecondsToFrames(1f);
     public const int MaxScale = 200;
     public LoopedSoundInstance flame;
 
@@ -171,7 +173,7 @@ public class DisintegrationNova : ProjOwnedByNPC<Asterlin>
 {
     public override string Texture => AssetRegistry.Invis;
     public override bool IgnoreOwnerActivity => true;
-    public static int Lifetime = SecondsToFrames(1.4f);
+    public static int Lifetime = CalUtils.SecondsToFrames(1.4f);
     public static int MaxRadius = 11000;
     public int Time
     {
@@ -222,7 +224,7 @@ public class DisintegrationNova : ProjOwnedByNPC<Asterlin>
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return CircularHitboxCollision(Projectile.Center, MaxRadius * Projectile.scale, targetHitbox);
+        return CalUtils.CircularHitboxCollision(Projectile.Center, MaxRadius * Projectile.scale, targetHitbox);
     }
 
     public override bool PreDraw(ref Color lightColor)

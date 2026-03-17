@@ -10,6 +10,7 @@ using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
@@ -35,7 +36,7 @@ public class Birch : BaseSwordSwing
             .Evaluate(SwingCompletion);
     }
 
-    public override float SwingAngle => 3 * MathHelper.Pi / 4;
+    public override float SwingAngle => 3 * Pi / 4;
     public override int SwingTime => SwingDir == SwingDirection.Down ? 85 : 60;
 
     public RotatedRectangle BushRect()

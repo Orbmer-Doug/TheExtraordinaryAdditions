@@ -1,4 +1,5 @@
-﻿using Terraria;
+﻿using CalamityMod;
+using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
@@ -41,7 +42,7 @@ public class LuminescentChaser : ModProjectile
 
         if (HasHitTarget)
         {
-            Projectile.velocity = Projectile.velocity.RotatedBy((double)((Projectile.identity % 2f == 0f).ToDirectionInt() * 0.06f), default) * 0.93f;
+            Projectile.velocity = Projectile.velocity.RotatedBy((double)((Projectile.identity % 2f == 0f).ToDirectionInt() * 0.06f)) * 0.93f;
             if (Projectile.timeLeft >= 30)
                 Projectile.timeLeft = 30;
         }
@@ -64,7 +65,7 @@ public class LuminescentChaser : ModProjectile
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int amount)
     {
-        target.SimpleStrikeNPC(target.lifeMax / 200, hit.HitDirection, false, 0f, null, false, 0f, false);
+        target.SimpleStrikeNPC(target.lifeMax / 200, hit.HitDirection);
 
         if (!HasHitTarget)
         {

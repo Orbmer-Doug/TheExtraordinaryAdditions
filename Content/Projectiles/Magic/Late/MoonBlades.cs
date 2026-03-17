@@ -17,6 +17,7 @@ using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
 
@@ -289,7 +290,7 @@ public class MoonPortal : ModProjectile
 
             AdditionsSound.MachinaBlast.Play(new Vector2(Position.X, Position.Y), .4f, 0f, .2f, 50);
 
-            Quaternion offset = Quaternion.CreateFromAxisAngle(Vector3.Right, MathHelper.ToRadians(-90f));
+            Quaternion offset = Quaternion.CreateFromAxisAngle(Vector3.Right, ToRadians(-90f));
             Rotation = LookAt(
                            Position,
                            new Vector3(Target, 0f), Vector3.Up) *

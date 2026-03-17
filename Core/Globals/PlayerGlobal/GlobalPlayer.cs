@@ -14,6 +14,7 @@ using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using TheExtraordinaryAdditions.UI;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Core.Globals;
 
@@ -50,13 +51,15 @@ public sealed partial class GlobalPlayer : ModPlayer
     }
 
     #region Vanilla
+
     public float BreakerLimit;
     public const int MaxLimit = 100;
     public int LimitTimer;
     public float CurrentLimit => InverseLerp(0f, MaxLimit, BreakerLimit);
     public bool AtMaxLimit => CurrentLimit == 1f;
-    public bool PlayedLimitSound = false;
-    public static readonly int MaxTimeWithLimit = SecondsToFrames(15);
+    public bool PlayedLimitSound;
+    public static readonly int MaxTimeWithLimit = CalUtils.SecondsToFrames(15);
+
     #endregion Vanilla
 
     public override void UpdateDead()
@@ -82,6 +85,7 @@ public sealed partial class GlobalPlayer : ModPlayer
         Player.statLifeMax2 += Player.statLifeMax / 5 / 20 * percentMaxLifeIncrease;
 
         #region SetFalse
+
         ResetMinion();
         ResetBuffs();
 
@@ -113,10 +117,12 @@ public sealed partial class GlobalPlayer : ModPlayer
     {
         Item item = player.HeldItem;
         return item.CountsAsClass<RangedDamageClass>() || item.CountsAsClass<MeleeDamageClass>()
-            || item.CountsAsClass<MagicDamageClass>() || item.CountsAsClass<ThrowingDamageClass>()
-            || item.CountsAsClass<SummonDamageClass>() || item.CountsAsClass<CalamityMod.RogueDamageClass>()
-            || item.CountsAsClass<CalamityMod.TrueMeleeDamageClass>()
-            || item.CountsAsClass<CalamityMod.TrueMeleeNoSpeedDamageClass>();
+                                                       || item.CountsAsClass<MagicDamageClass>() ||
+                                                       item.CountsAsClass<ThrowingDamageClass>()
+                                                       || item.CountsAsClass<SummonDamageClass>() ||
+                                                       item.CountsAsClass<CalamityMod.RogueDamageClass>()
+                                                       || item.CountsAsClass<CalamityMod.TrueMeleeDamageClass>()
+                                                       || item.CountsAsClass<CalamityMod.TrueMeleeNoSpeedDamageClass>();
     }
 
     public override void PostUpdateMiscEffects()
@@ -166,14 +172,10 @@ public sealed partial class GlobalPlayer : ModPlayer
     public override void ModifyHitByNPC(NPC npc, ref Player.HurtModifiers modifiers)
     {
         // funy
-        if ((npc.type == NPCID.DemonEye || npc.type == NPCID.BigMimicJungle ||
-            npc.type == NPCID.BrainofCthulhu || npc.type == NPCID.Snail ||
-            npc.type == NPCID.SolarCrawltipedeHead || npc.type == NPCID.WyvernHead ||
-            npc.type == NPCID.Clown || npc.type == NPCID.GiantTortoise ||
-            npc.type == NPCID.DuneSplicerHead || npc.type == NPCID.CaveBat ||
-            npc.type == NPCID.JungleBat || npc.type == NPCID.Medusa ||
-            npc.type == NPCID.MossHornet || npc.type == NPCID.LavaSlime ||
-            npc.type == NPCID.Harpy || npc.type == NPCID.Gastropod) && Main.rand.NextBool(80) && Main.zenithWorld)
+        if (npc.type is NPCID.DemonEye or NPCID.BigMimicJungle or NPCID.BrainofCthulhu or NPCID.Snail
+                or NPCID.SolarCrawltipedeHead or NPCID.WyvernHead or NPCID.Clown or NPCID.GiantTortoise
+                or NPCID.DuneSplicerHead or NPCID.CaveBat or NPCID.JungleBat or NPCID.Medusa or NPCID.MossHornet
+                or NPCID.LavaSlime or NPCID.Harpy or NPCID.Gastropod && Main.rand.NextBool(80) && Main.zenithWorld)
         {
             modifiers.Knockback *= 25f;
             modifiers.KnockbackImmunityEffectiveness *= 0f;
@@ -190,12 +192,17 @@ public sealed partial class GlobalPlayer : ModPlayer
         }
     }
 
-    public override void ModifyStartingInventory(IReadOnlyDictionary<string, List<Item>> itemsByMod, bool mediumCoreDeath)
+    public override void ModifyStartingInventory(IReadOnlyDictionary<string, List<Item>> itemsByMod,
+        bool mediumCoreDeath)
     {
         itemsByMod["Terraria"].Clear();
 
-        List<Item> items = [new(ItemID.CopperBroadsword), new(ItemID.CopperPickaxe), new(ItemID.CopperAxe),
-                new(ItemID.Torch, 15), new(ItemID.RopeCoil, 2), new(ItemID.Cobweb, 6), new(ItemID.BottledWater, 8), new(ItemID.Apple, 2)];
+        List<Item> items =
+        [
+            new(ItemID.CopperBroadsword), new(ItemID.CopperPickaxe), new(ItemID.CopperAxe),
+            new(ItemID.Torch, 15), new(ItemID.RopeCoil, 2), new(ItemID.Cobweb, 6), new(ItemID.BottledWater, 8),
+            new(ItemID.Apple, 2)
+        ];
 
         for (int i = 0; i < items.Count - 1; i++)
             itemsByMod["Terraria"].Add(items[i]);
@@ -208,8 +215,8 @@ public sealed partial class GlobalPlayer : ModPlayer
             if (AtMaxLimit)
             {
                 Player.moveSpeed += .5f;
-                Player.fallStart = (int)(Player.position.Y / 60f/*16f*/);
-                Player.maxFallSpeed = 20f/*10f*/;
+                Player.fallStart = (int)(Player.position.Y / 60f /*16f*/);
+                Player.maxFallSpeed = 20f /*10f*/;
             }
         }
     }
@@ -238,6 +245,7 @@ public sealed partial class GlobalPlayer : ModPlayer
                     AdditionsSound.BreakerCapped.Play(Player.Center);
                     PlayedLimitSound = true;
                 }
+
                 BreakerLimit = MaxLimit;
             }
             else
@@ -248,14 +256,17 @@ public sealed partial class GlobalPlayer : ModPlayer
         GlobalTimer++;
     }
 
-    public override bool PreKill(double damage, int hitDirection, bool pvp, ref bool playSound, ref bool genGore, ref PlayerDeathReason damageSource)
+    public override bool PreKill(double damage, int hitDirection, bool pvp, ref bool playSound, ref bool genGore,
+        ref PlayerDeathReason damageSource)
     {
         if (Main.rand.NextBool(60))
-            damageSource = PlayerDeathReason.ByCustomReason(NetworkText.FromKey("Mods.TheExtraordinaryAdditions.Status.Death.Silly" + Main.rand.Next(1, 3), Player.name));
+            damageSource = PlayerDeathReason.ByCustomReason(NetworkText.FromKey(
+                "Mods.TheExtraordinaryAdditions.Status.Death.Silly" + Main.rand.Next(1, 3), Player.name));
         return true;
     }
 
-    public override void DrawEffects(PlayerDrawSet drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
+    public override void DrawEffects(PlayerDrawSet drawInfo, ref float r, ref float g, ref float b, ref float a,
+        ref bool fullBright)
     {
         Vector2 randHitbox = Player.RandAreaInEntity();
         bool noShadow = drawInfo.shadow == 0f;
@@ -267,11 +278,13 @@ public sealed partial class GlobalPlayer : ModPlayer
                 Vector2 vel = Vector2.UnitY.RotatedByRandom(.25f) * -Main.rand.NextFloat(4f, 10f);
                 float scale = Main.rand.NextFloat(.3f, .8f);
                 int life = Main.rand.Next(12, 20);
-                Color color = MulticolorLerp(Main.rand.NextFloat(0.2f, 0.8f), Color.Red, Color.OrangeRed, Color.IndianRed, Color.DarkRed, Color.Orange, Color.DarkOrange, Color.OrangeRed * 1.6f);
+                Color color = MulticolorLerp(Main.rand.NextFloat(0.2f, 0.8f), Color.Red, Color.OrangeRed,
+                    Color.IndianRed, Color.DarkRed, Color.Orange, Color.DarkOrange, Color.OrangeRed * 1.6f);
                 ParticleRegistry.SpawnHeavySmokeParticle(randHitbox, vel, life, scale, color, .9f, true, .09f);
 
                 Dust.NewDustPerfect(randHitbox, DustID.SteampunkSteam, vel * .7f, 0, default, scale * 1.4f);
             }
+
             g *= 0.3f;
             r *= 0.52f;
             b *= 0.2f;
@@ -287,21 +300,24 @@ public sealed partial class GlobalPlayer : ModPlayer
 
     public override void ProcessTriggers(TriggersSet triggersSet)
     {
-        if (AdditionsKeybinds.TeleportHotKey.Current && Teleport && Main.myPlayer == Player.whoAmI && !Player.CCed && !Player.chaosState)
+        if (AdditionsKeybinds.TeleportHotKey.Current && Teleport && Main.myPlayer == Player.whoAmI && !Player.CCed &&
+            !Player.chaosState)
         {
             Vector2 teleportLocation = default;
             teleportLocation.X = Main.mouseX + Main.screenPosition.X;
-            if (Player.gravDir == 1f)
+            if ((int)Player.gravDir == 1)
                 teleportLocation.Y = Main.mouseY + Main.screenPosition.Y - Player.height;
             else
                 teleportLocation.Y = Main.screenPosition.Y + Main.screenHeight - Main.mouseY;
-            teleportLocation.X -= Player.width / 2;
+            teleportLocation.X -= Player.width / 2f;
             if (teleportLocation.X > 50f && teleportLocation.X < Main.maxTilesX * 16 - 50 && teleportLocation.Y > 50f
-                && teleportLocation.Y < Main.maxTilesY * 16 - 50 && !Collision.SolidCollision(teleportLocation, Player.width, Player.height))
+                && teleportLocation.Y < Main.maxTilesY * 16 - 50 &&
+                !Collision.SolidCollision(teleportLocation, Player.width, Player.height))
             {
                 Player.Teleport(teleportLocation, TeleportationStyleID.Portal, 0);
-                NetMessage.SendData(MessageID.TeleportEntity, -1, -1, null, 0, Player.whoAmI, teleportLocation.X, teleportLocation.Y, 1, 0, 0);
-                Player.AddBuff(BuffID.ChaosState, SecondsToFrames(60));
+                NetMessage.SendData(MessageID.TeleportEntity, -1, -1, null, 0, Player.whoAmI, teleportLocation.X,
+                    teleportLocation.Y, 1, 0, 0);
+                Player.AddBuff(BuffID.ChaosState, CalUtils.SecondsToFrames(60));
             }
         }
     }
@@ -315,7 +331,8 @@ public sealed partial class GlobalPlayer : ModPlayer
             Texture2D glow = AssetRegistry.GetTexture(AdditionsTexture.GlowSoft);
             Vector2 origin = glow.Size() * .5f;
             float size = .5f + (MathF.Cos(Main.GlobalTimeWrappedHourly * 4f) * .2f + .2f);
-            drawInfo.DrawDataCache.Add(new DrawData(glow, pos, null, Color.White with { A = 0 }, 0f, origin, size, 0, 0f));
+            drawInfo.DrawDataCache.Add(new DrawData(glow, pos, null, Color.White with { A = 0 }, 0f, origin, size, 0,
+                0f));
         }
     }
 }

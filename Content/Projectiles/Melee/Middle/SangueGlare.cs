@@ -1,10 +1,12 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
+using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
@@ -19,7 +21,7 @@ public class SangueGlare : ModProjectile
     }
 
     public ref float Time => ref Projectile.ai[0];
-    private static readonly int Life = SecondsToFrames(1.8f);
+    private static readonly int Life = CalUtils.SecondsToFrames(1.8f);
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 30;

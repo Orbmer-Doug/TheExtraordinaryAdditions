@@ -33,7 +33,7 @@ public readonly struct AdditionsLoopedSound
 
 public sealed class LoopedSoundManager : ModSystem
 {
-    private static readonly List<LoopedSoundInstance> loopedSounds = new();
+    private static readonly List<LoopedSoundInstance> loopedSounds = [];
 
     public override void OnModLoad()
     {
@@ -106,13 +106,11 @@ public sealed class LoopedSoundInstance
     public Func<bool> TerminationCondition
     {
         get;
-        private set;
     }
 
     public Func<bool> ActiveCondition
     {
         get;
-        private set;
     }
 
     public SlotId StartingSoundSlot
@@ -178,29 +176,12 @@ public sealed class LoopedSoundInstance
         // If a starting sound should be used, play that first, and wait for it to end before playing the looping sound
         if (!HasLoopSoundBeenStarted && isActive && !IsBeingPlayed)
         {
-            /*
-            bool hasStartEnded = !HasStartingSoundBeenStarted || (SoundEngine.TryGetActiveSound(StartingSoundSlot, out ActiveSound s) && s.IsPlaying);
-            if (!UsesStartingSound)
-                hasStartEnded = false;
-
-            if (!hasStartEnded)
-            {
-                LoopingSoundSlot = SoundEngine.PlaySound(loopSound.Style, soundPosition);
-                HasLoopSoundBeenStarted = true;
-                HasStartingSoundBeenStarted = true;
-            }
-            else if (UsesStartingSound && !HasStartingSoundBeenStarted)
-            {
-                StartingSoundSlot = SoundEngine.PlaySound(startSound.Value.Style, soundPosition);
-                HasStartingSoundBeenStarted = true;
-            }
-            */
-
             bool hasStartEnded = HasStartingSoundBeenStarted && (!SoundEngine.TryGetActiveSound(StartingSoundSlot, out ActiveSound s) || !s.IsPlaying);
 
             if (UsesStartingSound && !HasStartingSoundBeenStarted)
             {
-                StartingSoundSlot = SoundEngine.PlaySound(startSound.Value.Style, soundPosition);
+                if (startSound != null)
+                    StartingSoundSlot = SoundEngine.PlaySound(startSound.Value.Style, soundPosition);
                 HasStartingSoundBeenStarted = true;
             }
             else if (!UsesStartingSound || hasStartEnded)
@@ -214,8 +195,12 @@ public sealed class LoopedSoundInstance
         if (SoundEngine.TryGetActiveSound(StartingSoundSlot, out ActiveSound s1))
         {
             s1.Position = soundPosition;
-            s1.Volume = startSound.Value.Volume();
-            s1.Pitch = startSound.Value.Pitch();
+            if (startSound != null)
+            {
+                s1.Volume = startSound.Value.Volume();
+                s1.Pitch = startSound.Value.Pitch();
+            }
+
             if (!isActive)
                 s1.Pause();
             else
@@ -243,9 +228,9 @@ public sealed class LoopedSoundInstance
             return;
 
         if (SoundEngine.TryGetActiveSound(StartingSoundSlot, out ActiveSound s1))
-            s1?.Stop();
+            s1.Stop();
         if (SoundEngine.TryGetActiveSound(LoopingSoundSlot, out ActiveSound s2))
-            s2?.Stop();
+            s2.Stop();
 
         HasBeenStopped = true;
     }

@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 
 public class ConcentratedBloodExplosion : ProjOwnedByNPC<StygainHeart>
 {
-    public static readonly float Lifetime = SecondsToFrames(1.1f);
+    public static readonly float Lifetime = CalUtils.SecondsToFrames(1.1f);
 
     public ref float Radius => ref Projectile.ai[0];
     public static Color DetermineExplosionColor()
@@ -49,7 +49,7 @@ public class ConcentratedBloodExplosion : ProjOwnedByNPC<StygainHeart>
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return CircularHitboxCollision(Projectile.Center, Radius * 0.4f, targetHitbox);
+        return CalUtils.CircularHitboxCollision(Projectile.Center, Radius * 0.4f, targetHitbox);
     }
 
     public override bool PreDraw(ref Color lightColor)

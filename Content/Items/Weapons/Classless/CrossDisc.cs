@@ -44,19 +44,19 @@ public class CrossDisc : ModItem
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
-        var feelingiceolated = new TooltipLine(Mod, "CrossDisc", this.GetLocalization("FeelingIceolated").Value)
+        TooltipLine feelingiceolated = new TooltipLine(Mod, "CrossDisc", this.GetLocalization("FeelingIceolated").Value)
         {
             OverrideColor = new Color(194, 255, 246)
         };
-        var lightningreturns = new TooltipLine(Mod, "CrossDisc", this.GetLocalization("LightningReturns").Value)
+        TooltipLine lightningreturns = new TooltipLine(Mod, "CrossDisc", this.GetLocalization("LightningReturns").Value)
         {
             OverrideColor = new Color(142, 47, 237)
         };
-        var playingwithfire = new TooltipLine(Mod, "CrossDisc", this.GetLocalization("PlayingWithFire").Value)
+        TooltipLine playingwithfire = new TooltipLine(Mod, "CrossDisc", this.GetLocalization("PlayingWithFire").Value)
         {
             OverrideColor = new Color(237, 119, 0)
         };
-        var whatdoyoumeannotearth = new TooltipLine(Mod, "CrossDisc", this.GetLocalization("WhatDoYouMeanNotEarth").Value)
+        TooltipLine whatdoyoumeannotearth = new TooltipLine(Mod, "CrossDisc", this.GetLocalization("WhatDoYouMeanNotEarth").Value)
         {
             OverrideColor = new Color(61, 227, 83)
         };

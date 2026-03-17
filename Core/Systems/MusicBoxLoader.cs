@@ -70,14 +70,14 @@ public class MusicBoxLoader : ModSystem
 
     public override void AddRecipes()
     {
-        Recipe recipe = Recipe.Create(AngelsRageID, 1)
-            .AddIngredient(ItemID.MusicBox, 1)
-            .AddIngredient(ModContent.ItemType<JudgeOfHellsArmaments>(), 1)
+        Recipe recipe = Recipe.Create(AngelsRageID)
+            .AddIngredient(ItemID.MusicBox)
+            .AddIngredient(ModContent.ItemType<JudgeOfHellsArmaments>())
             .AddTile(TileID.LunarCraftingStation);
         recipe.Register();
 
-        recipe = Recipe.Create(FierceBattleID, 1)
-            .AddIngredient(ItemID.MusicBox, 1)
+        recipe = Recipe.Create(FierceBattleID)
+            .AddIngredient(ItemID.MusicBox)
             .AddIngredient(ItemID.SpikyBall, 20)
             .AddIngredient(ItemID.GoldenPlatform, 20)
             .AddIngredient(ItemID.LunarTabletFragment, 20)
@@ -87,34 +87,34 @@ public class MusicBoxLoader : ModSystem
             .AddTile(TileID.LunarMonolith);
         recipe.Register();
 
-        recipe = Recipe.Create(MenuMusicID, 1)
-            .AddIngredient(ItemID.MusicBox, 1)
-            .AddIngredient(ModContent.ItemType<FlagPole>(), 1)
+        recipe = Recipe.Create(MenuMusicID)
+            .AddIngredient(ItemID.MusicBox)
+            .AddIngredient(ModContent.ItemType<FlagPole>())
             .AddTile(TileID.Anvils);
         recipe.Register();
 
-        recipe = Recipe.Create(RainDanceID, 1)
-            .AddIngredient(ItemID.MusicBox, 1)
+        recipe = Recipe.Create(RainDanceID)
+            .AddIngredient(ItemID.MusicBox)
             .AddIngredient(ItemID.SandBlock, 120)
             .AddIngredient(ItemID.Seashell, 5)
             .AddCondition(Condition.InBeach)
             .AddCondition(Condition.NearWater);
         recipe.Register();
 
-        recipe = Recipe.Create(SereneSatelliteID, 1)
-            .AddIngredient(ItemID.MusicBox, 1)
+        recipe = Recipe.Create(SereneSatelliteID)
+            .AddIngredient(ItemID.MusicBox)
             .AddIngredient(ItemID.Moonglow, 10)
             .AddTile(TileID.BloodMoonMonolith);
         recipe.Register();
 
-        recipe = Recipe.Create(SpiderMusicID, 1)
-            .AddIngredient(ItemID.MusicBox, 1)
+        recipe = Recipe.Create(SpiderMusicID)
+            .AddIngredient(ItemID.MusicBox)
             .AddIngredient(ItemID.SpiderFang, 12)
             .AddTile(TileID.Cobweb);
         recipe.Register();
 
-        recipe = Recipe.Create(WereYouFoolinID, 1)
-            .AddIngredient(ItemID.MusicBox, 1)
+        recipe = Recipe.Create(WereYouFoolinID)
+            .AddIngredient(ItemID.MusicBox)
             .AddIngredient(ItemID.CopperBrick, 10)
             .AddIngredient(ItemID.YellowPaint, 15)
             .AddIngredient(ItemID.Glass, 10)

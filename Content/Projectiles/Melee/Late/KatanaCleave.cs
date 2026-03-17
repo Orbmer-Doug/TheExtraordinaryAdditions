@@ -11,6 +11,7 @@ using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
 
@@ -294,7 +295,7 @@ public class KatanaCleave : BaseSwordSwing
             const int amount = 10;
             for (int i = 0; i < amount; i++)
             {
-                Vector2 drawOffset = (MathHelper.TwoPi * i / amount).ToRotationVector2() * Convert01To010(SwingCompletion) * 3f;
+                Vector2 drawOffset = (TwoPi * i / amount).ToRotationVector2() * Convert01To010(SwingCompletion) * 3f;
                 Main.spriteBatch.Draw(Tex, Projectile.Center + drawOffset - Main.screenPosition, null, Color.White with { A = 0 } * .9f,
                     Projectile.rotation + RotationOffset, origin, Projectile.scale, Effects, 0f);
             }
@@ -501,10 +502,10 @@ public class KatanaSweep : ModProjectile
                 Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.BloomLine);
 
                 Vector2 origin = tex.Size() * 0.5f;
-                float opac = Animators.MakePoly(2f).InFunction(InverseLerp(20f, 0f, TotalTime)) * 3f;
+                float opac = MakePoly(2f).InFunction(InverseLerp(20f, 0f, TotalTime)) * 3f;
                 Color col = Color.Lerp(Color.SlateGray, Color.Gray, Projectile.identity / 7f % 1f) * opac;
 
-                float width = InitialStart.Distance(End) * Animators.MakePoly(6f).OutFunction(InverseLerp(0f, SliceTime * 2, TotalTime));
+                float width = InitialStart.Distance(End) * MakePoly(6f).OutFunction(InverseLerp(0f, SliceTime * 2, TotalTime));
                 float height = Projectile.ThisProjectileTexture().Height / 3;
                 float rot = Projectile.velocity.ToRotation();
                 Vector2 size = new(width, height);
@@ -565,10 +566,10 @@ public class KatanaSlice : ModProjectile
     {
         Projectile.rotation = Projectile.velocity.ToRotation();
 
-        int width = (int)Animators.MakePoly(3f).OutFunction.Evaluate(70f, MaxWidth, Interpolant);
-        int height = (int)Animators.MakePoly(3f).OutFunction.Evaluate(100f, 10f, Interpolant);
+        int width = (int)MakePoly(3f).OutFunction.Evaluate(70f, MaxWidth, Interpolant);
+        int height = (int)MakePoly(3f).OutFunction.Evaluate(100f, 10f, Interpolant);
         Size = new(width, height);
-        Projectile.Opacity = Animators.MakePoly(2f).InFunction(InverseLerp(0f, 5f * Projectile.MaxUpdates, Projectile.timeLeft));
+        Projectile.Opacity = MakePoly(2f).InFunction(InverseLerp(0f, 5f * Projectile.MaxUpdates, Projectile.timeLeft));
 
         Time++;
     }

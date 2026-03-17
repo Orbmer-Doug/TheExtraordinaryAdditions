@@ -9,6 +9,7 @@ using TheExtraordinaryAdditions.Content.Projectiles.Melee.Late.Fulmina;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
 

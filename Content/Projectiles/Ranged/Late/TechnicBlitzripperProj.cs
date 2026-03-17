@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using CalamityMod;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
@@ -8,6 +9,7 @@ using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
@@ -24,8 +26,8 @@ public class TechnicBlitzripperProj : BaseIdleHoldoutProjectile, ILocalizedModTy
     public ref bool Overheating => ref Owner.GetModPlayer<RipperPlayer>().Overheating;
     public ref int OverheatTimer => ref Owner.GetModPlayer<RipperPlayer>().OverheatTimer;
 
-    public static readonly int FireSniper = SecondsToFrames(5);
-    public static readonly int OverheatTime = SecondsToFrames(3);
+    public static readonly int FireSniper = CalUtils.SecondsToFrames(5);
+    public static readonly int OverheatTime = CalUtils.SecondsToFrames(3);
     public static readonly int MaxHeat = 60;
 
     public int Dir => Projectile.velocity.X.NonZeroSign();

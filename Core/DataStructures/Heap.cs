@@ -7,7 +7,6 @@ public class Heap<T>(int maxHeapSize = 1000, int resizeBuffer = 100) where T : I
 {
     private T[] items = new T[maxHeapSize];
     private int currentItemCount;
-    private readonly int sizeBuffer = resizeBuffer;
 
     public void Add(T item)
     {
@@ -92,7 +91,7 @@ public class Heap<T>(int maxHeapSize = 1000, int resizeBuffer = 100) where T : I
 
     private void Resize()
     {
-        T[] newItems = new T[items.Length + sizeBuffer];
+        T[] newItems = new T[items.Length + resizeBuffer];
         for (int i = 0; i < items.Length; i++)
             newItems[i] = items[i];
 

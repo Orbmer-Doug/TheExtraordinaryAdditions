@@ -1,1 +1,16 @@
-FIXED A SINGLE   TOOLTIP
+fixed solar guardians spawning in pre-hardmode... for some reason
+copper wire wrapped rock ALWAYS strikes things with lightning
+reworked cosmireaper
+reworked reality seamstresses glove
+reworked final strikes right-click
+reworked lance of sanguine steels
+removed arid flask
+simplified absolute armors recipes a little
+hopefully fixed aurora guard despawning
+
+fixed a few bugs with Asterlin and improved some telegraphing
+did some changes to Stygain Heart:
+- Slightly lowered blood rain fall
+- Barriers created in later attacks no longer deal damage
+- Lances created during the beacon follow the player's y-axis
+- Eased the difficulty a little across the board

@@ -2,6 +2,7 @@
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
@@ -21,7 +22,7 @@ public class InfernalFork : ModProjectile, ILocalizedModType, IModType
         Projectile.alpha = 255;
         Projectile.ignoreWater = false;
         Projectile.tileCollide = true;
-        Projectile.timeLeft = SecondsToFrames(3);
+        Projectile.timeLeft = CalUtils.SecondsToFrames(3);
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = 20;
         Projectile.penetrate = 1;

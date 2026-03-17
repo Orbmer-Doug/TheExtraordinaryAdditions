@@ -410,6 +410,6 @@ public class BarrageBeam : ProjOwnedByNPC<Asterlin>
     }
 
     public override bool? CanDamage() => LaserbeamLength >= MathF.Abs(LaserZPos) ? null : false;
-    public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => CircularHitboxCollision(Projectile.Center, Projectile.scale, targetHitbox);
+    public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => CalUtils.CircularHitboxCollision(Projectile.Center, Projectile.scale, targetHitbox);
     public override bool PreDraw(ref Color lightColor) => false;
 }

@@ -5,10 +5,12 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
+using static CalamityMod.CalamityUtils;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 
-public class LightSpirit : ModProjectile, ILocalizedModType, IModType
+public class LightSpirit : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
 
@@ -27,7 +29,6 @@ public class LightSpirit : ModProjectile, ILocalizedModType, IModType
         Projectile.timeLeft = 18000;
         Projectile.penetrate = -1;
         Projectile.tileCollide = false;
-        Projectile.DamageType = Owner.GetBestClass();
     }
 
     public Player Owner => Main.player[Projectile.owner];
@@ -38,6 +39,7 @@ public class LightSpirit : ModProjectile, ILocalizedModType, IModType
 
     public override void AI()
     {
+        Projectile.DamageType = Owner.GetBestClass();
         Projectile.Opacity = InverseLerp(0f, 30f, Time);
         Lighting.AddLight(Projectile.Center, Color.Goldenrod.ToVector3() * 1.4f * Projectile.Opacity);
 

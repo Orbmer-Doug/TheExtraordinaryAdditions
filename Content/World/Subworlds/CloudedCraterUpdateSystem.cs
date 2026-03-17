@@ -21,11 +21,7 @@ namespace TheExtraordinaryAdditions.Content.World.Subworlds;
 
 public class CloudedCraterUpdateSystem : ModSystem
 {
-    public static bool WasInSubworldLastUpdateFrame
-    {
-        get;
-        private set;
-    }
+    public static bool WasInSubworldLastUpdateFrame { get; private set; }
 
     public override void OnModLoad()
     {
@@ -52,10 +48,11 @@ public class CloudedCraterUpdateSystem : ModSystem
 
         // Disable liquid placing/removing items
         int itemID = item.type;
-        bool isSponge = itemID == ItemID.SuperAbsorbantSponge || itemID == ItemID.LavaAbsorbantSponge || itemID == ItemID.HoneyAbsorbantSponge || itemID == ItemID.UltraAbsorbantSponge;
-        bool isRegularBucket = itemID == ItemID.EmptyBucket || itemID == ItemID.WaterBucket || itemID == ItemID.LavaBucket || itemID == ItemID.HoneyBucket;
-        bool isSpecialBucket = itemID == ItemID.BottomlessBucket || itemID == ItemID.BottomlessLavaBucket || itemID == ItemID.BottomlessHoneyBucket || itemID == ItemID.BottomlessShimmerBucket;
-        return !isSponge && !isRegularBucket && !isSpecialBucket || itemID == ModContent.ItemType<MatterDisintegrationDrill>();
+        bool isSponge = itemID is ItemID.SuperAbsorbantSponge or ItemID.LavaAbsorbantSponge or ItemID.HoneyAbsorbantSponge or ItemID.UltraAbsorbantSponge;
+        bool isRegularBucket = itemID is ItemID.EmptyBucket or ItemID.WaterBucket or ItemID.LavaBucket or ItemID.HoneyBucket;
+        bool isSpecialBucket = itemID is ItemID.BottomlessBucket or ItemID.BottomlessLavaBucket or ItemID.BottomlessHoneyBucket or ItemID.BottomlessShimmerBucket;
+        return !isSponge && !isRegularBucket && !isSpecialBucket ||
+               itemID == ModContent.ItemType<MatterDisintegrationDrill>();
     }
 
     private bool KillProblematicProjectiles(Projectile projectile)
@@ -64,50 +61,54 @@ public class CloudedCraterUpdateSystem : ModSystem
         if (!WasInSubworldLastUpdateFrame)
             return true;
 
-        if (projectile.type == ProjectileID.DD2ElderWins)
+        switch (projectile.type)
         {
-            projectile.active = false;
-            return false;
+            case ProjectileID.DD2ElderWins:
+                projectile.active = false;
+                return false;
+            // no tombs
+            case ProjectileID.Tombstone or ProjectileID.Gravestone or ProjectileID.RichGravestone1
+                or ProjectileID.RichGravestone2 or
+                ProjectileID.RichGravestone3 or ProjectileID.RichGravestone4
+                or ProjectileID.Headstone or ProjectileID.Obelisk or
+                ProjectileID.GraveMarker or ProjectileID.CrossGraveMarker:
+                projectile.active = false;
+                break;
         }
-
-        // no tombs
-        if (projectile.type is ProjectileID.Tombstone or ProjectileID.Gravestone or ProjectileID.RichGravestone1 or ProjectileID.RichGravestone2 or
-            ProjectileID.RichGravestone3 or ProjectileID.RichGravestone4 or ProjectileID.RichGravestone4 or ProjectileID.Headstone or ProjectileID.Obelisk or
-            ProjectileID.GraveMarker or ProjectileID.CrossGraveMarker or ProjectileID.Headstone)
-            projectile.active = false;
 
         // Prevent tile-manipulating items from working messing up tiles
         if (projectile.type == ModContent.ProjectileType<CannonHoldout>())
             projectile.active = false;
         if (projectile.type == ModContent.ProjectileType<CrystylCrusherRay>())
             projectile.active = false;
-        if (projectile.type == ProjectileID.DirtBomb || projectile.type == ProjectileID.DirtStickyBomb)
-            projectile.active = false;
-        if (projectile.type == ProjectileID.SandBallGun || projectile.type == ProjectileID.SandBallGun)
-            projectile.active = false;
-        if (projectile.type == ProjectileID.SandBallFalling || projectile.type == ProjectileID.PearlSandBallFalling)
-            projectile.active = false;
-        if (projectile.type == ProjectileID.EbonsandBallFalling || projectile.type == ProjectileID.EbonsandBallGun)
-            projectile.active = false;
-        if (projectile.type == ProjectileID.CrimsandBallFalling || projectile.type == ProjectileID.CrimsandBallGun)
-            projectile.active = false;
-
-        // dirt rod
-        if (projectile.type == ProjectileID.DirtBall)
-            projectile.Kill();
+        switch (projectile.type)
+        {
+            case ProjectileID.DirtBomb or ProjectileID.DirtStickyBomb:
+            case ProjectileID.SandBallGun:
+            case ProjectileID.SandBallFalling or ProjectileID.PearlSandBallFalling:
+            case ProjectileID.EbonsandBallFalling or ProjectileID.EbonsandBallGun:
+            case ProjectileID.CrimsandBallFalling or ProjectileID.CrimsandBallGun:
+                projectile.active = false;
+                break;
+            // dirt rod
+            case ProjectileID.DirtBall:
+                projectile.Kill();
+                break;
+        }
 
         // No explosives
-        bool dryRocket = projectile.type == ProjectileID.DryRocket || projectile.type == ProjectileID.DrySnowmanRocket;
-        bool wetRocket = projectile.type == ProjectileID.WetRocket || projectile.type == ProjectileID.WetSnowmanRocket;
-        bool honeyRocket = projectile.type == ProjectileID.HoneyRocket || projectile.type == ProjectileID.HoneySnowmanRocket;
-        bool lavaRocket = projectile.type == ProjectileID.LavaRocket || projectile.type == ProjectileID.LavaSnowmanRocket;
+        bool dryRocket = projectile.type is ProjectileID.DryRocket or ProjectileID.DrySnowmanRocket;
+        bool wetRocket = projectile.type is ProjectileID.WetRocket or ProjectileID.WetSnowmanRocket;
+        bool honeyRocket = projectile.type is ProjectileID.HoneyRocket or ProjectileID.HoneySnowmanRocket;
+        bool lavaRocket = projectile.type is ProjectileID.LavaRocket or ProjectileID.LavaSnowmanRocket;
         bool rocket = dryRocket || wetRocket || honeyRocket || lavaRocket ||
-            projectile.type == ModContent.ProjectileType<MortarRoundProj>() || projectile.type == ModContent.ProjectileType<RubberMortarRoundProj>();
+                      projectile.type == ModContent.ProjectileType<MortarRoundProj>() ||
+                      projectile.type == ModContent.ProjectileType<RubberMortarRoundProj>();
 
-        bool dryMisc = projectile.type == ProjectileID.DryGrenade || projectile.type == ProjectileID.DryMine;
-        bool wetMisc = projectile.type == ProjectileID.WetGrenade || projectile.type == ProjectileID.WetMine;
-        bool honeyMisc = projectile.type == ProjectileID.HoneyGrenade || projectile.type == ProjectileID.HoneyMine;
-        bool lavaMisc = projectile.type == ProjectileID.LavaGrenade || projectile.type == ProjectileID.LavaMine;
+        bool dryMisc = projectile.type is ProjectileID.DryGrenade or ProjectileID.DryMine;
+        bool wetMisc = projectile.type is ProjectileID.WetGrenade or ProjectileID.WetMine;
+        bool honeyMisc = projectile.type is ProjectileID.HoneyGrenade or ProjectileID.HoneyMine;
+        bool lavaMisc = projectile.type is ProjectileID.LavaGrenade or ProjectileID.LavaMine;
         bool miscExplosive = dryMisc || wetMisc || honeyMisc || lavaMisc;
 
         if (rocket || miscExplosive)
@@ -125,48 +126,29 @@ public class CloudedCraterUpdateSystem : ModSystem
         if (type == TileID.Tombstones)
             Main.tile[x, y].Get<TileWallWireStateData>().HasTile = false;
     }
-
-    private bool DisallowTileBreakage(int x, int y, int type)
-    {
-        return WasInSubworldLastUpdateFrame;
-    }
-
-    private bool DisallowWallBreakage(int x, int y, int type)
-    {
-        return WasInSubworldLastUpdateFrame;
-    }
+    
+    private bool DisallowTileBreakage(int x, int y, int type) => WasInSubworldLastUpdateFrame;
+    private bool DisallowWallBreakage(int x, int y, int type) => WasInSubworldLastUpdateFrame;
+    
 
     public override void PreUpdateEntities()
     {
-        // Verify whether things are in the subworld. This hook runs on both clients and the server. If for some reason this stuff needs to be determined in a different
-        // hook it is necessary to ensure that property is preserved wherever you put it.
+        // Check whether things are in the subworld
         bool inCrater = SubworldSystem.IsActive<CloudedCrater>();
         if (WasInSubworldLastUpdateFrame != inCrater)
         {
-            // A major flaw with respect to subworld data transfer is the fact that Calamity's regular OnWorldLoad hooks clear everything.
-            // This works well and good for Calamity's purposes, but it causes serious issues when going between subworlds. The result of this is
-            // ordered as follows:
-
-            // 1. Exit world. Store necessary data for subworld transfer.
-            // 2. Load necessary stuff for subworld and wait.
-            // 3. Enter subworld. Load data from step 1.
-            // 4. Call OnWorldLoad, resetting everything from step 3.
-
-            // In order to address this, a final step is introduced:
-            // 5. Load data from step 3 again on the first frame of entity updating.
             if (inCrater)
             {
                 if (Main.netMode != NetmodeID.Server)
                     LoadWorldDataFromTag("Client", ClientWorldDataTag);
             }
 
-            // Allow the fade in when entering either world
             PlayerEnterEffects();
 
             WasInSubworldLastUpdateFrame = inCrater;
         }
 
-        // Everything beyond this point applies solely to the subworld
+        // Everything beyond this point applies only to the subworld
         if (!WasInSubworldLastUpdateFrame)
             return;
 
@@ -202,7 +184,8 @@ public class CloudedCraterUpdateSystem : ModSystem
         PlayerCount(out int total, out int alive);
         if (!NPC.AnyNPCs(asterlin) && total == alive)
         {
-            Point pos = FindNearestSurface(new Vector2(Main.rightWorld / 2, Main.bottomWorld / 2), true, Main.bottomWorld / 2, 1, true).Value.ToPoint();
+            Point pos = FindNearestSurface(new Vector2(Main.rightWorld / 2, Main.bottomWorld / 2), true,
+                Main.bottomWorld / 2, 1, true)!.Value.ToPoint();
             int index = NPC.NewNPC(new EntitySource_WorldEvent(), pos.X, pos.Y + 58, asterlin, 1);
             if (Main.netMode == NetmodeID.MultiplayerClient)
                 NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, index);
@@ -219,6 +202,7 @@ public class CloudedCraterUpdateSystem : ModSystem
             Main.bloodMoon = false;
             AdditionsNetcode.SyncWorld();
         }
+
         if (Main.eclipse)
         {
             Main.eclipse = false;
@@ -252,7 +236,8 @@ public class CloudedCraterUpdateSystem : ModSystem
                 continue;
 
             if (Main.myPlayer == i)
-                Projectile.NewProjectile(new EntitySource_WorldEvent(), p.Center, Vector2.Zero, ModContent.ProjectileType<TransmitterLightspeed>(), 0, 0f, Main.myPlayer, 0f, ai1: 1f);
+                Projectile.NewProjectile(new EntitySource_WorldEvent(), p.Center, Vector2.Zero,
+                    ModContent.ProjectileType<TransmitterLightspeed>(), 0, 0f, Main.myPlayer, ai1: 1f);
             ScreenShakeSystem.New(new(7f, .6f), p.Center);
         }
     }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
+using CalamityMod;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
@@ -11,6 +12,7 @@ using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
@@ -99,7 +101,7 @@ public class HolySwordSwing : BaseSwordSwing
                 {
                     foreach (NPC npc in Main.ActiveNPCs)
                     {
-                        if (npc.CanHomeInto() && Utility.IsInFieldOfView(LightPos, PiOver2, npc.Center, LightWidth * 2f, 1000f) && npc.GetGlobalNPC<HolyGlobalNPC>().MarkedTime <= 0)
+                        if (npc.CanHomeInto() && LightPos.IsInFieldOfView(PiOver2, npc.Center, LightWidth * 2f, 1000f) && npc.GetGlobalNPC<HolyGlobalNPC>().MarkedTime <= 0)
                             npc.GetGlobalNPC<HolyGlobalNPC>().MarkedTime = HolyGlobalNPC.TimeMarked;
                     }
 
@@ -326,7 +328,7 @@ public class HolyGlobalNPC : GlobalNPC
     public override bool InstancePerEntity => true;
     public int MarkedTime;
     public Vector2 CrossPos;
-    public static readonly int TimeMarked = SecondsToFrames(10);
+    public static readonly int TimeMarked = CalUtils.SecondsToFrames(10);
     public override bool AppliesToEntity(NPC entity, bool lateInstantiation)
     {
         return lateInstantiation && entity.realLife <= 0;
@@ -352,7 +354,7 @@ public class HolyGlobalNPC : GlobalNPC
 
             for (int i = 0; i < 6; i++)
             {
-                Vector2 spinStart = drawPosition + Utils.RotatedBy(spinPoint, (double)(rotation - (float)Math.PI * i / 3f), default);
+                Vector2 spinStart = drawPosition + Terraria.Utils.RotatedBy(spinPoint, (double)(rotation - (float)Math.PI * i / 3f), default);
                 Color glowAlpha = backglow;
                 glowAlpha.A = 25;
                 Main.spriteBatch.Draw(tex, spinStart, null, glowAlpha * .85f, 0f, tex.Size() / 2, scale, 0, 0f);

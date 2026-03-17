@@ -2,6 +2,9 @@
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using Utils = Terraria.Utils;
+
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
 public class CursedEruption : ModProjectile
@@ -47,7 +50,7 @@ public class CursedEruption : ModProjectile
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return CircularHitboxCollision(Projectile.Center, Projectile.width * 3f * Projectile.scale, targetHitbox);
+        return CalUtils.CircularHitboxCollision(Projectile.Center, Projectile.width * 3f * Projectile.scale, targetHitbox);
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)

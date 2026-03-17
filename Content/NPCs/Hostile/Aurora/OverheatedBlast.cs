@@ -2,6 +2,7 @@
 using Terraria.ID;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using static TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora.AuroraGuard;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 

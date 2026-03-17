@@ -11,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Late.Avia;
 
 public class TenebrisBlast : ModProjectile
 {
-    public static readonly int Lifetime = SecondsToFrames(.5f);
+    public static readonly int Lifetime = CalUtils.SecondsToFrames(.5f);
 
     public ref float Radius => ref Projectile.ai[0];
 
@@ -51,7 +51,7 @@ public class TenebrisBlast : ModProjectile
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return CircularHitboxCollision(Projectile.Center, Radius * 0.4f, targetHitbox);
+        return CalUtils.CircularHitboxCollision(Projectile.Center, Radius * 0.4f, targetHitbox);
     }
 
     public override bool PreDraw(ref Color lightColor)

@@ -7,7 +7,6 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.CrossCompatibility;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
-using TheExtraordinaryAdditions.Core.ILEditing;
 using TheExtraordinaryAdditions.Core.Netcode;
 using TheExtraordinaryAdditions.Core.Systems;
 
@@ -36,16 +35,13 @@ public class AdditionsMain : Mod
     {
         DoneLoading = false;
         
-        SetLoadingText("Setting up shader recompilation monitor...");
-        ShaderRecompilationMonitor.LoadForMod(this);
-        
         SetLoadingText("Loading shaders...");
         AssetRegistry.LoadShaders(this);
 
         SetLoadingText("Initializing screen shaders...");
         Main.QueueMainThreadAction(() =>
         {
-            foreach (String key in AssetRegistry.Filters.Keys)
+            foreach (string key in AssetRegistry.Filters.Keys)
             {
                 if (AssetRegistry.Filters.TryGetValue(key, out ManagedScreenShader shader))
                     ScreenShaderPool.InitializePool(filterName: key, baseEffect: shader.Shader, initialCapacity: 10);
@@ -55,9 +51,9 @@ public class AdditionsMain : Mod
         SetLoadingText("Loading boss heads...");
         if (!Main.dedServ)
         {
-            AddBossHeadTexture(AssetRegistry.GetTexturePath(AdditionsTexture.StygainHeart_Head_Boss), -1);
-            AddBossHeadTexture(AssetRegistry.GetTexturePath(AdditionsTexture.Asterlin_Head_Boss), -1);
-            AddBossHeadTexture(AssetRegistry.GetTexturePath(AdditionsTexture.AuroraTurretHead_Head_Boss), -1);
+            AddBossHeadTexture(AssetRegistry.GetTexturePath(AdditionsTexture.StygainHeart_Head_Boss));
+            AddBossHeadTexture(AssetRegistry.GetTexturePath(AdditionsTexture.Asterlin_Head_Boss));
+            AddBossHeadTexture(AssetRegistry.GetTexturePath(AdditionsTexture.AuroraTurretHead_Head_Boss));
         }
 
         SetLoadingText("Loading projectile relationships and overrides...");

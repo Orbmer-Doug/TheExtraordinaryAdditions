@@ -32,7 +32,7 @@ public class MartianLaser : ModProjectile
             trail = new(WidthFunction, ColorFunction, null, 40);
 
         Projectile.velocity *= .985f;
-        if (Time > 30f && Utility.AllPointsEqual(cache.Points))
+        if (Time > 30f && cache.Points.AllPointsEqual())
             Projectile.Kill();
 
         Projectile.scale = Projectile.Opacity = InverseLerp(0f, 10f, Time);

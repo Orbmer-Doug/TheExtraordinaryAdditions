@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
 public class VirulentFlower : ModProjectile, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.VirulentFlower);
-    private readonly int Timeleft = SecondsToFrames(5);
+    private readonly int Timeleft = CalUtils.SecondsToFrames(5);
     public override void SetDefaults()
     {
         Projectile.width = 32;

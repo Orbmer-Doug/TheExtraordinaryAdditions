@@ -15,6 +15,7 @@ namespace TheExtraordinaryAdditions.Content.Tiles;
 public class MonsterBanner : ModTile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.MonsterBanner);
+
     public override void SetStaticDefaults()
     {
         Main.tileFrameImportant[Type] = true;
@@ -42,6 +43,7 @@ public class MonsterBanner : ModTile
         {
             return;
         }
+
         Player player = Main.LocalPlayer;
         if (player != null && player.active && !player.dead)
         {
@@ -55,32 +57,24 @@ public class MonsterBanner : ModTile
         }
     }
 
-    public override void SetDrawPositions(int i, int j, ref int width, ref int offsetY, ref int height, ref short tileFrameX, ref short tileFrameY)
+    public override void SetDrawPositions(int i, int j, ref int width, ref int offsetY, ref int height,
+        ref short tileFrameX, ref short tileFrameY)
     {
         PlatformHangOffset(i, j, ref offsetY);
     }
 
     public static int GetBannerNPC(int style)
     {
-        int npc = -1;
-        switch (style)
+        int npc = style switch
         {
-            case 0:
-                npc = ModContent.NPCType<GlassPiercer>();
-                break;
-            case 1:
-                npc = ModContent.NPCType<DuneProwler>();
-                break;
-            case 2:
-                npc = ModContent.NPCType<FulminationSpirit>();
-                break;
-            case 3:
-                npc = ModContent.NPCType<SolarGuardian>();
-                break;
-            case 4:
-                npc = ModContent.NPCType<AuroraGuard>();
-                break;
-        }
+            0 => ModContent.NPCType<GlassPiercer>(),
+            1 => ModContent.NPCType<DuneProwler>(),
+            2 => ModContent.NPCType<FulminationSpirit>(),
+            3 => ModContent.NPCType<SolarGuardian>(),
+            4 => ModContent.NPCType<AuroraGuard>(),
+            _ => -1
+        };
+
         return npc;
     }
 }

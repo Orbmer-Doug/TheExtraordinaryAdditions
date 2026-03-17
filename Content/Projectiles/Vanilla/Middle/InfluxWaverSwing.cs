@@ -9,6 +9,7 @@ using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
@@ -265,15 +266,15 @@ public class InfluxWaverProj : ModProjectile
 
         if (Copy)
         {
-            float t = Animators.CubicBezier(.27f, .79f, 0f, 1.01f)(InverseLerp(0f, SliceTime, Time));
+            float t = CubicBezier(.27f, .79f, 0f, 1.01f)(InverseLerp(0f, SliceTime, Time));
             Projectile.Center = MultiLerp(t, Path);
             if (t < .99f)
-                Projectile.rotation = Projectile.Center.AngleTo(MultiLerp(t + .01f, Path)) + MathHelper.PiOver4;
+                Projectile.rotation = Projectile.Center.AngleTo(MultiLerp(t + .01f, Path)) + PiOver4;
         }
         else
         {
             Projectile.scale = MathF.Sin(Time * .15f) * .1f + .9f;
-            Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver4;
+            Projectile.rotation = Projectile.velocity.ToRotation() + PiOver4;
             if (Time % 2 == 1)
                 ParticleRegistry.SpawnTechyHolosquareParticle(Projectile.RotHitbox().TopRight, -Projectile.velocity * Main.rand.NextFloat(.1f, .2f),
                     Main.rand.Next(30, 50), Main.rand.NextFloat(.6f, .9f), new(34, 128, 203));
@@ -322,7 +323,7 @@ public class InfluxWaverProj : ModProjectile
     {
         if (Copy)
         {
-            Utility.DrawChromaticAberration(Projectile.rotation.ToRotationVector2(), 3f, (Vector2 offset, Color colorMod) =>
+            DrawChromaticAberration(Projectile.rotation.ToRotationVector2(), 3f, (Vector2 offset, Color colorMod) =>
             {
                 Main.spriteBatch.DrawBetter(Projectile.ThisProjectileTexture(), Projectile.Center + offset, null, Color.White.MultiplyRGBA(colorMod) * Projectile.Opacity,
                     Projectile.rotation, Projectile.ThisProjectileTexture().Size() / 2, Projectile.scale);

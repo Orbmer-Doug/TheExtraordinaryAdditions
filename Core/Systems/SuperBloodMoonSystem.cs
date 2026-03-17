@@ -14,6 +14,8 @@ using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Terraria.Main;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Core.Systems;
 
@@ -28,7 +30,7 @@ public class SuperBloodMoonSystem : ModSystem
 
     public override void SaveWorldData(TagCompound tag)
     {
-        List<string> list = new List<string>();
+        List<string> list = [];
         if (SuperBloodMoon)
             list.Add(nameof(SuperBloodMoon));
         tag[nameof(SuperBloodMoonSystem)] = list;
@@ -45,7 +47,7 @@ public class IncreaseBloodMoonSpawnRate : ModSystem
 {
     public override void Load()
     {
-        Main.QueueMainThreadAction(static () =>
+        QueueMainThreadAction(static () =>
         {
             On_Main.UpdateTime_StartNight += IncreaseBloodMoonRate;
             On_Main.DrawSunAndMoon += ModifyMoon;
@@ -54,7 +56,7 @@ public class IncreaseBloodMoonSpawnRate : ModSystem
 
     public override void Unload()
     {
-        Main.QueueMainThreadAction(static () =>
+        QueueMainThreadAction(static () =>
         {
             On_Main.UpdateTime_StartNight -= IncreaseBloodMoonRate;
             On_Main.DrawSunAndMoon -= ModifyMoon;
@@ -107,17 +109,9 @@ public class IncreaseBloodMoonSpawnRate : ModSystem
 
             int moonX = (int)(nightCompletion * (double)(sceneArea.totalWidth + moon.Value.Width * 2)) - moon.Value.Width;
             double verticalOffset;
-            int moonY;
-            if (nightCompletion < .5f)
-            {
-                verticalOffset = Math.Pow(1.0 - nightCompletion * 2.0, 2.0);
-                moonY = (int)(sceneArea.bgTopY + verticalOffset * 250.0 + 180.0);
-            }
-            else
-            {
-                verticalOffset = Math.Pow((nightCompletion - 0.5) * 2.0, 2.0);
-                moonY = (int)(sceneArea.bgTopY + verticalOffset * 250.0 + 180.0);
-            }
+            verticalOffset = nightCompletion < .5f ? Math.Pow(1.0 - nightCompletion * 2.0, 2.0) : Math.Pow((nightCompletion - 0.5) * 2.0, 2.0);
+
+            int moonY = (int)(sceneArea.bgTopY + verticalOffset * 250.0 + 180.0);
             float moonScale = (float)(1.2 - verticalOffset * 0.4) * ForcedMinimumZoom;
 
             Vector2 moonPos = new Vector2(moonX, moonY + moonModY) + sceneArea.SceneLocalScreenPositionOffset;

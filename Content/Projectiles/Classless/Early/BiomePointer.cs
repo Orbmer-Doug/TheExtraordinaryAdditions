@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.Linq;
+using CalamityMod;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -10,6 +11,7 @@ using TheExtraordinaryAdditions.Content.Items.Tools;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Utilities;
 using TheExtraordinaryAdditions.UI;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Early;
 
@@ -113,7 +115,7 @@ public class BiomePointer : BaseIdleHoldoutProjectile
                     currentRadius += stepSize;
                 }
 
-            FoundEnough:
+                FoundEnough:
                 // Cache the results
                 cachedCoords.Clear();
                 cachedCoords.AddRange(Coords.Select(c => (c, Mode, Owner.Center)));
@@ -145,24 +147,15 @@ public class BiomePointer : BaseIdleHoldoutProjectile
         // Allow switching of modes
         if (this.RunLocal() && Modded.SafeMouseRight.JustPressed)
         {
-            switch (Mode)
+            Mode = Mode switch
             {
-                case BlockToPointTo.Marble:
-                    Mode = BlockToPointTo.Granite;
-                    break;
-                case BlockToPointTo.Granite:
-                    Mode = BlockToPointTo.Mushroom;
-                    break;
-                case BlockToPointTo.Mushroom:
-                    Mode = BlockToPointTo.Hive;
-                    break;
-                case BlockToPointTo.Hive:
-                    Mode = BlockToPointTo.Shimmer;
-                    break;
-                case BlockToPointTo.Shimmer:
-                    Mode = BlockToPointTo.Marble;
-                    break;
-            }
+                BlockToPointTo.Marble => BlockToPointTo.Granite,
+                BlockToPointTo.Granite => BlockToPointTo.Mushroom,
+                BlockToPointTo.Mushroom => BlockToPointTo.Hive,
+                BlockToPointTo.Hive => BlockToPointTo.Shimmer,
+                BlockToPointTo.Shimmer => BlockToPointTo.Marble,
+                _ => Mode
+            };
             BiomePointerUI.Scroll = 1f;
             this.Sync();
         }

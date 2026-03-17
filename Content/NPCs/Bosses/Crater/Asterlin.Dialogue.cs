@@ -14,20 +14,24 @@ public partial class Asterlin
 {
     private static ManagedRenderTarget crtTarget;
     private static ManagedShader crtShader;
-    private static readonly RenderTargetInitializationAction TargetInitializer = (width, height) => new RenderTarget2D(Main.instance.GraphicsDevice, width, height);
+
+    private static readonly RenderTargetInitializationAction TargetInitializer =
+        (width, height) => new RenderTarget2D(Main.instance.GraphicsDevice, width, height);
+
     public DialogueManager Dialogue_Manager;
     public float Dialogue_ScreenInterpolant;
     public bool Dialogue_FindingChannel;
 
-    public void Dialouge_SendExtraAI(BinaryWriter wr)
+    public void Dialogue_SendExtraAI(BinaryWriter wr)
     {
-        wr.Write((float)Dialogue_ScreenInterpolant);
-        wr.Write((bool)Dialogue_FindingChannel);
+        wr.Write(Dialogue_ScreenInterpolant);
+        wr.Write(Dialogue_FindingChannel);
     }
+
     public void Dialogue_RecieveExtraAI(BinaryReader re)
     {
-        Dialogue_ScreenInterpolant = (float)re.ReadSingle();
-        Dialogue_FindingChannel = (bool)re.ReadBoolean();
+        Dialogue_ScreenInterpolant = re.ReadSingle();
+        Dialogue_FindingChannel = re.ReadBoolean();
     }
 
     public static readonly Color Dialogue_InfoColor = Color.Goldenrod;
@@ -35,25 +39,41 @@ public partial class Asterlin
     public static readonly Color Dialogue_StatusColor = Color.DeepSkyBlue;
     public static readonly TextSnippet Dialogue_Pause = new(" ", Color.Transparent, .5f);
     public static readonly TextSnippet Dialogue_LongPause = new(" ", Color.Transparent, 3.6f);
+
     public AwesomeSentence FullDialogue => new(1000f, [
-        new TextSnippet(this.GetLocalization("OverheatTemperatureWarning").Value, Dialogue_WarningColor, .045f, TextSnippet.AppearFadingFromRight, null, true, 2.4f),
-         new TextSnippet(this.GetLocalization("OverheatImminent").Value, Dialogue_WarningColor, .045f, TextSnippet.AppearFadingFromRight, null, true, 2.4f),
-         new TextSnippet(this.GetLocalization("OverheatHeatsinks").Value, Dialogue_InfoColor, .025f, TextSnippet.AppearFadingFromRight, null, true, 2.4f),
-        new TextSnippet(this.GetLocalization("OverheatEyeScan").Value, Dialogue_StatusColor, .02f, null, null, true, 2.4f),
-         Dialogue_Pause,
-         new TextSnippet(this.GetLocalization("OverheatEyeScan1").Value, Dialogue_StatusColor, .015f, null, null, true, 2.4f),
-         new TextSnippet(this.GetLocalization("OverheatEyeScan2").Value, Dialogue_StatusColor, .015f, null, null, true, 2.4f),
-         new TextSnippet(this.GetLocalization("OverheatEyeScan3").Value, Dialogue_StatusColor, .015f, null, null, true, 2.4f),
-        new TextSnippet(this.GetLocalization("OverheatLegScans").Value, Dialogue_StatusColor, .02f, null, null, true, 2.4f),
-         Dialogue_Pause,
-         new TextSnippet(this.GetLocalization("OverheatLegScans1").Value, Dialogue_StatusColor, .015f, null, null, true, 2.4f),
-         new TextSnippet(this.GetLocalization("OverheatLegScans2").Value, Dialogue_StatusColor, .015f, null, null, true, 2.4f),
-         new TextSnippet(this.GetLocalization("OverheatLegScans3").Value, Dialogue_StatusColor, .015f, null, null, true, 2.4f),
-        new TextSnippet(this.GetLocalization("OverheatArmScans").Value, Dialogue_StatusColor, .02f, null, null, true, 2.4f),
-         Dialogue_Pause,
-         new TextSnippet(this.GetLocalization("OverheatArmScans1").Value, Dialogue_StatusColor, .015f, null, null, true, 2.4f),
-         new TextSnippet(this.GetLocalization("OverheatArmScans2").Value, Dialogue_StatusColor, .015f, null, null, true, 2.4f),
-        new TextSnippet(this.GetLocalization("OverheatUhOh").Value, Dialogue_InfoColor, .037f, TextSnippet.AppearFadingFromRight, TextSnippet.RandomDisplacement, true, 2.4f),
+        new TextSnippet(this.GetLocalization("OverheatTemperatureWarning").Value, Dialogue_WarningColor, .045f,
+            TextSnippet.AppearFadingFromRight, null, true, 2.4f),
+        new TextSnippet(this.GetLocalization("OverheatImminent").Value, Dialogue_WarningColor, .045f,
+            TextSnippet.AppearFadingFromRight, null, true, 2.4f),
+        new TextSnippet(this.GetLocalization("OverheatHeatsinks").Value, Dialogue_InfoColor, .025f,
+            TextSnippet.AppearFadingFromRight, null, true, 2.4f),
+        new TextSnippet(this.GetLocalization("OverheatEyeScan").Value, Dialogue_StatusColor, .02f, null, null, true,
+            2.4f),
+        Dialogue_Pause,
+        new TextSnippet(this.GetLocalization("OverheatEyeScan1").Value, Dialogue_StatusColor, .015f, null, null, true,
+            2.4f),
+        new TextSnippet(this.GetLocalization("OverheatEyeScan2").Value, Dialogue_StatusColor, .015f, null, null, true,
+            2.4f),
+        new TextSnippet(this.GetLocalization("OverheatEyeScan3").Value, Dialogue_StatusColor, .015f, null, null, true,
+            2.4f),
+        new TextSnippet(this.GetLocalization("OverheatLegScans").Value, Dialogue_StatusColor, .02f, null, null, true,
+            2.4f),
+        Dialogue_Pause,
+        new TextSnippet(this.GetLocalization("OverheatLegScans1").Value, Dialogue_StatusColor, .015f, null, null, true,
+            2.4f),
+        new TextSnippet(this.GetLocalization("OverheatLegScans2").Value, Dialogue_StatusColor, .015f, null, null, true,
+            2.4f),
+        new TextSnippet(this.GetLocalization("OverheatLegScans3").Value, Dialogue_StatusColor, .015f, null, null, true,
+            2.4f),
+        new TextSnippet(this.GetLocalization("OverheatArmScans").Value, Dialogue_StatusColor, .02f, null, null, true,
+            2.4f),
+        Dialogue_Pause,
+        new TextSnippet(this.GetLocalization("OverheatArmScans1").Value, Dialogue_StatusColor, .015f, null, null, true,
+            2.4f),
+        new TextSnippet(this.GetLocalization("OverheatArmScans2").Value, Dialogue_StatusColor, .015f, null, null, true,
+            2.4f),
+        new TextSnippet(this.GetLocalization("OverheatUhOh").Value, Dialogue_InfoColor, .037f,
+            TextSnippet.AppearFadingFromRight, TextSnippet.RandomDisplacement, true, 2.4f),
         Dialogue_LongPause
     ]);
 
@@ -65,14 +85,14 @@ public partial class Asterlin
     public const int TimeToLast = 1201; // FullDialogue.GetTimeToSnippet(17);
     public const float DialogueTime = 1256.94f; // FullDialogue.MaxProgress * 60
 
-    public void LoadDialogue()
+    public static void LoadDialogue()
     {
         if (Main.dedServ)
             return;
 
-        Main.QueueMainThreadAction(() =>
+        Main.QueueMainThreadAction(static () =>
         {
-            crtTarget = new ManagedRenderTarget(true, TargetInitializer, true);
+            crtTarget = new ManagedRenderTarget(true, TargetInitializer);
 
             // Initialize target
             GraphicsDevice device = Main.instance.GraphicsDevice;
@@ -86,9 +106,9 @@ public partial class Asterlin
         RenderTargetManager.RenderTargetUpdateLoopEvent += DrawToTarget;
     }
 
-    public void UnloadDialogue()
+    public static void UnloadDialogue()
     {
-        Main.QueueMainThreadAction(() =>
+        Main.QueueMainThreadAction(static () =>
         {
             crtTarget?.Dispose();
             crtTarget = null;
@@ -117,11 +137,13 @@ public partial class Asterlin
         device.SetRenderTarget(crtTarget);
         device.Clear(Color.Transparent);
 
-        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, Main.Rasterizer, null, Matrix.Identity);
+        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp,
+            DepthStencilState.None, Main.Rasterizer, null, Matrix.Identity);
 
         // Initial background
         Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
-        Main.spriteBatch.DrawBetterRect(tex, ToTarget(Main.screenPosition, resolution), null, Color.Black, 0f, Vector2.Zero, SpriteEffects.None, false);
+        Main.spriteBatch.DrawBetterRect(tex, ToTarget(Main.screenPosition, resolution), null, Color.Black, 0f,
+            Vector2.Zero);
 
         // Actual text
         asterlin.Dialogue_Manager?.Draw();
@@ -147,13 +169,14 @@ public partial class Asterlin
         crtShader.TrySetParameter("findingChannel", asterlin.Dialogue_FindingChannel);
         crtShader.TrySetParameter("resolution", new Vector2(800f, 600f));
 
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, Main.Rasterizer, crtShader.Effect, Main.GameViewMatrix.TransformationMatrix);
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp,
+            DepthStencilState.None, Main.Rasterizer, crtShader.Effect, Main.GameViewMatrix.TransformationMatrix);
 
         float x = 800f * Animators.MakePoly(3f).InFunction(asterlin.Dialogue_ScreenInterpolant);
         float y = 600f * Animators.MakePoly(12f).InFunction(asterlin.Dialogue_ScreenInterpolant);
         Vector2 size = new Vector2(x, y);
         Vector2 pos = asterlin.NPC.Center - Vector2.UnitY * 450f;
-        Main.spriteBatch.DrawBetterRect(crtTarget, ToTarget(pos, size), null, Color.White, 0f, crtTarget.Size() / 2f, SpriteEffects.None, false);
+        Main.spriteBatch.DrawBetterRect(crtTarget, ToTarget(pos, size), null, Color.White, 0f, crtTarget.Size() / 2f);
 
         Main.spriteBatch.End();
     }

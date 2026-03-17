@@ -1,10 +1,12 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.Cynosure;
 
@@ -12,7 +14,7 @@ public class Kilonova : ModProjectile
 {
     public ref float Time => ref Projectile.ai[0];
 
-    public static int Lifetime => SecondsToFrames(8f);
+    public static int Lifetime => CalUtils.SecondsToFrames(8f);
 
     public override string Texture => AssetRegistry.Invis;
 
@@ -34,10 +36,10 @@ public class Kilonova : ModProjectile
 
     public override void AI()
     {
-        // Grow over time.
+        // Grow over time
         Projectile.scale = Utils.Remap(Time, 0f, 30f, 0f, 20f);
 
-        // Dissipate at the end.
+        // Dissipate at the end
         Projectile.Opacity = InverseLerp(8f, 120f, Projectile.timeLeft);
 
         Time++;
@@ -57,9 +59,9 @@ public class Kilonova : ModProjectile
         nova.TrySetParameter("generalOpacity", Projectile.Opacity);
         nova.TrySetParameter("scale", Projectile.scale);
         nova.TrySetParameter("brightness", InverseLerp(20f, 4f, Projectile.scale) * 3f + 2.25f);
-        nova.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WavyBlotchNoise), 1);
-        nova.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WavyBlotchNoise), 2);
-        nova.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Cosmos2), 3);
+        nova.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WavyBlotchNoise), 1, SamplerState.LinearWrap);
+        nova.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WavyBlotchNoise), 2, SamplerState.LinearWrap);
+        nova.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Cosmos2), 3, SamplerState.LinearWrap);
         nova.Render();
 
         Main.spriteBatch.EnterShaderRegion(BlendState.AlphaBlend, nova.Shader.Value);

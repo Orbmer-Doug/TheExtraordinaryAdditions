@@ -12,18 +12,12 @@ public class BossBackgroundsSystem : ModSystem
 {
     public override void OnModLoad()
     {
-        Main.QueueMainThreadAction(static () =>
-        {
-            On_Main.DrawSurfaceBG += DrawFog;
-        });
+        Main.QueueMainThreadAction(static () => { On_Main.DrawSurfaceBG += DrawFog; });
     }
 
     public override void OnModUnload()
     {
-        Main.QueueMainThreadAction(static () =>
-        {
-            On_Main.DrawSurfaceBG -= DrawFog;
-        });
+        Main.QueueMainThreadAction(static () => { On_Main.DrawSurfaceBG -= DrawFog; });
     }
 
     private static void DrawFog(On_Main.orig_DrawSurfaceBG orig, Main self)
@@ -50,11 +44,13 @@ public class BossBackgroundsSystem : ModSystem
         fog.TrySetParameter("time", Main.GlobalTimeWrappedHourly * .2f);
 
         sb.End();
-        sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearWrap, DepthStencilState.None, Main.Rasterizer, fog.Effect, Main.GameViewMatrix.TransformationMatrix);
+        sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearWrap, DepthStencilState.None,
+            Main.Rasterizer, fog.Effect, Main.GameViewMatrix.TransformationMatrix);
         fog.Render();
         Point size = new(Main.graphics.GraphicsDevice.Viewport.Width,
             Main.graphics.GraphicsDevice.Viewport.Height);
-        sb.Draw(noise, new Rectangle(0, 0, size.X, size.Y), null, Color.White * fogInterpolant, 0f, Vector2.Zero, 0, 0f);
+        sb.Draw(noise, new Rectangle(0, 0, size.X, size.Y), null, Color.White * fogInterpolant, 0f, Vector2.Zero, 0,
+            0f);
         sb.ExitShaderRegion();
     }
 }

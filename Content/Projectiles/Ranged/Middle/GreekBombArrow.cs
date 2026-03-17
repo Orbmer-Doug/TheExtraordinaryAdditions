@@ -3,6 +3,7 @@ using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 
@@ -12,7 +13,7 @@ public class GreekBombArrow : ModProjectile
     public override void SetDefaults()
     {
         Projectile.width = 14;
-        Projectile.height = 42;
+        Projectile.height = 14;
         Projectile.aiStyle = 0;
         Projectile.friendly = true;
         Projectile.hostile = false;
@@ -25,7 +26,7 @@ public class GreekBombArrow : ModProjectile
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        target.AddBuff(BuffID.CursedInferno, SecondsToFrames(4));
+        target.AddBuff(BuffID.CursedInferno, CalUtils.SecondsToFrames(4));
     }
 
     public ref float Time => ref Projectile.ai[0];

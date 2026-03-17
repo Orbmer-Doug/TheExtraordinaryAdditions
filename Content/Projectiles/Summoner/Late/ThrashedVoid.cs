@@ -7,6 +7,7 @@ using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Late;
 
@@ -58,7 +59,7 @@ public class ThrashedVoid : BaseWhip
     public override void NPCHitEffects(NPC target, NPC.HitInfo hit, in Vector2 pos, in Vector2 vel, in int index)
     {
         Projectile.damage = (int)(Projectile.damage * .85f);
-        target.AddBuff(ModContent.BuffType<VoidDebuff>(), SecondsToFrames(4));
+        target.AddBuff(ModContent.BuffType<VoidDebuff>(), CalUtils.SecondsToFrames(4));
     }
 
     public override Color LineColor(SystemVector2 completion, Vector2 position)

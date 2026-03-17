@@ -2,6 +2,8 @@
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Utilities;
+using static CalamityMod.CalamityUtils;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.CrossCode;
 
@@ -26,7 +28,7 @@ public class WaveSiphon : ModProjectile
     public Player Owner => Main.player[Projectile.owner];
     public bool TileDeath
     {
-        get => Projectile.ai[0] == 1f;
+        get => (int)Projectile.ai[0] == 1;
         set => Projectile.ai[0] = value.ToInt();
     }
     public ref float Time => ref Projectile.ai[1];
@@ -43,7 +45,7 @@ public class WaveSiphon : ModProjectile
         else
             Projectile.velocity *= .996f;
 
-        Utility.ProjAntiClump(Projectile, .3f);
+        Projectile.ProjAntiClump(.3f);
         Projectile.FacingUp();
         Time++;
     }

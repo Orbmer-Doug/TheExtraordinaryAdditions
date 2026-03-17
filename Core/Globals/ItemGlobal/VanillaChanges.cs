@@ -170,23 +170,24 @@ public class VanillaChanges : GlobalItem
     {
         return item.type switch
         {
-            ItemID.BreakerBlade | ItemID.TheHorsemansBlade | ItemID.InfluxWaver => player.ownedProjectileCounts[item.shoot] <= 0,
+            ItemID.BreakerBlade | ItemID.TheHorsemansBlade | ItemID.InfluxWaver =>
+                player.ownedProjectileCounts[item.shoot] <= 0,
             _ => true,
         };
     }
 
-    public override bool Shoot(Item item, Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    public override bool Shoot(Item item, Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position,
+        Vector2 velocity, int type, int damage, float knockback)
     {
-        Player owner = Main.player[player.whoAmI];
         GlobalPlayer mod = player.Additions();
 
-        float adjustedItemScale = player.GetAdjustedItemScale(item);
-
-        void NewProj(int type, int? damag, Vector2? pos = default, Vector2? vel = default, float ai0 = 0f, float ai1 = 0f, float ai2 = 0f, float extra0 = 0f, float extra1 = 0f)
+        void NewProj(int type, int? damag, Vector2? pos = default, Vector2? vel = default, float ai0 = 0f,
+            float ai1 = 0f, float ai2 = 0f, float extra0 = 0f, float extra1 = 0f)
         {
             if (Main.myPlayer == player.whoAmI)
             {
-                int proj = Projectile.NewProjectile(source, pos ?? position, vel ?? velocity, type, damag ?? damage, knockback, Main.myPlayer, ai0, ai1, ai2);
+                int proj = Projectile.NewProjectile(source, pos ?? position, vel ?? velocity, type, damag ?? damage,
+                    knockback, Main.myPlayer, ai0, ai1, ai2);
                 Projectile p = Main.projectile[proj];
                 p.AdditionsInfo().ExtraAI[0] = extra0;
                 p.AdditionsInfo().ExtraAI[1] = extra1;
@@ -209,6 +210,7 @@ public class VanillaChanges : GlobalItem
                     NewProj(ModContent.ProjectileType<PhoenixRound>(), default, default, velocity * .7f);
                     return false;
                 }
+
                 return true;
             case ItemID.InfluxWaver:
                 NewProj(ModContent.ProjectileType<InfluxWaverSwing>(), default, default, velocity);
@@ -217,14 +219,15 @@ public class VanillaChanges : GlobalItem
                 if (player.altFunctionUse == ItemAlternativeFunctionID.ActivatedAndUsed)
                 {
                     NewProj(ModContent.ProjectileType<HorsemenDive>(), damage * 2, default, velocity);
-                    CalUtils.AddCooldown(player, PumpkinDashCooldown.ID, SecondsToFrames(3));
+                    CalUtils.AddCooldown(player, PumpkinDashCooldown.ID, CalUtils.SecondsToFrames(3));
                     return false;
                 }
 
                 NewProj(ModContent.ProjectileType<HorsemenSwing>(), default, default, velocity);
                 return false;
             case ItemID.AquaScepter:
-                NewProj(ModContent.ProjectileType<WaterStream>(), default, default, velocity, 0f, Collision.DrownCollision(player.TopLeft, player.width, player.height) ? 1f : 0f);
+                NewProj(ModContent.ProjectileType<WaterStream>(), default, default, velocity, 0f,
+                    Collision.DrownCollision(player.TopLeft, player.width, player.height) ? 1f : 0f);
                 return false;
             case ItemID.InfernoFork:
                 NewProj(ModContent.ProjectileType<InfernalFork>(), default);
@@ -239,7 +242,10 @@ public class VanillaChanges : GlobalItem
                 NewProj(ModContent.ProjectileType<LaserBlast>(), default);
                 return false;
             case ItemID.BreakerBlade:
-                BreakerBladeCrush crush = Main.projectile[Projectile.NewProjectile(source, position, velocity, type, damage, knockback, Main.myPlayer)].As<BreakerBladeCrush>();
+                BreakerBladeCrush crush = Main
+                    .projectile[
+                        Projectile.NewProjectile(source, position, velocity, type, damage, knockback, Main.myPlayer)]
+                    .As<BreakerBladeCrush>();
                 bool s = Main.keyState.IsKeyDown(Keys.S);
                 if (mod.SafeMouseRight.Current)
                     crush.Beam = true;
@@ -250,9 +256,12 @@ public class VanillaChanges : GlobalItem
         }
 
         bool damageClass = item.CountsAsClass<RangedDamageClass>() || item.CountsAsClass<MeleeDamageClass>()
-            || item.CountsAsClass<MagicDamageClass>() || item.CountsAsClass<ThrowingDamageClass>() || item.CountsAsClass<SummonDamageClass>();
+                                                                   || item.CountsAsClass<MagicDamageClass>() ||
+                                                                   item.CountsAsClass<ThrowingDamageClass>() ||
+                                                                   item.CountsAsClass<SummonDamageClass>();
         if (mod.AridFlask && damageClass && Main.rand.NextBool(4) && !item.channel && player.whoAmI == Main.myPlayer)
-            Projectile.NewProjectile(source, position, velocity, ModContent.ProjectileType<SandBlast>(), DamageSoftCap(damage, 80), 1f, player.whoAmI, 0f, 0f, 0f);
+            Projectile.NewProjectile(source, position, velocity, ModContent.ProjectileType<SandBlast>(),
+                DamageSoftCap(damage, 80), 1f, player.whoAmI, 0f, 0f, 0f);
         return true;
     }
 
@@ -263,7 +272,8 @@ public class VanillaChanges : GlobalItem
             ItemID.PhoenixBlaster => true,
             ItemID.CursedFlames => true,
             ItemID.BreakerBlade => true,
-            ItemID.TheHorsemansBlade => player.ownedProjectileCounts[ModContent.ProjectileType<HorsemenDive>()] <= 0 && !CalUtils.HasCooldown(player, PumpkinDashCooldown.ID),
+            ItemID.TheHorsemansBlade => player.ownedProjectileCounts[ModContent.ProjectileType<HorsemenDive>()] <= 0 &&
+                                        !CalUtils.HasCooldown(player, PumpkinDashCooldown.ID),
             _ => base.AltFunctionUse(item, player),
         };
     }
@@ -279,11 +289,6 @@ public class VanillaChanges : GlobalItem
         }
 
         return base.CanUseItem(item, player);
-    }
-
-    public override bool? UseItem(Item item, Player player)
-    {
-        return base.UseItem(item, player);
     }
 
     public override void UseItemFrame(Item item, Player player)
@@ -308,18 +313,21 @@ public class VanillaChanges : GlobalItem
         {
             player.ChangeDir(Math.Sign((player.Additions().MouseWorld - player.Center).X));
             float animProgress = 1f - player.itemTime / (float)player.itemTimeMax;
-            float rotation = (player.Center - player.Additions().MouseWorld).ToRotation() * player.gravDir + MathHelper.PiOver2;
+            float rotation = (player.Center - player.Additions().MouseWorld).ToRotation() * player.gravDir +
+                             MathHelper.PiOver2;
             if (animProgress < 0.4f)
             {
                 rotation += -amount * ((0.4f - animProgress) / 0.4f).Squared() * player.direction;
             }
+
             player.SetCompositeArmFront(true, 0, rotation);
         }
 
         void AimArms()
         {
             player.ChangeDir(Math.Sign((player.Additions().MouseWorld - player.Center).X));
-            float rotation = (player.Center - player.Additions().MouseWorld).ToRotation() * player.gravDir + MathHelper.PiOver2;
+            float rotation = (player.Center - player.Additions().MouseWorld).ToRotation() * player.gravDir +
+                             MathHelper.PiOver2;
             player.SetCompositeArmFront(true, 0, rotation);
         }
     }
@@ -363,7 +371,8 @@ public class VanillaChanges : GlobalItem
         }
     }
 
-    public override void ModifyShootStats(Item item, Player player, ref Vector2 position, ref Vector2 velocity, ref int type, ref int damage, ref float knockback)
+    public override void ModifyShootStats(Item item, Player player, ref Vector2 position, ref Vector2 velocity,
+        ref int type, ref int damage, ref float knockback)
     {
         switch (item.type)
         {

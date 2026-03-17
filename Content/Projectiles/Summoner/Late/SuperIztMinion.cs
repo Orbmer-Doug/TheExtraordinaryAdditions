@@ -1,9 +1,11 @@
-﻿using Terraria;
+﻿using CalamityMod;
+using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Summon;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Late;
 
@@ -63,7 +65,7 @@ public class SuperIztMinion : ModProjectile
         if (target != null)
         {
             if (HasHitTarget)
-                Projectile.velocity = Utils.RotatedBy(Projectile.velocity, (double)((Projectile.identity % 2f == 0f).ToDirectionInt() * 0.06f), default(Vector2)) * 0.93f;
+                Projectile.velocity = Terraria.Utils.RotatedBy(Projectile.velocity, (double)((Projectile.identity % 2f == 0f).ToDirectionInt() * 0.06f), default(Vector2)) * 0.93f;
             else
                 TargetPosition(target.Center);
         }
@@ -78,7 +80,7 @@ public class SuperIztMinion : ModProjectile
         if (HitTime <= 0)
             HasHitTarget = false;
 
-        Utility.ProjAntiClump(Projectile, .1f);
+        CoreUtils.ProjAntiClump(Projectile, .1f);
     }
 
     private bool CheckActive()

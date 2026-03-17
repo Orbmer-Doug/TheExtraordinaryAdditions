@@ -1,23 +1,29 @@
 ﻿using System.Collections.Generic;
+using CalamityMod;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 using TheExtraordinaryAdditions.Core.DataStructures;
+using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Primitives;
+using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Systems;
+using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
-public partial class Asterlin : ModNPC
+public partial class Asterlin
 {
     public static readonly Dictionary<AsterlinAIType, float> Lightripper_PossibleStates =
-        new Dictionary<AsterlinAIType, float> { { AsterlinAIType.Tesselestic, 1f }, { AsterlinAIType.Disintegration, .6f } };
+        new Dictionary<AsterlinAIType, float>
+            { { AsterlinAIType.Tesselestic, 1f }, { AsterlinAIType.Disintegration, .6f } };
+
     [AutomatedMethodInvoke]
     public void LoadStateTransitions_Lightripper()
     {
-        StateMachine.RegisterTransition(AsterlinAIType.Lightripper, Lightripper_PossibleStates, false, () =>
-        {
-            return Lightripper_Cycles >= Lightripper_TotalCycles;
-        });
+        StateMachine.RegisterTransition(AsterlinAIType.Lightripper, Lightripper_PossibleStates, false,
+            () => Lightripper_Cycles >= Lightripper_TotalCycles);
         StateMachine.RegisterStateBehavior(AsterlinAIType.Lightripper, DoBehavior_Lightripper);
     }
 
@@ -34,11 +40,13 @@ public partial class Asterlin : ModNPC
     }
 
     public ref float Lightripper_Cycles => ref ExtraAI[0];
+
     public LightripperState Lightripper_State
     {
         get => (LightripperState)ExtraAI[1];
         set => ExtraAI[1] = (int)value;
     }
+
     public ref float Lightripper_InitialDirection => ref ExtraAI[2];
 
     public static int Lightripper_BeamDelay => 11;
@@ -46,13 +54,22 @@ public partial class Asterlin : ModNPC
     public static int Lightripper_ReleaseRate => 2;
     public static int Lightripper_TotalBeams => DifficultyBasedValue(7, 8, 10, 11, 12, 14);
 
-    public static int Lightripper_HoverTime => SecondsToFrames(1.1f);
-    public static int Lightripper_ReelbackTime => SecondsToFrames(.6f);
-    public static int Lightripper_DashTime => SecondsToFrames(.35f);
-    public static int Lightripper_SlowdownTime => SecondsToFrames(.67f);
+    public static int Lightripper_HoverTime => CalUtils.SecondsToFrames(1.1f);
+    public static int Lightripper_ReelbackTime => CalUtils.SecondsToFrames(.6f);
+    public static int Lightripper_DashTime => CalUtils.SecondsToFrames(.35f);
+    public static int Lightripper_SlowdownTime => CalUtils.SecondsToFrames(.67f);
 
     public void DoBehavior_Lightripper()
     {
+        if (Lightripper_Tele == null || Lightripper_Tele.Disposed)
+            Lightripper_Tele = new(_ => AngledWidth, (uv, _) =>
+            {
+                float comp = InverseLerp(0f, Lightripper_ReelbackTime, AITimer);
+                if (Lightripper_State != LightripperState.Reel)
+                    comp = 0f;
+                return Color.Cyan * comp * Animators.MakePoly(4f).OutFunction(1f - uv.X);
+            }, null, 50);
+        
         switch (Lightripper_State)
         {
             case LightripperState.BeamRelease:
@@ -61,14 +78,16 @@ public partial class Asterlin : ModNPC
 
                 if (AITimer > Lightripper_BeamDelay)
                 {
-                    float fanInterpolant = Utils.GetLerpValue(0f, Lightripper_ReleaseRate * Lightripper_TotalBeams, AITimer - Lightripper_BeamDelay, true);
+                    float fanInterpolant = Utils.GetLerpValue(0f, Lightripper_ReleaseRate * Lightripper_TotalBeams,
+                        AITimer - Lightripper_BeamDelay, true);
                     float offsetAngle = MathHelper.Lerp(-Lightripper_FanOffset, Lightripper_FanOffset, fanInterpolant);
                     Vector2 shootVelocity = (Lightripper_InitialDirection + offsetAngle).ToRotationVector2();
 
                     if (this.RunServer() && AITimer % Lightripper_ReleaseRate == Lightripper_ReleaseRate - 1)
                     {
                         int type = ModContent.ProjectileType<LightrippingBeam>();
-                        NPC.NewNPCProj(RightHandPosition + shootVelocity.SafeNormalize(Vector2.Zero) * 100f, shootVelocity, type, HeavyAttackDamage, 0f);
+                        NPC.NewNPCProj(RightHandPosition + shootVelocity.SafeNormalize(Vector2.Zero) * 100f,
+                            shootVelocity, type, HeavyAttackDamage, 0f);
                     }
 
                     SetRightHandTarget(RightArm.RootPosition + shootVelocity * 400f);
@@ -82,7 +101,8 @@ public partial class Asterlin : ModNPC
                     }
                 }
 
-                Vector2 hoverDestination = Target.Center + new Vector2((Target.Center.X < NPC.Center.X).ToDirectionInt() * 450f, -150f);
+                Vector2 hoverDestination = Target.Center +
+                                           new Vector2((Target.Center.X < NPC.Center.X).ToDirectionInt() * 450f, -150f);
                 Vector2 idealVelocity = (hoverDestination - NPC.Center) * 0.07f;
                 NPC.velocity = Vector2.Lerp(NPC.velocity, idealVelocity, 0.3f);
                 break;
@@ -97,6 +117,7 @@ public partial class Asterlin : ModNPC
                     AITimer = 0;
                     this.Sync();
                 }
+
                 break;
             case LightripperState.Reel:
                 float reelBackSpeed = InverseLerp(0f, Lightripper_ReelbackTime, AITimer).Squared() * 50f;
@@ -108,15 +129,19 @@ public partial class Asterlin : ModNPC
                 NPC.velocity *= 0.9f;
 
                 // Create a bunch of light to indicate direction
-                ParticleRegistry.SpawnSquishyLightParticle(RotatedHitbox.RandomPoint(), NPC.rotation.ToRotationVector2() * Main.rand.NextFloat(8f, 40f),
+                ParticleRegistry.SpawnSquishyLightParticle(RotatedHitbox.RandomPoint(),
+                    NPC.rotation.ToRotationVector2() * Main.rand.NextFloat(8f, 40f),
                     Main.rand.Next(20, 50), Main.rand.NextFloat(.5f, 1.5f), Color.DeepSkyBlue, 1f, 2f, 5f);
 
+                Lightripper_Points.SetPoints(NPC.Center.GetLaserControlPoints(Target.Center, 50));
+                
                 if (AITimer >= Lightripper_ReelbackTime)
                 {
                     Lightripper_State = LightripperState.Dash;
                     AITimer = 0;
                     this.Sync();
                 }
+
                 break;
             case LightripperState.Dash:
                 if (this.RunServer())
@@ -125,7 +150,8 @@ public partial class Asterlin : ModNPC
                     for (int i = 0; i < Lightripper_DartBombCount; i++)
                     {
                         Vector2 pos = NPC.Center;
-                        Vector2 vel = NPC.SafeDirectionTo(Target.Center).RotatedByRandom(.85f) * Main.rand.NextFloat(11f, 99f);
+                        Vector2 vel = NPC.SafeDirectionTo(Target.Center).RotatedByRandom(.85f) *
+                                      Main.rand.NextFloat(11f, 99f);
                         NPC.NewNPCProj(pos, vel, ModContent.ProjectileType<DartBomb>(), LightAttackDamage, 0f);
                     }
                 }
@@ -148,7 +174,23 @@ public partial class Asterlin : ModNPC
                     AITimer = 0;
                     this.Sync();
                 }
+
                 break;
         }
+    }
+
+    public OptimizedPrimitiveTrail Lightripper_Tele;
+    public TrailPoints Lightripper_Points = new TrailPoints(50);
+
+    public void Lightripper_Draw()
+    {
+        void draw()
+        {
+            if (Lightripper_Tele == null || Lightripper_Tele.Disposed || Lightripper_Points == null)
+                return;
+            
+            Lightripper_Tele.DrawTrail(ShaderRegistry.StandardPrimitiveShader, Lightripper_Points.Points);
+        }
+        PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderNPCs);
     }
 }

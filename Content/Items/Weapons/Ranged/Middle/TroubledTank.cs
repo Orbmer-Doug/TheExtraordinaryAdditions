@@ -34,6 +34,11 @@ public class TroubledTank : ModItem, ILocalizedModType, IModType
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
+        TooltipLine bug = new TooltipLine(Mod, "TroubledTank", this.GetLocalization("Bugs").Value)
+        {
+            OverrideColor = Color.Green
+        };
+        tooltips.DrawHeldShiftTooltip([bug]);
         tooltips.ColorLocalization(Color.Green);
     }
 

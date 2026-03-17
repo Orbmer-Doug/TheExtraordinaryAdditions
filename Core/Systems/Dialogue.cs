@@ -20,20 +20,35 @@ namespace TheExtraordinaryAdditions.Core.Systems;
 public struct TextSnippet
 {
     public delegate Vector2 CharacterDisplacementDelegate(int character);
+
     public delegate Vector2 CharacterAppearDelegate(int character, float progress);
+
     public delegate Color LetterColorDelegate(int character, float globalProgress);
 
     public static Vector2 NoDisplacement(int character) => Vector2.Zero;
     public static Vector2 SmallRandomDisplacement(int character) => Main.rand.NextVector2Circular(1.1f, 1.1f);
     public static Vector2 RandomDisplacement(int character) => Main.rand.NextVector2Circular(2f, 2f);
-    public static Vector2 SmallWaveDisplacement(int character) => new Vector2(0, (float)Math.Sin(Main.GlobalTimeWrappedHourly * 2.5f + character * 0.8f) * 2.5f);
-    public static Vector2 WaveDisplacement(int character) => new Vector2(0, (float)Math.Sin(Main.GlobalTimeWrappedHourly * 4f + character * 0.8f) * 4f);
-    public static Vector2 WaveEmphasisDisplacement(int character) => new Vector2(0, -4f * MathHelper.Clamp(((float)Math.Sin(-Main.GlobalTimeWrappedHourly * 4f + character * 0.2f) - 0.7f) / 0.3f, 0f, 1f));
+
+    public static Vector2 SmallWaveDisplacement(int character) => new Vector2(0,
+        (float)Math.Sin(Main.GlobalTimeWrappedHourly * 2.5f + character * 0.8f) * 2.5f);
+
+    public static Vector2 WaveDisplacement(int character) => new Vector2(0,
+        (float)Math.Sin(Main.GlobalTimeWrappedHourly * 4f + character * 0.8f) * 4f);
+
+    public static Vector2 WaveEmphasisDisplacement(int character) => new Vector2(0,
+        -4f * MathHelper.Clamp(((float)Math.Sin(-Main.GlobalTimeWrappedHourly * 4f + character * 0.2f) - 0.7f) / 0.3f,
+            0f, 1f));
 
     public static Vector2 AppearSuddenly(int character, float progress) => Vector2.Zero;
-    public static Vector2 AppearFadingFromTop(int character, float progress) => new Vector2(0, -Animators.MakePoly(1.6f).InFunction(1 - progress) * 16f);
-    public static Vector2 AppearFadingFromTopZipper(int character, float progress) => new Vector2(0, -Animators.MakePoly(1.6f).InFunction(1 - progress) * 16f * (character % 2 == 1 ? 1 : -1));
-    public static Vector2 AppearFadingFromRight(int character, float progress) => new Vector2(Animators.MakePoly(2.1f).OutFunction(1 - progress) * 16f, 0f);
+
+    public static Vector2 AppearFadingFromTop(int character, float progress) =>
+        new Vector2(0, -Animators.MakePoly(1.6f).InFunction(1 - progress) * 16f);
+
+    public static Vector2 AppearFadingFromTopZipper(int character, float progress) => new Vector2(0,
+        -Animators.MakePoly(1.6f).InFunction(1 - progress) * 16f * (character % 2 == 1 ? 1 : -1));
+
+    public static Vector2 AppearFadingFromRight(int character, float progress) =>
+        new Vector2(Animators.MakePoly(2.1f).OutFunction(1 - progress) * 16f, 0f);
 
     public string Content;
     public LetterColorDelegate TextColor;
@@ -52,7 +67,8 @@ public struct TextSnippet
     /// </summary>
     public int OriginalID;
 
-    public TextSnippet(string text, Color? color = null, float characterDelay = .025f, CharacterAppearDelegate textAppear = null, CharacterDisplacementDelegate textDisplacement = null,
+    public TextSnippet(string text, Color? color = null, float characterDelay = .025f,
+        CharacterAppearDelegate textAppear = null, CharacterDisplacementDelegate textDisplacement = null,
         bool newLine = false, float fontSize = 1f, DynamicSpriteFont font = null)
     {
         if (Main.dedServ)
@@ -70,7 +86,7 @@ public struct TextSnippet
         }
 
         Content = text;
-        TextColor = delegate (int character, float globalProgress) { return color ?? Color.White; };
+        TextColor = delegate { return color ?? Color.White; };
         CharacterAppearDelay = characterDelay;
         TextAppear = textAppear ?? AppearSuddenly;
         TextDisplacement = textDisplacement ?? NoDisplacement;
@@ -81,7 +97,8 @@ public struct TextSnippet
         Dimensions = ChatManager.GetStringSize(Font, Content, Vector2.One) * FontSize;
     }
 
-    public TextSnippet(string text, LetterColorDelegate color, float characterDelay = .025f, CharacterAppearDelegate textAppear = null, CharacterDisplacementDelegate textDisplacement = null,
+    public TextSnippet(string text, LetterColorDelegate color, float characterDelay = .025f,
+        CharacterAppearDelegate textAppear = null, CharacterDisplacementDelegate textDisplacement = null,
         bool newLine = false, float fontSize = 1f, DynamicSpriteFont font = null)
     {
         if (Main.dedServ)
@@ -138,7 +155,8 @@ public struct TextSnippet
         Dimensions = ChatManager.GetStringSize(Font, Content, Vector2.One) * FontSize;
     }
 
-    public void DrawLetterByLetterSnippet(SpriteBatch sb, Vector2 position, float completion, int character, float opacity = 1f, float rotation = 0f)
+    public void DrawLetterByLetterSnippet(SpriteBatch sb, Vector2 position, float completion, int character,
+        float opacity = 1f, float rotation = 0f)
     {
         for (int i = 0; i < Content.Length; i++)
         {
@@ -146,14 +164,18 @@ public struct TextSnippet
                 return;
 
             Vector2 displacement = TextDisplacement(character + i);
-            if (completion >= i * CharacterAppearDelay && completion < (i + 1) * CharacterAppearDelay && TextAppear != AppearSuddenly)
-                displacement += TextAppear(character + i, (completion - i * CharacterAppearDelay) / CharacterAppearDelay);
+            if (completion >= i * CharacterAppearDelay && completion < (i + 1) * CharacterAppearDelay &&
+                TextAppear != AppearSuddenly)
+                displacement += TextAppear(character + i,
+                    (completion - i * CharacterAppearDelay) / CharacterAppearDelay);
 
             displacement = displacement.RotatedBy(rotation);
 
             Color mainColor = TextColor(character + i, completion) * opacity;
-            DrawBorderStringEightWay(sb, Font, Content[i].ToString(), position + displacement, mainColor, Color.Black * opacity, rotation, FontSize);
-            position += Vector2.UnitX.RotatedBy(rotation) * ChatManager.GetStringSize(Font, Content[i].ToString(), Vector2.One).X * FontSize;
+            DrawBorderStringEightWay(sb, Font, Content[i].ToString(), position + displacement, mainColor,
+                Color.Black * opacity, rotation, FontSize);
+            position += Vector2.UnitX.RotatedBy(rotation) *
+                        ChatManager.GetStringSize(Font, Content[i].ToString(), Vector2.One).X * FontSize;
         }
     }
 
@@ -175,7 +197,7 @@ public sealed class AwesomeSentence
 
     public AwesomeSentence(float textboxWidth, params TextSnippet[] textSnippets)
     {
-        Snippets = new List<TextSnippet>();
+        Snippets = [];
         for (int i = 0; i < textSnippets.Length; i++)
         {
             TextSnippet snippet = textSnippets[i];
@@ -187,8 +209,7 @@ public sealed class AwesomeSentence
 
         if (textboxWidth >= TotalWidth)
             return;
-        else
-            ReWrap(textboxWidth);
+        ReWrap(textboxWidth);
     }
 
     public void ReWrap(float newWidth)
@@ -239,24 +260,28 @@ public sealed class AwesomeSentence
                 // Split the snippet if it doesn't fit
                 string splitSnippetRightHalf = currentSnippet.Content;
                 string splitSnippetLeftHalf = "";
-                MatchCollection firstWordRegex = Regex.Matches(splitSnippetRightHalf, "\\s*\\S+");
+                MatchCollection firstWordRegex = Regex.Matches(splitSnippetRightHalf, @"\s*\S+");
 
                 bool addedFragment = false;
                 while (firstWordRegex.Count > 0)
                 {
                     string nextSnippetFragment = firstWordRegex[0].Value;
-                    float nextSnippetFragmentWidth = ChatManager.GetStringSize(currentSnippet.Font, nextSnippetFragment, Vector2.One).X * currentSnippet.FontSize;
+                    float nextSnippetFragmentWidth =
+                        ChatManager.GetStringSize(currentSnippet.Font, nextSnippetFragment, Vector2.One).X *
+                        currentSnippet.FontSize;
 
                     if (lineWidth + nextSnippetFragmentWidth <= newWidth)
                     {
                         lineWidth += nextSnippetFragmentWidth;
                         splitSnippetLeftHalf += nextSnippetFragment;
-                        splitSnippetRightHalf = splitSnippetRightHalf.Substring(nextSnippetFragment.Length);
-                        firstWordRegex = Regex.Matches(splitSnippetRightHalf, "\\s*\\S+");
+                        splitSnippetRightHalf = splitSnippetRightHalf[nextSnippetFragment.Length..];
+                        firstWordRegex = Regex.Matches(splitSnippetRightHalf, @"\s*\S+");
 
                         if (firstWordRegex.Count == 0 && splitSnippetRightHalf.Length > 0)
                         {
-                            lineWidth += ChatManager.GetStringSize(currentSnippet.Font, splitSnippetRightHalf, Vector2.One).X * currentSnippet.FontSize;
+                            lineWidth +=
+                                ChatManager.GetStringSize(currentSnippet.Font, splitSnippetRightHalf, Vector2.One).X *
+                                currentSnippet.FontSize;
                             wrappedSnippets.Add(currentSnippet);
                             i++;
                             addedFragment = true;
@@ -266,14 +291,19 @@ public sealed class AwesomeSentence
                     {
                         if (splitSnippetLeftHalf != "")
                         {
-                            TextSnippet leftSnippet = new TextSnippet(splitSnippetLeftHalf, currentSnippet);
-                            leftSnippet.OriginalID = currentSnippet.OriginalID;
+                            TextSnippet leftSnippet = new TextSnippet(splitSnippetLeftHalf, currentSnippet)
+                            {
+                                OriginalID = currentSnippet.OriginalID
+                            };
                             wrappedSnippets.Add(leftSnippet);
                         }
+
                         wrappedSnippets.Add(new TextSnippet("\n"));
                         lineWidth = 0;
-                        TextSnippet rightSnippet = new TextSnippet(splitSnippetRightHalf, currentSnippet);
-                        rightSnippet.OriginalID = currentSnippet.OriginalID;
+                        TextSnippet rightSnippet = new TextSnippet(splitSnippetRightHalf, currentSnippet)
+                        {
+                            OriginalID = currentSnippet.OriginalID
+                        };
                         Snippets[i] = rightSnippet;
                         addedFragment = true;
                         break;
@@ -341,8 +371,10 @@ public sealed class AwesomeSentence
                 current = snippet;
                 return true;
             }
+
             currentProgress += snippetDuration;
         }
+
         index = -1;
         current = null;
         return false;
@@ -362,6 +394,7 @@ public sealed class AwesomeSentence
                 return progression >= currentProgress && progression < currentProgress + snippetDuration;
             currentProgress += snippetDuration;
         }
+
         return false;
     }
 
@@ -426,7 +459,8 @@ public sealed class AwesomeSentence
             }
 
             Vector2 snippetHeightDown = Vector2.UnitY * (currentLineHeight - snippet.Dimensions.Y) / 2f;
-            snippet.DrawLetterByLetterSnippet(Main.spriteBatch, currentPosition + snippetHeightDown, progression - sentenceProgress, currentCharacter, opacity, rotation);
+            snippet.DrawLetterByLetterSnippet(Main.spriteBatch, currentPosition + snippetHeightDown,
+                progression - sentenceProgress, currentCharacter, opacity, rotation);
             currentPosition += snippet.Dimensions.X * Vector2.UnitX.RotatedBy(rotation);
 
             sentenceProgress += snippet.Duration;
@@ -435,32 +469,22 @@ public sealed class AwesomeSentence
     }
 }
 
-public class DialogueManager
+public sealed class DialogueManager(
+    Vector2 position,
+    float delayBetweenSentences = 0.5f,
+    float fadeRatio = 0f,
+    float rotation = 0f)
 {
-    private Queue<AwesomeSentence> Sentences;
+    private Queue<AwesomeSentence> Sentences = new();
     public AwesomeSentence CurrentSentence;
     public float CurrentProgress;
     private float TimeSinceSentenceEnd;
-    private float DelayBetweenSentences;
-    public Vector2 Position;
-    public float Rotation;
-    public float FadeRatio;
+    public Vector2 Position = position;
+    public float Rotation = rotation;
+    public float FadeRatio = fadeRatio;
     public bool Active;
 
     public bool IsComplete => !Active && Sentences.Count == 0 && CurrentSentence == null;
-
-    public DialogueManager(Vector2 position, float delayBetweenSentences = 0.5f, float fadeRatio = 0f, float rotation = 0f)
-    {
-        Sentences = new Queue<AwesomeSentence>();
-        Position = position;
-        Rotation = rotation;
-        DelayBetweenSentences = delayBetweenSentences;
-        FadeRatio = fadeRatio;
-        CurrentProgress = 0f;
-        TimeSinceSentenceEnd = 0f;
-        Active = false;
-        CurrentSentence = null;
-    }
 
     public void AddSentence(in AwesomeSentence sentence) => Sentences.Enqueue(sentence);
 
@@ -496,6 +520,7 @@ public class DialogueManager
             }
             else
                 Active = false;
+
             return;
         }
 
@@ -504,7 +529,7 @@ public class DialogueManager
         else
         {
             TimeSinceSentenceEnd += progressionIncrement;
-            if (TimeSinceSentenceEnd >= DelayBetweenSentences)
+            if (TimeSinceSentenceEnd >= delayBetweenSentences)
             {
                 CurrentSentence = null; // Move to the next sentence
                 TimeSinceSentenceEnd = 0f;
@@ -520,8 +545,8 @@ public class DialogueManager
         float opacity = 1f;
         if (CurrentProgress >= CurrentSentence.MaxProgress && FadeRatio > 0)
         {
-            float fadeDuration = DelayBetweenSentences * FadeRatio;
-            opacity = InverseLerp(DelayBetweenSentences, DelayBetweenSentences - fadeDuration, TimeSinceSentenceEnd);
+            float fadeDuration = delayBetweenSentences * FadeRatio;
+            opacity = InverseLerp(delayBetweenSentences, delayBetweenSentences - fadeDuration, TimeSinceSentenceEnd);
         }
 
         CurrentSentence.Draw(CurrentProgress, Position, opacity, Rotation);

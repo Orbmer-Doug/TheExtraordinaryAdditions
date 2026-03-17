@@ -33,7 +33,8 @@ public class TechnicTransmitterPlaced : ModTile
         TileObjectData.newTile.Width = Width;
         TileObjectData.newTile.Height = Height;
         TileObjectData.newTile.Origin = new Point16(Width / 2, Height - 1);
-        TileObjectData.newTile.AnchorBottom = new AnchorData(AnchorType.SolidTile | AnchorType.SolidWithTop | AnchorType.SolidSide, TileObjectData.newTile.Width, 0);
+        TileObjectData.newTile.AnchorBottom = new AnchorData(
+            AnchorType.SolidTile | AnchorType.SolidWithTop | AnchorType.SolidSide, TileObjectData.newTile.Width, 0);
         TileObjectData.newTile.CoordinateHeights = Enumerable.Repeat(16, TileObjectData.newTile.Height).ToArray();
         TileObjectData.newTile.LavaDeath = false;
         TileObjectData.newTile.DrawYOffset = 2;
@@ -66,12 +67,12 @@ public class TechnicTransmitterPlaced : ModTile
     {
         if (Main.ActiveWorldFileData.IsCloudSave)
         {
-            Utility.DisplayText(this.GetLocalizedValue("CloudSave"));
+            DisplayText(this.GetLocalizedValue("CloudSave"));
             return false;
         }
 
         int type = ModContent.ProjectileType<TransmitterLightspeed>();
-        if (!Utility.AnyProjectile(type))
+        if (!AnyProjectile(type))
         {
             Tile tile = Main.tile[i, j];
             int snapX = tile.TileFrameX / 18;
@@ -84,9 +85,10 @@ public class TechnicTransmitterPlaced : ModTile
             position.X += 10;
             position.Y += 4;
             IEntitySource source = Main.LocalPlayer.GetProjectileSource_TileInteraction(pos.X, pos.Y);
-            int index = Projectile.NewProjectile(source, position, Vector2.Zero, type, 0, 0f, Main.myPlayer, 0f, 0f, 0f);
+            int index = Projectile.NewProjectile(source, position, Vector2.Zero, type, 0, 0f, Main.myPlayer);
             Main.projectile[index].originatedFromActivableTile = true;
         }
+
         return true;
     }
 }
@@ -94,10 +96,12 @@ public class TechnicTransmitterPlaced : ModTile
 public class TransmitterLightspeed : ModProjectile, IHasScreenShader
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.DrawScreenCheckFluff[Type] = 60000;
     }
+
     public override void SetDefaults()
     {
         Projectile.Size = new(1f);
@@ -112,11 +116,13 @@ public class TransmitterLightspeed : ModProjectile, IHasScreenShader
     public const float TotalDuration = CollapseDuration + ScaleDuration;
 
     public ref float Time => ref Projectile.ai[0];
+
     public bool Reverse
     {
-        get => Projectile.ai[1] == 1;
+        get => (int)Projectile.ai[1] == 1;
         set => Projectile.ai[1] = value.ToInt();
     }
+
     public override void AI()
     {
         if (!Reverse)
@@ -125,7 +131,8 @@ public class TransmitterLightspeed : ModProjectile, IHasScreenShader
                 beam = new(WidthFunct, ColorFunct, null, 20);
 
             Vector2 start = Projectile.Center;
-            Vector2 end = start - Vector2.UnitY * Animators.MakePoly(3f).InOutFunction.Evaluate(Time, 0f, 1f, 2f, 1400f);
+            Vector2 end = start -
+                          Vector2.UnitY * Animators.MakePoly(3f).InOutFunction.Evaluate(Time, 0f, 1f, 2f, 1400f);
             points.SetPoints(start.GetLaserControlPoints(end, 20));
         }
 
@@ -155,7 +162,8 @@ public class TransmitterLightspeed : ModProjectile, IHasScreenShader
     }
 
     public ManagedScreenShader Shader { get; private set; }
-    public bool HasShader { get; private set; } = false;
+    public bool HasShader { get; private set; }
+
     public void InitializeShader()
     {
         Shader = ScreenShaderPool.GetShader("AsterlinSpaceTravel");
@@ -173,14 +181,14 @@ public class TransmitterLightspeed : ModProjectile, IHasScreenShader
 
     public void ReleaseShader()
     {
-        if (HasShader)
-        {
-            Shader.Deactivate();
-            ScreenShaderPool.ReturnShader("AsterlinSpaceTravel", Shader);
-            HasShader = false;
-            Shader = null;
-            ScreenShaderUpdates.UnregisterEntity(this);
-        }
+        if (!HasShader) 
+            return;
+        
+        Shader.Deactivate();
+        ScreenShaderPool.ReturnShader("AsterlinSpaceTravel", Shader);
+        HasShader = false;
+        Shader = null;
+        ScreenShaderUpdates.UnregisterEntity(this);
     }
 
     public bool IsEntityActive() => Projectile.active;
@@ -195,16 +203,16 @@ public class TransmitterLightspeed : ModProjectile, IHasScreenShader
         {
             return thickness;
         }
-        else
-        {
-            float term = (c - 1f + percentageFromEnd) / percentageFromEnd;
-            return thickness * (float)Math.Sqrt(1f - term * term);
-        }
+
+        float term = (c - 1f + percentageFromEnd) / percentageFromEnd;
+        return thickness * (float)Math.Sqrt(1f - term * term);
     }
+
     public Color ColorFunct(SystemVector2 c, Vector2 pos) => Color.Cyan * InverseLerp(0f, 1.4f, Time);
 
     public OptimizedPrimitiveTrail beam;
     public TrailPoints points = new(20);
+
     public override bool PreDraw(ref Color lightColor)
     {
         if (this.RunLocal())
@@ -224,8 +232,9 @@ public class TransmitterLightspeed : ModProjectile, IHasScreenShader
 
                 ManagedShader shader = ShaderRegistry.CrunchyLaserShader;
                 shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Perlin), 1, SamplerState.AnisotropicWrap);
-                beam.DrawTrail(shader, points.Points, 200, true, true);
+                beam.DrawTrail(shader, points.Points, 200, true);
             }
+
             PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.OverNPCs);
         }
 

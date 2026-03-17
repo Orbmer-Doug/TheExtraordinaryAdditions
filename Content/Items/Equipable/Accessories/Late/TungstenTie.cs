@@ -11,6 +11,7 @@ using TheExtraordinaryAdditions.Content.Projectiles.Classless.Late;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Late;
 
@@ -125,7 +126,7 @@ public sealed class TungstenTiePlayer : ModPlayer
             if (Player.statLife > Player.statLifeMax2)
                 Player.statLife = Player.statLifeMax2;
 
-            Player.AddBuff(ModContent.BuffType<TheTiesCooldown>(), SecondsToFrames(210));
+            Player.AddBuff(ModContent.BuffType<TheTiesCooldown>(), CalUtils.SecondsToFrames(210));
             return false;
         }
 

@@ -26,9 +26,9 @@ public class DivineSpiritCatalyst : ModItem
     public override void SetStaticDefaults()
     {
         Item.ResearchUnlockCount = 1;
-        Main.RegisterItemAnimation(this.Item.type, new DrawAnimationVertical(10, 6, false));
-        ItemID.Sets.SortingPriorityMaterials[this.Type] = 122;
-        ItemID.Sets.ItemNoGravity[this.Item.type] = true;
+        Main.RegisterItemAnimation(Item.type, new DrawAnimationVertical(10, 6, false));
+        ItemID.Sets.SortingPriorityMaterials[Type] = 122;
+        ItemID.Sets.ItemNoGravity[Item.type] = true;
 
         ItemID.Sets.AnimatesAsSoul[Type] = true;
     }
@@ -68,7 +68,7 @@ public class DivineSpiritCatalyst : ModItem
             for (int i = 0; i < 3; i++)
             {
                 Vector2 drawPosition = baseDrawPosition + (MathHelper.TwoPi * i / 8f).ToRotationVector2() * drawPositionOffset;
-                spriteBatch.Draw(TextureAssets.Item[this.Item.type].Value, drawPosition, (Rectangle?)frame, drawColor, 0f, Vector2.Zero, baseScale, 0, 0f);
+                spriteBatch.Draw(TextureAssets.Item[Item.type].Value, drawPosition, (Rectangle?)frame, drawColor, 0f, Vector2.Zero, baseScale, 0, 0f);
             }
         }
     }
@@ -77,7 +77,7 @@ public class DivineSpiritCatalyst : ModItem
     {
         float brightness = Main.essScale * Main.rand.NextFloat(0.9f, 1.1f);
         Lighting.AddLight(Item.Center, 1.2f * brightness, 0.4f * brightness, 0.8f);
-        Rectangle frame = TextureAssets.Item[this.Item.type].Value.Frame(1, 6, 0, 0, 0, 0);
+        Rectangle frame = TextureAssets.Item[Item.type].Value.Frame(1, 6, 0, 0, 0, 0);
         DrawBackAfterimage(spriteBatch, Item.position - Main.screenPosition, frame, scale);
         return true;
     }

@@ -47,7 +47,7 @@ public class SolemnLament : ModItem
     {
         if (player.altFunctionUse == 2)
         {
-            player.AddBuff(ModContent.BuffType<EternalRest>(), SecondsToFrames(10));
+            player.AddBuff(ModContent.BuffType<EternalRest>(), CalUtils.SecondsToFrames(10));
         }
         else
         {

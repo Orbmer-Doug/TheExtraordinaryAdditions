@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using CalamityMod;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Middle;
@@ -39,7 +40,7 @@ public class StarlessHoldout : BaseIdleHoldoutProjectile
     {
         if (this.RunLocal())
         {
-            float interpolant = Utils.GetLerpValue(5f, 20f, Projectile.Distance(Modded.MouseWorld), true);
+            float interpolant = Terraria.Utils.GetLerpValue(5f, 20f, Projectile.Distance(Modded.MouseWorld), true);
             Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Modded.MouseWorld), interpolant);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
@@ -105,7 +106,7 @@ public class StarlessHoldout : BaseIdleHoldoutProjectile
                 water.Offset = Main.rand.NextVector2Circular(OffsetMax, OffsetMax);
             }
 
-            List<Projectile> waters = Utility.AllProjectilesFromOwner(type, Owner);
+            List<Projectile> waters = AllProjectilesFromOwner(type, Owner);
             if ((this.RunLocal() && Modded.SafeMouseLeft.Current) && !Released && waters.Count > 0)
             {
                 AdditionsSound.MagicStrike.Play(Projectile.Center, 1.2f, .2f, .1f, 20, Name);

@@ -4,20 +4,22 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Terraria;
 using TheExtraordinaryAdditions.Core.Utilities;
+
 namespace TheExtraordinaryAdditions.Core.DataStructures;
 
 // A slightly modified version of the IK present in Calamity Fables
 // love those guys
 
 // TODO: Offsets to joint position without blowing up?
-public class CCDKinematicJoint
+public sealed class CCDKinematicJoint
 {
     public CCDKinematicJoint Parent { get; set; }
     public CCDKinematicJoint Child { get; set; }
 
-    public CCDKinematicsConstraint? Constraint = null;
+    public CCDKinematicsConstraint? Constraint;
 
     #region Variables
+
     internal bool _needsRotationRecalculation = true;
     internal bool _needsPositionRecalculation = true;
     internal Vector2 _position;
@@ -153,9 +155,11 @@ public class CCDKinematicJoint
     }
 
     public Vector2 SegmentVector => Rotation.ToRotationVector2() * JointLength;
+
     #endregion
 
     #region Constructors
+
     public CCDKinematicJoint(Vector2 position)
     {
         Position = position;
@@ -173,9 +177,11 @@ public class CCDKinematicJoint
         float rotation = (position - parent.Position).ToRotation();
         Rotation = rotation;
     }
+
     #endregion
 
     #region Adding children
+
     /// <summary>
     /// Appends a new joint to the end of the limb
     /// </summary>
@@ -231,6 +237,7 @@ public class CCDKinematicJoint
         else
             Append(Position + newJointOffset, constraints);
     }
+
     #endregion
 
     public List<CCDKinematicJoint> GetSubLimb()
@@ -263,55 +270,52 @@ public class CCDKinematicJoint
 
     public CCDKinematicJoint GetEndEffector()
     {
-        if (Child != null)
-            return Child.GetEndEffector();
-        return this;
+        return Child != null ? Child.GetEndEffector() : this;
     }
 
     public override string ToString()
     {
-        return $"Rotation={Rotation}, Joint Length={JointLength}, Position={Position}, Segment Vector={SegmentVector}, End Effector={EndEffector}";
+        return
+            $"Rotation={Rotation}, Joint Length={JointLength}, Position={Position}, Segment Vector={SegmentVector}, End Effector={EndEffector}";
     }
 }
 
 /// <summary>
 /// Allows for easy constraints on limbs
 /// </summary>
-public readonly struct CCDKinematicsConstraint
+public readonly struct CCDKinematicsConstraint(
+    float minimumAngle,
+    float maximumAngle,
+    float delta = 0.1f,
+    float stiffness = 2f,
+    bool flip = false)
 {
     /// <summary>
     /// Minimum angle the limb may go
     /// </summary>
-    public readonly float MinimumAngle;
+    public readonly float MinimumAngle = flip ? -maximumAngle : minimumAngle;
 
     /// <summary>
     /// Maximum angle the limb may go
     /// </summary>
-    public readonly float MaximumAngle;
+    public readonly float MaximumAngle = flip ? -minimumAngle : maximumAngle;
 
     /// <summary>
     /// Maximum overshoot (in radians) this joint can go
     /// </summary>
-    public readonly float Delta;
+    public readonly float Delta = delta;
 
     /// <summary>
     /// How sharp the limb moves beyond its limits
     /// </summary>
-    public readonly float Stiffness;
-    public CCDKinematicsConstraint(float minimumAngle, float maximumAngle, float delta = 0.1f, float stiffness = 2f, bool flip = false)
-    {
-        MinimumAngle = flip ? -maximumAngle : minimumAngle;
-        MaximumAngle = flip ? -minimumAngle : maximumAngle;
-        Delta = delta;
-        Stiffness = stiffness;
-    }
+    public readonly float Stiffness = stiffness;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public float Apply(float angle)
     {
         if (angle < MinimumAngle)
             return MinimumAngle + Delta * (float)Math.Tanh(Stiffness * (angle - MinimumAngle));
-        else if (angle > MaximumAngle)
+        if (angle > MaximumAngle)
             return MaximumAngle + Delta * (float)Math.Tanh(Stiffness * (angle - MaximumAngle));
         return angle;
 
@@ -361,7 +365,8 @@ public static class CCDKinematics
                 else
                 {
                     float angleToEE = hingePos.AngleTo(endEffector.Position);
-                    float angleDiff = MathHelper.WrapAngle(angleToTarget - angleToEE); // Use wrapped diff for signed accuracy
+                    float angleDiff =
+                        MathHelper.WrapAngle(angleToTarget - angleToEE); // Use wrapped diff for signed accuracy
                     joints[i].Rotation += angleDiff;
                 }
             }
@@ -414,15 +419,16 @@ public static class CCDKinematics
     }
 }
 
-public class JointChain
+public sealed class JointChain
 {
-    private readonly List<CCDKinematicJoint> joints = new();
+    private readonly List<CCDKinematicJoint> joints = [];
     public Vector2 RootPosition { get; set; }
     public int JointCount => joints.Count;
     public CCDKinematicJoint Root => joints[0];
     public CCDKinematicJoint EndEffector => joints[^1].EndEffector;
 
-    public JointChain(Vector2 rootPosition, params (float length, CCDKinematicsConstraint? constraints)[] jointDefinitions)
+    public JointChain(Vector2 rootPosition,
+        params (float length, CCDKinematicsConstraint? constraints)[] jointDefinitions)
     {
         RootPosition = rootPosition;
         CCDKinematicJoint root = new(rootPosition);

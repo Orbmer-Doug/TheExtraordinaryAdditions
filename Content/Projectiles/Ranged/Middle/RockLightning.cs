@@ -48,7 +48,7 @@ public class RockLightning : ModProjectile
         foreach (Line line in Branches)
         {
             int width = 8;
-            if (new Rectangle((int)line.a.X - width / 2, (int)line.a.Y - width / 2, width, width).Intersects(targetHitbox))
+            if (new Rectangle((int)line.A.X - width / 2, (int)line.A.Y - width / 2, width, width).Intersects(targetHitbox))
                 return true;
         }
 

@@ -8,6 +8,8 @@ using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
 
 public class Comet : ModProjectile
@@ -32,7 +34,7 @@ public class Comet : ModProjectile
     }
 
     public Player Owner => Main.player[Projectile.owner];
-    public static readonly int FadeTime = SecondsToFrames(.7f);
+    public static readonly int FadeTime = CalUtils.SecondsToFrames(.7f);
 
     public int HitTime
     {

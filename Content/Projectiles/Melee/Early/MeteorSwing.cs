@@ -9,6 +9,7 @@ using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Early;
 
@@ -94,13 +95,13 @@ public class MeteorSwing : BaseSwordSwing
             {
                 SwingDir = SwingDir == SwingDirection.Up ? SwingDirection.Down : SwingDirection.Up;
                 Initialized = false;
-                this.Sync();
             }
             else
             {
                 VanishTime++;
-                this.Sync();
             }
+
+            this.Sync();
         }
 
         CreateSparkles();

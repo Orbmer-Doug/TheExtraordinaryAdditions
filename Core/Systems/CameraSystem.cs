@@ -16,21 +16,24 @@ public sealed class CameraSystem : ModSystem
     /// Where the <see cref="Main.screenPosition"/> would be without modifications
     /// </summary>
     public static Vector2 UnmodifiedCameraPosition =>
-        Main.LocalPlayer.TopLeft + new Vector2(Main.LocalPlayer.width * 0.5f, Main.LocalPlayer.height - 21f) - Main.ScreenSize.ToVector2() * 0.5f + Vector2.UnitY * Main.LocalPlayer.gfxOffY;
-    
-    public static Rectangle CameraRect => new((int)Main.Camera.ScaledPosition.X, (int)Main.Camera.ScaledPosition.Y, (int)Main.Camera.ScaledSize.X, (int)Main.Camera.ScaledSize.Y);
+        Main.LocalPlayer.TopLeft + new Vector2(Main.LocalPlayer.width * 0.5f, Main.LocalPlayer.height - 21f) -
+        Main.ScreenSize.ToVector2() * 0.5f + Vector2.UnitY * Main.LocalPlayer.gfxOffY;
+
+    public static Rectangle CameraRect => new((int)Main.Camera.ScaledPosition.X, (int)Main.Camera.ScaledPosition.Y,
+        (int)Main.Camera.ScaledSize.X, (int)Main.Camera.ScaledSize.Y);
 
     public delegate void CameraModifierDelegate(Action innerAction);
 
     private static bool limitCameraUpdateRateOverride = false;
 
-    private readonly static SortedList<int, CameraModifierDelegate> cameraModifiers = [];
+    private static readonly SortedList<int, CameraModifierDelegate> cameraModifiers = [];
 
     private static Vector2 lastPositionRemainder;
     private static Vector2 screenCenter;
     public static Vector2 ScreenSize { get; private set; }
     public static Vector2 ScreenHalf { get; private set; }
     public static Rectangle ScreenRect { get; private set; }
+
     public static Vector2 ScreenCenter
     {
         get => screenCenter;
@@ -74,6 +77,14 @@ public sealed class CameraSystem : ModSystem
 
                 int i = 0;
 
+                lock (cameraModifiers)
+                {
+                    ModifierRecursion();
+                }
+
+                PostCameraUpdate();
+                return;
+
                 void ModifierRecursion()
                 {
                     int iCopy = i++;
@@ -87,13 +98,6 @@ public sealed class CameraSystem : ModSystem
                         orig();
                     }
                 }
-
-                lock (cameraModifiers)
-                {
-                    ModifierRecursion();
-                }
-
-                PostCameraUpdate();
             };
         });
     }
@@ -130,32 +134,17 @@ public sealed class CameraSystem : ModSystem
         ScreenSize = new(Main.screenWidth, Main.screenHeight);
         ScreenHalf = new(Main.screenWidth * 0.5f, Main.screenHeight * 0.5f);
         ScreenRect = new((int)Main.screenPosition.X, (int)Main.screenPosition.Y, Main.screenWidth, Main.screenHeight);
-        screenCenter = new(Main.screenPosition.X + Main.screenWidth * 0.5f, Main.screenPosition.Y + Main.screenHeight * 0.5f);
+        screenCenter = new(Main.screenPosition.X + Main.screenWidth * 0.5f,
+            Main.screenPosition.Y + Main.screenHeight * 0.5f);
     }
 
-    public static Vector2 Position
-    {
-        get;
-        set;
-    }
+    public static Vector2 Position { get; set; }
 
-    public static float Interpolant
-    {
-        get;
-        set;
-    }
+    public static float Interpolant { get; set; }
 
-    public static float Zoom
-    {
-        get;
-        set;
-    }
+    public static float Zoom { get; set; }
 
-    public static bool ManualPause
-    {
-        get;
-        set;
-    }
+    public static bool ManualPause { get; set; }
 
     public override void ModifyScreenPosition()
     {
@@ -174,11 +163,12 @@ public sealed class CameraSystem : ModSystem
         }
 
         // Make interpolants gradually return to their original values
-        if (!Main.gamePaused && ManualPause == false)
+        if (!Main.gamePaused && !ManualPause)
         {
             Interpolant = MathHelper.Clamp(Interpolant - 0.06f, 0f, 1f);
             Zoom = MathHelper.Lerp(Zoom, 0f, 0.09f);
         }
+
         ManualPause = false;
     }
 
@@ -190,9 +180,6 @@ public sealed class CameraSystem : ModSystem
     /// <summary>
     /// Easily set the camera of the local player
     /// </summary>
-    /// <param name="pos"></param>
-    /// <param name="interpolant"></param>
-    /// <param name="zoom"></param>
     public static void SetCamera(Vector2 pos, float interpolant, float zoom = 0f, bool pause = false)
     {
         Position = pos;

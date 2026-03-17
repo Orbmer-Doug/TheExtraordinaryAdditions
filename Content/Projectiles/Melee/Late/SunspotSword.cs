@@ -15,6 +15,8 @@ using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
 
@@ -186,7 +188,7 @@ public class SunspotSword : BaseIdleHoldoutProjectile, IHasScreenShader
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        target.AddBuff(ModContent.BuffType<PlasmaIncineration>(), SecondsToFrames(3));
+        target.AddBuff(ModContent.BuffType<PlasmaIncineration>(), CalUtils.SecondsToFrames(3));
         if (AngularDamageFactor > 0.1f)
         {
             Vector2 start = target.Hitbox.ClosestPointInRect(Tip);

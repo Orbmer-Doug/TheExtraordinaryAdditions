@@ -35,8 +35,8 @@ public class CosmicImplosionHoldout : BaseIdleHoldoutProjectile
         set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
 
-    public static readonly int PullbackTime = SecondsToFrames(1.4f);
-    public static readonly int FireTime = SecondsToFrames(.4f);
+    public static readonly int PullbackTime = CalUtils.SecondsToFrames(1.4f);
+    public static readonly int FireTime = CalUtils.SecondsToFrames(.4f);
 
     public Vector2 CurrentEnd;
     public override void WriteExtraAI(BinaryWriter writer) => writer.WriteVector2(CurrentEnd);

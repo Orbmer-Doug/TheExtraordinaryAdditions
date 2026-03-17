@@ -10,6 +10,7 @@ using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
 
@@ -234,7 +235,7 @@ public class SpoonSwing : BaseSwordSwing
 
     public override void NPCHitEffects(in Vector2 start, in Vector2 end, NPC npc, NPC.HitInfo hit)
     {
-        npc.AddBuff(ModContent.BuffType<DentedBySpoon>(), SecondsToFrames(4));
+        npc.AddBuff(ModContent.BuffType<DentedBySpoon>(), CalUtils.SecondsToFrames(4));
 
         switch (CurrentState)
         {
@@ -245,12 +246,12 @@ public class SpoonSwing : BaseSwordSwing
                 break;
             case SpoonState.Scoop:
                 AdditionsSound.BeegBell.Play(Projectile.Center, .58f, 0f, .3f);
-                ScreenShakeSystem.New(new(2f, .5f), Projectile.Center);
+                ScreenShakeSystem.New(new(2f), Projectile.Center);
 
                 break;
             case SpoonState.Smash:
                 int type = ModContent.ProjectileType<SpoonShockwave>();
-                if (this.RunLocal() && Owner.ownedProjectileCounts[type] <= 0 && Utility.CountOwnerProjectiles(Owner, type) <= 0)
+                if (this.RunLocal() && Owner.ownedProjectileCounts[type] <= 0 && Owner.CountOwnerProjectiles(type) <= 0)
                 {
                     ParticleRegistry.SpawnBlurParticle(Projectile.Center, 40, .4f, 800f);
 

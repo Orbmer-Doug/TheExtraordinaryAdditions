@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using CalamityMod;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
@@ -8,6 +9,7 @@ using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 
@@ -36,7 +38,7 @@ public class RejuvenationHover : ModProjectile
             player.GetModPlayer<RejuvenationPlayer>().HealWait = 0;
     }
 
-    public static readonly int timeForHeal = SecondsToFrames(7);
+    public static readonly int timeForHeal = CalUtils.SecondsToFrames(7);
     public override void AI()
     {
         if (!Owner.Available() || Owner.GetModPlayer<RejuvenationArtifactPlayer>().Equipped == false)

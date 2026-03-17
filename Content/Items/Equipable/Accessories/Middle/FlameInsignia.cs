@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -6,6 +7,7 @@ using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
 
@@ -77,10 +79,9 @@ public sealed class FlameInsigniaPlayer : ModPlayer
                         if (target.active && target.WithinRange(Player.Center, radius) && target.CanBeChasedBy(Player) && !target.friendly)
                         {
                             int dmg = (int)Player.GetTotalDamage(Player.GetBestClass()).ApplyTo(25);
-                            float kb = 0f;
                             int type = ModContent.ProjectileType<InsigniaBlaze>();
                             if (Main.myPlayer == Player.whoAmI)
-                                Player.NewPlayerProj(target.Center, Vector2.Zero, type, dmg, kb, Player.whoAmI, target.whoAmI);
+                                Player.NewPlayerProj(target.Center, Vector2.Zero, type, dmg, 0f, Player.whoAmI, target.whoAmI);
                         }
                     }
                 }

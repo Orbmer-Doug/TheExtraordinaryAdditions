@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using CalamityMod;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -7,6 +8,7 @@ using TheExtraordinaryAdditions.Content.Buffs.Summon;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
 
@@ -147,11 +149,11 @@ public class WitheredShredderShield : ModProjectile
             Hover();
         }
 
-        SawSlot ??= LoopedSoundManager.CreateNew(new(AdditionsSound.chainsawThrown, () => Utils.Remap(ShredTimer, SecondsToFrames(4.3f), SecondsToFrames(5), .3f, 0f)),
+        SawSlot ??= LoopedSoundManager.CreateNew(new(AdditionsSound.chainsawThrown, () => Terraria.Utils.Remap(ShredTimer, CalUtils.SecondsToFrames(4.3f), CalUtils.SecondsToFrames(5), .3f, 0f)),
             () => AdditionsLoopedSound.ProjectileNotActive(Projectile), () => State == CurrentState.Charge && subState == SubState.Shred);
         SawSlot?.Update(Projectile.Center);
 
-        bool ramming = subState == SubState.Ram && HasHitTarget == false;
+        bool ramming = subState == SubState.Ram && !HasHitTarget;
         after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0,
             (byte)(ramming ? 255 : 40), ramming ? 0 : 2, ramming ? 0f : 4f));
 
@@ -193,16 +195,16 @@ public class WitheredShredderShield : ModProjectile
             Projectile.velocity = Projectile.Center.SafeDirectionTo(Owner.Center) * 40f;
 
         // Variables
-        float speed = 40f;
-        float distance = 300f;
-        float rot = MathHelper.Pi;
+        const float speed = 40f;
+        const float distance = 300f;
+        const float rot = MathHelper.Pi;
         Vector2 spawnOffset = Vector2.UnitY.RotatedBy(MathHelper.Lerp(-rot, rot, Projectile.whoAmI % 16f / 16f)) * distance;
         if (Projectile.whoAmI * 113 % 2 == 1)
             spawnOffset *= -1f;
 
         Vector2 destination = Target.Center + spawnOffset;
 
-        Vector2 targetDestination = Utility.GetHomingVelocity(Projectile.position, Target.position, Target.velocity, speed);
+        Vector2 targetDestination = GetHomingVelocity(Projectile.position, Target.position, Target.velocity, speed);
         switch (subState)
         {
             case SubState.Position:
@@ -237,28 +239,28 @@ public class WitheredShredderShield : ModProjectile
                 {
                     for (int i = 0; i < 4; i++)
                     {
-                        Vector2 pos = Projectile.Center + Utils.ToRotationVector2(i * MathHelper.PiOver2 + Projectile.rotation) * 10f;
+                        Vector2 pos = Projectile.Center + Terraria.Utils.ToRotationVector2(i * MathHelper.PiOver2 + Projectile.rotation) * 10f;
                         ParticleRegistry.SpawnSparkParticle(pos, -Projectile.velocity * Main.rand.NextFloat(.1f, .4f), 20, .3f, Color.AntiqueWhite);
                     }
                 }
-                if (HasHitTarget == true)
+                if (HasHitTarget)
                     AltCounter++;
 
                 // Halt to stop
-                if (HasHitTarget == true && AltCounter < 40f)
+                if (HasHitTarget && AltCounter < 40f)
                 {
                     Projectile.velocity *= .9f;
                 }
 
                 // Go shred if ready
-                if (HasHitTarget == true && AltCounter > 40f)
+                if (HasHitTarget && AltCounter > 40f)
                 {
                     subState = SubState.Shred;
                     this.Sync();
                 }
 
                 // Otherwise repeat
-                else if (HasHitTarget == false && AltCounter > ReelBackTime)
+                else if (!HasHitTarget && AltCounter > ReelBackTime)
                 {
                     Timer = 0f;
                     PlayedSound = false;
@@ -268,7 +270,7 @@ public class WitheredShredderShield : ModProjectile
                     this.Sync();
                 }
 
-                if (PlayedSound == false && !Main.dedServ)
+                if (!PlayedSound && !Main.dedServ)
                 {
                     SoundID.DD2_WyvernDiveDown.Play(Projectile.Center, 1.2f, -.1f);
                     PlayedSound = true;
@@ -286,7 +288,7 @@ public class WitheredShredderShield : ModProjectile
     {
         ShredTimer++;
 
-        if (ShredTimer >= SecondsToFrames(5))
+        if (ShredTimer >= CalUtils.SecondsToFrames(5))
         {
             Timer = 0f;
             HasHitTarget = false;
@@ -360,7 +362,7 @@ public class WitheredShredderShield : ModProjectile
         Color mainColor = subState == SubState.Shred ? Color.DarkRed : lightColor;
         float rotation = Projectile.rotation;
 
-        bool ramming = subState == SubState.Ram && HasHitTarget == false;
+        bool ramming = subState == SubState.Ram && !HasHitTarget;
         if (ramming || subState == SubState.Shred)
         {
             Color[] col = ramming ? [lightColor] : [Color.DarkRed, Color.Red];

@@ -13,6 +13,8 @@ using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 using static Terraria.Main;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
 
@@ -175,15 +177,15 @@ public class HeavenForgedSwing : BaseSwordSwing
                 }
                 else
                 {
-                    Time = 0f;
+                    Time = 0;
                 }
-                this.Sync();
             }
             else
             {
                 VanishTime++;
-                this.Sync();
             }
+
+            this.Sync();
         }
     }
 
@@ -197,11 +199,11 @@ public class HeavenForgedSwing : BaseSwordSwing
                 for (int a = -1; a <= 1; a += 2)
                 {
                     Vector2 target = Modded.MouseWorld;
-                    position = Owner.Center - new Vector2(Main.rand.NextFloat(100f, Main.screenWidth / 2) * Owner.direction, 600f * a);
+                    position = Owner.Center - new Vector2(rand.NextFloat(100f, screenWidth / 2) * Owner.direction, 600f * a);
                     position.Y -= 40 * i;
 
-                    Vector2 vel = position.SafeDirectionTo(target) * Main.rand.NextFloat(10f, 20f);
-                    vel.Y += Main.rand.NextFloat(-2f, 2f);
+                    Vector2 vel = position.SafeDirectionTo(target) * rand.NextFloat(10f, 20f);
+                    vel.Y += rand.NextFloat(-2f, 2f);
 
                     int proj = ModContent.ProjectileType<HeavenForgedSpear>();
                     int dmg = (int)(Projectile.damage * .55f);
@@ -240,7 +242,7 @@ public class HeavenForgedSwing : BaseSwordSwing
         for (int i = 0; i < 24; i++)
         {
             Vector2 vel = (Rect().Bottom.SafeDirectionTo(Rect().Top)).RotatedByRandom(.3f) * rand.NextFloat(7f, 15f);
-            ParticleRegistry.SpawnSparkParticle(start + Main.rand.NextVector2Circular(9f, 9f), vel, Main.rand.Next(30, 40), Main.rand.NextFloat(.7f, 1f), Color.DeepSkyBlue);
+            ParticleRegistry.SpawnSparkParticle(start + rand.NextVector2Circular(9f, 9f), vel, rand.Next(30, 40), rand.NextFloat(.7f, 1f), Color.DeepSkyBlue);
         }
 
         AdditionsSound.etherealHit4.Play(start, 1f, 0f, .2f, 10, Name);
@@ -252,7 +254,7 @@ public class HeavenForgedSwing : BaseSwordSwing
         for (int i = 0; i < 24; i++)
         {
             Vector2 vel = (Rect().Bottom.SafeDirectionTo(Rect().Top)).RotatedByRandom(.3f) * rand.NextFloat(7f, 15f);
-            ParticleRegistry.SpawnSparkParticle(start + Main.rand.NextVector2Circular(9f, 9f), vel, Main.rand.Next(30, 40), Main.rand.NextFloat(.7f, 1f), Color.DeepSkyBlue);
+            ParticleRegistry.SpawnSparkParticle(start + rand.NextVector2Circular(9f, 9f), vel, rand.Next(30, 40), rand.NextFloat(.7f, 1f), Color.DeepSkyBlue);
         }
 
         AdditionsSound.etherealHit4.Play(start, 1f, 0f, .2f, 10, Name);
@@ -312,8 +314,7 @@ public class HeavenForgedSwing : BaseSwordSwing
             trailShader.TrySetParameter("flip", flip);
 
             trailShader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Cosmos), 0, SamplerState.LinearWrap);
-            trailShader.Matrix = Get3DOrthoPrimitiveMatrix(Projectile.Center, Rotation, Projectile.scale, InitialMouseAngle, 1);
-            trail.DrawTrail(trailShader, points.Points, 40);
+            trail.DrawTrail(trailShader, points.Points, 40, false, true, Get3DOrthoPrimitiveMatrix(Projectile.Center, Rotation, Projectile.scale, InitialMouseAngle));
         }
 
         // Draw the main sword

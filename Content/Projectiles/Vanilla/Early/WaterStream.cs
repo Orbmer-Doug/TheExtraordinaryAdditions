@@ -1,4 +1,5 @@
-﻿using Terraria;
+﻿using CalamityMod;
+using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -18,7 +19,7 @@ public class WaterStream : ModProjectile
         Projectile.friendly = true;
         Projectile.hostile = false;
         Projectile.penetrate = 5;
-        Projectile.timeLeft = SecondsToFrames(6);
+        Projectile.timeLeft = CalUtils.SecondsToFrames(6);
         Projectile.ignoreWater = true;
         Projectile.tileCollide = true;
         Projectile.DamageType = DamageClass.Magic;

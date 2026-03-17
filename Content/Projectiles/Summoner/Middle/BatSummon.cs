@@ -1,4 +1,5 @@
-﻿using Terraria;
+﻿using CalamityMod;
+using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Summon;
@@ -50,12 +51,12 @@ public class BatSummon : ModProjectile
         NPC target = NPCTargeting.MinionHoming(new(Projectile.Center, 1200), Owner);
         if (target != null)
         {
-            Utility.ProjAntiClump(Projectile, .3f);
+            CoreUtils.ProjAntiClump(Projectile, .3f);
             Charging(target.Center);
         }
         else
         {
-            Utility.ProjAntiClump(Projectile, .15f);
+            CoreUtils.ProjAntiClump(Projectile, .15f);
             Hover();
         }
     }

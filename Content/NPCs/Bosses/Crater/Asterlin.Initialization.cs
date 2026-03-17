@@ -1,5 +1,4 @@
 ﻿using CalamityMod.Items.Potions;
-using CalamityMod.NPCs.Yharon;
 using Terraria;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
@@ -71,7 +70,7 @@ public partial class Asterlin
         NPC.noTileCollide = false;
         NPC.HitSound = AssetRegistry.GetSound(AdditionsSound.AsterlinHit) with { Volume = 1f, PitchVariance = .2f, PitchRange = new(-.2f, 0f) };
         NPC.DeathSound = null;
-        NPC.value = Item.buyPrice(50, 0, 0, 0) / 5;
+        NPC.value = Item.buyPrice(50) / 5f;
         NPC.BossBar = ModContent.GetInstance<AsterlinBossbar>();
         NPC.netAlways = true;
 
@@ -148,7 +147,7 @@ public partial class Asterlin
     {
         // Unfortunately, theres no way to check the total amount of players between both worlds
         // And due to the shenanigans described in Asterlin.AbsorbingEnergy, it wont capture the correct amount of players
-        NPC.lifeMax = (int)((float)NPC.lifeMax * 0.8f * balance * bossAdjustment);
+        NPC.lifeMax = (int)(NPC.lifeMax * 0.8f * balance * bossAdjustment);
     }
 
     public override void BossLoot(ref int potionType) => potionType = ModContent.ItemType<OmegaHealingPotion>();

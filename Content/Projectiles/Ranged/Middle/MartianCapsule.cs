@@ -1,10 +1,12 @@
 ﻿using System;
+using CalamityMod;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 
@@ -20,7 +22,7 @@ public class MartianCapsule : ModProjectile
         Projectile.hostile = false;
         Projectile.DamageType = DamageClass.Ranged;
         Projectile.penetrate = 1;
-        Projectile.timeLeft = SecondsToFrames(6);
+        Projectile.timeLeft = CalUtils.SecondsToFrames(6);
         Projectile.ignoreWater = true;
         Projectile.tileCollide = true;
         Projectile.usesLocalNPCImmunity = true;

@@ -5,6 +5,7 @@ using TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 
@@ -36,7 +37,7 @@ public class GlacialShell : ProjOwnedByNPC<AuroraGuard>
 
     public bool HitGround
     {
-        get => Projectile.ai[0] == 1f;
+        get => (int)Projectile.ai[0] == 1;
         set => Projectile.ai[0] = value.ToInt();
     }
     public ref float Time => ref Projectile.ai[1];

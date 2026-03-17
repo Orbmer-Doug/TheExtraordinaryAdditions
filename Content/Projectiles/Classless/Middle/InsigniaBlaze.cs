@@ -1,7 +1,9 @@
-﻿using Terraria;
+﻿using CalamityMod;
+using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 
@@ -20,13 +22,12 @@ public class InsigniaBlaze : ModProjectile
         Projectile.timeLeft = 10;
         Projectile.penetrate = 1;
         Projectile.stopsDealingDamageAfterPenetrateHits = true;
-        Projectile.DamageType = Owner.GetBestClass();
     }
 
-    public NPC Target => Main.npc[(int)Projectile.ai[0]];
     public Player Owner => Main.player[Projectile.owner];
     public override void AI()
     {
+        Projectile.DamageType = Owner.GetBestClass();
         Vector2 pos = Projectile.Center;
         Vector2 vel = -Vector2.UnitY.RotatedByRandom(.4f) * Main.rand.NextFloat(2f, 5f);
         ParticleRegistry.SpawnGlowParticle(pos, Vector2.Zero, 14, 50f, Color.OrangeRed);
@@ -39,6 +40,6 @@ public class InsigniaBlaze : ModProjectile
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        target.AddBuff(BuffID.OnFire3, SecondsToFrames(2));
+        target.AddBuff(BuffID.OnFire3, CalUtils.SecondsToFrames(2));
     }
 }

@@ -26,7 +26,6 @@ public class FulminicSpark : ModProjectile
     }
 
     public ref float Time => ref Projectile.ai[0];
-    public ref float Power => ref Projectile.ai[1];
     public float Completion => Animators.MakePoly(5).OutFunction(InverseLerp(0f, Life, Time));
 
     private List<Line> Branches = [];
@@ -50,7 +49,7 @@ public class FulminicSpark : ModProjectile
         foreach (Line line in Branches)
         {
             int width = 16;
-            if (new Rectangle((int)line.a.X - width / 2, (int)line.a.Y - width / 2, width, width).Intersects(targetHitbox))
+            if (new Rectangle((int)line.A.X - width / 2, (int)line.A.Y - width / 2, width, width).Intersects(targetHitbox))
                 return true;
         }
 

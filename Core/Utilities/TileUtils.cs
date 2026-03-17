@@ -6,7 +6,7 @@ using Terraria.ObjectData;
 
 namespace TheExtraordinaryAdditions.Core.Utilities;
 
-public static partial class Utility
+public static class TileUtils
 {
     public static Vector2? FindNearestSurface(Vector2 searchOrigin, bool searchDown, float maxDistance, int searchWidth, bool finePrecision = false)
     {
@@ -348,16 +348,16 @@ public static partial class Utility
         }
     }
 
-    public static bool SolidCollisionFix(Vector2 Position, int Width, int Height, bool acceptTopSurfaces = false)
+    public static bool SolidCollisionFix(Vector2 position, int width, int height, bool acceptTopSurfaces = false)
     {
-        int value = (int)(Position.X / 16f) - 1;
-        int value2 = (int)((Position.X + Width) / 16f) + 2;
-        int value3 = (int)(Position.Y / 16f) - 1;
-        int value4 = (int)((Position.Y + Height) / 16f) + 2;
-        int num = Utils.Clamp(value, 0, Main.maxTilesX - 1);
-        value2 = Utils.Clamp(value2, 0, Main.maxTilesX - 1);
-        value3 = Utils.Clamp(value3, 0, Main.maxTilesY - 1);
-        value4 = Utils.Clamp(value4, 0, Main.maxTilesY - 1);
+        int value = (int)(position.X / 16f) - 1;
+        int value2 = (int)((position.X + width) / 16f) + 2;
+        int value3 = (int)(position.Y / 16f) - 1;
+        int value4 = (int)((position.Y + height) / 16f) + 2;
+        int num = Terraria.Utils.Clamp(value, 0, Main.maxTilesX - 1);
+        value2 = Terraria.Utils.Clamp(value2, 0, Main.maxTilesX - 1);
+        value3 = Terraria.Utils.Clamp(value3, 0, Main.maxTilesY - 1);
+        value4 = Terraria.Utils.Clamp(value4, 0, Main.maxTilesY - 1);
         Vector2 vector = default;
         for (int i = num; i < value2; i++)
         {
@@ -382,7 +382,7 @@ public static partial class Utility
                         num2 -= 8;
                     }
 
-                    if (Position.X + Width > vector.X && Position.X < vector.X + 16f && Position.Y + Height > vector.Y && Position.Y < vector.Y + num2)
+                    if (position.X + width > vector.X && position.X < vector.X + 16f && position.Y + height > vector.Y && position.Y < vector.Y + num2)
                         return true;
                 }
             }
@@ -402,27 +402,22 @@ public static partial class Utility
         if (player.velocity.Y != 0f)
             return false;
 
-        bool ground = true;
         int playerCenterX = (int)player.Center.X / 16;
         int playerCenterY = (int)(player.position.Y + player.height - 1f) / 16 + 1;
         for (int i = 0; i <= solidGroundAhead; i++)
         {
-            ground = Main.tile[playerCenterX + player.direction * i, playerCenterY].IsTileSolidGround();
+            bool ground = Main.tile[playerCenterX + player.direction * i, playerCenterY].IsTileSolidGround();
             if (!ground)
-            {
-                return ground;
-            }
+                return false;
             for (int j = 1; j <= airExposureNeeded; j++)
             {
                 Tile checkedTile = Main.tile[playerCenterX + player.direction * i, playerCenterY - j];
                 ground = !(checkedTile != null) || !checkedTile.HasUnactuatedTile || !Main.tileSolid[checkedTile.TileType];
                 if (!ground)
-                {
-                    return ground;
-                }
+                    return false;
             }
         }
-        return ground;
+        return true;
     }
 
     public static bool Active(this Tile tile, bool countActuater = true)
@@ -445,10 +440,7 @@ public static partial class Utility
 
     public static Tile ParanoidTileRetrieval(int x, int y)
     {
-        if (!WorldGen.InWorld(x, y, 0))
-            return default;
-
-        return Main.tile[x, y];
+        return !WorldGen.InWorld(x, y) ? default : Main.tile[x, y];
     }
 
     public static float GetTileRNG(this Point tilePos, int shift = 0)
@@ -498,13 +490,10 @@ public static partial class Utility
 
     public static bool IsTileSolidGround(this Tile tile)
     {
-        if (tile != null && tile.HasUnactuatedTile)
-        {
-            if (!Main.tileSolid[tile.TileType])
-                return Main.tileSolidTop[tile.TileType];
-            return true;
-        }
-        return false;
+        if (tile == null || !tile.HasUnactuatedTile)
+            return false;
+        
+        return Main.tileSolid[tile.TileType] || Main.tileSolidTop[tile.TileType];
     }
 
     public static bool IsTileFull(this Tile tile)

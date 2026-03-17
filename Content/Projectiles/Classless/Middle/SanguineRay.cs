@@ -7,6 +7,7 @@ using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
@@ -64,7 +65,7 @@ public class SanguineRay : ModProjectile
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        if (Utility.CheckLinearCollision(cache.Points[0], cache.Points[^1], target.Hitbox, out Vector2 pos, out _))
+        if (CheckLinearCollision(cache.Points[0], cache.Points[^1], target.Hitbox, out Vector2 pos, out _))
         {
             for (int i = 0; i < 3; i++)
             {

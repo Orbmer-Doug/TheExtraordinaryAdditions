@@ -14,6 +14,7 @@ using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
 
@@ -150,7 +151,7 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
             Projectile.netUpdate = true;
         }
         Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver4;
-        Projectile.Center = Vector2.Lerp(Projectile.Center, Center - PolarVector(StaffLength / 2, Projectile.rotation - MathHelper.PiOver4), Utils.Remap(Time, 0f, 20f, .2f, .7f));
+        Projectile.Center = Vector2.Lerp(Projectile.Center, Center - PolarVector(StaffLength / 2, Projectile.rotation - MathHelper.PiOver4), Terraria.Utils.Remap(Time, 0f, 20f, .2f, .7f));
 
         int wait = (int)MathHelper.Lerp(6, 2, HeatInterpolant);
 
@@ -202,8 +203,8 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
     public override void WriteExtraAI(BinaryWriter writer) => writer.WriteVector2(offset);
     public override void GetExtraAI(BinaryReader reader) => offset = reader.ReadVector2();
 
-    public static readonly int ReelTime = SecondsToFrames(1.8f);
-    public static readonly int OutTime = SecondsToFrames(.4f);
+    public static readonly int ReelTime = CalUtils.SecondsToFrames(1.8f);
+    public static readonly int OutTime = CalUtils.SecondsToFrames(.4f);
     public float ReelCompletion => InverseLerp(0f, ReelTime, Time);
     public float OutCompletion => InverseLerp(0f, OutTime, Time);
 
@@ -226,7 +227,7 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
         {
             case BeamState.Reel:
 
-                dist = Animators.MakePoly(4f).InOutFunction.Evaluate(-20f, -100f, ReelCompletion);
+                dist = MakePoly(4f).InOutFunction.Evaluate(-20f, -100f, ReelCompletion);
 
                 if (this.RunLocal() && !Modded.SafeMouseRight.Current && ReelCompletion >= 1f && SubState != BeamState.Cast)
                 {
@@ -245,10 +246,10 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
                 }
                 break;
             case BeamState.Cast:
-                if (!Utility.FindProjectile(out _, ModContent.ProjectileType<TesselesticBeam>(), Owner.whoAmI))
+                if (!FindProjectile(out _, ModContent.ProjectileType<TesselesticBeam>(), Owner.whoAmI))
                     CurrentState = State.Idle;
 
-                dist = Animators.MakePoly(5f).OutFunction.Evaluate(-100f, 0f, OutCompletion);
+                dist = MakePoly(5f).OutFunction.Evaluate(-100f, 0f, OutCompletion);
                 break;
         }
 
@@ -269,7 +270,7 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
         return false;
     }
 
-    public void drawPortal()
+    public void DrawPortal()
     {
         Texture2D noiseTexture = AssetRegistry.GetTexture(AdditionsTexture.Cosmos);
         Vector2 drawPosition = Rect().Top - Main.screenPosition;
@@ -278,7 +279,7 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
         float opac = CurrentState == State.Idle ? 0f : ReelCompletion;
         if (SubState != BeamState.Reel)
         {
-            if (Utility.FindProjectile(out Projectile beam, ModContent.ProjectileType<TesselesticBeam>(), Owner.whoAmI))
+            if (FindProjectile(out Projectile beam, ModContent.ProjectileType<TesselesticBeam>(), Owner.whoAmI))
             {
                 opac = InverseLerp(TesselesticBeam.BeamTime + TesselesticBeam.CollapseTime + TesselesticBeam.LaserExpandTime,
                 TesselesticBeam.BeamTime + TesselesticBeam.LaserExpandTime, beam.ai[0]);
@@ -341,7 +342,7 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
         }
         if (CurrentState == State.Beam)
         {
-            PixelationSystem.QueueTextureRenderAction(drawPortal, PixelationLayer.OverPlayers, null, ShaderRegistry.PortalShader);
+            PixelationSystem.QueueTextureRenderAction(DrawPortal, PixelationLayer.OverPlayers, null, ShaderRegistry.PortalShader);
         }
 
         return false;
@@ -352,10 +353,10 @@ public class TesselesticBeam : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
 
-    public static readonly int BeamTime = SecondsToFrames(1.5f);
-    public static readonly int CollapseTime = SecondsToFrames(.25f);
+    public static readonly int BeamTime = CalUtils.SecondsToFrames(1.5f);
+    public static readonly int CollapseTime = CalUtils.SecondsToFrames(.25f);
 
-    public static readonly int LaserExpandTime = SecondsToFrames(.3f);
+    public static readonly int LaserExpandTime = CalUtils.SecondsToFrames(.3f);
 
     public static readonly int Lifetime = BeamTime + CollapseTime + LaserExpandTime;
 

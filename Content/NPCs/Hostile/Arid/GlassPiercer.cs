@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
+using CalamityMod;
 using Terraria;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
@@ -14,6 +15,7 @@ using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Terraria.Utilities.NPCUtils;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Arid;
 
@@ -106,7 +108,7 @@ public class GlassPiercer : ModNPC
     }
 
     public static readonly float StuckJumpPower = -5f;
-    public static readonly int RunTime = SecondsToFrames(2.5f);
+    public static readonly int RunTime = CalUtils.SecondsToFrames(2.5f);
     public ref float IdleTimer => ref NPC.ai[0];
     public ref float DoorInteractionTimer => ref NPC.ai[1];
     public ref float DoorAttemptTimer => ref NPC.ai[2];

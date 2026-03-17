@@ -22,7 +22,7 @@ public class RenderTargetManager : ModSystem
     /// <summary>
     /// How long standard render targets can go, in frames, before they are subject to automatic disposal
     /// </summary>
-    public static readonly int TimeUntilUntilUnusedTargetsAreDisposed = SecondsToFrames(10f);
+    public static readonly int TimeUntilUntilUnusedTargetsAreDisposed = CalUtils.SecondsToFrames(10f);
 
     public delegate void RenderTargetUpdateDelegate();
 
@@ -45,7 +45,7 @@ public class RenderTargetManager : ModSystem
     public override void OnModLoad()
     {
         // Prepare update functionalities.
-        Terraria.Main.OnPreDraw += HandleTargetUpdateLoop;
+        Main.OnPreDraw += HandleTargetUpdateLoop;
         On_Main.SetDisplayMode += ResizeScreenSizedTargets;
     }
 
@@ -55,7 +55,7 @@ public class RenderTargetManager : ModSystem
         DisposeOfTargets();
 
         // Unsubscribe from the OnPreDraw event
-        Terraria.Main.OnPreDraw -= HandleTargetUpdateLoop;
+        Main.OnPreDraw -= HandleTargetUpdateLoop;
 
         // Reset the update loop event
         RenderTargetUpdateLoopEvent = null;

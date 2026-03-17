@@ -6,18 +6,20 @@ using Terraria.ID;
 namespace TheExtraordinaryAdditions.Core.DataStructures;
 
 // Entire credit goes to Calamity Fables (and a little sebastion lague)
-
 public static partial class AStarPathfinding
 {
-    public static bool OffsetPositionsToValidNavigation(TileNavigableDelegate navigation, Vector2 start, Vector2 end, int startIterations, int endIterations, out Point startPoint, out Point endPoint)
+    public static bool OffsetPositionsToValidNavigation(TileNavigableDelegate navigation, Vector2 start, Vector2 end,
+        int startIterations, int endIterations, out Point startPoint, out Point endPoint)
     {
         startPoint = start.ToSafeTileCoordinates();
         endPoint = end.ToSafeTileCoordinates();
 
-        return OffsetPositionsToValidNavigation(navigation, ref startPoint, ref endPoint, startIterations, endIterations);
+        return OffsetPositionsToValidNavigation(navigation, ref startPoint, ref endPoint, startIterations,
+            endIterations);
     }
 
-    public static bool OffsetPositionsToValidNavigation(TileNavigableDelegate navigation, ref Point start, ref Point end, int startIterations, int endIterations)
+    public static bool OffsetPositionsToValidNavigation(TileNavigableDelegate navigation, ref Point start,
+        ref Point end, int startIterations, int endIterations)
     {
         int maxIterations = startIterations;
         start = OffsetUntilNavigable(start, new Point(0, 1), navigation, ref maxIterations);
@@ -26,13 +28,11 @@ public static partial class AStarPathfinding
 
         maxIterations = endIterations;
         end = OffsetUntilNavigable(end, new Point(0, 1), navigation, ref maxIterations);
-        if (maxIterations < 0)
-            return false;
-
-        return true;
+        return maxIterations >= 0;
     }
 
     #region Premade navigation checks
+
     public static int SolidCreatureNavigHeight = 1;
     public static int SolidCreatureNavigWallClimbCheckDown = -1;
 
@@ -48,33 +48,33 @@ public static partial class AStarPathfinding
         bool solidTile = Main.tileSolid[t.TileType];
         bool platform = TileID.Sets.Platforms[t.TileType];
 
-        //Can't navigate inside solid tiles
-        if (t.HasUnactuatedTile && !t.IsHalfBlock && !platform && solidTile)
-            return false;
-
-        //Can navigate on half tiles and platforms just fine
-        if (t.HasUnactuatedTile && (t.IsHalfBlock || platform) && solidTile)
-            return true;
+        switch (t.HasUnactuatedTile)
+        {
+            // Can't navigate inside solid tiles
+            case true when !t.IsHalfBlock && !platform && solidTile:
+                return false;
+            // Can navigate on half tiles and platforms just fine
+            case true when (t.IsHalfBlock || platform) && solidTile:
+                return true;
+        }
 
         universallyUnnavigable = false;
         for (int i = -1; i <= 1; i++)
-            for (int j = 0; j <= 1; j++)
-            {
-                //Only cardinal directions here
-                if (j * i != 0 || (j == 0 && i == 0))
-                    continue;
+        for (int j = 0; j <= 1; j++)
+        {
+            // Only cardinal directions here
+            if (j * i != 0 || (j == 0 && i == 0))
+                continue;
 
-                //IF a neighboring tile is solid we can go on it
-                Tile adjacentTile = Main.tile[p.X + i, p.Y + j];
-                if (adjacentTile.HasUnactuatedTile && !adjacentTile.IsHalfBlock && (Main.tileSolid[adjacentTile.TileType] || (Main.tileSolidTop[adjacentTile.TileType] && adjacentTile.TileFrameY == 0)))
-                    return true;
-            }
+            // IF a neighboring tile is solid we can go on it
+            Tile adjacentTile = Main.tile[p.X + i, p.Y + j];
+            if (adjacentTile.HasUnactuatedTile && !adjacentTile.IsHalfBlock && (Main.tileSolid[adjacentTile.TileType] ||
+                    (Main.tileSolidTop[adjacentTile.TileType] && adjacentTile.TileFrameY == 0)))
+                return true;
+        }
 
-        //Can fall straight down just fine
-        if (from != null && p.X == from.Value.X && p.Y > from.Value.Y)
-            return true;
-
-        return false;
+        // Can fall straight down just fine
+        return from != null && p.X == from.Value.X && p.Y > from.Value.Y;
     }
 
     /// <summary>
@@ -99,15 +99,13 @@ public static partial class AStarPathfinding
         for (int i = 1; i < SolidCreatureNavigHeight; i++)
         {
             Tile aboveTile = Main.tile[p + new Point(0, -i)];
-            if (aboveTile.HasUnactuatedTile && !TileID.Sets.Platforms[aboveTile.TileType] && Main.tileSolid[aboveTile.TileType])
+            if (aboveTile.HasUnactuatedTile && !TileID.Sets.Platforms[aboveTile.TileType] &&
+                Main.tileSolid[aboveTile.TileType])
                 return false;
         }
 
 
-        if (BasicNavigationChecks(p, from, ref universallyUnnavigable))
-            return true;
-
-        return false;
+        return BasicNavigationChecks(p, from, ref universallyUnnavigable);
     }
 
     /// <summary>
@@ -120,23 +118,19 @@ public static partial class AStarPathfinding
     {
         universallyUnnavigable = true;
         if (!from.HasValue)
-            return SolidCreatureNavigation(p, from, out universallyUnnavigable);
-
-
-        //Can't navigate if you don't have the height clearance
+            return SolidCreatureNavigation(p, null, out universallyUnnavigable);
+        
+        // Can't navigate if you don't have the height clearance
         for (int i = 0; i < SolidCreatureNavigHeight; i++)
         {
-            if (!RaytraceTo(from.Value.X, from.Value.Y - i, p.X, p.Y - i, i == 0))
-            {
-                universallyUnnavigable = false;
-                return false;
-            }
+            if (RaytraceTo(from.Value.X, from.Value.Y - i, p.X, p.Y - i, i == 0)) 
+                continue;
+            
+            universallyUnnavigable = false;
+            return false;
         }
 
-        if (BasicNavigationChecks(p, from, ref universallyUnnavigable))
-            return true;
-
-        return false;
+        return BasicNavigationChecks(p, from, ref universallyUnnavigable);
     }
 
     private static bool CheckFloorAndWalls(Point p, Point? from)
@@ -144,23 +138,26 @@ public static partial class AStarPathfinding
         if (SolidCreatureNavigWallClimbCheckDown <= 0)
         {
             for (int i = -1; i <= 1; i++)
-                for (int j = 0; j <= 1; j++)
-                {
-                    //Only cardinal directions here
-                    if (j * i != 0 || (j == 0 && i == 0))
-                        continue;
+            for (int j = 0; j <= 1; j++)
+            {
+                //Only cardinal directions here
+                if (j * i != 0 || (j == 0 && i == 0))
+                    continue;
 
-                    //IF a neighboring tile is solid we can go on it
-                    Tile adjacentTile = Main.tile[p.X + i, p.Y + j];
-                    if (adjacentTile.HasUnactuatedTile && !adjacentTile.IsHalfBlock && (Main.tileSolid[adjacentTile.TileType] || (Main.tileSolidTop[adjacentTile.TileType] && adjacentTile.TileFrameY == 0)))
-                        return true;
-                }
+                //IF a neighboring tile is solid we can go on it
+                Tile adjacentTile = Main.tile[p.X + i, p.Y + j];
+                if (adjacentTile.HasUnactuatedTile && !adjacentTile.IsHalfBlock &&
+                    (Main.tileSolid[adjacentTile.TileType] ||
+                     (Main.tileSolidTop[adjacentTile.TileType] && adjacentTile.TileFrameY == 0)))
+                    return true;
+            }
         }
         else
         {
             //Check for floor directly below, if there is its fine
             Tile adjacentTile = Main.tile[p.X, p.Y + 1];
-            if (adjacentTile.HasUnactuatedTile && !adjacentTile.IsHalfBlock && (Main.tileSolid[adjacentTile.TileType] || (Main.tileSolidTop[adjacentTile.TileType] && adjacentTile.TileFrameY == 0)))
+            if (adjacentTile.HasUnactuatedTile && !adjacentTile.IsHalfBlock && (Main.tileSolid[adjacentTile.TileType] ||
+                    (Main.tileSolidTop[adjacentTile.TileType] && adjacentTile.TileFrameY == 0)))
                 return true;
 
             //if no wall to crawl on, return false
@@ -168,7 +165,9 @@ public static partial class AStarPathfinding
             for (int j = -1; j <= 1; j += 2)
             {
                 adjacentTile = Main.tile[p.X + j, p.Y];
-                if (adjacentTile.HasUnactuatedTile && !adjacentTile.IsHalfBlock && (Main.tileSolid[adjacentTile.TileType] || (Main.tileSolidTop[adjacentTile.TileType] && adjacentTile.TileFrameY == 0)))
+                if (adjacentTile.HasUnactuatedTile && !adjacentTile.IsHalfBlock &&
+                    (Main.tileSolid[adjacentTile.TileType] ||
+                     (Main.tileSolidTop[adjacentTile.TileType] && adjacentTile.TileFrameY == 0)))
                 {
                     anyWall = true;
                     break;
@@ -186,7 +185,9 @@ public static partial class AStarPathfinding
             for (int i = 1; i < SolidCreatureNavigWallClimbCheckDown; i++)
             {
                 adjacentTile = Main.tile[p.X, p.Y + 1 + i];
-                if (adjacentTile.HasUnactuatedTile && !adjacentTile.IsHalfBlock && (Main.tileSolid[adjacentTile.TileType] || (Main.tileSolidTop[adjacentTile.TileType] && adjacentTile.TileFrameY == 0)))
+                if (adjacentTile.HasUnactuatedTile && !adjacentTile.IsHalfBlock &&
+                    (Main.tileSolid[adjacentTile.TileType] ||
+                     (Main.tileSolidTop[adjacentTile.TileType] && adjacentTile.TileFrameY == 0)))
                     return true;
             }
         }
@@ -219,11 +220,8 @@ public static partial class AStarPathfinding
 
         return false;
     }
-    #endregion
 
-    public class PathfindingTraceback
-    {
-    }
+    #endregion
 }
 
 public static partial class AStarPathfinding
@@ -239,7 +237,8 @@ public static partial class AStarPathfinding
     {
         universallyUnnavigable = true;
         Tile t = Main.tile[p];
-        return t.HasUnactuatedTile && (Main.tileSolid[t.TileType] || (Main.tileSolidTop[t.TileType] && t.TileFrameY == 0));
+        return t.HasUnactuatedTile &&
+               (Main.tileSolid[t.TileType] || (Main.tileSolidTop[t.TileType] && t.TileFrameY == 0));
     }
 
     public static bool EdgeRunner(Point p, Point? origin, out bool universallyUnnavigable)
@@ -249,26 +248,29 @@ public static partial class AStarPathfinding
         bool solidTile = Main.tileSolid[t.TileType];
         bool platform = TileID.Sets.Platforms[t.TileType];
 
-        //Can't navigate inside solid tiles
-        if (t.HasUnactuatedTile && !t.IsHalfBlock && !platform && solidTile)
-            return false;
-
-        //Can navigate on half tiles and platforms just fine
-        if (t.HasUnactuatedTile && (t.IsHalfBlock || platform) && solidTile)
-            return true;
+        switch (t.HasUnactuatedTile)
+        {
+            // Can't navigate inside solid tiles
+            case true when !t.IsHalfBlock && !platform && solidTile:
+                return false;
+            // Can navigate on half tiles and platforms just fine
+            case true when (t.IsHalfBlock || platform) && solidTile:
+                return true;
+        }
 
         for (int i = -1; i <= 1; i++)
-            for (int j = -1; j <= 1; j++)
-            {
-                //Only cardinal directions here
-                if (j * i != 0 || (j == 0 && i == 0))
-                    continue;
+        for (int j = -1; j <= 1; j++)
+        {
+            //Only cardinal directions here
+            if (j * i != 0 || (j == 0 && i == 0))
+                continue;
 
-                //IF a neighboring tile is solid we can go on it
-                Tile adjacentTile = Main.tile[p.X + i, p.Y + j];
-                if (adjacentTile.HasUnactuatedTile && !adjacentTile.IsHalfBlock && (Main.tileSolid[adjacentTile.TileType] || (Main.tileSolidTop[adjacentTile.TileType] && adjacentTile.TileFrameY == 0)))
-                    return true;
-            }
+            //IF a neighboring tile is solid we can go on it
+            Tile adjacentTile = Main.tile[p.X + i, p.Y + j];
+            if (adjacentTile.HasUnactuatedTile && !adjacentTile.IsHalfBlock && (Main.tileSolid[adjacentTile.TileType] ||
+                    (Main.tileSolidTop[adjacentTile.TileType] && adjacentTile.TileFrameY == 0)))
+                return true;
+        }
 
         return false;
     }
@@ -279,7 +281,8 @@ public static partial class AStarPathfinding
         return OffsetUntilNavigable(point, offset, navigable, ref iterations);
     }
 
-    public static Point OffsetUntilNavigable(Point point, Point offset, TileNavigableDelegate navigable, ref int iterations)
+    public static Point OffsetUntilNavigable(Point point, Point offset, TileNavigableDelegate navigable,
+        ref int iterations)
     {
         if (navigable(point, null, out _))
             return point;
@@ -290,21 +293,25 @@ public static partial class AStarPathfinding
             if (iterations < 0)
                 return Point.Zero;
         }
+
         return point;
     }
 
-    public static List<Point> Pathfind(Vector2 start, Vector2 end, List<AStarNeighbour> neighborConfiguration, TileNavigableDelegate tileNavigable, int maxIterations = 1000)
+    public static List<Point> Pathfind(Vector2 start, Vector2 end, List<AStarNeighbour> neighborConfiguration,
+        TileNavigableDelegate tileNavigable, int maxIterations = 1000)
     {
-        return Pathfind(start.ToTileCoordinates(), end.ToTileCoordinates(), neighborConfiguration, tileNavigable, maxIterations);
+        return Pathfind(start.ToTileCoordinates(), end.ToTileCoordinates(), neighborConfiguration, tileNavigable,
+            maxIterations);
     }
 
-    public static List<Point> Pathfind(Point start, Point end, List<AStarNeighbour> neighborConfiguration, TileNavigableDelegate tileNavigable, int maxIterations = 1000)
+    public static List<Point> Pathfind(Point start, Point end, List<AStarNeighbour> neighborConfiguration,
+        TileNavigableDelegate tileNavigable, int maxIterations = 1000)
     {
         _maxNodeIndex = 0;
         MeshNode startNode = GetNode(start, 0, 0);
         MeshNode endNode = GetNode(end, 0, 0);
 
-        if (!tileNavigable(start, null, out _) || !tileNavigable(endNode.origin, null, out _))
+        if (!tileNavigable(start, null, out _) || !tileNavigable(endNode.Origin, null, out _))
             return [start];
 
         Heap<MeshNode> openNodes = new();
@@ -315,9 +322,9 @@ public static partial class AStarPathfinding
         while (openNodes.Count > 0)
         {
             MeshNode current = openNodes.PopFirst();
-            closedNodes.Add(current.origin);
+            closedNodes.Add(current.Origin);
 
-            if (current.origin == endNode.origin)
+            if (current.Origin == endNode.Origin)
             {
                 endNode = current;
                 break;
@@ -325,34 +332,34 @@ public static partial class AStarPathfinding
 
             foreach (AStarNeighbour neighborNode in neighborConfiguration)
             {
-                Point newOrigin = current.origin + neighborNode.offset;
+                Point newOrigin = current.Origin + neighborNode.Offset;
                 if (closedNodes.Contains(newOrigin))
                     continue;
 
                 //If we can't navigate to the new tile, add it to the list of closed tiles
-                if (!tileNavigable(newOrigin, current.origin, out bool universallyUnnavigable))
+                if (!tileNavigable(newOrigin, current.Origin, out bool universallyUnnavigable))
                 {
                     if (universallyUnnavigable)
                         closedNodes.Add(newOrigin);
                     continue;
                 }
 
-                float newPathlength = current.gCost + neighborNode.travelCost;
-                float distanceToEndPoint = GetShortestDistance(newOrigin, endNode.origin);
-                bool alreadyInOpen = openNodes.TryFind(n => n != null && n.origin == newOrigin, out MeshNode adjNode);
+                float newPathlength = current.GCost + neighborNode.TravelCost;
+                float distanceToEndPoint = GetShortestDistance(newOrigin, endNode.Origin);
+                bool alreadyInOpen = openNodes.TryFind(n => n != null && n.Origin == newOrigin, out MeshNode adjNode);
 
                 //Create a new node if it doesnt exist already
                 if (!alreadyInOpen)
                 {
                     adjNode = GetNode(newOrigin, newPathlength, distanceToEndPoint);
-                    adjNode.parent = current;
+                    adjNode.Parent = current;
                     openNodes.Add(adjNode);
                 }
                 //Update the node if it already exists and we found a shoter path
-                else if (adjNode.gCost > newPathlength)
+                else if (adjNode.GCost > newPathlength)
                 {
-                    adjNode.gCost = newPathlength;
-                    adjNode.parent = current;
+                    adjNode.GCost = newPathlength;
+                    adjNode.Parent = current;
                     openNodes.UpdateItem(adjNode);
                 }
             }
@@ -382,23 +389,27 @@ public static partial class AStarPathfinding
     {
         List<Point> path = [];
         MeshNode currentNode = endPoint;
-        while (currentNode.parent != null)
+        while (currentNode.Parent != null)
         {
-            path.Add(currentNode.origin);
-            currentNode = currentNode.parent;
+            path.Add(currentNode.Origin);
+            currentNode = currentNode.Parent;
         }
-        path.Add(currentNode.origin);
+
+        path.Add(currentNode.Origin);
         return path;
     }
 
-    public static bool IsThereAPath(Vector2 start, Vector2 end, List<AStarNeighbour> neighborConfiguration, TileNavigableDelegate tileNavigable, float distanceTreshold)
+    public static bool IsThereAPath(Vector2 start, Vector2 end, List<AStarNeighbour> neighborConfiguration,
+        TileNavigableDelegate tileNavigable, float distanceTreshold)
     {
-        return IsThereAPath(start.ToTileCoordinates(), end.ToTileCoordinates(), neighborConfiguration, tileNavigable, distanceTreshold);
+        return IsThereAPath(start.ToTileCoordinates(), end.ToTileCoordinates(), neighborConfiguration, tileNavigable,
+            distanceTreshold);
     }
 
     public delegate bool TileNavigableDelegate(Point tileCandidate, Point? fromTile, out bool universallyUnnavigable);
 
-    public static bool IsThereAPath(Point start, Point end, List<AStarNeighbour> neighborConfiguration, TileNavigableDelegate tileNavigable, float distanceTreshold)
+    public static bool IsThereAPath(Point start, Point end, List<AStarNeighbour> neighborConfiguration,
+        TileNavigableDelegate tileNavigable, float distanceTreshold)
     {
         bool debug = false;
 
@@ -407,7 +418,7 @@ public static partial class AStarPathfinding
 
         MeshNode startNode = GetNode(start, 0, 0);
         MeshNode endNode = GetNode(end, 0, 0);
-        if (!tileNavigable(start, null, out _) || !tileNavigable(endNode.origin, null, out _))
+        if (!tileNavigable(start, null, out _) || !tileNavigable(endNode.Origin, null, out _))
             return false;
 
         distanceTreshold += start.ToWorldCoordinates().Distance(end.ToWorldCoordinates());
@@ -417,53 +428,53 @@ public static partial class AStarPathfinding
         openNodes.Add(startNode);
 
         if (debug)
-            Dust.QuickDust(endNode.origin, Color.Red);
+            Dust.QuickDust(endNode.Origin, Color.Red);
 
         int iterations = 0;
 
         while (openNodes.Count > 0)
         {
             MeshNode current = openNodes.PopFirst();
-            closedNodes.Add(current.origin);
-            if (current.origin == endNode.origin)
+            closedNodes.Add(current.Origin);
+            if (current.Origin == endNode.Origin)
                 return true;
 
             if (debug)
-                Dust.QuickDust(current.origin, Color.Orange);
-            if (current.gCost * 16f > distanceTreshold)
+                Dust.QuickDust(current.Origin, Color.Orange);
+            if (current.GCost * 16f > distanceTreshold)
                 return false;
 
 
             foreach (AStarNeighbour neighborNode in neighborConfiguration)
             {
-                Point newOrigin = current.origin + neighborNode.offset;
+                Point newOrigin = current.Origin + neighborNode.Offset;
                 if (closedNodes.Contains(newOrigin))
                     continue;
 
                 //If we can't navigate to the new tile, add it to the list of closed tiles
-                if (!tileNavigable(newOrigin, current.origin, out bool universallyUnnavigable))
+                if (!tileNavigable(newOrigin, current.Origin, out bool universallyUnnavigable))
                 {
                     if (universallyUnnavigable)
                         closedNodes.Add(newOrigin);
                     continue;
                 }
 
-                float newPathlength = current.gCost + neighborNode.travelCost;
-                float distanceToEndPoint = GetShortestDistance(newOrigin, endNode.origin);
-                bool alreadyInOpen = openNodes.TryFind(n => n != null && n.origin == newOrigin, out MeshNode adjNode);
+                float newPathlength = current.GCost + neighborNode.TravelCost;
+                float distanceToEndPoint = GetShortestDistance(newOrigin, endNode.Origin);
+                bool alreadyInOpen = openNodes.TryFind(n => n != null && n.Origin == newOrigin, out MeshNode adjNode);
 
                 //Create a new node if it doesnt exist already
                 if (!alreadyInOpen)
                 {
-                    if (neighborNode.offset == new Point(1, 0))
-                        current.gCost *= 1f;
+                    if (neighborNode.Offset == new Point(1, 0))
+                        current.GCost *= 1f;
                     adjNode = GetNode(newOrigin, newPathlength, distanceToEndPoint);
                     openNodes.Add(adjNode);
                 }
                 //Update the node if it already exists and we found a shoter path
-                else if (adjNode.gCost > newPathlength)
+                else if (adjNode.GCost > newPathlength)
                 {
-                    adjNode.gCost = newPathlength;
+                    adjNode.GCost = newPathlength;
                     openNodes.UpdateItem(adjNode);
                 }
             }
@@ -486,60 +497,62 @@ public static partial class AStarPathfinding
         //else
         //    Main.NewText("Deviation from straight line to goal: " + (endNode.gCost * 16f - start.ToWorldCoordinates().Distance(end.ToWorldCoordinates())).ToString());
 
-        return endNode.gCost != 0;
+        return endNode.GCost != 0;
     }
 }
 
 public static partial class AStarPathfinding
 {
-    private static readonly List<MeshNode> _nodePool = new(200);
+    private static readonly List<MeshNode> NodePool = new(200);
     private static int _maxNodeIndex;
+
     private static MeshNode GetNode(Point origin, float gCost, float hCost, int createMore = 10)
     {
-        if (_maxNodeIndex < _nodePool.Count)
+        if (_maxNodeIndex < NodePool.Count)
         {
-            MeshNode poolNode = _nodePool[_maxNodeIndex++];
-            poolNode.origin = origin;
-            poolNode.gCost = gCost;
-            poolNode.hCost = hCost;
+            MeshNode poolNode = NodePool[_maxNodeIndex++];
+            poolNode.Origin = origin;
+            poolNode.GCost = gCost;
+            poolNode.HCost = hCost;
             return poolNode;
         }
 
-        //Create a bunch of new nodes for the future
+        // Create a bunch of new nodes for the future
         for (int i = 0; i < createMore; i++)
         {
-            _nodePool.Add(new MeshNode());
+            NodePool.Add(new MeshNode());
         }
 
-        MeshNode node = _nodePool[_maxNodeIndex++];
-        node.origin = origin;
-        node.gCost = gCost;
-        node.hCost = hCost;
+        MeshNode node = NodePool[_maxNodeIndex++];
+        node.Origin = origin;
+        node.GCost = gCost;
+        node.HCost = hCost;
         return node;
     }
-
 }
 
 /// <summary>
 /// Represents a combination of offset and cost data for a given position
 /// </summary>
-public class AStarNeighbour
+public readonly struct AStarNeighbour
 {
-    public readonly Point offset;
-    public readonly float travelCost;
+    public readonly Point Offset;
+    public readonly float TravelCost;
 
     public AStarNeighbour(Point offset, float travelCost)
     {
-        this.offset = offset;
-        this.travelCost = travelCost;
+        Offset = offset;
+        TravelCost = travelCost;
     }
+
     public AStarNeighbour(int x, int y, float travelCost)
     {
-        this.offset = new Point(x, y);
-        this.travelCost = travelCost;
+        Offset = new Point(x, y);
+        TravelCost = travelCost;
     }
 
     internal const float SquareRootOfTwo = 1.41421f;
+
     public static readonly List<AStarNeighbour> BasicCardinalOrdinal =
     [
         new AStarNeighbour(-1, -1, SquareRootOfTwo),
@@ -552,22 +565,6 @@ public class AStarNeighbour
         new AStarNeighbour(-1, 1, SquareRootOfTwo),
         new AStarNeighbour(0, 1, 1),
         new AStarNeighbour(1, 1, SquareRootOfTwo),
-    ];
-
-    public static readonly List<AStarNeighbour> DoubleStride =
-    [
-            new AStarNeighbour(-1, -1, SquareRootOfTwo),
-            new AStarNeighbour(0, -1, 1),
-            new AStarNeighbour(1, -1, SquareRootOfTwo),
-
-            new AStarNeighbour(-1, 0, 1),
-            new AStarNeighbour(1, 0, 1),
-            new AStarNeighbour(-2, 0, 2),
-            new AStarNeighbour(2, 0, 2),
-
-            new AStarNeighbour(-1, 1, SquareRootOfTwo),
-            new AStarNeighbour(0, 1, 1),
-            new AStarNeighbour(1, 1, SquareRootOfTwo)
     ];
 
     public static List<AStarNeighbour> BigStride(int stride)
@@ -619,31 +616,6 @@ public class AStarNeighbour
 
         return movementPattern;
     }
-
-    //Not done fully . L
-    public static List<AStarNeighbour> UStride(int strideWidth, int strideHeight)
-    {
-        List<AStarNeighbour> movementPattern = new(3 + 2 * strideHeight * strideWidth);
-
-        for (int i = 1; i <= strideWidth; i++)
-        {
-            movementPattern.Add(new AStarNeighbour(-i, 0, i));
-            movementPattern.Add(new AStarNeighbour(i, 0, i));
-
-            for (int j = 1; j <= strideHeight; j++)
-            {
-                movementPattern.Add(new AStarNeighbour(-i, -j, i));
-                movementPattern.Add(new AStarNeighbour(i, -j, i));
-            }
-        }
-
-        movementPattern.Add(new AStarNeighbour(-1, 1, SquareRootOfTwo));
-        movementPattern.Add(new AStarNeighbour(0, 1, 1));
-        movementPattern.Add(new AStarNeighbour(1, 1, SquareRootOfTwo));
-
-        return movementPattern;
-    }
-
 }
 
 public class MeshNode : IHeapItem<MeshNode>
@@ -652,38 +624,39 @@ public class MeshNode : IHeapItem<MeshNode>
     /// The length of the path we took to reach this node, starting from the original node
     /// May get updated as we find shorter paths to reach this node
     /// </summary>
-    public float gCost;
+    public float GCost;
 
     /// <summary>
     /// The heuristic guess of how much distance is between the current node and the target node
     /// Remains constant, as neither the node itself or the target moves
     /// </summary>
-    public float hCost;
+    public float HCost;
 
     /// <summary>
     /// The combined cost of both the length of the path from the starting node, and the estimated length of the path to the target node
     /// </summary>
-    public float FCost => gCost + hCost;
+    public float FCost => GCost + HCost;
 
-    public Point origin;
-    public MeshNode parent;
+    public Point Origin;
+    public MeshNode Parent;
 
     public int HeapIndex { get; set; }
+
     public int CompareTo(MeshNode other)
     {
         int compare = FCost.CompareTo(other.FCost);
 
-        //If the 2 nodes have the same F cost, pick the one with the smaller H cost
+        // If the 2 nodes have the same F cost, pick the one with the smaller H cost
         if (compare == 0)
-            compare = hCost.CompareTo(other.hCost);
+            compare = HCost.CompareTo(other.HCost);
         return -compare;
     }
 
     public MeshNode(Point origin, float gCost, float hCost)
     {
-        this.origin = origin;
-        this.gCost = gCost;
-        this.hCost = hCost;
+        Origin = origin;
+        GCost = gCost;
+        HCost = hCost;
     }
 
     public MeshNode()

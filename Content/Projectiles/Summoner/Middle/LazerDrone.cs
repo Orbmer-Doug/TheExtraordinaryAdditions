@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
+using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -8,6 +9,7 @@ using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
 
@@ -138,7 +140,7 @@ public class LazerDrone : ModProjectile
         {
             Projectile.AI_GetMyGroupIndex(out var index, out var total);
 
-            float time = SecondsToFrames(5f);
+            float time = CalUtils.SecondsToFrames(5f);
             float cycle = Modded.GlobalTimer % time / time * MathF.Tau;
             float offset = MathF.Tau * InverseLerp(0f, total, index);
             Vector2 dest = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true) + GetPointOnRotatedEllipse(300f, 110f, offset + cycle, cycle);

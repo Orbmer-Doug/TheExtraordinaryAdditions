@@ -5,6 +5,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Fulgur;
 
@@ -45,6 +46,7 @@ public class LightningVolt : ModProjectile
     }
 
     public ref float Time => ref Projectile.ai[0];
+
     public override void AI()
     {
         after ??= new(5, () => Projectile.Center);
@@ -57,7 +59,8 @@ public class LightningVolt : ModProjectile
         else if (Projectile.timeLeft > 0)
             Projectile.frame = 3;
 
-        after.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 0, 0, 0, Projectile.ThisProjectileTexture().Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame)));
+        after.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 0,
+            0, 0, Projectile.ThisProjectileTexture().Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame)));
 
         if (Projectile.velocity.Length() < 64f)
             Projectile.velocity *= 1.01f;
@@ -81,13 +84,16 @@ public class LightningVolt : ModProjectile
     {
         for (int i = 0; i < 9; i++)
         {
-            ParticleRegistry.SpawnSparkParticle(Projectile.BaseRotHitbox().Right, Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.4f)
+            ParticleRegistry.SpawnSparkParticle(Projectile.BaseRotHitbox().Right,
+                Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.4f)
                 * Main.rand.NextFloat(4f, 12f), Main.rand.Next(30, 40), Main.rand.NextFloat(.5f, .8f), Color.Pink);
         }
+
         SoundID.NPCHit53.Play(Projectile.Center, 1f, 0f, .1f);
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D texture = Projectile.ThisProjectileTexture();
@@ -98,8 +104,10 @@ public class LightningVolt : ModProjectile
         after?.DrawFancyAfterimages(texture, [Color.Pink, Color.Violet], Projectile.Opacity);
 
         // Draw the base sprite and glowmask.
-        Main.EntitySpriteDraw(texture, drawPosition, frame, Projectile.GetAlpha(lightColor), Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, 0, 0);
-        Main.EntitySpriteDraw(glowmask, drawPosition, frame, Projectile.GetAlpha(Color.White), Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, 0, 0);
+        Main.EntitySpriteDraw(texture, drawPosition, frame, Projectile.GetAlpha(lightColor), Projectile.rotation,
+            frame.Size() * 0.5f, Projectile.scale, 0);
+        Main.EntitySpriteDraw(glowmask, drawPosition, frame, Projectile.GetAlpha(Color.White), Projectile.rotation,
+            frame.Size() * 0.5f, Projectile.scale, 0);
         return false;
     }
 }

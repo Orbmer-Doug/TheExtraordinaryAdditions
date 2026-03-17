@@ -3,6 +3,7 @@ using Terraria;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 
@@ -10,11 +11,13 @@ public class Razorflake : ProjOwnedByNPC<AuroraGuard>
 {
     public bool HitGround
     {
-        get => Projectile.ai[1] == 1f;
+        get => (int)Projectile.ai[1] == 1;
         set => Projectile.ai[1] = value.ToInt();
     }
+
     public ref float Time => ref Projectile.ai[2];
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Snowflake);
+
     public override void SetStaticDefaults()
     {
         Main.projFrames[Projectile.type] = 4;
@@ -42,7 +45,8 @@ public class Razorflake : ProjOwnedByNPC<AuroraGuard>
             Projectile.ai[0] = 1f;
         }
 
-        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.width * 1.1f, 1.5f, Projectile.rotation, SpriteEffects.None, 40, 2, 0, null, true, 0f));
+        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.width * 1.1f, 1.5f,
+            Projectile.rotation, SpriteEffects.None, 40, 2, 0, null, true));
 
         Projectile.Opacity = GetLerpBump(0f, 30f, 300f, 290f, Projectile.timeLeft);
         Projectile.VelocityBasedRotation(.02f);
@@ -68,11 +72,14 @@ public class Razorflake : ProjOwnedByNPC<AuroraGuard>
     {
         for (int i = 0; i < 12; i++)
         {
-            ParticleRegistry.SpawnDustParticle(Projectile.RotHitbox().RandomPoint(), Main.rand.NextVector2Circular(5f, 5f), Main.rand.Next(20, 30), Main.rand.NextFloat(.5f, .7f), AuroraGuard.SlateBlue, .1f, true, true);
+            ParticleRegistry.SpawnDustParticle(Projectile.RotHitbox().RandomPoint(),
+                Main.rand.NextVector2Circular(5f, 5f), Main.rand.Next(20, 30), Main.rand.NextFloat(.5f, .7f),
+                AuroraGuard.SlateBlue, .1f, true, true);
         }
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D tex = Projectile.ThisProjectileTexture();
@@ -82,11 +89,14 @@ public class Razorflake : ProjOwnedByNPC<AuroraGuard>
 
         void draw()
         {
-            after.DrawFancyAfterimages(AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall), [AuroraGuard.DeepBlue, Color.DeepSkyBlue, Color.SkyBlue], Projectile.Opacity, 1f, 0f, true);
+            after.DrawFancyAfterimages(AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall),
+                [AuroraGuard.DeepBlue, Color.DeepSkyBlue, Color.SkyBlue], Projectile.Opacity, 1f, 0f, true);
         }
+
         PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.UnderProjectiles, BlendState.Additive);
 
-        Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Vector2.One * Projectile.width), frame, Color.White * Projectile.Opacity, Projectile.rotation, frame.Size() / 2);
+        Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Vector2.One * Projectile.width), frame,
+            Color.White * Projectile.Opacity, Projectile.rotation, frame.Size() / 2);
 
         return false;
     }

@@ -15,6 +15,7 @@ using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Base;
 
@@ -26,6 +27,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Base;
 public abstract class BaseWhip : ModProjectile
 {
     #region Variables/Defaults
+
     public const int Samples = 50;
     public const int MaxUpdates = 8;
     public virtual int TipSize => 16;
@@ -86,7 +88,10 @@ public abstract class BaseWhip : ModProjectile
         Defaults();
     }
 
-    public virtual void Defaults() { }
+    public virtual void Defaults()
+    {
+    }
+
     #endregion
 
     public sealed override void AI()
@@ -143,7 +148,9 @@ public abstract class BaseWhip : ModProjectile
         }
     }
 
-    public virtual void SafeAI() { }
+    public virtual void SafeAI()
+    {
+    }
 
     public virtual void CrackEffects()
     {
@@ -172,7 +179,7 @@ public abstract class BaseWhip : ModProjectile
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return targetHitbox.CollisionFromPoints(WhipPoints.Points, c => TipSize);
+        return targetHitbox.CollisionFromPoints(WhipPoints.Points, _ => TipSize);
     }
 
     public sealed override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
@@ -188,13 +195,25 @@ public abstract class BaseWhip : ModProjectile
         ModifyNPCEffects(target, ref modifiers, pos, index);
     }
 
-    public virtual void NPCHitEffects(NPC target, NPC.HitInfo hit, in Vector2 pos, in Vector2 vel, in int index) { }
-    public virtual void ModifyNPCEffects(NPC target, ref NPC.HitModifiers modifiers, in Vector2 pos, in int index) { }
+    public virtual void NPCHitEffects(NPC target, NPC.HitInfo hit, in Vector2 pos, in Vector2 vel, in int index)
+    {
+    }
+
+    public virtual void ModifyNPCEffects(NPC target, ref NPC.HitModifiers modifiers, in Vector2 pos, in int index)
+    {
+    }
 
     public virtual float GetCompletion() => Animators.MakePoly(3f).InOutFunction(Completion);
     private const float Leniance = .1f;
-    public virtual float GetTheta(float t) => new Animators.PiecewiseCurve().Add(MathHelper.Pi - Leniance, 0f, .5f, c => c).Add(0f, -MathHelper.Pi + Leniance, 1f, c => c).Evaluate(t) * -Owner.direction * Owner.gravDir;
-    public virtual float GetThin(float t) => new Animators.PiecewiseCurve().Add(0f, 1f, .2f, Animators.MakePoly(2f).OutFunction).AddStall(1f, .8f).Add(1f, 0f, 1f, Animators.MakePoly(2f).InFunction).Evaluate(t);
+
+    public virtual float GetTheta(float t) =>
+        new Animators.PiecewiseCurve().Add(MathHelper.Pi - Leniance, 0f, .5f, c => c)
+            .Add(0f, -MathHelper.Pi + Leniance, 1f, c => c).Evaluate(t) * -Owner.direction * Owner.gravDir;
+
+    public virtual float GetThin(float t) => new Animators.PiecewiseCurve()
+        .Add(0f, 1f, .2f, Animators.MakePoly(2f).OutFunction).AddStall(1f, .8f)
+        .Add(1f, 0f, 1f, Animators.MakePoly(2f).InFunction).Evaluate(t);
+
     public void UpdateControlPoints()
     {
         float width = Projectile.width;
@@ -230,13 +249,16 @@ public abstract class BaseWhip : ModProjectile
         WhipPoints.SetPoints(points);
     }
 
-    public virtual void OverridePoints() { }
+    public virtual void OverridePoints()
+    {
+    }
 
     public override void Load()
     {
         On_Projectile.Colliding += OverrideWhipCollision;
         On_Projectile.CutTiles += OverrideCuttingTiles;
     }
+
     public override void Unload()
     {
         On_Projectile.Colliding -= OverrideWhipCollision;
@@ -262,7 +284,8 @@ public abstract class BaseWhip : ModProjectile
         orig.Invoke(self);
     }
 
-    private bool OverrideWhipCollision(On_Projectile.orig_Colliding orig, Projectile self, Rectangle myRect, Rectangle targetRect)
+    private bool OverrideWhipCollision(On_Projectile.orig_Colliding orig, Projectile self, Rectangle myRect,
+        Rectangle targetRect)
     {
         if (ProjectileID.Sets.IsAWhip[self.type] && (self.ModProjectile as BaseWhip) != null)
         {

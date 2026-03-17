@@ -14,6 +14,8 @@ using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 using static Terraria.Main;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Late.Everbladed;
 
@@ -382,8 +384,8 @@ public class EverbladedSwing : BaseSwordSwing
             trailShader.TrySetParameter("flip", CurrentPhase == Phase.VisceralSlice && Owner.gravDir == -1 ? Direction == 1 : flip);
 
             trailShader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.SuperWavyPerlin), 0, SamplerState.LinearWrap);
-            trailShader.Matrix = Get3DOrthoPrimitiveMatrix(Projectile.Center, Rotation, Projectile.scale, InitialMouseAngle, 1);
-            trail.DrawTrail(trailShader, points.Points);
+            trail.DrawTrail(trailShader, points.Points, -1, false, true,
+                Get3DOrthoPrimitiveMatrix(Projectile.Center, Rotation, Projectile.scale, InitialMouseAngle));
         }
 
         // Draw the main sword

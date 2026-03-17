@@ -36,7 +36,7 @@ public class FrigidTonic : ModItem
         Item.rare = ItemRarityID.Orange;
         Item.value = AdditionsGlobalItem.RarityWhiteBuyPrice;
         Item.buffType = ModContent.BuffType<WinterHeart>();
-        Item.buffTime = SecondsToFrames(260);
+        Item.buffTime = CalUtils.SecondsToFrames(260);
     }
 
     public override void AddRecipes()

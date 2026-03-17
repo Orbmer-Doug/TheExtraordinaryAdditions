@@ -15,7 +15,7 @@ public class BloodBeacon : ProjOwnedByNPC<StygainHeart>
 {
     public override string Texture => AssetRegistry.Invis;
 
-    public static readonly int Lifetime = SecondsToFrames(15);
+    public static readonly int Lifetime = CalUtils.SecondsToFrames(15);
 
     public const int MaxLaserLength = 3000;
 
@@ -40,9 +40,11 @@ public class BloodBeacon : ProjOwnedByNPC<StygainHeart>
     public Vector2 End => Start + Vector2.UnitY * LaserLength;
     public float Completion => ModOwner.ExtraAI[2];
     public LoopedSoundInstance sound;
+
     public override void SafeAI()
     {
-        sound ??= LoopedSoundManager.CreateNew(new(AdditionsSound.BraveMediumFireLoop, () => Completion, () => -.1f), () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
+        sound ??= LoopedSoundManager.CreateNew(new(AdditionsSound.BraveMediumFireLoop, () => Completion, () => -.1f),
+            () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
         sound?.Update(Projectile.Center);
 
         if (trail == null || trail.Disposed)
@@ -74,11 +76,13 @@ public class BloodBeacon : ProjOwnedByNPC<StygainHeart>
 
     public float AltWidthFunction(float _) => WidthFunction(_) * 2f;
 
-    public static Color AltColorFunction(SystemVector2 completionRatio, Vector2 position) => ColorFunction(completionRatio, position) * .4f;
+    public static Color AltColorFunction(SystemVector2 completionRatio, Vector2 position) =>
+        ColorFunction(completionRatio, position) * .4f;
 
     public TrailPoints cache = new(24);
     public OptimizedPrimitiveTrail trail;
     public OptimizedPrimitiveTrail trail2;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -97,6 +101,7 @@ public class BloodBeacon : ProjOwnedByNPC<StygainHeart>
 
             trail2.DrawTrail(shader, cache.Points, 80);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.OverPlayers);
         return false;
     }

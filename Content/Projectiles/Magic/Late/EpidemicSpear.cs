@@ -1,9 +1,11 @@
-﻿using Terraria;
+﻿using CalamityMod;
+using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Common.Particles.Shader;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
 
@@ -40,7 +42,7 @@ public class EpidemicSpear : ModProjectile
     public const float StartingScale = 0f;
     public const float IdealScale = 2f;
 
-    public static readonly int TotalCharge = SecondsToFrames(5f);
+    public static readonly int TotalCharge = CalUtils.SecondsToFrames(5f);
 
     public override bool? CanDamage()
     {
@@ -126,7 +128,7 @@ public class EpidemicSpear : ModProjectile
         }
 
         AdditionsSound.etherealHit2.Play(Projectile.Center, .8f, -.2f, 0f, 10, Name);
-        target.AddBuff(BuffID.Poisoned, SecondsToFrames(6));
+        target.AddBuff(BuffID.Poisoned, CalUtils.SecondsToFrames(6));
         target.AddBuff(BuffID.Venom, 120);
     }
 }

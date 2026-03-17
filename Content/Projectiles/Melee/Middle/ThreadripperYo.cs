@@ -1,10 +1,13 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using CalamityMod;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
@@ -19,7 +22,7 @@ public class ThreadripperYo : ModProjectile
     public ref float Wait => ref Projectile.AdditionsInfo().ExtraAI[6];
     public ref int Counter => ref Owner.GetModPlayer<ThreadripperPlayer>().Counter;
     public const int Max = 25;
-    public static readonly int ShredTime = SecondsToFrames(6.5f);
+    public static readonly int ShredTime = CalUtils.SecondsToFrames(6.5f);
     public float Interpol => Shred > 0 ? InverseLerp(0f, ShredTime, Shred) : InverseLerp(0f, Max, Counter);
 
     public override void SetStaticDefaults()

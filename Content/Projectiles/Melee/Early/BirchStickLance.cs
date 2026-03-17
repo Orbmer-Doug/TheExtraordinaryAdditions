@@ -169,11 +169,11 @@ public class BirchStickLance : ModProjectile
 
         if (TimeStop > 0f)
             TimeStop--;
-
+        
         TotalTime++;
     }
 
-    public float SwingTime => SecondsToFrames(1.2f) / (int)Owner.GetTotalAttackSpeed(Projectile.DamageType);
+    public float SwingTime => CalUtils.SecondsToFrames(1.2f) / (int)Owner.GetTotalAttackSpeed(Projectile.DamageType);
     public float SwingCompletion => InverseLerp(0f, SwingTime, Time);
     public int Direction => Projectile.velocity.X.NonZeroSign();
     public const float ReelPercent = .3f;
@@ -273,10 +273,7 @@ public class BirchStickLance : ModProjectile
 
     public override bool CanHitPvp(Player target)
     {
-        if (State != BirchStickState.Poke)
-            return SwingCompletion.BetweenNum(ReelPercent, SwingPercent);
-        else
-            return Stabbing;
+        return State != BirchStickState.Poke ? SwingCompletion.BetweenNum(ReelPercent, SwingPercent) : Stabbing;
     }
 
     public override void OnHitPlayer(Player target, Player.HurtInfo info)
@@ -375,7 +372,7 @@ public class BirchStickLance : ModProjectile
         return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), GetRect().Top, GetRect().Bottom, GetRect().Width, ref _);
     }
 
-    private Color ColorFunct(SystemVector2 c, Vector2 position) => Color.SaddleBrown * MathHelper.SmoothStep(1f, 0f, c.X) * InverseLerp(0.026f, 0.1f, AngularVelocity);
+    private Color ColorFunct(SystemVector2 c, Vector2 position) => Color.SaddleBrown * MathHelper.SmoothStep(1f, 0f, c.X) * InverseLerp(0.026f, 0.1f, AngularVelocity) * InverseLerp(0, 255, Lighting.GetColor(Projectile.Center.ToTileCoordinates()).R);
     private float WidthFunct(float c) => Projectile.width;
     public OptimizedPrimitiveTrail trail;
     private TrailPoints cache;

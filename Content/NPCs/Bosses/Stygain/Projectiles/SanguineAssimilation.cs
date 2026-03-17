@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using CalamityMod;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Core.DataStructures;
@@ -7,6 +8,8 @@ using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 
@@ -26,10 +29,14 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
 
     public bool NotFree
     {
-        get => Projectile.ai[1] == 1f;
+        get => (int)Projectile.ai[1] == 1;
         set => Projectile.ai[1] = value.ToInt();
     }
-    public ref float Time => ref Projectile.ai[2];
+    public int Time
+    {
+        get => (int)Projectile.ai[2];
+        set => Projectile.ai[2] = value;
+    }
     public ref float Rot => ref Projectile.AdditionsInfo().ExtraAI[0];
     public ref float SavedDistance => ref Projectile.AdditionsInfo().ExtraAI[1];
     public ref float BeamTimer => ref Projectile.AdditionsInfo().ExtraAI[2];
@@ -44,13 +51,12 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
     }
     public override bool ShouldUpdatePosition()
     {
-        if (BeamTimer > 0f)
-            return false;
-        return true;
+        return !(BeamTimer > 0f);
     }
 
     public const int TimeForBeam = 95;
-    public const int Lifetime = TimeForBeam + 30;
+    public const int TotalBeamTime = 35;
+    public const int Lifetime = TimeForBeam + TotalBeamTime;
     private void GetPoints(out Vector2 start, out Vector2 end)
     {
         float interpolant = Utils.Remap(BeamTimer, 0f, 15f, 0f, 1f);
@@ -92,7 +98,7 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
         basePoints ??= new(40);
         if (Time < TimeForBeam && !NotFree)
         {
-            float move = Animators.MakePoly(2).OutFunction(InverseLerp(0f, TimeForBeam - 30f, Time));
+            float move = Animators.MakePoly(2).OutFunction(InverseLerp(0f, TimeForBeam - TotalBeamTime, Time));
             Projectile.Center = Vector2.Lerp(Projectile.Center, Target.Center + PolarVector(500f, Rot), move);
 
             float interpolant = Animators.MakePoly(4).OutFunction(InverseLerp(0f, TimeForBeam, Time));
@@ -101,7 +107,7 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
             Projectile.velocity = Projectile.SafeDirectionTo(Target.Center);
 
             Vector2 start2 = Projectile.Center;
-            Vector2 end2 = start + Projectile.SafeDirectionTo(Target.Center).SafeNormalize(Vector2.Zero) * (1800f * InverseLerp(0f, TimeForBeam / 2, Time));
+            Vector2 end2 = start + Projectile.SafeDirectionTo(Target.Center).SafeNormalize(Vector2.Zero) * (1800f * InverseLerp(0f, TimeForBeam / 2f, Time));
 
             basePoints.SetPoints(start2.GetLaserControlPoints(end2, 40));
         }
@@ -127,7 +133,7 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
         Time++;
     }
 
-    public float OpacityInterpolant => 1f - InverseLerp(20f, 30f, BeamTimer);
+    public float OpacityInterpolant => 1f - InverseLerp(20f, TotalBeamTime, BeamTimer);
     public float WidthFunction(float c)
     {
         return MathHelper.SmoothStep(Projectile.width, 0f, c);
@@ -191,7 +197,7 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
         {
             if (BeamTimer > 0f)
             {
-                GetPoints(out Vector2 start, out Vector2 end);
+                GetPoints(out _, out Vector2 end);
 
                 for (float i = 0f; i < .2f; i += .05f)
                 {

@@ -10,26 +10,24 @@ using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
-public partial class Asterlin : ModNPC
+public partial class Asterlin
 {
-    public static readonly Dictionary<AsterlinAIType, float> AbsorbingEnery_PossibleStates = new Dictionary<AsterlinAIType, float> { { AsterlinAIType.Barrage, 1f } };
+    public static readonly Dictionary<AsterlinAIType, float> AbsorbingEnery_PossibleStates =
+        new Dictionary<AsterlinAIType, float> { { AsterlinAIType.Barrage, 1f } };
+
     [AutomatedMethodInvoke]
     public void LoadStateTransitions_AbsorbingEnergy()
     {
-        StateMachine.RegisterTransition(AsterlinAIType.AbsorbingEnergy, AbsorbingEnery_PossibleStates, false, () 
+        StateMachine.RegisterTransition(AsterlinAIType.AbsorbingEnergy, AbsorbingEnery_PossibleStates, false, ()
                 => FightStarted,
-        () =>
-        {
-            NPC.Opacity = 1;
-        });
+            () => { NPC.Opacity = 1; });
 
-        StateMachine.RegisterStateEntryCallback(AsterlinAIType.AbsorbingEnergy, () =>
-        {
-            ProjOwnedByNPC<Asterlin>.KillAll();
-        });
+        StateMachine.RegisterStateEntryCallback(AsterlinAIType.AbsorbingEnergy,
+            () => { ProjOwnedByNPC<Asterlin>.KillAll(); });
 
         StateMachine.RegisterStateBehavior(AsterlinAIType.AbsorbingEnergy, DoBehavior_AbsorbingEnergy);
     }
@@ -38,9 +36,10 @@ public partial class Asterlin : ModNPC
     {
         NPC.Opacity = InverseLerp(0f, 20f, AITimer);
         int type = ModContent.ProjectileType<CondensedSoulMass>();
-        if (Utility.FindProjectile(out Projectile mass, type))
+        if (FindProjectile(out Projectile mass, type))
         {
-            SetHeadRotation(EyePosition.AngleTo(mass.Center + Vector2.UnitX * MathF.Cos(Main.GlobalTimeWrappedHourly * .5f) * 40f));
+            SetHeadRotation(EyePosition.AngleTo(mass.Center +
+                                                Vector2.UnitX * MathF.Cos(Main.GlobalTimeWrappedHourly * .5f) * 40f));
             SetRightHandTarget(mass.Center + Vector2.UnitY * MathF.Sin(Main.GlobalTimeWrappedHourly) * 50f);
             SetLeftLegRotation(-1.5f);
             SetRightLegRotation(-1.5f);
@@ -50,29 +49,44 @@ public partial class Asterlin : ModNPC
             for (int i = 0; i < absorb.Length; i++)
             {
                 if (absorb[i] == null || absorb[i].Disposed)
-                    absorb[i] = new(c => 24f * mass.scale, (c, pos) => MulticolorLerp(1f - c.X, Color.White, Color.Gold, Color.DarkGoldenrod) * NPC.Opacity, null, 100);
+                    absorb[i] = new(_ => 24f * mass.scale,
+                        (c, _) => MulticolorLerp(1f - c.X, Color.White, Color.Gold, Color.DarkGoldenrod) *
+                                    NPC.Opacity, null, 100);
             }
 
             for (int i = 0; i < points.Length; i++)
             {
                 points[i] ??= new(100);
-                List<Vector2> positions = [RightHandPosition, mass.Center + PolarVector(200f * mass.scale, i == 0 ? -.5f : i == 1 ? .8f : 1.8f), mass.Center];
+                List<Vector2> positions =
+                [
+                    RightHandPosition,
+                    mass.Center + PolarVector(200f * mass.scale, i switch
+                    {
+                        0 => -.5f,
+                        1 => .8f,
+                        _ => 1.8f
+                    }), mass.Center
+                ];
                 for (int j = 0; j < 100; j++)
-                    points[i].SetPoint(j, Animators.CatmullRomSpline(positions, InverseLerp(0, 100, j) * Animators.MakePoly(4f).InFunction(mass.scale)));
+                    points[i].SetPoint(j,
+                        Animators.CatmullRomSpline(positions,
+                            InverseLerp(0, 100, j) * Animators.MakePoly(4f).InFunction(mass.scale)));
 
                 if (Main.rand.NextBool(25))
                 {
                     Vector2 point = points[i].Points[Main.rand.Next(points[i].Count)];
-                    ParticleRegistry.SpawnBloomPixelParticle(point, Main.rand.NextVector2Circular(3f, 3f), Main.rand.Next(50, 90), Main.rand.NextFloat(.5f, 1.1f), Color.Gold, Color.PaleGoldenrod);
+                    ParticleRegistry.SpawnBloomPixelParticle(point, Main.rand.NextVector2Circular(3f, 3f),
+                        Main.rand.Next(50, 90), Main.rand.NextFloat(.5f, 1.1f), Color.Gold, Color.PaleGoldenrod);
                 }
             }
 
             if (Main.rand.NextBool(9))
-                ParticleRegistry.SpawnGlowParticle(RightHandPosition, Main.rand.NextVector2Circular(3f, 3f), Main.rand.Next(40, 50), Main.rand.NextFloat(20f, 30f), Color.Gold);
+                ParticleRegistry.SpawnGlowParticle(RightHandPosition, Main.rand.NextVector2Circular(3f, 3f),
+                    Main.rand.Next(40, 50), Main.rand.NextFloat(20f, 30f), Color.Gold);
         }
         else if (!FightStarted)
         {
-            if (!Utility.FindProjectile(out _, type))
+            if (!FindProjectile(out _, type))
             {
                 int index = NPC.NewNPCProj(NPC.Center, Vector2.Zero, type, 0, 0f);
                 Main.projectile[index].netUpdate = true;
@@ -98,8 +112,8 @@ public partial class Asterlin : ModNPC
                     if (who < proj.whoAmI)
                         closest = proj;
                 }
-                if (closest != null)
-                    closest.active = false;
+
+                closest?.active = false;
             }
         }
 
@@ -128,7 +142,7 @@ public partial class Asterlin : ModNPC
     {
         void draw()
         {
-            if (!FindProjectile(out Projectile mass, ModContent.ProjectileType<CondensedSoulMass>()))
+            if (!FindProjectile(out _, ModContent.ProjectileType<CondensedSoulMass>()))
                 return;
 
             for (int i = 0; i < absorb.Length; i++)
@@ -139,20 +153,26 @@ public partial class Asterlin : ModNPC
                     continue;
 
                 ManagedShader shader = AssetRegistry.GetShader("OverchargedLaserShader");
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TurbulentNoise2), 1, SamplerState.AnisotropicWrap);
+                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TurbulentNoise2), 1,
+                    SamplerState.AnisotropicWrap);
                 shader.TrySetParameter("time", -Main.GlobalTimeWrappedHourly);
-                trail?.DrawTrail(shader, manual.Points, -1, true);
+                trail.DrawTrail(shader, manual.Points, -1, true);
             }
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderNPCs);
 
         void glow()
         {
             Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
-            Main.spriteBatch.DrawBetterRect(tex, ToTarget(RightHandPosition, new Vector2(20f)), null, Color.White, 0f, tex.Size() / 2);
-            Main.spriteBatch.DrawBetterRect(tex, ToTarget(RightHandPosition, new Vector2(40f)), null, Color.Gold, 0f, tex.Size() / 2);
-            Main.spriteBatch.DrawBetterRect(tex, ToTarget(RightHandPosition, new Vector2(60f)), null, Color.DarkGoldenrod, 0f, tex.Size() / 2);
+            Main.spriteBatch.DrawBetterRect(tex, ToTarget(RightHandPosition, new Vector2(20f)), null, Color.White, 0f,
+                tex.Size() / 2);
+            Main.spriteBatch.DrawBetterRect(tex, ToTarget(RightHandPosition, new Vector2(40f)), null, Color.Gold, 0f,
+                tex.Size() / 2);
+            Main.spriteBatch.DrawBetterRect(tex, ToTarget(RightHandPosition, new Vector2(60f)), null,
+                Color.DarkGoldenrod, 0f, tex.Size() / 2);
         }
+
         PixelationSystem.QueueTextureRenderAction(glow, PixelationLayer.OverNPCs, BlendState.Additive);
     }
 }

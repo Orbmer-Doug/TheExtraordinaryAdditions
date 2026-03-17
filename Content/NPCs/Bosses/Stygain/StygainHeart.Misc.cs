@@ -5,19 +5,20 @@ using TheExtraordinaryAdditions.Content.Buffs.Debuff;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain;
 
-public sealed partial class StygainHeart : ModNPC
+public sealed partial class StygainHeart
 {
     public void SummonMass()
     {
         // not excessive whatsoever
         MassTimer++;
 
-        const float TotalTime = 180f;
+        const float totalTime = 180f;
 
-        if (this.RunServer() && MassInitialize == false)
+        if (this.RunServer() && !MassInitialize)
         {
             MassPosition = NPC.Center + Main.rand.NextVector2CircularLimited(400f, 400f, .5f, 1f);
             MassSpinStart = RandomRotation();
@@ -26,9 +27,9 @@ public sealed partial class StygainHeart : ModNPC
             NPC.netUpdate = true;
         }
 
-        if (MassTimer < TotalTime)
+        if (MassTimer < totalTime)
         {
-            float completion = 1f - InverseLerp(0f, TotalTime, MassTimer);
+            float completion = 1f - InverseLerp(0f, totalTime, MassTimer);
             for (int i = 0; i < 6; i++)
             {
                 Vector2 pos = MassPosition + (MathHelper.TwoPi * i / 6 + ((MathHelper.TwoPi * completion * MassSpinDir) + MassSpinStart)).ToRotationVector2() * (completion * 400f);
@@ -41,7 +42,7 @@ public sealed partial class StygainHeart : ModNPC
             }
         }
 
-        if (MassTimer >= TotalTime)
+        if (MassTimer >= totalTime)
         {
             if (this.RunServer())
             {
@@ -74,7 +75,7 @@ public sealed partial class StygainHeart : ModNPC
     {
         if (hit > 1 && target.HasBuff(ModContent.BuffType<HemorrhageTransfer>()))
         {
-            float healAmt = hit * (.25f * Utility.CountNPCs(ModContent.NPCType<CoalescentMass>()));
+            float healAmt = hit * (.25f * CountNPCs(ModContent.NPCType<CoalescentMass>()));
             p.SpawnProjectile(target.Center, Vector2.Zero, ModContent.ProjectileType<BloodletRelay>(), 0, 0f, healAmt);
         }
     }
@@ -86,13 +87,13 @@ public sealed partial class StygainHeart : ModNPC
         foreach (NPC n in Main.ActiveNPCs)
         {
             int shield = ModContent.NPCType<CoalescentMass>();
-            if (n.type == shield && n != null)
+            if (n.type == shield)
             {
                 n.active = false;
             }
         }
 
-        if (Utility.FindProjectile(out Projectile p, ModContent.ProjectileType<HemoglobBarrier>()))
+        if (FindProjectile(out Projectile p, ModContent.ProjectileType<HemoglobBarrier>()))
         {
             p.As<HemoglobBarrier>().FadeOut = true;
         }
@@ -101,8 +102,8 @@ public sealed partial class StygainHeart : ModNPC
     public void FixedRotation(Entity target, float weight = 1f)
     {
         Vector2 position = new(NPC.position.X + NPC.width * 0.5f, NPC.position.Y + NPC.height * 0.5f);
-        float posX = target.position.X + target.width / 2 - position.X;
-        float posY = target.position.Y + target.height / 2 - position.Y;
+        float posX = target.position.X + target.width / 2f - position.X;
+        float posY = target.position.Y + target.height / 2f - position.Y;
 
         NPC.rotation = NPC.rotation.AngleLerp(MathF.Atan2(posY, posX) + (posX.NonZeroSign() < 0 ? MathHelper.Pi : 0f), weight);
         NPC.spriteDirection = posX.NonZeroSign();

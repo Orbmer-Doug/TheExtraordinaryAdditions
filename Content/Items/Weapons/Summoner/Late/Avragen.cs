@@ -12,6 +12,7 @@ using TheExtraordinaryAdditions.Content.Projectiles.Summoner.Late.Avia;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Late;
 

@@ -167,11 +167,11 @@ public class AdditionsNetcode
         netMessage.Write((byte)AdditionsModMessageType.SpawnGodDummy);
         netMessage.Write((int)spawnPosition.X);
         netMessage.Write((int)spawnPosition.Y);
-        netMessage.Write((int)DummyUI.MaxLife);
-        netMessage.Write((int)DummyUI.Defense);
-        netMessage.Write((float)DummyUI.Size);
-        netMessage.Write((bool)DummyUI.Gravity);
-        netMessage.Write((float)DummyUI.Rotation);
+        netMessage.Write(DummyUI.MaxLife);
+        netMessage.Write(DummyUI.Defense);
+        netMessage.Write(DummyUI.Size);
+        netMessage.Write(DummyUI.Gravity);
+        netMessage.Write(DummyUI.Rotation);
 
         netMessage.Send();
     }
@@ -179,6 +179,6 @@ public class AdditionsNetcode
     public static void SyncWorld()
     {
         if (Main.dedServ)
-            NetMessage.SendData(MessageID.WorldData, -1, -1, null, 0, 0f, 0f, 0f, 0, 0, 0);
+            NetMessage.SendData(MessageID.WorldData);
     }
 }

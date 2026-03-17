@@ -18,12 +18,18 @@ public class PushdownAutomata<TStateWrapper, TStateIdentifier>
     /// <summary>
     /// Represents a framework for hijacking a transition's final state selection.
     /// </summary>
-    public record TransitionHijack(Func<TStateIdentifier?, TStateIdentifier?> SelectionHijackFunction, Action<TStateIdentifier?> HijackAction);
+    public record TransitionHijack(
+        Func<TStateIdentifier?, TStateIdentifier?> SelectionHijackFunction,
+        Action<TStateIdentifier?> HijackAction);
 
     /// <summary>
     /// Represents a framework for a state transition's information.
     /// </summary>
-    public record TransitionInfo(TStateIdentifier? NewState, bool RememberPreviousState, Func<bool> TransitionCondition, Action TransitionCallback = null);
+    public record TransitionInfo(
+        TStateIdentifier? NewState,
+        bool RememberPreviousState,
+        Func<bool> TransitionCondition,
+        Action TransitionCallback = null);
 
     /// <summary>
     /// Delegate for actions that run when OnStateTransition is fired.
@@ -61,17 +67,7 @@ public class PushdownAutomata<TStateWrapper, TStateIdentifier>
     /// <summary>
     /// The current state of the automaton.
     /// </summary>
-    public TStateWrapper CurrentState
-    {
-        get
-        {
-            if (StateStack.Count > 0)
-            {
-                return StateStack.Peek();
-            }
-            return null;
-        }
-    }
+    public TStateWrapper CurrentState => StateStack.Count > 0 ? StateStack.Peek() : null;
 
     /// <summary>
     /// The set of actions that should occur when a state is popped.
@@ -88,7 +84,8 @@ public class PushdownAutomata<TStateWrapper, TStateIdentifier>
     /// </summary>
     public event Action OnStackEmpty;
 
-    public void AddTransitionStateHijack(Func<TStateIdentifier?, TStateIdentifier?> hijackSelection, Action<TStateIdentifier?> hijackAction = null)
+    public void AddTransitionStateHijack(Func<TStateIdentifier?, TStateIdentifier?> hijackSelection,
+        Action<TStateIdentifier?> hijackAction = null)
     {
         HijackActions.Add(new TransitionHijack(hijackSelection, hijackAction));
     }
@@ -97,8 +94,7 @@ public class PushdownAutomata<TStateWrapper, TStateIdentifier>
     {
         if (CurrentState != null && StateBehaviors.TryGetValue(CurrentState.Identifier, out Action value))
         {
-            Action behavior = value;
-            behavior?.Invoke();
+            value?.Invoke();
         }
     }
 
@@ -111,7 +107,8 @@ public class PushdownAutomata<TStateWrapper, TStateIdentifier>
         }
 
         TStateWrapper currentState = CurrentState;
-        if (currentState == null || !transitionTable.TryGetValue(currentState.Identifier, out List<TransitionInfo> value))
+        if (currentState == null ||
+            !transitionTable.TryGetValue(currentState.Identifier, out List<TransitionInfo> value))
         {
             return;
         }
@@ -120,13 +117,13 @@ public class PushdownAutomata<TStateWrapper, TStateIdentifier>
         TransitionInfo transition = null;
 
         // Find the first valid transition
-        for (int i = 0; i < potentialStates.Count; i++)
+        foreach (TransitionInfo t in potentialStates)
         {
-            if (potentialStates[i].TransitionCondition())
-            {
-                transition = potentialStates[i];
-                break;
-            }
+            if (!t.TransitionCondition()) 
+                continue;
+            
+            transition = t;
+            break;
         }
 
         if (transition == null)
@@ -146,16 +143,15 @@ public class PushdownAutomata<TStateWrapper, TStateIdentifier>
 
         // Perform the transition
         TStateIdentifier? newState = transition.NewState;
-        for (int i = 0; i < HijackActions.Count; i++)
+        foreach (TransitionHijack hijack in HijackActions)
         {
-            TransitionHijack hijack = HijackActions[i];
             TStateIdentifier? hijackedState = hijack.SelectionHijackFunction(newState);
-            if (!Equals(hijackedState, newState))
-            {
-                newState = hijackedState;
-                hijack.HijackAction?.Invoke(newState);
-                break;
-            }
+            if (Equals(hijackedState, newState)) 
+                continue;
+            
+            newState = hijackedState;
+            hijack.HijackAction?.Invoke(newState);
+            break;
         }
 
         if (newState.HasValue && StateRegistry.TryGetValue(newState.Value, out TStateWrapper wrapper))
@@ -186,11 +182,11 @@ public class PushdownAutomata<TStateWrapper, TStateIdentifier>
 
             for (int i = 0; i < potentialStates.Count; i++)
             {
-                if (potentialStates[i].TransitionCondition())
-                {
-                    transition = potentialStates[i];
-                    break;
-                }
+                if (!potentialStates[i].TransitionCondition()) 
+                    continue;
+                
+                transition = potentialStates[i];
+                break;
             }
 
             if (transition == null)
@@ -239,8 +235,9 @@ public class PushdownAutomata<TStateWrapper, TStateIdentifier>
         StateBehaviors[state] = behavior;
     }
 
-    public void RegisterTransition(TStateIdentifier initialState, TStateIdentifier? newState, bool rememberPreviousState,
-                                  Func<bool> transitionCondition, Action transitionCallback = null)
+    public void RegisterTransition(TStateIdentifier initialState, TStateIdentifier? newState,
+        bool rememberPreviousState,
+        Func<bool> transitionCondition, Action transitionCallback = null)
     {
         if (!transitionTable.TryGetValue(initialState, out List<TransitionInfo> value))
         {
@@ -264,6 +261,7 @@ public class PushdownAutomata<TStateWrapper, TStateIdentifier>
                     break;
                 }
             }
+
             if (!isException)
             {
                 action(pair.Key);
@@ -272,7 +270,8 @@ public class PushdownAutomata<TStateWrapper, TStateIdentifier>
     }
 }
 
-public class EntityAIState<TStateIdentifier>(TStateIdentifier identifier) : IState<TStateIdentifier> where TStateIdentifier : struct
+public class EntityAIState<TStateIdentifier>(TStateIdentifier identifier)
+    : IState<TStateIdentifier> where TStateIdentifier : struct
 {
     public TStateIdentifier Identifier { get; protected set; } = identifier;
     public int Time;
@@ -283,7 +282,7 @@ public class EntityAIState<TStateIdentifier>(TStateIdentifier identifier) : ISta
     }
 }
 
-public interface IState<TStateIdentifier> where TStateIdentifier : struct
+public interface IState<out TStateIdentifier> where TStateIdentifier : struct
 {
     TStateIdentifier Identifier { get; }
     void OnPopped();
@@ -296,10 +295,11 @@ public class AutoloadAsBehavior<TStateWrapper, TStateIdentifier>(TStateIdentifie
 {
     public readonly TStateIdentifier AssociatedState = associatedState;
 
-    public static void FillStateMachineBehaviors<TInstanceType>(PushdownAutomata<TStateWrapper, TStateIdentifier> stateMachine, TInstanceType instance)
+    public static void FillStateMachineBehaviors<TInstanceType>(
+        PushdownAutomata<TStateWrapper, TStateIdentifier> stateMachine, TInstanceType instance)
     {
         MethodInfo[] methods = instance.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public);
-        if (methods == null || methods.Length == 0)
+        if (methods.Length == 0)
         {
             return;
         }
@@ -307,12 +307,15 @@ public class AutoloadAsBehavior<TStateWrapper, TStateIdentifier>(TStateIdentifie
         for (int i = 0; i < methods.Length; i++)
         {
             MethodInfo method = methods[i];
-            object[] attributes = method.GetCustomAttributes(typeof(AutoloadAsBehavior<TStateWrapper, TStateIdentifier>), false);
-            if (attributes.Length > 0)
-            {
-                AutoloadAsBehavior<TStateWrapper, TStateIdentifier> autoloadAttribute = (AutoloadAsBehavior<TStateWrapper, TStateIdentifier>)attributes[0];
-                stateMachine.RegisterStateBehavior(autoloadAttribute.AssociatedState, () => method.Invoke(instance, null));
-            }
+            object[] attributes =
+                method.GetCustomAttributes(typeof(AutoloadAsBehavior<TStateWrapper, TStateIdentifier>), false);
+            if (attributes.Length <= 0) 
+                continue;
+            
+            AutoloadAsBehavior<TStateWrapper, TStateIdentifier> autoloadAttribute =
+                (AutoloadAsBehavior<TStateWrapper, TStateIdentifier>)attributes[0];
+            stateMachine.RegisterStateBehavior(autoloadAttribute.AssociatedState,
+                () => method.Invoke(instance, null));
         }
     }
 }
@@ -342,7 +345,9 @@ public class RandomPushdownAutomata<TStateWrapper, TStateIdentifier>
     /// <summary>
     /// Represents a framework for hijacking a transition's final state selection.
     /// </summary>
-    public record TransitionHijack(Func<TStateIdentifier?, TStateIdentifier?> SelectionHijackFunction, Action<TStateIdentifier?> HijackAction);
+    public record TransitionHijack(
+        Func<TStateIdentifier?, TStateIdentifier?> SelectionHijackFunction,
+        Action<TStateIdentifier?> HijackAction);
 
     /// <summary>
     /// Represents information for a random state transition with multiple possible states.
@@ -390,14 +395,19 @@ public class RandomPushdownAutomata<TStateWrapper, TStateIdentifier>
     /// <summary>
     /// Initializes the automata with an initial state and a seed for randomness.
     /// </summary>
-    public RandomPushdownAutomata(TStateWrapper initialState, int seed) : this(initialState, new UnifiedRandom(seed)) { }
+    public RandomPushdownAutomata(TStateWrapper initialState, int seed) : this(initialState, new UnifiedRandom(seed))
+    {
+    }
 
     /// <summary>
     /// Initializes the automata with an initial state and Main.rand for randomness.
     /// </summary>
-    public RandomPushdownAutomata(TStateWrapper initialState) : this(initialState, Main.rand) { }
+    public RandomPushdownAutomata(TStateWrapper initialState) : this(initialState, Main.rand)
+    {
+    }
 
-    public void AddTransitionStateHijack(Func<TStateIdentifier?, TStateIdentifier?> hijackSelection, Action<TStateIdentifier?> hijackAction = null)
+    public void AddTransitionStateHijack(Func<TStateIdentifier?, TStateIdentifier?> hijackSelection,
+        Action<TStateIdentifier?> hijackAction = null)
     {
         HijackActions.Add(new TransitionHijack(hijackSelection, hijackAction));
     }
@@ -419,7 +429,8 @@ public class RandomPushdownAutomata<TStateWrapper, TStateIdentifier>
         }
 
         TStateWrapper currentState = CurrentState;
-        if (currentState == null || !transitionTable.TryGetValue(currentState.Identifier, out List<RandomTransitionInfo> transitions))
+        if (currentState == null ||
+            !transitionTable.TryGetValue(currentState.Identifier, out List<RandomTransitionInfo> transitions))
             return;
 
         RandomTransitionInfo transition = null;
@@ -436,7 +447,8 @@ public class RandomPushdownAutomata<TStateWrapper, TStateIdentifier>
             return;
 
         Dictionary<TStateIdentifier, float> possibleStatesWeights = transition.PossibleStatesWeights;
-        Dictionary<TStateIdentifier, float> filteredStatesWeights = GetFilteredWeights(currentState.Identifier, possibleStatesWeights);
+        Dictionary<TStateIdentifier, float> filteredStatesWeights =
+            GetFilteredWeights(currentState.Identifier, possibleStatesWeights);
 
         TStateIdentifier? newStateId = SelectRandomState(currentState.Identifier, filteredStatesWeights);
         if (!newStateId.HasValue)
@@ -445,14 +457,13 @@ public class RandomPushdownAutomata<TStateWrapper, TStateIdentifier>
         for (int i = 0; i < HijackActions.Count; i++)
         {
             TransitionHijack hijack = HijackActions[i];
-            Nullable<TStateIdentifier> hijackedState = hijack.SelectionHijackFunction(newStateId);
-            if (!Equals(hijackedState, newStateId))
-            {
-                newStateId = hijackedState;
-
-                hijack.HijackAction?.Invoke(newStateId);
-                break;
-            }
+            TStateIdentifier? hijackedState = hijack.SelectionHijackFunction(newStateId);
+            if (Equals(hijackedState, newStateId)) 
+                continue;
+            
+            newStateId = hijackedState;
+            hijack.HijackAction?.Invoke(newStateId);
+            break;
         }
 
         TStateWrapper oldState = null;
@@ -512,13 +523,13 @@ public class RandomPushdownAutomata<TStateWrapper, TStateIdentifier>
             for (int i = 0; i < HijackActions.Count; i++)
             {
                 TransitionHijack hijack = HijackActions[i];
-                Nullable<TStateIdentifier> hijackedState = hijack.SelectionHijackFunction(newStateId);
-                if (!Equals(hijackedState, newStateId))
-                {
-                    newStateId = hijackedState;
-                    hijack.HijackAction?.Invoke(newStateId);
-                    break;
-                }
+                TStateIdentifier? hijackedState = hijack.SelectionHijackFunction(newStateId);
+                if (Equals(hijackedState, newStateId)) 
+                    continue;
+                
+                newStateId = hijackedState;
+                hijack.HijackAction?.Invoke(newStateId);
+                break;
             }
 
             oldState = null;
@@ -553,15 +564,18 @@ public class RandomPushdownAutomata<TStateWrapper, TStateIdentifier>
         StateBehaviors[state] = behavior;
     }
 
-    public void RegisterTransition(TStateIdentifier initialState, Dictionary<TStateIdentifier, float> possibleStatesWeights,
-                                  bool rememberPreviousState, Func<bool> transitionCondition, Action transitionCallback = null)
+    public void RegisterTransition(TStateIdentifier initialState,
+        Dictionary<TStateIdentifier, float> possibleStatesWeights,
+        bool rememberPreviousState, Func<bool> transitionCondition, Action transitionCallback = null)
     {
         if (!transitionTable.TryGetValue(initialState, out List<RandomTransitionInfo> list))
         {
             list = new List<RandomTransitionInfo>(4); // Preallocate with reasonable capacity
             transitionTable[initialState] = list;
         }
-        list.Add(new RandomTransitionInfo(possibleStatesWeights, rememberPreviousState, transitionCondition, transitionCallback));
+
+        list.Add(new RandomTransitionInfo(possibleStatesWeights, rememberPreviousState, transitionCondition,
+            transitionCallback));
     }
 
     /// <summary>
@@ -585,6 +599,7 @@ public class RandomPushdownAutomata<TStateWrapper, TStateIdentifier>
                     break;
                 }
             }
+
             if (!isException)
             {
                 action(pair.Key);
@@ -592,14 +607,16 @@ public class RandomPushdownAutomata<TStateWrapper, TStateIdentifier>
         }
     }
 
-    private Dictionary<TStateIdentifier, float> GetFilteredWeights(TStateIdentifier currentStateId, Dictionary<TStateIdentifier, float> possibleStatesWeights)
+    private Dictionary<TStateIdentifier, float> GetFilteredWeights(TStateIdentifier currentStateId,
+        Dictionary<TStateIdentifier, float> possibleStatesWeights)
     {
         // Try to get cached filtered weights
         if (filteredWeightsCache.TryGetValue(currentStateId, out Dictionary<TStateIdentifier, float> cachedWeights))
         {
             // Verify cache is still valid (same possibleStatesWeights reference)
             bool isValid = true;
-            if (cachedWeights.Count == possibleStatesWeights.Count - (possibleStatesWeights.ContainsKey(currentStateId) ? 1 : 0))
+            if (cachedWeights.Count ==
+                possibleStatesWeights.Count - (possibleStatesWeights.ContainsKey(currentStateId) ? 1 : 0))
             {
                 foreach (KeyValuePair<TStateIdentifier, float> kv in cachedWeights)
                 {
@@ -622,7 +639,8 @@ public class RandomPushdownAutomata<TStateWrapper, TStateIdentifier>
         }
 
         // Create new filtered dictionary
-        Dictionary<TStateIdentifier, float> filtered = new Dictionary<TStateIdentifier, float>(possibleStatesWeights.Count);
+        Dictionary<TStateIdentifier, float> filtered =
+            new Dictionary<TStateIdentifier, float>(possibleStatesWeights.Count);
         foreach (KeyValuePair<TStateIdentifier, float> kv in possibleStatesWeights)
         {
             if (!Equals(kv.Key, currentStateId))
@@ -634,7 +652,8 @@ public class RandomPushdownAutomata<TStateWrapper, TStateIdentifier>
         return filtered.Count > 0 ? filtered : possibleStatesWeights;
     }
 
-    private TStateIdentifier? SelectRandomState(TStateIdentifier currentStateId, Dictionary<TStateIdentifier, float> statesWeights)
+    private TStateIdentifier? SelectRandomState(TStateIdentifier currentStateId,
+        Dictionary<TStateIdentifier, float> statesWeights)
     {
         if (statesWeights.Count == 0)
             return null;

@@ -28,7 +28,7 @@ public class OverchargedLaser : ProjOwnedByNPC<Asterlin>
     public ref float Time => ref Projectile.ai[0];
     public bool DontHome
     {
-        get => Projectile.ai[1] == 1f;
+        get => (int)Projectile.ai[1] == 1;
         set => Projectile.ai[1] = value.ToInt();
     }
     public override void SafeAI()
@@ -46,15 +46,13 @@ public class OverchargedLaser : ProjOwnedByNPC<Asterlin>
                 Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.Center.SafeDirectionTo(Target.Center) * speed, amt);
             }
         }
-        if (Projectile.velocity.Length() < 60f)
-            Projectile.velocity *= 1.03f;
 
         Time++;
     }
 
     public float WidthFunct(float c)
     {
-        return OptimizedPrimitiveTrail.PyriformWidthFunct(c, Projectile.width * Projectile.scale, 2f);
+        return OptimizedPrimitiveTrail.PyriformWidthFunct(c, Projectile.width * Projectile.scale);
     }
 
     public Color ColorFunct(SystemVector2 c, Vector2 pos)
@@ -74,7 +72,7 @@ public class OverchargedLaser : ProjOwnedByNPC<Asterlin>
             ManagedShader shader = AssetRegistry.GetShader("OverchargedLaserShader");
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FlameMap1), 1, SamplerState.AnisotropicWrap);
             shader.TrySetParameter("time", Main.GlobalTimeWrappedHourly * 1.2f);
-            trail.DrawTrail(shader, points.Points, 200, true, true);
+            trail.DrawTrail(shader, points.Points, 200, true);
         }
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;

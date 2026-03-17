@@ -15,17 +15,24 @@ using TheExtraordinaryAdditions.Core.Utilities;
 namespace TheExtraordinaryAdditions.Content.Rarities;
 
 public abstract class Behavior<TInfo>
-        where TInfo : struct
+    where TInfo : struct
 {
     public abstract string TexturePath { get; }
     public abstract void Update();
     public abstract void Draw(SpriteBatch sb, Vector2 position, DrawableTooltipLine line = null);
-    public virtual bool UseAdditive { get; } = false;
+    public virtual bool UseAdditive => false;
     public TInfo Info;
 }
 
 [StructLayout(LayoutKind.Auto)]
-public struct RarityParticleInfo(Vector2 position, Vector2 velocity, int life, float scale, Color color, float opacity, float rotation)
+public struct RarityParticleInfo(
+    Vector2 position,
+    Vector2 velocity,
+    int life,
+    float scale,
+    Color color,
+    float opacity,
+    float rotation)
 {
     public Texture2D Texture;
     public int Type;
@@ -40,7 +47,6 @@ public struct RarityParticleInfo(Vector2 position, Vector2 velocity, int life, f
     public float Opacity = opacity;
     public Color DrawColor = color;
 
-    public Rectangle? BaseFrame;
     public readonly float TimeRatio => InverseLerp(0f, Lifetime, Time);
 }
 
@@ -53,7 +59,9 @@ public class CustomRaritySystem : ModSystem
     }
 
     public static readonly Texture2D GlowTexture = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
-    public static void DrawTextWithGlow(DrawableTooltipLine line, Color glowColor, Color textOuterColor, Color? textInnerColor = null, Texture2D glowTexture = null)
+
+    public static void DrawTextWithGlow(DrawableTooltipLine line, Color glowColor, Color textOuterColor,
+        Color? textInnerColor = null, Texture2D glowTexture = null)
     {
         textInnerColor ??= Color.Black;
         glowTexture ??= GlowTexture;
@@ -67,11 +75,11 @@ public class CustomRaritySystem : ModSystem
         Vector2 glowPosition = new(line.X + textCenter.X, line.Y + textCenter.Y / 1.5f);
 
         // Get the scale of the glow texture based off of the text size.
-        Vector2 glowScale = new(textSize.X * 0.115f, 0.6f);
         glowColor.A = 0;
 
         // Draw the glow texture.
-        Main.spriteBatch.DrawBetterRect(glowTexture, ToScreenTarget(glowPosition, textSize * 2.2f), null, glowColor * .85f, 0f, glowTexture.Size() / 2f);
+        Main.spriteBatch.DrawBetterRect(glowTexture, ToScreenTarget(glowPosition, textSize * 2.2f), null,
+            glowColor * .85f, 0f, glowTexture.Size() / 2f);
 
         // Get an offset to the afterimageOffset based on a sine wave.
         float sine = (float)((1 + Math.Sin(Main.GlobalTimeWrappedHourly * 2.5f)) / 2);
@@ -80,7 +88,8 @@ public class CustomRaritySystem : ModSystem
         // Draw text backglow effects.
         for (int i = 0; i < 12; i++)
         {
-            Vector2 afterimageOffset = (MathHelper.TwoPi * i / 12f + Main.GlobalTimeWrappedHourly).ToRotationVector2() * (2f * sineOffset);
+            Vector2 afterimageOffset = (MathHelper.TwoPi * i / 12f + Main.GlobalTimeWrappedHourly).ToRotationVector2() *
+                                       (2f * sineOffset);
 
             ChatManager.DrawColorCodedString(Main.spriteBatch, line.Font, text,
                 (textPosition + afterimageOffset).RotatedBy(MathHelper.TwoPi * (i / 12)),
@@ -96,26 +105,27 @@ public class CustomRaritySystem : ModSystem
     public static void DrawTextWithShader(DrawableTooltipLine line, Effect shader, Color textInnerColor)
     {
         string text = line.Text;
-        Vector2 textSize = line.Font.MeasureString(text);
-        Vector2 textCenter = textSize * 0.5f;
         Vector2 textPosition = new(line.X, line.Y);
 
         Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.SamplerStateForCursor, DepthStencilState.None, RasterizerState.CullCounterClockwise, shader, Main.UIScaleMatrix);
+        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.SamplerStateForCursor,
+            DepthStencilState.None, RasterizerState.CullCounterClockwise, shader, Main.UIScaleMatrix);
 
         ChatManager.DrawColorCodedString(Main.spriteBatch, line.Font, text,
             textPosition, textInnerColor, line.Rotation, line.Origin, line.BaseScale);
 
         Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.SamplerStateForCursor, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
+        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.SamplerStateForCursor,
+            DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
     }
 
-    public static void UpdateAndDrawParticles(DrawableTooltipLine line, ref List<Behavior<RarityParticleInfo>> particleList)
+    public static void UpdateAndDrawParticles(DrawableTooltipLine line,
+        ref List<Behavior<RarityParticleInfo>> particleList)
     {
         if (!Main.mouseText)
             return;
 
-        GetTextDimensions(in line, out Vector2 textSize, out Rectangle textRect);
+        GetTextDimensions(in line, out Vector2 textSize, out _);
 
         for (int i = 0; i < particleList.Count; i++)
         {
@@ -129,8 +139,8 @@ public class CustomRaritySystem : ModSystem
             particleList[i].Update();
         }
 
-        var alpha = particleList.Where(p => !p.UseAdditive).ToList();
-        var additive = particleList.Where(p => p.UseAdditive).ToList();
+        List<Behavior<RarityParticleInfo>> alpha = particleList.Where(p => !p.UseAdditive).ToList();
+        List<Behavior<RarityParticleInfo>> additive = particleList.Where(p => p.UseAdditive).ToList();
 
         if (alpha.Count > 0)
         {
@@ -144,15 +154,18 @@ public class CustomRaritySystem : ModSystem
         if (additive.Count > 0)
         {
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.SamplerStateForCursor, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.SamplerStateForCursor,
+                DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
 
             foreach (Behavior<RarityParticleInfo> particle in additive)
             {
                 RarityParticleInfo info = particle.Info;
                 particle.Draw(Main.spriteBatch, new Vector2(line.X, line.Y) + textSize * 0.5f + info.Position, line);
             }
+
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.SamplerStateForCursor, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.SamplerStateForCursor,
+                DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
         }
     }
 
@@ -161,14 +174,15 @@ public class CustomRaritySystem : ModSystem
         LoadParticles(Mod.Code);
     }
 
-    internal static readonly Dictionary<Type, int> particleTypeLookup = [];
-    internal static readonly Dictionary<int, Texture2D> particleTextureLookup = [];
+    internal static readonly Dictionary<Type, int> ParticleTypeLookup = [];
+    internal static readonly Dictionary<int, Texture2D> ParticleTextureLookup = [];
+
     public static void LoadParticles(Assembly assembly)
     {
         int currentParticleID = 0;
 
-        if (particleTypeLookup.Count != 0 && particleTypeLookup != null)
-            currentParticleID = particleTypeLookup.Values.Max() + 1;
+        if (ParticleTypeLookup.Count != 0 && ParticleTypeLookup != null)
+            currentParticleID = ParticleTypeLookup.Values.Max() + 1;
 
         foreach (Type particleType in AssemblyManager.GetLoadableTypes(assembly))
         {
@@ -176,21 +190,24 @@ public class CustomRaritySystem : ModSystem
             if (!particleType.IsSubclassOf(typeof(Behavior<RarityParticleInfo>)) || particleType.IsAbstract)
                 continue;
 
-            Behavior<RarityParticleInfo> particle = (Behavior<RarityParticleInfo>)RuntimeHelpers.GetUninitializedObject(particleType);
+            Behavior<RarityParticleInfo> particle =
+                (Behavior<RarityParticleInfo>)RuntimeHelpers.GetUninitializedObject(particleType);
 
             // Store an ID for the particle. All particles of this type that are spawned will copy the ID
-            particleTypeLookup[particleType] = currentParticleID;
+            ParticleTypeLookup[particleType] = currentParticleID;
 
             // Store the particle's texture in the lookup table
-            Texture2D particleTexture = ModContent.Request<Texture2D>(particle.TexturePath, AssetRequestMode.ImmediateLoad).Value;
-            particleTextureLookup[currentParticleID] = particleTexture;
+            Texture2D particleTexture =
+                ModContent.Request<Texture2D>(particle.TexturePath, AssetRequestMode.ImmediateLoad).Value;
+            ParticleTextureLookup[currentParticleID] = particleTexture;
 
             // Increment the particle ID
             currentParticleID++;
         }
     }
 
-    public static Behavior<RarityParticleInfo> Spawn(ref List<Behavior<RarityParticleInfo>> list, Behavior<RarityParticleInfo> particle)
+    public static Behavior<RarityParticleInfo> Spawn(ref List<Behavior<RarityParticleInfo>> list,
+        Behavior<RarityParticleInfo> particle)
     {
         if (Main.dedServ)
             return particle;
@@ -199,8 +216,8 @@ public class CustomRaritySystem : ModSystem
 
         info.Time = new();
         info.InitScale = info.Scale;
-        info.Type = particleTypeLookup[particle.GetType()];
-        info.Texture = particleTextureLookup[info.Type];
+        info.Type = ParticleTypeLookup[particle.GetType()];
+        info.Texture = ParticleTextureLookup[info.Type];
         list.Add(particle);
 
         return particle;

@@ -9,6 +9,7 @@ using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 
@@ -81,7 +82,7 @@ public class BloodRay : ProjOwnedByNPC<StygainHeart>
     {
         for (int i = 0; i < 12; i++)
         {
-            if (i % 4f == 3f)
+            if (i % 4 == 3)
             {
                 ParticleRegistry.SpawnBloodStreakParticle(Projectile.Center, Projectile.velocity.SafeNormalize(Vector2.Zero),
                     Main.rand.Next(16, 30), Main.rand.NextFloat(.2f, .5f), Color.DarkRed);

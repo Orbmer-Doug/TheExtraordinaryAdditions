@@ -8,7 +8,7 @@ using Terraria.Graphics.Effects;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Config;
-using static TheExtraordinaryAdditions.Common.Particles.ParticleRegistry;
+using static TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 using Vector4 = Microsoft.Xna.Framework.Vector4;
@@ -18,47 +18,40 @@ namespace TheExtraordinaryAdditions.Core.Graphics.Shaders;
 public class ManagedScreenShader : IDisposable
 {
     /// <summary>
-    /// All deferred textures that should be applied when the shader is applied.
+    /// All deferred textures that should be applied when the shader is applied
     /// </summary>
-    private readonly Dictionary<int, DeferredTexture> DeferredTextures = [];
+    private readonly Dictionary<int, DeferredTexture> _deferredTextures = [];
 
     /// <summary>
-    /// A managed copy of all parameter data. Used to minimize excess SetValue calls, in cases where the value aren't actually being changed.
+    /// A managed copy of all parameter data. Used to minimize excess SetValue calls, in cases where the value aren't actually being changed
     /// </summary>
-    internal readonly Dictionary<string, object> parameterCache;
+    internal readonly Dictionary<string, object> ParameterCache;
 
-    public Ref<Effect> Shader
-    {
-        get;
-        internal set;
-    }
+    public Ref<Effect> Shader { get; internal set; }
 
     public Effect WrappedEffect => Shader.Value;
 
-    public bool Disposed
-    {
-        get;
-        private set;
-    }
+    public bool Disposed { get; private set; }
 
-    public bool IsActive
-    {
-        get;
-        private set;
-    }
+    public bool IsActive { get; private set; }
 
     /// <summary>
-    /// The standard parameter name prefix for texture sizes.
+    /// The standard parameter name prefix for texture sizes
     /// </summary>
     public const string TextureSizeParameterPrefix = "textureSize";
 
     /// <summary>
-    /// Represents a texture that is supplied to a filter when its shader is ready to be applied.
+    /// Represents a texture that is supplied to a filter when its shader is ready to be applied
     /// </summary>
-    /// <param name="Texture">The texture to use.</param>
-    /// <param name="Index">The index in the <see cref="GraphicsDevice.Textures"/> array that the texture should go in.</param>
-    /// <param name="SamplerState">An optional sampler state that should be used alongside the texture. Does nothing if <see langword="null"/>.</param>
-    public record DeferredTexture(Texture2D Texture, int Index, SamplerState SamplerState);
+    /// <param name="texture">The texture to use</param>
+    /// <param name="index">The index in the <see cref="GraphicsDevice.Textures"/> array that the texture should go in</param>
+    /// <param name="samplerState">An optional sampler state that should be used alongside the texture. Does nothing if <see langword="null"/></param>
+    public readonly struct DeferredTexture(Texture2D texture, int index, SamplerState samplerState)
+    {
+        public readonly Texture2D Texture = texture;
+        public readonly int Index = index;
+        public readonly SamplerState SamplerState = samplerState;
+    }
 
     /// <summary>
     /// A wrapper class for <see cref="Effect"/> that is focused around screen filter effects.
@@ -68,47 +61,42 @@ public class ManagedScreenShader : IDisposable
         Shader = shader;
 
         // Initialize the parameter cache.
-        parameterCache = [];
+        ParameterCache = [];
     }
 
     internal bool ParameterIsCachedAsValue(string parameterName, object value)
     {
-        // If the parameter cache has not registered this parameter yet, that means it can't have changed, because there's nothing to compare against.
-        // In this case, initialize the parameter in the cache for later.
-        if (!parameterCache.TryGetValue(parameterName, out object parameter))
+        // If the parameter cache has not registered this parameter yet, that means it can't have changed, because there's nothing to compare against
+        if (!ParameterCache.TryGetValue(parameterName, out object parameter))
             return false;
 
         return parameter?.Equals(value) ?? false;
     }
 
     /// <summary>
-    /// Attempts to send parameter data to the GPU for the filter to use.
+    /// Attempts to send parameter data to the GPU for the filter to use
     /// </summary>
-    /// <param name="parameterName">The name of the parameter. This must correspond with the parameter name in the filter.</param>
-    /// <param name="value">The value to supply to the parameter.</param>
+    /// <param name="parameterName">The name of the parameter. This must correspond with the parameter name in the filter</param>
+    /// <param name="value">The value to supply to the parameter</param>
     public bool TrySetParameter(string parameterName, object value)
     {
-        // Shaders do not work on servers. If this method is called on one, terminate it immediately.
+        // Shaders do not work on servers
         if (Main.netMode == NetmodeID.Server)
             return false;
 
-        // Check if the parameter even exists. If it doesn't, obviously do nothing else.
+        // Check if the parameter even exists
         EffectParameter parameter = Shader.Value.Parameters[parameterName];
         if (parameter is null)
             return false;
 
-        // Check if the parameter value is already cached as the supplied value. If it is, don't waste resources informing the GPU of
-        // parameter data, since nothing relevant has changed.
         if (ParameterIsCachedAsValue(parameterName, value))
             return false;
 
-        // Store the value in the cache.
-        parameterCache[parameterName] = value;
+        // Store the value in the cache
+        ParameterCache[parameterName] = value;
 
-        // Unfortunately, there is no simple type upon which singles, integers, matrices, etc. can be converted in order to be sent to the GPU, and there is no
-        // super easy solution for checking a parameter's expected type. FNA just messes with pointers under the hood and tosses back exceptions if that doesn't work.
-        // Unless something neater arises, this switch expression will do, I suppose.
-
+        // There isn't really a good way to sent stuff over to the GPU due to no simple type numbers can be converted to
+        // So until something better appears this switch will do
         try
         {
             switch (value)
@@ -170,57 +158,55 @@ public class ManagedScreenShader : IDisposable
         }
         catch
         {
-            AdditionsMain.Instance.Logger.Error($"ruh roh the screen shader {Shader.Value.Name} tried to set a parameter with an unsupported type of {value.GetType().Name}");
+            AdditionsMain.Instance.Logger.Error(
+                $"ruh roh the shader {Shader.Value.Name} tried to set a parameter with an unsupported type of {value.GetType().Name}");
             return false;
         }
     }
 
     /// <summary>
-    /// Sets a texture at a given index for this shader to use. Typically, index 0 is populated with whatever was passed into a <see cref="SpriteBatch"/>.Draw call.
+    /// Sets a texture at a given index for this shader to use <br></br>
+    /// Remember, index 0 may be populated with whatever was passed into a <see cref="SpriteBatch"/>.Draw call
     /// </summary>
-    /// <param name="texture">The texture to supply.</param>
-    /// <param name="textureIndex">The index to place the texture in.</param>
-    /// <param name="samplerStateOverride">Which sampler should be used for the texture.</param>
+    /// <param name="texture">The texture to supply</param>
+    /// <param name="textureIndex">The index to place the texture in</param>
+    /// <param name="samplerStateOverride">Which sampler should be used for the texture</param>
     public void SetTexture(Texture2D texture, int textureIndex, SamplerState samplerStateOverride = null)
     {
         if (Main.netMode == NetmodeID.Server)
             return;
 
         DeferredTexture deferredTexture = new(texture, textureIndex, samplerStateOverride);
-        DeferredTextures[textureIndex] = deferredTexture;
+        _deferredTextures[textureIndex] = deferredTexture;
     }
 
     /// <summary>
-    /// Call to indicate that the filter should be active. This needs to happen each frame it should be active for.
+    /// Call to indicate that the filter should be active. This needs to happen each frame it should be active for
     /// </summary>
     public void Activate() => IsActive = true;
 
     /// <summary>
-    /// Automatically called at the end of each update, after updating the filter.
+    /// Automatically called at the end of each update, after updating the filter
     /// </summary>
     public void Deactivate() => IsActive = false;
 
     /// <summary>
-    /// Apply the filter.
+    /// Apply the filter
     /// </summary>
-    /// <param name="setCommonParams">If true, this will automatically try to set certain parameters in the shader, such as globalTime.</param>
-    /// <param name="pass">Specify a specific pass to use, if the shader has multiple.</param>
+    /// <param name="setCommonParams">If true, this will automatically try to set certain parameters in the shader, such as globalTime</param>
+    /// <param name="pass">Specify a specific pass to use, if the shader has multiple</param>
     public void Apply(bool setCommonParams = true, string pass = null)
     {
-        // Apply commonly used parameters.
         if (setCommonParams)
-            SetCommonParameters();
+        {
+            TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly);
+            TrySetParameter("screenPosition", Main.screenPosition);
+            TrySetParameter("screenSize", new Vector2(Main.screenWidth, Main.screenHeight));
+            TrySetParameter("zoom", Main.GameZoomTarget);
+        }
 
-        SupplyDeferredTextures();
-
-        WrappedEffect.CurrentTechnique.Passes[pass ?? ManagedShader.DefaultPassName].Apply();
-    }
-
-    private void SupplyDeferredTextures()
-    {
         GraphicsDevice gd = Main.instance.GraphicsDevice;
-
-        foreach (DeferredTexture textureWrapper in DeferredTextures.Values)
+        foreach (DeferredTexture textureWrapper in _deferredTextures.Values)
         {
             int textureIndex = textureWrapper.Index;
             Texture2D texture = textureWrapper.Texture;
@@ -231,14 +217,8 @@ public class ManagedScreenShader : IDisposable
             if (samplerStateOverride is not null)
                 gd.SamplerStates[textureIndex] = samplerStateOverride;
         }
-    }
 
-    public void SetCommonParameters()
-    {
-        TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly);
-        TrySetParameter("screenPosition", Main.screenPosition);
-        TrySetParameter("screenSize", new Vector2(Main.screenWidth, Main.screenHeight));
-        TrySetParameter("zoom", Main.GameZoomTarget);
+        WrappedEffect.CurrentTechnique.Passes[pass ?? ManagedShader.DefaultPassName].Apply();
     }
 
     public void Dispose()
@@ -248,7 +228,7 @@ public class ManagedScreenShader : IDisposable
 
         Disposed = true;
         Main.QueueMainThreadAction(Shader.Value.Dispose);
-        parameterCache.Clear();
+        ParameterCache.Clear();
         GC.SuppressFinalize(this);
     }
 }
@@ -259,35 +239,33 @@ public sealed class ScreenShaderUpdates : ModSystem
     public static ManagedRenderTarget MainTarget { get; private set; }
     public static ManagedRenderTarget AuxiliaryTarget { get; private set; }
 
-    private static readonly List<ManagedScreenShader> activeFilters = [];
-    private static readonly List<ManagedScreenShader> blurParticles = [];
-    private static readonly List<ManagedScreenShader> chromaticAberrationParticles = [];
-    private static readonly List<ManagedScreenShader> flashParticles = [];
-    private static readonly List<ManagedScreenShader> shockwaveParticles = [];
+    private static readonly List<ManagedScreenShader> ActiveFilters = [];
+    private static readonly List<ManagedScreenShader> BlurParticles = [];
+    private static readonly List<ManagedScreenShader> ChromaticAberrationParticles = [];
+    private static readonly List<ManagedScreenShader> FlashParticles = [];
+    private static readonly List<ManagedScreenShader> ShockwaveParticles = [];
     private static readonly List<DrawAction> DrawActions = new(9000);
 
-    public static void QueueDrawAction(Action renderAction, BlendState blendState = null, ManagedShader effect = null, string groupID = null)
+    public static void QueueDrawAction(Action renderAction, BlendState blendState = null, ManagedShader effect = null,
+        string groupID = null)
     {
         ArgumentNullException.ThrowIfNull(renderAction);
         BlendState blend = blendState ?? BlendState.AlphaBlend;
-        DrawAction action = new DrawAction(renderAction, blend, isTexture: true, effect, groupID); // Treat as texture for consistency
+        DrawAction action =
+            new DrawAction(renderAction, blend, isTexture: true, effect, groupID); // Treat as texture for consistency
         DrawActions.Add(action);
     }
 
-    private readonly struct ParticleShaderHandler
+    private readonly struct ParticleShaderHandler(
+        ParticleTypes type,
+        string shaderName,
+        List<ManagedScreenShader> shaderList)
     {
-        public readonly ParticleTypes ParticleType;
-        public readonly string ShaderName;
-        public readonly List<ManagedScreenShader> ShaderList;
+        public readonly ParticleTypes ParticleType = type;
+        public readonly string ShaderName = shaderName;
+        public readonly List<ManagedScreenShader> ShaderList = shaderList;
 
-        public ParticleShaderHandler(ParticleTypes type, string shaderName, List<ManagedScreenShader> shaderList)
-        {
-            ParticleType = type;
-            ShaderName = shaderName;
-            ShaderList = shaderList;
-        }
-
-        public readonly void ProcessParticle(ref ParticleData particle)
+        public void ProcessParticle(ref ParticleData particle)
         {
             if (!particle.Active || particle.Type != ParticleType)
                 return;
@@ -308,7 +286,7 @@ public sealed class ScreenShaderUpdates : ModSystem
             shader.TrySetParameter("radius", particle.Scale / Main.screenWidth);
         }
 
-        private readonly void ConfigureSpecificParameters(ManagedScreenShader shader, ref ParticleData particle)
+        private void ConfigureSpecificParameters(ManagedScreenShader shader, ref ParticleData particle)
         {
             switch (ParticleType)
             {
@@ -334,13 +312,14 @@ public sealed class ScreenShaderUpdates : ModSystem
         }
     }
 
-    private static readonly ParticleShaderHandler[] ParticleHandlers = new[]
-    {
-        new ParticleShaderHandler(ParticleTypes.Blur,  "BlurFilter", blurParticles),
-        new ParticleShaderHandler(ParticleTypes.ChromaticAberration,"ChromaticAberration",chromaticAberrationParticles),
-        new ParticleShaderHandler(ParticleTypes.Flash,"FlashFilter",flashParticles),
-        new ParticleShaderHandler(ParticleTypes.Shockwave,"ShockwaveShader",shockwaveParticles)
-    };
+    private static readonly ParticleShaderHandler[] ParticleHandlers =
+    [
+        new ParticleShaderHandler(ParticleTypes.Blur, "BlurFilter", BlurParticles),
+        new ParticleShaderHandler(ParticleTypes.ChromaticAberration, "ChromaticAberration",
+            ChromaticAberrationParticles),
+        new ParticleShaderHandler(ParticleTypes.Flash, "FlashFilter", FlashParticles),
+        new ParticleShaderHandler(ParticleTypes.Shockwave, "ShockwaveShader", ShockwaveParticles)
+    ];
 
     public override void OnModLoad()
     {
@@ -349,8 +328,8 @@ public sealed class ScreenShaderUpdates : ModSystem
 
         Main.QueueMainThreadAction(static () =>
         {
-            MainTarget = new ManagedRenderTarget(true, ManagedRenderTarget.CreateScreenSizedTarget, true);
-            AuxiliaryTarget = new ManagedRenderTarget(true, ManagedRenderTarget.CreateScreenSizedTarget, true);
+            MainTarget = new ManagedRenderTarget(true, ManagedRenderTarget.CreateScreenSizedTarget);
+            AuxiliaryTarget = new ManagedRenderTarget(true, ManagedRenderTarget.CreateScreenSizedTarget);
         });
     }
 
@@ -366,19 +345,23 @@ public sealed class ScreenShaderUpdates : ModSystem
         });
     }
 
-    internal static void ApplyScreenFilters(RenderTarget2D _, RenderTarget2D screenTarget1, RenderTarget2D _2, Color clearColor)
+    internal static void ApplyScreenFilters(RenderTarget2D _, RenderTarget2D screenTarget1, RenderTarget2D _2,
+        Color clearColor)
     {
         RenderTarget2D target1 = null;
         RenderTarget2D target2 = screenTarget1;
 
         // Handle gravity flipping
-        if (Main.player[Main.myPlayer].gravDir == -1f)
+        if ((int)Main.player[Main.myPlayer].gravDir == -1)
         {
             target1 = AuxiliaryTarget;
             Main.instance.GraphicsDevice.SetRenderTarget(target1);
             Main.instance.GraphicsDevice.Clear(clearColor);
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Matrix.Invert(Main.GameViewMatrix.EffectMatrix));
-            Main.spriteBatch.Draw(target2, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.FlipVertically, 0f);
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp,
+                DepthStencilState.Default, RasterizerState.CullNone, null,
+                Matrix.Invert(Main.GameViewMatrix.EffectMatrix));
+            Main.spriteBatch.Draw(target2, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 1f,
+                SpriteEffects.FlipVertically, 0f);
             Main.spriteBatch.End();
             target2 = AuxiliaryTarget;
         }
@@ -396,18 +379,19 @@ public sealed class ScreenShaderUpdates : ModSystem
         }
 
         // Collect all active filters
-        activeFilters.Clear();
+        ActiveFilters.Clear();
         foreach (ManagedScreenShader filter in AssetRegistry.Filters.Values)
         {
             if (filter.IsActive)
-                activeFilters.Add(filter);
+                ActiveFilters.Add(filter);
         }
-        activeFilters.AddRange(ActiveShaders);
+
+        ActiveFilters.AddRange(ActiveShaders);
         foreach (ParticleShaderHandler handler in ParticleHandlers)
-            activeFilters.AddRange(handler.ShaderList);
+            ActiveFilters.AddRange(handler.ShaderList);
 
         // Apply filters
-        foreach (ManagedScreenShader filter in activeFilters)
+        foreach (ManagedScreenShader filter in ActiveFilters)
         {
             target1 = (target2 != MainTarget.Target) ? MainTarget : AuxiliaryTarget;
             Main.instance.GraphicsDevice.SetRenderTarget(target1);
@@ -449,7 +433,9 @@ public sealed class ScreenShaderUpdates : ModSystem
                             if (action.RenderAction == null)
                                 continue;
 
-                            sb.Begin(SpriteSortMode.Deferred, action.Blend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, action.Shader?.Effect, Main.GameViewMatrix.TransformationMatrix);
+                            sb.Begin(SpriteSortMode.Deferred, action.Blend, Main.DefaultSamplerState,
+                                DepthStencilState.None, RasterizerState.CullNone, action.Shader?.Effect,
+                                Main.GameViewMatrix.TransformationMatrix);
                             action.Shader?.Render();
                             action.RenderAction();
                             sb.End();
@@ -462,7 +448,9 @@ public sealed class ScreenShaderUpdates : ModSystem
                         if (action.RenderAction == null)
                             continue;
 
-                        sb.Begin(SpriteSortMode.Deferred, action.Blend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, action.Shader?.Effect, Main.GameViewMatrix.TransformationMatrix);
+                        sb.Begin(SpriteSortMode.Deferred, action.Blend, Main.DefaultSamplerState,
+                            DepthStencilState.None, RasterizerState.CullNone, action.Shader?.Effect,
+                            Main.GameViewMatrix.TransformationMatrix);
                         action.Shader?.Render();
                         action.RenderAction();
                         sb.End();
@@ -471,7 +459,8 @@ public sealed class ScreenShaderUpdates : ModSystem
                     {
                         // Grouped: batch actions with same GroupId, assuming shared shader parameters
                         ManagedShader sharedShader = groupActions[0].Shader;
-                        sb.Begin(SpriteSortMode.Deferred, blend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, sharedShader?.Effect, Main.GameViewMatrix.TransformationMatrix);
+                        sb.Begin(SpriteSortMode.Deferred, blend, Main.DefaultSamplerState, DepthStencilState.None,
+                            RasterizerState.CullNone, sharedShader?.Effect, Main.GameViewMatrix.TransformationMatrix);
                         foreach (DrawAction action in groupActions)
                         {
                             if (action.RenderAction == null)
@@ -482,6 +471,7 @@ public sealed class ScreenShaderUpdates : ModSystem
                                 action.Shader?.Render();
                             action.RenderAction();
                         }
+
                         sb.End();
                     }
                 }
@@ -501,11 +491,11 @@ public sealed class ScreenShaderUpdates : ModSystem
         for (int i = ShaderEntities.Count - 1; i >= 0; i--)
         {
             IHasScreenShader entity = ShaderEntities[i];
-            if (!entity.IsEntityActive())
-            {
-                if (entity.HasShader)
-                    entity.ReleaseShader();
-            }
+            if (entity.IsEntityActive())
+                continue;
+
+            if (entity.HasShader)
+                entity.ReleaseShader();
         }
     }
 
@@ -554,13 +544,14 @@ public sealed class ScreenShaderUpdates : ModSystem
     }
 }
 
-public class ScreenModifierManager : ModSystem
+public sealed class ScreenModifierManager : ModSystem
 {
     private record ScreenModifierInfo(ScreenTargetModifierDelegate Info, byte Layer);
 
-    public delegate void ScreenTargetModifierDelegate(RenderTarget2D finalTexture, RenderTarget2D screenTarget1, RenderTarget2D screenTarget2, Color clearColor);
+    public delegate void ScreenTargetModifierDelegate(RenderTarget2D finalTexture, RenderTarget2D screenTarget1,
+        RenderTarget2D screenTarget2, Color clearColor);
 
-    private static List<ScreenModifierInfo> screenModifiers;
+    private static List<ScreenModifierInfo> _screenModifiers;
 
     /// <summary>
     /// The layer of screen filters in the modifiers
@@ -570,14 +561,14 @@ public class ScreenModifierManager : ModSystem
     public override void Load()
     {
         On_FilterManager.EndCapture += EndCaptureDetour;
-        screenModifiers = [];
+        _screenModifiers = [];
         RegisterScreenModifier(ScreenShaderUpdates.ApplyScreenFilters, FilterLayer);
     }
 
     public override void Unload()
     {
         On_FilterManager.EndCapture -= EndCaptureDetour;
-        screenModifiers.Clear();
+        _screenModifiers.Clear();
     }
 
     /// <summary>
@@ -588,15 +579,16 @@ public class ScreenModifierManager : ModSystem
         if (Main.dedServ)
             return;
 
-        screenModifiers.Add(new(screenTargetModifierDelegate, layer));
+        _screenModifiers.Add(new(screenTargetModifierDelegate, layer));
 
-        if (screenModifiers.Count > 1)
-            screenModifiers = [.. screenModifiers.OrderBy(element => element.Layer)];
+        if (_screenModifiers.Count > 1)
+            _screenModifiers = [.. _screenModifiers.OrderBy(element => element.Layer)];
     }
 
-    private void EndCaptureDetour(On_FilterManager.orig_EndCapture orig, FilterManager self, RenderTarget2D finalTexture, RenderTarget2D screenTarget1, RenderTarget2D screenTarget2, Color clearColor)
+    private void EndCaptureDetour(On_FilterManager.orig_EndCapture orig, FilterManager self,
+        RenderTarget2D finalTexture, RenderTarget2D screenTarget1, RenderTarget2D screenTarget2, Color clearColor)
     {
-        foreach (ScreenModifierInfo screenModifier in screenModifiers)
+        foreach (ScreenModifierInfo screenModifier in _screenModifiers)
             screenModifier.Info(finalTexture, screenTarget1, screenTarget2, clearColor);
 
         orig(self, finalTexture, screenTarget1, screenTarget2, clearColor);
@@ -629,26 +621,29 @@ public static class ScreenShaderPool
         {
             if (!BaseEffects.TryGetValue(filterName, out Ref<Effect> baseEffect))
             {
-                AdditionsMain.Instance.Logger.Error($"Shader '{filterName}' not found in BaseEffects. Available: {string.Join(", ", BaseEffects.Keys)}");
+                AdditionsMain.Instance.Logger.Error(
+                    $"Shader '{filterName}' not found in BaseEffects. Available: {string.Join(", ", BaseEffects.Keys)}");
                 throw new ArgumentException($"No pool initialized for filter '{filterName}'.");
             }
+
             Effect clonedEffect = baseEffect.Value.Clone();
             return new ManagedScreenShader(new Ref<Effect>(clonedEffect));
         }
 
         ManagedScreenShader shader = pool.Dequeue();
         shader.Deactivate();
-        shader.parameterCache.Clear();
+        shader.ParameterCache.Clear();
         return shader;
     }
 
     public static void ReturnShader(string filterName, ManagedScreenShader shader)
     {
-        if (Main.netMode == NetmodeID.Server || !ShaderPools.TryGetValue(filterName, out Queue<ManagedScreenShader> pool))
+        if (Main.netMode == NetmodeID.Server ||
+            !ShaderPools.TryGetValue(filterName, out Queue<ManagedScreenShader> pool))
             return;
 
         shader.Deactivate();
-        shader.parameterCache.Clear();
+        shader.ParameterCache.Clear();
         pool.Enqueue(shader);
     }
 
@@ -662,6 +657,7 @@ public static class ScreenShaderPool
                 shader.Dispose();
             }
         }
+
         ShaderPools.Clear();
         BaseEffects.Clear();
     }

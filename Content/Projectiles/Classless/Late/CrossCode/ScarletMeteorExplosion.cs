@@ -5,13 +5,13 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.CrossCode;
 
-public class ScarletMeteorExplosion : ModProjectile, ILocalizedModType, IModType
+public class ScarletMeteorExplosion : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ScarletMeteorExplosion);
 
-    private const int horiz = 6;
+    private const int Horiz = 6;
 
-    private const int vert = 2;
+    private const int Vert = 2;
 
     public int FrameX
     {
@@ -41,7 +41,7 @@ public class ScarletMeteorExplosion : ModProjectile, ILocalizedModType, IModType
         if (Projectile.frameCounter % 3 == 2)
         {
             FrameX++;
-            if (FrameX >= horiz)
+            if (FrameX >= Horiz)
             {
                 FrameY++;
                 FrameX = 0;
@@ -62,13 +62,13 @@ public class ScarletMeteorExplosion : ModProjectile, ILocalizedModType, IModType
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return CircularHitboxCollision(Projectile.Center, 119f, targetHitbox);
+        return CalUtils.CircularHitboxCollision(Projectile.Center, 119f, targetHitbox);
     }
 
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D tex = Projectile.ThisProjectileTexture();
-        Rectangle frame = tex.Frame(horiz, vert, FrameX, FrameY);
+        Rectangle frame = tex.Frame(Horiz, Vert, FrameX, FrameY);
         Vector2 orig = frame.Size() / 2;
         Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, frame, Color.White, Projectile.rotation, orig, 1f, 0, 0f);
         return false;

@@ -6,7 +6,7 @@ using static Microsoft.Xna.Framework.MathHelper;
 
 namespace TheExtraordinaryAdditions.Core.Utilities;
 
-public static partial class Utility
+public static class PrimitiveUtils
 {
     public static readonly short[] TextureQuadIndices = [0, 1, 2, 2, 3, 0];
     public static void LogDeviceInfo(this GraphicsDevice g)
@@ -20,8 +20,7 @@ public static partial class Utility
             $" IsDisposed: {g.IsDisposed}" +
             $" RasterizerState: {g.RasterizerState}" +
             $" ScissorRectangle: {g.ScissorRectangle}" +
-            $" Viewport: {g.Viewport}" +
-            $" Exists? {g == null}").Log();
+            $" Viewport: {g.Viewport}").Log();
     }
 
     #region 2D
@@ -43,7 +42,7 @@ public static partial class Utility
         effectView *= Matrix.CreateRotationZ(Pi);
 
         // Account for the inverted gravity effect
-        if (Main.LocalPlayer.gravDir == -1f)
+        if ((int)Main.LocalPlayer.gravDir == -1)
             effectView *= Matrix.CreateScale(1f, -1f, 1f) * Matrix.CreateTranslation(0f, height, 0f);
 
         // And account for the current zoom
@@ -114,7 +113,7 @@ public static partial class Utility
 
         for (int side = 0; side < 2; side++)
         {
-            float cylinderOffsetAngle = side == 0 ? MathHelper.Pi : 0f;
+            float cylinderOffsetAngle = side == 0 ? Pi : 0f;
 
             for (int i = 0; i <= heightSegments; i++)
             {
@@ -136,7 +135,7 @@ public static partial class Utility
 
                 for (int j = 0; j <= widthSegments; j++)
                 {
-                    float angle = MathHelper.Pi * j * widthStep + cylinderOffsetAngle;
+                    float angle = Pi * j * widthStep + cylinderOffsetAngle;
                     Vector3 baseOffset = new(0f, MathF.Sin(angle), MathF.Cos(angle));
                     Vector3 orthogonalOffset = Vector3.Transform(baseOffset, rotationMatrix) * width;
                     Vector3 finalPoint = cylinderPoint + orthogonalOffset;
@@ -169,7 +168,7 @@ public static partial class Utility
         effectView *= zoomScaleMatrix;
 
         Matrix effectProjection = Matrix.CreatePerspectiveFieldOfView(
-            MathHelper.ToRadians(fov),
+            ToRadians(fov),
             (float)width / height, // Aspect ratio
             1f, 3000f); // Near and far planes
 
@@ -235,7 +234,7 @@ public static partial class Utility
         view *= zoomScaleMatrix;
 
         Matrix projection = Matrix.CreatePerspectiveFieldOfView(
-            MathHelper.ToRadians(fov),
+            ToRadians(fov),
             (float)width / height, // Aspect ratio
             1f, 3000f); // Near and far planes
 
@@ -247,7 +246,7 @@ public static partial class Utility
         Matrix scale = Matrix.CreateScale(size);
         Matrix objectMatrix = rotation * scale;
         if (horizontalDir == -1)
-            objectMatrix = Matrix.CreateReflection(new Plane(Vector3.UnitX, 1f)) * Matrix.CreateRotationZ(MathHelper.PiOver2) * objectMatrix;
+            objectMatrix = Matrix.CreateReflection(new Plane(Vector3.UnitX, 1f)) * Matrix.CreateRotationZ(PiOver2) * objectMatrix;
 
         return objectMatrix * world * view * projection;
     }

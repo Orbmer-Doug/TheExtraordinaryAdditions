@@ -1,6 +1,8 @@
-﻿using Terraria;
+﻿using CalamityMod;
+using Terraria;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 
@@ -26,13 +28,14 @@ public class BloodletRelay : ProjOwnedByNPC<StygainHeart>
         }
 
         Projectile.netUpdate = true;
-        ref float Offset = ref Projectile.ai[2];
-        Offset += .09f * (Projectile.identity % 2f == 1f).ToDirectionInt() % MathHelper.TwoPi;
-        int arms = 3;
+        ref float offset = ref Projectile.ai[2];
+        offset += .09f * (Projectile.identity % 2 == 1).ToDirectionInt() % MathHelper.TwoPi;
+        const int arms = 3;
         for (int i = 0; i < arms; i++)
         {
-            Vector2 vel = (MathHelper.TwoPi * i / arms + Offset).ToRotationVector2().RotatedBy(4) * Main.rand.NextFloat(2.1f, 4.1f);
-            ParticleRegistry.SpawnGlowParticle(Projectile.Center, vel, 20, 42f, Color.DarkRed, 1f);
+            Vector2 vel = (MathHelper.TwoPi * i / arms + offset).ToRotationVector2().RotatedBy(4) *
+                          Main.rand.NextFloat(2.1f, 4.1f);
+            ParticleRegistry.SpawnGlowParticle(Projectile.Center, vel, 20, 42f, Color.DarkRed);
         }
 
         Projectile.velocity = Projectile.SafeDirectionTo(Owner.Center) * 12f;

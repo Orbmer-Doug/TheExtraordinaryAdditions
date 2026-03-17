@@ -411,6 +411,11 @@ Mods: {
 			MoonBlades.DisplayName: Moon Blades
 			MoonPortal.DisplayName: Moon Portal
 			HailfireRockets.DisplayName: Hailfire Rockets
+			CosmireapSweep.DisplayName: Cosmireap Sweep
+			CosmireapThrow.DisplayName: Cosmireap Throw
+			NebulaicBolt.DisplayName: Nebulaic Bolt
+			SeamstressDraw.DisplayName: Seamstress Draw
+			VermillionDart.DisplayName: Vermillion Dart
 		}
 
 		Keybinds: {
@@ -707,7 +712,7 @@ Mods: {
 				DisplayName: Primeval Toolkit
 				Tooltip:
 					'''
-					The tungsten cube is absolutely necessary
+					`The tungsten cube is absolutely necessary`
 					Increases tile range and placing speed
 					If underground the tools are amplified in power
 					Turn on visibility to get a tungsten cube effect
@@ -1010,7 +1015,6 @@ Mods: {
 				DisplayName: Tremor Greathelm
 				Tooltip:
 					'''
-					Subterranean helmet of noble quality
 					+65 increased mana
 					18% reduced mana cost
 					12% increased magic critical chance
@@ -1292,7 +1296,11 @@ Mods: {
 				Tooltip:
 					'''
 					Glove worn by a revered yet unusual seamstress
-					Conjure a magic circle that shoots burst of homing darts that explode in homing stars then fires a powerful, infinitely piercing needle that rips apart the threads of your enemies
+					Draw different shapes on the screen
+					Lines slice at enemies they touch
+					Closed loops swarm any enemy caught within it with stars
+					Triangles create homing darts
+					Non-line based shapes must be big enough for their effect to take place
 					'''
 			}
 
@@ -1332,7 +1340,12 @@ Mods: {
 
 			LanceOfSanguineSteels: {
 				DisplayName: Lance of Sanguine Steels
-				Tooltip: Conjures a portal to release a torrent of lances
+				Tooltip:
+					'''
+					Release a mix of lances and homing tears
+					Tears home in on the weakest enemy and progressively gain more damage over time, up to 3 times original
+					Hold <right> to make all current tears home directly onto an enemy and deal damage
+					'''
 			}
 
 			StarlessSea: {
@@ -1417,8 +1430,8 @@ Mods: {
 				DisplayName: Cosmireaper
 				Tooltip:
 					'''
-					Reel back a weighty reaper
-					<right> while held to cycle through various states
+					Swing around a weighty reaper
+					<right> to throw it out and cause a rip in the cosmos
 					'''
 			}
 
@@ -1456,9 +1469,7 @@ Mods: {
 				Tooltip:
 					'''
 					Charges a infinitely piercing spear that leaves a wake of sword tears
-					Hold <right> to stab with the spear
-					Getting 10 stabs with the spear creates a portal
-					If the spear is thrown through this portal, it will redirect and supercharge to the cursor to obliterate anything
+					Hold <right> to stab with the spear, creating lightning on hit
 					'''
 			}
 
@@ -1849,7 +1860,11 @@ Mods: {
 
 			TimberLash: {
 				DisplayName: Timber Lash
-				Tooltip: Simple whip made of forest-y resources
+				Tooltip:
+					'''
+					Simple whip made of forest-y resources
+					Strike with the tip for a guaranteed critical strike
+					'''
 			}
 
 			Avragen: {
@@ -1897,7 +1912,7 @@ Mods: {
 
 			BatLantern: {
 				DisplayName: Bat Lantern
-				Tooltip: Calls in Midnight Bats. Effected by magic and summon damage
+				Tooltip: Calls in Midnight Bats
 			}
 
 			EclipsedDuo: {
@@ -1953,15 +1968,19 @@ Mods: {
 				DisplayName: Troubled Tank
 				Tooltip:
 					'''
+					"Is this an AZ Tanks reference!?"
+					"Emissaries of Wibtor, the Devourer of Souls"
 					Holds out a meticulous tank
 					<right> to cycle through mysterious modes of destruction that may require cooldowns...
+					Hold SHIFT to see an expanded description of the modes
+					'''
+				Bugs:
+					'''
 					Slug: Releases a small bouncing slug that does 1.5x damage
-					Grub: Unleash a terrifying grub that violenty erupts in wall piercing shrapnel.
+					Grub: Unleash a terrifying grub that violently erupts in wall piercing shrapnel.
 					Lazer: shoot a regular bouncing lazer for 1.25x damage
 					Maggot: Let enemies carry the burden of a maggot
 					Bees: 'You have angered the hive!'
-					"Is this an AZ Tanks reference!?"
-					"Emissaries of Wibtor, the Devourer of Souls"
 					'''
 			}
 
@@ -2004,7 +2023,7 @@ Mods: {
 				DisplayName: Copper Wire Wrapped Rock
 				Tooltip:
 					'''
-					Strikes non-organic enemies with lightning
+					Strikes enemies with lightning
 					"you WILL throw this at power lines"
 					'''
 			}
@@ -2147,7 +2166,7 @@ Mods: {
 				OverheatLegScans2: "[NEXUS Worker/STATUS]: CONTINUOUS PROPULSION SYSTEM: OK"
 				OverheatLegScans3: "[NEXUS Worker/STATUS]: POTENTIAL ENERGY STORAGE SYSTEM: OK"
 				OverheatCoreScan: "[NEXUS Worker/STATUS]: CORE MODULE SCAN..."
-				OverheatCoreScan1: "[NEXUS Worker/STATUS]: SOUL ENERGY TRANSUMATION SYSTEM: OK"
+				OverheatCoreScan1: "[NEXUS Worker/STATUS]: SOUL ENERGY TRANSMUTATION SYSTEM: OK"
 				OverheatCoreScan2: "[NEXUS Worker/STATUS]: AUTOMATIC REORIENTATION SYSTEM: OK"
 				OverheatCoreScan3: "[NEXUS Worker/STATUS]: INERTIA CORRECTION SYSTEM: OK"
 				OverheatArmScans: "[NEXUS Worker/STATUS]: ARM MODULE (2) SCAN..."
@@ -2349,7 +2368,7 @@ Mods: {
 
 			DefeatedSnail: {
 				FriendlyName: Old Enemy
-				Description: Obliterate The Giant Snail From Ancient Times, a greatly feared entity which sleeps in the coldest caverns.
+				Description: Obliterate The Giant Snail From Ancient Times, a greatly feared entity which sleeps in the coldest caverns on the coldest moons.
 			}
 
 			DefeatedStygain: {

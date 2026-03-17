@@ -9,19 +9,6 @@ using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 
 namespace TheExtraordinaryAdditions.Core.Graphics;
 
-public enum DrawLayer
-{
-    BeforeTiles,
-    AfterTiles,
-    BeforeNPCs,
-    AfterNPCs,
-    BeforeProjectiles,
-    AfterProjectiles,
-    BeforePlayers,
-    AfterPlayers,
-    Dusts,
-}
-
 [Autoload(Side = ModSide.Client)]
 public class LayeredDrawSystem : ModSystem
 {

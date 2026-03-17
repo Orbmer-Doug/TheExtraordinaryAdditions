@@ -7,13 +7,14 @@ using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
 public class CosmicSlugCharge : ModProjectile, ILocalizedModType, IModType
 {
     internal static readonly int UpdateCount = 8;
-    internal static readonly int Lifetime = UpdateCount * SecondsToFrames(2);
+    internal static readonly int Lifetime = UpdateCount * CalUtils.SecondsToFrames(2);
     public override string Texture => AssetRegistry.Invis;
 
     public override void SetStaticDefaults()

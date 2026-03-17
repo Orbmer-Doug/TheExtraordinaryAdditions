@@ -7,7 +7,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Base;
 
-public abstract class BaseHoldoutProjectile : ModProjectile, ILocalizedModType, IModType
+public abstract class BaseHoldoutProjectile : ModProjectile
 {
     public virtual void Defaults() { }
     public sealed override void SetDefaults()
@@ -27,7 +27,7 @@ public abstract class BaseHoldoutProjectile : ModProjectile, ILocalizedModType, 
     public virtual bool SetItemTime => true;
 
     public bool TryUseMana(bool pay = true) => Item.CheckManaBetter(Owner, Owner.GetManaCost(Item), pay);
-    public bool HasMana() => Item.CheckManaBetter(Owner, Owner.GetManaCost(Item), false);
+    public bool HasMana() => Item.CheckManaBetter(Owner, Owner.GetManaCost(Item));
     public bool TryUseAmmo(out int projToShoot, out float speed, out int dmg, out float kb, out int ammoID)
     {
         if (!Owner.HasAmmo(Item))
@@ -61,7 +61,7 @@ public abstract class BaseHoldoutProjectile : ModProjectile, ILocalizedModType, 
             return;
         }
 
-        Center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
+        Center = Owner.RotatedRelativePoint(Owner.MountedCenter);
         Mouse = Modded.MouseWorld;
 
         Projectile.timeLeft = 2;

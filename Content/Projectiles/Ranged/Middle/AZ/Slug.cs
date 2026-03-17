@@ -1,6 +1,7 @@
 ﻿using System;
 using Terraria;
 using Terraria.ModLoader;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle.AZ;
 
@@ -14,7 +15,7 @@ public class Slug : ModProjectile
         Projectile.hostile = false;
         Projectile.ignoreWater = true;
         Projectile.tileCollide = true;
-        Projectile.timeLeft = SecondsToFrames(10);
+        Projectile.timeLeft = CalUtils.SecondsToFrames(10);
     }
 
     public override bool OnTileCollide(Vector2 oldVelocity)

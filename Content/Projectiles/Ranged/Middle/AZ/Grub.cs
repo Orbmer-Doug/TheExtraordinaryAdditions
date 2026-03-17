@@ -3,6 +3,7 @@ using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle.AZ;
 
@@ -17,7 +18,7 @@ public class Grub : ModProjectile
         Projectile.hostile = false;
         Projectile.ignoreWater = true;
         Projectile.tileCollide = true;
-        Projectile.timeLeft = SecondsToFrames(10);
+        Projectile.timeLeft = CalUtils.SecondsToFrames(10);
     }
 
     public override bool OnTileCollide(Vector2 oldVelocity)

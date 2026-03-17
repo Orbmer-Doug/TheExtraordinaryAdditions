@@ -7,6 +7,9 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
+using Utils = Terraria.Utils;
+using static CalamityMod.CalamityUtils;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
@@ -81,7 +84,7 @@ public class HellsToothpickHeld : ModProjectile
         Timer++;
     }
 
-    public int WaitUntilMax = SecondsToFrames(5);
+    public int WaitUntilMax = CalUtils.SecondsToFrames(5);
     private void BehaviorCharge()
     {
         if (Held < WaitUntilMax)

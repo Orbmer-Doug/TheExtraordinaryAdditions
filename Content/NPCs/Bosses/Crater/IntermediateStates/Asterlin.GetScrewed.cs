@@ -7,7 +7,7 @@ using static TheExtraordinaryAdditions.Core.Graphics.Animators;
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
 /// Do a silly animation upon killing all players
-public partial class Asterlin : ModNPC
+public partial class Asterlin
 {
     [AutomatedMethodInvoke]
     public void LoadStateTransitions_GetScrewed()
@@ -32,7 +32,7 @@ public partial class Asterlin : ModNPC
         { AnimType.Judging, .7f },
         { AnimType.AbsoluteChinema, .7f },
         { AnimType.Party, .7f },
-        { AnimType.GetJiggy, .5f },
+        { AnimType.GetJiggy, .1f },
     });
 
     private AnimType GetScrewed_Type
@@ -41,7 +41,8 @@ public partial class Asterlin : ModNPC
         set => ExtraAI[0] = (int)value;
     }
 
-    public static readonly float GetScrewed_MaxTime = SecondsToFrames(2.5f);
+    public static readonly float GetScrewed_MaxTime = CalUtils.SecondsToFrames(2.5f);
+
     public void DoBehavior_GetScrewed()
     {
         if (AITimer == 1 && this.RunServer())
@@ -60,16 +61,18 @@ public partial class Asterlin : ModNPC
                 break;
 
             case AnimType.idk:
-                float progress = (float)AITimer / GetScrewed_MaxTime;
+                float progress = AITimer / GetScrewed_MaxTime;
                 PiecewiseCurve danceCurve = new PiecewiseCurve()
-                            .Add(0f, 1f, 0.5f, Sine.InOutFunction)
-                            .AddStall(1f, 1f)
-                            .Add(1f, 0f, 0.5f, Sine.InOutFunction);
+                    .Add(0f, 1f, 0.5f, Sine.InOutFunction)
+                    .AddStall(1f, 1f)
+                    .Add(1f, 0f, 0.5f, Sine.InOutFunction);
                 float danceT = danceCurve.Evaluate(progress);
                 SetBodyRotation(Lerp(-0.3f, 0.3f, Sine.InOutFunction(danceT)));
                 SetZPosition(Lerp(0.7f, 1f, Bounce.OutFunction(danceT)));
-                SetLeftHandTarget(NPC.Center + PolarVector(200f * ZPosition, BodyRotation + PiOver2 + Lerp(-0.5f * Direction, 0.5f * Direction, Sine.OutFunction(danceT))));
-                SetRightHandTarget(NPC.Center + PolarVector(200f * ZPosition, BodyRotation - PiOver2 + Lerp(0.5f * Direction, -0.5f * Direction, Sine.OutFunction(danceT))));
+                SetLeftHandTarget(NPC.Center + PolarVector(200f * ZPosition,
+                    BodyRotation + PiOver2 + Lerp(-0.5f * Direction, 0.5f * Direction, Sine.OutFunction(danceT))));
+                SetRightHandTarget(NPC.Center + PolarVector(200f * ZPosition,
+                    BodyRotation - PiOver2 + Lerp(0.5f * Direction, -0.5f * Direction, Sine.OutFunction(danceT))));
                 float legSwing = Lerp(-0.4f * Direction, 0.4f * Direction, Convert01To010(Sin01(danceT * 3)));
                 SetLeftLegRotation(legSwing);
                 SetRightLegRotation(-legSwing);
@@ -91,18 +94,22 @@ public partial class Asterlin : ModNPC
                 SetDirection(-1);
                 SetHeadRotation(Pi);
                 float partyTime = AITimer * .25f;
-                float swingAmt = .9f;
-                SetLeftHandTarget(LeftArm.RootPosition + PolarVector(400f, -Utils.Remap(Cos01(partyTime), 0, 1, -swingAmt - Pi, swingAmt - Pi)));
-                SetRightHandTarget(RightArm.RootPosition + PolarVector(400f, Utils.Remap(Cos01(partyTime), 0, 1, -swingAmt - Pi, swingAmt - Pi)));
+                const float swingAmt = .9f;
+                SetLeftHandTarget(LeftArm.RootPosition + PolarVector(400f,
+                    -Utils.Remap(Cos01(partyTime), 0, 1, -swingAmt - Pi, swingAmt - Pi)));
+                SetRightHandTarget(RightArm.RootPosition + PolarVector(400f,
+                    Utils.Remap(Cos01(partyTime), 0, 1, -swingAmt - Pi, swingAmt - Pi)));
                 SetZPosition(NPC.Opacity);
                 break;
 
             case AnimType.GetJiggy:
                 SetLookingStraight(true);
                 float jiggyTime = AITimer * .25f;
-                float max = .7f;
-                SetLeftHandTarget(LeftArm.RootPosition + PolarVector(400f, -Utils.Remap(Cos01(jiggyTime), 0, 1, -max - PiOver2, max - PiOver2)));
-                SetRightHandTarget(RightArm.RootPosition + PolarVector(400f, -Utils.Remap(Cos01(jiggyTime), 0, 1, -max - PiOver2, max - PiOver2)));
+                const float max = .7f;
+                SetLeftHandTarget(LeftArm.RootPosition + PolarVector(400f,
+                    -Utils.Remap(Cos01(jiggyTime), 0, 1, -max - PiOver2, max - PiOver2)));
+                SetRightHandTarget(RightArm.RootPosition + PolarVector(400f,
+                    -Utils.Remap(Cos01(jiggyTime), 0, 1, -max - PiOver2, max - PiOver2)));
                 SetLeftLegRotation(Utils.Remap(Cos01(jiggyTime), 0, 1, -.3f, .3f));
                 SetRightLegRotation(Utils.Remap(Cos01(jiggyTime), 0, 1, -.3f, .3f));
                 SetBodyRotation(Utils.Remap(Cos01(jiggyTime), 0, 1, -.15f, .15f));
@@ -112,11 +119,11 @@ public partial class Asterlin : ModNPC
 
         NPC.Opacity = InverseLerp(GetScrewed_MaxTime, GetScrewed_MaxTime - 40, AITimer);
         SetLegFlamesInterpolant(NPC.Opacity);
-        if (AITimer >= GetScrewed_MaxTime)
-        {
-            NPC.active = false;
-            NPC.netUpdate = true;
-            ProjOwnedByNPC<Asterlin>.KillAll();
-        }
+        if (!(AITimer >= GetScrewed_MaxTime)) 
+            return;
+        
+        NPC.active = false;
+        NPC.netUpdate = true;
+        ProjOwnedByNPC<Asterlin>.KillAll();
     }
 }

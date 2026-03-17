@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.IO;
+using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -9,6 +10,8 @@ using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
 
@@ -56,7 +59,7 @@ public class TheStarsAreAfraid : ModProjectile
         set => Projectile.AdditionsInfo().ExtraAI[1] = value;
     }
 
-    public static readonly float ChargeTime = SecondsToFrames(1.5f);
+    public static readonly float ChargeTime = CalUtils.SecondsToFrames(1.5f);
     public float FadeOut => InverseLerp(0f, 50f, Projectile.timeLeft);
     public float ChargeCompletion => Animators.MakePoly(3).OutFunction(InverseLerp(0f, ChargeTime, Time)) * (1f - InverseLerp(0f, 30f, ReleaseTime));
     public float AmtCompletion => InverseLerp(0f, 4f, TypeOf);

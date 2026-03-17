@@ -1,13 +1,5 @@
-/*sampler uImage1 : register(s1);
-float globalTime;
-matrix transformMatrix;
-float globalTimeFactor;
-float coordZoom = 1;
-float saturation = 1;
-*/
-bool useOutline;
-sampler uImage0 : register(s0);
-sampler uImage1 : register(s1);
+sampler tex1 : register(s0);
+sampler tex2 : register(s1);
 float globalTime;
 matrix transformMatrix;
 
@@ -36,16 +28,11 @@ VertexShaderOutput VertexShaderFunction(in VertexShaderInput input)
     return output;
 }
 
-float InverseLerp(float x, float min, float max)
-{
-    return saturate((x - min) / (max - min));
-}
-
 float4 StarColorFunction(float2 coords)
 {
     float timeFactor = 4;
-    float4 c1 = tex2D(uImage0, coords + float2(sin(globalTime * timeFactor * 0.12) * 0.5, globalTime * timeFactor * 0.03));
-    float4 c2 = tex2D(uImage1, coords + float2(globalTime * timeFactor * -0.019, sin(globalTime * timeFactor * -0.09 + 0.754) * 0.6));
+    float4 c1 = tex2D(tex1, coords + float2(sin(globalTime * timeFactor * 0.12) * 0.5, globalTime * timeFactor * 0.03));
+    float4 c2 = tex2D(tex2, coords + float2(globalTime * timeFactor * -0.019, sin(globalTime * timeFactor * -0.09 + 0.754) * 0.6));
     return pow(c1 + c2, .8);
 }
 
@@ -67,7 +54,7 @@ technique Technique1
 {
     pass AutoloadPass
     {
-        VertexShader = compile vs_2_0 VertexShaderFunction();
-        PixelShader = compile ps_2_0 PixelShaderFunction();
+        VertexShader = compile vs_3_0 VertexShaderFunction();
+        PixelShader = compile ps_3_0 PixelShaderFunction();
     }
 }

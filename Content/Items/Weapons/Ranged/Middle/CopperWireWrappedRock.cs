@@ -12,7 +12,7 @@ public class CopperWireWrappedRock : ModItem
 
     public override void SetDefaults()
     {
-        Item.damage = 145;
+        Item.damage = 235;
         Item.DamageType = DamageClass.Ranged;
         Item.width = 94;
         Item.height = 36;

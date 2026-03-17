@@ -48,9 +48,9 @@ public class HemoglobbedCapsule : ModItem
 
     public override bool CanUseItem(Player player)
     {
-        if (Utility.FindProjectile(out Projectile p, Item.shoot, player.whoAmI))
+        if (FindProjectile(out Projectile p, Item.shoot, player.whoAmI))
         {
-            if (p.ai[0] == (int)HemoglobbedCapsuleThrown.BehaviorState.Aim)
+            if ((int)p.ai[0] == (int)HemoglobbedCapsuleThrown.BehaviorState.Aim)
                 return false;
         }
         return true;

@@ -5,7 +5,7 @@ using Terraria.ID;
 
 namespace TheExtraordinaryAdditions.Core.Utilities;
 
-public static partial class Utility
+public static class CollisionUtils
 {
     #region Raycasting
     [Flags]
@@ -20,7 +20,7 @@ public static partial class Utility
 
     public static Vector2 LaserCollision(Vector2 start, Vector2 end, CollisionTarget targets, float thickness = 0f, int numRays = 5)
     {
-        List<(Vector2 point, CollisionTarget targetType, bool noTileCollide)> intersections = new List<(Vector2, CollisionTarget, bool)>();
+        List<(Vector2 point, CollisionTarget targetType, bool noTileCollide)> intersections = [];
         float maxDistanceSquared = (end - start).LengthSquared();
 
         // Collect tile intersections
@@ -134,7 +134,7 @@ public static partial class Utility
 
     public static Vector2 LaserCollision(Vector2 start, Vector2 end, CollisionTarget targets, out CollisionTarget hitTarget, float thickness = 0f, int numRays = 5)
     {
-        List<(Vector2 point, CollisionTarget targetType, bool noTileCollide)> intersections = new List<(Vector2, CollisionTarget, bool)>();
+        List<(Vector2 point, CollisionTarget targetType, bool noTileCollide)> intersections = [];
         float maxDistanceSquared = (end - start).LengthSquared();
 
         // Collect tile intersections
@@ -304,7 +304,7 @@ public static partial class Utility
                     break;
 
                 // Stay in bounds
-                if (!WorldGen.InWorld(x, y, 0))
+                if (!WorldGen.InWorld(x, y))
                     break;
 
                 Tile tile = ParanoidTileRetrieval(x, y);
@@ -363,18 +363,18 @@ public static partial class Utility
                         }
 
                         // Define edges to check
-                        List<Vector2[]> edges = new();
+                        List<Vector2[]> edges = [];
                         if (tile.Slope != SlopeType.Solid && !tile.IsHalfBlock)
                         {
                             // Prioritize slope edge
-                            edges.Add(new[] { slopeStart, slopeEnd });
+                            edges.Add([slopeStart, slopeEnd]);
                         }
                         else
                         {
-                            edges.Add(new[] { topLeft, topRight });      // Top edge
-                            edges.Add(new[] { bottomLeft, bottomRight }); // Bottom edge
-                            edges.Add(new[] { topLeft, bottomLeft });    // Left edge
-                            edges.Add(new[] { topRight, bottomRight });  // Right edge
+                            edges.Add([topLeft, topRight]);      // Top edge
+                            edges.Add([bottomLeft, bottomRight]); // Bottom edge
+                            edges.Add([topLeft, bottomLeft]);    // Left edge
+                            edges.Add([topRight, bottomRight]);  // Right edge
                         }
 
                         // Check each edge for intersection with the ray
@@ -460,7 +460,7 @@ public static partial class Utility
             direction /= length; // Normalize
             Vector2 perp = new Vector2(-direction.Y, direction.X);
 
-            List<(Vector2 point, float t)> intersections = new List<(Vector2, float)>();
+            List<(Vector2 point, float t)> intersections = [];
             for (int k = 0; k < numRays; k++)
             {
                 float offsetFactor = (k / (numRays - 1f)) - 0.5f; // -0.5 to 0.5
@@ -560,7 +560,7 @@ public static partial class Utility
                     break;
 
                 // Check if we're out of bounds
-                if (!WorldGen.InWorld(x, y, 0))
+                if (!WorldGen.InWorld(x, y))
                     break;
 
                 // Check if there is liquid above
@@ -630,7 +630,7 @@ public static partial class Utility
             direction /= length; // Normalize
             Vector2 perp = new Vector2(-direction.Y, direction.X);
 
-            List<(Vector2 point, float t)> intersections = new List<(Vector2, float)>();
+            List<(Vector2 point, float t)> intersections = [];
             for (int k = 0; k < numRays; k++)
             {
                 float offsetFactor = (k / (numRays - 1f)) - 0.5f; // -0.5 to 0.5
@@ -705,13 +705,13 @@ public static partial class Utility
                     return start;
 
                 // Define the four sides of the NPCs hitbox
-                Vector2[] corners = new Vector2[]
-                {
+                Vector2[] corners =
+                [
                     npc.TopLeft,
                     npc.TopRight,
                     npc.BottomRight,
                     npc.BottomLeft
-                };
+                ];
 
                 // Check all four sides of the hitbox
                 for (int i = 0; i < 4; i++)
@@ -733,62 +733,60 @@ public static partial class Utility
 
             return closestIntersection;
         }
-        else
-        {
-            Vector2 direction = (end - start);
-            float length = direction.Length();
-            if (length <= 0)
-                return null;
-            direction /= length; // Normalize
-            Vector2 perp = new Vector2(-direction.Y, direction.X);
 
-            List<(Vector2 point, float t)> intersections = new List<(Vector2, float)>();
-            for (int k = 0; k < numRays; k++)
-            {
-                float offsetFactor = (k / (numRays - 1f)) - 0.5f; // -0.5 to 0.5
-                Vector2 offset = offsetFactor * thickness * perp;
-                Vector2 startOffset = start + offset;
-                Vector2 endOffset = end + offset;
-                Vector2? intersect = RaytraceNPCs(startOffset, endOffset, 0f, 1, requireHome);
-                if (intersect.HasValue)
-                {
-                    // Project the intersection point onto the main ray (start to end)
-                    Vector2 intersection = intersect.Value;
-                    Vector2 toIntersection = intersection - start;
-                    float t = Vector2.Dot(toIntersection, direction); // Distance along the main ray
-
-                    // Ensure the projected point is within the rays length
-                    if (t >= 0 && t <= length)
-                    {
-                        intersections.Add((intersection, t));
-                    }
-                }
-            }
-
-            if (intersections.Count == 0)
-                return null;
-
-            // Find the intersection with the smallest t (earliest along the main ray)
-            float bestT = float.MaxValue;
-            Vector2? bestPoint = null;
-
-            foreach (var (point, t) in intersections)
-            {
-                if (t < bestT)
-                {
-                    bestT = t;
-                    bestPoint = point;
-                }
-            }
-
-            if (bestPoint.HasValue)
-            {
-                // Return the point on the main ray at distance bestT
-                return start + direction * bestT;
-            }
-
+        Vector2 direction = (end - start);
+        float length = direction.Length();
+        if (length <= 0)
             return null;
+        direction /= length; // Normalize
+        Vector2 perp = new Vector2(-direction.Y, direction.X);
+
+        List<(Vector2 point, float t)> intersections = [];
+        for (int k = 0; k < numRays; k++)
+        {
+            float offsetFactor = (k / (numRays - 1f)) - 0.5f; // -0.5 to 0.5
+            Vector2 offset = offsetFactor * thickness * perp;
+            Vector2 startOffset = start + offset;
+            Vector2 endOffset = end + offset;
+            Vector2? intersect = RaytraceNPCs(startOffset, endOffset, 0f, 1, requireHome);
+            if (intersect.HasValue)
+            {
+                // Project the intersection point onto the main ray (start to end)
+                Vector2 intersection = intersect.Value;
+                Vector2 toIntersection = intersection - start;
+                float t = Vector2.Dot(toIntersection, direction); // Distance along the main ray
+
+                // Ensure the projected point is within the rays length
+                if (t >= 0 && t <= length)
+                {
+                    intersections.Add((intersection, t));
+                }
+            }
         }
+
+        if (intersections.Count == 0)
+            return null;
+
+        // Find the intersection with the smallest t (earliest along the main ray)
+        float bestT = float.MaxValue;
+        Vector2? bestPoint = null;
+
+        foreach (var (point, t) in intersections)
+        {
+            if (t < bestT)
+            {
+                bestT = t;
+                bestPoint = point;
+            }
+        }
+
+        if (bestPoint.HasValue)
+        {
+            // Return the point on the main ray at distance bestT
+            return start + direction * bestT;
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -816,13 +814,13 @@ public static partial class Utility
                     return start;
 
                 // Define the four sides of the players hitbox
-                Vector2[] corners = new Vector2[]
-                {
+                Vector2[] corners =
+                [
                     player.TopLeft,
                     player.TopRight,
                     player.BottomRight,
                     player.BottomLeft
-                };
+                ];
 
                 // Check all four sides of the hitbox
                 for (int i = 0; i < 4; i++)
@@ -844,62 +842,60 @@ public static partial class Utility
 
             return closestIntersection;
         }
-        else
-        {
-            Vector2 direction = (end - start);
-            float length = direction.Length();
-            if (length <= 0)
-                return null;
-            direction /= length; // Normalize
-            Vector2 perp = new Vector2(-direction.Y, direction.X);
 
-            List<(Vector2 point, float t)> intersections = new List<(Vector2, float)>();
-            for (int k = 0; k < numRays; k++)
-            {
-                float offsetFactor = (k / (numRays - 1f)) - 0.5f; // -0.5 to 0.5
-                Vector2 offset = offsetFactor * thickness * perp;
-                Vector2 startOffset = start + offset;
-                Vector2 endOffset = end + offset;
-                Vector2? intersect = RaytracePlayers(startOffset, endOffset, 0f, 1);
-                if (intersect.HasValue)
-                {
-                    // Project the intersection point onto the main ray (start to end)
-                    Vector2 intersection = intersect.Value;
-                    Vector2 toIntersection = intersection - start;
-                    float t = Vector2.Dot(toIntersection, direction); // Distance along the main ray
-
-                    // Ensure the projected point is within the rays length
-                    if (t >= 0 && t <= length)
-                    {
-                        intersections.Add((intersection, t));
-                    }
-                }
-            }
-
-            if (intersections.Count == 0)
-                return null;
-
-            // Find the intersection with the smallest t (earliest along the main ray)
-            float bestT = float.MaxValue;
-            Vector2? bestPoint = null;
-
-            foreach (var (point, t) in intersections)
-            {
-                if (t < bestT)
-                {
-                    bestT = t;
-                    bestPoint = point;
-                }
-            }
-
-            if (bestPoint.HasValue)
-            {
-                // Return the point on the main ray at distance bestT
-                return start + direction * bestT;
-            }
-
+        Vector2 direction = (end - start);
+        float length = direction.Length();
+        if (length <= 0)
             return null;
+        direction /= length; // Normalize
+        Vector2 perp = new Vector2(-direction.Y, direction.X);
+
+        List<(Vector2 point, float t)> intersections = [];
+        for (int k = 0; k < numRays; k++)
+        {
+            float offsetFactor = (k / (numRays - 1f)) - 0.5f; // -0.5 to 0.5
+            Vector2 offset = offsetFactor * thickness * perp;
+            Vector2 startOffset = start + offset;
+            Vector2 endOffset = end + offset;
+            Vector2? intersect = RaytracePlayers(startOffset, endOffset, 0f, 1);
+            if (!intersect.HasValue)
+                continue;
+                
+            // Project the intersection point onto the main ray (start to end)
+            Vector2 intersection = intersect.Value;
+            Vector2 toIntersection = intersection - start;
+            float t = Vector2.Dot(toIntersection, direction); // Distance along the main ray
+
+            // Ensure the projected point is within the rays length
+            if (t >= 0 && t <= length)
+            {
+                intersections.Add((intersection, t));
+            }
         }
+
+        if (intersections.Count == 0)
+            return null;
+
+        // Find the intersection with the smallest t (earliest along the main ray)
+        float bestT = float.MaxValue;
+        Vector2? bestPoint = null;
+
+        foreach (var (point, t) in intersections)
+        {
+            if (!(t < bestT)) 
+                continue;
+            
+            bestT = t;
+            bestPoint = point;
+        }
+
+        if (bestPoint.HasValue)
+        {
+            // Return the point on the main ray at distance bestT
+            return start + direction * bestT;
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -975,8 +971,8 @@ public static partial class Utility
 
     public static Point? RaytraceToFirstSolid(Vector2 pos1, Vector2 pos2)
     {
-        Point point1 = ToSafeTileCoordinates(pos1);
-        Point point2 = ToSafeTileCoordinates(pos2);
+        Point point1 = pos1.ToSafeTileCoordinates();
+        Point point2 = pos2.ToSafeTileCoordinates();
         return RaytraceToFirstSolid(point1, point2);
     }
 
@@ -996,24 +992,24 @@ public static partial class Utility
         int x = x0;
         int y = y0;
         int i = 1 + horizontalDistance + verticalDistance;
-        int E = horizontalDistance - verticalDistance;
+        int e = horizontalDistance - verticalDistance;
         horizontalDistance *= 2;
         verticalDistance *= 2;
 
         while (i > 0)
         {
-            if (IsTileSolidOrPlatform(Main.tile[x, y]))
+            if (Main.tile[x, y].IsTileSolidOrPlatform())
                 return new Point(x, y);
 
-            if (E > 0)
+            if (e > 0)
             {
                 x += horizontalIncrement;
-                E -= verticalDistance;
+                e -= verticalDistance;
             }
             else
             {
                 y += verticalIncrement;
-                E += horizontalDistance;
+                e += horizontalDistance;
             }
             i--;
         }
@@ -1447,17 +1443,6 @@ public static partial class Utility
         }
 
         return false;
-    }
-
-    public static bool CircularHitboxCollision(Vector2 center, float radius, Rectangle targetHitbox)
-    {
-        float closestX = MathHelper.Clamp(center.X, targetHitbox.Left, targetHitbox.Right);
-        float closestY = MathHelper.Clamp(center.Y, targetHitbox.Top, targetHitbox.Bottom);
-
-        Vector2 closestPoint = new(closestX, closestY);
-        float distanceSquared = Vector2.DistanceSquared(center, closestPoint);
-
-        return distanceSquared <= radius * radius;
     }
 
     public static bool EllipseCollision(Rectangle target, float ellipseWidth, float ellipseHeight, float ellipseRotation, Vector2 ellipseCenter)

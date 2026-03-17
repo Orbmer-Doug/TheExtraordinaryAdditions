@@ -46,17 +46,15 @@ public class AbsoluteGreaves : ModItem, ILocalizedModType, IModType
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        recipe.AddIngredient(ItemID.CrimsonGreaves, 1);
         recipe.AddIngredient(ModContent.ItemType<VoltGrieves>(), 1);
         recipe.AddIngredient(ModContent.ItemType<SpecteriteGreaves>(), 1);
         recipe.AddIngredient(ModContent.ItemType<BlueLeggings>(), 1);
         recipe.AddIngredient(ModContent.ItemType<TremorSheathe>(), 1);
         recipe.AddIngredient(ItemID.SolarFlareLeggings, 1);
-        recipe.AddIngredient(ModContent.ItemType<CoreofCalamity>(), 3);
         recipe.AddIngredient(ModContent.ItemType<GalacticaSingularity>(), 6);
-        recipe.AddIngredient(ModContent.ItemType<LifeAlloy>(), 5);
+        recipe.AddIngredient(ModContent.ItemType<LifeAlloy>(), 3);
         recipe.AddIngredient(ModContent.ItemType<RuinousSoul>(), 5);
-        recipe.AddIngredient(ModContent.ItemType<AscendantSpiritEssence>(), 4);
+        recipe.AddIngredient(ModContent.ItemType<AscendantSpiritEssence>(), 2);
         recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 12);
         recipe.AddTile(ModContent.TileType<CosmicAnvil>());
         recipe.Register();

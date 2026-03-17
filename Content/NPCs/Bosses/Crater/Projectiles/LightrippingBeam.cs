@@ -7,6 +7,7 @@ using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
@@ -14,12 +15,12 @@ public class LightrippingBeam : ProjOwnedByNPC<Asterlin>
 {
     public override string Texture => AssetRegistry.Invis;
 
-    public static readonly int TelegraphTime = SecondsToFrames(.8f);
-    public static readonly int BeamTime = SecondsToFrames(1.5f);
-    public static readonly int CollapseTime = SecondsToFrames(.25f);
+    public static readonly int TelegraphTime = CalUtils.SecondsToFrames(.8f);
+    public static readonly int BeamTime = CalUtils.SecondsToFrames(1.5f);
+    public static readonly int CollapseTime = CalUtils.SecondsToFrames(.25f);
 
-    public static readonly int PortalAppearTime = SecondsToFrames(.2f);
-    public static readonly int LaserExpandTime = SecondsToFrames(.3f);
+    public static readonly int PortalAppearTime = CalUtils.SecondsToFrames(.2f);
+    public static readonly int LaserExpandTime = CalUtils.SecondsToFrames(.3f);
 
     public static readonly int Lifetime = TelegraphTime + BeamTime + CollapseTime + PortalAppearTime + LaserExpandTime;
 

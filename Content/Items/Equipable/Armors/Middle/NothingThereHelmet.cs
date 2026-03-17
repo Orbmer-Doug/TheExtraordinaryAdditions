@@ -10,6 +10,7 @@ using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
 
@@ -46,7 +47,7 @@ public class NothingThereHelmet : ModItem
         player.setBonus = this.GetLocalization("SetBonus").Format(AdditionsKeybinds.SetBonusHotKey.TooltipHotkeyString());
         player.moveSpeed += 0.3f;
         ref int counter = ref there.Counter;
-        int time = SecondsToFrames(4);
+        int time = CalUtils.SecondsToFrames(4);
 
         // Start knashing
         if (player.whoAmI == Main.myPlayer && AdditionsKeybinds.SetBonusHotKey.JustPressed && counter <= 0 && !CalUtils.HasCooldown(player, MimicryCooldown.ID))

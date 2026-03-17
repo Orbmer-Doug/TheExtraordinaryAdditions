@@ -5,12 +5,13 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Late;
 
 public class CryogenicBlast : ModProjectile
 {
-    public static readonly float Lifetime = SecondsToFrames(.4f);
+    public static readonly float Lifetime = CalUtils.SecondsToFrames(.4f);
 
     public ref float Radius => ref Projectile.ai[1];
 
@@ -60,7 +61,7 @@ public class CryogenicBlast : ModProjectile
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return CircularHitboxCollision(Projectile.Center, Radius * 0.5f, targetHitbox);
+        return CalUtils.CircularHitboxCollision(Projectile.Center, Radius * 0.5f, targetHitbox);
     }
 
     public override bool PreDraw(ref Color lightColor)

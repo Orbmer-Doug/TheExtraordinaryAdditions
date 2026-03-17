@@ -1,8 +1,10 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
+using CalamityMod;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle.AZ;
 
@@ -43,7 +45,7 @@ public class Maggot : ModProjectile
                 Main.rand.NextFloat(.5f, .8f), color, col * .1f, 190);
         }
 
-        if (Time > SecondsToFrames(2))
+        if (Time > CalUtils.SecondsToFrames(2))
         {
             Player player = Main.player[Player.FindClosest(Projectile.Center, Projectile.width, Projectile.height)];
             if (CombinedHooks.CanHitPvpWithProj(Projectile, player) && player != Owner && player != null && PlayerLoader.CanHitPvpWithProj(Projectile, player))

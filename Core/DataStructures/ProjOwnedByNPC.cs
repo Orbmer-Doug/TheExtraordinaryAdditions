@@ -14,7 +14,7 @@ namespace TheExtraordinaryAdditions.Core.DataStructures;
 /// Utilizes <see cref="Projectile.localAI"/>[0]
 /// </remarks>
 /// <typeparam name="T"></typeparam>
-public abstract class ProjOwnedByNPC<T> : ModProjectile, ILocalizedModType, IModType where T : ModNPC
+public abstract class ProjOwnedByNPC<T> : ModProjectile where T : ModNPC
 {
     /// <summary>
     /// The index of the owner within <see cref="Main.npc"/>
@@ -54,7 +54,7 @@ public abstract class ProjOwnedByNPC<T> : ModProjectile, ILocalizedModType, IMod
 
     public sealed override void ReceiveExtraAI(BinaryReader reader)
     {
-        Projectile.localAI[0] = (int)reader.ReadInt32();
+        Projectile.localAI[0] = reader.ReadInt32();
         ReceiveAI(reader);
     }
     public virtual void ReceiveAI(BinaryReader reader) { }
@@ -67,7 +67,7 @@ public abstract class ProjOwnedByNPC<T> : ModProjectile, ILocalizedModType, IMod
     {
         foreach (Projectile p in Main.ActiveProjectiles)
         {
-            if (p.ModProjectile is not ProjOwnedByNPC<T>)
+            if (p.ModProjectile is not ProjOwnedByNPC<T> proj)
                 continue;
 
             if (type != int.MinValue)
@@ -75,7 +75,7 @@ public abstract class ProjOwnedByNPC<T> : ModProjectile, ILocalizedModType, IMod
                 if (p.type != type)
                     continue;
             }
-            (p as ProjOwnedByNPC<T>)?.Kill();
+            proj.Kill();
         }
     }
 
@@ -127,7 +127,7 @@ public abstract class ProjOwnedByNPC<T> : ModProjectile, ILocalizedModType, IMod
 
         // Assign the helper if necessary
         if (Owner != null)
-            ModOwner = Owner?.As<T>() ?? null;
+            ModOwner = Owner?.As<T>();
 
         // And update the shared target
         if (Owner != null && Owner.active && Owner.HasValidTarget)

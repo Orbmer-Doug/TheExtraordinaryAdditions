@@ -7,6 +7,7 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Early;
 
@@ -134,9 +135,9 @@ public class ObsidianMaceProj : ModProjectile
                         }
                     }
 
-                    Spin = (Spin + (Utils.Remap(Time, 0f, TotalSpeedUpTime / Speed, 1f, 4.8f * Speed))) % TotalSpeedUpTime;
-                    float theta = Utils.Remap(Spin, InitDir < 0f ? TotalSpeedUpTime : 0f, InitDir < 0f ? 0f : TotalSpeedUpTime, 0f, MathHelper.TwoPi);
-                    Projectile.Center = Owner.GetFrontHandPositionImproved() + Utility.GetPointOnRotatedEllipse(150f, 80f, InitDir == -1 ? MathHelper.Pi : 0f, theta);
+                    Spin = (Spin + (Terraria.Utils.Remap(Time, 0f, TotalSpeedUpTime / Speed, 1f, 4.8f * Speed))) % TotalSpeedUpTime;
+                    float theta = Terraria.Utils.Remap(Spin, InitDir < 0f ? TotalSpeedUpTime : 0f, InitDir < 0f ? 0f : TotalSpeedUpTime, 0f, MathHelper.TwoPi);
+                    Projectile.Center = Owner.GetFrontHandPositionImproved() + GetPointOnRotatedEllipse(150f, 80f, InitDir == -1 ? MathHelper.Pi : 0f, theta);
 
                     if (Main.rand.NextBool())
                         ParticleRegistry.SpawnGlowParticle(Projectile.Center, (Projectile.rotation + MathHelper.PiOver2).ToRotationVector2() * Main.rand.NextFloat(2f, 5f),

@@ -31,10 +31,11 @@ using static TheExtraordinaryAdditions.Core.Graphics.Animators;
 
 namespace TheExtraordinaryAdditions.Core.Utilities;
 
-public static partial class Utility
+public static class CoreUtils
 {
     public static bool RunServer(this ModProjectile mod) => Main.netMode != NetmodeID.MultiplayerClient;
     public static bool RunLocal(this ModProjectile mod) => Main.myPlayer == mod.Projectile.owner;
+
     public static void Sync(this ModProjectile mod)
     {
         mod.Projectile.netUpdate = true;
@@ -62,7 +63,7 @@ public static partial class Utility
     }
 
     public static int EstimateLightRadius(Vector3 lightColor, LightMaskMode medium = LightMaskMode.None,
-    float minIntensityThreshold = 0.0185f, int maxRadius = 15)
+        float minIntensityThreshold = 0.0185f, int maxRadius = 15)
     {
         float maxIntensity = Math.Max(Math.Max(lightColor.X, lightColor.Y), lightColor.Z);
         if (maxIntensity <= 0)
@@ -83,7 +84,8 @@ public static partial class Utility
         return Math.Min(Math.Max(0, radius), maxRadius);
     }
 
-    public static float CalculateIntensityForRadius(float desiredRadius, LightMaskMode medium = LightMaskMode.None, float edgeIntensity = 0.5f)
+    public static float CalculateIntensityForRadius(float desiredRadius, LightMaskMode medium = LightMaskMode.None,
+        float edgeIntensity = 0.5f)
     {
         float decayRate = medium switch
         {
@@ -117,11 +119,14 @@ public static partial class Utility
     }
 
     public static SlotId Play(this AdditionsSound sound, Vector2 position, float volume = 1f, float pitch = 0f,
-        float pitchVariance = 0f, int maxInstances = 1, string identifier = null, PauseBehavior behavior = PauseBehavior.KeepPlaying)
-        => Play(AssetRegistry.GetSound(sound), position, volume, pitch, pitchVariance, null, maxInstances, identifier);
+        float pitchVariance = 0f, int maxInstances = 1, string identifier = null,
+        PauseBehavior behavior = PauseBehavior.KeepPlaying)
+        =>
+            AssetRegistry.GetSound(sound).Play(position, volume, pitch, pitchVariance, null, maxInstances, identifier);
 
     public static SlotId Play(this SoundStyle style, Vector2 position, float volume = 1f, float pitch = 0f,
-        float pitchVariance = 0f, (float, float)? pitchRange = null, int maxInstances = 1, string identifier = null, PauseBehavior behavior = PauseBehavior.KeepPlaying)
+        float pitchVariance = 0f, (float, float)? pitchRange = null, int maxInstances = 1, string identifier = null,
+        PauseBehavior behavior = PauseBehavior.KeepPlaying)
     {
         SoundStyle sound = style;
         sound.Volume = volume;
@@ -136,8 +141,10 @@ public static partial class Utility
         return SoundEngine.PlaySound(sound, position);
     }
 
-    public static SlotId Play(this Dictionary<AdditionsSound, float> styles, Vector2 position, float volume = 1f, float pitch = 0f,
-    float pitchVariance = 0f, (float, float)? pitchRange = null, int maxInstances = 1, string identifier = null, PauseBehavior behavior = PauseBehavior.KeepPlaying)
+    public static SlotId Play(this Dictionary<AdditionsSound, float> styles, Vector2 position, float volume = 1f,
+        float pitch = 0f,
+        float pitchVariance = 0f, (float, float)? pitchRange = null, int maxInstances = 1, string identifier = null,
+        PauseBehavior behavior = PauseBehavior.KeepPlaying)
     {
         SoundStyle sound = AssetRegistry.GetSound(new WeightedDict<AdditionsSound>(styles).GetRandom());
         sound.Volume = volume;
@@ -161,9 +168,11 @@ public static partial class Utility
                 if (p.type != ofType.Value)
                     continue;
             }
+
             if (p != null && p.minion && p.owner == player.whoAmI)
                 usedMinions += p.minionSlots;
         }
+
         return usedMinions;
     }
 
@@ -180,7 +189,8 @@ public static partial class Utility
         for (int i = 0; i < Main.maxProjectiles; i++)
         {
             Projectile projectile = Main.projectile[i];
-            if (projectile != null && projectile.active && projectile.owner == proj.owner && projectile.type == proj.type)
+            if (projectile != null && projectile.active && projectile.owner == proj.owner &&
+                projectile.type == proj.type)
             {
                 if (proj.whoAmI > i)
                     index++;
@@ -190,12 +200,16 @@ public static partial class Utility
         }
     }
 
-    public static bool ShouldConsumeAmmo(this Player player, Item item) => player.IsAmmoFreeThisShot(item, player.ChooseAmmo(item), player.ChooseAmmo(item).type);
-    public static bool Available(this Player player) => player != null && player.active && !player.dead && !player.ghost && !player.CCed && !player.noItems;
+    public static bool ShouldConsumeAmmo(this Player player, Item item) =>
+        player.IsAmmoFreeThisShot(item, player.ChooseAmmo(item), player.ChooseAmmo(item).type);
+
+    public static bool Available(this Player player) => player != null && player.active && !player.dead &&
+                                                        !player.ghost && !player.CCed && !player.noItems;
 
     private class ExplosionProjectile : ModProjectile
     {
         public override string Texture => AssetRegistry.Invis;
+
         public override void SetDefaults()
         {
             Projectile.timeLeft = 10;
@@ -215,6 +229,7 @@ public static partial class Utility
         public Vector2 Size;
         public Vector2? ToSize;
         public bool Friendly;
+
         public override void SendExtraAI(BinaryWriter writer)
         {
             writer.WriteRGB(Light);
@@ -222,6 +237,7 @@ public static partial class Utility
             if (ToSize.HasValue && ToSize != null)
                 writer.WriteVector2(ToSize.Value);
         }
+
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             Light = reader.ReadRGB();
@@ -229,7 +245,9 @@ public static partial class Utility
             if (ToSize.HasValue && ToSize != null)
                 ToSize = reader.ReadVector2();
         }
+
         public ref float Lifetime => ref Projectile.ai[0];
+
         public override void AI()
         {
             if (Friendly)
@@ -247,20 +265,27 @@ public static partial class Utility
 
             if (ToSize.HasValue && ToSize != null)
             {
-                Projectile.Resize((int)MathHelper.Lerp(Size.X, ToSize.Value.X, completion), (int)MathHelper.Lerp(Size.Y, ToSize.Value.Y, completion));
+                Projectile.Resize((int)MathHelper.Lerp(Size.X, ToSize.Value.X, completion),
+                    (int)MathHelper.Lerp(Size.Y, ToSize.Value.Y, completion));
             }
             else
             {
                 Projectile.Resize((int)Size.X, (int)Size.Y);
             }
 
-            Lighting.AddLight(Projectile.Center, (new Color(Light.R, Light.G, Light.B) * Light.A * completion).ToVector3());
+            Lighting.AddLight(Projectile.Center,
+                (new Color(Light.R, Light.G, Light.B) * Light.A * completion).ToVector3());
         }
     }
 
-    public static void CreateExplosion(IEntitySource source, DamageClass dmgClass, Vector2 position, Vector2 size, int damage, float kb, int lifetime, int iframes, int owner = -1, bool friendly = true, Vector2? toSize = null, Color light = default, string name = "")
+    public static void CreateExplosion(IEntitySource source, DamageClass dmgClass, Vector2 position, Vector2 size,
+        int damage, float kb, int lifetime, int iframes, int owner = -1, bool friendly = true, Vector2? toSize = null,
+        Color light = default, string name = "")
     {
-        Projectile proj = Main.projectile[Projectile.NewProjectile(source, position, Vector2.Zero, ModContent.ProjectileType<ExplosionProjectile>(), damage, kb, owner)];
+        Projectile proj =
+            Main.projectile[
+                Projectile.NewProjectile(source, position, Vector2.Zero,
+                    ModContent.ProjectileType<ExplosionProjectile>(), damage, kb, owner)];
         ExplosionProjectile explosion = proj.As<ExplosionProjectile>();
 
         explosion.Friendly = friendly;
@@ -276,19 +301,26 @@ public static partial class Utility
         proj.netUpdate = true;
     }
 
-    public static void CreateFriendlyExplosion(this Projectile proj, Vector2 pos, Vector2 size, int dmg, float kb, int life, int iframes, Vector2? toSize = null, Color light = default)
+    public static void CreateFriendlyExplosion(this Projectile proj, Vector2 pos, Vector2 size, int dmg, float kb,
+        int life, int iframes, Vector2? toSize = null, Color light = default)
     {
         if (Main.LocalPlayer == Main.player[proj.owner])
-            CreateExplosion(proj.GetSource_FromThis(), proj.DamageType, pos, size, dmg, kb, life, iframes, proj.owner, true, toSize, light, proj.Name);
+            CreateExplosion(proj.GetSource_FromThis(), proj.DamageType, pos, size, dmg, kb, life, iframes, proj.owner,
+                true, toSize, light, proj.Name);
     }
 
-    public static string ToHexRGB(this Color color) => BitConverter.ToString([color.R, color.G, color.B]).Replace("-", "");
-    public static string ToHexRGBA(this Color color) => BitConverter.ToString([color.R, color.G, color.B, color.A]).Replace("-", "");
+    public static string ToHexRGB(this Color color) =>
+        BitConverter.ToString([color.R, color.G, color.B]).Replace("-", "");
+
+    public static string ToHexRGBA(this Color color) =>
+        BitConverter.ToString([color.R, color.G, color.B, color.A]).Replace("-", "");
+
     public static string ColoredText(this string text, Color color)
         => $"[c/{color.ToHexRGB()}:{text}]";
 
     public static bool OnGround(this Player player)
         => player.velocity.Y == 0f;
+
     public static bool WasOnGround(this Player player)
         => player.oldVelocity.Y == 0f;
 
@@ -296,10 +328,12 @@ public static partial class Utility
         => !PlayerInput.WritingText && Main.hasFocus && Main.keyState.IsKeyDown(key);
 
     public static bool GetKeyDown(this Keys key)
-        => !PlayerInput.WritingText && Main.hasFocus && Main.keyState.IsKeyDown(key) && !Main.oldKeyState.IsKeyDown(key);
+        => !PlayerInput.WritingText && Main.hasFocus && Main.keyState.IsKeyDown(key) &&
+           !Main.oldKeyState.IsKeyDown(key);
 
     public static bool GetKeyUp(this Keys key)
-        => !PlayerInput.WritingText && Main.hasFocus && !Main.keyState.IsKeyDown(key) && Main.oldKeyState.IsKeyDown(key);
+        => !PlayerInput.WritingText && Main.hasFocus && !Main.keyState.IsKeyDown(key) &&
+           Main.oldKeyState.IsKeyDown(key);
 
     public static ILCursor HijackIncomingLabels(this ILCursor cursor)
     {
@@ -335,13 +369,16 @@ public static partial class Utility
 
     public static void Log(this string message) => AdditionsMain.Instance?.Logger.Info(" " + message);
     public static void Warn(this string message) => AdditionsMain.Instance?.Logger.Warn(" " + message);
+
     public static void ServerLog(this string message)
     {
-        DateTime time = System.DateTime.Now;
-        Console.WriteLine($"[TEA] [{time.Hour}.{time.Minute}.{time.Second}.{time.Millisecond}.{time.Microsecond}]: {message}");
+        DateTime time = DateTime.Now;
+        Console.WriteLine(
+            $"[TEA] [{time.Hour}.{time.Minute}.{time.Second}.{time.Millisecond}.{time.Microsecond}]: {message}");
     }
 
-    public static bool CheckManaBetter(this Item item, Player player, int amount = -1, bool pay = false, bool blockQuickMana = false)
+    public static bool CheckManaBetter(this Item item, Player player, int amount = -1, bool pay = false,
+        bool blockQuickMana = false)
     {
         if (amount <= -1)
             amount = player.GetManaCost(item);
@@ -394,6 +431,7 @@ public static partial class Utility
     }
 
     #region Tooltips
+
     public static void ColorLocalization(this List<TooltipLine> tooltips, Color col, int lineToStart = 0)
     {
         var tooltiped = tooltips.Where(x => x.Name.Contains("Tooltip") && x.Mod == "Terraria");
@@ -404,7 +442,9 @@ public static partial class Utility
                 tooltip.OverrideColor = col;
         }
     }
-    public static void ModifyTooltip(this List<TooltipLine> tooltips, TooltipLine[] NewTooltips, bool hideNormalTooltip = false)
+
+    public static void ModifyTooltip(this List<TooltipLine> tooltips, TooltipLine[] NewTooltips,
+        bool hideNormalTooltip = false)
     {
         int firstTooltipIndex = -1;
         int lastTooltipIndex = -1;
@@ -417,6 +457,7 @@ public static partial class Utility
                 {
                     firstTooltipIndex = i;
                 }
+
                 lastTooltipIndex = i;
                 standardTooltipCount++;
             }
@@ -435,12 +476,13 @@ public static partial class Utility
         }
     }
 
-    public static void DrawHeldShiftTooltip(this List<TooltipLine> tooltips, TooltipLine[] holdShiftTooltips, bool hideNormalTooltip = false)
+    public static void DrawHeldShiftTooltip(this List<TooltipLine> tooltips, TooltipLine[] holdShiftTooltips,
+        bool hideNormalTooltip = false)
     {
         // Do not override anything if the Left Shift key is not being held.
         if (!Main.keyState.IsKeyDown(Keys.LeftShift))
             return;
-        ModifyTooltip(tooltips, holdShiftTooltips, hideNormalTooltip);
+        tooltips.ModifyTooltip(holdShiftTooltips, hideNormalTooltip);
     }
 
     public static void AddTooltips(ModItem item, string[] tooltips)
@@ -456,11 +498,8 @@ public static partial class Utility
 
     public static void FindAndReplace(this List<TooltipLine> tooltips, string replacedKey, string newKey)
     {
-        TooltipLine line = tooltips.FirstOrDefault((TooltipLine x) => x.Mod == "Terraria" && x.Text.Contains(replacedKey));
-        if (line != null)
-        {
-            line.Text = line.Text.Replace(replacedKey, newKey);
-        }
+        TooltipLine line = tooltips.FirstOrDefault(x => x.Mod == "Terraria" && x.Text.Contains(replacedKey));
+        line?.Text = line.Text.Replace(replacedKey, newKey);
     }
 
     public static string TooltipHotkeyString(this ModKeybind mhk)
@@ -469,17 +508,20 @@ public static partial class Utility
         {
             return "";
         }
-        List<string> keys = mhk.GetAssignedKeys(0);
+
+        List<string> keys = mhk.GetAssignedKeys();
         if (keys.Count == 0)
         {
             return "[NONE]";
         }
+
         StringBuilder sb = new StringBuilder(16);
         sb.Append(keys[0]);
         for (int i = 1; i < keys.Count; i++)
         {
             sb.Append(" / ").Append(keys[i]);
         }
+
         return sb.ToString();
     }
 
@@ -492,11 +534,11 @@ public static partial class Utility
     /// <param name="whatToFindToReplaceWith">Typically something like [KEY]</param>
     public static void IntegrateHotkey(this List<TooltipLine> tooltips, ModKeybind mhk, string whatToFindToReplaceWith)
     {
-        if (!Main.dedServ && mhk != null)
-        {
-            string finalKey = mhk.TooltipHotkeyString();
-            tooltips.FindAndReplace(whatToFindToReplaceWith, finalKey);
-        }
+        if (Main.dedServ || mhk == null)
+            return;
+
+        string finalKey = mhk.TooltipHotkeyString();
+        tooltips.FindAndReplace(whatToFindToReplaceWith, finalKey);
     }
 
     #endregion Tooltips
@@ -561,7 +603,8 @@ public static partial class Utility
     /// <summary>
     /// Make a new projectile from a source of a player
     /// </summary>
-    public static int NewPlayerProj(this Player player, Vector2 center, Vector2 velocity, int type, int damage, float knockback, int owner = -1,
+    public static int NewPlayerProj(this Player player, Vector2 center, Vector2 velocity, int type, int damage,
+        float knockback, int owner = -1,
         float ai0 = 0f, float ai1 = 0f, float ai2 = 0f, float extra0 = 0f, float extra1 = 0f)
     {
         IEntitySource source = player.GetSource_FromThis();
@@ -575,13 +618,15 @@ public static partial class Utility
             projectile.AdditionsInfo().ExtraAI[0] = extra0;
             projectile.AdditionsInfo().ExtraAI[1] = extra1;
         }
+
         return index;
     }
 
     /// <summary>
     /// Make a new projectile from a source of a projectile
     /// </summary>
-    public static int NewProj(this Projectile proj, Vector2 center, Vector2 velocity, int type, int damage, float knockback, int owner = -1,
+    public static int NewProj(this Projectile proj, Vector2 center, Vector2 velocity, int type, int damage,
+        float knockback, int owner = -1,
         float ai0 = 0f, float ai1 = 0f, float ai2 = 0f, float extra0 = 0f, float extra1 = 0f)
     {
         IEntitySource source = proj.GetSource_FromThis();
@@ -595,6 +640,7 @@ public static partial class Utility
             projectile.AdditionsInfo().ExtraAI[0] = extra0;
             projectile.AdditionsInfo().ExtraAI[1] = extra1;
         }
+
         return index;
     }
 
@@ -604,7 +650,8 @@ public static partial class Utility
     /// </summary>
     /// <param name="damage">Automatically fixes damage from current difficulty</param>
     /// <returns>The index within <see cref="Main.projectile"/></returns>
-    public static int NewNPCProj(this NPC npc, Vector2 position, Vector2 velocity, int type, int damage, float knockback,
+    public static int NewNPCProj(this NPC npc, Vector2 position, Vector2 velocity, int type, int damage,
+        float knockback,
         float ai0 = 0f, float ai1 = 0f, float ai2 = 0f, float extra0 = 0f, float extra1 = 0f)
     {
         damage = FixDamageFromDifficulty(damage);
@@ -632,19 +679,23 @@ public static partial class Utility
     /// Spawns a new projectile from this NPC <br></br>
     /// Use <see cref="NewNPCProj(NPC, Vector2, Vector2, int, int, float, float, float, float, float, float)"/> if the projectile should have an owner
     /// </summary>
-    public static int Shoot(this NPC proj, Vector2 center, Vector2 velocity, int type, int damage, float knockback, int owner = -1, float ai0 = 0f, float ai1 = 0f, float ai2 = 0f)
+    public static int Shoot(this NPC proj, Vector2 center, Vector2 velocity, int type, int damage, float knockback,
+        int owner = -1, float ai0 = 0f, float ai1 = 0f, float ai2 = 0f)
     {
         IEntitySource source = proj.GetSource_FromThis();
-        int projectile = Projectile.NewProjectile(source, center, velocity, type, damage, knockback, owner, ai0, ai1, ai2);
+        int projectile =
+            Projectile.NewProjectile(source, center, velocity, type, damage, knockback, owner, ai0, ai1, ai2);
         Projectile p = Main.projectile[projectile];
         if (projectile >= 0 && projectile < Main.maxProjectiles)
             p.netUpdate = true;
         return projectile;
     }
 
-    public static int NewNPCBetter(this NPC npc, Vector2 pos, Vector2 vel, int type, int start = 0, float ai0 = 0f, float ai1 = 0f, float ai2 = 0f, float ai3 = 0f, int target = -1)
+    public static int NewNPCBetter(this NPC npc, Vector2 pos, Vector2 vel, int type, int start = 0, float ai0 = 0f,
+        float ai1 = 0f, float ai2 = 0f, float ai3 = 0f, int target = -1)
     {
-        int index = NPC.NewNPC(npc.GetSpawnSourceForNPCFromNPCAI(), (int)pos.X, (int)pos.Y, type, start, ai0, ai1, ai2, ai3, target);
+        int index = NPC.NewNPC(npc.GetSpawnSourceForNPCFromNPCAI(), (int)pos.X, (int)pos.Y, type, start, ai0, ai1, ai2,
+            ai3, target);
 
         if (index >= 0 && index < Main.maxNPCs)
         {
@@ -721,19 +772,19 @@ public static partial class Utility
         NetworkText.FromKey("Mods.TheExtraordinaryAdditions." + key, substitutions);
 
     public static LocalizedText GetText(string key) =>
-         Language.GetOrRegister("Mods.TheExtraordinaryAdditions." + key, null);
+        Language.GetOrRegister("Mods.TheExtraordinaryAdditions." + key);
 
     public static string GetTextValue(string key) =>
-         Language.GetTextValue("Mods.TheExtraordinaryAdditions." + key);
+        Language.GetTextValue("Mods.TheExtraordinaryAdditions." + key);
 
     public static Texture2D ThisNPCTexture(this NPC NPC) =>
-         TextureAssets.Npc[NPC.type].Value;
+        TextureAssets.Npc[NPC.type].Value;
 
     public static Texture2D ThisProjectileTexture(this Projectile Projectile) =>
-         TextureAssets.Projectile[Projectile.type].Value;
+        TextureAssets.Projectile[Projectile.type].Value;
 
     public static Texture2D ThisItemTexture(this Item Item) =>
-         TextureAssets.Item[Item.type].Value;
+        TextureAssets.Item[Item.type].Value;
 
     /// <summary>
     /// Determines if an NPC is "fleshy" based on it's hit sound
@@ -742,25 +793,25 @@ public static partial class Utility
     /// <returns></returns>
     public static bool IsFleshy(this NPC target)
     {
-        return target.HitSound != SoundID.NPCHit4 && target.HitSound != SoundID.NPCHit41 && target.HitSound != SoundID.NPCHit2 &&
-                target.HitSound != SoundID.NPCHit5 && target.HitSound != SoundID.NPCHit11 && target.HitSound != SoundID.NPCHit30 &&
-                target.HitSound != SoundID.NPCHit34 && target.HitSound != SoundID.NPCHit36 && target.HitSound != SoundID.NPCHit42 &&
-                target.HitSound != SoundID.NPCHit49 && target.HitSound != SoundID.NPCHit52 && target.HitSound != SoundID.NPCHit53 &&
-                target.HitSound != SoundID.NPCHit54 && target.HitSound != null;
+        return target.HitSound != SoundID.NPCHit4 && target.HitSound != SoundID.NPCHit41 &&
+               target.HitSound != SoundID.NPCHit2 &&
+               target.HitSound != SoundID.NPCHit5 && target.HitSound != SoundID.NPCHit11 &&
+               target.HitSound != SoundID.NPCHit30 &&
+               target.HitSound != SoundID.NPCHit34 && target.HitSound != SoundID.NPCHit36 &&
+               target.HitSound != SoundID.NPCHit42 &&
+               target.HitSound != SoundID.NPCHit49 && target.HitSound != SoundID.NPCHit52 &&
+               target.HitSound != SoundID.NPCHit53 &&
+               target.HitSound != SoundID.NPCHit54 && target.HitSound != null;
     }
 
     public static bool PressingShift(this KeyboardState kb)
     {
-        if (!kb.IsKeyDown(Keys.LeftShift))
-            return kb.IsKeyDown(Keys.RightShift);
-        return true;
+        return kb.IsKeyDown(Keys.LeftShift) || kb.IsKeyDown(Keys.RightShift);
     }
 
     public static bool PressingControl(this KeyboardState kb)
     {
-        if (!kb.IsKeyDown(Keys.LeftControl))
-            return kb.IsKeyDown(Keys.RightControl);
-        return true;
+        return kb.IsKeyDown(Keys.LeftControl) || kb.IsKeyDown(Keys.RightControl);
     }
 
     public static void DirectlyDisplayText(string text, Color? color = null)
@@ -779,10 +830,7 @@ public static partial class Utility
 
     public static Item HeldMouseItem(this Player player)
     {
-        if (!Main.mouseItem.IsAir)
-            return Main.mouseItem;
-
-        return player.HeldItem;
+        return !Main.mouseItem.IsAir ? Main.mouseItem : player.HeldItem;
     }
 
     public static void StartRain()
@@ -790,44 +838,46 @@ public static partial class Utility
         int ticks = 86400;
         int rand = ticks / 24;
         Main.rainTime = Main.rand.Next(rand * 8, ticks);
-        if (Utils.NextBool(Main.rand, 3))
+        if (Main.rand.NextBool(3))
             Main.rainTime += Main.rand.Next(0, rand);
-        if (Utils.NextBool(Main.rand, 4))
+        if (Main.rand.NextBool(4))
             Main.rainTime += Main.rand.Next(0, rand * 2);
-        if (Utils.NextBool(Main.rand, 5))
+        if (Main.rand.NextBool(5))
             Main.rainTime += Main.rand.Next(0, rand * 2);
-        if (Utils.NextBool(Main.rand, 6))
+        if (Main.rand.NextBool(6))
             Main.rainTime += Main.rand.Next(0, rand * 3);
-        if (Utils.NextBool(Main.rand, 7))
+        if (Main.rand.NextBool(7))
             Main.rainTime += Main.rand.Next(0, rand * 4);
-        if (Utils.NextBool(Main.rand, 8))
+        if (Main.rand.NextBool(8))
             Main.rainTime += Main.rand.Next(0, rand * 5);
 
         float mult = 1f;
-        if (Utils.NextBool(Main.rand, 2))
+        if (Main.rand.NextBool(2))
             mult += 0.05f;
-        if (Utils.NextBool(Main.rand, 3))
+        if (Main.rand.NextBool(3))
             mult += 0.1f;
-        if (Utils.NextBool(Main.rand, 4))
+        if (Main.rand.NextBool(4))
             mult += 0.15f;
-        if (Utils.NextBool(Main.rand, 5))
+        if (Main.rand.NextBool(5))
             mult += 0.2f;
 
-        Main.rainTime = (int)(Main.rainTime * (double)mult);
+        Main.rainTime = (int)(Main.rainTime * mult);
         Main.raining = true;
         AdditionsNetcode.SyncWorld();
     }
 
-    public static NPCShop AddWithCustomValue(this NPCShop shop, int itemType, int customValue, params Condition[] conditions)
+    public static NPCShop AddWithCustomValue(this NPCShop shop, int itemType, int customValue,
+        params Condition[] conditions)
     {
-        Item item = new(itemType, 1, 0)
+        Item item = new(itemType)
         {
             shopCustomPrice = customValue
         };
         return shop.Add(item, conditions);
     }
 
-    public static readonly BindingFlags UniversalBindingFlags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+    public static readonly BindingFlags UniversalBindingFlags =
+        BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
 
     public static IEnumerable<Type> GetEveryTypeDerivedFrom(Type baseType, Assembly assemblyToSearch)
     {
@@ -859,13 +909,14 @@ public static partial class Utility
     }
 
     #region Color Utils
+
     public static string ColorMessage(string msg, Color color)
     {
         StringBuilder sb;
         if (!msg.Contains('\n'))
         {
             sb = new StringBuilder(msg.Length + 12);
-            sb.Append("[c/").Append(Utils.Hex3(color)).Append(':')
+            sb.Append("[c/").Append(color.Hex3()).Append(':')
                 .Append(msg)
                 .Append(']');
         }
@@ -875,12 +926,13 @@ public static partial class Utility
             string[] array = msg.Split('\n');
             foreach (string newlineSlice in array)
             {
-                sb.Append("[c/").Append(Utils.Hex3(color)).Append(':')
+                sb.Append("[c/").Append(color.Hex3()).Append(':')
                     .Append(newlineSlice)
                     .Append(']')
                     .Append('\n');
             }
         }
+
         return sb.ToString();
     }
 
@@ -917,42 +969,40 @@ public static partial class Utility
 
     public static Color ColorSwap(Color firstColor, Color secondColor, float seconds)
     {
-        float colorMe = (float)((Math.Sin((double)(MathHelper.Pi * 2f / seconds) * Main.GlobalTimeWrappedHourly) + 1.0) * 0.5);
+        float colorMe =
+            (float)((Math.Sin((double)(MathHelper.Pi * 2f / seconds) * Main.GlobalTimeWrappedHourly) + 1.0) * 0.5);
         return Color.Lerp(firstColor, secondColor, colorMe);
     }
 
     public delegate void ChromaAberrationDelegate(Vector2 offset, Color colorMult);
+
     public static void DrawChromaticAberration(Vector2 direction, float strength, ChromaAberrationDelegate drawCall)
     {
         for (int i = -1; i <= 1; i++)
         {
-            Color aberrationColor = Color.White;
-            switch (i)
+            Color aberrationColor = i switch
             {
-                case -1:
-                    aberrationColor = new Color(255, 0, 0, 0);
-                    break;
-                case 0:
-                    aberrationColor = new Color(0, 255, 0, 0);
-                    break;
-                case 1:
-                    aberrationColor = new Color(0, 0, 255, 0);
-                    break;
-            }
-            Vector2 offset = Utils.RotatedBy(direction, MathHelper.PiOver2, default) * i;
+                -1 => new Color(255, 0, 0, 0),
+                0 => new Color(0, 255, 0, 0),
+                1 => new Color(0, 0, 255, 0),
+                _ => Color.White
+            };
+            Vector2 offset = direction.RotatedBy(MathHelper.PiOver2) * i;
             offset *= strength;
             drawCall(offset, aberrationColor);
         }
     }
+
     #endregion Color Utils
 
-    public static void CleanHoldStyle(Player player, float desiredRotation, Vector2 desiredPosition, Vector2 spriteSize, Vector2? rotationOriginFromCenter = null, bool noSandstorm = false, bool flipAngle = false, bool stepDisplace = true)
+    public static void CleanHoldStyle(Player player, float desiredRotation, Vector2 desiredPosition, Vector2 spriteSize,
+        Vector2? rotationOriginFromCenter = null, bool noSandstorm = false, bool flipAngle = false,
+        bool stepDisplace = true)
     {
         if (noSandstorm)
             player.sandStorm = false;
 
-        if (rotationOriginFromCenter == null)
-            rotationOriginFromCenter = new Vector2?(Vector2.Zero);
+        rotationOriginFromCenter ??= Vector2.Zero;
 
         Vector2 origin = rotationOriginFromCenter.Value;
         origin.X *= player.direction;
@@ -963,7 +1013,9 @@ public static partial class Utility
         else if (player.direction < 0)
             player.itemRotation += MathHelper.Pi;
 
-        Vector2 consistentAnchor = Utils.ToRotationVector2(player.itemRotation) * (spriteSize.X / -2f - 10f) * player.direction - Utils.RotatedBy(origin, player.itemRotation, default);
+        Vector2 consistentAnchor =
+            player.itemRotation.ToRotationVector2() * (spriteSize.X / -2f - 10f) * player.direction -
+            origin.RotatedBy(player.itemRotation);
         Vector2 offsetAgain = spriteSize * -0.5f;
         Vector2 finalPosition = desiredPosition + offsetAgain + consistentAnchor;
         if (stepDisplace)
@@ -974,6 +1026,7 @@ public static partial class Utility
                 finalPosition -= Vector2.UnitY * 2f;
             }
         }
+
         player.itemLocation = finalPosition + new Vector2(spriteSize.X * 0.5f, 0f);
     }
 
@@ -981,16 +1034,19 @@ public static partial class Utility
     {
         string typeName = Main.npc[npcIndex].TypeName;
         if (Main.netMode == NetmodeID.SinglePlayer)
-            Main.NewText(Language.GetTextValue("Announcement.HasAwoken", typeName), (Color?)new Color(175, 75, 255));
+            Main.NewText(Language.GetTextValue("Announcement.HasAwoken", typeName), new Color(175, 75, 255));
         else if (Main.dedServ)
-            ChatHelper.BroadcastChatMessage(NetworkText.FromKey("Announcement.HasAwoken", [Main.npc[npcIndex].GetTypeNetName()]), new Color(175, 75, 255), -1);
+            ChatHelper.BroadcastChatMessage(
+                NetworkText.FromKey("Announcement.HasAwoken", [Main.npc[npcIndex].GetTypeNetName()]),
+                new Color(175, 75, 255));
     }
 
     public static bool IsOffscreen(this Projectile p)
     {
-        // Check whether the projectile's hitbox intersects the screen, accounting for the screen fluff setting.
+        // Check whether the projectile's hitbox intersects the screen, accounting for the screen fluff setting
         int fluff = ProjectileID.Sets.DrawScreenCheckFluff[p.type];
-        Rectangle screenArea = new((int)Main.Camera.ScaledPosition.X - fluff, (int)Main.Camera.ScaledPosition.Y - fluff, (int)Main.Camera.ScaledSize.X + fluff * 2, (int)Main.Camera.ScaledSize.Y + fluff * 2);
+        Rectangle screenArea = new((int)Main.Camera.ScaledPosition.X - fluff, (int)Main.Camera.ScaledPosition.Y - fluff,
+            (int)Main.Camera.ScaledSize.X + fluff * 2, (int)Main.Camera.ScaledSize.Y + fluff * 2);
         return !screenArea.Intersects(p.Hitbox);
     }
 
@@ -1006,7 +1062,8 @@ public static partial class Utility
                 continue;
 
             bool num = otherProj.type == projectile.type;
-            float taxicabDist = Math.Abs(projectile.position.X - otherProj.position.X) + Math.Abs(projectile.position.Y - otherProj.position.Y);
+            float taxicabDist = Math.Abs(projectile.position.X - otherProj.position.X) +
+                                Math.Abs(projectile.position.Y - otherProj.position.Y);
             if (num && taxicabDist < projectile.width)
             {
                 if (projectile.position.X < otherProj.position.X)
@@ -1022,22 +1079,16 @@ public static partial class Utility
         }
     }
 
-    public static bool WithinBounds(this int index, int cap)
-    {
-        if (index >= 0)
-            return index < cap;
-        return false;
-    }
-
     public static bool StandingStill(this Player player, float velocity = 0.05f) => player.velocity.Length() < velocity;
 
-    public static bool IsUnderwater(this Player player) => Collision.DrownCollision(player.position, player.width, player.height, player.gravDir, false);
+    public static bool IsUnderwater(this Player player) =>
+        Collision.DrownCollision(player.position, player.width, player.height, player.gravDir);
 
     public static bool InSpace(this Player player)
     {
         float x = Main.maxTilesX / 4200f;
         x *= x;
-        return (float)((double)(player.position.Y / 16f - (60f + 10f * x)) / (Main.worldSurface / 6.0)) < 1f;
+        return (float)((player.position.Y / 16f - (60f + 10f * x)) / (Main.worldSurface / 6.0)) < 1f;
     }
 
     public static bool GiveIFrames(this Player player, int frames, bool blink = false)
@@ -1064,26 +1115,18 @@ public static partial class Utility
             if (player.hurtCooldowns[i] < frames)
                 player.hurtCooldowns[i] = frames;
         }
+
         return true;
     }
 
-    public static void RemoveAllIFrames(this Player player)
-    {
-        player.immune = false;
-        player.immuneNoBlink = false;
-        player.immuneTime = 0;
-        for (int i = 0; i < player.hurtCooldowns.Length; i++)
-        {
-            player.hurtCooldowns[i] = 0;
-        }
-    }
-
-    public static void HideAccessories(this Player player, bool hideHeadAccs = true, bool hideBodyAccs = true, bool hideLegAccs = true, bool hideShield = true)
+    public static void HideAccessories(this Player player, bool hideHeadAccs = true, bool hideBodyAccs = true,
+        bool hideLegAccs = true, bool hideShield = true)
     {
         if (hideHeadAccs)
         {
             player.face = -1;
         }
+
         if (hideBodyAccs)
         {
             player.handon = -1;
@@ -1092,59 +1135,26 @@ public static partial class Utility
             player.front = -1;
             player.neck = -1;
         }
+
         if (hideLegAccs)
         {
             player.shoe = -1;
             player.waist = -1;
         }
+
         if (hideShield)
         {
             player.shield = -1;
         }
     }
 
-    public static bool InventoryHas(this Player player, params int[] items) => player.inventory.Any((Item item) => items.Contains(item.type));
+    public static bool InventoryHas(this Player player, params int[] items) =>
+        player.inventory.Any(item => items.Contains(item.type));
 
-    public static DamageClass GetBestClass(this Player player)
-    {
-        float bestDamage = 1f;
-        DamageClass bestClass = DamageClass.Generic;
-        StatModifier totalDamage = player.GetTotalDamage<MeleeDamageClass>();
-        float melee = totalDamage.Additive;
-        if (melee > bestDamage)
-        {
-            bestDamage = melee;
-            bestClass = DamageClass.Melee;
-        }
-        totalDamage = player.GetTotalDamage<RangedDamageClass>();
-        float ranged = totalDamage.Additive;
-        if (ranged > bestDamage)
-        {
-            bestDamage = ranged;
-            bestClass = DamageClass.Ranged;
-        }
-        totalDamage = player.GetTotalDamage<MagicDamageClass>();
-        float magic = totalDamage.Additive;
-        if (magic > bestDamage)
-        {
-            bestDamage = magic;
-            bestClass = DamageClass.Magic;
-        }
-        totalDamage = player.GetTotalDamage<SummonDamageClass>();
-        float summon = totalDamage.Additive;
-        if (summon > bestDamage)
-        {
-            bestDamage = summon;
-            bestClass = DamageClass.Summon;
-        }
-        return bestClass;
-    }
-    
     public static void StickyProjAI(this Projectile projectile, int timeLeft, bool findNewNPC = false)
     {
-        if (projectile.ai[0] == 1)
+        if ((int)projectile.ai[0] == 1)
         {
-            int seconds = timeLeft;
             bool killProj = false;
             bool spawnDust = false;
 
@@ -1163,7 +1173,7 @@ public static partial class Utility
             NPC npc = Main.npc[npcIndex];
 
             //Kill projectile after so many seconds or if the NPC it is stuck to no longer exists
-            if (projectile.localAI[0] >= (float)(60 * seconds))
+            if (projectile.localAI[0] >= 60 * timeLeft)
             {
                 killProj = true;
             }
@@ -1191,34 +1201,39 @@ public static partial class Utility
 
             //Kill the projectile or reset stats if needed
             if (!killProj) return;
-            
+
             if (findNewNPC)
                 projectile.ai[0] = 0f;
             else
                 projectile.Kill();
         }
     }
-    
+
     public static void ModifyHitNPCSticky(this Projectile projectile, int maxStick)
     {
         Player player = Main.player[projectile.owner];
         Rectangle myRect = projectile.Hitbox;
 
-        if (projectile.owner != Main.myPlayer) 
+        if (projectile.owner != Main.myPlayer)
             return;
-        
+
         for (int npcIndex = 0; npcIndex < Main.maxNPCs; npcIndex++)
         {
             NPC npc = Main.npc[npcIndex];
-                
+
             //covers most edge cases like voodoo dolls
             if (npc.active && !npc.dontTakeDamage &&
-                ((projectile.friendly && (!npc.friendly || (npc.type == NPCID.Guide && projectile.owner < Main.maxPlayers && player.killGuide) || (npc.type == NPCID.Clothier && projectile.owner < Main.maxPlayers && player.killClothier))) ||
-                 (projectile.hostile && npc.friendly && !npc.dontTakeDamageFromHostiles)) && (projectile.owner < 0 || npc.immune[projectile.owner] == 0 || projectile.maxPenetrate == 1))
+                ((projectile.friendly && (!npc.friendly ||
+                                          (npc.type == NPCID.Guide && projectile.owner < Main.maxPlayers &&
+                                           player.killGuide) || (npc.type == NPCID.Clothier &&
+                                                                 projectile.owner < Main.maxPlayers &&
+                                                                 player.killClothier))) ||
+                 (projectile.hostile && npc.friendly && !npc.dontTakeDamageFromHostiles)) && (projectile.owner < 0 ||
+                    npc.immune[projectile.owner] == 0 || projectile.maxPenetrate == 1))
             {
                 if (!npc.noTileCollide && projectile.ownerHitCheck)
                     continue;
-                    
+
                 bool stickingToNPC;
                 //Solar Crawltipede tail has special collision
                 if (npc.type == NPCID.SolarCrawltipedeTail)
@@ -1236,38 +1251,40 @@ public static partial class Utility
                     stickingToNPC = projectile.Colliding(myRect, npc.Hitbox);
                 }
 
-                if (!stickingToNPC) 
+                if (!stickingToNPC)
                     continue;
-                        
-                //reflect projectile if the npc can reflect it (like Selenians)
+
+                // reflect projectile if the npc can reflect it (like Selenians)
                 if (npc.reflectsProjectiles && projectile.CanBeReflected())
                 {
                     npc.ReflectProjectile(projectile);
                     return;
                 }
 
-                //let the projectile know it is sticking and the npc it is sticking too
+                // let the projectile know it is sticking and the npc it is sticking too
                 projectile.ai[0] = 1f;
                 projectile.ai[1] = npcIndex;
 
-                //follow the NPC
+                // follow the NPC
                 projectile.velocity = (npc.Center - projectile.Center);
 
                 projectile.netUpdate = true;
 
-                //Count how many projectiles are attached, delete as necessary
+                // Count how many projectiles are attached, delete as necessary
                 Point[] array2 = new Point[maxStick];
                 int projCount = 0;
                 for (int projIndex = 0; projIndex < Main.maxProjectiles; projIndex++)
                 {
                     Projectile proj = Main.projectile[projIndex];
-                    if (projIndex != projectile.whoAmI && proj.active && proj.owner == Main.myPlayer && proj.type == projectile.type && proj.ai[0] == 1f && proj.ai[1] == (float)npcIndex)
+                    if (projIndex != projectile.whoAmI && proj.active && proj.owner == Main.myPlayer &&
+                        proj.type == projectile.type && proj.ai[0] == 1f && proj.ai[1] == npcIndex)
                     {
                         array2[projCount++] = new Point(projIndex, proj.timeLeft);
                         if (projCount >= array2.Length)
                             break;
                     }
                 }
+
                 if (projCount >= array2.Length)
                 {
                     int stuckProjAmt = 0;
@@ -1278,10 +1295,10 @@ public static partial class Utility
                             stuckProjAmt = m;
                         }
                     }
+
                     Main.projectile[array2[stuckProjAmt].X].Kill();
                 }
             }
         }
     }
-    
 }

@@ -15,6 +15,7 @@ using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
@@ -458,7 +459,7 @@ public class AstralKatanaThrow : ModProjectile
                     return;
                 }
                 AdditionsSound.BraveDashStart.Play(center, 1f, .1f);
-                CalUtils.AddCooldown(Owner, AstralDashCooldown.ID, SecondsToFrames(LungeWait));
+                CalUtils.AddCooldown(Owner, AstralDashCooldown.ID, CalUtils.SecondsToFrames(LungeWait));
                 SavedAngle = center.AngleTo(dest);
                 State = CurrentState.Lunging;
                 Time = 0;
@@ -508,7 +509,7 @@ public class AstralKatanaThrow : ModProjectile
                         Vector2 vel = -dest.SafeDirectionTo(Owner.Center) * Main.rand.NextFloat(4f, 8f);
                         int life = Main.rand.Next(19, 25);
                         float scale = Main.rand.NextFloat(.4f, .8f);
-                        Color color = MulticolorLerp(Main.rand.NextFloat(), Utility.FastUnion(AstralKatanaSweep.AstralBluePalette, AstralKatanaSweep.AstralOrangePalette));
+                        Color color = MulticolorLerp(Main.rand.NextFloat(), AstralKatanaSweep.AstralBluePalette.FastUnion(AstralKatanaSweep.AstralOrangePalette));
                         ParticleRegistry.SpawnSquishyPixelParticle(pos, vel, life * 3, scale * 2f, color, Color.White, 4);
                     }
                 }
@@ -551,7 +552,7 @@ public class AstralKatanaThrow : ModProjectile
     public override void OnKill(int timeLeft)
     {
         if (State != CurrentState.Lunging)
-            CalUtils.AddCooldown(Owner, AstralDashCooldown.ID, SecondsToFrames(NonLungeWait));
+            CalUtils.AddCooldown(Owner, AstralDashCooldown.ID, CalUtils.SecondsToFrames(NonLungeWait));
     }
 
     private void SetCollided(bool stick)

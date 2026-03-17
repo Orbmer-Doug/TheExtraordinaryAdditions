@@ -7,6 +7,7 @@ using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Early;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Early;
 
@@ -69,7 +70,7 @@ public class BoneFlintlockHeld : BaseIdleHoldoutProjectile
             Projectile.NewProj(Projectile.Center, Center.SafeDirectionTo(Modded.MouseWorld) * 10f, bomb, Projectile.damage * 2, Projectile.knockBack * 2f, Owner.whoAmI);
             SoundID.Item1.Play(Projectile.Center);
             Wait = time;
-            CalUtils.AddCooldown(Owner, SkullBombCooldown.ID, SecondsToFrames(1.5f));
+            CalUtils.AddCooldown(Owner, SkullBombCooldown.ID, CalUtils.SecondsToFrames(1.5f));
         }
         if (Wait > 0f)
             Wait--;

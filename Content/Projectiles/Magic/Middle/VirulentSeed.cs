@@ -5,6 +5,7 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
 
@@ -54,11 +55,11 @@ public class VirulentSeed : ModProjectile, ILocalizedModType, IModType
         if (Time.BetweenNum(30f, 120f))
         {
             NPC target = NPCTargeting.GetWeakestNPC(new(Projectile.Center, 450, false, true));
-            if (target.CanHomeInto())
-            {
-                Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.Center.SafeDirectionTo(target.Center) * 10f, .3f);
-                Projectile.velocity += Utility.VelEqualTrig(Projectile.velocity.SafeNormalize(Vector2.Zero), MathF.Sin, 20f, 1.5f, ref Projectile.AdditionsInfo().ExtraAI[0], ref Projectile.AdditionsInfo().ExtraAI[1]);
-            }
+            if (!target.CanHomeInto()) 
+                return;
+            
+            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.Center.SafeDirectionTo(target.Center) * 10f, .3f);
+            Projectile.velocity += Projectile.velocity.SafeNormalize(Vector2.Zero).VelEqualTrig(MathF.Sin, 20f, 1.5f, ref Projectile.AdditionsInfo().ExtraAI[0], ref Projectile.AdditionsInfo().ExtraAI[1]);
         }
     }
 

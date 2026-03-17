@@ -2,6 +2,7 @@
 using ReLogic.Graphics;
 using System;
 using System.Collections.Generic;
+using CalamityMod;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
@@ -18,6 +19,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles;
 
 /// <summary>
 /// I cannot make this up my adv. pre-cal teacher allowed me to do this for a project so im taking my chance
+/// btw i got a 100
 /// </summary>
 public class UnitCircle : ModProjectile
 {

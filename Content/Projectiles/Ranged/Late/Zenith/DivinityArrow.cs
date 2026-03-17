@@ -13,6 +13,9 @@ using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 using static TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late.Zenith.CoalescenceHoldout;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using Utils = Terraria.Utils;
+using static CalamityMod.CalamityUtils;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late.Zenith;
 
@@ -87,7 +90,7 @@ public class DivinityArrow : ModProjectile
 
     public Player Owner => Main.player[Projectile.owner];
     public GlobalPlayer Modded => Owner.Additions();
-    public float ChargeCompletion => InverseLerp(0f, CoalescenceHoldout.ReelTime, Charge);
+    public float ChargeCompletion => InverseLerp(0f, ReelTime, Charge);
 
     public override bool ShouldUpdatePosition()
     {

@@ -1,4 +1,5 @@
 ﻿using System;
+using CalamityMod;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -6,10 +7,11 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 using TheExtraordinaryAdditions.Core.Netcode;
 using TheExtraordinaryAdditions.Core.Systems;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain;
 
-public sealed partial class StygainHeart : ModNPC
+public sealed partial class StygainHeart
 {
     public void DoAttack_SpawnEffects(Player target)
     {
@@ -89,7 +91,7 @@ public sealed partial class StygainHeart : ModNPC
 
     public void DoBehavior_Phase2Drama(Player target)
     {
-        int totalTime = SecondsToFrames(7f);
+        int totalTime = CalUtils.SecondsToFrames(7f);
 
         NPC.velocity = Vector2.Lerp(NPC.velocity, Vector2.Zero, .4f);
 

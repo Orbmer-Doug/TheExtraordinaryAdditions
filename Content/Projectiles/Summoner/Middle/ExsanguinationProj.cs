@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using CalamityMod;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using TheExtraordinaryAdditions.Common.Particles.Shader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
@@ -7,6 +8,7 @@ using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
 
@@ -19,7 +21,7 @@ public class ExsanguinationProj : BaseWhip
         Projectile.Size = new(600, 250);
     }
 
-    public static readonly int TotalEmbedTime = SecondsToFrames(5);
+    public static readonly int TotalEmbedTime = CalUtils.SecondsToFrames(5);
     public bool AbleToHit
     {
         get => (int)Projectile.ai[2] == 1;

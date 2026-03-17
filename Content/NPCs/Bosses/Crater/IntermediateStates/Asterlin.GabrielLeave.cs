@@ -4,6 +4,7 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Systems;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
@@ -15,11 +16,13 @@ public partial class Asterlin : ModNPC
         StateMachine.RegisterStateBehavior(AsterlinAIType.GabrielLeave, DoBehavior_GabrielLeave);
     }
 
-    public static int GabrielLeave_HoverTime => SecondsToFrames(2);
-    public static int GabrielLeave_DisintegrationWaitTime => SecondsToFrames(.75f);
-    public static int GabrielLeave_DisintegrationTime => SecondsToFrames(.95f);
-    public static int GabrielLeave_BeamFadeTime => SecondsToFrames(.4f);
-    public static int GabrielLeave_MaxTime => GabrielLeave_HoverTime + GabrielLeave_DisintegrationWaitTime + GabrielLeave_DisintegrationTime + GabrielLeave_BeamFadeTime;
+    public static int GabrielLeave_HoverTime => CalUtils.SecondsToFrames(2);
+    public static int GabrielLeave_DisintegrationWaitTime => CalUtils.SecondsToFrames(.75f);
+    public static int GabrielLeave_DisintegrationTime => CalUtils.SecondsToFrames(.95f);
+    public static int GabrielLeave_BeamFadeTime => CalUtils.SecondsToFrames(.4f);
+
+    public static int GabrielLeave_MaxTime => GabrielLeave_HoverTime + GabrielLeave_DisintegrationWaitTime +
+                                              GabrielLeave_DisintegrationTime + GabrielLeave_BeamFadeTime;
 
     public void DoBehavior_GabrielLeave()
     {
@@ -31,8 +34,12 @@ public partial class Asterlin : ModNPC
         {
             HeatDistortionStrength = Utils.Remap(AITimer, 40f, 0f, 0f, DesperationDrama_MaxHeatDistortionStrength);
             HeatDistortionArea = Utils.Remap(AITimer, 40f, 0f, 0f, DesperationDrama_MaxHeatDistortionArea);
-            ParticleRegistry.SpawnTechyHolosquareParticle(TopAntennaPosition, -Vector2.UnitY.RotatedByRandom(.2f) * Main.rand.NextFloat(2f, 13f), Main.rand.Next(30, 45), Main.rand.NextFloat(.3f, .5f), Color.Cyan);
-            NPC.SmoothFlyNear(new Vector2(Target.Center.X + (300f * (NPC.Center.X > Target.Center.X).ToDirectionInt()), Target.Center.Y - 20f), .07f, .5f);
+            ParticleRegistry.SpawnTechyHolosquareParticle(TopAntennaPosition,
+                -Vector2.UnitY.RotatedByRandom(.2f) * Main.rand.NextFloat(2f, 13f), Main.rand.Next(30, 45),
+                Main.rand.NextFloat(.3f, .5f), Color.Cyan);
+            NPC.SmoothFlyNear(
+                new Vector2(Target.Center.X + 300f * (NPC.Center.X > Target.Center.X).ToDirectionInt(),
+                    Target.Center.Y - 20f), .07f, .5f);
             SetLegFlamesInterpolant(InverseLerp(GabrielLeave_HoverTime, GabrielLeave_HoverTime - 40, AITimer));
         }
         else if (AITimer == GabrielLeave_HoverTime)
@@ -45,7 +52,8 @@ public partial class Asterlin : ModNPC
         {
             NPC.velocity = Vector2.Zero;
             float interpol = InverseLerp(GabrielLeave_HoverTime + GabrielLeave_DisintegrationWaitTime,
-                GabrielLeave_HoverTime + GabrielLeave_DisintegrationWaitTime + GabrielLeave_DisintegrationTime, AITimer);
+                GabrielLeave_HoverTime + GabrielLeave_DisintegrationWaitTime + GabrielLeave_DisintegrationTime,
+                AITimer);
             DisintegrationInterpolant = interpol;
 
             if (AITimer >= GabrielLeave_MaxTime)
@@ -57,11 +65,13 @@ public partial class Asterlin : ModNPC
                     int life = (int)MathHelper.Lerp(60, 180, lerper);
                     float scale = MathHelper.Lerp(300f, 500f, lerper);
                     Color col = Color.Lerp(Color.White, Color.Gold, lerper);
-                    ParticleRegistry.SpawnPulseRingParticle(NPC.Center, Vector2.Zero, life, 0f, Vector2.One, 0f, scale, col);
+                    ParticleRegistry.SpawnPulseRingParticle(NPC.Center, Vector2.Zero, life, 0f, Vector2.One, 0f, scale,
+                        col);
                 }
 
                 for (int i = 0; i < 80; i++)
-                    ParticleRegistry.SpawnBloomLineParticle(NPC.Center, Main.rand.NextVector2Circular(40, 40) + Main.rand.NextVector2Circular(4, 4),
+                    ParticleRegistry.SpawnBloomLineParticle(NPC.Center,
+                        Main.rand.NextVector2Circular(40, 40) + Main.rand.NextVector2Circular(4, 4),
                         Main.rand.Next(50, 90), Main.rand.NextFloat(.7f, 1.4f), Color.Goldenrod);
                 NPC.Kill();
             }
@@ -74,8 +84,10 @@ public partial class Asterlin : ModNPC
             return;
 
         Texture2D pix = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
-        float beamWidth = (1f - Animators.MakePoly(2f).OutFunction(InverseLerp(GabrielLeave_HoverTime + GabrielLeave_DisintegrationWaitTime + GabrielLeave_DisintegrationTime,
-            GabrielLeave_HoverTime + GabrielLeave_DisintegrationWaitTime + GabrielLeave_DisintegrationTime + GabrielLeave_BeamFadeTime, AITimer)));
+        float beamWidth = 1f - Animators.MakePoly(2f).OutFunction(InverseLerp(
+            GabrielLeave_HoverTime + GabrielLeave_DisintegrationWaitTime + GabrielLeave_DisintegrationTime,
+            GabrielLeave_HoverTime + GabrielLeave_DisintegrationWaitTime + GabrielLeave_DisintegrationTime +
+            GabrielLeave_BeamFadeTime, AITimer));
 
         Vector2 a = NPC.Center - Vector2.UnitY * 3000f;
         Vector2 b = NPC.Center + Vector2.UnitY * 3000f;
@@ -87,8 +99,12 @@ public partial class Asterlin : ModNPC
         {
             float interpol = InverseLerp(0f, 16f, i);
             Vector2 middleScale = new(a.Distance(b) / pix.Width, beamWidth * MathHelper.Lerp(200f, 500f, interpol));
-            Color col = Color.White.Lerp(Color.DarkGoldenrod, Animators.MakePoly(3f).OutFunction(interpol)) with { A = 0 };
-            Main.spriteBatch.Draw(pix, a - Main.screenPosition, null, col, rotation, middleOrigin, middleScale, SpriteEffects.None, 0f);
+            Color col = Color.White.Lerp(Color.DarkGoldenrod, Animators.MakePoly(3f).OutFunction(interpol)) with
+            {
+                A = 0
+            };
+            Main.spriteBatch.Draw(pix, a - Main.screenPosition, null, col, rotation, middleOrigin, middleScale,
+                SpriteEffects.None, 0f);
         }
     }
 }

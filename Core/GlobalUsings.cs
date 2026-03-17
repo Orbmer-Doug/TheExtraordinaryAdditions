@@ -1,8 +1,13 @@
 ﻿global using Microsoft.Xna.Framework;
 global using TheExtraordinaryAdditions.Assets;
-global using TheExtraordinaryAdditions.Common.Particles;
-global using static TheExtraordinaryAdditions.Core.Utilities.Utility;
+global using TheExtraordinaryAdditions.Common.Particles.Particle;
+global using static TheExtraordinaryAdditions.Core.Utilities.CoreUtils;
+global using static TheExtraordinaryAdditions.Core.Utilities.CollisionUtils;
+global using static TheExtraordinaryAdditions.Core.Utilities.MathUtils;
+global using static TheExtraordinaryAdditions.Core.Utilities.PrimitiveUtils;
+global using static TheExtraordinaryAdditions.Core.Utilities.TileUtils;
+global using static TheExtraordinaryAdditions.Core.Utilities.SpriteBatchUtils;
+global using static TheExtraordinaryAdditions.Core.Utilities.SeekingUtils;
 global using CalUtils = CalamityMod.CalamityUtils;
 global using RotatedRectangle = TheExtraordinaryAdditions.Core.DataStructures.RotatedRectangle;
-// System.Numerics vectors use SIMD, or Single Instruction, Multiple Data. They are more performant because of this.
 global using SystemVector2 = System.Numerics.Vector2;

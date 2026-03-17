@@ -24,7 +24,6 @@ public class EmptyRound : ModProjectile
     public override void AI()
     {
         Projectile.extraUpdates = 0;
-        _ = Main.player[Projectile.owner];
         if (!TouchedGrass)
         {
             Projectile.rotation += 0.5f * Projectile.direction;

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using Terraria;
@@ -17,7 +15,7 @@ public class BitmaskUtils
     /// <summary>
     /// An iterator that goes over active indices in a bitmask
     /// </summary>
-    public readonly ref struct BitmaskEnumerable
+    public readonly ref struct BitmaskEnumerable(ReadOnlySpan<ulong> mask, uint maxIndex)
     {
         public ref struct BitmaskEnumerator(ReadOnlySpan<ulong> presenceMask, uint maxIndex)
         {
@@ -57,14 +55,8 @@ public class BitmaskUtils
             }
         }
 
-        public readonly ReadOnlySpan<ulong> mask;
-        public readonly uint maxIndex;
-
-        public BitmaskEnumerable(ReadOnlySpan<ulong> mask, uint maxIndex)
-        {
-            this.mask = mask;
-            this.maxIndex = maxIndex;
-        }
+        public readonly ReadOnlySpan<ulong> mask = mask;
+        public readonly uint maxIndex = maxIndex;
 
         public BitmaskEnumerator GetEnumerator()
         {
@@ -78,7 +70,6 @@ public class BitmaskUtils
     /// <param name="presenceMask">The bitmask array to modify</param>
     /// <param name="index">The slot index to set or clear</param>
     /// <param name="value"><c>true</c> for active, <c>false</c> for inactive</param>
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void SetBit(in ulong[] presenceMask, int index, bool value)
     {

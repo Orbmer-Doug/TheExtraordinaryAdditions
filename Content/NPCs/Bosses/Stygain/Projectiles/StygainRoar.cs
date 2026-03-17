@@ -11,9 +11,10 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 
 public class StygainRoar : ModProjectile
 {
-    public static readonly float Lifetime = SecondsToFrames(.8f);
+    public static readonly float Lifetime = CalUtils.SecondsToFrames(.8f);
     public ref float Radius => ref Projectile.ai[1];
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.DrawScreenCheckFluff[Projectile.type] = 4000;
@@ -44,15 +45,16 @@ public class StygainRoar : ModProjectile
         Main.spriteBatch.PrepareForShaders();
 
         Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.BigWavyBlobNoise);
-        DrawData explosionDrawData = new(tex, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), Color.White * Projectile.Opacity);
+        DrawData explosionDrawData = new(tex, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight),
+            Color.White * Projectile.Opacity);
 
-        ManagedShader shockwaveShader = ShaderRegistry.LightShockwave;
-        shockwaveShader.TrySetParameter("mainColor", Color.Crimson.ToVector3());
-        shockwaveShader.TrySetParameter("screenSize", Main.ScreenSize.ToVector2());
-        shockwaveShader.TrySetParameter("explosionDistance", Radius * Projectile.scale * 0.5f);
-        shockwaveShader.TrySetParameter("projPosition", Projectile.Center - Main.screenPosition);
-        shockwaveShader.TrySetParameter("shockwaveOpacity", Projectile.Opacity * .8f);
-        shockwaveShader.Render();
+        ManagedShader wave = ShaderRegistry.LightShockwave;
+        wave.TrySetParameter("mainColor", Color.Crimson.ToVector3());
+        wave.TrySetParameter("screenSize", Main.ScreenSize.ToVector2());
+        wave.TrySetParameter("explosionDistance", Radius * Projectile.scale * 0.5f);
+        wave.TrySetParameter("projPosition", Projectile.Center - Main.screenPosition);
+        wave.TrySetParameter("shockwaveOpacity", Projectile.Opacity * .8f);
+        wave.Render();
         explosionDrawData.Draw(Main.spriteBatch);
 
         Main.spriteBatch.ResetToDefault();

@@ -10,6 +10,7 @@ using Terraria.Utilities;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Classless;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Friendly;
 

@@ -14,6 +14,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 using static System.MathF;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
@@ -40,7 +41,7 @@ public class BreakerBladeCrush : BaseSwordSwing
         set => Projectile.AdditionsInfo().ExtraAI[9] = value.ToInt();
     }
 
-    public override int SwingTime => Beam ? SecondsToFrames(.8f) : SpecialAttack ? SecondsToFrames(.4f) : SecondsToFrames(.6f);
+    public override int SwingTime => Beam ? CalUtils.SecondsToFrames(.8f) : SpecialAttack ? CalUtils.SecondsToFrames(.4f) : CalUtils.SecondsToFrames(.6f);
     public const float BladeLength = 122f;
     public Color Brightest => Color.White.Lerp(Color.Violet, .2f);
     public Color Bright => SpecialAttack ? new(163, 222, 250) : new(85, 237, 71);
@@ -56,7 +57,7 @@ public class BreakerBladeCrush : BaseSwordSwing
     public override void SafeAI()
     {
         if (Beam)
-            InitialMouseAngle = Direction == 1 ? 0f : MathHelper.Pi;
+            InitialMouseAngle = Direction == 1 ? 0f : Pi;
 
         Projectile.Center = Owner.GetFrontHandPositionImproved();
         Owner.heldProj = Projectile.whoAmI;
@@ -124,7 +125,7 @@ public class BreakerBladeCrush : BaseSwordSwing
             case BladeState.Charging:
                 if (Time == 0f)
                 {
-                    Projectile.rotation = MathHelper.Pi * 3f / 2f;
+                    Projectile.rotation = Pi * 3f / 2f;
                     this.Sync();
                 }
 
@@ -136,7 +137,7 @@ public class BreakerBladeCrush : BaseSwordSwing
                     () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
                 charge.Update(Projectile.Center);
 
-                Projectile.rotation = Projectile.rotation.AngleLerp(Direction == 1 ? SwordRotation : MathHelper.Pi + SwordRotation, .2f);
+                Projectile.rotation = Projectile.rotation.AngleLerp(Direction == 1 ? SwordRotation : Pi + SwordRotation, .2f);
                 Owner.velocity.X = 0f;
                 Projectile.scale = Projectile.Opacity = Exp().OutFunction(InverseLerp(0f, 30f, Time));
                 Modded.BreakerLimit += .02f;

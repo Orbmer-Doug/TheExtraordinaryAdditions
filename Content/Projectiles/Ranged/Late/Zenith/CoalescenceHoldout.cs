@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using CalamityMod;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
@@ -14,6 +15,8 @@ using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late.Zenith;
 
@@ -39,7 +42,7 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
     public List<Vector2> Points = [];
     public const int MaxPoints = 50;
     public const float ReelDist = 30f;
-    public static readonly float ReelTime = SecondsToFrames(3.5f);
+    public static readonly float ReelTime = CalUtils.SecondsToFrames(3.5f);
     public ref float Time => ref Projectile.ai[0];
     public ref float Switch => ref Projectile.ai[1];
     public ref float StringCompletion => ref Projectile.ai[2];

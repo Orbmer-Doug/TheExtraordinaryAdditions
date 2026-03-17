@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CalamityMod;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
@@ -10,18 +11,12 @@ public partial class Asterlin : ModNPC
 {
     public static readonly Dictionary<AsterlinAIType, float> Swings_PossibleStates =
         new Dictionary<AsterlinAIType, float> { { AsterlinAIType.RotatedDicing, 1f }, { AsterlinAIType.Barrage, .6f } };
+
     [AutomatedMethodInvoke]
     public void LoadStateTransitions_Swings()
     {
-        StateMachine.RegisterTransition(AsterlinAIType.Swings, Swings_PossibleStates, false, () =>
-        {
-            return ExtraAI[0] >= Swings_MaxSwingCount && Sword == null;
-        });
-        StateMachine.RegisterStateEntryCallback(AsterlinAIType.Swings, () =>
-        {
-            if (this.RunServer())
-                NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<CyberneticSword>(), MediumAttackDamage, 0f);
-        });
+        StateMachine.RegisterTransition(AsterlinAIType.Swings, Swings_PossibleStates, false,
+            () => ExtraAI[0] >= Swings_MaxSwingCount && Sword == null);
         StateMachine.RegisterStateBehavior(AsterlinAIType.Swings, DoBehavior_Swings);
     }
 
@@ -32,9 +27,18 @@ public partial class Asterlin : ModNPC
 
     public void DoBehavior_Swings()
     {
-        Vector2 hoverDestination = Target.Center + new Vector2((NPC.Center.X > Target.Center.X).ToDirectionInt() * 175f, -60f);
+        Vector2 hoverDestination =
+            Target.Center + new Vector2((NPC.Center.X > Target.Center.X).ToDirectionInt() * 175f, -60f);
         float distanceToDestination = NPC.Distance(hoverDestination);
         Vector2 idealVelocity = NPC.SafeDirectionTo(hoverDestination) * MathHelper.Min(distanceToDestination, 10f);
-        NPC.SimpleFlyMovement(Vector2.Lerp(idealVelocity, (hoverDestination - NPC.Center) * 0.15f, InverseLerp(280f, 540f, distanceToDestination)), 0.7f);
+        NPC.SimpleFlyMovement(
+            Vector2.Lerp(idealVelocity, (hoverDestination - NPC.Center) * 0.15f,
+                InverseLerp(280f, 540f, distanceToDestination)), 0.7f);
+
+        if (AITimer > 50 && Sword == null && ExtraAI[0] < Swings_MaxSwingCount)
+        {
+            if (this.RunServer())
+                NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<CyberneticSword>(), MediumAttackDamage, 0f);
+        }
     }
 }

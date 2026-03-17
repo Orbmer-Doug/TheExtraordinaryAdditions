@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
+using CalamityMod;
 using Terraria;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
@@ -9,15 +10,21 @@ using TheExtraordinaryAdditions.Content.Items.Novelty;
 using TheExtraordinaryAdditions.Content.Items.Placeable;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle.AZ;
+using TheExtraordinaryAdditions.Core;
+using TheExtraordinaryAdditions.Core.Config;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Misc;
 
-public class TheGiantSnailFromAncientTimes : ModNPC
+// sorry
+public sealed class TheGiantSnailFromAncientTimes : ModNPC
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TheGiantSnailFromAncientTimes);
-    public override string BossHeadTexture => AssetRegistry.GetTexturePath(AdditionsTexture.TheGiantSnailFromAncientTimes);
+
+    public override string BossHeadTexture =>
+        AssetRegistry.GetTexturePath(AdditionsTexture.TheGiantSnailFromAncientTimes);
 
     public override void SetStaticDefaults()
     {
@@ -51,10 +58,10 @@ public class TheGiantSnailFromAncientTimes : ModNPC
     public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
     {
         bestiaryEntry.Info.AddRange([
-                BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.UndergroundSnow,
-                new FlavorTextBestiaryInfoElement(this.GetLocalizedValue("Bestiary")),
-                new BossBestiaryInfoElement(),
-            ]);
+            BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.UndergroundSnow,
+            new FlavorTextBestiaryInfoElement(this.GetLocalizedValue("Bestiary")),
+            new BossBestiaryInfoElement(),
+        ]);
     }
 
     public override void OnHitByProjectile(Projectile projectile, NPC.HitInfo hit, int damageDone)
@@ -63,12 +70,41 @@ public class TheGiantSnailFromAncientTimes : ModNPC
             NPC.Kill();
     }
 
-    public ref float Timer => ref NPC.ai[0];
+    public override void Load()
+    {
+        On_Main.UpdateAudio_DecideOnNewMusic += NotBossButHaveMusic;
+    }
+
+    public override void Unload()
+    {
+        On_Main.UpdateAudio_DecideOnNewMusic -= NotBossButHaveMusic;
+    }
+
+    private static void NotBossButHaveMusic(On_Main.orig_UpdateAudio_DecideOnNewMusic orig, Main self)
+    {
+        orig(self);
+        if (Main.newMusic == MusicLoader.GetMusicSlot(AdditionsMain.Instance,
+                AssetRegistry.GetMusicPath(AdditionsSound.FrigidGale)))
+            return;
+
+        if (FindNPC(out NPC npc, ModContent.NPCType<TheGiantSnailFromAncientTimes>()))
+        {
+            Main.newMusic = MusicLoader.GetMusicSlot(AdditionsMain.Instance,
+                AssetRegistry.GetMusicPath(AdditionsSound.sickest_beat_ever));
+        }
+    }
+
+    public int Timer
+    {
+        get => (int)NPC.ai[0];
+        set => NPC.ai[0] = value;
+    }
+
     public override void AI()
     {
         if (NPC.ai[1] == 0f)
         {
-            Utility.DisplayText(this.GetLocalizedValue("Awaken"), Color.Red);
+            DisplayText(this.GetLocalizedValue("Awaken"), Color.Red);
             NPC.ai[1] = 1f;
             this.Sync();
         }
@@ -82,22 +118,27 @@ public class TheGiantSnailFromAncientTimes : ModNPC
         Timer++;
 
         float interpolant = InverseLerp(NPC.lifeMax, 0f, NPC.life);
-        Vector2 dest = target.Center - Vector2.UnitY * (400f + (float)Math.Sin(Timer * MathHelper.Lerp(.06f, .3f, interpolant / 2)) * 30f);
+        Vector2 dest = target.Center - Vector2.UnitY *
+            (400f + (float)Math.Sin(Timer * MathHelper.Lerp(.06f, .3f, interpolant / 2)) * 30f);
         if (interpolant >= .5f)
-            dest = target.Center + PolarVector(MathF.Sin(Timer * MathHelper.Lerp(.002f, .05f, interpolant / 2 + .5f)) * 600f, Timer * .02f);
+            dest = target.Center +
+                   PolarVector(MathF.Sin(Timer * MathHelper.Lerp(.002f, .05f, interpolant / 2 + .5f)) * 600f,
+                       Timer * .02f);
 
-        NPC.velocity = Vector2.SmoothStep(NPC.velocity, NPC.SafeDirectionTo(dest) * MathHelper.Lerp(10f, 30f, interpolant), MathHelper.Lerp(.1f, .2f, interpolant));
+        NPC.velocity = Vector2.SmoothStep(NPC.velocity,
+            NPC.SafeDirectionTo(dest) * MathHelper.Lerp(10f, 30f, interpolant), MathHelper.Lerp(.1f, .2f, interpolant));
         if (NPC.Distance(dest) < 20f)
             NPC.velocity += Main.rand.NextVector2CircularEdge(2f, 2f);
 
-        if (Timer % 60f == 59f && Vector2.Distance(NPC.Center, target.Center) < 2000)
+        if (Timer % 60 == 59 && Vector2.Distance(NPC.Center, target.Center) < 2000)
         {
             AdditionsSound.PETER.Play(NPC.Center, .6f, 0f, .3f, 0);
             Vector2 direction = (target.Center - NPC.Center).SafeNormalize(Vector2.UnitX);
             int damage = DifficultyBasedValue(30, 50, 65, 69, 80);
             const float speed = 10f;
             if (this.RunServer())
-                NPC.NewNPCProj(NPC.Center, direction.RotatedByRandom(.5f) * speed, ModContent.ProjectileType<ParmaJawn>(), damage, 1f);
+                NPC.NewNPCProj(NPC.Center, direction.RotatedByRandom(.5f) * speed,
+                    ModContent.ProjectileType<ParmaJawn>(), damage, 1f);
             NPC.netUpdate = true;
         }
 
@@ -112,10 +153,13 @@ public class TheGiantSnailFromAncientTimes : ModNPC
 
     public override float SpawnChance(NPCSpawnInfo spawnInfo)
     {
-        if (spawnInfo.Player.ZoneSnow && (spawnInfo.Player.ZoneDirtLayerHeight || spawnInfo.Player.ZoneRockLayerHeight) && NPC.CountNPCS(ModContent.NPCType<TheGiantSnailFromAncientTimes>()) <= 0 && Main.snowMoon)
+        if (spawnInfo.Player.ZoneSnow && (spawnInfo.Player.ZoneDirtLayerHeight || spawnInfo.Player.ZoneRockLayerHeight)
+                                      && NPC.CountNPCS(ModContent.NPCType<TheGiantSnailFromAncientTimes>()) <= 0 &&
+                                      Main.snowMoon)
         {
             return 1f;
         }
+
         return 0f;
     }
 
@@ -127,20 +171,25 @@ public class TheGiantSnailFromAncientTimes : ModNPC
             Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Bone, hit.HitDirection, -1f, 0, default, 1f);
         }
 
-        if (NPC.life <= 0)
+        if (NPC.life > 0)
+            return;
+
+        ParticleRegistry.SpawnFlash(NPC.Center, 40, .8f, 1000f);
+        ParticleRegistry.SpawnBlurParticle(NPC.Center, 120, 2f, 5000f);
+        ParticleRegistry.SpawnChromaticAberration(NPC.Center, 50, 1f, 5000f);
+        ScreenShakeSystem.New(new(40f, 3f, 50000f), NPC.Center);
+
+        // the result of an oopsie in audacity
+        AdditionsSound.WibtorNUKE.Play(NPC.Center, 1f, 0f, 0f, 1, Name, Terraria.Audio.PauseBehavior.PauseWithGame);
+        for (int j = 0; j < 100; j++)
         {
-            ParticleRegistry.SpawnFlash(NPC.Center, 40, .8f, 1000f);
-            ParticleRegistry.SpawnBlurParticle(NPC.Center, 120, 2f, 5000f);
-            ParticleRegistry.SpawnChromaticAberration(NPC.Center, 50, 1f, 5000f);
-            ScreenShakeSystem.New(new(40f, 3f, 50000f), NPC.Center);
-            AdditionsSound.WibtorNUKE.Play(NPC.Center, 1f, 0f, 0f, 1, Name, Terraria.Audio.PauseBehavior.PauseWithGame);
-            for (int j = 0; j < 100; j++)
-            {
-                ParticleRegistry.SpawnBloomLineParticle(NPC.Center, Main.rand.NextVector2Circular(40f, 40f), Main.rand.Next(30, 80), Main.rand.NextFloat(.8f, 1.6f), Color.Crimson);
-                ParticleRegistry.SpawnDetailedBlastParticle(NPC.Center, Vector2.Zero, Vector2.One * Main.rand.NextFloat(2000f, 8000f)
-                    * new Vector2(Main.rand.NextFloat(), Main.rand.NextFloat()), Vector2.Zero, 50, Color.Red, RandomRotation(), Color.DarkRed);
-                Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Bone, hit.HitDirection, -20f, 0, default, 5f);
-            }
+            ParticleRegistry.SpawnBloomLineParticle(NPC.Center, Main.rand.NextVector2Circular(40f, 40f),
+                Main.rand.Next(30, 80), Main.rand.NextFloat(.8f, 1.6f), Color.Crimson);
+            ParticleRegistry.SpawnDetailedBlastParticle(NPC.Center, Vector2.Zero, Vector2.One *
+                Main.rand.NextFloat(2000f, 8000f)
+                * new Vector2(Main.rand.NextFloat(), Main.rand.NextFloat()), Vector2.Zero, 50, Color.Red,
+                RandomRotation(), Color.DarkRed);
+            Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Bone, hit.HitDirection, -20f, 0, default, 5f);
         }
     }
 
@@ -161,7 +210,8 @@ public class TheGiantSnailFromAncientTimes : ModNPC
         float interpolant = InverseLerp(NPC.lifeMax, 0f, NPC.life);
         if (interpolant > .5f)
             NPC.DrawNPCBackglow(Color.Red, 5f, fx, new(0, 0, NPC.width, NPC.height), 0);
-        spriteBatch.DrawBetter(NPC.ThisNPCTexture(), NPC.Center, null, drawColor, NPC.rotation, NPC.ThisNPCTexture().Size() / 2, 1f, fx);
+        spriteBatch.DrawBetter(NPC.ThisNPCTexture(), NPC.Center, null, drawColor, NPC.rotation,
+            NPC.ThisNPCTexture().Size() / 2, 1f, fx);
         return false;
     }
 }

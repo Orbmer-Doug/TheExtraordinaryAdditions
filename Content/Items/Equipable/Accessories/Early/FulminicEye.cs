@@ -8,6 +8,8 @@ using TheExtraordinaryAdditions.Content.Projectiles.Classless.Early;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
+using static CalamityMod.CalamityUtils;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Early;
 
@@ -37,10 +39,10 @@ public class FulminicEye : ModItem
     public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
     {
         Texture2D texture = Item.ThisItemTexture();
-        spriteBatch.Draw(texture, Item.position - Main.screenPosition, (Rectangle?)Item.GetCurrentFrame(ref frame, ref frameCounter, 9, 6), lightColor, 0f, Vector2.Zero, 1f, 0, 0f);
+        spriteBatch.Draw(texture, Item.position - Main.screenPosition, Item.GetCurrentFrame(ref frame, ref frameCounter, 9, 6), lightColor, 0f, Vector2.Zero, 1f, 0, 0f);
 
         Texture2D texture2 = AssetRegistry.GetTexture(AdditionsTexture.FulminicEye_Glow);
-        spriteBatch.Draw(texture2, Item.position - Main.screenPosition, (Rectangle?)Item.GetCurrentFrame(ref frame, ref frameCounter, 9, 6), Color.White, 0f, Vector2.Zero, 1f, 0, 0f);
+        spriteBatch.Draw(texture2, Item.position - Main.screenPosition, Item.GetCurrentFrame(ref frame, ref frameCounter, 9, 6), Color.White, 0f, Vector2.Zero, 1f, 0, 0f);
         return false;
     }
 

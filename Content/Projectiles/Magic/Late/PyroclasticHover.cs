@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.IO;
+using CalamityMod;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Assets.Audio;
@@ -19,8 +20,8 @@ public class PyroclasticHover : BaseIdleHoldoutProjectile
     public override int AssociatedItemID => ModContent.ItemType<PyroclasticVeil>();
     public override int IntendedProjectileType => ModContent.ProjectileType<PyroclasticHover>();
 
-    public static readonly int AppearTime = SecondsToFrames(.8f);
-    public static readonly int FadeTime = SecondsToFrames(.4f);
+    public static readonly int AppearTime = CalUtils.SecondsToFrames(.8f);
+    public static readonly int FadeTime = CalUtils.SecondsToFrames(.4f);
     public static readonly int CircleSize = 100;
     public ref float Time => ref Projectile.ai[0];
     public ref float AppearTimer => ref Projectile.ai[1];
@@ -86,7 +87,7 @@ public class PyroclasticHover : BaseIdleHoldoutProjectile
             float vel = Collision.WetCollision(Projectile.Center, 1, 1) ? 8f : 14f;
             MetaballRegistry.SpawnLavaMetaball(Projectile.Center,
                 Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.2f) * vel,
-                SecondsToFrames(7), 120, Owner.whoAmI, Projectile.damage);
+                CalUtils.SecondsToFrames(7), 120, Owner.whoAmI, Projectile.damage);
             if (Time % 2 == 1)
                 Item.CheckManaBetter(Owner, 1, true);
         }

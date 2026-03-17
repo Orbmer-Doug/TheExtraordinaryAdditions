@@ -18,13 +18,7 @@ public class CloudyCraterSky : CustomSky
     public const string ShaderKey = "CloudyBackground";
 
     public float BackgroundIntensity;
-    public static bool CanSkyBeActive
-    {
-        get
-        {
-            return SubworldSystem.IsActive<CloudedCrater>();
-        }
-    }
+    public static bool CanSkyBeActive => SubworldSystem.IsActive<CloudedCrater>();
 
     public static readonly Color DrawColor = new(0.46f, 0.46f, 0.46f);
 
@@ -42,20 +36,21 @@ public class CloudyCraterSky : CustomSky
         Opacity = BackgroundIntensity;
     }
 
-    public override Color OnTileColor(Color inColor) => new(Vector4.Lerp(DrawColor.ToVector4(), inColor.ToVector4(), 1f - BackgroundIntensity));
+    public override Color OnTileColor(Color inColor) =>
+        new(Vector4.Lerp(DrawColor.ToVector4(), inColor.ToVector4(), 1f - BackgroundIntensity));
 
     public static void DrawGreySky()
     {
         Vector2 screenSize = new(instance.GraphicsDevice.Viewport.Width, instance.GraphicsDevice.Viewport.Height);
 
         #region Vanilla Sky Calculations
+
         bool dayTime = Main.dayTime;
         float dayCompletion = (float)(time / dayLength);
         float nightCompletion = (float)(time / nightLength);
 
         int screenWidth = instance.GraphicsDevice.Viewport.Width;
         int screenHeight = instance.GraphicsDevice.Viewport.Height;
-        float ForcedMinimumZoom = Main.ForcedMinimumZoom;
         Texture2D sunTexture = TextureAssets.Sun.Value;
 
         // In this case we won't be using it in the shader because it looks weird.
@@ -71,12 +66,14 @@ public class CloudyCraterSky : CustomSky
             zero.X -= num15 * 0.5f;
             num13 = 800;
         }
+
         if (num14 < 600)
         {
             int num16 = 600 - num14;
             zero.Y -= num16 * 0.5f;
             num14 = 600;
         }
+
         SceneArea sceneArea = new()
         {
             bgTopY = 0,
@@ -89,43 +86,22 @@ public class CloudyCraterSky : CustomSky
         int num2 = sceneArea.bgTopY;
         int sunX = (int)(dayCompletion * (sceneArea.totalWidth + sunTexture.Width * 2)) - sunTexture.Width;
         int sunY = 0;
-        float sunScale = 1f;
         int moonX = (int)(nightCompletion * (sceneArea.totalWidth + moonTexture.Width * 2)) - moonTexture.Width;
         int moonY = 0;
-        float moonScale = 1f;
 
         if (dayTime)
         {
-            double num10;
-            if (dayCompletion < .5f)
-            {
-                num10 = Math.Pow(1.0 - dayCompletion * 2.0, 2.0);
-                sunY = (int)(num2 + num10 * 250.0 + 180.0);
-            }
-            else
-            {
-                num10 = Math.Pow((dayCompletion - 0.5) * 2.0, 2.0);
-                sunY = (int)(num2 + num10 * 250.0 + 180.0);
-            }
-            sunScale = (float)(1.2 - num10 * 0.4);
-            sunScale *= ForcedMinimumZoom;
-            sunScale *= 1.1f;
+            double num10 = dayCompletion < .5f
+                ? Math.Pow(1.0 - dayCompletion * 2.0, 2.0)
+                : Math.Pow((dayCompletion - 0.5) * 2.0, 2.0);
+            sunY = (int)(num2 + num10 * 250.0 + 180.0);
         }
         else
         {
-            double num11;
-            if (nightCompletion < .5f)
-            {
-                num11 = Math.Pow(1.0 - nightCompletion * 2.0, 2.0);
-                moonY = (int)(num2 + num11 * 250.0 + 180.0);
-            }
-            else
-            {
-                num11 = Math.Pow((nightCompletion - 0.5) * 2.0, 2.0);
-                moonY = (int)(num2 + num11 * 250.0 + 180.0);
-            }
-            moonScale = (float)(1.2 - num11 * 0.4);
-            moonScale *= ForcedMinimumZoom;
+            double num11 = nightCompletion < .5f
+                ? Math.Pow(1.0 - nightCompletion * 2.0, 2.0)
+                : Math.Pow((nightCompletion - 0.5) * 2.0, 2.0);
+            moonY = (int)(num2 + num11 * 250.0 + 180.0);
         }
 
         // Convert pixel positions to normalized screen coordinates (0.0 to 1.0)
@@ -134,11 +110,14 @@ public class CloudyCraterSky : CustomSky
             (sunY + sceneArea.SceneLocalScreenPositionOffset.Y) / sceneArea.totalHeight
         );
         Vector2 moonPosition = new(
-        (moonX + sceneArea.SceneLocalScreenPositionOffset.X) / sceneArea.totalWidth,
-        (moonY + sceneArea.SceneLocalScreenPositionOffset.Y) / sceneArea.totalHeight
+            (moonX + sceneArea.SceneLocalScreenPositionOffset.X) / sceneArea.totalWidth,
+            (moonY + sceneArea.SceneLocalScreenPositionOffset.Y) / sceneArea.totalHeight
         );
 
-        float intensity = dayTime ? Clamp(Convert01To101(dayCompletion) * 2f, 1f, 2f) : Clamp(Convert01To010(nightCompletion), .6f, 1f);
+        float intensity = dayTime
+            ? Clamp(Convert01To101(dayCompletion) * 2f, 1f, 2f)
+            : Clamp(Convert01To010(nightCompletion), .6f, 1f);
+
         #endregion
 
         ManagedShader cloudShader = AssetRegistry.GetShader(ShaderKey);
@@ -148,11 +127,12 @@ public class CloudyCraterSky : CustomSky
         cloudShader.TrySetParameter("SunPosition", sunPosition);
         cloudShader.TrySetParameter("MoonPosition", moonPosition);
         cloudShader.TrySetParameter("IsDay", dayTime);
-        cloudShader.TrySetParameter("GravDir", LocalPlayer.gravDir == 1 ? false : true);
+        cloudShader.TrySetParameter("GravDir", (int)LocalPlayer.gravDir != 1);
         cloudShader.TrySetParameter("Time", GlobalTimeWrappedHourly);
-        cloudShader.TrySetParameter("SkyColor", new Vector4(Vector3.Max(new Vector3(.2f, .2f, .2f), ColorOfTheSkies.ToVector3()), intensity));
+        cloudShader.TrySetParameter("SkyColor",
+            new Vector4(Vector3.Max(new Vector3(.2f, .2f, .2f), ColorOfTheSkies.ToVector3()), intensity));
         cloudShader.TrySetParameter("Parallax", screenPosition * (caveParallax * new Vector2(.3f, .175f)));
-        cloudShader.TrySetParameter("ScreenRes", Main.graphics.GraphicsDevice.Viewport.Bounds.Size());
+        cloudShader.TrySetParameter("ScreenRes", graphics.GraphicsDevice.Viewport.Bounds.Size());
         cloudShader.Render();
 
         Texture2D pix = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
@@ -167,27 +147,36 @@ public class CloudyCraterSky : CustomSky
             return;
 
         // Draw in the foreground
-        if (maxDepth >= float.MaxValue || minDepth < float.MaxValue)
-        {
-            Matrix backgroundMatrix = BackgroundViewMatrix.TransformationMatrix;
-            Vector3 translationDirection = new(1f, BackgroundViewMatrix.Effects.HasFlag(SpriteEffects.FlipVertically) ? -1f : 1f, 1f);
-            backgroundMatrix.Translation -= BackgroundViewMatrix.ZoomMatrix.Translation * translationDirection;
+        if (!(maxDepth >= float.MaxValue) && !(minDepth < float.MaxValue))
+            return;
 
-            spriteBatch.End();
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearWrap, DepthStencilState.None, Rasterizer, null, backgroundMatrix);
-            DrawGreySky();
-            spriteBatch.End();
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, DefaultSamplerState, DepthStencilState.None, Rasterizer, null, backgroundMatrix);
-        }
+        Matrix backgroundMatrix = BackgroundViewMatrix.TransformationMatrix;
+        Vector3 translationDirection = new(1f,
+            BackgroundViewMatrix.Effects.HasFlag(SpriteEffects.FlipVertically) ? -1f : 1f, 1f);
+        backgroundMatrix.Translation -= BackgroundViewMatrix.ZoomMatrix.Translation * translationDirection;
+
+        spriteBatch.End();
+        spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearWrap,
+            DepthStencilState.None, Rasterizer, null, backgroundMatrix);
+        DrawGreySky();
+        spriteBatch.End();
+        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, DefaultSamplerState, DepthStencilState.None,
+            Rasterizer, null, backgroundMatrix);
     }
 
     public override float GetCloudAlpha() => 0f;
 
-    public override void Reset() { }
+    public override void Reset()
+    {
+    }
 
-    public override void Activate(Vector2 position, params object[] args) { }
+    public override void Activate(Vector2 position, params object[] args)
+    {
+    }
 
-    public override void Deactivate(params object[] args) { }
+    public override void Deactivate(params object[] args)
+    {
+    }
 
     public override bool IsActive()
     {
@@ -220,7 +209,10 @@ public class CloudedCraterBackgroundScene : ModSceneEffect
 
     public override void Load()
     {
-        Filters.Scene[CloudyCraterSky.Key] = new Filter(new CloudedCraterScreenShaderData("FilterMiniTower").UseColor(CloudyCraterSky.DrawColor).UseOpacity(0.25f), EffectPriority.VeryHigh);
+        Filters.Scene[CloudyCraterSky.Key] =
+            new Filter(
+                new CloudedCraterScreenShaderData("FilterMiniTower").UseColor(CloudyCraterSky.DrawColor)
+                    .UseOpacity(0.25f), EffectPriority.VeryHigh);
         SkyManager.Instance[CloudyCraterSky.Key] = new CloudyCraterSky();
         SkyManager.Instance[CloudyCraterSky.Key].Load();
     }

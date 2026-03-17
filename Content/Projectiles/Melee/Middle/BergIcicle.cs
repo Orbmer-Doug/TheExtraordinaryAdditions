@@ -5,6 +5,7 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
@@ -52,14 +53,14 @@ public class BergIcicle : ModProjectile
 
         if (Time < WaitTime)
         {
-            Projectile.rotation += Projectile.velocity.X.NonZeroSign() * Utils.Remap(Time, 0f, WaitTime, .28f, 0f);
+            Projectile.rotation += Projectile.velocity.X.NonZeroSign() * Terraria.Utils.Remap(Time, 0f, WaitTime, .28f, 0f);
             Projectile.velocity *= .94f;
         }
         else
         {
             if (!Hit)
             {
-                if (Utility.FindProjectile(out Projectile p, ModContent.ProjectileType<BergcrusherSwing>(), Projectile.owner))
+                if (FindProjectile(out Projectile p, ModContent.ProjectileType<BergcrusherSwing>(), Projectile.owner))
                 {
                     BergcrusherSwing swing = p.As<BergcrusherSwing>();
                     if (swing.Rect().Intersects(Projectile.RotHitbox()) && swing.AngularVelocity > .03f && swing.Time > 5)

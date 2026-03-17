@@ -12,6 +12,8 @@ using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Multi.Middle;
 
@@ -310,7 +312,7 @@ public class GunGunSword : ModProjectile
                     Owner.velocity -= Projectile.velocity * Utils.Remap(Owner.Distance(pos), 0f, 500f, 10f, 0f);
                     Modded.LungingDown = true;
 
-                    CalUtils.AddCooldown(Owner, SkullKaboomCooldown.ID, SecondsToFrames(3));
+                    CalUtils.AddCooldown(Owner, SkullKaboomCooldown.ID, CalUtils.SecondsToFrames(3));
                     AdditionsSound.SnakeRocket.Play(Projectile.Center, 1.4f);
                     Projectile.MaxUpdates = 2;
                     this.Sync();

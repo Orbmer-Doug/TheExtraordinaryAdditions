@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.IO;
+using CalamityMod;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
@@ -9,6 +10,7 @@ using TheExtraordinaryAdditions.Content.Items.Tools;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
+using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Misc;
 
@@ -182,7 +184,7 @@ public class GodDummyNPC : ModNPC
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
         Color mainColor = Color.White;
-        if (NotABossAround() == false)
+        if (!NotABossAround())
             mainColor = Color.Red;
 
         Texture2D texture = TextureAssets.Npc[NPC.type].Value;
