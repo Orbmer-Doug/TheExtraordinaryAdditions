@@ -28,7 +28,7 @@ public static class RelicAutoloader
         public override string Texture => texturePath;
 
         // Necessary for autoloaded types since the constructor is important in determining the behavior of the given instance
-        public override bool CloneNewInstances => true;
+        protected override bool CloneNewInstances => true;
 
         public AutoloadableRelicItem(string texturePath)
         {

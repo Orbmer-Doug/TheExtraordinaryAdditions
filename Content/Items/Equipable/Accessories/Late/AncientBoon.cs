@@ -38,7 +38,7 @@ public class AncientBoon : ModItem
 
         if (!player.slowFall && player.wingTime < player.wingTimeMax && !player.controlJump && player.miscCounter % 2 == 0)
             player.wingTime += 1.8f;
-        
+
         player.statDefense *= 1.16f;
         player.GetModPlayer<AncientBoonPlayer>().Equipped = true;
     }
@@ -47,7 +47,6 @@ public class AncientBoon : ModItem
         Recipe recipe = CreateRecipe();
         recipe.AddIngredient(ItemID.SoulofFlight, 40);
         recipe.AddIngredient(ModContent.ItemType<CoreofCalamity>(), 5);
-        recipe.AddIngredient(ModContent.ItemType<GalacticaSingularity>(), 12);
         recipe.AddIngredient(ModContent.ItemType<AscendantSpiritEssence>(), 5);
         recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 5);
         recipe.AddTile(ModContent.TileType<CosmicAnvil>());

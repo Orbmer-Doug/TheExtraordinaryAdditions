@@ -858,7 +858,7 @@ public partial class Asterlin : IHasScreenShader
 
 public sealed class AsterlinTarget : ARenderTargetContentByRequest
 {
-    public override void HandleUseReqest(GraphicsDevice device, SpriteBatch spriteBatch)
+    protected override void HandleUseReqest(GraphicsDevice device, SpriteBatch spriteBatch)
     {
         Vector2 size = new(device.Viewport.Width, device.Viewport.Height);
         PrepareARenderTarget_WithoutListeningToEvents(ref _target, Main.instance.GraphicsDevice, (int)size.X, (int)size.Y, RenderTargetUsage.PreserveContents);
@@ -878,7 +878,7 @@ public sealed class AsterlinTarget : ARenderTargetContentByRequest
 
 public sealed class AsterlinPostProcessTarget : ARenderTargetContentByRequest
 {
-    public override void HandleUseReqest(GraphicsDevice device, SpriteBatch spriteBatch)
+    protected override void HandleUseReqest(GraphicsDevice device, SpriteBatch spriteBatch)
     {
         Vector2 size = new(device.Viewport.Width, device.Viewport.Height);
         PrepareARenderTarget_WithoutListeningToEvents(ref _target, Main.instance.GraphicsDevice, (int)size.X, (int)size.Y, RenderTargetUsage.PreserveContents);

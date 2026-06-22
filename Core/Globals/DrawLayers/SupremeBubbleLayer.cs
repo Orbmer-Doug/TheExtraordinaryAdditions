@@ -21,7 +21,7 @@ public class SupremeBubbleLayer : PlayerDrawLayer
         return false;
     }
 
-    public override void Draw(ref PlayerDrawSet drawInfo)
+    protected override void Draw(ref PlayerDrawSet drawInfo)
     {
         Texture2D texture = AssetRegistry.GetTexture(AdditionsTexture.Bubble);
         int drawX = (int)(drawInfo.Center.X - Main.screenPosition.X);

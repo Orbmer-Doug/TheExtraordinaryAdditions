@@ -63,7 +63,7 @@ public class SmartPistolLayer : PlayerDrawLayer
     }
 
     public static bool Drawing = false;
-    public override void Draw(ref PlayerDrawSet drawInfo)
+    protected override void Draw(ref PlayerDrawSet drawInfo)
     {
         Player drawPlayer = drawInfo.drawPlayer;
 

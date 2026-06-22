@@ -65,7 +65,6 @@ public class DeepestNadir : ModItem
         recipe.AddIngredient(ModContent.ItemType<EclipsedDuo>(), 1);
         recipe.AddIngredient(ItemID.ScytheWhip, 1);
         recipe.AddIngredient(ItemID.RainbowWhip, 1);
-        recipe.AddIngredient(ModContent.ItemType<GalacticaSingularity>(), 12);
         recipe.AddIngredient(ModContent.ItemType<DarkPlasma>(), 8);
         recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 5);
         recipe.AddTile(ModContent.TileType<CosmicAnvil>());

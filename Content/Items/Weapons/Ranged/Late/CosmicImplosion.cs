@@ -51,7 +51,6 @@ public class CosmicImplosion : ModItem
     {
         Recipe recipe = CreateRecipe();
         recipe.AddIngredient(ModContent.ItemType<EternalBlizzard>(), 1);
-        recipe.AddIngredient(ModContent.ItemType<GalacticaSingularity>(), 10);
         recipe.AddIngredient(ModContent.ItemType<DarkPlasma>(), 8);
         recipe.AddTile(TileID.VoidMonolith);
         recipe.Register();

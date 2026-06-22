@@ -51,7 +51,6 @@ public class AbsoluteGreaves : ModItem, ILocalizedModType, IModType
         recipe.AddIngredient(ModContent.ItemType<BlueLeggings>(), 1);
         recipe.AddIngredient(ModContent.ItemType<TremorSheathe>(), 1);
         recipe.AddIngredient(ItemID.SolarFlareLeggings, 1);
-        recipe.AddIngredient(ModContent.ItemType<GalacticaSingularity>(), 6);
         recipe.AddIngredient(ModContent.ItemType<LifeAlloy>(), 3);
         recipe.AddIngredient(ModContent.ItemType<RuinousSoul>(), 5);
         recipe.AddIngredient(ModContent.ItemType<AscendantSpiritEssence>(), 2);

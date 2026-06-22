@@ -33,7 +33,7 @@ public readonly struct AdditionsLoopedSound
 
 public sealed class LoopedSoundManager : ModSystem
 {
-    private static readonly List<LoopedSoundInstance> loopedSounds = [];
+    private static readonly List<LoopedSoundInstance> LoopedSounds = [];
 
     public override void OnModLoad()
     {
@@ -46,10 +46,10 @@ public sealed class LoopedSoundManager : ModSystem
 
     private static void UpdateLoopedSounds(On_SoundEngine.orig_Update orig)
     {
-        if (SoundEngine.IsAudioSupported && loopedSounds.Count != 0)
+        if (SoundEngine.IsAudioSupported && LoopedSounds.Count != 0)
         {
             // Go through all looped sounds and perform automatic cleanup
-            loopedSounds.RemoveAll(s =>
+            LoopedSounds.RemoveAll(s =>
             {
                 // If the sound was started but is no longer playing, restart it
                 bool shouldBeRemoved = false;
@@ -82,14 +82,14 @@ public sealed class LoopedSoundManager : ModSystem
     public static LoopedSoundInstance CreateNew(AdditionsLoopedSound loopingSound, Func<bool> terminationCondition = null, Func<bool> activeCondition = null)
     {
         LoopedSoundInstance sound = new(loopingSound, terminationCondition ?? (() => false), activeCondition);
-        loopedSounds.Add(sound);
+        LoopedSounds.Add(sound);
         return sound;
     }
 
     public static LoopedSoundInstance CreateNew(AdditionsLoopedSound startingSound, AdditionsLoopedSound loopingSound, Func<bool> terminationCondition = null, Func<bool> activeCondition = null)
     {
         LoopedSoundInstance sound = new(startingSound, loopingSound, terminationCondition ?? (() => false), activeCondition);
-        loopedSounds.Add(sound);
+        LoopedSounds.Add(sound);
         return sound;
     }
 }

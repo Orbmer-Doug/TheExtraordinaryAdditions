@@ -21,7 +21,7 @@ public static class MaskAutoloader
 
         public override string Texture => texturePath;
 
-        public override bool CloneNewInstances => true;
+        protected override bool CloneNewInstances => true;
 
         public AutoloadableMask(string texturePath, bool permitDefaultHeadDrawing)
         {

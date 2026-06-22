@@ -1,14 +1,14 @@
 {
   "profiles": {
-    "Terraria": {
+    "Terraria Client": {
       "commandName": "Executable",
-      "executablePath": "/run/media/doug/2TB Games/SteamLibrary/steamapps/common/tModLoader/LaunchUtils/ScriptCaller.sh",
+      "executablePath": "/mnt/Games/SteamLibrary/steamapps/common/tModLoader/LaunchUtils/ScriptCaller.sh",
       "commandLineArgs": "tModLoader.dll",
-      "workingDirectory": "/run/media/doug/2TB Games/SteamLibrary/steamapps/common/tModLoader"
+      "workingDirectory": "/mnt/Games/SteamLibrary/steamapps/common/tModLoader/"
     },
-    "TerrariaServer": {
+    "Terraria Server": {
       "commandName": "Executable",
-      "executablePath": "/run/media/doug/2TB Games/SteamLibrary/steamapps/common/tModLoader/start-tModLoaderServer.sh",
+      "executablePath": "/mnt/Games/SteamLibrary/steamapps/common/tModLoader/LaunchUtils/ScriptCaller.sh",
       "commandLineArgs": "$(tMLServerPath)",
       "workingDirectory": "$(tMLSteamPath)"
     }

@@ -49,7 +49,6 @@ public class AbsoluteCoreplate : ModItem, ILocalizedModType, IModType
         recipe.AddIngredient(ModContent.ItemType<BlueTuxedo>(), 1);
         recipe.AddIngredient(ModContent.ItemType<TremorPlating>(), 1);
         recipe.AddIngredient(ItemID.SolarFlareBreastplate, 1);
-        recipe.AddIngredient(ModContent.ItemType<GalacticaSingularity>(), 7);
         recipe.AddIngredient(ModContent.ItemType<LifeAlloy>(), 3);
         recipe.AddIngredient(ModContent.ItemType<RuinousSoul>(), 5);
         recipe.AddIngredient(ModContent.ItemType<AscendantSpiritEssence>(), 3);

@@ -86,7 +86,6 @@ public class AbsoluteGreathelm : ModItem, ILocalizedModType, IModType
         recipe.AddIngredient(ModContent.ItemType<BlueTopHat>(), 1);
         recipe.AddIngredient(ModContent.ItemType<TremorGreathelm>(), 1);
         recipe.AddIngredient(ItemID.SolarFlareHelmet, 1);
-        recipe.AddIngredient(ModContent.ItemType<GalacticaSingularity>(), 4);
         recipe.AddIngredient(ModContent.ItemType<LifeAlloy>(), 3);
         recipe.AddIngredient(ModContent.ItemType<RuinousSoul>(), 5);
         recipe.AddIngredient(ModContent.ItemType<AscendantSpiritEssence>(), 2);

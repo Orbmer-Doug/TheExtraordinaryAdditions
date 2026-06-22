@@ -13,7 +13,7 @@ namespace TheExtraordinaryAdditions.Assets;
 
 public readonly struct LazyAsset<T>(Func<Asset<T>> assetLoadFunction, string path) where T : class
 {
-    private readonly Lazy<Asset<T>> asset = new Lazy<Asset<T>>(assetLoadFunction);
+    private readonly Lazy<Asset<T>> asset = new(assetLoadFunction);
 
     public Asset<T> Asset => asset.Value;
 
@@ -89,8 +89,8 @@ public sealed class AssetRegistry : ModSystem
         HasFinishedLoading = false;
         List<string> fileNames = mod.GetFileNames() ?? [];
 
-        List<string> textureFiles = fileNames.Where(f => f.Contains(TexturePath) && f.EndsWith(".rawimg") && !f.Contains("Container")).ToList();
-        List<string> soundFiles = fileNames.Where(f => f.Contains(AudioPath)).ToList();
+        List<string> textureFiles = [.. fileNames.Where(f => f.Contains(TexturePath) && f.EndsWith(".rawimg") && !f.Contains("Container"))];
+        List<string> soundFiles = [.. fileNames.Where(f => f.Contains(AudioPath))];
 
         foreach (string path in textureFiles)
         {
@@ -112,7 +112,7 @@ public sealed class AssetRegistry : ModSystem
             string clearedPath = $"{mod.Name}/{Path.Combine(Path.GetDirectoryName(path), name).Replace(@"\", "/")}";
             if (Enum.TryParse(name, out AdditionsSound sound))
             {
-                SoundType type = clearedPath.Contains("Music") ? SoundType.Music : SoundType.Sound;
+                SoundType type = clearedPath.Contains("NotMusic") ? SoundType.Music : SoundType.Sound;
                 Sounds[sound] = new Lazy<AssetInfo<SoundStyle>>(() =>
                     new AssetInfo<SoundStyle>(new SoundStyle(clearedPath, type), clearedPath));
             }
@@ -215,7 +215,8 @@ public sealed class AssetRegistry : ModSystem
 
     public static SoundStyle GetSound(AdditionsSound sound) => GetAsset<SoundStyle, AdditionsSound>(sound);
     public static string GetSoundPath(AdditionsSound sound) => GetAssetPath(sound);
-    public static string GetMusicPath(AdditionsSound sound) => "Assets/Audio/Music/" + sound.ToString();
+    // For whatever reason, having a folder named Music causes tMods autoloaders to try to add a key twice
+    public static string GetMusicPath(AdditionsSound sound) => "Assets/Audio/NotMusic/" + sound;
     public static Texture2D GetTexture(AdditionsTexture texture) => GetAsset<Texture2D, AdditionsTexture>(texture);
     public static string GetTexturePath(AdditionsTexture texture) => GetAssetPath(texture);
     public static string Invis => GetTexturePath(AdditionsTexture.Invisible);

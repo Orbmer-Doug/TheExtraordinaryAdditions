@@ -24,7 +24,7 @@ public static class MusicBoxAutoloader
 
         public override string Texture => texturePath;
 
-        public override bool CloneNewInstances => true;
+        protected override bool CloneNewInstances => true;
 
         public AutoloadableMusicBoxItem(string texturePath, string musicPath)
         {

@@ -19,7 +19,7 @@ public class CloudedCrater : Subworld
 {
     public class CloudedCraterPass() : GenPass("Terrain", 1f)
     {
-        public override void ApplyPass(GenerationProgress progress, GameConfiguration configuration)
+        protected override void ApplyPass(GenerationProgress progress, GameConfiguration configuration)
         {
             // Set the progress text
             progress.Message = "Blasting a part of the world.";
