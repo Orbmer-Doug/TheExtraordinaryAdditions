@@ -39,7 +39,7 @@ public class Fireball : ModItem
         Item.crit = 40; //it is very effective
         Item.mana = 15;
     }
-    
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(new Color(227, 170, 36));

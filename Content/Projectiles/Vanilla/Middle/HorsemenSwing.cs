@@ -25,6 +25,7 @@ public class HorsemenSwing : BaseSwordSwing
         // Reset arrays
         after.Clear();
     }
+
     public override void SafeAI()
     {
         Projectile.Center = Owner.GetFrontHandPositionImproved();
@@ -41,7 +42,8 @@ public class HorsemenSwing : BaseSwordSwing
             PlayedSound = true;
         }
 
-        after?.UpdateFancyAfterimages(new(Center, Vector2.One * Projectile.scale, Projectile.Opacity, Projectile.rotation, Effects, 0, 3));
+        after?.UpdateFancyAfterimages(new(Center, Vector2.One * Projectile.scale, Projectile.Opacity,
+            Projectile.rotation, Effects, 0, 3));
 
         float scale = MeleeScale * 1.48f;
         if (VanishTime <= 0)
@@ -76,15 +78,18 @@ public class HorsemenSwing : BaseSwordSwing
     {
         for (int i = 0; i < 20; i++)
         {
-            Dust d = Dust.NewDustPerfect(start + Main.rand.NextVector2Circular(10f, 10f), DustID.Torch, SwordDir.RotatedByRandom(.4f) * Main.rand.NextFloat(6f, 12f),
+            Dust d = Dust.NewDustPerfect(start + Main.rand.NextVector2Circular(10f, 10f), DustID.Torch,
+                SwordDir.RotatedByRandom(.4f) * Main.rand.NextFloat(6f, 12f),
                 0, default, Main.rand.NextFloat(1.9f, 2.8f));
             d.noGravity = true;
         }
+
         if (!npc.immortal && !npc.SpawnedFromStatue && !NPCID.Sets.CountsAsCritter[npc.type])
             Owner.HorsemansBlade_SpawnPumpkin(npc.whoAmI, Projectile.damage, Projectile.knockBack);
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         // Determine the effects for drawing. These must be done here otherwise silly things WILL happen.
@@ -108,7 +113,9 @@ public class HorsemenSwing : BaseSwordSwing
             Effects = SpriteEffects.FlipHorizontally;
         }
 
-        after?.DrawFancySwordAfterimages(Tex, Projectile.Center, [new(255, 255, 204), new(255, 255, 0), new(244, 184, 0), new(254, 158, 35), new(252, 95, 4)], origin, Effects, RotationOffset, Projectile.Opacity, Projectile.scale);
+        after?.DrawFancySwordAfterimages(Tex, Projectile.Center,
+            [new(255, 255, 204), new(255, 255, 0), new(244, 184, 0), new(254, 158, 35), new(252, 95, 4)], origin,
+            Effects, RotationOffset, Projectile.Opacity, Projectile.scale);
 
         Main.spriteBatch.Draw(Tex, Projectile.Center - Main.screenPosition, null, lightColor,
             Projectile.rotation + RotationOffset, origin, Projectile.scale, Effects, 0f);
@@ -138,11 +145,13 @@ public class HorsemenDive : ModProjectile
     public Vector2 Start;
     public Vector2 End;
     public Vector2 Center => Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
+
     public override void SendExtraAI(BinaryWriter writer)
     {
         writer.WriteVector2(Start);
         writer.WriteVector2(End);
     }
+
     public override void ReceiveExtraAI(BinaryReader reader)
     {
         Start = reader.ReadVector2();
@@ -156,10 +165,13 @@ public class HorsemenDive : ModProjectile
     public const int Width = 20;
     public float MaxDist => 600f * Owner.GetTotalAttackSpeed(DamageClass.Melee);
     public int Dir => Projectile.velocity.X.NonZeroSign();
+
     public RotatedRectangle Rect()
     {
-        return new(Width * Projectile.scale, Projectile.Center, Projectile.Center + PolarVector(76f * Projectile.scale, Projectile.rotation - PiOver4));
+        return new(Width * Projectile.scale, Projectile.Center,
+            Projectile.Center + PolarVector(76f * Projectile.scale, Projectile.rotation - PiOver4));
     }
+
     public override void AI()
     {
         if (Time == 0f)
@@ -185,7 +197,8 @@ public class HorsemenDive : ModProjectile
         if (Time < WaitTime)
         {
             float comp = InverseLerp(0f, WaitTime, Time);
-            Projectile.rotation = PiOver4 + Projectile.velocity.ToRotation() - PiOver2 * MakePoly(3f).InOutFunction.Evaluate(1f, 0f, comp) * Dir * Owner.gravDir;
+            Projectile.rotation = PiOver4 + Projectile.velocity.ToRotation() -
+                                  PiOver2 * MakePoly(3f).InOutFunction.Evaluate(1f, 0f, comp) * Dir * Owner.gravDir;
         }
         else if (Time == WaitTime)
             SoundID.Item73.Play(Projectile.Center, 1.1f, -.2f, 0f, null, 20, Name);
@@ -196,7 +209,8 @@ public class HorsemenDive : ModProjectile
 
             for (int i = 0; i < 2; i++)
             {
-                Dust d = Dust.NewDustPerfect(Rect().RandomPoint(), DustID.Torch, -(Projectile.rotation - PiOver4).ToRotationVector2() * Main.rand.NextFloat(2f, 8f),
+                Dust d = Dust.NewDustPerfect(Rect().RandomPoint(), DustID.Torch,
+                    -(Projectile.rotation - PiOver4).ToRotationVector2() * Main.rand.NextFloat(2f, 8f),
                     0, default, Main.rand.NextFloat(1.7f, 2.1f));
                 d.noGravity = true;
             }
@@ -207,6 +221,7 @@ public class HorsemenDive : ModProjectile
             if (Projectile.Opacity <= 0f)
                 Projectile.Kill();
         }
+
         Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, Projectile.rotation - PiOver4);
         Projectile.Center = Owner.GetFrontHandPositionImproved();
 

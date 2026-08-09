@@ -17,7 +17,7 @@ public class OverloadedLightDart : ModProjectile
 
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
 
@@ -40,6 +40,7 @@ public class OverloadedLightDart : ModProjectile
     }
 
     public const float Supersonic = 28f;
+
     public override void AI()
     {
         if (trail == null || trail.Disposed)
@@ -53,7 +54,8 @@ public class OverloadedLightDart : ModProjectile
 
         Vector2 start = Projectile.RotHitbox().Bottom;
         float dist = Animators.MakePoly(3f).InOutFunction.Evaluate(Time, 0f, Supersonic, 0f, 2200f);
-        telePoints.SetPoints(start.GetLaserControlPoints(start + Projectile.velocity.SafeNormalize(Vector2.Zero) * dist, 30));
+        telePoints.SetPoints(start.GetLaserControlPoints(start + Projectile.velocity.SafeNormalize(Vector2.Zero) * dist,
+            30));
 
         if (Time < Supersonic)
         {
@@ -61,14 +63,19 @@ public class OverloadedLightDart : ModProjectile
         }
         else if (Time == Supersonic)
         {
-            ParticleRegistry.SpawnPulseRingParticle(start, Projectile.velocity * .01f, 20, Projectile.velocity.ToRotation(), new(.4f, 1f), 0f, Projectile.height * 1.2f, Color.Gold);
+            ParticleRegistry.SpawnPulseRingParticle(start, Projectile.velocity * .01f, 20,
+                Projectile.velocity.ToRotation(), new(.4f, 1f), 0f, Projectile.height * 1.2f, Color.Gold);
 
             for (int i = 0; i < 12; i++)
             {
-                Vector2 vel = NextVector2EllipseEdge(Projectile.height * .4f, Projectile.height, Projectile.velocity.ToRotation()) * .4f;
-                ParticleRegistry.SpawnHeavySmokeParticle(start, vel, Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .6f), Color.Gold.Lerp(Color.DarkGoldenrod, Main.rand.NextFloat(0f, .4f)));
-                ParticleRegistry.SpawnBloomLineParticle(start, vel, Main.rand.Next(40, 50), Main.rand.NextFloat(.3f, .4f), Color.Gold);
+                Vector2 vel = NextVector2EllipseEdge(Projectile.height * .4f, Projectile.height,
+                    Projectile.velocity.ToRotation()) * .4f;
+                ParticleRegistry.SpawnHeavySmokeParticle(start, vel, Main.rand.Next(20, 30),
+                    Main.rand.NextFloat(.4f, .6f), Color.Gold.Lerp(Color.DarkGoldenrod, Main.rand.NextFloat(0f, .4f)));
+                ParticleRegistry.SpawnBloomLineParticle(start, vel, Main.rand.Next(40, 50),
+                    Main.rand.NextFloat(.3f, .4f), Color.Gold);
             }
+
             AdditionsSound.explo04.Play(start, .7f, -.2f);
             Projectile.timeLeft = 800;
             this.Sync();
@@ -78,6 +85,7 @@ public class OverloadedLightDart : ModProjectile
             Projectile.extraUpdates = 12;
             points.Update(Projectile.RotHitbox().Top);
         }
+
         Time++;
 
         // Done twice to ensure no slip-ups (particulary when spawning in)
@@ -86,7 +94,8 @@ public class OverloadedLightDart : ModProjectile
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return targetHitbox.LineCollision(Projectile.BaseRotHitbox().Bottom, Projectile.BaseRotHitbox().Top, Projectile.width);
+        return targetHitbox.LineCollision(Projectile.BaseRotHitbox().Bottom, Projectile.BaseRotHitbox().Top,
+            Projectile.width);
     }
 
     public float TrailWidthFunction(float completionRatio)
@@ -99,7 +108,9 @@ public class OverloadedLightDart : ModProjectile
         return Color.Goldenrod * MathF.Sqrt(completion.X) * Projectile.Opacity;
     }
 
-    public float FadeAway => Animators.MakePoly(2f).InFunction.Evaluate(Time, Supersonic, Supersonic + (18f * Projectile.MaxUpdates), 1f, 0f);
+    public float FadeAway => Animators.MakePoly(2f).InFunction
+        .Evaluate(Time, Supersonic, Supersonic + (18f * Projectile.MaxUpdates), 1f, 0f);
+
     public float TelegraphWidthFunction(float completionRatio)
     {
         float width = Projectile.width * .5f * FadeAway;
@@ -113,7 +124,9 @@ public class OverloadedLightDart : ModProjectile
         float endFadeOpacity = GetLerpBump(0f, .2f, 1f, .8f, completion.X);
 
         float telegraphInterpolant = InverseLerp(0f, Supersonic - 4f, Time);
-        Color telegraphColor = Color.Lerp(Color.LightGoldenrodYellow, Color.Gold, MathF.Pow(telegraphInterpolant, 0.6f)) * telegraphInterpolant;
+        Color telegraphColor =
+            Color.Lerp(Color.LightGoldenrodYellow, Color.Gold, MathF.Pow(telegraphInterpolant, 0.6f)) *
+            telegraphInterpolant;
 
         return telegraphColor * endFadeOpacity * FadeAway * .3f;
     }
@@ -142,11 +155,13 @@ public class OverloadedLightDart : ModProjectile
                 trail.DrawTrail(shader, points.Points);
             }
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 
         Texture2D texture = Projectile.ThisProjectileTexture();
         Projectile.DrawProjectileBackglow(Color.Goldenrod, 3f, 40, 10);
-        Main.spriteBatch.DrawBetter(texture, Projectile.Center, null, Projectile.GetAlpha(Color.White), Projectile.rotation, texture.Size() * 0.5f, Projectile.scale, 0);
+        Main.spriteBatch.DrawBetter(texture, Projectile.Center, null, Projectile.GetAlpha(Color.White),
+            Projectile.rotation, texture.Size() * 0.5f, Projectile.scale, 0);
 
         return false;
     }

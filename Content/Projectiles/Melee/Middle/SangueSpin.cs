@@ -22,9 +22,10 @@ public class SangueSpin : ModProjectile
     public Vector2 Center => Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
     public float Speed => Owner.GetAttackSpeed(DamageClass.Melee);
     public int Dir => Projectile.velocity.X.NonZeroSign();
-    public int ReelTime => (int)(40 / Speed);
-    public int ThrowTime => (int)(60 / Speed);
+    public int ReelTime => (int) (40 / Speed);
+    public int ThrowTime => (int) (60 / Speed);
     public ref float Time => ref Projectile.ai[0];
+
     public enum SangueState
     {
         Reel,
@@ -33,8 +34,8 @@ public class SangueSpin : ModProjectile
 
     public SangueState State
     {
-        get => (SangueState)Projectile.ai[1];
-        set => Projectile.ai[1] = (int)value;
+        get => (SangueState) Projectile.ai[1];
+        set => Projectile.ai[1] = (int) value;
     }
 
     public bool Init
@@ -56,7 +57,9 @@ public class SangueSpin : ModProjectile
         Projectile.DamageType = DamageClass.MeleeNoSpeed;
     }
 
-    public RotatedRectangle Rect() => new(20, Projectile.Center + PolarVector(57f, Projectile.rotation - SwordRot), Projectile.Center + PolarVector(150f, Projectile.rotation - SwordRot));
+    public RotatedRectangle Rect() => new(20, Projectile.Center + PolarVector(57f, Projectile.rotation - SwordRot),
+        Projectile.Center + PolarVector(150f, Projectile.rotation - SwordRot));
+
     public override void AI()
     {
         if (this.RunLocal() && !Owner.Available())
@@ -82,13 +85,14 @@ public class SangueSpin : ModProjectile
         {
             case SangueState.Reel:
                 float anim = new PiecewiseCurve()
-                .Add(0f, -2.1f, .4f, MakePoly(2.8f).InOutFunction)
-                .Add(-2.1f, 0f, 1f, MakePoly(5f).InFunction)
-                .Evaluate(InverseLerp(0f, ReelTime, Time)) * Dir;
+                    .Add(0f, -2.1f, .4f, MakePoly(2.8f).InOutFunction)
+                    .Add(-2.1f, 0f, 1f, MakePoly(5f).InFunction)
+                    .Evaluate(InverseLerp(0f, ReelTime, Time)) * Dir;
 
                 if (this.RunLocal())
                 {
-                    Projectile.velocity = Vector2.Lerp(Projectile.velocity, Center.SafeDirectionTo(Modded.MouseWorld), .1f);
+                    Projectile.velocity =
+                        Vector2.Lerp(Projectile.velocity, Center.SafeDirectionTo(Modded.MouseWorld), .1f);
                     Dist = Clamp(Center.Distance(Modded.MouseWorld), 150f, 1000f);
                     if (Projectile.velocity != Projectile.oldVelocity)
                         this.Sync();
@@ -107,6 +111,7 @@ public class SangueSpin : ModProjectile
                     Projectile.netUpdate = true;
                     Projectile.netSpam = 0;
                 }
+
                 break;
             case SangueState.Throw:
                 points.Update(Rect().Center - Projectile.Center);
@@ -129,16 +134,20 @@ public class SangueSpin : ModProjectile
 
                 if (!Main.dedServ)
                 {
-                    Vector2 dir = (Projectile.rotation - SwordRot - PiOver2 * -Dir).ToRotationVector2() * Main.rand.NextFloat(2f, 9f);
-                    ParticleRegistry.SpawnBloomPixelParticle(Rect().RandomPoint(), dir, Main.rand.Next(30, 50), Main.rand.NextFloat(.4f, .7f), Color.DarkRed, Color.Crimson, null, 2f);
+                    Vector2 dir = (Projectile.rotation - SwordRot - PiOver2 * -Dir).ToRotationVector2() *
+                                  Main.rand.NextFloat(2f, 9f);
+                    ParticleRegistry.SpawnBloomPixelParticle(Rect().RandomPoint(), dir, Main.rand.Next(30, 50),
+                        Main.rand.NextFloat(.4f, .7f), Color.DarkRed, Color.Crimson, null, 2f);
                     for (int i = 0; i < 2; i++)
-                        ParticleRegistry.SpawnHeavySmokeParticle(Rect().RandomPoint(), dir * .7f, Main.rand.Next(20, 40), Main.rand.NextFloat(.6f, 1.1f), Color.DarkRed, .8f);
+                        ParticleRegistry.SpawnHeavySmokeParticle(Rect().RandomPoint(), dir * .7f,
+                            Main.rand.Next(20, 40), Main.rand.NextFloat(.6f, 1.1f), Color.DarkRed, .8f);
                 }
 
-                int wait = (int)(5 / Speed);
+                int wait = (int) (5 / Speed);
                 if (lerper.BetweenNum(.8f, 1f) && Time % wait == (wait - 1) && this.RunLocal())
                 {
-                    Projectile.NewProj(Rect().Top, (Projectile.rotation - SwordRot).ToRotationVector2(), ModContent.ProjectileType<SangueGlare>(),
+                    Projectile.NewProj(Rect().Top, (Projectile.rotation - SwordRot).ToRotationVector2(),
+                        ModContent.ProjectileType<SangueGlare>(),
                         Projectile.damage / 4, Projectile.knockBack, Projectile.owner);
                 }
 
@@ -155,6 +164,7 @@ public class SangueSpin : ModProjectile
                     else if (!Modded.SafeMouseLeft.Current)
                         Projectile.Kill();
                 }
+
                 break;
         }
 
@@ -166,12 +176,14 @@ public class SangueSpin : ModProjectile
         for (int i = 0; i < 20; i++)
         {
             Vector2 pos = target.RandAreaInEntity();
-            Vector2 vel = (Projectile.rotation - SwordRot + PiOver2 * Dir).ToRotationVector2() * Main.rand.NextFloat(2f, 9f);
+            Vector2 vel = (Projectile.rotation - SwordRot + PiOver2 * Dir).ToRotationVector2() *
+                          Main.rand.NextFloat(2f, 9f);
             int life = Main.rand.Next(40, 50);
             float scale = Main.rand.NextFloat(.5f, .8f);
             ParticleRegistry.SpawnBloodParticle(pos, vel * 1.4f, life * 2, scale, Color.DarkRed);
             ParticleRegistry.SpawnHeavySmokeParticle(pos, vel, life, scale, Color.DarkRed, .6f);
         }
+
         AdditionsSound.MimicryLand.Play(Projectile.Center, 1.4f, .4f, .05f, 10, Name);
     }
 
@@ -183,9 +195,13 @@ public class SangueSpin : ModProjectile
     }
 
     public float WidthFunct(float c) => 101f;
-    public Color ColorFunct(SystemVector2 c, Vector2 pos) => Color.DarkRed * Convert01To010(InverseLerp(0f, ThrowTime, Time));
+
+    public Color ColorFunct(SystemVector2 c, Vector2 pos) =>
+        Color.DarkRed * Convert01To010(InverseLerp(0f, ThrowTime, Time));
+
     public OptimizedPrimitiveTrail trail;
     public TrailPoints points = new(10);
+
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D tex = Projectile.ThisProjectileTexture();

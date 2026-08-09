@@ -12,7 +12,9 @@ namespace TheExtraordinaryAdditions.UI.LaserUI;
 
 public class LaserResourceUI : SmartUIState
 {
-    public override int InsertionIndex(List<GameInterfaceLayer> layers) => layers.FindIndex(layer => layer.Name == "Vanilla: Mouse Text");
+    public override int InsertionIndex(List<GameInterfaceLayer> layers) =>
+        layers.FindIndex(layer => layer.Name == "Vanilla: Mouse Text");
+
     public override InterfaceScaleType Scale => InterfaceScaleType.None;
 
     public static readonly Texture2D outline = AssetRegistry.GetTexture(AdditionsTexture.LaserResource);
@@ -30,6 +32,7 @@ public class LaserResourceUI : SmartUIState
     public override bool Visible => Main.LocalPlayer.GetModPlayer<LaserResource>().HoldingLaserWeapon;
     private bool BeingDragged;
     private Vector2 Dest;
+
     public override void Draw(SpriteBatch spriteBatch)
     {
         LaserResource modPlayer = Main.LocalPlayer.GetModPlayer<LaserResource>();
@@ -43,7 +46,7 @@ public class LaserResourceUI : SmartUIState
         spriteBatch.Draw(outline, pos, null, color, rotation, outline.Size() * .5f, backgroundScale, 0, 0f);
 
         // Draw the bar
-        float quotient = Utils.Clamp((float)modPlayer.HeatCurrent / modPlayer.HeatMax2, 0f, 1f);
+        float quotient = Utils.Clamp((float) modPlayer.HeatCurrent / modPlayer.HeatMax2, 0f, 1f);
         Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.Perlin);
 
         ManagedShader shader = AssetRegistry.GetShader("OverheatIndicator");
@@ -51,13 +54,17 @@ public class LaserResourceUI : SmartUIState
         shader.TrySetParameter("Time", Main.GlobalTimeWrappedHourly);
 
         spriteBatch.End();
-        spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, Main.Rasterizer, shader.Effect, Matrix.Identity);
+        spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp,
+            DepthStencilState.None, Main.Rasterizer, shader.Effect, Matrix.Identity);
 
         shader.Render();
-        spriteBatch.DrawBetterRect(tex, ToScreenTarget(pos + new Vector2(-outline.Width / 2 + 4f, 12f), new Vector2(100, 24) * backgroundScale), null, Color.White * modPlayer.HeatBarAlpha, 0f, Vector2.Zero);
+        spriteBatch.DrawBetterRect(tex,
+            ToScreenTarget(pos + new Vector2(-outline.Width / 2 + 4f, 12f), new Vector2(100, 24) * backgroundScale),
+            null, Color.White * modPlayer.HeatBarAlpha, 0f, Vector2.Zero);
 
         spriteBatch.End();
-        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Matrix.Identity);
+        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState,
+            DepthStencilState.None, Main.Rasterizer, null, Matrix.Identity);
     }
 
     public override void SafeUpdate(GameTime gameTime)
@@ -76,7 +83,9 @@ public class LaserResourceUI : SmartUIState
             string HeatStr = modPlayer.HeatCurrent.ToString("n2");
             string maxHeatStr = modPlayer.HeatMax.ToString("n2");
             string textToDisplay = $"{GetTextValue("UI.Heat")}: {HeatStr}/{maxHeatStr}\n";
-            textToDisplay = Main.keyState.IsKeyDown(Keys.LeftShift) ? textToDisplay + GetTextValue("UI.HeatInfoText") : textToDisplay + GetTextValue("UI.HeatShiftText");
+            textToDisplay = Main.keyState.IsKeyDown(Keys.LeftShift)
+                ? textToDisplay + GetTextValue("UI.HeatInfoText")
+                : textToDisplay + GetTextValue("UI.HeatShiftText");
             Main.instance.MouseText(textToDisplay, 0, 0, -1, -1, -1, -1, 0);
             modPlayer.HeatBarAlpha = MathHelper.Lerp(modPlayer.HeatBarAlpha, 0.25f, 0.035f);
         }

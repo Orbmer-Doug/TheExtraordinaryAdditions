@@ -53,7 +53,9 @@ public sealed class BarrageBeamManager : ModSystem
 
     public static bool Golden;
 
-    public static readonly Quaternion Rotation = Animators.EulerAnglesConversion(1, MathHelper.PiOver2, (3f * MathHelper.Pi) / 2f);
+    public static readonly Quaternion Rotation =
+        Animators.EulerAnglesConversion(1, MathHelper.PiOver2, (3f * MathHelper.Pi) / 2f);
+
     public static readonly Quaternion PortalRotation = Animators.EulerAnglesConversion(1, MathHelper.PiOver2, 0f);
     public static readonly Matrix RotationMatrix = Matrix.CreateFromQuaternion(Rotation);
 
@@ -65,55 +67,72 @@ public sealed class BarrageBeamManager : ModSystem
         Main.QueueMainThreadAction(() =>
         {
             // Index buffers for main beam cylinders
-            CylinderIndices = new IndexBuffer(Main.instance.GraphicsDevice, IndexElementSize.SixteenBits, NumIndices * MaxProjectiles, BufferUsage.None);
+            CylinderIndices = new IndexBuffer(Main.instance.GraphicsDevice, IndexElementSize.SixteenBits,
+                NumIndices * MaxProjectiles, BufferUsage.None);
             short[] cylinderIndices = new short[NumIndices * MaxProjectiles];
             for (int p = 0; p < MaxProjectiles; p++)
             {
-                short[] projIndices = GenerateCylinderIndices(p * NumVertices, CylinderWidthSegments, CylinderHeightSegments);
+                short[] projIndices =
+                    GenerateCylinderIndices(p * NumVertices, CylinderWidthSegments, CylinderHeightSegments);
                 Array.Copy(projIndices, 0, cylinderIndices, p * NumIndices, NumIndices);
             }
+
             CylinderIndices.SetData(cylinderIndices);
 
             // Index buffers for bloom cylinders
-            BloomIndices = new IndexBuffer(Main.instance.GraphicsDevice, IndexElementSize.SixteenBits, BloomNumIndices * MaxProjectiles * NumBloomLayers, BufferUsage.None);
+            BloomIndices = new IndexBuffer(Main.instance.GraphicsDevice, IndexElementSize.SixteenBits,
+                BloomNumIndices * MaxProjectiles * NumBloomLayers, BufferUsage.None);
             short[] bloomIndicesArray = new short[BloomNumIndices * MaxProjectiles * NumBloomLayers];
             for (int p = 0; p < MaxProjectiles; p++)
             {
                 for (int b = 0; b < NumBloomLayers; b++)
                 {
-                    short[] bloomProjIndices = GenerateCylinderIndices(p * BloomNumVertices * NumBloomLayers + b * BloomNumVertices, BloomWidthSegments, BloomHeightSegments);
-                    Array.Copy(bloomProjIndices, 0, bloomIndicesArray, (p * NumBloomLayers + b) * BloomNumIndices, BloomNumIndices);
+                    short[] bloomProjIndices = GenerateCylinderIndices(
+                        p * BloomNumVertices * NumBloomLayers + b * BloomNumVertices, BloomWidthSegments,
+                        BloomHeightSegments);
+                    Array.Copy(bloomProjIndices, 0, bloomIndicesArray, (p * NumBloomLayers + b) * BloomNumIndices,
+                        BloomNumIndices);
                 }
             }
+
             BloomIndices.SetData(bloomIndicesArray);
 
             // Index buffers for portals
-            PortalIndices = new IndexBuffer(Main.instance.GraphicsDevice, IndexElementSize.SixteenBits, NumPortalIndices * MaxProjectiles, BufferUsage.None);
+            PortalIndices = new IndexBuffer(Main.instance.GraphicsDevice, IndexElementSize.SixteenBits,
+                NumPortalIndices * MaxProjectiles, BufferUsage.None);
             short[] portalIndices = new short[NumPortalIndices * MaxProjectiles];
             for (int p = 0; p < MaxProjectiles; p++)
             {
-                short[] quadIndices = new short[] {
-                    (short)(p * NumPortalVertices + 0),
-                    (short)(p * NumPortalVertices + 1),
-                    (short)(p * NumPortalVertices + 2),
-                    (short)(p * NumPortalVertices + 0),
-                    (short)(p * NumPortalVertices + 2),
-                    (short)(p * NumPortalVertices + 3)
+                short[] quadIndices = new short[]
+                {
+                    (short) (p * NumPortalVertices + 0),
+                    (short) (p * NumPortalVertices + 1),
+                    (short) (p * NumPortalVertices + 2),
+                    (short) (p * NumPortalVertices + 0),
+                    (short) (p * NumPortalVertices + 2),
+                    (short) (p * NumPortalVertices + 3)
                 };
                 Array.Copy(quadIndices, 0, portalIndices, p * NumPortalIndices, NumPortalIndices);
             }
+
             PortalIndices.SetData(portalIndices);
 
             // Vertex buffers
-            BatchBeamVertexBuffer = new DynamicVertexBuffer(Main.instance.GraphicsDevice, typeof(VertexPositionColorTexture), NumVertices * MaxProjectiles, BufferUsage.WriteOnly);
-            BatchBloomVertexBuffer = new DynamicVertexBuffer(Main.instance.GraphicsDevice, typeof(VertexPositionColorTexture), BloomNumVertices * MaxProjectiles * NumBloomLayers, BufferUsage.WriteOnly);
-            BatchPortalVertexBuffer = new DynamicVertexBuffer(Main.instance.GraphicsDevice, typeof(VertexPositionColorTexture), NumPortalVertices * MaxProjectiles, BufferUsage.WriteOnly);
+            BatchBeamVertexBuffer = new DynamicVertexBuffer(Main.instance.GraphicsDevice,
+                typeof(VertexPositionColorTexture), NumVertices * MaxProjectiles, BufferUsage.WriteOnly);
+            BatchBloomVertexBuffer = new DynamicVertexBuffer(Main.instance.GraphicsDevice,
+                typeof(VertexPositionColorTexture), BloomNumVertices * MaxProjectiles * NumBloomLayers,
+                BufferUsage.WriteOnly);
+            BatchPortalVertexBuffer = new DynamicVertexBuffer(Main.instance.GraphicsDevice,
+                typeof(VertexPositionColorTexture), NumPortalVertices * MaxProjectiles, BufferUsage.WriteOnly);
 
             // Render target
-            BeamRenderTarget = new ManagedRenderTarget(true, (w, h) => new RenderTarget2D(Main.instance.GraphicsDevice, w / 2, h / 2), true);
+            BeamRenderTarget = new ManagedRenderTarget(true,
+                (w, h) => new RenderTarget2D(Main.instance.GraphicsDevice, w / 2, h / 2), true);
             Main.instance.GraphicsDevice.SetRenderTarget(BeamRenderTarget);
             Main.instance.GraphicsDevice.Clear(Color.Transparent);
-            PortalRenderTarget = new ManagedRenderTarget(true, (w, h) => new RenderTarget2D(Main.instance.GraphicsDevice, w / 2, h / 2), true);
+            PortalRenderTarget = new ManagedRenderTarget(true,
+                (w, h) => new RenderTarget2D(Main.instance.GraphicsDevice, w / 2, h / 2), true);
             Main.instance.GraphicsDevice.SetRenderTarget(PortalRenderTarget);
             Main.instance.GraphicsDevice.Clear(Color.Transparent);
             Main.instance.GraphicsDevice.SetRenderTarget(null);
@@ -173,7 +192,8 @@ public sealed class BarrageBeamManager : ModSystem
 
     private static void DrawToTargets()
     {
-        if (!AssetRegistry.HasFinishedLoading || Main.gameMenu || Main.netMode == NetmodeID.Server || ActiveBeams.Count == 0)
+        if (!AssetRegistry.HasFinishedLoading || Main.gameMenu || Main.netMode == NetmodeID.Server ||
+            ActiveBeams.Count == 0)
             return;
 
         // Compute primitive matrices
@@ -181,8 +201,10 @@ public sealed class BarrageBeamManager : ModSystem
 
         // Fill batched vertex buffers
         VertexPositionColorTexture[] beamVertices = new VertexPositionColorTexture[NumVertices * ActiveBeams.Count];
-        VertexPositionColorTexture[] bloomVertices = new VertexPositionColorTexture[BloomNumVertices * ActiveBeams.Count * NumBloomLayers];
-        VertexPositionColorTexture[] portalVertices = new VertexPositionColorTexture[NumPortalVertices * ActiveBeams.Count];
+        VertexPositionColorTexture[] bloomVertices =
+            new VertexPositionColorTexture[BloomNumVertices * ActiveBeams.Count * NumBloomLayers];
+        VertexPositionColorTexture[] portalVertices =
+            new VertexPositionColorTexture[NumPortalVertices * ActiveBeams.Count];
 
         // Initialize bloom vertices to zero to prevent garbage data
         Array.Clear(bloomVertices, 0, bloomVertices.Length);
@@ -212,7 +234,8 @@ public sealed class BarrageBeamManager : ModSystem
             }
 
             // Fill portal vertices
-            VertexPositionColorTexture[] portalVerts = GenerateQuadClockwise(new(beam.Projectile.scale * 12f), portalStart, PortalRotation, Color.White, true);
+            VertexPositionColorTexture[] portalVerts = GenerateQuadClockwise(new(beam.Projectile.scale * 12f),
+                portalStart, PortalRotation, Color.White, true);
             Array.Copy(portalVerts, 0, portalVertices, i * NumPortalVertices, NumPortalVertices);
         }
 
@@ -232,7 +255,8 @@ public sealed class BarrageBeamManager : ModSystem
         // Draw portal
         ManagedShader portalShader = AssetRegistry.GetShader("3DPortalShaderAlt");
         portalShader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Pixel), 0, SamplerState.PointClamp);
-        portalShader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DendriticNoiseDim), 1, SamplerState.LinearWrap);
+        portalShader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DendriticNoiseDim), 1,
+            SamplerState.LinearWrap);
         portalShader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TurbulentNoise), 2, SamplerState.LinearWrap);
         portalShader.TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly);
         portalShader.TrySetParameter("coolColor", (Golden ? Color.DarkGoldenrod : Color.DarkCyan).ToVector3());
@@ -245,7 +269,8 @@ public sealed class BarrageBeamManager : ModSystem
         {
             portalShader.TrySetParameter("scale", ActiveBeams[i].PortalInterpolant); // So its unique every projectile
             portalShader.Effect.CurrentTechnique.Passes[ManagedShader.DefaultPassName].Apply();
-            device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, i * NumPortalVertices, NumPortalVertices, i * NumPortalIndices, NumPortalIndices / 3);
+            device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, i * NumPortalVertices, NumPortalVertices,
+                i * NumPortalIndices, NumPortalIndices / 3);
         }
 
         device.SetRenderTarget(BeamRenderTarget);
@@ -284,14 +309,17 @@ public sealed class BarrageBeamManager : ModSystem
 
     private static void DrawPortalTarget(On_Main.orig_DoDraw_WallsTilesNPCs orig, Main self)
     {
-        if (ActiveBeams.Count != 0 && AssetRegistry.HasFinishedLoading && !Main.gameMenu && Main.netMode != NetmodeID.Server)
+        if (ActiveBeams.Count != 0 && AssetRegistry.HasFinishedLoading && !Main.gameMenu &&
+            Main.netMode != NetmodeID.Server)
         {
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp,
                 DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-            Main.spriteBatch.Draw(PortalRenderTarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+            Main.spriteBatch.Draw(PortalRenderTarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 2f,
+                SpriteEffects.None, 0f);
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState,
+                DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
         }
 
         orig(self);
@@ -301,11 +329,13 @@ public sealed class BarrageBeamManager : ModSystem
     {
         orig(self);
 
-        if (ActiveBeams.Count != 0 && AssetRegistry.HasFinishedLoading && !Main.gameMenu && Main.netMode != NetmodeID.Server)
+        if (ActiveBeams.Count != 0 && AssetRegistry.HasFinishedLoading && !Main.gameMenu &&
+            Main.netMode != NetmodeID.Server)
         {
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp,
                 DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-            Main.spriteBatch.Draw(BeamRenderTarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+            Main.spriteBatch.Draw(BeamRenderTarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 2f,
+                SpriteEffects.None, 0f);
             Main.spriteBatch.End();
         }
     }
@@ -324,13 +354,14 @@ public class BarrageBeam : ProjOwnedByNPC<Asterlin>
 
     public override void SendAI(BinaryWriter writer)
     {
-        writer.Write((float)Projectile.scale);
-        writer.WriteVector2((Vector2)TargetPosition);
+        writer.Write((float) Projectile.scale);
+        writer.WriteVector2((Vector2) TargetPosition);
     }
+
     public override void ReceiveAI(BinaryReader reader)
     {
-        Projectile.scale = (float)reader.ReadSingle();
-        TargetPosition = (Vector2)reader.ReadVector2();
+        Projectile.scale = (float) reader.ReadSingle();
+        TargetPosition = (Vector2) reader.ReadVector2();
     }
 
     public override void SetDefaults()
@@ -360,7 +391,9 @@ public class BarrageBeam : ProjOwnedByNPC<Asterlin>
             {
                 validPosition = true;
 
-                pos = Target.Center + Vector2.Zero.SafeNormalize(Main.rand.NextVector2Unit()).RotatedByRandom(RandomRotation()) * (new Vector2(700f, 420f) * Main.rand.NextFloat(.1f, 1f));
+                pos = Target.Center +
+                      Vector2.Zero.SafeNormalize(Main.rand.NextVector2Unit()).RotatedByRandom(RandomRotation()) *
+                      (new Vector2(700f, 420f) * Main.rand.NextFloat(.1f, 1f));
                 pos = pos.ClampInWorld();
 
                 foreach (Projectile r in AllProjectilesByID(Type))
@@ -376,8 +409,7 @@ public class BarrageBeam : ProjOwnedByNPC<Asterlin>
                 }
 
                 tries++;
-            }
-            while (!validPosition && tries < maxTries);
+            } while (!validPosition && tries < maxTries);
 
             Projectile.scale = BarrageBeamManager.Golden ? 40f : 30f;
 
@@ -386,7 +418,8 @@ public class BarrageBeam : ProjOwnedByNPC<Asterlin>
         }
 
         float hoverInterpol = InverseLerp(0f, Asterlin.Barrage_HoverTime, Time);
-        Projectile.Center = Vector2.SmoothStep(Projectile.Center, TargetPosition, Animators.CubicBezier(.48f, .41f, 0f, 1f)(hoverInterpol));
+        Projectile.Center = Vector2.SmoothStep(Projectile.Center, TargetPosition,
+            Animators.CubicBezier(.48f, .41f, 0f, 1f)(hoverInterpol));
         Projectile.Opacity = hoverInterpol;
 
         int timeUntilFade = Asterlin.Barrage_HoverTime + Asterlin.Barrage_BeamExpandTime + Asterlin.Barrage_BeamTime;
@@ -394,7 +427,8 @@ public class BarrageBeam : ProjOwnedByNPC<Asterlin>
         {
             PortalZPos = LaserZPos = -300f;
             PortalInterpolant = Animators.MakePoly(3f).OutFunction(hoverInterpol);
-            LaserbeamLength = Animators.MakePoly(3.6f).OutFunction.Evaluate(Time, Asterlin.Barrage_HoverTime, Asterlin.Barrage_HoverTime + Asterlin.Barrage_BeamExpandTime, 0f, MaxLaserLength);
+            LaserbeamLength = Animators.MakePoly(3.6f).OutFunction.Evaluate(Time, Asterlin.Barrage_HoverTime,
+                Asterlin.Barrage_HoverTime + Asterlin.Barrage_BeamExpandTime, 0f, MaxLaserLength);
         }
         else
         {
@@ -405,11 +439,15 @@ public class BarrageBeam : ProjOwnedByNPC<Asterlin>
             if (fadeInterpolant >= 1f)
                 Projectile.Kill();
         }
+
         Time++;
         BarrageBeamManager.RegisterBeam(this);
     }
 
     public override bool? CanDamage() => LaserbeamLength >= MathF.Abs(LaserZPos) ? null : false;
-    public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => CalUtils.CircularHitboxCollision(Projectile.Center, Projectile.scale, targetHitbox);
+
+    public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) =>
+        CircularHitboxCollision(Projectile.Center, Projectile.scale, targetHitbox);
+
     public override bool PreDraw(ref Color lightColor) => false;
 }

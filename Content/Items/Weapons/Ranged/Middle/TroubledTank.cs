@@ -19,7 +19,7 @@ public class TroubledTank : ModItem, ILocalizedModType, IModType
         Item.width = 34;
         Item.height = 52;
         Item.useTime =
-        Item.useAnimation = 20;
+            Item.useAnimation = 20;
         Item.useStyle = ItemUseStyleID.Shoot;
         Item.noMelee = true;
         Item.knockBack = 2f;

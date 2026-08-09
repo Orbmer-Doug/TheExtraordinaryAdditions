@@ -11,6 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 public class EclipsedAura : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 145;
@@ -26,28 +27,34 @@ public class EclipsedAura : ModProjectile
     public Player Owner => Main.player[Projectile.owner];
     public GlobalPlayer ModdedOwner => Owner.Additions();
     public ref float Time => ref Projectile.ai[0];
+
     public override void AI()
     {
-        if (Owner == null || Owner.dead || Owner.active == false || !Owner.GetModPlayer<EclipsedOnesCloakPlayer>().Equipped)
+        if (Owner == null || Owner.dead || Owner.active == false ||
+            !Owner.GetModPlayer<EclipsedOnesCloakPlayer>().Equipped)
         {
             Projectile.Kill();
             return;
         }
 
         Projectile.DamageType = Owner.HeldItem.DamageType;
-        Projectile.damage = (int)Owner.GetTotalDamage(Projectile.DamageType).ApplyTo(Owner.HeldItem.damage) / 7;
+        Projectile.damage = (int) Owner.GetTotalDamage(Projectile.DamageType).ApplyTo(Owner.HeldItem.damage) / 7;
 
         Projectile.Center = Owner.MountedCenter;
         Projectile.timeLeft = 2;
 
         if (Time % 3 == 2)
         {
-            ParticleRegistry.SpawnCloudParticle(Projectile.Center + Main.rand.NextVector2Circular(30, 30), Main.rand.NextVector2Circular(2f, 2f) + Owner.velocity,
-                Color.SlateBlue, Color.DarkSlateGray, Main.rand.Next(50, 80), Main.rand.NextFloat(50f, 90f), Main.rand.NextFloat(.5f, 1f));
+            ParticleRegistry.SpawnCloudParticle(Projectile.Center + Main.rand.NextVector2Circular(30, 30),
+                Main.rand.NextVector2Circular(2f, 2f) + Owner.velocity,
+                Color.SlateBlue, Color.DarkSlateGray, Main.rand.Next(50, 80), Main.rand.NextFloat(50f, 90f),
+                Main.rand.NextFloat(.5f, 1f));
         }
+
         if (Main.rand.NextBool(14))
             ParticleRegistry.SpawnSquishyPixelParticle(Projectile.Center + Main.rand.NextVector2Circular(200f, 200f),
-                Main.rand.NextVector2Circular(6f, 6f), Main.rand.Next(90, 120), Main.rand.NextFloat(.4f, .8f), Color.White, Color.SlateBlue);
+                Main.rand.NextVector2Circular(6f, 6f), Main.rand.Next(90, 120), Main.rand.NextFloat(.4f, .8f),
+                Color.White, Color.SlateBlue);
 
         foreach (NPC npc in Main.ActiveNPCs)
         {
@@ -73,5 +80,6 @@ public class EclipsedAura : ModProjectile
 
         Time++;
     }
+
     public override bool ShouldUpdatePosition() => false;
 }

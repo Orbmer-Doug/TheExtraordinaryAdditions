@@ -26,16 +26,19 @@ public class TheTesselesticMeltdown : ProjOwnedByNPC<Asterlin>
 
     public RotatedRectangle Rect()
     {
-        return new(36, Projectile.Center, Projectile.Center + PolarVector(StaffLength, Projectile.rotation - MathHelper.PiOver4));
+        return new(36, Projectile.Center,
+            Projectile.Center + PolarVector(StaffLength, Projectile.rotation - MathHelper.PiOver4));
     }
+
     public Vector2 TipOfStaff => Rect().Top;
     public int Dir => ModOwner.Direction;
 
     public State CurrentState
     {
-        get => (State)Projectile.ai[0];
-        set => Projectile.ai[0] = (float)value;
+        get => (State) Projectile.ai[0];
+        set => Projectile.ai[0] = (float) value;
     }
+
     public ref float StateTime => ref Projectile.ai[1];
     public ref float OverallTime => ref Projectile.ai[2];
     public LoopedSoundInstance slot;
@@ -67,7 +70,8 @@ public class TheTesselesticMeltdown : ProjOwnedByNPC<Asterlin>
         }
 
         slot ??= LoopedSoundManager.CreateNew(new(AdditionsSound.ElectricityContinuous, () => .67f),
-            () => AdditionsLoopedSound.ProjectileNotActive(Projectile), () => CurrentState == State.Barrage && ModOwner.Tesselestic_Shooting);
+            () => AdditionsLoopedSound.ProjectileNotActive(Projectile),
+            () => CurrentState == State.Barrage && ModOwner.Tesselestic_Shooting);
         slot?.Update(Projectile.Center);
 
         Projectile.timeLeft = 2;
@@ -77,13 +81,15 @@ public class TheTesselesticMeltdown : ProjOwnedByNPC<Asterlin>
 
     private void Behavior_Idle()
     {
-        Vector2 pos = ModOwner.RotatedHitbox.Center + Vector2.UnitX * (140f * -ModOwner.Direction) + Vector2.UnitY * 22f * MathF.Sin(Main.GlobalTimeWrappedHourly);
+        Vector2 pos = ModOwner.RotatedHitbox.Center + Vector2.UnitX * (140f * -ModOwner.Direction) +
+                      Vector2.UnitY * 22f * MathF.Sin(Main.GlobalTimeWrappedHourly);
         Projectile.velocity = Vector2.UnitX * -ModOwner.Direction;
         Projectile.Center = Vector2.Lerp(Projectile.Center, pos + Vector2.UnitY * StaffLength / 2, .6f);
         Projectile.rotation = Projectile.rotation.AngleLerp(-MathHelper.PiOver4, .1f);
 
         if (OverallTime % 4f == 3f)
-            ParticleRegistry.SpawnLightningArcParticle(Rect().RandomPoint(), Main.rand.NextVector2Circular(100f, 100f), Main.rand.Next(12, 20), .6f, Color.Cyan);
+            ParticleRegistry.SpawnLightningArcParticle(Rect().RandomPoint(), Main.rand.NextVector2Circular(100f, 100f),
+                Main.rand.Next(12, 20), .6f, Color.Cyan);
 
         if (StateTime != 0f)
         {
@@ -99,7 +105,9 @@ public class TheTesselesticMeltdown : ProjOwnedByNPC<Asterlin>
         Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, dir, amt);
 
         Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver4;
-        Projectile.Center = Vector2.Lerp(Projectile.Center, ModOwner.RightHandPosition - Projectile.velocity * StaffLength / 2, Utils.Remap(StateTime, 0f, 50f, .02f, .9f));
+        Projectile.Center = Vector2.Lerp(Projectile.Center,
+            ModOwner.RightHandPosition - Projectile.velocity * StaffLength / 2,
+            Utils.Remap(StateTime, 0f, 50f, .02f, .9f));
         StateTime++;
     }
 
@@ -128,6 +136,7 @@ public class TheTesselesticMeltdown : ProjOwnedByNPC<Asterlin>
             off = MathHelper.PiOver2;
             fx = SpriteEffects.FlipHorizontally;
         }
+
         Texture2D glow = AssetRegistry.GetTexture(AdditionsTexture.TesselesticMeltdown_Glowmask);
 
         Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, null, Color.White * Projectile.Opacity,

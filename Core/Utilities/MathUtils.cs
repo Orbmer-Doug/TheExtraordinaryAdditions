@@ -1,5 +1,4 @@
-﻿using CalamityMod.World;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,26 +7,15 @@ using Terraria;
 using Terraria.GameContent.RGB;
 using Terraria.Utilities;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Utilities;
 using static Terraria.Player;
 
 namespace TheExtraordinaryAdditions.Core.Utilities;
 
-[Flags]
-public enum Direction2D : byte
-{
-    Up = 1,
-    Down = 2,
-    Left = 4,
-    Right = 8,
-    TopLeft = Up | Left,
-    TopRight = Up | Right,
-    BottomLeft = Down | Left,
-    BottomRight = Down | Right,
-}
-
 public static class MathUtils
 {
+    // just as a reminder...
+    public const int FramesPerSecond = 60;
+
     public const float GoldenRatio = 1.618033989f;
     public const float InverseGoldenRatio = 0.618033989f;
     public const float PiOver3 = MathF.PI / 3f;
@@ -66,6 +54,18 @@ public static class MathUtils
         return MathF.Max(
             amplitude * MathF.Exp(-(dx * dx / (2f * (sigma.X * sigma.X)) + dy * dy / (2f * (sigma.Y * sigma.Y)))),
             minValue);
+    }
+
+    public static int SecondsToFrames(int x) => x * FramesPerSecond;
+    public static int SecondsToFrames(float x) => (int) MathF.Round(x * FramesPerSecond);
+    public static bool WithinBounds(this int index, int cap) => index >= 0 && index < cap;
+
+    public static Vector2 SafeDirectionTo(this Entity entity, Vector2 destination, Vector2? fallback = null)
+    {
+        if (!fallback.HasValue)
+            fallback = Vector2.Zero;
+
+        return (destination - entity.Center).SafeNormalize(fallback.Value);
     }
 
     public static Vector2 ClampToCardinalDirection(Vector2 direction)
@@ -151,37 +151,10 @@ public static class MathUtils
 
         Vector2 pos = Vector2.Transform(position - Main.screenPosition,
             invert ? Matrix.Invert(Main.GameViewMatrix.ZoomMatrix) : Main.GameViewMatrix.ZoomMatrix);
-        if ((int)(player ?? Main.LocalPlayer).gravDir == -1)
+        if ((int) (player ?? Main.LocalPlayer).gravDir == -1)
             pos.Y = Main.screenPosition.Y + Main.screenHeight - position.Y;
 
         return pos;
-    }
-
-    /// <summary>
-    /// Checks if a target is within a cone of sight
-    /// </summary>
-    public static bool IsInFieldOfView(this Vector2 viewerPosition, float viewerRotation, Vector2 targetPosition,
-        float viewAngle, float? maxDistance = null)
-    {
-        Vector2 directionToTarget = targetPosition - viewerPosition;
-        float distanceSquared = directionToTarget.LengthSquared();
-
-        if (distanceSquared < 0.0001f)
-            return true;
-
-        if (maxDistance != null)
-        {
-            if (distanceSquared > maxDistance * maxDistance)
-                return false;
-        }
-
-        directionToTarget = directionToTarget.SafeNormalize(Vector2.Zero);
-        Vector2 viewerDirection = viewerRotation.ToRotationVector2();
-
-        float dotProduct = Vector2.Dot(viewerDirection, directionToTarget);
-        float angleThreshold = (float)Math.Cos(viewAngle / 2f);
-
-        return dotProduct >= angleThreshold;
     }
 
     public static Vector2 CalculateJointPosition(Vector2 start, Vector2 end, float limbLength, float secondLimbLength,
@@ -189,87 +162,57 @@ public static class MathUtils
     {
         float c = Vector2.Distance(start, end);
         float angle =
-            (float)Math.Acos(Math.Clamp(
+            (float) Math.Acos(Math.Clamp(
                 (c * c + limbLength * limbLength - secondLimbLength * secondLimbLength) / (c * limbLength * 2f), -1f,
                 1f)) * (flip ? -1 : 1);
         return start + (angle + start.AngleTo(end)).ToRotationVector2() * limbLength;
     }
 
-    public static Vector2 ClampInRect(this Vector2 vector, Rectangle rect) => new(
-        Math.Clamp(vector.X, rect.Left, rect.Right),
-        Math.Clamp(vector.Y, rect.Top, rect.Bottom));
-
-    public static Vector2 ClampInCircle(this Vector2 point, Vector2 center, float radius)
-    {
-        if (radius < 0)
-            return point;
-
-        Vector2 direction = point - center;
-        float distance = direction.Length();
-
-        if (distance > radius)
-            return center + Vector2.Normalize(direction) * radius;
-
-        return point;
-    }
-
-    public static Vector2 ClampOutCircle(this Vector2 point, Vector2 center, float radius)
-    {
-        if (radius < 0)
-            return point;
-
-        Vector2 direction = point - center;
-        float distance = direction.Length();
-
-        if (distance < radius)
-            return center + Vector2.Normalize(direction) * radius;
-
-        // Point is inside or on the circle, no clamping needed
-        return point;
-    }
-
     public static Rectangle RectangleFromVectors(Vector2 topLeft, Vector2 bottomRight) => new(
-        (int)Math.Min(topLeft.X, bottomRight.X),
-        (int)Math.Min(topLeft.Y, bottomRight.Y),
-        (int)Math.Abs(topLeft.X - bottomRight.X),
-        (int)Math.Abs(topLeft.Y - bottomRight.Y));
+        (int) Math.Min(topLeft.X, bottomRight.X),
+        (int) Math.Min(topLeft.Y, bottomRight.Y),
+        (int) Math.Abs(topLeft.X - bottomRight.X),
+        (int) Math.Abs(topLeft.Y - bottomRight.Y));
 
-    public static bool ContainsZeroedPoint(this ReadOnlySpan<Vector2> points)
+    extension(ReadOnlySpan<Vector2> points)
     {
-        for (int i = 0; i < points.Length; i++)
+        public bool ContainsZeroedPoint()
         {
-            if (points[i] == Vector2.Zero)
-                return true;
+            for (int i = 0; i < points.Length; i++)
+            {
+                if (points[i] == Vector2.Zero)
+                    return true;
+            }
+
+            return false;
         }
 
-        return false;
-    }
-
-    public static bool ContainsInvalidPoint(this ReadOnlySpan<Vector2> points)
-    {
-        for (int i = 0; i < points.Length; i++)
+        public bool ContainsInvalidPoint()
         {
-            if (float.IsNaN(points[i].X) || float.IsNaN(points[i].Y) ||
-                float.IsInfinity(points[i].X) || float.IsInfinity(points[i].Y))
-                return true;
+            for (int i = 0; i < points.Length; i++)
+            {
+                if (float.IsNaN(points[i].X) || float.IsNaN(points[i].Y) ||
+                    float.IsInfinity(points[i].X) || float.IsInfinity(points[i].Y))
+                    return true;
+            }
+
+            return false;
         }
 
-        return false;
-    }
-
-    public static bool AllPointsEqual(this ReadOnlySpan<Vector2> points)
-    {
-        if (points.Length <= 1)
-            return true; // 0 or 1 point is trivially "all equal"
-
-        Vector2 first = points[0];
-        for (int i = 1; i < points.Length; i++)
+        public bool AllPointsEqual()
         {
-            if (points[i] != first)
-                return false;
-        }
+            if (points.Length <= 1)
+                return true; // 0 or 1 point is trivially "all equal"
 
-        return true;
+            Vector2 first = points[0];
+            for (int i = 1; i < points.Length; i++)
+            {
+                if (points[i] != first)
+                    return false;
+            }
+
+            return true;
+        }
     }
 
     /// <summary>
@@ -311,7 +254,7 @@ public static class MathUtils
 
         for (int i = 0; i < branchPoints.Length; i++)
         {
-            Vector2 boltStart = pos[(int)(branchPoints[i] * (pos.Count - 1))];
+            Vector2 boltStart = pos[(int) (branchPoints[i] * (pos.Count - 1))];
             Vector2 boltEnd = (diff * (1 - branchPoints[i])).RotatedByRandom(maxRot) + boltStart;
             Vector2 dir = boltStart.SafeDirectionTo(boltEnd);
             boltEnd += dir * branchExtraDist;
@@ -397,7 +340,7 @@ public static class MathUtils
         Vector2 normal = Vector2.Normalize(new Vector2(tangent.Y, -tangent.X));
         float length = tangent.Length();
 
-        int estimatedSegments = (int)(length / segmentDensity) + 2;
+        int estimatedSegments = (int) (length / segmentDensity) + 2;
         List<float> positions = new List<float>(estimatedSegments) { 0f };
 
         // Generate positions without sorting
@@ -516,20 +459,20 @@ public static class MathUtils
     #region Polars
 
     public static SystemVector2 PolarVector2(float radius, float theta) =>
-        new SystemVector2((float)Math.Cos(theta), (float)Math.Sin(theta)) * radius;
+        new SystemVector2((float) Math.Cos(theta), (float) Math.Sin(theta)) * radius;
 
     /// <summary>
     /// A circle
     /// </summary>
     /// <param name="theta">Subtract <see cref="MathHelper.PiOver2"/> to go up, add to go down</param>
     public static Vector2 PolarVector(float radius, float theta) =>
-        new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta)) * radius;
+        new Vector2((float) Math.Cos(theta), (float) Math.Sin(theta)) * radius;
 
     /// <summary>
     /// A circle that could be oval
     /// </summary>
     public static Vector2 PolarVector(Vector2 radius, float theta) =>
-        new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta)) * radius;
+        new Vector2((float) Math.Cos(theta), (float) Math.Sin(theta)) * radius;
 
     public static Vector2 NextVector2Ellipse(float width, float height, float rotation, Vector2? offset = null)
     {
@@ -538,15 +481,15 @@ public static class MathUtils
         // Generate a random radius and angle in polar coordinates
         float randomAngle = RandomRotation();
         float randomRadius =
-            (float)(Main.rand.NextDouble() * 0.5) + 0.5f; // Random radius between 0.5 and 1.0 for ellipse scaling
+            (float) (Main.rand.NextDouble() * 0.5) + 0.5f; // Random radius between 0.5 and 1.0 for ellipse scaling
 
         // Convert polar coordinates to Cartesian coordinates for the unrotated ellipse
-        float x = (float)(Math.Cos(randomAngle) * (width / 2) * randomRadius);
-        float y = (float)(Math.Sin(randomAngle) * (height / 2) * randomRadius);
+        float x = (float) (Math.Cos(randomAngle) * (width / 2) * randomRadius);
+        float y = (float) (Math.Sin(randomAngle) * (height / 2) * randomRadius);
 
         // Rotate the point
-        float rotatedX = x * (float)Math.Cos(rotation) - y * (float)Math.Sin(rotation);
-        float rotatedY = x * (float)Math.Sin(rotation) + y * (float)Math.Cos(rotation);
+        float rotatedX = x * (float) Math.Cos(rotation) - y * (float) Math.Sin(rotation);
+        float rotatedY = x * (float) Math.Sin(rotation) + y * (float) Math.Cos(rotation);
 
         return new Vector2(offset.Value.X + rotatedX, offset.Value.Y + rotatedY);
     }
@@ -563,12 +506,12 @@ public static class MathUtils
         offset ??= Vector2.Zero;
 
         // Calculate the unrotated ellipse point using parametric equations
-        float x = width / 2 * (float)Math.Cos(theta);
-        float y = height / 2 * (float)Math.Sin(theta);
+        float x = width / 2 * (float) Math.Cos(theta);
+        float y = height / 2 * (float) Math.Sin(theta);
 
         // Rotate the point
-        float rotatedX = x * (float)Math.Cos(rotation) - y * (float)Math.Sin(rotation);
-        float rotatedY = x * (float)Math.Sin(rotation) + y * (float)Math.Cos(rotation);
+        float rotatedX = x * (float) Math.Cos(rotation) - y * (float) Math.Sin(rotation);
+        float rotatedY = x * (float) Math.Sin(rotation) + y * (float) Math.Cos(rotation);
 
         return new Vector2(offset.Value.X + rotatedX, offset.Value.Y + rotatedY);
     }
@@ -578,15 +521,15 @@ public static class MathUtils
         float theta = completion * MathHelper.TwoPi;
 
         // Parametric equations for a lemniscate
-        float sinTheta = (float)Math.Sin(theta);
-        float cosTheta = (float)Math.Cos(theta);
+        float sinTheta = (float) Math.Sin(theta);
+        float cosTheta = (float) Math.Cos(theta);
         float denominator = 1f + sinTheta * sinTheta;
         float x = a * cosTheta / denominator;
         float y = a * sinTheta * cosTheta / denominator;
 
         // Apply rotation using a 2D rotation matrix
-        float rotatedX = x * (float)Math.Cos(rotation) - y * (float)Math.Sin(rotation);
-        float rotatedY = x * (float)Math.Sin(rotation) + y * (float)Math.Cos(rotation);
+        float rotatedX = x * (float) Math.Cos(rotation) - y * (float) Math.Sin(rotation);
+        float rotatedY = x * (float) Math.Sin(rotation) + y * (float) Math.Cos(rotation);
 
         return new Vector2(rotatedX, rotatedY);
     }
@@ -598,50 +541,57 @@ public static class MathUtils
 
     #region System Vectors
 
-    public static bool HasNaNs(this SystemVector2 vec)
+    extension(SystemVector2 vec)
     {
-        if (!float.IsNaN(vec.X))
-            return float.IsNaN(vec.Y);
+        public bool HasNaNs()
+        {
+            if (!float.IsNaN(vec.X))
+                return float.IsNaN(vec.Y);
 
-        return true;
+            return true;
+        }
+
+        public SystemVector2 SafeNormalize(SystemVector2 defaultValue)
+        {
+            if (vec == SystemVector2.Zero || vec.HasNaNs())
+                return defaultValue;
+
+            return SystemVector2.Normalize(vec);
+        }
     }
 
-    public static SystemVector2 SafeNormalize(this SystemVector2 v, SystemVector2 defaultValue)
+    extension(in SystemVector2 from)
     {
-        if (v == SystemVector2.Zero || v.HasNaNs())
-            return defaultValue;
+        public SystemVector2 SafeDirectionTo(in SystemVector2 to,
+            SystemVector2? fallback = null)
+        {
+            fallback ??= SystemVector2.Zero;
+            return (to - from).SafeNormalize(fallback.Value);
+        }
 
-        return SystemVector2.Normalize(v);
-    }
+        public float AngleTo(in SystemVector2 to)
+        {
+            SystemVector2 v = to - from;
+            return (float) Math.Atan2(v.Y, v.X);
+        }
 
-    public static SystemVector2 SafeDirectionTo(this in SystemVector2 from, in SystemVector2 to,
-        SystemVector2? fallback = null)
-    {
-        if (!fallback.HasValue)
-            fallback = SystemVector2.Zero;
+        public float ToRotation()
+        {
+            return (float) Math.Atan2(from.Y, from.X);
+        }
 
-        return (to - from).SafeNormalize(fallback.Value);
-    }
+        public SystemVector2 RotatedBy(float radians)
+        {
+            float cos = MathF.Cos(radians);
+            float sin = MathF.Sin(radians);
+            return new SystemVector2(
+                from.X * cos - from.Y * sin,
+                from.X * sin + from.Y * cos
+            );
+        }
 
-    public static float AngleTo(this in SystemVector2 from, in SystemVector2 to)
-    {
-        SystemVector2 v = to - from;
-        return (float)Math.Atan2(v.Y, v.X);
-    }
-
-    public static float ToRotation(this in SystemVector2 v)
-    {
-        return (float)Math.Atan2(v.Y, v.X);
-    }
-
-    public static SystemVector2 RotatedBy(this in SystemVector2 v, float radians)
-    {
-        float cos = MathF.Cos(radians);
-        float sin = MathF.Sin(radians);
-        return new SystemVector2(
-            v.X * cos - v.Y * sin,
-            v.X * sin + v.Y * cos
-        );
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Vector2 FromNumerics() => new(from.X, from.Y);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -669,9 +619,6 @@ public static class MathUtils
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static SystemVector2 ToNumerics(this in Vector2 v) => new(v.X, v.Y);
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 FromNumerics(this in SystemVector2 v) => new(v.X, v.Y);
-
     #endregion System Vectors
 
     public static int AngleToXDirection(float angle) => MathF.Cos(angle).NonZeroSign();
@@ -683,23 +630,23 @@ public static class MathUtils
 
     public static float Cross(Vector2 a, Vector2 b) => a.X * b.Y - a.Y * b.X;
 
-    public static Rectangle MouseHitbox => new((int)Main.LocalPlayer.Additions().MouseWorld.X,
-        (int)Main.LocalPlayer.Additions().MouseWorld.Y, 14, 14);
+    public static Rectangle MouseHitbox => new((int) Main.LocalPlayer.Additions().MouseWorld.X,
+        (int) Main.LocalPlayer.Additions().MouseWorld.Y, 14, 14);
 
-    public static Rectangle MouseScreenHitbox => new((int)Main.LocalPlayer.Additions().MouseScreen.X,
-        (int)Main.LocalPlayer.Additions().MouseScreen.Y, 14, 14);
+    public static Rectangle MouseScreenHitbox => new((int) Main.LocalPlayer.Additions().MouseScreen.X,
+        (int) Main.LocalPlayer.Additions().MouseScreen.Y, 14, 14);
 
     public static Vector2 ClampToWorld(Vector2 position, bool tilePos = false)
     {
         if (tilePos)
         {
-            position.X = (int)MathHelper.Clamp(position.X, 0f, Main.maxTilesX);
-            position.Y = (int)MathHelper.Clamp(position.Y, 0f, Main.maxTilesY);
+            position.X = (int) MathHelper.Clamp(position.X, 0f, Main.maxTilesX);
+            position.Y = (int) MathHelper.Clamp(position.Y, 0f, Main.maxTilesY);
         }
         else
         {
-            position.X = (int)MathHelper.Clamp(position.X, 0f, Main.maxTilesX * 16);
-            position.Y = (int)MathHelper.Clamp(position.Y, 0f, Main.maxTilesY * 16);
+            position.X = (int) MathHelper.Clamp(position.X, 0f, Main.maxTilesX * 16);
+            position.Y = (int) MathHelper.Clamp(position.Y, 0f, Main.maxTilesY * 16);
         }
 
         return position;
@@ -709,13 +656,13 @@ public static class MathUtils
     {
         if (tilePos)
         {
-            position.X = (int)MathHelper.Clamp(position.X, 0f, Main.maxTilesX);
-            position.Y = (int)MathHelper.Clamp(position.Y, 0f, Main.maxTilesY);
+            position.X = (int) MathHelper.Clamp(position.X, 0f, Main.maxTilesX);
+            position.Y = (int) MathHelper.Clamp(position.Y, 0f, Main.maxTilesY);
         }
         else
         {
-            position.X = (int)MathHelper.Clamp(position.X, 0f, Main.maxTilesX * 16);
-            position.Y = (int)MathHelper.Clamp(position.Y, 0f, Main.maxTilesY * 16);
+            position.X = (int) MathHelper.Clamp(position.X, 0f, Main.maxTilesX * 16);
+            position.Y = (int) MathHelper.Clamp(position.Y, 0f, Main.maxTilesY * 16);
         }
 
         return position;
@@ -731,18 +678,18 @@ public static class MathUtils
 
     public static void SetFrontHandBetter(this Player player, CompositeArmStretchAmount stretch, float rotation) =>
         player.SetCompositeArmFront(true, stretch,
-            (rotation - MathHelper.PiOver2) * player.gravDir + ((int)player.gravDir == -1 ? MathHelper.Pi : 0f));
+            (rotation - MathHelper.PiOver2) * player.gravDir + ((int) player.gravDir == -1 ? MathHelper.Pi : 0f));
 
     public static void SetBackHandBetter(this Player player, CompositeArmStretchAmount stretch, float rotation) =>
         player.SetCompositeArmBack(true, stretch,
-            (rotation - MathHelper.PiOver2) * player.gravDir + ((int)player.gravDir == -1 ? MathHelper.Pi : 0f));
+            (rotation - MathHelper.PiOver2) * player.gravDir + ((int) player.gravDir == -1 ? MathHelper.Pi : 0f));
 
     public static Vector2 GetFrontHandPositionImproved(this Player player, bool addGfXOffY = true)
     {
         CompositeArmData arm = player.compositeFrontArm;
         Vector2 position = player
             .GetFrontHandPosition(arm.stretch, (arm.rotation + player.fullRotation) * player.gravDir).Floor();
-        if ((int)player.gravDir == -1)
+        if ((int) player.gravDir == -1)
             position.Y = player.position.Y + player.height + (player.position.Y - position.Y);
 
         if (addGfXOffY)
@@ -755,7 +702,7 @@ public static class MathUtils
         CompositeArmData arm = player.compositeBackArm;
         Vector2 position = player
             .GetBackHandPosition(arm.stretch, (arm.rotation + player.fullRotation) * player.gravDir).Floor();
-        if ((int)player.gravDir == -1)
+        if ((int) player.gravDir == -1)
             position.Y = player.position.Y + player.height + (player.position.Y - position.Y);
 
         if (addGfXOffY)
@@ -802,8 +749,8 @@ public static class MathUtils
 
         if (ua > 0 && ua < 1 && ub > 0 && ub < 1)
         {
-            float x = (float)(point1.X + ua * (point2.X - point1.X));
-            float y = (float)(point1.Y + ua * (point2.Y - point1.Y));
+            float x = (float) (point1.X + ua * (point2.X - point1.X));
+            float y = (float) (point1.Y + ua * (point2.Y - point1.Y));
             intersectPoint = new Vector2(x, y);
             return true;
         }
@@ -864,8 +811,8 @@ public static class MathUtils
     public static RotatedRectangle RotHitbox(this Projectile projectile)
     {
         Point point = (projectile.position + projectile.velocity).ToPoint();
-        return new Rectangle(point.X, point.Y, (int)(projectile.width * projectile.scale),
-            (int)(projectile.height * projectile.scale)).ToRotated(projectile.rotation);
+        return new Rectangle(point.X, point.Y, (int) (projectile.width * projectile.scale),
+            (int) (projectile.height * projectile.scale)).ToRotated(projectile.rotation);
     }
 
     /// <inheritdoc cref="RotHitbox(Entity, float)"></inheritdoc>
@@ -882,19 +829,16 @@ public static class MathUtils
         return new Rectangle(point.X, point.Y, player.width, player.height).ToRotated(player.fullRotation);
     }
 
-    public static RotatedRectangle BaseRotHitbox(this Entity entity, float rotation) =>
-        new Rectangle((int)entity.position.X, (int)entity.position.Y, entity.width, entity.height).ToRotated(rotation);
-
     public static RotatedRectangle BaseRotHitbox(this Projectile projectile) =>
-        new Rectangle((int)projectile.position.X, (int)projectile.position.Y,
-                (int)(projectile.width * projectile.scale), (int)(projectile.height * projectile.scale))
+        new Rectangle((int) projectile.position.X, (int) projectile.position.Y,
+                (int) (projectile.width * projectile.scale), (int) (projectile.height * projectile.scale))
             .ToRotated(projectile.rotation);
 
     public static RotatedRectangle BaseRotHitbox(this NPC npc) =>
-        new Rectangle((int)npc.position.X, (int)npc.position.Y, npc.width, npc.height).ToRotated(npc.rotation);
+        new Rectangle((int) npc.position.X, (int) npc.position.Y, npc.width, npc.height).ToRotated(npc.rotation);
 
     public static RotatedRectangle BaseRotHitbox(this Player player) =>
-        new Rectangle((int)player.position.X, (int)player.position.Y, player.width, player.height).ToRotated(
+        new Rectangle((int) player.position.X, (int) player.position.Y, player.width, player.height).ToRotated(
             player.fullRotation);
 
     public static int MultiLerp(float t, params int[] ints)
@@ -907,7 +851,7 @@ public static class MathUtils
             return ints[^1];
 
         float scaledIndex = t * (ints.Length - 1);
-        int lowerIndex = (int)scaledIndex;
+        int lowerIndex = (int) scaledIndex;
         int upperIndex = lowerIndex + 1;
 
         // Interpolation factors
@@ -916,7 +860,7 @@ public static class MathUtils
         int difference = upperValue - lowerValue;
 
         // Perform the interpolation
-        return lowerValue + (int)(difference * (scaledIndex - lowerIndex));
+        return lowerValue + (int) (difference * (scaledIndex - lowerIndex));
     }
 
     public static Vector2 MultiLerp(float t, params Vector2[] points)
@@ -925,7 +869,7 @@ public static class MathUtils
 
         // Calculate the total number of segments
         float segmentLength = 1f / (points.Length - 1);
-        int segmentIndex = (int)(t / segmentLength);
+        int segmentIndex = (int) (t / segmentLength);
 
         if (segmentIndex >= points.Length - 1)
             return points[^1];
@@ -1015,31 +959,31 @@ public static class MathUtils
         float maxHeight = distanceToTravel.Y - (heightabovetarget ?? 0);
 
         if (minArcHeight != null)
-            maxHeight = Math.Min(maxHeight, -(float)minArcHeight);
+            maxHeight = Math.Min(maxHeight, -(float) minArcHeight);
 
         if (maxArcHeight != null)
-            maxHeight = Math.Max(maxHeight, -(float)maxArcHeight);
+            maxHeight = Math.Max(maxHeight, -(float) maxArcHeight);
 
         float travelTime;
         float neededYvel;
 
         if (maxHeight <= 0)
         {
-            neededYvel = -(float)Math.Sqrt(-2 * gravity * maxHeight);
-            travelTime = (float)Math.Sqrt(-2 * maxHeight / gravity) +
-                         (float)Math.Sqrt(2 * Math.Max(distanceToTravel.Y - maxHeight, 0) /
-                                          gravity); // Time up, then time down
+            neededYvel = -(float) Math.Sqrt(-2 * gravity * maxHeight);
+            travelTime = (float) Math.Sqrt(-2 * maxHeight / gravity) +
+                         (float) Math.Sqrt(2 * Math.Max(distanceToTravel.Y - maxHeight, 0) /
+                                           gravity); // Time up, then time down
         }
         else
         {
             neededYvel = 0;
             travelTime =
-                (-neededYvel + (float)Math.Sqrt(Math.Pow(neededYvel, 2) - 4 * -distanceToTravel.Y * gravity / 2)) /
+                (-neededYvel + (float) Math.Sqrt(Math.Pow(neededYvel, 2) - 4 * -distanceToTravel.Y * gravity / 2)) /
                 gravity; // Time down
         }
 
         return maxXvel != null
-            ? new Vector2(MathHelper.Clamp(distanceToTravel.X / travelTime, -(float)maxXvel, (float)maxXvel),
+            ? new Vector2(MathHelper.Clamp(distanceToTravel.X / travelTime, -(float) maxXvel, (float) maxXvel),
                 neededYvel)
             : new Vector2(distanceToTravel.X / travelTime, neededYvel);
     }
@@ -1047,10 +991,7 @@ public static class MathUtils
     public static float InverseLerp(float from, float to, float x, bool clamped = true)
     {
         float inverse = (x - from) / (to - from);
-        if (!clamped)
-            return inverse;
-
-        return MathHelper.Clamp(inverse, 0f, 1f);
+        return !clamped ? inverse : MathHelper.Clamp(inverse, 0f, 1f);
     }
 
     public static float GetLerpBump(float from1, float to1, float from2, float to2, float x, bool clamp = true) =>
@@ -1058,100 +999,178 @@ public static class MathUtils
 
     public static int NonZeroSign(this float x) => x >= 0f ? 1 : -1;
 
-    public static List<Vector2> GetLaserControlPoints(this Vector2 start, Vector2 end, int samplesCount)
+    extension(Vector2 start)
     {
-        List<Vector2> controlPoints = [];
-        for (int i = 0; i < samplesCount; i++)
-            controlPoints.Add(Vector2.Lerp(start, end, i / (samplesCount - 1f)));
-
-        return controlPoints;
-    }
-
-    public static float AngleBetween(this Vector2 v1, Vector2 v2) =>
-        (float)Math.Acos(Vector2.Dot(v1.SafeNormalize(Vector2.Zero), v2.SafeNormalize(Vector2.Zero)));
-
-    public static float AngleBetween(this float angle, float otherAngle) =>
-        (otherAngle - angle + MathHelper.Pi).Modulo(MathHelper.TwoPi) - MathHelper.Pi;
-
-    /// <summary>
-    /// Smoothly interpolates between current and target angles
-    /// </summary>
-    /// <param name="smoothness">0-1 value, 0 is instant, 1 is very smooth</param>
-    /// <param name="shiftSpeed">Base rotation speed in radians per frame</param>
-    public static float SmoothAngleLerp(this float currentAngle, float targetAngle, float smoothness, float shiftSpeed)
-    {
-        // Normalize angles
-        currentAngle = MathHelper.WrapAngle(currentAngle);
-        targetAngle = MathHelper.WrapAngle(targetAngle);
-
-        // Calculate shortest angular distance
-        float difference = targetAngle - currentAngle;
-        switch (difference)
+        public List<Vector2> GetLaserControlPoints(Vector2 end, int samplesCount)
         {
-            case > MathHelper.Pi:
-                difference -= MathHelper.TwoPi;
-                break;
-            case < -MathHelper.Pi:
-                difference += MathHelper.TwoPi;
-                break;
+            List<Vector2> controlPoints = [];
+            for (int i = 0; i < samplesCount; i++)
+                controlPoints.Add(Vector2.Lerp(start, end, i / (samplesCount - 1f)));
+
+            return controlPoints;
         }
 
-        // Calculate rotation amount with smoothness
-        float smoothFactor = MathHelper.Clamp(smoothness, 0f, 1f);
-        float effectiveSpeed = shiftSpeed * (1f - smoothFactor);
+        public float AngleBetween(Vector2 v2) =>
+            (float) Math.Acos(Vector2.Dot(start.SafeNormalize(Vector2.Zero), v2.SafeNormalize(Vector2.Zero)));
 
-        // Apply velocity based interpolation
-        float change = MathHelper.Clamp(
-            difference * (1f - smoothFactor) + difference * smoothFactor * 2f,
-            -effectiveSpeed,
-            effectiveSpeed
-        );
+        public Vector2 SafeDirectionTo(Vector2 destination) =>
+            (destination - start).SafeNormalize(Vector2.Zero);
 
-        // Apply the change and wrap the result
-        float newAngle = MathHelper.WrapAngle(currentAngle + change);
+        public Rectangle ToRectangle(int width, int height) =>
+            new((int) start.X - width / 2, (int) start.Y - height / 2, width, height);
 
-        return newAngle;
+        public Vector2 ClampOutCircle(Vector2 center, float radius)
+        {
+            if (radius < 0)
+                return start;
+
+            Vector2 direction = start - center;
+            float distance = direction.Length();
+
+            if (distance < radius)
+                return center + Vector2.Normalize(direction) * radius;
+
+            // Point is inside or on the circle, no clamping needed
+            return start;
+        }
+
+        public Vector2 ClampInRect(Rectangle rect) => new(
+            Math.Clamp(start.X, rect.Left, rect.Right),
+            Math.Clamp(start.Y, rect.Top, rect.Bottom));
+
+        public Vector2 ClampInCircle(Vector2 center, float radius)
+        {
+            if (radius < 0)
+                return start;
+
+            Vector2 direction = start - center;
+            float distance = direction.Length();
+
+            if (distance > radius)
+                return center + Vector2.Normalize(direction) * radius;
+
+            return start;
+        }
+
+        /// <summary>
+        /// Checks if a target is within a cone of sight
+        /// </summary>
+        public bool IsInFieldOfView(float viewerRotation, Vector2 targetPosition,
+            float viewAngle, float? maxDistance = null)
+        {
+            Vector2 directionToTarget = targetPosition - start;
+            float distanceSquared = directionToTarget.LengthSquared();
+
+            if (distanceSquared < 0.0001f)
+                return true;
+
+            if (maxDistance != null)
+            {
+                if (distanceSquared > maxDistance * maxDistance)
+                    return false;
+            }
+
+            directionToTarget = directionToTarget.SafeNormalize(Vector2.Zero);
+            Vector2 viewerDirection = viewerRotation.ToRotationVector2();
+
+            float dotProduct = Vector2.Dot(viewerDirection, directionToTarget);
+            float angleThreshold = (float) Math.Cos(viewAngle / 2f);
+
+            return dotProduct >= angleThreshold;
+        }
     }
 
-    public static SpriteEffects ToSpriteDirection(this int direction) =>
-        direction == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
-
-    public static Vector2 SafeDirectionTo(this Vector2 target, Vector2 destination) =>
-        (destination - target).SafeNormalize(Vector2.Zero);
-
-    public static void SmoothFlyNear(this Entity entity, Vector2 destination, float movementSharpnessInterpolant,
-        float movementSmoothnessInterpolant)
+    extension(float angle)
     {
-        // Calculate the ideal velocity. The closer movementSharpnessInterpolant is to 1, the more closely the entity will hover exactly at the destination
-        // Lower, greater than zero values result in a greater tendency to hover in the general vicinity of the destination, rather than zipping straight towards it
-        Vector2 idealVelocity =
-            (destination - entity.Center) * MathHelper.Clamp(movementSharpnessInterpolant, 0.0001f, 1f);
+        public float AngleBetween(float otherAngle) =>
+            (otherAngle - angle + MathHelper.Pi).Modulo(MathHelper.TwoPi) - MathHelper.Pi;
 
-        // Interpolate towards the ideal velocity. The closer movementSmoothnessInterpolant is to 1, the more opportunities the entity has for overshooting and more "curvy" motion.
-        entity.velocity = Vector2.Lerp(entity.velocity, idealVelocity,
-            MathHelper.Clamp(1f - movementSmoothnessInterpolant, 0.0001f, 1f));
+        /// <summary>
+        /// Smoothly interpolates between current and target angles
+        /// </summary>
+        /// <param name="smoothness">0-1 value, 0 is instant, 1 is very smooth</param>
+        /// <param name="shiftSpeed">Base rotation speed in radians per frame</param>
+        public float SmoothAngleLerp(float targetAngle, float smoothness, float shiftSpeed)
+        {
+            // Normalize angles
+            angle = MathHelper.WrapAngle(angle);
+            targetAngle = MathHelper.WrapAngle(targetAngle);
+
+            // Calculate shortest angular distance
+            float difference = targetAngle - angle;
+            switch (difference)
+            {
+                case > MathHelper.Pi:
+                    difference -= MathHelper.TwoPi;
+                    break;
+                case < -MathHelper.Pi:
+                    difference += MathHelper.TwoPi;
+                    break;
+            }
+
+            // Calculate rotation amount with smoothness
+            float smoothFactor = MathHelper.Clamp(smoothness, 0f, 1f);
+            float effectiveSpeed = shiftSpeed * (1f - smoothFactor);
+
+            // Apply velocity based interpolation
+            float change = MathHelper.Clamp(
+                difference * (1f - smoothFactor) + difference * smoothFactor * 2f,
+                -effectiveSpeed,
+                effectiveSpeed
+            );
+
+            // Apply the change and wrap the result
+            float newAngle = MathHelper.WrapAngle(angle + change);
+
+            return newAngle;
+        }
+
+        public float Modulo(float divisor)
+        {
+            return angle - (float) Math.Floor(angle / divisor) * divisor;
+        }
     }
 
-    public static void SmoothFlyNearWithSlowdownRadius(this Entity entity, Vector2 destination,
-        float movementSharpnessInterpolant, float movementSmoothnessInterpolant, float slowdownRadius)
+    extension(Entity entity)
     {
-        // Calculate the distance to the slowdown radius. If the entity is within the slowdown radius, the distance is registered as zero
-        float distanceToSlowdownRadius = entity.Distance(destination) - slowdownRadius;
-        if (distanceToSlowdownRadius < 0f)
-            distanceToSlowdownRadius = 0f;
+        public void SmoothFlyNear(Vector2 destination, float movementSharpnessInterpolant,
+            float movementSmoothnessInterpolant)
+        {
+            // Calculate the ideal velocity. The closer movementSharpnessInterpolant is to 1, the more closely the entity will hover exactly at the destination
+            // Lower, greater than zero values result in a greater tendency to hover in the general vicinity of the destination, rather than zipping straight towards it
+            Vector2 idealVelocity =
+                (destination - entity.Center) * MathHelper.Clamp(movementSharpnessInterpolant, 0.0001f, 1f);
 
-        // Determine the ideal speed based on the distance to the slowdown radius rather than the destination itself
-        float idealSpeed = distanceToSlowdownRadius * MathHelper.Clamp(movementSharpnessInterpolant, 0.0001f, 1f);
-        Vector2 idealVelocity = entity.Center.SafeDirectionTo(destination) * idealSpeed;
+            // Interpolate towards the ideal velocity. The closer movementSmoothnessInterpolant is to 1, the more opportunities the entity has for overshooting and more "curvy" motion.
+            entity.velocity = Vector2.Lerp(entity.velocity, idealVelocity,
+                MathHelper.Clamp(1f - movementSmoothnessInterpolant, 0.0001f, 1f));
+        }
 
-        // Same velocity interpolation behavior as SmoothFlyNear.
-        entity.velocity = Vector2.Lerp(entity.velocity, idealVelocity,
-            MathHelper.Clamp(1f - movementSmoothnessInterpolant, 0.0001f, 1f));
+        public void SmoothFlyNearWithSlowdownRadius(Vector2 destination,
+            float movementSharpnessInterpolant, float movementSmoothnessInterpolant, float slowdownRadius)
+        {
+            // Calculate the distance to the slowdown radius. If the entity is within the slowdown radius, the distance is registered as zero
+            float distanceToSlowdownRadius = entity.Distance(destination) - slowdownRadius;
+            if (distanceToSlowdownRadius < 0f)
+                distanceToSlowdownRadius = 0f;
+
+            // Determine the ideal speed based on the distance to the slowdown radius rather than the destination itself
+            float idealSpeed = distanceToSlowdownRadius * MathHelper.Clamp(movementSharpnessInterpolant, 0.0001f, 1f);
+            Vector2 idealVelocity = entity.Center.SafeDirectionTo(destination) * idealSpeed;
+
+            // Same velocity interpolation behavior as SmoothFlyNear.
+            entity.velocity = Vector2.Lerp(entity.velocity, idealVelocity,
+                MathHelper.Clamp(1f - movementSmoothnessInterpolant, 0.0001f, 1f));
+        }
+
+        public Vector2 RandAreaInEntity() => entity.position +
+                                             new Vector2(Main.rand.Next(0, entity.width),
+                                                 Main.rand.Next(0, entity.height));
+
+        public RotatedRectangle BaseRotHitbox(float rotation) =>
+            new Rectangle((int) entity.position.X, (int) entity.position.Y, entity.width, entity.height)
+                .ToRotated(rotation);
     }
-
-    public static Vector2 RandAreaInEntity(this Entity entity) => entity.position +
-                                                                  new Vector2(Main.rand.Next(0, entity.width),
-                                                                      Main.rand.Next(0, entity.height));
 
     public static Vector2 RandomVelocity(float directionMult, float min, float max)
     {
@@ -1166,23 +1185,48 @@ public static class MathUtils
         return velocity;
     }
 
-    public static Vector2 NextVector2FromRectangleLimited(this UnifiedRandom r, Rectangle rect, float min, float max)
-        => new(rect.X + r.NextFloat(min, max) * rect.Width, rect.Y + r.NextFloat(min, max) * rect.Height);
-
-    public static Vector2 NextVector2CircularLimited(this UnifiedRandom r, float circleHalfWidth,
-        float circleHalfHeight, float min, float max)
-        => r.NextVector2Unit() * new Vector2(circleHalfWidth, circleHalfHeight) * r.NextFloat(min, max);
-
-    public static byte NextByte(this UnifiedRandom r, byte min, byte max) => (byte)r.Next(min, max);
-
-    public static T NextEnum<T>(this UnifiedRandom r) where T : Enum
+    /// <param name="r">The RNG to use for sampling.</param>
+    extension(UnifiedRandom r)
     {
-        T[] values = (T[])Enum.GetValues(typeof(T));
-        return values[r.Next(values.Length)];
-    }
+        public Vector2 NextVector2FromRectangleLimited(Rectangle rect, float min, float max)
+            => new(rect.X + r.NextFloat(min, max) * rect.Width, rect.Y + r.NextFloat(min, max) * rect.Height);
 
-    public static T NextFromSet<T>(this UnifiedRandom random, HashSet<T> objs) =>
-        objs.ToArray()[random.Next(objs.Count)];
+        public Vector2 NextVector2CircularLimited(float circleHalfWidth,
+            float circleHalfHeight, float min, float max)
+            => r.NextVector2Unit() * new Vector2(circleHalfWidth, circleHalfHeight) * r.NextFloat(min, max);
+
+        public byte NextByte(byte min, byte max) => (byte) r.Next(min, max);
+
+        public T NextEnum<T>() where T : Enum
+        {
+            T[] values = (T[]) Enum.GetValues(typeof(T));
+            return values[r.Next(values.Length)];
+        }
+
+        public T NextFromSet<T>(HashSet<T> objs) =>
+            objs.ToArray()[r.Next(objs.Count)];
+
+        /// <summary>
+        /// Samples a random value from a Gaussian distribution.
+        /// </summary>
+        /// <param name="standardDeviation">The standard deviation of the distribution.</param>
+        /// <param name="mean">The mean of the distribution. Used for horizontally shifting the overall resulting graph.</param>
+        public float NextGaussian(float standardDeviation = 1f, float mean = 0f)
+        {
+            // Refer to the following link for an explanation of why this works:
+            // https://blog.cupcakephysics.com/computational%20physics/2015/05/10/the-box-muller-algorithm.html
+            float randomAngle = RandomRotation();
+
+            // An incredibly tiny value of 1e-6 is used as a safe lower bound for the interpolant, as a value of exactly zero will cause the
+            // upcoming logarithm to short circuit and return an erroneous output of float.NegativeInfinity.
+            // This situation is extremely unlikely, but better safe than sorry.
+
+            float distributionInterpolant = r.NextFloat(1e-6f, 1f);
+
+            return MathF.Sqrt(MathF.Log(distributionInterpolant) * -2f) * MathF.Cos(randomAngle) * standardDeviation +
+                   mean;
+        }
+    }
 
     public static float GaussianDistribution(float x, float standardDeviation, float mean = 0f)
     {
@@ -1191,27 +1235,6 @@ public static class MathUtils
         float correctionCoefficient = 1f / (standardDeviation * sqrt2Pi);
         float exponent = ((x - mean) / standardDeviation).Squared() * -0.5f;
         return correctionCoefficient * MathF.Exp(exponent);
-    }
-
-    /// <summary>
-    /// Samples a random value from a Gaussian distribution.
-    /// </summary>
-    /// <param name="r">The RNG to use for sampling.</param>
-    /// <param name="standardDeviation">The standard deviation of the distribution.</param>
-    /// <param name="mean">The mean of the distribution. Used for horizontally shifting the overall resulting graph.</param>
-    public static float NextGaussian(this UnifiedRandom r, float standardDeviation = 1f, float mean = 0f)
-    {
-        // Refer to the following link for an explanation of why this works:
-        // https://blog.cupcakephysics.com/computational%20physics/2015/05/10/the-box-muller-algorithm.html
-        float randomAngle = RandomRotation();
-
-        // An incredibly tiny value of 1e-6 is used as a safe lower bound for the interpolant, as a value of exactly zero will cause the
-        // upcoming logarithm to short circuit and return an erroneous output of float.NegativeInfinity.
-        // This situation is extremely unlikely, but better safe than sorry.
-
-        float distributionInterpolant = r.NextFloat(1e-6f, 1f);
-
-        return MathF.Sqrt(MathF.Log(distributionInterpolant) * -2f) * MathF.Cos(randomAngle) * standardDeviation + mean;
     }
 
     /// <summary>
@@ -1239,9 +1262,6 @@ public static class MathUtils
 
     public static float RandomRotation() => Main.rand.NextFloat(MathHelper.TwoPi);
     public static Vector2 RandomRectangle(this Rectangle rect) => Main.rand.NextVector2FromRectangle(rect);
-
-    public static Rectangle ToRectangle(this Vector2 vector, int width, int height) =>
-        new((int)vector.X - width / 2, (int)vector.Y - height / 2, width, height);
 
     /// <summary>
     /// Applies 2D FBM, an iterative process commonly use with things like Perlin noise to give a natural, "crisp" aesthetic to noise, rather than a blobby one.
@@ -1277,45 +1297,42 @@ public static class MathUtils
         return result;
     }
 
-    public static float Modulo(this float dividend, float divisor)
-    {
-        return dividend - (float)Math.Floor(dividend / divisor) * divisor;
-    }
-
-    /// <summary>
-    /// Approximates the derivative of a function at a given point based on a 
-    /// </summary>
     /// <param name="fx">The function to take the derivative of.</param>
-    /// <param name="x">The value to evaluate the derivative at.</param>
-    public static double ApproximateDerivative(this Func<double, double> fx, double x)
+    extension(Func<double, double> fx)
     {
-        double left = fx(x + 1e-7);
-        double right = fx(x - 1e-7);
-        return (left - right) * 5e6;
-    }
-
-    /// <summary>
-    /// Searches for an approximate for a root of a given function.
-    /// </summary>
-    /// <param name="fx">The function to find the root for.</param>
-    /// <param name="initialGuess">The initial guess for what the root could be.</param>
-    /// <param name="iterations">The amount of iterations to perform. The higher this is, the more generally accurate the result will be.</param>
-    public static double IterativelySearchForRoot(this Func<double, double> fx, double initialGuess, int iterations)
-    {
-        // This uses the Newton-Raphson method to iteratively get closer and closer to roots of a given function.
-        // The exactly formula is as follows:
-        // x = x - f(x) / f'(x)
-        // In most circumstances repeating the above equation will result in closer and closer approximations to a root.
-        // The exact reason as to why this intuitively works can be found at the following video:
-        // https://www.youtube.com/watch?v=-RdOwhmqP5s
-        double result = initialGuess;
-        for (int i = 0; i < iterations; i++)
+        /// <summary>
+        /// Approximates the derivative of a function at a given point based on a 
+        /// </summary>
+        /// <param name="x">The value to evaluate the derivative at.</param>
+        public double ApproximateDerivative(double x)
         {
-            double derivative = fx.ApproximateDerivative(result);
-            result -= fx(result) / derivative;
+            double left = fx(x + 1e-7);
+            double right = fx(x - 1e-7);
+            return (left - right) * 5e6;
         }
 
-        return result;
+        /// <summary>
+        /// Searches for an approximate for a root of a given function.
+        /// </summary>
+        /// <param name="initialGuess">The initial guess for what the root could be.</param>
+        /// <param name="iterations">The amount of iterations to perform. The higher this is, the more generally accurate the result will be.</param>
+        public double IterativelySearchForRoot(double initialGuess, int iterations)
+        {
+            // This uses the Newton-Raphson method to iteratively get closer and closer to roots of a given function.
+            // The exactly formula is as follows:
+            // x = x - f(x) / f'(x)
+            // In most circumstances repeating the above equation will result in closer and closer approximations to a root.
+            // The exact reason as to why this intuitively works can be found at the following video:
+            // https://www.youtube.com/watch?v=-RdOwhmqP5s
+            double result = initialGuess;
+            for (int i = 0; i < iterations; i++)
+            {
+                double derivative = fx.ApproximateDerivative(result);
+                result -= fx(result) / derivative;
+            }
+
+            return result;
+        }
     }
 
     public static float QuadraticBump(float input) => input * (4 - input * 4);
@@ -1337,70 +1354,85 @@ public static class MathUtils
         return firstTerm + secondTerm + thirdTerm;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public static float Cubed(this int input)
+    extension(int input)
     {
-        return (int)MathF.Pow(input, 3);
+        public SpriteEffects ToSpriteDirection() =>
+            input == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        public float Cubed()
+        {
+            return (int) MathF.Pow(input, 3);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        public float Squared()
+        {
+            return (int) MathF.Pow(input, 2);
+        }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public static float Squared(this int input)
+    extension(float input)
     {
-        return (int)MathF.Pow(input, 2);
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        public float Quartic()
+        {
+            return MathF.Pow(input, 4);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        public float Cubed()
+        {
+            return MathF.Pow(input, 3);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        public float Squared()
+        {
+            return MathF.Pow(input, 2);
+        }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public static float Quartic(this float input)
+    extension(double input)
     {
-        return MathF.Pow(input, 4);
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        public double Quartic()
+        {
+            return Math.Pow(input, 4);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        public double Cubed()
+        {
+            return Math.Pow(input, 3);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        public double Squared()
+        {
+            return Math.Pow(input, 2);
+        }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public static float Cubed(this float input)
+    extension(Projectile proj)
     {
-        return MathF.Pow(input, 3);
-    }
+        public void VelocityBasedRotation(float power = .03f) => proj.rotation +=
+            (Math.Abs(proj.velocity.X) + Math.Abs(proj.velocity.Y)) * power * proj.direction;
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public static float Squared(this float input)
-    {
-        return MathF.Pow(input, 2);
-    }
+        public float FacingUpRight() => proj.rotation = proj.velocity.ToRotation() - MathHelper.PiOver4;
+        public float FacingUp() => proj.rotation = proj.velocity.ToRotation() + MathHelper.PiOver2;
+        public float FacingDown() => proj.rotation = proj.velocity.ToRotation() - MathHelper.PiOver2;
+        public float FacingRight() => proj.rotation = proj.velocity.ToRotation();
+        public float FacingLeft() => proj.rotation = proj.velocity.ToRotation() + 3f * MathHelper.Pi / 2f;
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public static double Quartic(this double input)
-    {
-        return Math.Pow(input, 4);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public static double Cubed(this double input)
-    {
-        return Math.Pow(input, 3);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public static double Squared(this double input)
-    {
-        return Math.Pow(input, 2);
-    }
-
-    public static void VelocityBasedRotation(this Projectile proj, float power = .03f) => proj.rotation +=
-        (Math.Abs(proj.velocity.X) + Math.Abs(proj.velocity.Y)) * power * proj.direction;
-
-    public static float FacingUpRight(this Projectile p) => p.rotation = p.velocity.ToRotation() - MathHelper.PiOver4;
-    public static float FacingUp(this Projectile p) => p.rotation = p.velocity.ToRotation() + MathHelper.PiOver2;
-    public static float FacingDown(this Projectile p) => p.rotation = p.velocity.ToRotation() - MathHelper.PiOver2;
-    public static float FacingRight(this Projectile p) => p.rotation = p.velocity.ToRotation();
-    public static float FacingLeft(this Projectile p) => p.rotation = p.velocity.ToRotation() + 3f * MathHelper.Pi / 2f;
-
-    public static float FacingDirectionLiteral(this Projectile p, bool flip = false)
-    {
-        float dir1 = -p.velocity.ToRotation();
-        float dir2 = p.velocity.ToRotation();
-        if (p.direction < 0)
-            return p.rotation = flip ? dir2 : dir1;
-        return p.rotation = flip ? dir1 : dir2;
+        public float FacingDirectionLiteral(bool flip = false)
+        {
+            float dir1 = -proj.velocity.ToRotation();
+            float dir2 = proj.velocity.ToRotation();
+            if (proj.direction < 0)
+                return proj.rotation = flip ? dir2 : dir1;
+            return proj.rotation = flip ? dir1 : dir2;
+        }
     }
 
     public static CompositeArmStretchAmount ToStretchAmount(this float interpolant)
@@ -1421,7 +1453,7 @@ public static class MathUtils
             damageJankCorrectionFactor = 1f / 4f;
         if (Main.masterMode)
             damageJankCorrectionFactor = 1f / 6f;
-        return (int)(damage * damageJankCorrectionFactor);
+        return (int) (damage * damageJankCorrectionFactor);
     }
 
     public static int DifficultyBasedValue(int normal, int? expert = null, int? master = null, int? ftw = null,
@@ -1430,9 +1462,9 @@ public static class MathUtils
         int val = normal;
         if (expert.HasValue && Main.expertMode)
             val = expert.Value;
-        if (master.HasValue && (Main.masterMode || CalamityWorld.revenge))
+        if (master.HasValue && Main.masterMode)
             val = master.Value;
-        if (ftw.HasValue && (Main.getGoodWorld || CalamityWorld.death))
+        if (ftw.HasValue && Main.getGoodWorld)
             val = ftw.Value;
         if (legendary.HasValue && Main.getGoodWorld && Main.masterMode)
             val = legendary.Value;
@@ -1447,9 +1479,9 @@ public static class MathUtils
         float val = normal;
         if (expert.HasValue && Main.expertMode)
             val = expert.Value;
-        if (master.HasValue && (Main.masterMode || CalamityWorld.revenge))
+        if (master.HasValue && Main.masterMode)
             val = master.Value;
-        if (ftw.HasValue && (Main.getGoodWorld || CalamityWorld.death))
+        if (ftw.HasValue && Main.getGoodWorld)
             val = ftw.Value;
         if (legendary.HasValue && Main.getGoodWorld && Main.masterMode)
             val = legendary.Value;
@@ -1467,9 +1499,9 @@ public static class MathUtils
         npc.lifeMax = normalModeHP;
         if (Main.expertMode)
             npc.lifeMax = expertModeHP;
-        if (CalamityWorld.revenge || Main.masterMode)
+        if (Main.masterMode)
             npc.lifeMax = revengeanceModeHP;
-        if (deathModeHP.HasValue && CalamityWorld.death)
+        if (deathModeHP.HasValue)
             npc.lifeMax = deathModeHP.Value;
         if (gfbModeHP.HasValue && Main.zenithWorld)
             npc.lifeMax = gfbModeHP.Value;
@@ -1478,10 +1510,10 @@ public static class MathUtils
     public static int DamageSoftCap(double dmgInput, int cap)
     {
         if (dmgInput < cap)
-            return (int)dmgInput;
+            return (int) dmgInput;
 
         double cappedRatio = Math.Pow(dmgInput / cap, 0.5) / 1.25 + 0.2;
-        return (int)(cap * cappedRatio);
+        return (int) (cap * cappedRatio);
     }
 
     public static float WrapAngle360(float theta)
@@ -1536,7 +1568,7 @@ public static class MathUtils
         if (discriminant < 0f)
             return null;
 
-        float sqrtD = (float)Math.Sqrt(discriminant);
+        float sqrtD = (float) Math.Sqrt(discriminant);
         float t1 = (-b - sqrtD) / (2f * a);
         float t2 = (-b + sqrtD) / (2f * a);
 

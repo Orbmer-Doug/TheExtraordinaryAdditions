@@ -15,6 +15,7 @@ public class RemoteHoldout : BaseIdleHoldoutProjectile
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.RemoteHoldout);
     public override int AssociatedItemID => ModContent.ItemType<HiTechRemote>();
     public override int IntendedProjectileType => ModContent.ProjectileType<RemoteHoldout>();
+
     public override void Defaults()
     {
         Projectile.width = 16;
@@ -24,14 +25,17 @@ public class RemoteHoldout : BaseIdleHoldoutProjectile
 
     public ref float Wait => ref Projectile.ai[0];
     public ref float Time => ref Projectile.ai[1];
+
     public override void SafeAI()
     {
         if (this.RunLocal())
         {
-            Projectile.velocity = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true).SafeDirectionTo(Modded.MouseWorld);
+            Projectile.velocity = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true)
+                .SafeDirectionTo(Modded.MouseWorld);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
+
         int dir = Projectile.velocity.X.NonZeroSign();
         Owner.ChangeDir(dir);
         float rot = MathHelper.PiOver4 + (dir == -1 ? MathHelper.Pi - MathHelper.PiOver2 : 0f);
@@ -48,10 +52,15 @@ public class RemoteHoldout : BaseIdleHoldoutProjectile
         {
             SoundID.Item44.Play(Projectile.Center, 1f, 0f, .2f);
 
-            Vector2 pos = Projectile.Center - new Vector2(Main.rand.NextFloat(-Main.LogicCheckScreenWidth / 3, Main.LogicCheckScreenWidth / 3), 800f);
-            Projectile.NewProj(pos, Vector2.Zero, ModContent.ProjectileType<LazerDrone>(), Projectile.damage, Projectile.knockBack, Owner.whoAmI);
+            Vector2 pos = Projectile.Center -
+                          new Vector2(
+                              Main.rand.NextFloat(-Main.LogicCheckScreenWidth / 3, Main.LogicCheckScreenWidth / 3),
+                              800f);
+            Projectile.NewProj(pos, Vector2.Zero, ModContent.ProjectileType<LazerDrone>(), Projectile.damage,
+                Projectile.knockBack, Owner.whoAmI);
             for (int i = 0; i < 7; i++)
-                ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 25, 0f, Vector2.One, 0f, .05f, Color.SkyBlue);
+                ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 25, 0f, Vector2.One, 0f, .05f,
+                    Color.SkyBlue);
 
             Wait = Item.useTime;
         }
@@ -84,7 +93,9 @@ public class RemoteHoldout : BaseIdleHoldoutProjectile
             direction = SpriteEffects.FlipHorizontally;
             rotation += MathHelper.Pi;
         }
-        Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), rotation, origin, Projectile.scale, direction, 0f);
+
+        Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), rotation, origin,
+            Projectile.scale, direction, 0f);
         return false;
     }
 }

@@ -149,12 +149,12 @@ public class ClothSimulation : IDisposable
                 _triangles.Add(new Triangle(topRight, bottomLeft, bottomRight, stickIndices2));
 
                 // Initial indices
-                _indices[indexCount++] = (short)topLeft;
-                _indices[indexCount++] = (short)bottomLeft;
-                _indices[indexCount++] = (short)topRight;
-                _indices[indexCount++] = (short)topRight;
-                _indices[indexCount++] = (short)bottomLeft;
-                _indices[indexCount++] = (short)bottomRight;
+                _indices[indexCount++] = (short) topLeft;
+                _indices[indexCount++] = (short) bottomLeft;
+                _indices[indexCount++] = (short) topRight;
+                _indices[indexCount++] = (short) topRight;
+                _indices[indexCount++] = (short) bottomLeft;
+                _indices[indexCount++] = (short) bottomRight;
             }
         }
 
@@ -181,9 +181,9 @@ public class ClothSimulation : IDisposable
         Parallel.For(0, _points.Count, i =>
         {
             Point point = _points[i];
-            if (point.IsPinned) 
+            if (point.IsPinned)
                 return;
-            
+
             point.Position += velocity.Value;
             point.PreviousPosition += velocity.Value;
             _points[i] = point;
@@ -193,9 +193,9 @@ public class ClothSimulation : IDisposable
         for (int x = 0; x < _gridWidth; x++)
         {
             Point point = _points[x];
-            if (!point.IsPinned) 
+            if (!point.IsPinned)
                 continue;
-            
+
             // Rotate offset relative to pivot
             Vector2 offset = _initialOffsets[x];
             Vector2 relativeToPivot = offset - (pivot.Value - position);
@@ -347,8 +347,8 @@ public class ClothSimulation : IDisposable
                 {
                     Position = new Vector3(point.Position, 0f),
                     Color = point.IsSelected ? Color.Red : Color.White,
-                    TextureCoordinate = new Vector2((float)(i % _gridWidth) / (_gridWidth - 1),
-                        (float)(i / _gridWidth) / (_gridHeight - 1))
+                    TextureCoordinate = new Vector2((float) (i % _gridWidth) / (_gridWidth - 1),
+                        (float) (i / _gridWidth) / (_gridHeight - 1))
                 };
             }
 
@@ -358,9 +358,9 @@ public class ClothSimulation : IDisposable
             {
                 if (triangle.IsActive)
                 {
-                    activeIndices.Add((short)triangle.V0);
-                    activeIndices.Add((short)triangle.V1);
-                    activeIndices.Add((short)triangle.V2);
+                    activeIndices.Add((short) triangle.V0);
+                    activeIndices.Add((short) triangle.V1);
+                    activeIndices.Add((short) triangle.V2);
                 }
             }
 
@@ -519,12 +519,12 @@ public class ClothSimulationTiles : IDisposable
                 _triangles.Add(new Triangle(topLeft, bottomLeft, topRight));
                 _triangles.Add(new Triangle(topRight, bottomLeft, bottomRight));
 
-                _indices[indexCount++] = (short)topLeft;
-                _indices[indexCount++] = (short)bottomLeft;
-                _indices[indexCount++] = (short)topRight;
-                _indices[indexCount++] = (short)topRight;
-                _indices[indexCount++] = (short)bottomLeft;
-                _indices[indexCount++] = (short)bottomRight;
+                _indices[indexCount++] = (short) topLeft;
+                _indices[indexCount++] = (short) bottomLeft;
+                _indices[indexCount++] = (short) topRight;
+                _indices[indexCount++] = (short) topRight;
+                _indices[indexCount++] = (short) bottomLeft;
+                _indices[indexCount++] = (short) bottomRight;
             }
         }
 
@@ -573,7 +573,7 @@ public class ClothSimulationTiles : IDisposable
 
             foreach (Player p in Main.ActivePlayers)
             {
-                if (p.Hitbox.Intersects((point.Position + entityPos).ToRectangle((int)Spacing, (int)Spacing)))
+                if (p.Hitbox.Intersects((point.Position + entityPos).ToRectangle((int) Spacing, (int) Spacing)))
                 {
                     Vector2 difference = p.position - p.oldPosition;
                     difference.X = MathHelper.Clamp(difference.X, -2f, 2f);
@@ -586,7 +586,8 @@ public class ClothSimulationTiles : IDisposable
             Vector2 windForce = new Vector2(
                 x: (MathF.Cos(Main.GlobalTimeWrappedHourly * 25f + point.Position.X * 0.4f +
                               point.Position.Y * 0.09f) * 0.5f + 0.076f
-                                                               + Main.windSpeedCurrent * 9f * (float)Main.dayRate) * interpol * .5f,
+                                                               + Main.windSpeedCurrent * 9f * (float) Main.dayRate) *
+                   interpol * .5f,
                 y: MathF.Cos(Main.GlobalTimeWrappedHourly * -4.6f + point.Position.X * 0.03f) * interpol * 9f);
 
             Vector2 localPos = point.Position - anchor;
@@ -619,9 +620,9 @@ public class ClothSimulationTiles : IDisposable
                     Points[stick.P0Index] = p0;
                 }
 
-                if (p1.IsPinned) 
+                if (p1.IsPinned)
                     continue;
-                
+
                 p1.Position = p1.Position - anchor - offset + anchor;
                 Points[stick.P1Index] = p1;
             }
@@ -643,14 +644,14 @@ public class ClothSimulationTiles : IDisposable
             int x = i % GridWidth;
             int y = i / GridWidth;
 
-            Color colorTop = Color.Lerp(colors.TopLeftColor, colors.TopRightColor, x / (float)GridWidth);
-            Color colorBottom = Color.Lerp(colors.BottomLeftColor, colors.BottomRightColor, x / (float)GridWidth);
+            Color colorTop = Color.Lerp(colors.TopLeftColor, colors.TopRightColor, x / (float) GridWidth);
+            Color colorBottom = Color.Lerp(colors.BottomLeftColor, colors.BottomRightColor, x / (float) GridWidth);
 
             vertices[i] = new VertexPositionColorTexture
             {
                 Position = new Vector3(point.Position.X, point.Position.Y, 0f),
-                Color = Color.Lerp(colorTop, colorBottom, y / (float)GridHeight),
-                TextureCoordinate = new Vector2((float)x / (GridWidth - 1), (float)y / (GridHeight - 1))
+                Color = Color.Lerp(colorTop, colorBottom, y / (float) GridHeight),
+                TextureCoordinate = new Vector2((float) x / (GridWidth - 1), (float) y / (GridHeight - 1))
             };
         }
 
@@ -658,12 +659,12 @@ public class ClothSimulationTiles : IDisposable
         List<short> activeIndices = new List<short>(_triangles.Count * 3);
         foreach (Triangle triangle in _triangles)
         {
-            if (!triangle.IsActive) 
+            if (!triangle.IsActive)
                 continue;
-            
-            activeIndices.Add((short)triangle.V0);
-            activeIndices.Add((short)triangle.V1);
-            activeIndices.Add((short)triangle.V2);
+
+            activeIndices.Add((short) triangle.V0);
+            activeIndices.Add((short) triangle.V1);
+            activeIndices.Add((short) triangle.V2);
         }
 
         _indices = activeIndices.ToArray();
@@ -690,14 +691,14 @@ public class ClothSimulationTiles : IDisposable
         BlendState prevBlend = gd.BlendState;
         Viewport prevViewport = gd.Viewport;
         Rectangle prevScissor = gd.ScissorRectangle;
-        
+
         gd.RasterizerState = RasterizerState.CullNone;
         gd.BlendState = BlendState.AlphaBlend;
         gd.SetVertexBuffer(Vertices);
         gd.Indices = Indices;
-        
+
         gd.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, vertices.Length, 0, _indices.Length / 3);
-        
+
         gd.RasterizerState = prevRasterizer;
         gd.BlendState = prevBlend;
         gd.Viewport = prevViewport;

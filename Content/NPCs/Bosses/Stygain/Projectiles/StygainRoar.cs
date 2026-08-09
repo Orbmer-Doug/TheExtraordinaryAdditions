@@ -11,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 
 public class StygainRoar : ModProjectile
 {
-    public static readonly float Lifetime = CalUtils.SecondsToFrames(.8f);
+    public static readonly float Lifetime = SecondsToFrames(.8f);
     public ref float Radius => ref Projectile.ai[1];
     public override string Texture => AssetRegistry.Invis;
 
@@ -27,7 +27,7 @@ public class StygainRoar : ModProjectile
         Projectile.penetrate = -1;
         Projectile.tileCollide = false;
         Projectile.ignoreWater = true;
-        Projectile.timeLeft = (int)Lifetime;
+        Projectile.timeLeft = (int) Lifetime;
         Projectile.scale = 0.001f;
 
         Projectile.hostile = Projectile.friendly = false;
@@ -42,7 +42,7 @@ public class StygainRoar : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        Main.spriteBatch.PrepareForShaders();
+        Main.spriteBatch.EnterShaderRegion();
 
         Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.BigWavyBlobNoise);
         DrawData explosionDrawData = new(tex, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight),

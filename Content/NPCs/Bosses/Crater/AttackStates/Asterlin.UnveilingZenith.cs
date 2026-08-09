@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using CalamityMod;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
@@ -33,24 +32,24 @@ public partial class Asterlin
         StateMachine.RegisterStateBehavior(AsterlinAIType.UnveilingZenith, DoBehavior_UnveilingZenith);
     }
 
-    public static int UnveilingZenith_StarCollapseTime => CalUtils.SecondsToFrames(.3f);
+    public static int UnveilingZenith_StarCollapseTime => SecondsToFrames(.3f);
 
-    public static int UnveilingZenith_BeamReleaseRate => DifficultyBasedValue(CalUtils.SecondsToFrames(.5f),
-        CalUtils.SecondsToFrames(.4f), CalUtils.SecondsToFrames(.3f), CalUtils.SecondsToFrames(.25f),
-        CalUtils.SecondsToFrames(.2f), CalUtils.SecondsToFrames(.2f));
+    public static int UnveilingZenith_BeamReleaseRate => DifficultyBasedValue(SecondsToFrames(.5f),
+        SecondsToFrames(.4f), SecondsToFrames(.3f), SecondsToFrames(.25f),
+        SecondsToFrames(.2f), SecondsToFrames(.2f));
 
-    public static int UnveilingZenith_TotalTime => CalUtils.SecondsToFrames(20.8f);
+    public static int UnveilingZenith_TotalTime => SecondsToFrames(20.8f);
     public static float UnveilingZenith_BlurAmount => .4f;
 
     public int UnveilingZenith_CurrentAmount
     {
-        get => (int)ExtraAI[0];
+        get => (int) ExtraAI[0];
         set => ExtraAI[0] = value;
     }
 
     public int UnveilingZenith_CollapseTimer
     {
-        get => (int)ExtraAI[1];
+        get => (int) ExtraAI[1];
         set => ExtraAI[1] = value;
     }
 

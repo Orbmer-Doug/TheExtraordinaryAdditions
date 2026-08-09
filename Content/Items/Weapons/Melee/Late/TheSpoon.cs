@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -24,7 +23,7 @@ public class TheSpoon : ModItem
         Item.UseSound = null;
         Item.rare = ItemRarityID.Purple;
         Item.value = AdditionsGlobalItem.UniqueRarityPrice;
-        Item.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
+        Item.DamageType = ModContent.GetInstance<MeleeNoSpeedDamageClass>();
         Item.shoot = ModContent.ProjectileType<SpoonSwing>();
         Item.noMelee = true;
         Item.noUseGraphic = true;

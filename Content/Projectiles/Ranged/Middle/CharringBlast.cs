@@ -10,6 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 public class CharringBlast : ModProjectile, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 20;
@@ -34,7 +35,8 @@ public class CharringBlast : ModProjectile, ILocalizedModType, IModType
         float interpol = Projectile.scale = Projectile.Opacity = GetLerpBump(0f, 5f, 300f, 290f, Time);
         Lighting.AddLight(Projectile.Center, Color.OrangeRed.ToVector3() * interpol);
 
-        Color col = Color.Lerp(Color.Red, Color.Lerp(Color.OrangeRed, Color.Chocolate, Main.rand.NextFloat(.4f, .7f)), Projectile.scale);
+        Color col = Color.Lerp(Color.Red, Color.Lerp(Color.OrangeRed, Color.Chocolate, Main.rand.NextFloat(.4f, .7f)),
+            Projectile.scale);
         for (int i = 0; i < 4; i++)
         {
             Vector2 pos = Projectile.Center;
@@ -53,10 +55,19 @@ public class CharringBlast : ModProjectile, ILocalizedModType, IModType
 
     public override void OnKill(int timeLeft)
     {
-        SoundEngine.PlaySound(SoundID.Item20 with { Volume = Main.rand.NextFloat(.8f, .9f), Pitch = -.1f, PitchVariance = .05f, MaxInstances = 10 }, Projectile.Center);
-        SoundEngine.PlaySound(SoundID.Item14 with { Volume = Main.rand.NextFloat(1.1f, 1.25f), Pitch = .15f, PitchVariance = .1f, MaxInstances = 10 }, Projectile.Center);
+        SoundEngine.PlaySound(
+            SoundID.Item20 with
+            {
+                Volume = Main.rand.NextFloat(.8f, .9f), Pitch = -.1f, PitchVariance = .05f, MaxInstances = 10
+            }, Projectile.Center);
+        SoundEngine.PlaySound(
+            SoundID.Item14 with
+            {
+                Volume = Main.rand.NextFloat(1.1f, 1.25f), Pitch = .15f, PitchVariance = .1f, MaxInstances = 10
+            }, Projectile.Center);
         if (this.RunLocal())
-            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<CharringBlastBlast>(), Projectile.damage, Projectile.knockBack, Projectile.owner, 0f, 0f, 0f);
+            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<CharringBlastBlast>(),
+                Projectile.damage, Projectile.knockBack, Projectile.owner, 0f, 0f, 0f);
     }
 
     public override bool PreDraw(ref Color lightColor) => false;

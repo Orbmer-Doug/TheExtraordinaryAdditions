@@ -20,7 +20,7 @@ public class EmptyRound : ModProjectile
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = -1;
     }
-    
+
     public override void AI()
     {
         Projectile.extraUpdates = 0;
@@ -28,6 +28,7 @@ public class EmptyRound : ModProjectile
         {
             Projectile.rotation += 0.5f * Projectile.direction;
         }
+
         Projectile.velocity.Y -= 0.055f;
         Projectile.velocity.X *= 0.992f;
     }

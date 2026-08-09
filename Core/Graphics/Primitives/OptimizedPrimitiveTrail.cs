@@ -26,11 +26,11 @@ namespace TheExtraordinaryAdditions.Core.Graphics.Primitives;
 public readonly struct Vertex2D(SystemVector2 position, Color color, SystemVector2 texCoord) : IVertexType
 {
     public static readonly VertexDeclaration VertexDeclaration2D = new(
-        [
-            new VertexElement(0, VertexElementFormat.Vector2, VertexElementUsage.Position, 0),
-            new VertexElement(8, VertexElementFormat.Color, VertexElementUsage.Color, 0),
-            new VertexElement(12, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0)
-        ]);
+    [
+        new VertexElement(0, VertexElementFormat.Vector2, VertexElementUsage.Position, 0),
+        new VertexElement(8, VertexElementFormat.Color, VertexElementUsage.Color, 0),
+        new VertexElement(12, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0)
+    ]);
 
     public static readonly VertexDeclaration VertexDeclaration = VertexDeclaration2D;
 
@@ -206,6 +206,7 @@ public sealed class TrailCleaner : ModSystem
 public sealed class OptimizedPrimitiveTrail : IDisposable
 {
     #region Public Delegates
+
     /// <summary>
     /// Delegate for a function that returns the trail width based on a completion ratio.
     /// </summary>
@@ -227,32 +228,40 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
     /// <param name="completionRatio">A value from 0 to 1 indicating progress along the trail.</param>
     /// <returns>The offset vector to apply at the given completion ratio.</returns>
     public delegate SystemVector2 VertexOffsetFunction(float completionRatio);
+
     #endregion
 
     #region Private Fields
+
     private SystemVector2[] _trailPointsBuffer;
     private Vertex2D[] _verticesBuffer;
     private short[] _indicesBuffer;
     private readonly int _maxTrailPoints;
+
     #endregion
 
     #region Internal Fields
+
     internal readonly VertexWidthFunction widthFunction;
     internal readonly VertexColorFunction colorFunction;
     internal readonly VertexOffsetFunction offsetFunction;
+
     #endregion
 
     #region Public Fields
+
     public bool Disposed;
     public int FailedTicks;
+
     #endregion
 
     #region Public Constructor
+
     /// <summary>
     /// Initializes a new <see cref="OptimizedPrimitiveTrail"/>.
     /// </summary>
     public OptimizedPrimitiveTrail(VertexWidthFunction widthFunction, VertexColorFunction colorFunction,
-    VertexOffsetFunction offsetFunction = null, int maxTrailPoints = 1024)
+        VertexOffsetFunction offsetFunction = null, int maxTrailPoints = 1024)
     {
         if (!Main.dedServ)
         {
@@ -271,9 +280,11 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
         TrailCleaner.Instance.Trails.Add(this);
         FailedTicks = 10;
     }
+
     #endregion
 
     #region Private Methods
+
     /// <summary>
     /// Precomputes the triangle indices for the trail body to improve rendering efficiency.
     /// </summary>
@@ -284,12 +295,12 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
         {
             int start = i * 6;
             int connect = i * 2;
-            _indicesBuffer[start] = (short)connect;
-            _indicesBuffer[start + 1] = (short)(connect + 1);
-            _indicesBuffer[start + 2] = (short)(connect + 2);
-            _indicesBuffer[start + 3] = (short)(connect + 2);
-            _indicesBuffer[start + 4] = (short)(connect + 1);
-            _indicesBuffer[start + 5] = (short)(connect + 3);
+            _indicesBuffer[start] = (short) connect;
+            _indicesBuffer[start + 1] = (short) (connect + 1);
+            _indicesBuffer[start + 2] = (short) (connect + 2);
+            _indicesBuffer[start + 3] = (short) (connect + 2);
+            _indicesBuffer[start + 4] = (short) (connect + 1);
+            _indicesBuffer[start + 5] = (short) (connect + 3);
         }
     }
 
@@ -327,6 +338,7 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
                 trailPoints[0] = originalPositions[0];
                 return 1;
             }
+
             return 0;
         }
 
@@ -361,7 +373,8 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
         while (currentPoint < totalTrailPoints && segmentIndex < segmentLengths.Length)
         {
             float targetLength = currentPoint * step;
-            while (accumulatedLength + segmentLengths[segmentIndex] < targetLength && segmentIndex < segmentLengths.Length - 1)
+            while (accumulatedLength + segmentLengths[segmentIndex] < targetLength &&
+                   segmentIndex < segmentLengths.Length - 1)
             {
                 accumulatedLength += segmentLengths[segmentIndex];
                 segmentIndex++;
@@ -393,7 +406,7 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
     /// Performs Catmull-Rom spline interpolation for smooth trail points.
     /// </summary>
     private int GetSmoothTrailPoints(ReadOnlySpan<SystemVector2> originalPositions,
-    Span<SystemVector2> trailPoints, int totalTrailPoints)
+        Span<SystemVector2> trailPoints, int totalTrailPoints)
     {
         if (originalPositions.Length < 2)
             return originalPositions.Length;
@@ -406,11 +419,11 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
         originalPositions.CopyTo(controlPoints[1..]);
         controlPoints[^1] = pN;
 
-        float tStep = (float)(originalPositions.Length - 1) / (totalTrailPoints - 1);
+        float tStep = (float) (originalPositions.Length - 1) / (totalTrailPoints - 1);
         for (int i = 0; i < totalTrailPoints; i++)
         {
             float t = i * tStep;
-            int idx = (int)t;
+            int idx = (int) t;
             float u = t - idx;
             trailPoints[i] = CatmullRom(
                 controlPoints[idx],
@@ -442,7 +455,7 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
 
         for (int i = 0; i < trailPoints.Length; i++)
         {
-            float completion = i / (float)(trailPoints.Length - 1);
+            float completion = i / (float) (trailPoints.Length - 1);
             SystemVector2 direction;
             if (directionOverride == null)
             {
@@ -451,7 +464,8 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
                 else if (i == trailPoints.Length - 1)
                     direction = (trailPoints[i] - trailPoints[i - 1]).SafeNormalize(SystemVector2.UnitX);
                 else
-                    direction = (trailPoints[i + 1] - trailPoints[i] + (trailPoints[i] - trailPoints[i - 1])).SafeNormalize(SystemVector2.UnitX);
+                    direction = (trailPoints[i + 1] - trailPoints[i] + (trailPoints[i] - trailPoints[i - 1]))
+                        .SafeNormalize(SystemVector2.UnitX);
             }
             else
                 direction = PolarVector2(1f, directionOverride.Value);
@@ -475,9 +489,11 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
 
         return trailPoints.Length * 2;
     }
+
     #endregion
 
     #region Public Methods
+
     /// <summary>
     /// Directly draws a trail.
     /// </summary>
@@ -487,11 +503,13 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
     /// <param name="smooth">Set to true for greater smoothness</param>
     /// <param name="pixelated">Is this trail pixelated?</param>
     /// <param name="matrix">Customize the world-view-projection matrix</param>
-    public void DrawTrail(ManagedShader effect, ReadOnlySpan<Vector2> originalPositions, int totalTrailPoints = -1, bool smooth = false, bool pixelated = true, Matrix? matrix = null)
+    public void DrawTrail(ManagedShader effect, ReadOnlySpan<Vector2> originalPositions, int totalTrailPoints = -1,
+        bool smooth = false, bool pixelated = true, Matrix? matrix = null)
     {
         if (Main.dedServ)
             return;
-        if (originalPositions == null || originalPositions.Length < 2 || originalPositions.ContainsInvalidPoint() || originalPositions.AllPointsEqual())
+        if (originalPositions == null || originalPositions.Length < 2 || originalPositions.ContainsInvalidPoint() ||
+            originalPositions.AllPointsEqual())
             return;
 
         int effectiveTotalPoints = totalTrailPoints > 0 ? totalTrailPoints : _maxTrailPoints;
@@ -504,8 +522,10 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
         // Clear potentially stale data
         Array.Clear(_trailPointsBuffer, 0, _trailPointsBuffer.Length);
         int pointCount = smooth
-            ? GetSmoothTrailPoints(convertedPositions, _trailPointsBuffer.AsSpan(0, effectiveTotalPoints), effectiveTotalPoints)
-            : GetLinearTrailPoints(convertedPositions, _trailPointsBuffer.AsSpan(0, effectiveTotalPoints), effectiveTotalPoints);
+            ? GetSmoothTrailPoints(convertedPositions, _trailPointsBuffer.AsSpan(0, effectiveTotalPoints),
+                effectiveTotalPoints)
+            : GetLinearTrailPoints(convertedPositions, _trailPointsBuffer.AsSpan(0, effectiveTotalPoints),
+                effectiveTotalPoints);
 
         if (pointCount < 2)
             return;
@@ -579,8 +599,9 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
             return ((tempVertices[0].position + tempVertices[1].position) * 0.5f).FromNumerics();
         }
 
-        return vertexCount < 2 ? tempPoints[pointCount - 1].FromNumerics() :
-            ((tempVertices[vertexCount - 1].position + tempVertices[vertexCount - 2].position) * 0.5f).FromNumerics();
+        return vertexCount < 2
+            ? tempPoints[pointCount - 1].FromNumerics()
+            : ((tempVertices[vertexCount - 1].position + tempVertices[vertexCount - 2].position) * 0.5f).FromNumerics();
     }
 
     public void Dispose()
@@ -594,9 +615,11 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
             GC.SuppressFinalize(this);
         }
     }
+
     #endregion
 
     #region Public Static Methods
+
     /// <summary>
     /// Helps make a <see cref="VertexWidthFunction"/> that creates a pyriform shaped trail (commonly referred to as a meteor trail or pear)
     /// </summary>
@@ -606,9 +629,11 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
     /// <param name="hemisphereAmt">The percentage of how much of the trail the hemisphere should take.</param>
     /// <param name="taperAmt">The percentage of how much of the trail should taper off.</param>
     /// <returns></returns>
-    public static float PyriformWidthFunct(float completionRatio, float width, float power = 2f, float hemisphereAmt = .3f, float taperAmt = .4f)
+    public static float PyriformWidthFunct(float completionRatio, float width, float power = 2f,
+        float hemisphereAmt = .3f, float taperAmt = .4f)
     {
-        float tipInterpolant = MathF.Sqrt(1f - Animators.MakePoly(power).InFunction(InverseLerp(hemisphereAmt, 0f, completionRatio)));
+        float tipInterpolant =
+            MathF.Sqrt(1f - Animators.MakePoly(power).InFunction(InverseLerp(hemisphereAmt, 0f, completionRatio)));
         return width * InverseLerp(1f, taperAmt, completionRatio) * tipInterpolant;
     }
 
@@ -620,14 +645,18 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
     /// <param name="power">The thickness of the base</param>
     /// <param name="hemisphereAmt">The percentage of how much of the trail the hemisphere should take.</param>
     /// <returns></returns>
-    public static float HemisphereWidthFunct(float completionRatio, float width, float power = 1f, float hemisphereAmt = .3f)
+    public static float HemisphereWidthFunct(float completionRatio, float width, float power = 1f,
+        float hemisphereAmt = .3f)
     {
-        float tipInterpolant = MathF.Sqrt(1f - Animators.MakePoly(power).InFunction(InverseLerp(hemisphereAmt, 0f, completionRatio)));
+        float tipInterpolant =
+            MathF.Sqrt(1f - Animators.MakePoly(power).InFunction(InverseLerp(hemisphereAmt, 0f, completionRatio)));
         return width * tipInterpolant;
     }
+
     #endregion
 
     #region Destructor
+
     ~OptimizedPrimitiveTrail()
     {
         if (!Disposed)
@@ -636,12 +665,16 @@ public sealed class OptimizedPrimitiveTrail : IDisposable
             _verticesBuffer = null;
         }
     }
+
     #endregion
 
     #region Override Methods
+
     public override string ToString()
     {
-        return $"Rendering {_trailPointsBuffer.Length} trail points, {_verticesBuffer} vertices, and {_indicesBuffer} indices. Is this trail disposed? {Disposed} \n";
+        return
+            $"Rendering {_trailPointsBuffer.Length} trail points, {_verticesBuffer} vertices, and {_indicesBuffer} indices. Is this trail disposed? {Disposed} \n";
     }
+
     #endregion
 }

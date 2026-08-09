@@ -11,6 +11,7 @@ public class TesselesticLightning : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
     private const int Life = 30;
+
     public override void SetDefaults()
     {
         Projectile.DamageType = DamageClass.Magic;
@@ -55,7 +56,7 @@ public class TesselesticLightning : ModProjectile
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        Projectile.damage = (int)(Projectile.damage * .4f);
+        Projectile.damage = (int) (Projectile.damage * .4f);
     }
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
@@ -64,9 +65,13 @@ public class TesselesticLightning : ModProjectile
     }
 
     public float WidthFunct(float c) => 40f * InverseLerp(1.5f, 0f, c) * Projectile.Opacity;
-    public Color ColorFunct(SystemVector2 c, Vector2 pos) => MulticolorLerp(Completion, Color.White, MainColor) * Projectile.Opacity;
+
+    public Color ColorFunct(SystemVector2 c, Vector2 pos) =>
+        MulticolorLerp(Completion, Color.White, MainColor) * Projectile.Opacity;
+
     public TrailPoints points;
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -78,6 +83,7 @@ public class TesselesticLightning : ModProjectile
                 trail.DrawTrail(shader, points.Points, -1, false, true);
             }
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;
     }

@@ -61,7 +61,7 @@ public class HailfireShell : ModProjectile
                 Vector2 vel = Projectile.velocity.RotatedByRandom(.3f) * Main.rand.NextFloat(.5f, 1.4f);
                 int type = ModContent.ProjectileType<HailfireRockets>();
                 Projectile.NewProj(pos, vel,
-                    type, (int)(Projectile.damage * .25f),
+                    type, (int) (Projectile.damage * .25f),
                     Projectile.knockBack * .4f, Owner.whoAmI);
 
                 for (int j = 0; j < 5; j++)
@@ -69,8 +69,9 @@ public class HailfireShell : ModProjectile
                     ParticleRegistry.SpawnSparkParticle(pos, vel.RotatedByRandom(.4f) * Main.rand.NextFloat(.3f, 1.4f),
                         Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .6f),
                         Color.Chocolate.Lerp(Color.OrangeRed, Main.rand.NextFloat(0f, .4f)) * 4f, true);
-                    
-                    ParticleRegistry.SpawnGlowParticle(Projectile.Center, Vector2.Zero, 14, Main.rand.NextFloat(20f, 40f), Color.OrangeRed, 1.4f);
+
+                    ParticleRegistry.SpawnGlowParticle(Projectile.Center, Vector2.Zero, 14,
+                        Main.rand.NextFloat(20f, 40f), Color.OrangeRed, 1.4f);
                 }
 
                 SoundID.NPCHit4.Play(Projectile.Center, .6f, .3f, .1f);
@@ -134,7 +135,7 @@ public class HailfireRockets : ModProjectile
 
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
 
@@ -149,6 +150,7 @@ public class HailfireRockets : ModProjectile
         {
             Projectile.MaxUpdates = 2;
         }
+
         Projectile.velocity *= 1.02f;
         Projectile.FacingUp();
         Projectile.velocity.Y = MathHelper.Clamp(Projectile.velocity.Y + .45f, -30f, 30f);
@@ -186,7 +188,7 @@ public class HailfireExplosion : ModProjectile
 
     public int Time
     {
-        get => (int)Projectile.ai[1];
+        get => (int) Projectile.ai[1];
         set => Projectile.ai[1] = value;
     }
 
@@ -211,7 +213,7 @@ public class HailfireExplosion : ModProjectile
     {
         if (Time == 0)
         {
-            for (int i = 0; i < (int)MathHelper.Lerp(30, 100, RadiusInterpolant); i++)
+            for (int i = 0; i < (int) MathHelper.Lerp(30, 100, RadiusInterpolant); i++)
             {
                 Vector2 pos = Projectile.Center;
                 Vector2 vel = (Main.rand.NextVector2Circular(2f, 2f) + Main.rand.NextVector2Circular(12f, 12f)) *
@@ -221,13 +223,15 @@ public class HailfireExplosion : ModProjectile
                 float scale = Main.rand.NextFloat(.7f, 1.2f) * RadiusInterpolant;
                 ParticleRegistry.SpawnGlowParticle(pos, vel * .2f, life / 2, scale * 115f, color.Lerp(Color.White, .3f),
                     .9f);
-                
+
                 ParticleRegistry.SpawnSparkParticle(pos, vel * 2f, life / 3, scale * .8f, color);
-                
-                ParticleRegistry.SpawnSquishyPixelParticle(pos, vel * Main.rand.NextFloat(.5f, .9f), life * 3, scale * 2f, color, Color.Chocolate, 5, false, true);
+
+                ParticleRegistry.SpawnSquishyPixelParticle(pos, vel * Main.rand.NextFloat(.5f, .9f), life * 3,
+                    scale * 2f, color, Color.Chocolate, 5, false, true);
 
                 if (i % 3 == 2)
-                    ParticleRegistry.SpawnCloudParticle(pos, vel * .3f - Vector2.UnitY * Main.rand.NextFloat(0f, 4f), Color.DarkGray, color, life, scale * 50f,
+                    ParticleRegistry.SpawnCloudParticle(pos, vel * .3f - Vector2.UnitY * Main.rand.NextFloat(0f, 4f),
+                        Color.DarkGray, color, life, scale * 50f,
                         Main.rand.NextFloat(.6f, 1.1f));
             }
         }
@@ -237,6 +241,6 @@ public class HailfireExplosion : ModProjectile
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return CalUtils.CircularHitboxCollision(Projectile.Center, Radius, targetHitbox);
+        return CircularHitboxCollision(Projectile.Center, Radius, targetHitbox);
     }
 }

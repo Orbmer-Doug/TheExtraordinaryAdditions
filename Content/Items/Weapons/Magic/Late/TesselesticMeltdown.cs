@@ -43,7 +43,7 @@ public class TesselesticMeltdown : ModItem
         Item.noUseGraphic = true;
         Item.useAmmo = AmmoID.None;
     }
-    
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(Color.Cyan);
@@ -56,7 +56,8 @@ public class TesselesticMeltdown : ModItem
         // Make some visuals at the rune part of the cube
         Vector2 pos = new(Item.Center.X + 48f, Item.Center.Y - 60f);
         if (Main.GameUpdateCount % 4f == 3f)
-            ParticleRegistry.SpawnLightningArcParticle(pos, Main.rand.NextVector2Circular(120f, 120f), Main.rand.Next(12, 20), .7f, Color.DeepSkyBlue);
+            ParticleRegistry.SpawnLightningArcParticle(pos, Main.rand.NextVector2Circular(120f, 120f),
+                Main.rand.Next(12, 20), .7f, Color.DeepSkyBlue);
         Lighting.AddLight(pos, Color.Cyan.ToVector3() * 1.1f);
     }
 

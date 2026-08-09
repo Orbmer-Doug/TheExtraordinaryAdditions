@@ -11,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Late.Avia;
 
 public class TenebrisBlast : ModProjectile
 {
-    public static readonly int Lifetime = CalUtils.SecondsToFrames(.5f);
+    public static readonly int Lifetime = SecondsToFrames(.5f);
 
     public ref float Radius => ref Projectile.ai[0];
 
@@ -23,10 +23,12 @@ public class TenebrisBlast : ModProjectile
     }
 
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.DrawScreenCheckFluff[Projectile.type] = 1111;
     }
+
     public override void SetDefaults()
     {
         Projectile.width = 72;
@@ -51,15 +53,17 @@ public class TenebrisBlast : ModProjectile
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return CalUtils.CircularHitboxCollision(Projectile.Center, Radius * 0.4f, targetHitbox);
+        return CircularHitboxCollision(Projectile.Center, Radius * 0.4f, targetHitbox);
     }
 
     public override bool PreDraw(ref Color lightColor)
     {
         Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearWrap, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearWrap,
+            DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
         Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.ManifoldNoise);
-        DrawData explosionDrawData = new(tex, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), Color.White * Projectile.Opacity);
+        DrawData explosionDrawData = new(tex, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight),
+            Color.White * Projectile.Opacity);
 
         ManagedShader shockwaveShader = ShaderRegistry.ShockwaveShader;
         shockwaveShader.TrySetParameter("mainColor", DetermineExplosionColor().ToVector3());

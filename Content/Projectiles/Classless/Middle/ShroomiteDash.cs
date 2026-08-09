@@ -17,6 +17,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 public class ShroomiteDash : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.width = 30;
@@ -36,16 +37,19 @@ public class ShroomiteDash : ModProjectile
 
     public ref float Time => ref Projectile.ai[0];
     public ref float DashTime => ref Projectile.ai[1];
+
     private bool IsDashing
     {
         get => Projectile.ai[2] == 1f;
         set => Projectile.ai[2] = value.ToInt();
     }
+
     private bool HitEnemy
     {
         get => Projectile.AdditionsInfo().ExtraAI[0] == 1f;
         set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
+
     private float trailWidth = 1;
 
     public const float MaxCharge = 120f;
@@ -80,8 +84,11 @@ public class ShroomiteDash : ModProjectile
                 AdditionsSound.HeatTail.Play(Projectile.Center, .8f, .2f);
                 Projectile.localAI[0] = 1f;
             }
+
             if (Completion >= 1f && Main.rand.NextBool(5))
-                ParticleRegistry.SpawnBloomPixelParticle(Owner.RotHitbox().RandomPoint(), -Vector2.UnitY * Main.rand.NextFloat(3f, 6f), Main.rand.Next(20, 40), Main.rand.NextFloat(.1f, .2f), new(85, 89, 225), Color.DarkBlue, null, .5f);
+                ParticleRegistry.SpawnBloomPixelParticle(Owner.RotHitbox().RandomPoint(),
+                    -Vector2.UnitY * Main.rand.NextFloat(3f, 6f), Main.rand.Next(20, 40), Main.rand.NextFloat(.1f, .2f),
+                    new(85, 89, 225), Color.DarkBlue, null, .5f);
             IsDashing = false;
             this.Sync();
         }
@@ -104,7 +111,8 @@ public class ShroomiteDash : ModProjectile
                     float currentRotation = Projectile.velocity.ToRotation();
                     float idealRotation = Owner.MountedCenter.SafeDirectionTo(mouse).ToRotation();
 
-                    Projectile.velocity = currentRotation.AngleTowards(idealRotation, rotationstrength).ToRotationVector2();
+                    Projectile.velocity = currentRotation.AngleTowards(idealRotation, rotationstrength)
+                        .ToRotationVector2();
                     this.Sync();
                 }
 
@@ -139,7 +147,7 @@ public class ShroomiteDash : ModProjectile
     {
         if (IsDashing)
             return null;
-        
+
         return false;
     }
 
@@ -154,7 +162,8 @@ public class ShroomiteDash : ModProjectile
             Owner.velocity = -Owner.velocity * .2f;
 
             Vector2 pos = Projectile.Center;
-            ParticleRegistry.SpawnPulseRingParticle(pos, -Projectile.velocity, 30, Projectile.rotation, new(.5f, 1f), 0f, 500f, Color.CornflowerBlue);
+            ParticleRegistry.SpawnPulseRingParticle(pos, -Projectile.velocity, 30, Projectile.rotation, new(.5f, 1f),
+                0f, 500f, Color.CornflowerBlue);
             for (int i = 0; i < 40; i++)
             {
                 Vector2 vel = -Projectile.velocity.RotatedByRandom(.65f) * Main.rand.NextFloat(10f, 20f);
@@ -165,7 +174,8 @@ public class ShroomiteDash : ModProjectile
             }
 
             if (this.RunLocal())
-                Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<ShroomiteDashImpact>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
+                Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<ShroomiteDashImpact>(),
+                    Projectile.damage, Projectile.knockBack, Projectile.owner);
             AdditionsSound.VirtueAttack.Play(Projectile.Center, 1.2f, .1f);
             ScreenShakeSystem.New(new(.7f, .5f), Projectile.Center);
 
@@ -180,22 +190,25 @@ public class ShroomiteDash : ModProjectile
     }
 
     public float WidthFunct(float c) => OptimizedPrimitiveTrail.PyriformWidthFunct(c, 80f * trailWidth, 2.4f, .2f, .4f);
+
     public Color ColorFunct(SystemVector2 c, Vector2 position)
     {
-        Color col = Color.Lerp(Color.Lerp(new Color(85, 89, 225), new Color(66, 180, 216), DashCompletion), new Color(99, 155, 255), c.X) * MathHelper.SmoothStep(1f, 0f, c.X);
+        Color col = Color.Lerp(Color.Lerp(new Color(85, 89, 225), new Color(66, 180, 216), DashCompletion),
+            new Color(99, 155, 255), c.X) * MathHelper.SmoothStep(1f, 0f, c.X);
         col *= 1f - DashCompletion;
         return col * trailWidth;
     }
 
     public TrailPoints cache;
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         if (!IsDashing)
         {
             ManagedShader effect = ShaderRegistry.SpreadTelegraph;
             effect.TrySetParameter("centerOpacity", 1.7f);
-            effect.TrySetParameter("mainOpacity", (float)Math.Sqrt(Completion) * 2f);
+            effect.TrySetParameter("mainOpacity", (float) Math.Sqrt(Completion) * 2f);
             effect.TrySetParameter("halfSpreadAngle", Spread / 2f);
             effect.TrySetParameter("edgeColor", Color.DodgerBlue.ToVector3());
 
@@ -204,11 +217,14 @@ public class ShroomiteDash : ModProjectile
             effect.TrySetParameter("edgeBlendStrength", 5f);
 
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, effect.Effect, Main.GameViewMatrix.TransformationMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState,
+                DepthStencilState.None, Main.Rasterizer, effect.Effect, Main.GameViewMatrix.TransformationMatrix);
             Texture2D invis = AssetRegistry.InvisTex;
-            Main.EntitySpriteDraw(invis, Owner.Center - Main.screenPosition, null, Color.White, Projectile.rotation, new Vector2(invis.Width / 2f, invis.Height / 2f), 700f, 0, 0f);
+            Main.EntitySpriteDraw(invis, Owner.Center - Main.screenPosition, null, Color.White, Projectile.rotation,
+                new Vector2(invis.Width / 2f, invis.Height / 2f), 700f, 0, 0f);
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState,
+                DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
         }
         else
         {
@@ -222,12 +238,15 @@ public class ShroomiteDash : ModProjectile
                 shader.TrySetParameter("time", Main.GlobalTimeWrappedHourly * 4f);
                 shader.TrySetParameter("repeats", 12f);
                 shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Streak), 1, SamplerState.LinearWrap);
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.SuperWavyPerlin), 2, SamplerState.LinearWrap);
+                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.SuperWavyPerlin), 2,
+                    SamplerState.LinearWrap);
 
                 trail.DrawTrail(shader, cache.Points, 100, true);
             }
+
             PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         }
+
         return false;
     }
 }

@@ -9,12 +9,16 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Base;
 
 public abstract class BaseHoldoutProjectile : ModProjectile
 {
-    public virtual void Defaults() { }
+    public virtual void Defaults()
+    {
+    }
+
     public sealed override void SetDefaults()
     {
         Projectile.timeLeft = 10000;
         Projectile.tileCollide = Projectile.hostile = false;
-        Projectile.ignoreWater = Projectile.friendly = Projectile.ContinuouslyUpdateDamageStats = Projectile.noEnchantmentVisuals = Projectile.netImportant = true;
+        Projectile.ignoreWater = Projectile.friendly = Projectile.ContinuouslyUpdateDamageStats =
+            Projectile.noEnchantmentVisuals = Projectile.netImportant = true;
         Projectile.penetrate = -1;
         Defaults();
     }
@@ -28,6 +32,7 @@ public abstract class BaseHoldoutProjectile : ModProjectile
 
     public bool TryUseMana(bool pay = true) => Item.CheckManaBetter(Owner, Owner.GetManaCost(Item), pay);
     public bool HasMana() => Item.CheckManaBetter(Owner, Owner.GetManaCost(Item));
+
     public bool TryUseAmmo(out int projToShoot, out float speed, out int dmg, out float kb, out int ammoID)
     {
         if (!Owner.HasAmmo(Item))
@@ -37,13 +42,17 @@ public abstract class BaseHoldoutProjectile : ModProjectile
             return false;
         }
 
-        Owner.PickAmmo(Item, out projToShoot, out speed, out dmg, out kb, out ammoID, Owner.IsAmmoFreeThisShot(Item, Owner.ChooseAmmo(Item), Owner.ChooseAmmo(Item).type));
+        Owner.PickAmmo(Item, out projToShoot, out speed, out dmg, out kb, out ammoID,
+            Owner.IsAmmoFreeThisShot(Item, Owner.ChooseAmmo(Item), Owner.ChooseAmmo(Item).type));
         return true;
     }
+
     public SpriteEffects FixedDirection()
     {
-        SpriteEffects effects = Projectile.direction == -(int)Owner.gravDir ? SpriteEffects.FlipVertically : SpriteEffects.None;
-        if ((int)Owner.gravDir == -1 && Projectile.direction == -(int)Owner.gravDir)
+        SpriteEffects effects = Projectile.direction == -(int) Owner.gravDir
+            ? SpriteEffects.FlipVertically
+            : SpriteEffects.None;
+        if ((int) Owner.gravDir == -1 && Projectile.direction == -(int) Owner.gravDir)
             effects |= SpriteEffects.FlipVertically;
         return effects;
     }
@@ -53,6 +62,7 @@ public abstract class BaseHoldoutProjectile : ModProjectile
     public sealed override bool CanHitPlayer(Player target) => false;
     public override bool? CanCutTiles() => false;
     public sealed override bool ShouldUpdatePosition() => false;
+
     public sealed override void AI()
     {
         if (ShouldDie())
@@ -72,11 +82,16 @@ public abstract class BaseHoldoutProjectile : ModProjectile
         Projectile.spriteDirection = Projectile.direction;
         Owner.itemRotation = MathHelper.WrapAngle(Projectile.velocity.ToRotation() * Projectile.direction);
     }
-    public virtual void SafeAI() { }
+
+    public virtual void SafeAI()
+    {
+    }
+
     public virtual bool ShouldDie()
     {
         return !Owner.Available() || (this.RunLocal() && !Modded.SafeMouseLeft.Current);
     }
+
     public virtual void DieEffect()
     {
         Projectile.Kill();
@@ -84,7 +99,7 @@ public abstract class BaseHoldoutProjectile : ModProjectile
 
     public sealed override void SendExtraAI(BinaryWriter writer)
     {
-        writer.Write((sbyte)Projectile.spriteDirection);
+        writer.Write((sbyte) Projectile.spriteDirection);
         WriteExtraAI(writer);
     }
 
@@ -93,6 +108,12 @@ public abstract class BaseHoldoutProjectile : ModProjectile
         Projectile.spriteDirection = reader.ReadSByte();
         GetExtraAI(reader);
     }
-    public virtual void WriteExtraAI(BinaryWriter writer) { }
-    public virtual void GetExtraAI(BinaryReader reader) { }
+
+    public virtual void WriteExtraAI(BinaryWriter writer)
+    {
+    }
+
+    public virtual void GetExtraAI(BinaryReader reader)
+    {
+    }
 }

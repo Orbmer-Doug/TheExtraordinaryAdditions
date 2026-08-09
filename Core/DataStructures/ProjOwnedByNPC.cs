@@ -21,7 +21,7 @@ public abstract class ProjOwnedByNPC<T> : ModProjectile where T : ModNPC
     /// </summary>
     public int OwnerIndex
     {
-        get => (int)Projectile.localAI[0];
+        get => (int) Projectile.localAI[0];
         set => Projectile.localAI[0] = value;
     }
 
@@ -47,17 +47,23 @@ public abstract class ProjOwnedByNPC<T> : ModProjectile where T : ModNPC
 
     public sealed override void SendExtraAI(BinaryWriter writer)
     {
-        writer.Write((int)Projectile.localAI[0]);
+        writer.Write((int) Projectile.localAI[0]);
         SendAI(writer);
     }
-    public virtual void SendAI(BinaryWriter writer) { }
+
+    public virtual void SendAI(BinaryWriter writer)
+    {
+    }
 
     public sealed override void ReceiveExtraAI(BinaryReader reader)
     {
         Projectile.localAI[0] = reader.ReadInt32();
         ReceiveAI(reader);
     }
-    public virtual void ReceiveAI(BinaryReader reader) { }
+
+    public virtual void ReceiveAI(BinaryReader reader)
+    {
+    }
 
     /// <summary>
     /// Destroys all projectiles owned by a specified npc
@@ -75,6 +81,7 @@ public abstract class ProjOwnedByNPC<T> : ModProjectile where T : ModNPC
                 if (p.type != type)
                     continue;
             }
+
             proj.Kill();
         }
     }
@@ -123,6 +130,7 @@ public abstract class ProjOwnedByNPC<T> : ModProjectile where T : ModNPC
             if (npc != null && npc.active && npc.ModNPC is T) // Check if they are available
                 owner = npc;
         }
+
         Owner = owner;
 
         // Assign the helper if necessary
@@ -131,7 +139,9 @@ public abstract class ProjOwnedByNPC<T> : ModProjectile where T : ModNPC
 
         // And update the shared target
         if (Owner != null && Owner.active && Owner.HasValidTarget)
-            Target = (Owner.HasPlayerTarget || !NPCID.Sets.UsesNewTargetting[Owner.type]) ? Main.player[Owner.target] : Main.npc[Owner.target - 300];
+            Target = (Owner.HasPlayerTarget || !NPCID.Sets.UsesNewTargetting[Owner.type])
+                ? Main.player[Owner.target]
+                : Main.npc[Owner.target - 300];
         else
             Target = null;
 
@@ -153,7 +163,9 @@ public abstract class ProjOwnedByNPC<T> : ModProjectile where T : ModNPC
         SafeAI();
     }
 
-    public virtual void SafeAI() { }
+    public virtual void SafeAI()
+    {
+    }
 
     public virtual void Kill()
     {

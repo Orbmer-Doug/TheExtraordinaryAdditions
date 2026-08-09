@@ -20,7 +20,7 @@ public partial class Asterlin
         StateMachine.RegisterStateBehavior(AsterlinAIType.EnterPhase3, DoBehavior_EnterPhase3);
     }
 
-    public static int EnterPhase3_Length => CalUtils.SecondsToFrames(4f);
+    public static int EnterPhase3_Length => SecondsToFrames(4f);
     public const float EnterPhase3_MaxHeatDistortionArea = 900f;
     public const float EnterPhase3_MaxHeatDistortionStrength = .7f;
 

@@ -1,7 +1,4 @@
-﻿using CalamityMod.Items.Materials;
-using CalamityMod.Tiles.Furniture.CraftingStations;
-using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
@@ -10,7 +7,6 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Late;
@@ -46,13 +42,15 @@ public class DeusExMachina : ModItem
         Item.noMelee = true;
         Item.noUseGraphic = true;
     }
-    
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
     }
 
     public override bool CanUseItem(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback)
     {
         player.NewPlayerProj(player.Center, Vector2.Zero, type, damage, knockback, player.whoAmI);
         return false;
@@ -61,9 +59,7 @@ public class DeusExMachina : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        recipe.AddIngredient(ModContent.ItemType<CoreofCalamity>(), 7);
-        recipe.AddIngredient(ModContent.ItemType<ShadowspecBar>(), 10);
-        recipe.AddTile(ModContent.TileType<DraedonsForge>());
+        //TODO
         recipe.Register();
     }
 }

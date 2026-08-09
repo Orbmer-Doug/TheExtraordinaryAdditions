@@ -12,6 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
 public class VirulentSeed : ModProjectile, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.VirulentSeed);
+
     public override void SetDefaults()
     {
         Projectile.width = 14;
@@ -25,13 +26,17 @@ public class VirulentSeed : ModProjectile, ILocalizedModType, IModType
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = -1;
     }
+
     public ref float Time => ref Projectile.ai[0];
+
     public bool HasHitTarget
     {
         get => Projectile.ai[1] == 1f;
         set => Projectile.ai[1] = value.ToInt();
     }
+
     public Player Owner => Main.player[Projectile.owner];
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         target.AddBuff(BuffID.Venom, 60);
@@ -43,6 +48,7 @@ public class VirulentSeed : ModProjectile, ILocalizedModType, IModType
             Projectile.netUpdate = true;
         }
     }
+
     public override void AI()
     {
         Projectile.FacingUp();
@@ -50,16 +56,19 @@ public class VirulentSeed : ModProjectile, ILocalizedModType, IModType
         Projectile.Opacity = GetLerpBump(0f, 10f, 180f, 160f, Time);
 
         after ??= new(8, () => Projectile.Center);
-        after.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.scale, Projectile.Opacity, Projectile.rotation, 0, 90, 3));
+        after.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.scale, Projectile.Opacity,
+            Projectile.rotation, 0, 90, 3));
 
         if (Time.BetweenNum(30f, 120f))
         {
             NPC target = NPCTargeting.GetWeakestNPC(new(Projectile.Center, 450, false, true));
-            if (!target.CanHomeInto()) 
+            if (!target.CanHomeInto())
                 return;
-            
-            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.Center.SafeDirectionTo(target.Center) * 10f, .3f);
-            Projectile.velocity += Projectile.velocity.SafeNormalize(Vector2.Zero).VelEqualTrig(MathF.Sin, 20f, 1.5f, ref Projectile.AdditionsInfo().ExtraAI[0], ref Projectile.AdditionsInfo().ExtraAI[1]);
+
+            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity,
+                Projectile.Center.SafeDirectionTo(target.Center) * 10f, .3f);
+            Projectile.velocity += Projectile.velocity.SafeNormalize(Vector2.Zero).VelEqualTrig(MathF.Sin, 20f, 1.5f,
+                ref Projectile.AdditionsInfo().ExtraAI[0], ref Projectile.AdditionsInfo().ExtraAI[1]);
         }
     }
 
@@ -68,15 +77,21 @@ public class VirulentSeed : ModProjectile, ILocalizedModType, IModType
         for (int i = 0; i < 10; i++)
         {
             Color col = Color.ForestGreen.Lerp(Color.DarkOliveGreen, Main.rand.NextFloat(.4f, .6f));
-            ParticleRegistry.SpawnDustParticle(Projectile.RotHitbox().RandomPoint(), Projectile.velocity * Main.rand.NextFloat(.1f, .2f), Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .7f), col, .1f, false);
-            ParticleRegistry.SpawnMistParticle(Projectile.RotHitbox().RandomPoint(), Projectile.velocity * .2f, Main.rand.NextFloat(0.45f, .9f), Color.ForestGreen, Color.DarkOliveGreen, Main.rand.NextFloat(100f, 140f));
+            ParticleRegistry.SpawnDustParticle(Projectile.RotHitbox().RandomPoint(),
+                Projectile.velocity * Main.rand.NextFloat(.1f, .2f), Main.rand.Next(20, 30),
+                Main.rand.NextFloat(.4f, .7f), col, .1f, false);
+            ParticleRegistry.SpawnMistParticle(Projectile.RotHitbox().RandomPoint(), Projectile.velocity * .2f,
+                Main.rand.NextFloat(0.45f, .9f), Color.ForestGreen, Color.DarkOliveGreen,
+                Main.rand.NextFloat(100f, 140f));
         }
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
-        after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [Color.LawnGreen, Color.Green, Color.Olive, Color.DarkOliveGreen]);
+        after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(),
+            [Color.LawnGreen, Color.Green, Color.Olive, Color.DarkOliveGreen]);
         Projectile.DrawBaseProjectile(lightColor);
         return false;
     }

@@ -8,7 +8,6 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
 using Utils = Terraria.Utils;
-using static CalamityMod.CalamityUtils;
 using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
@@ -20,16 +19,19 @@ public class HellsToothpickHeld : ModProjectile
         Charge,
         Stab
     }
+
     private State CurrentState
     {
-        get => (State)Projectile.ai[0];
-        set => Projectile.ai[0] = (float)value;
+        get => (State) Projectile.ai[0];
+        set => Projectile.ai[0] = (float) value;
     }
+
     public int Timer
     {
-        get => (int)Projectile.ai[1];
+        get => (int) Projectile.ai[1];
         set => Projectile.ai[1] = value;
     }
+
     public ref float Held => ref Projectile.ai[2];
 
     public Item Item => Owner.HeldItem;
@@ -66,11 +68,12 @@ public class HellsToothpickHeld : ModProjectile
                 BehaviorStab();
                 break;
         }
+
         Owner.itemRotation = (Projectile.direction * Projectile.velocity).ToRotation();
 
         float armPointingDirection = Owner.itemRotation;
         if (Owner.direction < 0)
-            armPointingDirection += (float)Math.PI;
+            armPointingDirection += (float) Math.PI;
         Owner.SetFrontHandBetter(0, armPointingDirection);
 
         Owner.heldProj = Projectile.whoAmI;
@@ -79,12 +82,15 @@ public class HellsToothpickHeld : ModProjectile
 
         Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver2;
         Vector2 pos = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.UnitY) * Item.height * .5f;
-        Lighting.AddLight(pos, Color.Lerp(Color.OrangeRed, Color.Red, (float)MathF.Sin(Main.GlobalTimeWrappedHourly * 2f)).ToVector3() * 1.2f);
+        Lighting.AddLight(pos,
+            Color.Lerp(Color.OrangeRed, Color.Red, (float) MathF.Sin(Main.GlobalTimeWrappedHourly * 2f)).ToVector3() *
+            1.2f);
 
         Timer++;
     }
 
-    public int WaitUntilMax = CalUtils.SecondsToFrames(5);
+    public int WaitUntilMax = SecondsToFrames(5);
+
     private void BehaviorCharge()
     {
         if (Held < WaitUntilMax)
@@ -104,8 +110,10 @@ public class HellsToothpickHeld : ModProjectile
                 Vector2 shootVelocity = (MathHelper.TwoPi * i / amount + offsetAngle).ToRotationVector2() * 2f;
                 ParticleRegistry.SpawnGlowParticle(pos, shootVelocity, 60, 40f, Color.OrangeRed);
             }
+
             Projectile.localAI[1] = 1f;
         }
+
         if (Held >= WaitUntilMax && Timer % 2f == 0f)
         {
             Vector2 vel = Vector2.UnitY.RotatedByRandom(.15) * -Main.rand.NextFloat(1f, 3f);
@@ -118,7 +126,8 @@ public class HellsToothpickHeld : ModProjectile
         {
             float aimInterpolant = Utils.GetLerpValue(5f, 25f, Owner.Distance(Owner.Additions().MouseWorld), true);
             Vector2 oldVelocity = Projectile.velocity;
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Owner.SafeDirectionTo(Owner.Additions().MouseWorld), aimInterpolant);
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Owner.SafeDirectionTo(Owner.Additions().MouseWorld),
+                aimInterpolant);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
@@ -145,14 +154,15 @@ public class HellsToothpickHeld : ModProjectile
         float progress = GetLerpBump(0f, .4f, 1f, .6f, Projectile.timeLeft / StabDuration);
 
         // Move the projectile from the min to the max and back, using SmoothStep for easing the movement
-        Projectile.Center = Owner.MountedCenter + Vector2.SmoothStep(Projectile.velocity * 30f, Projectile.velocity * 100f, progress);
+        Projectile.Center = Owner.MountedCenter +
+                            Vector2.SmoothStep(Projectile.velocity * 30f, Projectile.velocity * 100f, progress);
 
         // Fade out the projectile toward the end
         Projectile.Opacity = Projectile.scale = InverseLerp(0f, .2f, Projectile.timeLeft / StabDuration);
 
         if (Projectile.timeLeft > StabDuration && this.RunLocal())
         {
-            Projectile.timeLeft = (int)StabDuration;
+            Projectile.timeLeft = (int) StabDuration;
 
             float animationCompletion = Utils.GetLerpValue(0f, WaitUntilMax, Held, true);
             float value = Utils.Remap(Held, 0f, WaitUntilMax, 1f, 4f, true);
@@ -161,12 +171,12 @@ public class HellsToothpickHeld : ModProjectile
 
             Vector2 pos = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.UnitY) * Item.height * .68f;
             int type = ModContent.ProjectileType<HellFlame>();
-            int damage = (int)(Projectile.damage * value);
+            int damage = (int) (Projectile.damage * value);
             int flame = Projectile.NewProj(pos, vel, type, damage, Projectile.knockBack, Projectile.owner);
             if (Main.projectile[flame].whoAmI.WithinBounds(Main.maxProjectiles))
             {
                 Main.projectile[flame].ai[0] = animationCompletion;
-                Main.projectile[flame].penetrate = Held <= 60 ? 1 : (int)(Held / 60f);
+                Main.projectile[flame].penetrate = Held <= 60 ? 1 : (int) (Held / 60f);
             }
         }
     }
@@ -187,7 +197,8 @@ public class HellsToothpickHeld : ModProjectile
         Vector2 start = Projectile.Center;
         Vector2 end = start + Projectile.velocity * 6f;
         float useless = 0f;
-        return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), start, end, CollisionWidth, ref useless);
+        return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), start, end,
+            CollisionWidth, ref useless);
     }
 
     public override bool PreDraw(ref Color lightColor)
@@ -195,8 +206,11 @@ public class HellsToothpickHeld : ModProjectile
         Texture2D tex = Projectile.ThisProjectileTexture();
         Vector2 origin = tex.Size() * .5f;
         SpriteEffects fx = Projectile.direction.ToSpriteDirection();
-        Projectile.DrawProjectileBackglow(Color.Lerp(Color.OrangeRed, Color.Orange, Sin01(Main.GlobalTimeWrappedHourly)), Held / 80f, (byte)(90 * Projectile.Opacity), 8, fx);
-        Main.spriteBatch.DrawBetter(tex, Projectile.Center, null, lightColor, Projectile.rotation, origin, Projectile.scale, fx);
+        Projectile.DrawProjectileBackglow(
+            Color.Lerp(Color.OrangeRed, Color.Orange, Sin01(Main.GlobalTimeWrappedHourly)), Held / 80f,
+            (byte) (90 * Projectile.Opacity), 8, fx);
+        Main.spriteBatch.DrawBetter(tex, Projectile.Center, null, lightColor, Projectile.rotation, origin,
+            Projectile.scale, fx);
         return false;
     }
 }

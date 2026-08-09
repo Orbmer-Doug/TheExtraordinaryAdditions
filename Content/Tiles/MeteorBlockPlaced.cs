@@ -32,10 +32,11 @@ public class MeteorBlockPlaced : ModTile
         Color paintCol = WorldGen.paintColor(colType);
         if (colType >= 13 && colType <= 24)
         {
-            color.R = (byte)(paintCol.R / 255f * color.R);
-            color.G = (byte)(paintCol.G / 255f * color.G);
-            color.B = (byte)(paintCol.B / 255f * color.B);
+            color.R = (byte) (paintCol.R / 255f * color.R);
+            color.G = (byte) (paintCol.G / 255f * color.G);
+            color.B = (byte) (paintCol.B / 255f * color.B);
         }
+
         return color;
     }
 }

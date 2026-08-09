@@ -46,9 +46,11 @@ public class IceMistStaff : ModItem
         tooltips.ColorLocalization(new Color(76, 146, 237));
     }
 
-    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor,
+        Color itemColor, Vector2 origin, float scale)
     {
-        DrawInventoryCustomScale(spriteBatch, TextureAssets.Item[Type].Value, position, frame, drawColor, itemColor, origin, scale, 0.25f, new Vector2(0f, 0f));
+        DrawInventoryCustomScale(spriteBatch, TextureAssets.Item[Type].Value, position, frame, drawColor,
+            origin, scale, 0.25f, new Vector2(0f, 0f));
         return false;
     }
 

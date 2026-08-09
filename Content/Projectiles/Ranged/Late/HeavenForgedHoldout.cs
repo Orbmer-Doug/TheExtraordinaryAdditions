@@ -27,7 +27,9 @@ public class HeavenForgedHoldout : BaseIdleHoldoutProjectile, ILocalizedModType,
         Projectile.DamageType = DamageClass.Ranged;
     }
 
-    public Vector2 Tip => Projectile.Center + PolarVector(51f, Projectile.rotation) + PolarVector(4f * Dir * Owner.gravDir, Projectile.rotation - MathHelper.PiOver2);
+    public Vector2 Tip => Projectile.Center + PolarVector(51f, Projectile.rotation) +
+                          PolarVector(4f * Dir * Owner.gravDir, Projectile.rotation - MathHelper.PiOver2);
+
     public int Dir => Projectile.velocity.X.NonZeroSign();
 
     public override void SafeAI()
@@ -40,6 +42,7 @@ public class HeavenForgedHoldout : BaseIdleHoldoutProjectile, ILocalizedModType,
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
+
         Owner.ChangeDir((Projectile.velocity.X > 0f).ToDirectionInt());
         float anim = new Animators.PiecewiseCurve()
             .Add(0f, -1.1f, .3f, Animators.MakePoly(9f).OutFunction)
@@ -49,21 +52,24 @@ public class HeavenForgedHoldout : BaseIdleHoldoutProjectile, ILocalizedModType,
         Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, Projectile.rotation);
         Owner.SetBackHandBetter(Player.CompositeArmStretchAmount.Full, Projectile.rotation);
 
-        Projectile.Center = Center + PolarVector(35f - Recoil, Projectile.rotation) + PolarVector(10f * Dir * Owner.gravDir, Projectile.rotation - MathHelper.PiOver2);
+        Projectile.Center = Center + PolarVector(35f - Recoil, Projectile.rotation) +
+                            PolarVector(10f * Dir * Owner.gravDir, Projectile.rotation - MathHelper.PiOver2);
 
-        if ((this.RunLocal() && Modded.SafeMouseLeft.Current) && Wait <= 0f && TryUseAmmo(out _, out _, out _, out _, out _))
+        if ((this.RunLocal() && Modded.SafeMouseLeft.Current) && Wait <= 0f &&
+            TryUseAmmo(out _, out _, out _, out _, out _))
         {
             SoundID.Zombie103.Play(Tip, 1f, -.2f, .1f);
             Vector2 vel = Projectile.velocity.SafeNormalize(Vector2.Zero);
 
             for (int i = 0; i < 10; i++)
-                ParticleRegistry.SpawnGlowParticle(Tip, vel.RotatedByRandom(.4f) * Main.rand.NextFloat(2f, 5f), 12, Main.rand.NextFloat(50f, 80f), Color.Cyan, 1.3f);
+                ParticleRegistry.SpawnGlowParticle(Tip, vel.RotatedByRandom(.4f) * Main.rand.NextFloat(2f, 5f), 12,
+                    Main.rand.NextFloat(50f, 80f), Color.Cyan, 1.3f);
             for (int i = 0; i < 50; i++)
             {
                 float comp = InverseLerp(0f, 50f, i);
                 float lerp = Convert01To010(comp);
 
-                int life = (int)(Main.rand.Next(30, 40) * lerp);
+                int life = (int) (Main.rand.Next(30, 40) * lerp);
                 float scale = MathHelper.Lerp(.8f, 1.8f, lerp);
                 Color col = Color.DeepSkyBlue.Lerp(Color.Cyan, Main.rand.NextFloat());
 
@@ -75,13 +81,15 @@ public class HeavenForgedHoldout : BaseIdleHoldoutProjectile, ILocalizedModType,
                 velocity *= Main.rand.NextFloat(.9f, 1.1f);
 
                 ParticleRegistry.SpawnSquishyLightParticle(Tip, velocity, life, scale, col, 1f, .9f, 3.3f);
-                ParticleRegistry.SpawnBloomPixelParticle(Tip, velocity * 1.4f, life, scale * .6f, col, Color.DarkCyan, null, 1.8f);
+                ParticleRegistry.SpawnBloomPixelParticle(Tip, velocity * 1.4f, life, scale * .6f, col, Color.DarkCyan,
+                    null, 1.8f);
             }
 
             ScreenShakeSystem.New(new(.22f, .21f), Tip);
 
             if (this.RunLocal())
-                Projectile.NewProj(Tip, vel * 15f, ModContent.ProjectileType<LuminiteRocket>(), Projectile.damage, Projectile.knockBack, Owner.whoAmI);
+                Projectile.NewProj(Tip, vel * 15f, ModContent.ProjectileType<LuminiteRocket>(), Projectile.damage,
+                    Projectile.knockBack, Owner.whoAmI);
             Recoil = 20f;
             Wait = WaitTime;
             this.Sync();
@@ -100,7 +108,8 @@ public class HeavenForgedHoldout : BaseIdleHoldoutProjectile, ILocalizedModType,
         float rotation = Projectile.rotation;
         Vector2 drawPosition = Projectile.Center - Main.screenPosition;
         Vector2 origin = texture.Size() * .5f;
-        Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), rotation, origin, Projectile.scale, FixedDirection(), 0f);
+        Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), rotation, origin,
+            Projectile.scale, FixedDirection(), 0f);
         return false;
     }
 }

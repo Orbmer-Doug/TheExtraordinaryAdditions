@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.IO;
-using CalamityMod;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -20,6 +19,7 @@ public class BirchStickLance : ModProjectile
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BirchStick);
 
     public const int MaxUpdates = 3;
+
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.TrailingMode[Type] = 2;
@@ -40,42 +40,49 @@ public class BirchStickLance : ModProjectile
         Projectile.tileCollide = false;
         Projectile.scale = 1f;
         Projectile.ownerHitCheck = true;
-        Projectile.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
+        Projectile.DamageType = ModContent.GetInstance<MeleeNoSpeedDamageClass>();
         Projectile.noEnchantmentVisuals = true;
     }
 
     public Player Owner => Main.player[Projectile.owner];
     public GlobalPlayer Modded => Owner.Additions();
     public float AngularVelocity => MathF.Abs(Projectile.rotation - OldRot);
+
     public enum BirchStickState
     {
         BashUp,
         BashDown,
         Poke
     }
+
     public BirchStickState State
     {
-        get => (BirchStickState)Projectile.ai[0];
-        set => Projectile.ai[0] = (float)value;
+        get => (BirchStickState) Projectile.ai[0];
+        set => Projectile.ai[0] = (float) value;
     }
+
     public ref float Time => ref Projectile.ai[1];
     public ref float TimeStop => ref Projectile.ai[2];
     public ref float Counter => ref Projectile.AdditionsInfo().ExtraAI[0];
+
     public bool StruckTile
     {
         get => Projectile.AdditionsInfo().ExtraAI[1] == 1f;
         set => Projectile.AdditionsInfo().ExtraAI[1] = value.ToInt();
     }
+
     public bool Stabbing
     {
         get => Projectile.AdditionsInfo().ExtraAI[2] == 1f;
         set => Projectile.AdditionsInfo().ExtraAI[2] = value.ToInt();
     }
+
     public bool Initialized
     {
         get => Projectile.AdditionsInfo().ExtraAI[3] == 1f;
         set => Projectile.AdditionsInfo().ExtraAI[3] = value.ToInt();
     }
+
     public bool PlayedSound
     {
         get => Projectile.AdditionsInfo().ExtraAI[4] == 1f;
@@ -90,8 +97,12 @@ public class BirchStickLance : ModProjectile
     public ref float OldRot => ref Projectile.AdditionsInfo().ExtraAI[7];
 
     public Vector2 Center => Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
-    public Vector2 SwordDir => (Projectile.rotation - MathHelper.PiOver4 + MathHelper.PiOver2).ToRotationVector2() * (State != BirchStickState.BashUp).ToDirectionInt() * Direction;
+
+    public Vector2 SwordDir => (Projectile.rotation - MathHelper.PiOver4 + MathHelper.PiOver2).ToRotationVector2() *
+                               (State != BirchStickState.BashUp).ToDirectionInt() * Direction;
+
     public override bool ShouldUpdatePosition() => false;
+
     public override void AI()
     {
         if (!Initialized)
@@ -107,6 +118,7 @@ public class BirchStickLance : ModProjectile
             Initialized = true;
             this.Sync();
         }
+
         if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, (c) => Center.ToNumerics(), 20);
 
@@ -120,7 +132,8 @@ public class BirchStickLance : ModProjectile
 
         Projectile.Center = State switch
         {
-            BirchStickState.Poke => Owner.MountedCenter + Offset.RotatedBy(Projectile.rotation + MathHelper.PiOver4) * Projectile.scale,
+            BirchStickState.Poke => Owner.MountedCenter +
+                                    Offset.RotatedBy(Projectile.rotation + MathHelper.PiOver4) * Projectile.scale,
             _ => Owner.GetFrontHandPositionImproved() + Offset,
         };
 
@@ -169,11 +182,11 @@ public class BirchStickLance : ModProjectile
 
         if (TimeStop > 0f)
             TimeStop--;
-        
+
         TotalTime++;
     }
 
-    public float SwingTime => CalUtils.SecondsToFrames(1.2f) / (int)Owner.GetTotalAttackSpeed(Projectile.DamageType);
+    public float SwingTime => SecondsToFrames(1.2f) / (int) Owner.GetTotalAttackSpeed(Projectile.DamageType);
     public float SwingCompletion => InverseLerp(0f, SwingTime, Time);
     public int Direction => Projectile.velocity.X.NonZeroSign();
     public const float ReelPercent = .3f;
@@ -192,7 +205,8 @@ public class BirchStickLance : ModProjectile
     {
         if (SwingCompletion > ReelPercent && !PlayedSound)
         {
-            SoundEngine.PlaySound(SoundID.Item1 with { PitchVariance = .3f, Volume = Main.rand.NextFloat(.9f, 1.3f) }, Projectile.Center);
+            SoundEngine.PlaySound(SoundID.Item1 with { PitchVariance = .3f, Volume = Main.rand.NextFloat(.9f, 1.3f) },
+                Projectile.Center);
             PlayedSound = true;
             this.Sync();
         }
@@ -217,6 +231,7 @@ public class BirchStickLance : ModProjectile
             Stabbing = true;
             this.Sync();
         }
+
         if ((this.RunLocal() && Modded.MouseRight.Current) && !Stabbing)
         {
             float completion = Circ.InFunction(InverseLerp(0f, 50f, Time));
@@ -250,6 +265,7 @@ public class BirchStickLance : ModProjectile
 
                 StruckTile = true;
             }
+
             if (Projectile.numHits > 0)
                 StruckTile = true;
 
@@ -267,7 +283,8 @@ public class BirchStickLance : ModProjectile
         Projectile.timeLeft = 2;
         Owner.itemTime = Owner.itemAnimation = 2;
         Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver4;
-        Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, Projectile.velocity.ToRotation() + (.5f * Projectile.direction));
+        Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full,
+            Projectile.velocity.ToRotation() + (.5f * Projectile.direction));
         Time++;
     }
 
@@ -294,7 +311,8 @@ public class BirchStickLance : ModProjectile
         float width = 6f * scale;
         float y = a.Distance(b) * scale;
 
-        return new RotatedRectangle(Vector2.Lerp(a, b, .5f) - Vector2.UnitY * y / 2, new(width, y), Projectile.rotation + MathHelper.PiOver4);
+        return new RotatedRectangle(Vector2.Lerp(a, b, .5f) - Vector2.UnitY * y / 2, new(width, y),
+            Projectile.rotation + MathHelper.PiOver4);
     }
 
     public override bool? CanHitNPC(NPC target)
@@ -316,9 +334,13 @@ public class BirchStickLance : ModProjectile
             RotatedRectangle rect = GetRect();
             bool metal = !target.IsFleshy();
 
-            HitEffects(metal, CheckLinearCollision(GetRect().Bottom, GetRect().Top, target.Hitbox, out Vector2 start, out _) ? start : target.Center);
+            HitEffects(metal,
+                CheckLinearCollision(GetRect().Bottom, GetRect().Top, target.Hitbox, out Vector2 start, out _)
+                    ? start
+                    : target.Center);
 
-            target.velocity += GetRect().Bottom.SafeDirectionTo(GetRect().Top) * Projectile.knockBack * target.knockBackResist;
+            target.velocity += GetRect().Bottom.SafeDirectionTo(GetRect().Top) * Projectile.knockBack *
+                               target.knockBackResist;
         }
         else
         {
@@ -344,16 +366,23 @@ public class BirchStickLance : ModProjectile
         for (int i = 0; i < 12; i++)
         {
             float scale = Main.rand.NextFloat(.4f, 1f);
-            Dust.NewDustPerfect(point, DustID.WoodFurniture, SwordDir.RotatedByRandom(.24f) * Main.rand.NextFloat(2f, 5f), 0, default, scale);
+            Dust.NewDustPerfect(point, DustID.WoodFurniture,
+                SwordDir.RotatedByRandom(.24f) * Main.rand.NextFloat(2f, 5f), 0, default, scale);
         }
 
         TimeStop = StopTime;
         this.Sync();
         ScreenShakeSystem.New(new(.1f, .2f), point);
-        SoundEngine.PlaySound(SoundID.Dig with { PitchVariance = .3f, Volume = Main.rand.NextFloat(.9f, 1.2f), MaxInstances = 30, Pitch = metal ? .12f : -.1f }, point);
+        SoundEngine.PlaySound(
+            SoundID.Dig with
+            {
+                PitchVariance = .3f, Volume = Main.rand.NextFloat(.9f, 1.2f), MaxInstances = 30,
+                Pitch = metal ? .12f : -.1f
+            }, point);
     }
 
     public Vector2 Offset;
+
     public override void SendExtraAI(BinaryWriter writer)
     {
         writer.WriteVector2(Offset);
@@ -369,13 +398,21 @@ public class BirchStickLance : ModProjectile
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
         float _ = 0f;
-        return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), GetRect().Top, GetRect().Bottom, GetRect().Width, ref _);
+        return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), GetRect().Top,
+            GetRect().Bottom, GetRect().Width, ref _);
     }
 
-    private Color ColorFunct(SystemVector2 c, Vector2 position) => Color.SaddleBrown * MathHelper.SmoothStep(1f, 0f, c.X) * InverseLerp(0.026f, 0.1f, AngularVelocity) * InverseLerp(0, 255, Lighting.GetColor(Projectile.Center.ToTileCoordinates()).R);
+    private Color ColorFunct(SystemVector2 c, Vector2 position) => Color.SaddleBrown *
+                                                                   MathHelper.SmoothStep(1f, 0f, c.X) *
+                                                                   InverseLerp(0.026f, 0.1f, AngularVelocity) *
+                                                                   InverseLerp(0, 255,
+                                                                       Lighting.GetColor(Projectile.Center
+                                                                           .ToTileCoordinates()).R);
+
     private float WidthFunct(float c) => Projectile.width;
     public OptimizedPrimitiveTrail trail;
     private TrailPoints cache;
+
     public override bool PreDraw(ref Color lightColor)
     {
         if (State != BirchStickState.Poke && trail != null && cache != null)
@@ -385,7 +422,8 @@ public class BirchStickLance : ModProjectile
 
         Texture2D tex = Projectile.ThisProjectileTexture();
         Vector2 orig = tex.Size() / 2;
-        Main.spriteBatch.DrawBetter(tex, Projectile.Center, null, lightColor * Projectile.Opacity, Projectile.rotation, orig, Projectile.scale, 0);
+        Main.spriteBatch.DrawBetter(tex, Projectile.Center, null, lightColor * Projectile.Opacity, Projectile.rotation,
+            orig, Projectile.scale, 0);
         return false;
     }
 }

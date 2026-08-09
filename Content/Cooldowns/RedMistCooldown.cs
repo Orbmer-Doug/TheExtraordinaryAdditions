@@ -1,4 +1,4 @@
-﻿using CalamityMod.Cooldowns;
+﻿/*
 using Terraria;
 using Terraria.Localization;
 using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
@@ -14,10 +14,15 @@ public class RedMistCooldown : CooldownHandler
     public override Color OutlineColor => new(17, 17, 17);
     public override Color CooldownStartColor => new(104, 4, 3);
     public override Color CooldownEndColor => new(254, 38, 36);
+
     public override void Tick()
     {
         Vector2 pos = instance.player.Center + new Vector2(-4f * instance.player.direction, -20f);
-        ParticleRegistry.SpawnBloomPixelParticle(pos + Main.rand.NextVector2Circular(60f, 60f), Main.rand.NextVector2CircularEdge(2f, 2f),
+        ParticleRegistry.SpawnBloomPixelParticle(pos + Main.rand.NextVector2Circular(60f, 60f),
+            Main.rand.NextVector2CircularEdge(2f, 2f),
             30, Main.rand.NextFloat(.4f, .5f) * instance.Completion, Color.DarkRed, Color.Crimson, pos, 1f, 5);
     }
 }
+*/
+
+

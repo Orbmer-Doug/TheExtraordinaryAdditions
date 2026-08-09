@@ -32,7 +32,7 @@ public class SmartPistolMK6 : ModItem, ILocalizedModType, IModType
         Item.crit = 0;
         Item.noUseGraphic = true;
     }
-    
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(Color.OrangeRed);

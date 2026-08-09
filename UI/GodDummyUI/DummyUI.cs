@@ -13,9 +13,12 @@ using TheExtraordinaryAdditions.Core.Utilities;
 using static TheExtraordinaryAdditions.UI.GodDummyUI.DummyUI;
 
 namespace TheExtraordinaryAdditions.UI.GodDummyUI;
+
 public class DummyUI : SmartUIState
 {
-    public override int InsertionIndex(List<GameInterfaceLayer> layers) => layers.FindIndex(layer => layer.Name == "Vanilla: Mouse Text");
+    public override int InsertionIndex(List<GameInterfaceLayer> layers) =>
+        layers.FindIndex(layer => layer.Name == "Vanilla: Mouse Text");
+
     public override InterfaceScaleType Scale => InterfaceScaleType.None;
     public static bool visible;
     public override bool Visible => visible;
@@ -42,9 +45,13 @@ public class DummyUI : SmartUIState
         Info,
         Reset,
     }
-    public SmartUIElement[] Buttons = [new DummyButton(ButtonType.Life), new DummyButton(ButtonType.Defense),
+
+    public SmartUIElement[] Buttons =
+    [
+        new DummyButton(ButtonType.Life), new DummyButton(ButtonType.Defense),
         new DummyButton(ButtonType.Scale), new DummyButton(ButtonType.Rotation),
-        new DummyButton(ButtonType.Gravity), new DummyButton(ButtonType.Info), new DummyButton(ButtonType.Reset)];
+        new DummyButton(ButtonType.Gravity), new DummyButton(ButtonType.Info), new DummyButton(ButtonType.Reset)
+    ];
 
     private bool BeingDragged;
     public const int ButtonSize = 32;
@@ -85,6 +92,7 @@ public class DummyUI : SmartUIState
 
             AddElement(button, pos, 32, 32);
         }
+
         Height = new(BGTex.Size().Y, 0f);
         Width = new(BGTex.Size().X, 0f);
     }
@@ -127,6 +135,7 @@ public class DummyUI : SmartUIState
                         pos = new(ButtonSize * 4, ButtonSize * 3);
                         break;
                 }
+
                 Point position = pos;
                 element.Left.Set(position.X, 0f);
                 element.Top.Set(position.Y, 0f);
@@ -145,10 +154,18 @@ public class DummyUI : SmartUIState
         const float textX = -5f;
         const float textY = -70f;
         const float textSpace = 25f;
-        ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.MouseText.Value, $"{GetTextValue("UI.DummyLife")} {MaxLife}", Position + new Vector2(textX, textY), Color.Orange, Color.Black, 0f, Vector2.Zero, backgroundScale * .75f);
-        ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.MouseText.Value, $"{GetTextValue("UI.DummyDefense")} {Defense}", Position + new Vector2(textX, textY + textSpace), Color.Orange, Color.Black, 0f, Vector2.Zero, backgroundScale * .75f);
-        ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.MouseText.Value, $"{GetTextValue("UI.DummyScale")} {Size}", Position + new Vector2(textX, textY + textSpace * 2), Color.Orange, Color.Black, 0f, Vector2.Zero, backgroundScale * .75f);
-        ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.MouseText.Value, $"{GetTextValue("UI.DummyGravity")} {!Gravity}", Position + new Vector2(textX, textY + textSpace * 3), Color.Orange, Color.Black, 0f, Vector2.Zero, backgroundScale * .75f);
+        ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.MouseText.Value,
+            $"{GetTextValue("UI.DummyLife")} {MaxLife}", Position + new Vector2(textX, textY), Color.Orange,
+            Color.Black, 0f, Vector2.Zero, backgroundScale * .75f);
+        ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.MouseText.Value,
+            $"{GetTextValue("UI.DummyDefense")} {Defense}", Position + new Vector2(textX, textY + textSpace),
+            Color.Orange, Color.Black, 0f, Vector2.Zero, backgroundScale * .75f);
+        ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.MouseText.Value,
+            $"{GetTextValue("UI.DummyScale")} {Size}", Position + new Vector2(textX, textY + textSpace * 2),
+            Color.Orange, Color.Black, 0f, Vector2.Zero, backgroundScale * .75f);
+        ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.MouseText.Value,
+            $"{GetTextValue("UI.DummyGravity")} {!Gravity}", Position + new Vector2(textX, textY + textSpace * 3),
+            Color.Orange, Color.Black, 0f, Vector2.Zero, backgroundScale * .75f);
         base.Draw(spriteBatch);
     }
 
@@ -309,6 +326,7 @@ public class DummyButton(ButtonType type) : SmartUIElement
             {
                 Main.instance.MouseText(GetTextValue("UI.DummyInfo"), 0, 0, -1, -1, -1, -1, 0);
             }
+
             Main.LocalPlayer.mouseInterface = true;
         }
     }
@@ -316,11 +334,12 @@ public class DummyButton(ButtonType type) : SmartUIElement
     public override void Draw(SpriteBatch spriteBatch)
     {
         Color col = Color.White;
-        Rectangle frame = ButtonTextures.Frame(7, 1, (int)Type);
+        Rectangle frame = ButtonTextures.Frame(7, 1, (int) Type);
         if (IsMouseHovering && Type != ButtonType.Info)
         {
             col = Color.Tan;
         }
+
         col = col.Lerp(Color.Red, 1f - InverseLerp(-1f, 0f, Interpolant)).Lerp(Color.Green, Interpolant);
 
         float rot = 0f;

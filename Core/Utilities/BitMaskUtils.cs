@@ -105,7 +105,7 @@ public class BitmaskUtils
 
         if (overrideIndex)
         {
-            int randomIndex = Main.rand.Next((int)maxCount);
+            int randomIndex = Main.rand.Next((int) maxCount);
             presenceMask[randomIndex / BitsPerMask] |= 1ul << randomIndex % BitsPerMask;
             return randomIndex;
         }

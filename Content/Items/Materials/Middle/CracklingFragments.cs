@@ -19,9 +19,11 @@ public class CracklingFragments : ModItem
         ItemID.Sets.AnimatesAsSoul[Type] = true;
     }
 
-    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor,
+        Color itemColor, Vector2 origin, float scale)
     {
-        DrawInventoryCustomScale(spriteBatch, TextureAssets.Item[Type].Value, position, frame, drawColor, itemColor, origin, scale, 1f, new Vector2(0f, 0f));
+        DrawInventoryCustomScale(spriteBatch, TextureAssets.Item[Type].Value, position, frame, drawColor,
+            origin, scale, 1f, new Vector2(0f, 0f));
         return false;
     }
 

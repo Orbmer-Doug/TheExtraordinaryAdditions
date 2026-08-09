@@ -1,7 +1,4 @@
-﻿using CalamityMod.Items.Materials;
-using CalamityMod.Tiles.Furniture.CraftingStations;
-using System.Collections.Generic;
-using CalamityMod;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -49,7 +46,7 @@ public class FinalStrike : ModItem
     {
         if (FindProjectile(out Projectile spear, Item.shoot, player.whoAmI))
         {
-            if ((int)spear.ai[0] == (int)FinalStrikeHoldout.FinalStrikeState.Aim)
+            if ((int) spear.ai[0] == (int) FinalStrikeHoldout.FinalStrikeState.Aim)
                 return false;
         }
 
@@ -88,9 +85,7 @@ public class FinalStrike : ModItem
         recipe.AddIngredient(ItemID.DayBreak);
         recipe.AddIngredient(ModContent.ItemType<AbyssalCurrents>());
         recipe.AddIngredient(ModContent.ItemType<CondereFulmina>());
-        recipe.AddIngredient(ModContent.ItemType<AscendantSpiritEssence>(), 10);
-        recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 7);
-        recipe.AddTile(ModContent.TileType<CosmicAnvil>());
+        //TODO
         recipe.Register();
     }
 }

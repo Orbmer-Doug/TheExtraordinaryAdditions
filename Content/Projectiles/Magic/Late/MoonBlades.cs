@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
-using CalamityMod.Graphics.Primitives;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.DataStructures;
@@ -33,7 +32,7 @@ public class MoonBlades : BaseHoldoutProjectile
 
     public int OpacTime
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
 
@@ -44,7 +43,7 @@ public class MoonBlades : BaseHoldoutProjectile
 
     public int AimTime
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[0];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[0];
         set => Projectile.AdditionsInfo().ExtraAI[0] = value;
     }
 
@@ -52,7 +51,7 @@ public class MoonBlades : BaseHoldoutProjectile
 
     public int ShootTime
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[1];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[1];
         set => Projectile.AdditionsInfo().ExtraAI[1] = value;
     }
 
@@ -60,7 +59,7 @@ public class MoonBlades : BaseHoldoutProjectile
 
     public bool Swap
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[2] == 1;
+        get => (int) Projectile.AdditionsInfo().ExtraAI[2] == 1;
         set => Projectile.AdditionsInfo().ExtraAI[2] = value.ToInt();
     }
 
@@ -74,12 +73,12 @@ public class MoonBlades : BaseHoldoutProjectile
     public override void SafeAI()
     {
         Projectile.Opacity = InverseLerp(0f, MaxOpacTime, OpacTime);
-        
+
         NPC closest = NPCTargeting.GetClosestNPC(new(Mouse, 4000, false, false));
-        
+
         if (OpacTime < MaxOpacTime)
             OpacTime++;
-        
+
         if (this.RunLocal() && Modded.SafeMouseLeft.Current && closest.CanHomeInto())
         {
             if (AimTime < MaxAimTime)
@@ -123,16 +122,17 @@ public class MoonBlades : BaseHoldoutProjectile
 
         Projectile.Center = Owner.Center;
         Projectile.velocity = Projectile.Center.SafeDirectionTo(Mouse);
-        
+
         float interpol = Animators.MakePoly(4f).OutFunction(InverseLerp(0f, MaxAimTime, AimTime));
         float target = PiOver2.AngleLerp(Projectile.velocity.ToRotation(), interpol);
         BackRot = BackRot.AngleLerp(target, .14f);
         FrontRot = FrontRot.AngleLerp(target, .14f);
-        Owner.ChangeDir(closest == null ? Projectile.velocity.X.NonZeroSign() : BackRot.ToRotationVector2().X.NonZeroSign());
+        Owner.ChangeDir(closest == null
+            ? Projectile.velocity.X.NonZeroSign()
+            : BackRot.ToRotationVector2().X.NonZeroSign());
 
         Owner.SetBackHandBetter(Player.CompositeArmStretchAmount.Full, BackRot);
         Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, FrontRot);
-
     }
 
     public override bool ShouldDie()
@@ -218,13 +218,13 @@ public class MoonPortal : ModProjectile
 
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
 
     public Vector2 Target
     {
-        get => new Vector2((int)Projectile.ai[1], (int)Projectile.ai[2]);
+        get => new Vector2((int) Projectile.ai[1], (int) Projectile.ai[2]);
         set
         {
             Projectile.ai[1] = value.X;
@@ -285,7 +285,7 @@ public class MoonPortal : ModProjectile
         {
             if (Projectile is { active: true, timeLeft: > 0 })
                 MoonPortalDrawSystem.RegisterPortal(this);
-            
+
             Position = new Vector3(Target, 0f) + RandomInSphere(800f, .5f, 1f);
 
             AdditionsSound.MachinaBlast.Play(new Vector2(Position.X, Position.Y), .4f, 0f, .2f, 50);
@@ -301,7 +301,7 @@ public class MoonPortal : ModProjectile
             for (int i = 0; i < 20; i++)
             {
                 float rand = Main.rand.NextFloat();
-                int life = (int)Lerp(20, 50, rand);
+                int life = (int) Lerp(20, 50, rand);
                 float speed = Lerp(20f, 4f, rand);
                 Vector2 vel = Main.rand.NextVector2Circular(speed, speed);
                 Color col = Color.Lerp(StripColor, OuterColor, Main.rand.NextFloat());
@@ -417,13 +417,13 @@ public class MoonPortal : ModProjectile
     private static Vector3 RandomInSphere(float radius, float minPercent, float maxPercent)
     {
         float theta = RandomRotation();
-        float phi = (float)Math.Acos(2.0 * Main.rand.NextDouble() - 1.0);
+        float phi = (float) Math.Acos(2.0 * Main.rand.NextDouble() - 1.0);
 
-        float x = (float)(Math.Sin(phi) * Math.Cos(theta));
-        float y = (float)(Math.Sin(phi) * Math.Sin(theta));
-        float z = (float)Math.Cos(phi);
+        float x = (float) (Math.Sin(phi) * Math.Cos(theta));
+        float y = (float) (Math.Sin(phi) * Math.Sin(theta));
+        float z = (float) Math.Cos(phi);
 
-        float t = (float)Math.Pow(Main.rand.NextDouble(), 1.0 / 3.0);
+        float t = (float) Math.Pow(Main.rand.NextDouble(), 1.0 / 3.0);
         float r = radius * Lerp(minPercent, maxPercent, t);
 
         return new Vector3(x, y, z) * r;
@@ -460,12 +460,12 @@ public class MoonPortal : ModProjectile
 
         for (int i = 0; i <= heightSegments; i++)
         {
-            float v = (float)i / heightSegments;
+            float v = (float) i / heightSegments;
             float y = v * length;
 
             for (int j = 0; j <= widthSegments; j++)
             {
-                float u = (float)j / widthSegments;
+                float u = (float) j / widthSegments;
                 float angle = u * TwoPi;
 
                 float x = MathF.Cos(angle) * radius;
@@ -499,14 +499,14 @@ public class MoonPortal : ModProjectile
                 int topRight = topLeft + 1;
 
                 // First triangle
-                indices[idx++] = (short)bottomLeft;
-                indices[idx++] = (short)topLeft;
-                indices[idx++] = (short)bottomRight;
+                indices[idx++] = (short) bottomLeft;
+                indices[idx++] = (short) topLeft;
+                indices[idx++] = (short) bottomRight;
 
                 // Second triangle
-                indices[idx++] = (short)bottomRight;
-                indices[idx++] = (short)topLeft;
-                indices[idx++] = (short)topRight;
+                indices[idx++] = (short) bottomRight;
+                indices[idx++] = (short) topLeft;
+                indices[idx++] = (short) topRight;
             }
         }
 

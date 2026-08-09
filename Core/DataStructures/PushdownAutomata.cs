@@ -119,9 +119,9 @@ public class PushdownAutomata<TStateWrapper, TStateIdentifier>
         // Find the first valid transition
         foreach (TransitionInfo t in potentialStates)
         {
-            if (!t.TransitionCondition()) 
+            if (!t.TransitionCondition())
                 continue;
-            
+
             transition = t;
             break;
         }
@@ -146,9 +146,9 @@ public class PushdownAutomata<TStateWrapper, TStateIdentifier>
         foreach (TransitionHijack hijack in HijackActions)
         {
             TStateIdentifier? hijackedState = hijack.SelectionHijackFunction(newState);
-            if (Equals(hijackedState, newState)) 
+            if (Equals(hijackedState, newState))
                 continue;
-            
+
             newState = hijackedState;
             hijack.HijackAction?.Invoke(newState);
             break;
@@ -182,9 +182,9 @@ public class PushdownAutomata<TStateWrapper, TStateIdentifier>
 
             for (int i = 0; i < potentialStates.Count; i++)
             {
-                if (!potentialStates[i].TransitionCondition()) 
+                if (!potentialStates[i].TransitionCondition())
                     continue;
-                
+
                 transition = potentialStates[i];
                 break;
             }
@@ -309,11 +309,11 @@ public class AutoloadAsBehavior<TStateWrapper, TStateIdentifier>(TStateIdentifie
             MethodInfo method = methods[i];
             object[] attributes =
                 method.GetCustomAttributes(typeof(AutoloadAsBehavior<TStateWrapper, TStateIdentifier>), false);
-            if (attributes.Length <= 0) 
+            if (attributes.Length <= 0)
                 continue;
-            
+
             AutoloadAsBehavior<TStateWrapper, TStateIdentifier> autoloadAttribute =
-                (AutoloadAsBehavior<TStateWrapper, TStateIdentifier>)attributes[0];
+                (AutoloadAsBehavior<TStateWrapper, TStateIdentifier>) attributes[0];
             stateMachine.RegisterStateBehavior(autoloadAttribute.AssociatedState,
                 () => method.Invoke(instance, null));
         }
@@ -458,9 +458,9 @@ public class RandomPushdownAutomata<TStateWrapper, TStateIdentifier>
         {
             TransitionHijack hijack = HijackActions[i];
             TStateIdentifier? hijackedState = hijack.SelectionHijackFunction(newStateId);
-            if (Equals(hijackedState, newStateId)) 
+            if (Equals(hijackedState, newStateId))
                 continue;
-            
+
             newStateId = hijackedState;
             hijack.HijackAction?.Invoke(newStateId);
             break;
@@ -524,9 +524,9 @@ public class RandomPushdownAutomata<TStateWrapper, TStateIdentifier>
             {
                 TransitionHijack hijack = HijackActions[i];
                 TStateIdentifier? hijackedState = hijack.SelectionHijackFunction(newStateId);
-                if (Equals(hijackedState, newStateId)) 
+                if (Equals(hijackedState, newStateId))
                     continue;
-                
+
                 newStateId = hijackedState;
                 hijack.HijackAction?.Invoke(newStateId);
                 break;

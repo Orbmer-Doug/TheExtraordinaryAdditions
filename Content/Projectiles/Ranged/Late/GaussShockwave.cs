@@ -11,8 +11,9 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
 public class GaussShockwave : ModProjectile
 {
-    public static readonly float Lifetime = CalUtils.SecondsToFrames(.5f);
+    public static readonly float Lifetime = SecondsToFrames(.5f);
     public ref float Radius => ref Projectile.ai[1];
+
     public static Color DetermineExplosionColor()
     {
         Color c = Color.Lerp(Color.GreenYellow, Color.Yellow * 1.8f, 0.24f);
@@ -21,17 +22,19 @@ public class GaussShockwave : ModProjectile
     }
 
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.DrawScreenCheckFluff[Projectile.type] = 2200;
     }
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 72;
         Projectile.penetrate = -1;
         Projectile.tileCollide = false;
         Projectile.ignoreWater = true;
-        Projectile.timeLeft = (int)Lifetime;
+        Projectile.timeLeft = (int) Lifetime;
         Projectile.scale = 0.001f;
 
         Projectile.hostile = false;
@@ -52,15 +55,17 @@ public class GaussShockwave : ModProjectile
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return CalUtils.CircularHitboxCollision(Projectile.Center, Radius * 0.5f, targetHitbox);
+        return CircularHitboxCollision(Projectile.Center, Radius * 0.5f, targetHitbox);
     }
 
     public override bool PreDraw(ref Color lightColor)
     {
         Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearWrap, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearWrap,
+            DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
         Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.FlameMap2);
-        DrawData explosionDrawData = new(tex, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), Color.White * Projectile.Opacity);
+        DrawData explosionDrawData = new(tex, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight),
+            Color.White * Projectile.Opacity);
 
         ManagedShader shockwaveShader = ShaderRegistry.LightShockwave;
         shockwaveShader.TrySetParameter("mainColor", DetermineExplosionColor().ToVector3());

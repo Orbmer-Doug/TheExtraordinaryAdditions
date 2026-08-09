@@ -26,20 +26,22 @@ public class CyberneticSword : ProjOwnedByNPC<Asterlin>
     #region Variables
 
     public Texture2D Tex => Projectile.ThisProjectileTexture();
+
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
+
     public int OverallTime
     {
-        get => (int)Projectile.ai[1];
+        get => (int) Projectile.ai[1];
         set => Projectile.ai[1] = value;
     }
 
     public bool PlayedSound
     {
-        get => (int)Projectile.ai[2] == 1;
+        get => (int) Projectile.ai[2] == 1;
         set => Projectile.ai[2] = value.ToInt();
     }
 
@@ -48,7 +50,7 @@ public class CyberneticSword : ProjOwnedByNPC<Asterlin>
 
     public bool Initialized
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[2] == 1;
+        get => (int) Projectile.AdditionsInfo().ExtraAI[2] == 1;
         set => Projectile.AdditionsInfo().ExtraAI[2] = value.ToInt();
     }
 
@@ -56,16 +58,16 @@ public class CyberneticSword : ProjOwnedByNPC<Asterlin>
 
     public SwingDirection SwingDir
     {
-        get => (SwingDirection)Projectile.AdditionsInfo().ExtraAI[4];
-        set => Projectile.AdditionsInfo().ExtraAI[4] = (int)value;
+        get => (SwingDirection) Projectile.AdditionsInfo().ExtraAI[4];
+        set => Projectile.AdditionsInfo().ExtraAI[4] = (int) value;
     }
 
     public float[] OldRotations = new float[5];
 
     public SpriteEffects Effects
     {
-        get => (SpriteEffects)Projectile.spriteDirection;
-        set => Projectile.spriteDirection = (int)value;
+        get => (SpriteEffects) Projectile.spriteDirection;
+        set => Projectile.spriteDirection = (int) value;
     }
 
     public int Direction
@@ -116,9 +118,9 @@ public class CyberneticSword : ProjOwnedByNPC<Asterlin>
 
     public override void SendAI(BinaryWriter writer)
     {
-        writer.Write((sbyte)Projectile.direction);
+        writer.Write((sbyte) Projectile.direction);
         writer.Write(Projectile.rotation);
-        writer.Write((sbyte)Projectile.spriteDirection);
+        writer.Write((sbyte) Projectile.spriteDirection);
     }
 
     public override void ReceiveAI(BinaryReader reader)

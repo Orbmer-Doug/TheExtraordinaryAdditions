@@ -1,6 +1,5 @@
-﻿using CalamityMod.Items;
-using CalamityMod.Items.Materials;
-using CalamityMod.Rarities;
+﻿//TODO
+
 using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent.Creative;
@@ -32,10 +31,10 @@ public class CometStorm : ModItem
         Item.width = 116;
         Item.height = 184;
         Item.useTime =
-        Item.useAnimation = 8;
+            Item.useAnimation = 8;
         Item.knockBack = 0;
-        Item.value = CalamityGlobalItem.RarityPureGreenBuyPrice;
-        Item.rare = ModContent.RarityType<PureGreen>();
+        //Item.value = CalamityGlobalItem.RarityPureGreenBuyPrice;
+        //Item.rare = ModContent.RarityType<PureGreen>();
         Item.UseSound = null;
         Item.autoReuse = true;
         Item.shoot = ModContent.ProjectileType<CometStormHoldout>();
@@ -56,9 +55,7 @@ public class CometStorm : ModItem
     {
         Recipe recipe = CreateRecipe();
         recipe.AddIngredient(ItemID.MeteorStaff, 1);
-        recipe.AddIngredient(ModContent.ItemType<Lumenyl>(), 10);
-        recipe.AddIngredient(ModContent.ItemType<RuinousSoul>(), 5);
-        recipe.AddIngredient(ModContent.ItemType<DarkPlasma>(), 6);
+        //TODO
         recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();
     }

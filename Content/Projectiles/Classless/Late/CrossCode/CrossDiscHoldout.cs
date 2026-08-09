@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -89,8 +88,8 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
     /// </summary>
     public Element State
     {
-        get => (Element)Projectile.ai[0];
-        set => Projectile.ai[0] = (float)value;
+        get => (Element) Projectile.ai[0];
+        set => Projectile.ai[0] = (float) value;
     }
 
     /// <summary>
@@ -163,7 +162,7 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
         ElementalBalanceUI.visible = true;
 
         // For simplification in the ui
-        int mode = (int)Projectile.ai[0];
+        int mode = (int) Projectile.ai[0];
 
         #region Idle Effects
 
@@ -174,7 +173,7 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
         {
             ElementalBalance.OverloadSound.Play(Owner.Center, 1.5f, -.2f);
             State = Element.Neutral;
-            ElementPlayer.CircuitOverload = CalUtils.SecondsToFrames(30);
+            ElementPlayer.CircuitOverload = SecondsToFrames(30);
             this.Sync();
         }
 
@@ -217,8 +216,8 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
             // Make the swing
             Projectile swing = Main.projectile[Projectile.NewProj(Center, velocity, swingType,
                 Projectile.damage, Projectile.knockBack, Projectile.owner)];
-            swing.AdditionsInfo().ExtraAI[6] = (float)BaseSwordSwing.SwingDirection.Up;
-            swing.AdditionsInfo().ExtraAI[7] = (float)State;
+            swing.AdditionsInfo().ExtraAI[6] = (float) BaseSwordSwing.SwingDirection.Up;
+            swing.AdditionsInfo().ExtraAI[7] = (float) State;
             swing.netUpdate = true;
 
             SwingCooldown = Item.useTime;
@@ -232,7 +231,7 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
             VRPBehavior();
     }
 
-    public static readonly float MaxCharge = CalUtils.SecondsToFrames(.9f);
+    public static readonly float MaxCharge = SecondsToFrames(.9f);
     public float ReticleProgress => InverseLerp(0f, MaxCharge, ReticleCounter);
     public float FullReticleProgress => InverseLerp(BigBollCooldown, BigBollCooldown * 2, FullReticleCounter);
     public float Spread => MathHelper.PiOver4 * (1f - ReticleProgress);
@@ -374,7 +373,7 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
             Owner.ownedProjectileCounts[ModContent.ProjectileType<CrossSwing>()] <= 0)
         {
             float opacity = ReticleWait < 29f ? .3f : 1f;
-            int frame = (int)(FullReticleProgress * 3f);
+            int frame = (int) (FullReticleProgress * 3f);
             Rectangle dotFrame = normalReticle.Frame(1, 4, 0, frame);
 
             /*

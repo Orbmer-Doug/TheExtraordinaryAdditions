@@ -35,25 +35,25 @@ public class FinalStrikeHoldout : ModProjectile
 
     public FinalStrikeState CurrentState
     {
-        get => (FinalStrikeState)Projectile.ai[0];
-        set => Projectile.ai[0] = (int)value;
+        get => (FinalStrikeState) Projectile.ai[0];
+        set => Projectile.ai[0] = (int) value;
     }
 
     public int StateTime
     {
-        get => (int)Projectile.ai[1];
+        get => (int) Projectile.ai[1];
         set => Projectile.ai[1] = value;
     }
 
     public float Counter
     {
-        get => (int)Projectile.ai[2];
+        get => (int) Projectile.ai[2];
         set => Projectile.ai[2] = value;
     }
 
     public bool Init
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[0] == 1;
+        get => (int) Projectile.AdditionsInfo().ExtraAI[0] == 1;
         set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
 
@@ -62,7 +62,7 @@ public class FinalStrikeHoldout : ModProjectile
 
     public bool Vanish
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[3] == 1;
+        get => (int) Projectile.AdditionsInfo().ExtraAI[3] == 1;
         set => Projectile.AdditionsInfo().ExtraAI[3] = value.ToInt();
     }
 
@@ -115,7 +115,7 @@ public class FinalStrikeHoldout : ModProjectile
     }
 
     public Vector2 Center => Owner.RotatedRelativePoint(Owner.MountedCenter);
-    private static readonly int shootDelay = CalUtils.SecondsToFrames(2.4f);
+    private static readonly int shootDelay = SecondsToFrames(2.4f);
 
     public void DoBehavior_Aim()
     {
@@ -227,7 +227,7 @@ public class FinalStrikeHoldout : ModProjectile
         if (StateTime % 5f == 0f)
         {
             IEntitySource source = Projectile.GetSource_FromThis();
-            int damage = (int)(Projectile.damage * .5f);
+            int damage = (int) (Projectile.damage * .5f);
             float off = ToRadians(10f);
 
             for (int i = 0; i < 2; i++)
@@ -428,13 +428,13 @@ public class FinalStrikeHoldout : ModProjectile
                     Vector2 end = TipOfSpear + Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.4f) *
                         Main.rand.NextFloat(300f, 600f);
                     Projectile.NewProj(TipOfSpear, Vector2.Zero, ModContent.ProjectileType<DivineLightning>(),
-                        (int)(Projectile.damage * 4.25f), 0f, Owner.whoAmI, ai1: end.X, ai2: end.Y);
+                        (int) (Projectile.damage * 4.25f), 0f, Owner.whoAmI, ai1: end.X, ai2: end.Y);
                 }
             }
 
             ParticleRegistry.SpawnFlash(TipOfSpear, 30, .3f, 300f);
             ParticleRegistry.SpawnBlurParticle(TipOfSpear, 30, .2f, 200f);
-            
+
             ScreenShakeSystem.New(new ScreenShake(.2f, .1f), TipOfSpear);
 
             AdditionsSound.etherealSharpImpact.Play(TipOfSpear, 1.3f, -.1f, .3f, 12);
@@ -442,7 +442,7 @@ public class FinalStrikeHoldout : ModProjectile
         else
         {
             AdditionsSound.MediumExplosion.Play(TipOfSpear, 1.2f, 0f, .2f);
-            Projectile.damage = (int)MathF.Max(500f, Projectile.damage * 0.91f);
+            Projectile.damage = (int) MathF.Max(500f, Projectile.damage * 0.91f);
             Vector2 pos = CheckLinearCollision(Projectile.RotHitbox().TopRight, Projectile.RotHitbox().BottomLeft,
                 target.Hitbox,
                 out Vector2 start, out _)
@@ -495,7 +495,7 @@ public class FinalStrikeHoldout : ModProjectile
         Color backglowColor = Color.AntiqueWhite;
         backglowColor = Color.Lerp(backglowColor, Color.NavajoWhite,
             Utils.GetLerpValue(0.7f, 1f, DivineFormInterpolant, true) * 0.56f) * 0.4f;
-        backglowColor.A = (byte)(20 * Projectile.Opacity);
+        backglowColor.A = (byte) (20 * Projectile.Opacity);
 
         Texture2D glowmaskTexture = Projectile.ThisProjectileTexture();
         Rectangle frame = glowmaskTexture.Frame(1, Main.projFrames[Type], 0, Projectile.frame);
@@ -520,9 +520,9 @@ public class FinalStrikeHoldout : ModProjectile
         float opacity = .85f * DivineFormInterpolant;
         for (int i = 0; i < 6; i++)
         {
-            Vector2 spinStart = drawStartOuter + spinPoint.RotatedBy(rotation - (float)Math.PI * i / 3f);
+            Vector2 spinStart = drawStartOuter + spinPoint.RotatedBy(rotation - (float) Math.PI * i / 3f);
             Color glowAlpha = Projectile.GetAlpha(backglowColor * Projectile.Opacity);
-            glowAlpha.A = (byte)Projectile.alpha;
+            glowAlpha.A = (byte) Projectile.alpha;
             sb.Draw(glowmaskTexture, spinStart, frame, glowAlpha * opacity, auraRotation, origin, Projectile.scale,
                 0, 0f);
         }

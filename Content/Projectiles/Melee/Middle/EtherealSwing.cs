@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.IO;
-using CalamityMod;
 using Terraria;
 using Terraria.Audio;
 using Terraria.Enums;
@@ -41,7 +40,7 @@ public class EtherealSwing : ModProjectile
         Projectile.penetrate = -1;
         Projectile.timeLeft = 2;
         Projectile.extraUpdates = 3;
-        Projectile.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
+        Projectile.DamageType = ModContent.GetInstance<MeleeNoSpeedDamageClass>();
         Projectile.noEnchantmentVisuals = true;
         Projectile.netImportant = true;
     }
@@ -55,11 +54,16 @@ public class EtherealSwing : ModProjectile
 
     public float FadeCompletion => InverseLerp(FadeTime, 0f, FadeTimer);
     public float GetRotation() => Rotation % SwingTime / SwingTime * MathHelper.TwoPi;
-    public Vector2 GetOffset(float xOff = 1f, float yOff = 1f) => GetPointOnRotatedEllipse(xOff * 2f, yOff * 2.2f, Projectile.rotation, -GetRotation());
+
+    public Vector2 GetOffset(float xOff = 1f, float yOff = 1f) =>
+        GetPointOnRotatedEllipse(xOff * 2f, yOff * 2.2f, Projectile.rotation, -GetRotation());
+
     public Quaternion Get3DRotation() => EulerAnglesConversion(1, -GetRotation(), 1.2f);
 
     public int Dir => (MathF.Cos(Projectile.rotation) > 0f).ToDirectionInt();
-    public float ZInfluence => GetCircularSectionValue(Rotation % SwingTime / SwingTime * MathHelper.TwoPi, Dir == -1 ? 2f : .5f, 1f, Dir == -1 ? .5f : 2f);
+
+    public float ZInfluence => GetCircularSectionValue(Rotation % SwingTime / SwingTime * MathHelper.TwoPi,
+        Dir == -1 ? 2f : .5f, 1f, Dir == -1 ? .5f : 2f);
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
@@ -78,11 +82,12 @@ public class EtherealSwing : ModProjectile
 
     public override void SendExtraAI(BinaryWriter writer)
     {
-        writer.Write((float)Projectile.rotation);
+        writer.Write((float) Projectile.rotation);
     }
+
     public override void ReceiveExtraAI(BinaryReader reader)
     {
-        Projectile.rotation = (float)reader.ReadSingle();
+        Projectile.rotation = (float) reader.ReadSingle();
     }
 
     public override void AI()
@@ -92,7 +97,7 @@ public class EtherealSwing : ModProjectile
             Projectile.Kill();
             return;
         }
-        
+
         if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, null, 50);
 
@@ -116,6 +121,7 @@ public class EtherealSwing : ModProjectile
             if (Projectile.rotation != Projectile.oldRot[1])
                 this.Sync();
         }
+
         Projectile.Opacity = FadeCompletion;
         bool active = Owner.HeldItem.type == ModContent.ItemType<EtherealClaymore>() && !Owner.noItems;
 
@@ -151,7 +157,7 @@ public class EtherealSwing : ModProjectile
         if (Projectile.soundDelay == 0)
         {
             SoundEngine.PlaySound(SoundID.Item7 with { PitchVariance = .2f, Volume = 1.4f }, Projectile.Center);
-            Projectile.soundDelay = 120 - (int)(Spinup * .2f);
+            Projectile.soundDelay = 120 - (int) (Spinup * .2f);
         }
 
         if (Main.rand.NextBool(3))
@@ -160,10 +166,11 @@ public class EtherealSwing : ModProjectile
             Vector2 vel = off * Main.rand.NextFloat(0.04f);
             int life = Main.rand.Next(40, 50);
             float scale = Main.rand.NextFloat(.2f, .5f);
-            ParticleRegistry.SpawnBloomPixelParticle(pos, vel, life, scale * ZInfluence, Color.AliceBlue, Color.DeepSkyBlue, null, 1.8f, 5);
+            ParticleRegistry.SpawnBloomPixelParticle(pos, vel, life, scale * ZInfluence, Color.AliceBlue,
+                Color.DeepSkyBlue, null, 1.8f, 5);
         }
 
-        if (Main.rand.NextBool((int)Math.Round(25.0 / attackSpeedMult)))
+        if (Main.rand.NextBool((int) Math.Round(25.0 / attackSpeedMult)))
         {
             Vector2 pos = Owner.Center + off;
             Vector2 vel = off * Main.rand.NextFloat(0.1f);
@@ -193,22 +200,27 @@ public class EtherealSwing : ModProjectile
 
         for (int i = 0; i < 33; i++)
         {
-            ParticleRegistry.SpawnGlowParticle(pos, dir.RotatedByRandom(.17f) * Main.rand.NextFloat(5f, 14f), Main.rand.Next(24, 36), Main.rand.NextFloat(32f, 40.8f), Color.AliceBlue, 2f);
+            ParticleRegistry.SpawnGlowParticle(pos, dir.RotatedByRandom(.17f) * Main.rand.NextFloat(5f, 14f),
+                Main.rand.Next(24, 36), Main.rand.NextFloat(32f, 40.8f), Color.AliceBlue, 2f);
         }
     }
 
     public override bool ShouldUpdatePosition() => false;
-    private float WidthFunct(float c) => OptimizedPrimitiveTrail.HemisphereWidthFunct(c, MathHelper.SmoothStep(1f, 0f, c) * 40f * ZInfluence);
+
+    private float WidthFunct(float c) =>
+        OptimizedPrimitiveTrail.HemisphereWidthFunct(c, MathHelper.SmoothStep(1f, 0f, c) * 40f * ZInfluence);
+
     private Color ColorFunct(SystemVector2 c, Vector2 position)
     {
         if (c.X == 0f)
             return Color.Transparent;
 
-        return new Color(140, 90 + (int)(100 * (1f - c.X)), 255) * (1f - c.X) * FadeCompletion;
+        return new Color(140, 90 + (int) (100 * (1f - c.X)), 255) * (1f - c.X) * FadeCompletion;
     }
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints cache;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -221,10 +233,12 @@ public class EtherealSwing : ModProjectile
             effect.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.StreakMagma), 1);
             trail.DrawTrail(effect, cache.Points, 350, true);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 
         Texture2D tex = Projectile.ThisProjectileTexture();
-        DrawTextureIn3D(tex, Projectile.Center, Get3DRotation(), 1.2f, Projectile.rotation, Color.White * Projectile.Opacity);
+        DrawTextureIn3D(tex, Projectile.Center, Get3DRotation(), 1.2f, Projectile.rotation,
+            Color.White * Projectile.Opacity);
         return false;
     }
 }

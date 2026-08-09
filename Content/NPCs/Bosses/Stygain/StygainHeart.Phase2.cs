@@ -1,5 +1,4 @@
 ﻿using System;
-using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -74,8 +73,8 @@ public sealed partial class StygainHeart
 
     public void DoAttack_DartCyclone(Player target)
     {
-        int dartShootTime = CalUtils.SecondsToFrames(6);
-        int dartShootDelay = CalUtils.SecondsToFrames(1f);
+        int dartShootTime = SecondsToFrames(6);
+        int dartShootDelay = SecondsToFrames(1f);
         int dartBurstReleaseRate = DifficultyBasedValue(14, 10, 12, 10, 10, 10);
         int dartShootCount = DifficultyBasedValue(7, 9, 10, 11, 11, 11);
         float dartShootSpeed = DifficultyBasedValue(2.5f, 3f, 3.2f, 3.5f, 3.8f, 3.9f);
@@ -90,7 +89,7 @@ public sealed partial class StygainHeart
                 target.Center + new Vector2((NPC.Center.X > target.Center.X).ToDirectionInt() * 200f, 70f);
 
             // Never allow tiles into the barrier
-            if (Collision.SolidCollision(hoverDestination, 1, (int)BarrierSize))
+            if (Collision.SolidCollision(hoverDestination, 1, (int) BarrierSize))
             {
                 Vector2? ground = FindNearestSurface(hoverDestination - Vector2.UnitY * BarrierSize, true,
                     BarrierSize * 2f, 16, true);
@@ -212,9 +211,9 @@ public sealed partial class StygainHeart
         // Balance
         const int spearRelease = 28;
         int spearSpacing = DifficultyBasedValue(260, 220, 180, 170, 160, 150);
-        int moonRelease = DifficultyBasedValue(CalUtils.SecondsToFrames(2.8f), CalUtils.SecondsToFrames(2.3f),
-            CalUtils.SecondsToFrames(2.1f), CalUtils.SecondsToFrames(1.8f), CalUtils.SecondsToFrames(1.6f),
-            CalUtils.SecondsToFrames(1.3f));
+        int moonRelease = DifficultyBasedValue(SecondsToFrames(2.8f), SecondsToFrames(2.3f),
+            SecondsToFrames(2.1f), SecondsToFrames(1.8f), SecondsToFrames(1.6f),
+            SecondsToFrames(1.3f));
         const int starRelease = 16;
 
         // Movement
@@ -312,19 +311,19 @@ public sealed partial class StygainHeart
 
         if (preparing)
             return;
-        
+
         if (attacking)
         {
             if (AttackTimer % spearRelease == spearRelease - 1)
             {
                 int height = BloodBeacon.MaxLaserLength / 2 + Main.rand.Next(-100, 100);
-                float rot = (int)releaseCounter % 2 == 1 ? -.3f : .3f;
+                float rot = (int) releaseCounter % 2 == 1 ? -.3f : .3f;
                 for (int x = -1; x <= 1; x += 2)
                 {
                     for (int y = -height; y < height; y += spearSpacing * 2)
                     {
                         Vector2 pos = new(NPC.Center.X + 340f * x, target.Center.Y + y);
-                        if ((int)releaseCounter % 2 == 1)
+                        if ((int) releaseCounter % 2 == 1)
                             pos.Y -= spearSpacing;
 
                         if (!this.RunServer())
@@ -366,7 +365,7 @@ public sealed partial class StygainHeart
                         for (int y = -height; y < height; y += spearSpacing * 2)
                         {
                             Vector2 pos = new(NPC.Center.X + 140f * x, target.Center.Y + y);
-                            if ((int)releaseCounter % 2 == 1)
+                            if ((int) releaseCounter % 2 == 1)
                                 pos.Y -= spearSpacing;
 
                             NPC.NewNPCProj(pos, Vector2.UnitX * x * 3f, ModContent.ProjectileType<TaintedStar>(),

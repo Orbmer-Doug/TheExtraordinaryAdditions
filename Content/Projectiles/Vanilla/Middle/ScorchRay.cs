@@ -13,6 +13,7 @@ public class ScorchRay : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
     public const int Lifetime = 20;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 12;
@@ -34,9 +35,11 @@ public class ScorchRay : ModProjectile
         get => Projectile.ai[0] == 1f;
         set => Projectile.ai[0] = value.ToInt();
     }
+
     public Vector2 End;
     public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(End);
     public override void ReceiveExtraAI(BinaryReader reader) => End = reader.ReadVector2();
+
     public override void AI()
     {
         if (trail == null || trail.Disposed)
@@ -56,13 +59,15 @@ public class ScorchRay : ModProjectile
                 {
                     for (int i = 0; i < amount; i++)
                     {
-                        Vector2 velo = (MathHelper.TwoPi * i / amount + offsetAngle).ToRotationVector2() * Main.rand.NextFloat(4f, 7f) * a;
+                        Vector2 velo = (MathHelper.TwoPi * i / amount + offsetAngle).ToRotationVector2() *
+                                       Main.rand.NextFloat(4f, 7f) * a;
                         ParticleRegistry.SpawnGlowParticle(End, velo, Main.rand.Next(12, 18), 60f, Color.Chocolate);
                     }
                 }
 
                 HitSomething = true;
             }
+
             points.SetPoints(start.GetLaserControlPoints(End, 100));
         }
 
@@ -70,15 +75,18 @@ public class ScorchRay : ModProjectile
     }
 
     public override bool ShouldUpdatePosition() => false;
+
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return targetHitbox.LineCollision(Projectile.Center, End + (Projectile.velocity * Projectile.width), Projectile.width);
+        return targetHitbox.LineCollision(Projectile.Center, End + (Projectile.velocity * Projectile.width),
+            Projectile.width);
     }
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints points = new(100);
 
-    public float WidthFunct(float c) => OptimizedPrimitiveTrail.HemisphereWidthFunct(1f - c, Projectile.width * Projectile.Opacity, 2f, .1f);
+    public float WidthFunct(float c) =>
+        OptimizedPrimitiveTrail.HemisphereWidthFunct(1f - c, Projectile.width * Projectile.Opacity, 2f, .1f);
 
     public Color ColorFunct(SystemVector2 c, Vector2 position)
     {
@@ -95,6 +103,7 @@ public class ScorchRay : ModProjectile
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.CrackedNoise2), 1);
             trail.DrawTrail(shader, points.Points);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;
     }

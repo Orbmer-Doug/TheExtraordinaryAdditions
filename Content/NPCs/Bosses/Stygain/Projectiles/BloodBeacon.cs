@@ -15,7 +15,7 @@ public class BloodBeacon : ProjOwnedByNPC<StygainHeart>
 {
     public override string Texture => AssetRegistry.Invis;
 
-    public static readonly int Lifetime = CalUtils.SecondsToFrames(15);
+    public static readonly int Lifetime = SecondsToFrames(15);
 
     public const int MaxLaserLength = 3000;
 

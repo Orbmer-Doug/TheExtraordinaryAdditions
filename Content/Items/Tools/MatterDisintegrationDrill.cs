@@ -1,6 +1,4 @@
-﻿using CalamityMod.Items.Materials;
-using CalamityMod.Items.Tools;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -44,9 +42,8 @@ public class MatterDisintegrationDrill : ModItem, ILocalizedModType, IModType
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        recipe.AddIngredient(ModContent.ItemType<ShadowspecBar>(), 5);
+        //TODO
         recipe.AddIngredient(ModContent.ItemType<PlasmaCore>(), 1);
-        recipe.AddIngredient(ModContent.ItemType<MarniteObliterator>(), 1);
         recipe.AddTile(TileID.HeavyWorkBench);
         recipe.AddTile(TileID.MythrilAnvil);
         recipe.Register();

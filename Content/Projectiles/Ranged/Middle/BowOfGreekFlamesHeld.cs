@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using CalamityMod;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -46,6 +45,7 @@ public class BowOfGreekFlamesHeld : BaseIdleHoldoutProjectile
     public ref float OldStringCompletion => ref Projectile.AdditionsInfo().ExtraAI[0];
     public ref float TotalTime => ref Projectile.AdditionsInfo().ExtraAI[2];
     public int Dir => Projectile.velocity.X.NonZeroSign();
+
     public override void OnSpawn(IEntitySource source)
     {
         Switch = -1;
@@ -53,11 +53,13 @@ public class BowOfGreekFlamesHeld : BaseIdleHoldoutProjectile
     }
 
     public Vector2 arrowPos;
+
     public override void WriteExtraAI(BinaryWriter writer)
     {
         writer.WriteVector2(arrowPos);
         writer.Write(Projectile.rotation);
     }
+
     public override void GetExtraAI(BinaryReader reader)
     {
         arrowPos = reader.ReadVector2();
@@ -65,6 +67,7 @@ public class BowOfGreekFlamesHeld : BaseIdleHoldoutProjectile
     }
 
     public static readonly Texture2D arrow = AssetRegistry.GetTexture(AdditionsTexture.GreekBombArrow);
+
     public override void SafeAI()
     {
         if (trail == null || trail.Disposed)
@@ -77,7 +80,9 @@ public class BowOfGreekFlamesHeld : BaseIdleHoldoutProjectile
                 Projectile.netUpdate = true;
             Projectile.spriteDirection = (Projectile.velocity.X > 0f).ToDirectionInt();
         }
-        Projectile.Center = Center + PolarVector(Projectile.width / 2 + 5f, Projectile.rotation) + PolarVector(10f * Dir, Projectile.rotation + MathHelper.PiOver2);
+
+        Projectile.Center = Center + PolarVector(Projectile.width / 2 + 5f, Projectile.rotation) +
+                            PolarVector(10f * Dir, Projectile.rotation + MathHelper.PiOver2);
         Projectile.rotation = Projectile.velocity.ToRotation();
         Owner.itemRotation = (Projectile.direction * Projectile.velocity).ToRotation();
         Owner.ChangeDir(Dir);
@@ -85,17 +90,21 @@ public class BowOfGreekFlamesHeld : BaseIdleHoldoutProjectile
         float close = InverseLerp(0f, 22f, Time);
 
         float armRot = Projectile.rotation + (.72f * Dir);
-        float reelAnim = Animators.MakePoly(2.2f).InFunction.Evaluate(armRot, armRot + (.7f * Dir), Switch != 0 ? reel : OldStringCompletion);
+        float reelAnim = Animators.MakePoly(2.2f).InFunction
+            .Evaluate(armRot, armRot + (.7f * Dir), Switch != 0 ? reel : OldStringCompletion);
         Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, reelAnim - MathHelper.PiOver2);
-        Owner.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.ThreeQuarters, Projectile.rotation + .2f * Dir - MathHelper.PiOver2);
+        Owner.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.ThreeQuarters,
+            Projectile.rotation + .2f * Dir - MathHelper.PiOver2);
 
         Vector2 centerString = PolarVector(9f, Projectile.rotation - MathHelper.Pi);
         Vector2 drawBack = PolarVector(ReelDist * StringCompletion, Projectile.rotation - MathHelper.Pi);
 
-        Vector2 top = Projectile.RotHitbox().Center + PolarVector(18f, Projectile.rotation - MathHelper.PiOver2) + centerString;
+        Vector2 top = Projectile.RotHitbox().Center + PolarVector(18f, Projectile.rotation - MathHelper.PiOver2) +
+                      centerString;
         Vector2 middle = Projectile.RotHitbox().Center + centerString + drawBack;
         arrowPos = middle + PolarVector(arrow.Height / 2, Projectile.rotation);
-        Vector2 bottom = Projectile.RotHitbox().Center + PolarVector(-18f, Projectile.rotation - MathHelper.PiOver2) + centerString;
+        Vector2 bottom = Projectile.RotHitbox().Center + PolarVector(-18f, Projectile.rotation - MathHelper.PiOver2) +
+                         centerString;
 
         Points = [];
         cache ??= new(MaxPoints);
@@ -105,9 +114,11 @@ public class BowOfGreekFlamesHeld : BaseIdleHoldoutProjectile
 
         if (Main.rand.NextBool(2))
         {
-            ParticleRegistry.SpawnHeavySmokeParticle(top, Vector2.Zero, Main.rand.Next(30, 40), Main.rand.NextFloat(.09f, .14f),
+            ParticleRegistry.SpawnHeavySmokeParticle(top, Vector2.Zero, Main.rand.Next(30, 40),
+                Main.rand.NextFloat(.09f, .14f),
                 Color.LawnGreen.Lerp(Color.Lime, Main.rand.NextFloat(.4f, .6f)), Main.rand.NextFloat(.8f, 1.4f));
-            ParticleRegistry.SpawnHeavySmokeParticle(bottom, Vector2.Zero, Main.rand.Next(30, 40), Main.rand.NextFloat(.09f, .14f),
+            ParticleRegistry.SpawnHeavySmokeParticle(bottom, Vector2.Zero, Main.rand.Next(30, 40),
+                Main.rand.NextFloat(.09f, .14f),
                 Color.LawnGreen.Lerp(Color.Lime, Main.rand.NextFloat(.4f, .6f)), Main.rand.NextFloat(.8f, 1.4f));
         }
 
@@ -131,27 +142,36 @@ public class BowOfGreekFlamesHeld : BaseIdleHoldoutProjectile
                         Time = 0f;
                         this.Sync();
                     }
+
                     break;
                 case 1:
                     StringCompletion = Animators.MakePoly(2.2f).InFunction.Evaluate(0f, 1f, reel);
                     Lighting.AddLight(arrowPos, Color.LawnGreen.ToVector3() * .7f);
                     if (reel >= 1f || (this.RunLocal() && !Modded.MouseLeft.Current))
                     {
-                        Owner.PickAmmo(Item, out int type, out float speed, out int dmg, out float kb, out int ammo, Owner.ShouldConsumeAmmo(Item));
+                        Owner.PickAmmo(Item, out int type, out float speed, out int dmg, out float kb, out int ammo,
+                            Owner.ShouldConsumeAmmo(Item));
                         speed *= reel;
-                        dmg = (int)(dmg * MathHelper.Clamp(reel, .1f, 1f));
+                        dmg = (int) (dmg * MathHelper.Clamp(reel, .1f, 1f));
                         kb *= reel;
                         if (this.RunLocal())
                         {
-                            Projectile.NewProj(arrowPos, Projectile.velocity * speed, ModContent.ProjectileType<GreekBombArrow>(), dmg, kb, Owner.whoAmI);
+                            Projectile.NewProj(arrowPos, Projectile.velocity * speed,
+                                ModContent.ProjectileType<GreekBombArrow>(), dmg, kb, Owner.whoAmI);
                         }
-                        SoundEngine.PlaySound(SoundID.Item5 with { Volume = Main.rand.NextFloat(.9f, 1.2f), PitchVariance = .1f, Identifier = Name }, arrowPos);
+
+                        SoundEngine.PlaySound(
+                            SoundID.Item5 with
+                            {
+                                Volume = Main.rand.NextFloat(.9f, 1.2f), PitchVariance = .1f, Identifier = Name
+                            }, arrowPos);
 
                         OldStringCompletion = StringCompletion;
                         Switch = 0;
                         Time = 0f;
                         this.Sync();
                     }
+
                     break;
             }
 
@@ -166,6 +186,7 @@ public class BowOfGreekFlamesHeld : BaseIdleHoldoutProjectile
     }
 
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         if (trail != null && !trail.Disposed && cache != null)
@@ -181,12 +202,15 @@ public class BowOfGreekFlamesHeld : BaseIdleHoldoutProjectile
             direction = SpriteEffects.FlipHorizontally;
             rotation += MathHelper.Pi;
         }
-        Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), rotation, origin, Projectile.scale, direction, 0f);
+
+        Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), rotation, origin,
+            Projectile.scale, direction, 0f);
 
         float opacity = InverseLerp(0f, 10f, TotalTime);
         if (Switch == 0)
             opacity = 0f;
-        Main.spriteBatch.Draw(arrow, arrowPos - Main.screenPosition, null, lightColor * opacity, Projectile.rotation - MathHelper.PiOver2, arrow.Size() / 2, 1f, 0, 0f);
+        Main.spriteBatch.Draw(arrow, arrowPos - Main.screenPosition, null, lightColor * opacity,
+            Projectile.rotation - MathHelper.PiOver2, arrow.Size() / 2, 1f, 0, 0f);
 
         return false;
     }

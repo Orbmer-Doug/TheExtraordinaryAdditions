@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using CalamityMod;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Late;
@@ -22,6 +21,7 @@ public class EpidemicHoldout : BaseIdleHoldoutProjectile
 
     public ref float LeftCounter => ref Projectile.ai[1];
     public ref float RightCounter => ref Projectile.ai[2];
+
     public override void SetStaticDefaults()
     {
         Main.projFrames[Projectile.type] = 8;
@@ -41,13 +41,15 @@ public class EpidemicHoldout : BaseIdleHoldoutProjectile
         if (this.RunLocal())
         {
             float interpolant = Utils.GetLerpValue(5f, 40f, Projectile.Distance(Modded.MouseWorld), true);
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Modded.MouseWorld), interpolant);
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Modded.MouseWorld),
+                interpolant);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
 
         Owner.ChangeDir(Projectile.velocity.X.NonZeroSign());
-        Projectile.Center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true) + Projectile.velocity * Projectile.width * .4f;
+        Projectile.Center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true) +
+                            Projectile.velocity * Projectile.width * .4f;
         Projectile.damage = Owner.GetWeaponDamage(Owner.HeldItem);
         Projectile.rotation = Projectile.velocity.ToRotation();
         Owner.SetFrontHandBetter(0, Projectile.rotation);
@@ -57,7 +59,8 @@ public class EpidemicHoldout : BaseIdleHoldoutProjectile
             int spear = ModContent.ProjectileType<EpidemicSpear>();
             if (Owner.CountOwnerProjectiles(spear) <= 0 && Owner.HeldItem.CheckManaBetter(Owner, 15, true))
             {
-                Projectile.NewProj(Projectile.Center, Vector2.Zero, spear, Projectile.damage * 3, Projectile.knockBack, Projectile.owner, 0f, Projectile.whoAmI);
+                Projectile.NewProj(Projectile.Center, Vector2.Zero, spear, Projectile.damage * 3, Projectile.knockBack,
+                    Projectile.owner, 0f, Projectile.whoAmI);
             }
 
             if (RightCounter % 2f == 1f)
@@ -66,7 +69,8 @@ public class EpidemicHoldout : BaseIdleHoldoutProjectile
                 Vector2 vel = pos.SafeDirectionTo(pos);
                 int life = Main.rand.Next(20, 30);
                 float size = Main.rand.NextFloat(.3f, .6f);
-                ParticleRegistry.SpawnBloomPixelParticle(pos, vel, life, size, Color.LawnGreen, Color.OliveDrab, Projectile.Center, 1f, 7);
+                ParticleRegistry.SpawnBloomPixelParticle(pos, vel, life, size, Color.LawnGreen, Color.OliveDrab,
+                    Projectile.Center, 1f, 7);
             }
 
             if (RightCounter < EpidemicSpear.TotalCharge)
@@ -81,8 +85,11 @@ public class EpidemicHoldout : BaseIdleHoldoutProjectile
             if (this.RunLocal() && LeftCounter % wait == wait - 1f && Owner.HeldItem.CheckManaBetter(Owner, 8, true))
             {
                 AdditionsSound.WaterSpell.Play(Projectile.Center, 1f, 0f, 0f, 0);
-                Projectile.NewProj(Projectile.Center, Projectile.SafeDirectionTo(Modded.MouseWorld) * 15f, ModContent.ProjectileType<EpidemicLob>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
+                Projectile.NewProj(Projectile.Center, Projectile.SafeDirectionTo(Modded.MouseWorld) * 15f,
+                    ModContent.ProjectileType<EpidemicLob>(), Projectile.damage, Projectile.knockBack,
+                    Projectile.owner);
             }
+
             LeftCounter++;
         }
         else
@@ -97,17 +104,17 @@ public class EpidemicHoldout : BaseIdleHoldoutProjectile
 
         ManagedShader effect = ShaderRegistry.MagicRing;
         effect.TrySetParameter("time", rotation);
-        effect.TrySetParameter("cosine", (float)Math.Cos(rotation));
+        effect.TrySetParameter("cosine", (float) Math.Cos(rotation));
         effect.TrySetParameter("firstCol", color.ToVector3());
         effect.TrySetParameter("secondCol", Color.DarkSeaGreen.ToVector3());
         effect.TrySetParameter("opacity", prog * .75f);
 
-        sb.EnterShaderRegion(BlendState.Additive, effect.Shader.Value);
+        sb.EnterShaderRegion(effect.Shader.Value, BlendState.Additive);
 
-        Rectangle target = ToTarget(pos, (int)(60 * (w + prog)), (int)(60 * (h + prog)));
+        Rectangle target = ToTarget(pos, (int) (60 * (w + prog)), (int) (60 * (h + prog)));
         sb.Draw(ring, target, null, color * prog, Projectile.velocity.ToRotation(), ring.Size() / 2, 0, 0);
 
-        sb.ExitShaderRegion();
+        sb.ResetToDefault();
     }
 
     public override bool PreDraw(ref Color lightColor)
@@ -128,7 +135,8 @@ public class EpidemicHoldout : BaseIdleHoldoutProjectile
             DrawRing(Main.spriteBatch, Projectile.Center, scale, scale, Main.GameUpdateCount / 20f, interpolant, col);
         }
 
-        Main.spriteBatch.DrawBetter(texture, Projectile.Center, frame, Projectile.GetAlpha(Color.White), Projectile.rotation, origin, Projectile.scale, effects);
+        Main.spriteBatch.DrawBetter(texture, Projectile.Center, frame, Projectile.GetAlpha(Color.White),
+            Projectile.rotation, origin, Projectile.scale, effects);
 
         return false;
     }

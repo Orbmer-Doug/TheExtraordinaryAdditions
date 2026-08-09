@@ -9,6 +9,7 @@ namespace TheExtraordinaryAdditions.Content.Tiles;
 public class PolarityPlaced : ModTile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.PolarityPlaced);
+
     public override void SetStaticDefaults()
     {
         Main.tileFrameImportant[Type] = true;

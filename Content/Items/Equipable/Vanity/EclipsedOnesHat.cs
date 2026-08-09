@@ -13,8 +13,10 @@ public class EclipsedOnesHat : ModItem
     public override void SetStaticDefaults()
     {
         ArmorIDs.Head.Sets.DrawHead[Item.headSlot] = true; // Don't draw the head at all. Used by Space Creature Mask
-        ArmorIDs.Head.Sets.DrawHatHair[Item.headSlot] = false; // Draw hair as if a hat was covering the top. Used by Wizards Hat
-        ArmorIDs.Head.Sets.DrawFullHair[Item.headSlot] = false; // Draw all hair as normal. Used by Mime Mask, Sunglasses
+        ArmorIDs.Head.Sets.DrawHatHair[Item.headSlot] =
+            false; // Draw hair as if a hat was covering the top. Used by Wizards Hat
+        ArmorIDs.Head.Sets.DrawFullHair[Item.headSlot] =
+            false; // Draw all hair as normal. Used by Mime Mask, Sunglasses
         ArmorIDs.Head.Sets.DrawsBackHairWithoutHeadgear[Item.headSlot] = true;
     }
 

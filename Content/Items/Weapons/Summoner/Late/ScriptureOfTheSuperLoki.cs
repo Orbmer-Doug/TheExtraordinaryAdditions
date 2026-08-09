@@ -48,10 +48,12 @@ public class ScriptureOfTheSuperLoki : ModItem
         Item.shoot = ModContent.ProjectileType<SuperIztMinion>();
     }
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback)
     {
         player.AddBuff(Item.buffType, 2);
-        Projectile projectile = Projectile.NewProjectileDirect(source, player.Additions().MouseWorld, velocity, type, damage, knockback, Main.myPlayer);
+        Projectile projectile = Projectile.NewProjectileDirect(source, player.Additions().MouseWorld, velocity, type,
+            damage, knockback, Main.myPlayer);
         projectile.originalDamage = Item.damage;
         return false;
     }

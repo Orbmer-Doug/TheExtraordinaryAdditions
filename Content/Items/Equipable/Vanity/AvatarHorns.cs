@@ -1,5 +1,5 @@
-﻿using CalamityMod.Items.Materials;
-using CalamityMod.Tiles.Furniture.CraftingStations;
+﻿//TODO
+
 using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
@@ -17,8 +17,10 @@ public class AvatarHorns : ModItem
     public override void SetStaticDefaults()
     {
         ArmorIDs.Head.Sets.DrawHead[Item.headSlot] = false; // Don't draw the head at all. Used by Space Creature Mask
-        ArmorIDs.Head.Sets.DrawHatHair[Item.headSlot] = false; // Draw hair as if a hat was covering the top. Used by Wizards Hat
-        ArmorIDs.Head.Sets.DrawFullHair[Item.headSlot] = false; // Draw all hair as normal. Used by Mime Mask, Sunglasses
+        ArmorIDs.Head.Sets.DrawHatHair[Item.headSlot] =
+            false; // Draw hair as if a hat was covering the top. Used by Wizards Hat
+        ArmorIDs.Head.Sets.DrawFullHair[Item.headSlot] =
+            false; // Draw all hair as normal. Used by Mime Mask, Sunglasses
         ArmorIDs.Head.Sets.DrawsBackHairWithoutHeadgear[Item.headSlot] = false;
     }
 
@@ -39,8 +41,6 @@ public class AvatarHorns : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        recipe.AddIngredient(ModContent.ItemType<DubiousPlating>(), 3);
-        recipe.AddIngredient(ModContent.ItemType<MysteriousCircuitry>(), 2);
         recipe.AddRecipeGroup(AdditionsRecipes.AnyIronBar, 5);
         recipe.AddTile(TileID.Anvils);
         recipe.Register();

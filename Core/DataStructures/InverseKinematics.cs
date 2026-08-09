@@ -7,7 +7,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Core.DataStructures;
 
-// A slightly modified version of the IK present in Calamity Fables
+// A slightly modified version of the IK present in Fables
 // love those guys
 
 // TODO: Offsets to joint position without blowing up?
@@ -314,9 +314,9 @@ public readonly struct CCDKinematicsConstraint(
     public float Apply(float angle)
     {
         if (angle < MinimumAngle)
-            return MinimumAngle + Delta * (float)Math.Tanh(Stiffness * (angle - MinimumAngle));
+            return MinimumAngle + Delta * (float) Math.Tanh(Stiffness * (angle - MinimumAngle));
         if (angle > MaximumAngle)
-            return MaximumAngle + Delta * (float)Math.Tanh(Stiffness * (angle - MaximumAngle));
+            return MaximumAngle + Delta * (float) Math.Tanh(Stiffness * (angle - MaximumAngle));
         return angle;
 
         /* stiff

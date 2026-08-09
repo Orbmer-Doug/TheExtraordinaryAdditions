@@ -10,6 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Multi.Middle;
 public class SkeleShot : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 2;
@@ -24,6 +25,7 @@ public class SkeleShot : ModProjectile
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints cache;
+
     public override void AI()
     {
         if (trail == null || trail.Disposed)
@@ -43,7 +45,8 @@ public class SkeleShot : ModProjectile
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        ParticleRegistry.SpawnSparkleParticle(Projectile.Center, Vector2.Zero, 8, Main.rand.NextFloat(1.1f, 1.4f), Color.White, Color.Chocolate);
+        ParticleRegistry.SpawnSparkleParticle(Projectile.Center, Vector2.Zero, 8, Main.rand.NextFloat(1.1f, 1.4f),
+            Color.White, Color.Chocolate);
         AdditionsSound.AuroraTink1.Play(Projectile.Center, .5f, .4f, .1f, 20, Name);
     }
 
@@ -75,6 +78,7 @@ public class SkeleShot : ModProjectile
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Pixel), 1);
             trail.DrawTrail(shader, cache.Points, 30);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;
     }

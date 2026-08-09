@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Terraria;
+﻿using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -33,10 +32,12 @@ public class SharpTie : ModProjectile, ILocalizedModType, IModType
 
     public ref float Timer => ref Projectile.ai[0];
     public ref float FadeTimer => ref Projectile.ai[1];
+
     public override void AI()
     {
         after ??= new(10, () => Projectile.Center);
-        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.scale, Projectile.rotation, 0, 10));
+        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.scale, Projectile.rotation, 0,
+            10));
 
         Projectile.rotation += Projectile.direction * 0.3f * Animators.MakePoly(3f).InFunction(Projectile.scale);
         Lighting.AddLight(Projectile.Center, Color.WhiteSmoke.ToVector3() * .6f);
@@ -64,7 +65,8 @@ public class SharpTie : ModProjectile, ILocalizedModType, IModType
             NPC target = NPCTargeting.GetClosestNPC(new(Projectile.Center, 500, true, true));
             if (target != null && Timer > 20)
             {
-                Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(target.Center) * 18f, 0.1f);
+                Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(target.Center) * 18f,
+                    0.1f);
             }
             else
             {
@@ -82,7 +84,8 @@ public class SharpTie : ModProjectile, ILocalizedModType, IModType
         for (int i = 0; i < 15; i++)
         {
             Vector2 pos = target.RotHitbox().GetClosestPoint(Projectile.Center) + Main.rand.NextVector2Circular(8, 8);
-            Vector2 vel = -Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.38f) * Main.rand.NextFloat(2f, 8f);
+            Vector2 vel = -Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.38f) *
+                          Main.rand.NextFloat(2f, 8f);
             int life = Main.rand.Next(20, 40);
             float scale = Main.rand.NextFloat(.4f, .9f);
             ParticleRegistry.SpawnSparkParticle(pos, vel, life, scale, Color.White);
@@ -90,6 +93,7 @@ public class SharpTie : ModProjectile, ILocalizedModType, IModType
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [lightColor * Projectile.scale]);

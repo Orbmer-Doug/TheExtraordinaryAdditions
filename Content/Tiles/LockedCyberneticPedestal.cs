@@ -95,7 +95,7 @@ public class LockedCyberneticPedestal : ModTile
         Texture2D swordtex = AssetRegistry.GetTexture(AdditionsTexture.LockedCyberneticSword);
         Main.EntitySpriteDraw(swordtex,
             drawPosition + Vector2.UnitX * 28f -
-            Vector2.UnitY * (125f + (float)Math.Sin(Main.GameUpdateCount * 0.06f) * 30f), null, Color.White,
+            Vector2.UnitY * (125f + (float) Math.Sin(Main.GameUpdateCount * 0.06f) * 30f), null, Color.White,
             -MathHelper.PiOver4, swordtex.Size() * .5f, 1f, 0);
     }
 }

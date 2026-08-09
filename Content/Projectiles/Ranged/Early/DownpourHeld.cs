@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using CalamityMod;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -44,6 +43,7 @@ public class DownpourHeld : BaseIdleHoldoutProjectile
     public ref float OldStringCompletion => ref Projectile.AdditionsInfo().ExtraAI[0];
     public ref float TotalTime => ref Projectile.AdditionsInfo().ExtraAI[2];
     public int Dir => Projectile.velocity.X.NonZeroSign();
+
     public override void OnSpawn(IEntitySource source)
     {
         Switch = -1;
@@ -51,11 +51,13 @@ public class DownpourHeld : BaseIdleHoldoutProjectile
     }
 
     public Vector2 arrowPos;
+
     public override void WriteExtraAI(BinaryWriter writer)
     {
         writer.WriteVector2(arrowPos);
         writer.Write(Projectile.rotation);
     }
+
     public override void GetExtraAI(BinaryReader reader)
     {
         arrowPos = reader.ReadVector2();
@@ -65,10 +67,14 @@ public class DownpourHeld : BaseIdleHoldoutProjectile
     public override void SafeAI()
     {
         Item ammoItem = Owner.ChooseAmmo(Item);
-        Texture2D arrow = ammoItem != null ? ammoItem.ThisItemTexture() : AssetRegistry.GetTexture(AdditionsTexture.Pixel);
+        Texture2D arrow = ammoItem != null
+            ? ammoItem.ThisItemTexture()
+            : AssetRegistry.GetTexture(AdditionsTexture.Pixel);
 
         if (trail == null || trail.Disposed)
-            trail = new(c => 2f, (c, pos) => new Color(143, 152, 203) * Lighting.Brightness(pos.ToTileCoordinates().X, pos.ToTileCoordinates().Y), null, MaxPoints);
+            trail = new(c => 2f,
+                (c, pos) => new Color(143, 152, 203) *
+                            Lighting.Brightness(pos.ToTileCoordinates().X, pos.ToTileCoordinates().Y), null, MaxPoints);
         if (this.RunLocal())
         {
             Projectile.velocity = Center.SafeDirectionTo(Modded.MouseWorld);
@@ -76,7 +82,9 @@ public class DownpourHeld : BaseIdleHoldoutProjectile
                 Projectile.netUpdate = true;
             Projectile.spriteDirection = (Projectile.velocity.X > 0f).ToDirectionInt();
         }
-        Projectile.Center = Center + PolarVector(10f, Projectile.rotation) + PolarVector(10f * Dir, Projectile.rotation + MathHelper.PiOver2);
+
+        Projectile.Center = Center + PolarVector(10f, Projectile.rotation) +
+                            PolarVector(10f * Dir, Projectile.rotation + MathHelper.PiOver2);
         Projectile.rotation = Projectile.velocity.ToRotation();
         Owner.ChangeDir(Dir);
 
@@ -84,17 +92,21 @@ public class DownpourHeld : BaseIdleHoldoutProjectile
         float close = InverseLerp(0f, 22f, Time);
 
         float armRot = Projectile.rotation + (.595f * Dir);
-        float reelAnim = Animators.MakePoly(2.2f).InFunction.Evaluate(armRot, armRot + (.65f * Dir), Switch != 0 ? reel : OldStringCompletion);
+        float reelAnim = Animators.MakePoly(2.2f).InFunction
+            .Evaluate(armRot, armRot + (.65f * Dir), Switch != 0 ? reel : OldStringCompletion);
         Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, reelAnim - MathHelper.PiOver2);
-        Owner.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.ThreeQuarters, Projectile.rotation + .2f * Dir - MathHelper.PiOver2);
+        Owner.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.ThreeQuarters,
+            Projectile.rotation + .2f * Dir - MathHelper.PiOver2);
 
         Vector2 centerString = PolarVector(3f, Projectile.rotation - MathHelper.Pi);
         Vector2 drawBack = PolarVector(ReelDist * StringCompletion, Projectile.rotation - MathHelper.Pi);
 
-        Vector2 top = Projectile.RotHitbox().Center + PolarVector(13f, Projectile.rotation - MathHelper.PiOver2) + centerString;
+        Vector2 top = Projectile.RotHitbox().Center + PolarVector(13f, Projectile.rotation - MathHelper.PiOver2) +
+                      centerString;
         Vector2 middle = Projectile.RotHitbox().Center + centerString + drawBack;
         arrowPos = middle + PolarVector(arrow.Height / 2, Projectile.rotation);
-        Vector2 bottom = Projectile.RotHitbox().Center + PolarVector(-12f, Projectile.rotation - MathHelper.PiOver2) + centerString;
+        Vector2 bottom = Projectile.RotHitbox().Center + PolarVector(-12f, Projectile.rotation - MathHelper.PiOver2) +
+                         centerString;
 
         Points = [];
         cache ??= new(MaxPoints);
@@ -121,14 +133,16 @@ public class DownpourHeld : BaseIdleHoldoutProjectile
                         Time = 0f;
                         this.Sync();
                     }
+
                     break;
                 case 1:
                     StringCompletion = Animators.MakePoly(2.2f).InFunction.Evaluate(0f, 1f, reel);
                     if (reel >= 1f || (this.RunLocal() && !Modded.MouseLeft.Current))
                     {
-                        Owner.PickAmmo(Item, out int type, out float speed, out int dmg, out float kb, out int ammo, Owner.ShouldConsumeAmmo(Item));
+                        Owner.PickAmmo(Item, out int type, out float speed, out int dmg, out float kb, out int ammo,
+                            Owner.ShouldConsumeAmmo(Item));
                         speed *= reel;
-                        dmg = (int)(dmg * MathHelper.Clamp(reel, .1f, 1f));
+                        dmg = (int) (dmg * MathHelper.Clamp(reel, .1f, 1f));
                         kb *= reel;
                         Projectile.NewProj(arrowPos, Projectile.velocity * speed, type, dmg, kb, Owner.whoAmI);
 
@@ -138,20 +152,32 @@ public class DownpourHeld : BaseIdleHoldoutProjectile
                             Vector2 pos = arrowPos + offset;
                             if (this.RunLocal())
                             {
-                                Vector2 vel = pos.SafeDirectionTo(Modded.MouseWorld + offset) * speed * Main.rand.NextFloat(.8f, 1.3f);
-                                Projectile.NewProj(pos, vel, ModContent.ProjectileType<RainDrop>(), dmg / 3, kb / 3, Owner.whoAmI);
-                                ParticleRegistry.SpawnPulseRingParticle(pos, vel.SafeNormalize(Vector2.Zero), Main.rand.Next(20, 30), vel.ToRotation(), new(.5f, 1f), 0f, 30f, Color.CornflowerBlue);
+                                Vector2 vel = pos.SafeDirectionTo(Modded.MouseWorld + offset) * speed *
+                                              Main.rand.NextFloat(.8f, 1.3f);
+                                Projectile.NewProj(pos, vel, ModContent.ProjectileType<RainDrop>(), dmg / 3, kb / 3,
+                                    Owner.whoAmI);
+                                ParticleRegistry.SpawnPulseRingParticle(pos, vel.SafeNormalize(Vector2.Zero),
+                                    Main.rand.Next(20, 30), vel.ToRotation(), new(.5f, 1f), 0f, 30f,
+                                    Color.CornflowerBlue);
                                 for (int j = 0; j < 6; j++)
-                                    Dust.NewDustPerfect(pos, DustID.Water, vel.RotatedByRandom(.2f) * Main.rand.NextFloat(.4f, .8f), 0, default, Main.rand.NextFloat(1.5f, 1.9f)).noGravity = true;
+                                    Dust.NewDustPerfect(pos, DustID.Water,
+                                        vel.RotatedByRandom(.2f) * Main.rand.NextFloat(.4f, .8f), 0, default,
+                                        Main.rand.NextFloat(1.5f, 1.9f)).noGravity = true;
                             }
                         }
-                        SoundEngine.PlaySound(SoundID.Item5 with { Volume = Main.rand.NextFloat(.9f, 1.2f), PitchVariance = .1f, Identifier = Name }, arrowPos);
+
+                        SoundEngine.PlaySound(
+                            SoundID.Item5 with
+                            {
+                                Volume = Main.rand.NextFloat(.9f, 1.2f), PitchVariance = .1f, Identifier = Name
+                            }, arrowPos);
 
                         OldStringCompletion = StringCompletion;
                         Switch = 0;
                         Time = 0f;
                         this.Sync();
                     }
+
                     break;
             }
 
@@ -166,10 +192,13 @@ public class DownpourHeld : BaseIdleHoldoutProjectile
     }
 
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         Item ammoItem = Owner.ChooseAmmo(Item);
-        Texture2D arrow = ammoItem != null ? ammoItem.ThisItemTexture() : AssetRegistry.GetTexture(AdditionsTexture.Pixel);
+        Texture2D arrow = ammoItem != null
+            ? ammoItem.ThisItemTexture()
+            : AssetRegistry.GetTexture(AdditionsTexture.Pixel);
 
         if (trail != null && !trail.Disposed && cache != null)
             trail.DrawTrail(ShaderRegistry.StandardPrimitiveShader, cache.Points, 100, false, false);
@@ -184,12 +213,15 @@ public class DownpourHeld : BaseIdleHoldoutProjectile
             direction = SpriteEffects.FlipHorizontally;
             rotation += MathHelper.Pi;
         }
-        Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), rotation, origin, Projectile.scale, direction, 0f);
+
+        Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), rotation, origin,
+            Projectile.scale, direction, 0f);
 
         float opacity = InverseLerp(0f, 10f, TotalTime);
         if (Switch == 0)
             opacity = 0f;
-        Main.spriteBatch.Draw(arrow, arrowPos - Main.screenPosition, null, lightColor * opacity, Projectile.rotation - MathHelper.PiOver2, arrow.Size() / 2, 1f, 0, 0f);
+        Main.spriteBatch.Draw(arrow, arrowPos - Main.screenPosition, null, lightColor * opacity,
+            Projectile.rotation - MathHelper.PiOver2, arrow.Size() / 2, 1f, 0, 0f);
 
         return false;
     }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using CalamityMod;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.Achievements;
@@ -28,7 +27,7 @@ public class CannonHoldout : ModProjectile
 
     public bool PlayedSound
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[0] == 1;
+        get => (int) Projectile.AdditionsInfo().ExtraAI[0] == 1;
         set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
 
@@ -131,10 +130,10 @@ public class CannonHoldout : ModProjectile
         Vector2 destroyVector = Projectile.Center;
         const float destruction = 16f;
         const int scale = 3;
-        int destructleft = (int)(destroyVector.X / destruction - scale);
-        int destructright = (int)(destroyVector.X / destruction + scale);
-        int destructdown = (int)(destroyVector.Y / destruction - scale);
-        int destructup = (int)(destroyVector.Y / destruction + scale);
+        int destructleft = (int) (destroyVector.X / destruction - scale);
+        int destructright = (int) (destroyVector.X / destruction + scale);
+        int destructdown = (int) (destroyVector.Y / destruction - scale);
+        int destructup = (int) (destroyVector.Y / destruction + scale);
 
         if (destructleft < 0)
             destructleft = 0;

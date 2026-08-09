@@ -6,6 +6,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 public class ShroomiteDashImpact : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 120;

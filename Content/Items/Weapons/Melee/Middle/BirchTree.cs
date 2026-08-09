@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using CalamityMod;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -24,7 +23,7 @@ public class BirchTree : ModItem
         Item.useStyle = ItemUseStyleID.Shoot;
         Item.knockBack = 18;
         Item.damage = 600;
-        Item.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
+        Item.DamageType = ModContent.GetInstance<MeleeNoSpeedDamageClass>();
         Item.shoot = ModContent.ProjectileType<Birch>();
         Item.noUseGraphic = Item.noMelee = Item.autoReuse = true;
     }
@@ -36,9 +35,11 @@ public class BirchTree : ModItem
 
     public override bool CanUseItem(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback)
     {
-        Main.projectile[Projectile.NewProjectile(source, position, velocity, type, damage, knockback, Main.myPlayer)].As<Birch>().SwingDir = Projectiles.Base.BaseSwordSwing.SwingDirection.Up;
+        Main.projectile[Projectile.NewProjectile(source, position, velocity, type, damage, knockback, Main.myPlayer)]
+            .As<Birch>().SwingDir = Projectiles.Base.BaseSwordSwing.SwingDirection.Up;
         return false;
     }
 

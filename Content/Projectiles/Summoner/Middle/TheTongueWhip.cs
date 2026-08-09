@@ -37,7 +37,7 @@ public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
 
     public int Timer
     {
-        get => (int)Projectile.ai[1];
+        get => (int) Projectile.ai[1];
         set => Projectile.ai[1] = value;
     }
 
@@ -81,12 +81,14 @@ public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
                 VerletSimulatedSegment segment = new(Projectile.Center + Vector2.UnitY * 5f * i);
                 Segments.Add(segment);
             }
+
             Segments[0].Locked = true;
             Init = true;
             this.Sync();
         }
 
-        Projectile.Center = Projectile.Center.MoveTowards(Owner.RotatedRelativePoint(Owner.MountedCenter, false, true), 10f);
+        Projectile.Center =
+            Projectile.Center.MoveTowards(Owner.RotatedRelativePoint(Owner.MountedCenter, false, true), 10f);
 
         if (Segments == null)
         {
@@ -121,7 +123,8 @@ public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
             Vector2 dir = Segments.Last().Position - Owner.Center;
             if (dir.Length() > 380f * Owner.whipRangeMultiplier)
             {
-                Vector2 maxDist = Owner.Center + Utils.SafeNormalize(dir, Vector2.One) * 380f * Owner.whipRangeMultiplier;
+                Vector2 maxDist =
+                    Owner.Center + Utils.SafeNormalize(dir, Vector2.One) * 380f * Owner.whipRangeMultiplier;
                 Segments.Last().Position = maxDist;
             }
             else
@@ -135,7 +138,7 @@ public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
 
             Vector2 delta = Segments.Last().Position - Segments.Last().OldPosition;
             float centrifugalForce = Math.Clamp(delta.Length() * 2f, 0f, 130f) / 130f;
-            Projectile.damage = (int)(Owner.HeldItem.damage * centrifugalForce * 2f);
+            Projectile.damage = (int) (Owner.HeldItem.damage * centrifugalForce * 2f);
 
             if (dir.Length() > 3200f)
                 Projectile.Kill();
@@ -159,27 +162,32 @@ public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
             {
                 if (Main.rand.NextBool(2))
                 {
-                    int p = Projectile.NewProj(pos, vel, ModContent.ProjectileType<IchorGlobule>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
+                    int p = Projectile.NewProj(pos, vel, ModContent.ProjectileType<IchorGlobule>(), Projectile.damage,
+                        Projectile.knockBack, Projectile.owner);
                     Main.projectile[p].DamageType = DamageClass.Summon;
                     Main.projectile[p].tileCollide = false;
                     for (int i = 0; i < 20; i++)
                     {
                         vel *= Main.rand.NextFloat(.6f, 1f);
-                        Dust.NewDust(pos, 10, 10, DustID.Ichor, vel.X, vel.Y, 0, default, Main.rand.NextFloat(.8f, 1.2f));
+                        Dust.NewDust(pos, 10, 10, DustID.Ichor, vel.X, vel.Y, 0, default,
+                            Main.rand.NextFloat(.8f, 1.2f));
                     }
 
                     for (int i = 0; i < 30; i++)
                     {
                         vel *= Main.rand.NextFloat(.6f, 1f);
-                        Dust.NewDust(pos, 10, 10, DustID.Water, vel.X, vel.Y, 0, default, Main.rand.NextFloat(.8f, 1.2f));
+                        Dust.NewDust(pos, 10, 10, DustID.Water, vel.X, vel.Y, 0, default,
+                            Main.rand.NextFloat(.8f, 1.2f));
                     }
                 }
+
                 Owner.MinionAttackTargetNPC = target.whoAmI;
             }
 
             for (int i = 0; i < 8; i++)
             {
-                ParticleRegistry.SpawnSquishyPixelParticle(pos, vel.RotatedByRandom(.3f) * Main.rand.NextFloat(.7f, 1.4f),
+                ParticleRegistry.SpawnSquishyPixelParticle(pos,
+                    vel.RotatedByRandom(.3f) * Main.rand.NextFloat(.7f, 1.4f),
                     Main.rand.Next(70, 90), Main.rand.NextFloat(.8f, 1.5f), Color.Gold, Color.Yellow, 3, true, true);
             }
 
@@ -207,7 +215,9 @@ public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
 
         // Calculate squish vectors based on how fast the tongue is moving and how far it is from the player
         Vector2 val = Segments.Last().Position - Segments.Last().OldPosition;
-        float stretchFactor = MathHelper.Clamp(Segments.Last().Position.Distance(Owner.Center) / MouseWorld.Distance(Owner.Center), .5f, 1f);
+        float stretchFactor =
+            MathHelper.Clamp(Segments.Last().Position.Distance(Owner.Center) / MouseWorld.Distance(Owner.Center), .5f,
+                1f);
         if (!this.RunLocal())
             stretchFactor = 1f;
         float centrifugalForce = Math.Clamp(val.Length() * 2f - 10f, 0f, 130f) / 150f;
@@ -216,19 +226,23 @@ public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
         Vector2 scale = new(1f, 1f * stretchFactor);
         scale *= centrifugalSquish;
 
-        int totalChains = (int)(Vector2.Distance(Segments.First().Position, Segments.Last().Position) / innerTongueTex.Height / scale.Length()) / 2;
-        totalChains = (int)MathHelper.Clamp(totalChains, 30f, 1200f);
+        int totalChains = (int) (Vector2.Distance(Segments.First().Position, Segments.Last().Position) /
+                                 innerTongueTex.Height / scale.Length()) / 2;
+        totalChains = (int) MathHelper.Clamp(totalChains, 30f, 1200f);
         for (int i = 0; i < totalChains - 1; i++)
         {
-            Vector2 drawPosition = bezierCurve.Evaluate(i / (float)totalChains);
-            float completionRatio = i / (float)totalChains + 1f / totalChains;
+            Vector2 drawPosition = bezierCurve.Evaluate(i / (float) totalChains);
+            float completionRatio = i / (float) totalChains + 1f / totalChains;
             float angle = (bezierCurve.Evaluate(completionRatio) - drawPosition).ToRotation();
-            Color baseChainColor = Lighting.GetColor((int)drawPosition.X / 16, (int)drawPosition.Y / 16) * 2f;
+            Color baseChainColor = Lighting.GetColor((int) drawPosition.X / 16, (int) drawPosition.Y / 16) * 2f;
             if (i == totalChains - 2)
                 innerTongueTex = tongueTex;
 
-            Main.EntitySpriteDraw(innerTongueTex, drawPosition - Main.screenPosition, null, baseChainColor.MultiplyRGBA(Color.White) * (Projectile.timeLeft / (float)FadeoutTime), angle, innerTongueTex.Size() * 0.5f, scale, SpriteEffects.None, 0);
+            Main.EntitySpriteDraw(innerTongueTex, drawPosition - Main.screenPosition, null,
+                baseChainColor.MultiplyRGBA(Color.White) * (Projectile.timeLeft / (float) FadeoutTime), angle,
+                innerTongueTex.Size() * 0.5f, scale, SpriteEffects.None, 0);
         }
+
         return false;
     }
 
@@ -237,6 +251,7 @@ public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
         if (Segments != null)
             writer.WriteVector2(Segments.Last().Position);
     }
+
     public override void ReceiveExtraAI(BinaryReader reader)
     {
         if (Segments != null)

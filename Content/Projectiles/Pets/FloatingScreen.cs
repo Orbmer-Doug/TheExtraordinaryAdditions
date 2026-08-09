@@ -1,5 +1,4 @@
-﻿using CalamityMod.CalPlayer;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using SubworldLibrary;
 using System;
 using System.Reflection;
@@ -66,7 +65,9 @@ public class FloatingScreenManager : ModSystem
 {
     private ManagedRenderTarget crtTarget;
     private ManagedShader crtShader;
-    private static readonly RenderTargetInitializationAction TargetInitializer = (width, height) => new RenderTarget2D(Main.instance.GraphicsDevice, width, height);
+
+    private static readonly RenderTargetInitializationAction TargetInitializer =
+        (width, height) => new RenderTarget2D(Main.instance.GraphicsDevice, width, height);
 
     public override void Load()
     {
@@ -105,15 +106,18 @@ public class FloatingScreenManager : ModSystem
     {
         if (ModReferences.WotG != null)
         {
-            Type eternalGardenUpdateSystem = ModReferences.WotG.Code?.GetType("NoxusBoss.Core.World.Subworlds.EternalGardenUpdateSystem");
+            Type eternalGardenUpdateSystem =
+                ModReferences.WotG.Code?.GetType("NoxusBoss.Core.World.Subworlds.EternalGardenUpdateSystem");
             if (eternalGardenUpdateSystem == null)
                 return false;
-            PropertyInfo eternalProperty = eternalGardenUpdateSystem.GetProperty("WasInSubworldLastUpdateFrame", BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
+            PropertyInfo eternalProperty = eternalGardenUpdateSystem.GetProperty("WasInSubworldLastUpdateFrame",
+                BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
             if (eternalProperty == null)
                 return false;
 
-            return (bool)eternalProperty.GetValue(null);
+            return (bool) eternalProperty.GetValue(null);
         }
+
         return false;
     }
 
@@ -123,6 +127,7 @@ public class FloatingScreenManager : ModSystem
         {
             return NPC.AnyNPCs(npc.Type);
         }
+
         return false;
     }
 
@@ -137,7 +142,8 @@ public class FloatingScreenManager : ModSystem
         device.SetRenderTarget(crtTarget);
         device.Clear(Color.Transparent);
 
-        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, Main.Rasterizer, null, Matrix.Identity);
+        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp,
+            DepthStencilState.None, Main.Rasterizer, null, Matrix.Identity);
 
         foreach (Projectile projectile in Main.ActiveProjectiles)
         {
@@ -145,11 +151,6 @@ public class FloatingScreenManager : ModSystem
                 continue;
             FloatingScreen screen = projectile.As<FloatingScreen>();
             Player player = screen.Owner;
-            bool inSulphur = player.GetModPlayer<CalamityPlayer>().ZoneSulphur;
-            bool inAstral = player.GetModPlayer<CalamityPlayer>().ZoneAstral; // Astral Infection credit: https://www.deviantart.com/mp-24/art/The-Astral-Infection-873382367
-            bool inCrags = player.GetModPlayer<CalamityPlayer>().ZoneCalamity;
-            bool inSunkenSea = player.GetModPlayer<CalamityPlayer>().ZoneSunkenSea;
-            bool inAbyss = player.GetModPlayer<CalamityPlayer>().ZoneAbyss;
             bool inCrater = SubworldSystem.IsActive<CloudedCrater>();
             bool avatar = HiAvatar();
             bool garden = InEternalGarden();
@@ -162,11 +163,14 @@ public class FloatingScreenManager : ModSystem
 
             if (!avatar)
             {
-                int wall = Main.tile[(int)(player.Center.X / 16f), (int)(player.Center.Y / 16f)].wall;
+                int wall = Main.tile[(int) (player.Center.X / 16f), (int) (player.Center.Y / 16f)].wall;
                 if (inCrater)
                     background = AssetRegistry.GetTexture(AdditionsTexture.Background_CloudedCrater);
                 else if (garden)
                     background = AssetRegistry.GetTexture(AdditionsTexture.Background_EternalGarden);
+
+                //TODO
+                /*
                 else if (inCrags)
                     background = AssetRegistry.GetTexture(AdditionsTexture.Background_Brimstone);
                 else if (inAstral)
@@ -178,7 +182,9 @@ public class FloatingScreenManager : ModSystem
                     background = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
                     color = Color.Black;
                 }
-                else if (Main.screenPosition.Y > (float)((Main.maxTilesY - 232) * 16))
+                */
+
+                else if (Main.screenPosition.Y > (float) ((Main.maxTilesY - 232) * 16))
                     background = AssetRegistry.GetTexture(AdditionsTexture.Background_Underworld);
                 else if (player.ZoneDungeon)
                     background = AssetRegistry.GetTexture(AdditionsTexture.Background_Dungeon);
@@ -186,7 +192,7 @@ public class FloatingScreenManager : ModSystem
                     background = AssetRegistry.GetTexture(AdditionsTexture.Background_JungleTemple);
                 else if (player.ZoneShimmer)
                     background = AssetRegistry.GetTexture(AdditionsTexture.Background_Shimmer);
-                else if ((double)Main.screenPosition.Y > Main.worldSurface * 16.0)
+                else if ((double) Main.screenPosition.Y > Main.worldSurface * 16.0)
                 {
                     switch (wall)
                     {
@@ -208,16 +214,40 @@ public class FloatingScreenManager : ModSystem
                             break;
                         default:
                             // vanilla shenanigans
-                            background = player.ZoneGemCave ? AssetRegistry.GetTexture(AdditionsTexture.Background_GemCave) : (player.ZoneGlowshroom ? AssetRegistry.GetTexture(AdditionsTexture.Background_GlowingShrooms)
-                                : (player.ZoneCorrupt ? (player.ZoneDesert ? AssetRegistry.GetTexture(AdditionsTexture.Background_Corruption)
-                                : ((!player.ZoneSnow) ? AssetRegistry.GetTexture(AdditionsTexture.Background_Corruption) : AssetRegistry.GetTexture(AdditionsTexture.Background_Corruption)))
-                                : (player.ZoneCrimson ? (player.ZoneDesert ? AssetRegistry.GetTexture(AdditionsTexture.Background_Crimson)
-                                : ((!player.ZoneSnow) ? AssetRegistry.GetTexture(AdditionsTexture.Background_Crimson) : AssetRegistry.GetTexture(AdditionsTexture.Background_Crimson)))
-                                : (player.ZoneHallow ? (player.ZoneDesert ? AssetRegistry.GetTexture(AdditionsTexture.Background_Hallow)
-                                : ((!player.ZoneSnow) ? AssetRegistry.GetTexture(AdditionsTexture.Background_Hallow) : AssetRegistry.GetTexture(AdditionsTexture.Background_Hallow)))
-                                : (player.ZoneSnow ? AssetRegistry.GetTexture(AdditionsTexture.Background_Snow) : (player.ZoneJungle ? AssetRegistry.GetTexture(AdditionsTexture.Background_Jungle)
-                                : (player.ZoneDesert ? AssetRegistry.GetTexture(AdditionsTexture.Background_Desert)
-                                : ((!player.ZoneRockLayerHeight) ? AssetRegistry.GetTexture(AdditionsTexture.Background_Undergound) : AssetRegistry.GetTexture(AdditionsTexture.Background_Cavern)))))))));
+                            background = player.ZoneGemCave
+                                ? AssetRegistry.GetTexture(AdditionsTexture.Background_GemCave)
+                                : (player.ZoneGlowshroom
+                                    ? AssetRegistry.GetTexture(AdditionsTexture.Background_GlowingShrooms)
+                                    : (player.ZoneCorrupt
+                                        ? (player.ZoneDesert
+                                            ? AssetRegistry.GetTexture(AdditionsTexture.Background_Corruption)
+                                            : ((!player.ZoneSnow)
+                                                ? AssetRegistry.GetTexture(AdditionsTexture.Background_Corruption)
+                                                : AssetRegistry.GetTexture(AdditionsTexture.Background_Corruption)))
+                                        : (player.ZoneCrimson
+                                            ? (player.ZoneDesert
+                                                ? AssetRegistry.GetTexture(AdditionsTexture.Background_Crimson)
+                                                : ((!player.ZoneSnow)
+                                                    ? AssetRegistry.GetTexture(AdditionsTexture.Background_Crimson)
+                                                    : AssetRegistry.GetTexture(AdditionsTexture.Background_Crimson)))
+                                            : (player.ZoneHallow
+                                                ? (player.ZoneDesert
+                                                    ? AssetRegistry.GetTexture(AdditionsTexture.Background_Hallow)
+                                                    : ((!player.ZoneSnow)
+                                                        ? AssetRegistry.GetTexture(AdditionsTexture.Background_Hallow)
+                                                        : AssetRegistry.GetTexture(AdditionsTexture.Background_Hallow)))
+                                                : (player.ZoneSnow
+                                                    ? AssetRegistry.GetTexture(AdditionsTexture.Background_Snow)
+                                                    : (player.ZoneJungle
+                                                        ? AssetRegistry.GetTexture(AdditionsTexture.Background_Jungle)
+                                                        : (player.ZoneDesert
+                                                            ? AssetRegistry.GetTexture(AdditionsTexture
+                                                                .Background_Desert)
+                                                            : ((!player.ZoneRockLayerHeight)
+                                                                ? AssetRegistry.GetTexture(AdditionsTexture
+                                                                    .Background_Undergound)
+                                                                : AssetRegistry.GetTexture(AdditionsTexture
+                                                                    .Background_Cavern)))))))));
                             break;
                     }
                 }
@@ -249,7 +279,7 @@ public class FloatingScreenManager : ModSystem
                     background = AssetRegistry.GetTexture(AdditionsTexture.Background_GlowingShrooms);
                 else
                 {
-                    int centerTile = (int)((Main.screenPosition.X + (float)(Main.screenWidth / 2)) / 16f);
+                    int centerTile = (int) ((Main.screenPosition.X + (float) (Main.screenWidth / 2)) / 16f);
                     if (player.ZoneSkyHeight)
                         background = AssetRegistry.GetTexture(AdditionsTexture.Background_Space);
                     else if (player.ZoneCorrupt)
@@ -258,9 +288,8 @@ public class FloatingScreenManager : ModSystem
                         background = AssetRegistry.GetTexture(AdditionsTexture.Background_Crimson);
                     else if (player.ZoneHallow)
                         background = AssetRegistry.GetTexture(AdditionsTexture.Background_Hallow);
-                    else if (inSulphur)
-                        background = AssetRegistry.GetTexture(AdditionsTexture.Background_Sulphur);
-                    else if ((double)(Main.screenPosition.Y / 16f) < Main.worldSurface + 10.0 && (centerTile < 380 || centerTile > Main.maxTilesX - 380))
+                    else if ((double) (Main.screenPosition.Y / 16f) < Main.worldSurface + 10.0 &&
+                             (centerTile < 380 || centerTile > Main.maxTilesX - 380))
                         background = AssetRegistry.GetTexture(AdditionsTexture.Background_Ocean);
                     else if (player.ZoneSnow && player.ZoneRain)
                         background = AssetRegistry.GetTexture(AdditionsTexture.Background_Blizzard);
@@ -285,9 +314,11 @@ public class FloatingScreenManager : ModSystem
                     else if (player.ZoneRain)
                         background = AssetRegistry.GetTexture(AdditionsTexture.Background_Rain);
                 }
+
                 if (NPC.AnyNPCs(ModContent.NPCType<TheGiantSnailFromAncientTimes>()))
                     background = AssetRegistry.GetTexture(AdditionsTexture.Background_Snail);
-                Main.spriteBatch.DrawBetterRect(background, ToTarget(Main.screenPosition, resolution), null, color, 0f, Vector2.Zero, SpriteEffects.None, false);
+                Main.spriteBatch.DrawBetterRect(background, ToTarget(Main.screenPosition, resolution), null, color, 0f,
+                    Vector2.Zero, SpriteEffects.None, false);
             }
             else
             {
@@ -300,12 +331,17 @@ public class FloatingScreenManager : ModSystem
                 float baseInterpolant = Cos01(Main.GlobalTimeWrappedHourly * 2.1f);
                 float colorInterpolant = Animators.MakePoly(3f).InOutFunction(baseInterpolant);
 
-                Main.spriteBatch.DrawBetterRect(background, ToTarget(Main.screenPosition + Vector2.UnitX * resolution.X / 2f, size), null, Color.Lerp(a, b, 1f - colorInterpolant), 0f, Vector2.Zero, SpriteEffects.None, false);
-                Main.spriteBatch.DrawBetterRect(background, ToTarget(Main.screenPosition, size), null, Color.Lerp(a, b, colorInterpolant), 0f, Vector2.Zero, SpriteEffects.None, false);
+                Main.spriteBatch.DrawBetterRect(background,
+                    ToTarget(Main.screenPosition + Vector2.UnitX * resolution.X / 2f, size), null,
+                    Color.Lerp(a, b, 1f - colorInterpolant), 0f, Vector2.Zero, SpriteEffects.None, false);
+                Main.spriteBatch.DrawBetterRect(background, ToTarget(Main.screenPosition, size), null,
+                    Color.Lerp(a, b, colorInterpolant), 0f, Vector2.Zero, SpriteEffects.None, false);
             }
 
             Texture2D asterlin = AssetRegistry.GetTexture(AdditionsTexture.AsterlinFacingForward);
-            Main.spriteBatch.Draw(asterlin, new Vector2(Main.screenWidth / 2f, Main.screenHeight) - projectile.velocity * 4f, null, Color.White, 0f, asterlin.Size() / 2f, 6f, 0, 0f);
+            Main.spriteBatch.Draw(asterlin,
+                new Vector2(Main.screenWidth / 2f, Main.screenHeight) - projectile.velocity * 4f, null, Color.White, 0f,
+                asterlin.Size() / 2f, 6f, 0, 0f);
         }
 
         Main.spriteBatch.End();
@@ -324,7 +360,8 @@ public class FloatingScreenManager : ModSystem
         crtShader.TrySetParameter("findingChannel", false);
         crtShader.TrySetParameter("resolution", res);
 
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, Main.Rasterizer, crtShader.Effect, Main.GameViewMatrix.TransformationMatrix);
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp,
+            DepthStencilState.None, Main.Rasterizer, crtShader.Effect, Main.GameViewMatrix.TransformationMatrix);
         foreach (Projectile projectile in Main.ActiveProjectiles)
         {
             if (projectile == null || projectile.type != ModContent.ProjectileType<FloatingScreen>())
@@ -332,8 +369,10 @@ public class FloatingScreenManager : ModSystem
             FloatingScreen screen = projectile.As<FloatingScreen>();
             Player player = screen.Owner;
 
-            Main.spriteBatch.DrawBetterRect(crtTarget, ToTarget(projectile.Center, res), null, Color.White, 0f, crtTarget.Size() / 2f, SpriteEffects.None, false);
+            Main.spriteBatch.DrawBetterRect(crtTarget, ToTarget(projectile.Center, res), null, Color.White, 0f,
+                crtTarget.Size() / 2f, SpriteEffects.None, false);
         }
+
         Main.spriteBatch.End();
     }
 }

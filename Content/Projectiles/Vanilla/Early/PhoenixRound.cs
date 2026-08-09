@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -35,11 +34,13 @@ public class PhoenixRound : ModProjectile
             trail = new(WidthFunction, ColorFunction, null, 5);
 
         if (Main.rand.NextBool(7))
-            ParticleRegistry.SpawnSquishyPixelParticle(Projectile.Center, -Projectile.velocity * Main.rand.NextFloat(.9f, 1.27f),
+            ParticleRegistry.SpawnSquishyPixelParticle(Projectile.Center,
+                -Projectile.velocity * Main.rand.NextFloat(.9f, 1.27f),
                 Main.rand.Next(80, 90), Main.rand.NextFloat(.4f, .7f), Color.OrangeRed, Color.Chocolate, 6, true, true);
         if (Main.rand.NextBool(7))
             ParticleRegistry.SpawnMistParticle(Projectile.Center, -Projectile.velocity * Main.rand.NextFloat(.3f, .5f),
-                Main.rand.NextFloat(.5f, .7f), Color.LightGray, Color.DarkGray, Main.rand.NextFloat(80f, 120f), Main.rand.NextFloat(-.14f, .14f));
+                Main.rand.NextFloat(.5f, .7f), Color.LightGray, Color.DarkGray, Main.rand.NextFloat(80f, 120f),
+                Main.rand.NextFloat(-.14f, .14f));
 
         Lighting.AddLight(Projectile.Center, Color.OrangeRed.ToVector3() * Projectile.Opacity);
 
@@ -59,6 +60,7 @@ public class PhoenixRound : ModProjectile
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints cache;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -70,6 +72,7 @@ public class PhoenixRound : ModProjectile
                 trail.DrawTrail(shader, cache.Points, 30);
             }
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;
     }
@@ -86,10 +89,12 @@ public class PhoenixRound : ModProjectile
             Vector2 vel = Main.rand.NextVector2Circular(6f, 6f);
             int life = Main.rand.Next(30, 60);
             float scale = Main.rand.NextFloat(.5f, .9f);
-            ParticleRegistry.SpawnSquishyPixelParticle(pos, vel, life + 70, scale * 2.9f, Color.OrangeRed.Lerp(Color.Red, Main.rand.NextFloat(.4f, .8f)), Color.Orange, 6, true, true);
+            ParticleRegistry.SpawnSquishyPixelParticle(pos, vel, life + 70, scale * 2.9f,
+                Color.OrangeRed.Lerp(Color.Red, Main.rand.NextFloat(.4f, .8f)), Color.Orange, 6, true, true);
         }
 
-        ParticleRegistry.SpawnDetailedBlastParticle(Projectile.Center, Vector2.Zero, Vector2.One * 45, Vector2.Zero, 20, Color.OrangeRed, null, Color.Red, true);
+        ParticleRegistry.SpawnDetailedBlastParticle(Projectile.Center, Vector2.Zero, Vector2.One * 45, Vector2.Zero, 20,
+            Color.OrangeRed, null, Color.Red, true);
         if (this.RunLocal())
         {
             Projectile.penetrate = -1;

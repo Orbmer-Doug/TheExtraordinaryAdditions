@@ -49,6 +49,7 @@ public class SmartPistolGlobalPlayer : ModPlayer
 {
     public int Shots;
     public const int MaxShots = 12;
+
     public override void UpdateDead()
     {
         Shots = 0;
@@ -63,18 +64,22 @@ public class SmartPistolLayer : PlayerDrawLayer
     }
 
     public static bool Drawing = false;
+
     protected override void Draw(ref PlayerDrawSet drawInfo)
     {
         Player drawPlayer = drawInfo.drawPlayer;
 
         Drawing = false;
-        if (drawPlayer != null && FindItem(out Item item, drawPlayer, ModContent.ItemType<SmartPistolMK6>()) && drawInfo.shadow == 0f && Main.myPlayer == drawPlayer.whoAmI)
+        if (drawPlayer != null && FindItem(out Item item, drawPlayer, ModContent.ItemType<SmartPistolMK6>()) &&
+            drawInfo.shadow == 0f && Main.myPlayer == drawPlayer.whoAmI)
         {
             if (item != Main.mouseItem)
             {
-                int shot = (int)MathHelper.Clamp(12 - drawPlayer.GetModPlayer<SmartPistolGlobalPlayer>().Shots, 0, 12);
+                int shot = (int) MathHelper.Clamp(12 - drawPlayer.GetModPlayer<SmartPistolGlobalPlayer>().Shots, 0, 12);
                 string text = $"{shot}/12";
-                ChatManager.DrawColorCodedString(Main.spriteBatch, FontAssets.CombatText[1].Value, text, drawPlayer.Center - Vector2.UnitY * 60f - Vector2.UnitX * 22f - Main.screenPosition, Color.White, 0f, Vector2.Zero, Vector2.One * .7f);
+                ChatManager.DrawColorCodedString(Main.spriteBatch, FontAssets.CombatText[1].Value, text,
+                    drawPlayer.Center - Vector2.UnitY * 60f - Vector2.UnitX * 22f - Main.screenPosition, Color.White,
+                    0f, Vector2.Zero, Vector2.One * .7f);
 
                 Drawing = true;
             }
@@ -100,43 +105,55 @@ public class SmartPistolHeld : BaseIdleHoldoutProjectile
     public List<NPC> StruckTargets = [];
 
     public int Dir => Projectile.velocity.X.NonZeroSign();
-    public Vector2 Tip => Projectile.Center + PolarVector(22f, Projectile.rotation) + PolarVector(12f * Dir, Projectile.rotation - MathHelper.PiOver2);
-    public Vector2 LaserTip => Projectile.Center + PolarVector(14f, Projectile.rotation) + PolarVector(8f * Dir, Projectile.rotation - MathHelper.PiOver2);
-    public Vector2 CartridgePos => Projectile.Center + PolarVector(-22f, Projectile.rotation) + PolarVector(8f * Dir, Projectile.rotation - MathHelper.PiOver2);
+
+    public Vector2 Tip => Projectile.Center + PolarVector(22f, Projectile.rotation) +
+                          PolarVector(12f * Dir, Projectile.rotation - MathHelper.PiOver2);
+
+    public Vector2 LaserTip => Projectile.Center + PolarVector(14f, Projectile.rotation) +
+                               PolarVector(8f * Dir, Projectile.rotation - MathHelper.PiOver2);
+
+    public Vector2 CartridgePos => Projectile.Center + PolarVector(-22f, Projectile.rotation) +
+                                   PolarVector(8f * Dir, Projectile.rotation - MathHelper.PiOver2);
 
     public const float SightDist = 1000f;
     public const int MaxReloadTime = 130;
 
     public int ShootTime
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
+
     public bool Shooting
     {
         get => Projectile.ai[1] == 1f;
         set => Projectile.ai[1] = value.ToInt();
     }
+
     public int NPCIndex
     {
-        get => (int)Projectile.ai[2];
+        get => (int) Projectile.ai[2];
         set => Projectile.ai[2] = value;
     }
+
     public bool Reloading
     {
         get => Projectile.AdditionsInfo().ExtraAI[0] == 1f;
         set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
+
     public int ReloadTime
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[1];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[1];
         set => Projectile.AdditionsInfo().ExtraAI[1] = value;
     }
+
     public int ShotIndex
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[2];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[2];
         set => Projectile.AdditionsInfo().ExtraAI[2] = value;
     }
+
     public ref int Shots => ref Owner.GetModPlayer<SmartPistolGlobalPlayer>().Shots;
 
     public override void SafeAI()
@@ -191,6 +208,7 @@ public class SmartPistolHeld : BaseIdleHoldoutProjectile
                 Shots = 0;
                 Reloading = false;
             }
+
             ReloadTime++;
             this.Sync();
             return;
@@ -206,6 +224,7 @@ public class SmartPistolHeld : BaseIdleHoldoutProjectile
             ShotIndex = 0;
             this.Sync();
         }
+
         if (Shooting)
         {
             if (NPCIndex >= Targets.Count)
@@ -233,10 +252,12 @@ public class SmartPistolHeld : BaseIdleHoldoutProjectile
                         ParticleRegistry.SpawnGlowParticle(Tip, Vector2.Zero, 8, Main.rand.NextFloat(.7f, 1.2f) * 50f,
                             Color.White.Lerp(Color.OrangeRed, .3f));
                         for (int j = 0; j < 15; j++)
-                            ParticleRegistry.SpawnSparkParticle(Tip, vel.RotatedByRandom(.3f) * Main.rand.NextFloat(10f, 28f),
+                            ParticleRegistry.SpawnSparkParticle(Tip,
+                                vel.RotatedByRandom(.3f) * Main.rand.NextFloat(10f, 28f),
                                 Main.rand.Next(19, 30), Main.rand.NextFloat(.7f, 1f), Color.Orange, true, true);
 
-                        Projectile.CreateFriendlyExplosion(targetPos, Vector2.One, Projectile.damage, Projectile.knockBack, 2, 10);
+                        Projectile.CreateFriendlyExplosion(targetPos, Vector2.One, Projectile.damage,
+                            Projectile.knockBack, 2, 10);
                         SoundID.Item11.Play(Tip, 1.6f, .5f);
                         global.LockIn[ShotIndex] = 0;
                         Shots++;
@@ -265,7 +286,8 @@ public class SmartPistolHeld : BaseIdleHoldoutProjectile
         foreach (NPC npc in Main.ActiveNPCs)
         {
             if (npc == null || !LaserTip.IsInFieldOfView(Projectile.rotation, npc.Center, MathHelper.PiOver2, SightDist)
-                || !npc.CanHomeInto() || !Collision.CanHit(LaserTip, 2, 2, npc.Center, 1, 1) || StruckTargets.Contains(npc))
+                            || !npc.CanHomeInto() || !Collision.CanHit(LaserTip, 2, 2, npc.Center, 1, 1) ||
+                            StruckTargets.Contains(npc))
                 continue;
 
             potentialTargets.Add(npc);
@@ -323,6 +345,7 @@ public class SmartPistolHeld : BaseIdleHoldoutProjectile
             for (int i = 0; i < (npc.boss ? 3 : 1); i++)
                 global.LockIn[i] = 0;
         }
+
         Targets.Clear();
         StruckTargets.Clear();
         return base.PreKill(timeLeft);
@@ -359,6 +382,7 @@ public class SmartPistolHeld : BaseIdleHoldoutProjectile
                 }
             }
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.OverNPCs);
 
         void reticle()
@@ -380,20 +404,27 @@ public class SmartPistolHeld : BaseIdleHoldoutProjectile
                     float completion = InverseLerp(0f, SmartPistolGlobalNPC.TimeForLock, global.LockIn[i]);
                     Texture2D reticleTexture = AssetRegistry.GetTexture(AdditionsTexture.scope);
                     Vector2 position = targetPos - Main.screenPosition;
-                    float rotation = Main.GlobalTimeWrappedHourly + target.whoAmI * .5f * (target.whoAmI % 2 == 0).ToDirectionInt() + i * 0.1f;
+                    float rotation = Main.GlobalTimeWrappedHourly +
+                                     target.whoAmI * .5f * (target.whoAmI % 2 == 0).ToDirectionInt() + i * 0.1f;
                     Vector2 origin = reticleTexture.Size() / 2;
-                    Color color = Color.Lerp(Color.Yellow, Color.Red.Lerp(Color.Red * 1.6f, Sin01(Main.GlobalTimeWrappedHourly * 2)), completion) * completion;
+                    Color color = Color.Lerp(Color.Yellow,
+                                      Color.Red.Lerp(Color.Red * 1.6f, Sin01(Main.GlobalTimeWrappedHourly * 2)),
+                                      completion) *
+                                  completion;
                     float size = MathHelper.Lerp(50f, 30f, completion);
-                    Main.spriteBatch.DrawBetterRect(reticleTexture, ToTarget(targetPos, Vector2.One * size), null, color, rotation, origin);
+                    Main.spriteBatch.DrawBetterRect(reticleTexture, ToTarget(targetPos, Vector2.One * size), null,
+                        color, rotation, origin);
                 }
             }
         }
+
         LayeredDrawSystem.QueueDrawAction(reticle, PixelationLayer.OverNPCs);
 
         Texture2D texture = Projectile.ThisProjectileTexture();
         Vector2 drawPosition = Projectile.Center - Main.screenPosition;
         SpriteEffects effects = Projectile.direction == -1 ? SpriteEffects.FlipVertically : SpriteEffects.None;
-        Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(Color.White), Projectile.rotation, texture.Size() * 0.5f, Projectile.scale, effects, 0f);
+        Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(Color.White), Projectile.rotation,
+            texture.Size() * 0.5f, Projectile.scale, effects, 0f);
         return false;
     }
 }

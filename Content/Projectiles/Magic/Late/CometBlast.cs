@@ -15,6 +15,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
 public class CometBlast : ModProjectile, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.timeLeft = Lifetime;
@@ -31,7 +32,7 @@ public class CometBlast : ModProjectile, ILocalizedModType, IModType
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        Projectile.damage = (int)(Projectile.damage * 0.95);
+        Projectile.damage = (int) (Projectile.damage * 0.95);
     }
 
     public ref float SizeFactor => ref Projectile.ai[0];
@@ -41,6 +42,7 @@ public class CometBlast : ModProjectile, ILocalizedModType, IModType
     private const int Lifetime = 24;
     public float Completion => 1f - Utils.GetLerpValue(0f, Lifetime, Projectile.timeLeft);
     public float Radius => MakePoly(4).OutFunction.Evaluate(0f, 80f * SizeFactor, Completion);
+
     public override void AI()
     {
         if (trail == null || trail.Disposed)
@@ -63,7 +65,8 @@ public class CometBlast : ModProjectile, ILocalizedModType, IModType
 
                 for (int j = 0; j <= 1; j++)
                 {
-                    ParticleRegistry.SpawnHeavySmokeParticle(pos, vel * rand, lifetime, scale, Main.rand.NextBool() ? new Color(35, 119, 213) : new Color(30, 64, 128), .6f, true);
+                    ParticleRegistry.SpawnHeavySmokeParticle(pos, vel * rand, lifetime, scale,
+                        Main.rand.NextBool() ? new Color(35, 119, 213) : new Color(30, 64, 128), .6f, true);
                 }
             }
 
@@ -77,7 +80,8 @@ public class CometBlast : ModProjectile, ILocalizedModType, IModType
             float rot = RandomRotation();
 
             Vector2 pos = Projectile.Center + Vector2.One.RotatedBy(rot) * (Radius + 35);
-            Vector2 vel = Vector2.One.RotatedBy(rot + Main.rand.NextFloat(1.1f, 1.3f)) * 2 * Main.rand.NextFromList(-1, 1);
+            Vector2 vel = Vector2.One.RotatedBy(rot + Main.rand.NextFloat(1.1f, 1.3f)) * 2 *
+                          Main.rand.NextFromList(-1, 1);
             Color color = Color.Cyan;
             ParticleRegistry.SpawnSquishyLightParticle(pos, vel, 20, Main.rand.NextFloat(.2f, .4f), color, .4f, 3f, 6f);
         }
@@ -85,7 +89,7 @@ public class CometBlast : ModProjectile, ILocalizedModType, IModType
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return CalUtils.CircularHitboxCollision(Projectile.Center, (int)Radius + 75, targetHitbox);
+        return CircularHitboxCollision(Projectile.Center, (int) Radius + 75, targetHitbox);
     }
 
     private void ManageCaches()
@@ -109,13 +113,17 @@ public class CometBlast : ModProjectile, ILocalizedModType, IModType
         {
             cache.RemoveAt(0);
         }
+
         points.SetPoints(cache);
     }
 
     private float WidthFunct(float c) => 18f * GetLerpBump(0f, .2f, 1f, .7f, Completion);
-    private Color ColorFunct(SystemVector2 c, Vector2 position) => Color.Lerp(Color.White, Color.Cyan * 1.4f, Completion) * GetLerpBump(0f, .2f, 1f, .7f, Completion);
+
+    private Color ColorFunct(SystemVector2 c, Vector2 position) =>
+        Color.Lerp(Color.White, Color.Cyan * 1.4f, Completion) * GetLerpBump(0f, .2f, 1f, .7f, Completion);
 
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -132,6 +140,7 @@ public class CometBlast : ModProjectile, ILocalizedModType, IModType
 
             trail.DrawTrail(shader, points.Points, 300, true);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 
         return false;

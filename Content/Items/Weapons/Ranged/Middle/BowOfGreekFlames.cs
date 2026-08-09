@@ -32,7 +32,7 @@ public class BowOfGreekFlames : ModItem
         Item.shootSpeed = 30f;
         Item.autoReuse = true;
     }
-    
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(new Color(56, 237, 28));

@@ -34,39 +34,39 @@ public class TheExingendies : ModProjectile
 
     public States Phase
     {
-        get => (States)Projectile.ai[1];
-        set => Projectile.ai[1] = (int)value;
+        get => (States) Projectile.ai[1];
+        set => Projectile.ai[1] = (int) value;
     }
 
     public ref float ForwardRotation => ref Projectile.ai[2];
 
     public int ChargeTimer
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[0];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[0];
         set => Projectile.AdditionsInfo().ExtraAI[0] = value;
     }
 
     public int PhaseTimer
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[1];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[1];
         set => Projectile.AdditionsInfo().ExtraAI[1] = value;
     }
 
     public int FadeTimer
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[2];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[2];
         set => Projectile.AdditionsInfo().ExtraAI[2] = value;
     }
 
     public States SavePhase
     {
-        get => (States)Projectile.AdditionsInfo().ExtraAI[3];
-        set => Projectile.AdditionsInfo().ExtraAI[3] = (int)value;
+        get => (States) Projectile.AdditionsInfo().ExtraAI[3];
+        set => Projectile.AdditionsInfo().ExtraAI[3] = (int) value;
     }
 
     public bool RayWait
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[4] == 1;
+        get => (int) Projectile.AdditionsInfo().ExtraAI[4] == 1;
         set => Projectile.AdditionsInfo().ExtraAI[4] = value.ToInt();
     }
 
@@ -98,8 +98,8 @@ public class TheExingendies : ModProjectile
     public override bool? CanDamage() => false;
     public override bool ShouldUpdatePosition() => false;
 
-    public static readonly int FadeTime = CalUtils.SecondsToFrames(.65f);
-    public static readonly int ChargeTime = CalUtils.SecondsToFrames(.75f);
+    public static readonly int FadeTime = SecondsToFrames(.65f);
+    public static readonly int ChargeTime = SecondsToFrames(.75f);
     public float FadeCompletion => InverseLerp(FadeTime, 0f, FadeTimer);
     public float Completion => InverseLerp(0f, ChargeTime, ChargeTimer) * FadeCompletion;
     public Vector2 MainCenter => Owner.RotatedRelativePoint(Owner.MountedCenter);
@@ -116,7 +116,7 @@ public class TheExingendies : ModProjectile
             }
             else
             {
-                FadeTimer = (int)MakePoly(4f).InOutFunction.Evaluate(FadeTimer, 0f, .2f);
+                FadeTimer = (int) MakePoly(4f).InOutFunction.Evaluate(FadeTimer, 0f, .2f);
                 Projectile.timeLeft = 650;
             }
         }
@@ -166,7 +166,7 @@ public class TheExingendies : ModProjectile
                 if (this.RunLocal() && AdditionsKeybinds.MiscHotKey.JustPressed)
                 {
                     PhaseTimer = 0;
-                    Projectile.ai[1] = (Projectile.ai[1] + 1) % (int)GetLastEnumValue<States>();
+                    Projectile.ai[1] = (Projectile.ai[1] + 1) % (int) GetLastEnumValue<States>();
                 }
             }
 
@@ -199,7 +199,7 @@ public class TheExingendies : ModProjectile
             Projectile.NewProj(Projectile.Center,
                 MainCenter.SafeDirectionTo(ModdedOwner.MouseWorld).RotatedByRandom(.6f) * rand.NextFloat(10f, 20f),
                 ModContent.ProjectileType<LuminescentChaser>(),
-                (int)Owner.GetTotalDamage<GenericDamageClass>().ApplyTo(2000f), Projectile.knockBack, Owner.whoAmI);
+                (int) Owner.GetTotalDamage<GenericDamageClass>().ApplyTo(2000f), Projectile.knockBack, Owner.whoAmI);
             AdditionsSound.MagicHit.Play(Projectile.Center, .8f, 0f, .2f, 400, Name);
         }
 
@@ -207,12 +207,12 @@ public class TheExingendies : ModProjectile
         {
             Projectile.NewProj(ModdedOwner.MouseWorld, Vector2.UnitY.RotatedByRandom(.67f),
                 ModContent.ProjectileType<ScreenSplit>(),
-                (int)Owner.GetTotalDamage<GenericDamageClass>().ApplyTo(7500f), Projectile.knockBack, Owner.whoAmI);
+                (int) Owner.GetTotalDamage<GenericDamageClass>().ApplyTo(7500f), Projectile.knockBack, Owner.whoAmI);
             AdditionsSound.VirtueAttack.Play(ModdedOwner.MouseWorld, 1.4f, -.7f, 0f, 300, Name);
             AdditionsSound.LargeWeaponFireDifferent.Play(ModdedOwner.MouseWorld, 1.3f, .5f, 0f, 300, Name);
         }
 
-        if (PhaseTimer >= CalUtils.SecondsToFrames(7))
+        if (PhaseTimer >= SecondsToFrames(7))
         {
             PhaseTimer = 0;
             Phase = States.Constellative;
@@ -224,7 +224,7 @@ public class TheExingendies : ModProjectile
         if (PhaseTimer % 12 == 11 && this.RunLocal())
         {
             Projectile.NewProj(Projectile.Center, MainCenter.SafeDirectionTo(ModdedOwner.MouseWorld) * 14f,
-                ModContent.ProjectileType<SpaceRip>(), (int)Owner.GetTotalDamage<GenericDamageClass>().ApplyTo(2000f),
+                ModContent.ProjectileType<SpaceRip>(), (int) Owner.GetTotalDamage<GenericDamageClass>().ApplyTo(2000f),
                 Projectile.knockBack, Owner.whoAmI);
         }
 
@@ -232,11 +232,11 @@ public class TheExingendies : ModProjectile
         {
             Projectile.NewProj(ModdedOwner.MouseWorld, Vector2.UnitY.RotatedByRandom(.67f),
                 ModContent.ProjectileType<Constellation>(),
-                (int)Owner.GetTotalDamage<GenericDamageClass>().ApplyTo(1000f), Projectile.knockBack, Owner.whoAmI);
+                (int) Owner.GetTotalDamage<GenericDamageClass>().ApplyTo(1000f), Projectile.knockBack, Owner.whoAmI);
             AdditionsSound.etherealChargeBoom2.Play(ModdedOwner.MouseWorld, 1f, 0f, .1f, 200, Name);
         }
 
-        if (PhaseTimer >= CalUtils.SecondsToFrames(7))
+        if (PhaseTimer >= SecondsToFrames(7))
         {
             PhaseTimer = 0;
             Phase = States.Vaporization;
@@ -250,7 +250,7 @@ public class TheExingendies : ModProjectile
         {
             projectile[
                 Projectile.NewProj(Projectile.Center, Vector2.Zero, star,
-                    (int)Owner.GetTotalDamage<GenericDamageClass>().ApplyTo(42000f), Projectile.knockBack,
+                    (int) Owner.GetTotalDamage<GenericDamageClass>().ApplyTo(42000f), Projectile.knockBack,
                     Owner.whoAmI)].AdditionsInfo().ExtraAI[3] = Projectile.whoAmI;
             AdditionsSound.BallFire.Play(Projectile.Center, 1.2f, -.2f, 0f, 50, Name);
         }
@@ -258,9 +258,9 @@ public class TheExingendies : ModProjectile
         if (this.RunLocal() && PhaseTimer % 40 == 39)
             Projectile.NewProj(Projectile.Center, MainCenter.SafeDirectionTo(ModdedOwner.MouseWorld) * 16f,
                 ModContent.ProjectileType<HighSpeedDebris>(),
-                (int)Owner.GetTotalDamage<GenericDamageClass>().ApplyTo(18000f), Projectile.knockBack, Owner.whoAmI);
+                (int) Owner.GetTotalDamage<GenericDamageClass>().ApplyTo(18000f), Projectile.knockBack, Owner.whoAmI);
 
-        if (PhaseTimer >= CalUtils.SecondsToFrames(7))
+        if (PhaseTimer >= SecondsToFrames(7))
         {
             PhaseTimer = 0;
             Phase = States.Luminescence;

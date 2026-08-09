@@ -16,10 +16,10 @@ public partial class Asterlin : ModNPC
         StateMachine.RegisterStateBehavior(AsterlinAIType.GabrielLeave, DoBehavior_GabrielLeave);
     }
 
-    public static int GabrielLeave_HoverTime => CalUtils.SecondsToFrames(2);
-    public static int GabrielLeave_DisintegrationWaitTime => CalUtils.SecondsToFrames(.75f);
-    public static int GabrielLeave_DisintegrationTime => CalUtils.SecondsToFrames(.95f);
-    public static int GabrielLeave_BeamFadeTime => CalUtils.SecondsToFrames(.4f);
+    public static int GabrielLeave_HoverTime => SecondsToFrames(2);
+    public static int GabrielLeave_DisintegrationWaitTime => SecondsToFrames(.75f);
+    public static int GabrielLeave_DisintegrationTime => SecondsToFrames(.95f);
+    public static int GabrielLeave_BeamFadeTime => SecondsToFrames(.4f);
 
     public static int GabrielLeave_MaxTime => GabrielLeave_HoverTime + GabrielLeave_DisintegrationWaitTime +
                                               GabrielLeave_DisintegrationTime + GabrielLeave_BeamFadeTime;
@@ -62,7 +62,7 @@ public partial class Asterlin : ModNPC
                 for (int i = 0; i < 8; i++)
                 {
                     float lerper = InverseLerp(0, 8, i);
-                    int life = (int)MathHelper.Lerp(60, 180, lerper);
+                    int life = (int) MathHelper.Lerp(60, 180, lerper);
                     float scale = MathHelper.Lerp(300f, 500f, lerper);
                     Color col = Color.Lerp(Color.White, Color.Gold, lerper);
                     ParticleRegistry.SpawnPulseRingParticle(NPC.Center, Vector2.Zero, life, 0f, Vector2.One, 0f, scale,

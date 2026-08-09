@@ -18,13 +18,13 @@ public class Florescence : ModProjectile
 
     public int Timer
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
 
     public int Wait
     {
-        get => (int)Projectile.ai[1];
+        get => (int) Projectile.ai[1];
         set => Projectile.ai[1] = value;
     }
 
@@ -32,7 +32,7 @@ public class Florescence : ModProjectile
 
     public bool Hit
     {
-        get => (int)Projectile.ai[2] == 1;
+        get => (int) Projectile.ai[2] == 1;
         set => Projectile.ai[2] = value.ToInt();
     }
 
@@ -58,7 +58,7 @@ public class Florescence : ModProjectile
             {
                 Projectile.velocity = Projectile.Center.SafeDirectionTo(Modded.MouseWorld) * 20f;
             }
-            
+
             if (Wait >= MaxWait)
                 Projectile.MaxUpdates = 3;
             else
@@ -74,9 +74,8 @@ public class Florescence : ModProjectile
                     vel,
                     20, 1.4f, Color.HotPink);
             }
-
-            
         }
+
         ParticleRegistry.SpawnSquishyPixelParticle(Projectile.Center,
             Projectile.velocity * Main.rand.NextFloat(.1f, .2f), Main.rand.Next(30, 50),
             Main.rand.NextFloat(1.7f, 2.5f), Color.HotPink, Color.Pink, 5);
@@ -100,7 +99,7 @@ public class Florescence : ModProjectile
             this.Sync();
         }
 
-        Projectile.damage = (int)(Projectile.damage * .75f);
+        Projectile.damage = (int) (Projectile.damage * .75f);
     }
 
     public override void OnKill(int timeLeft)
@@ -108,7 +107,8 @@ public class Florescence : ModProjectile
         for (int i = 0; i < 18; i++)
         {
             ParticleRegistry.SpawnGlowParticle(Projectile.RandAreaInEntity(),
-                Projectile.velocity * Main.rand.NextFloat(.2f, .6f) + Main.rand.NextVector2Circular(2f, 2f), Main.rand.Next(18, 24),
+                Projectile.velocity * Main.rand.NextFloat(.2f, .6f) + Main.rand.NextVector2Circular(2f, 2f),
+                Main.rand.Next(18, 24),
                 Projectile.width * Main.rand.NextFloat(.5f, 1.5f), Color.Pink);
         }
     }

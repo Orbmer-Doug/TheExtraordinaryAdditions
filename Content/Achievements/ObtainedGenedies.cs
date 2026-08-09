@@ -10,6 +10,7 @@ public class ObtainedGenedies : ModAchievement
     public override string TextureName => AssetRegistry.GetTexturePath(AdditionsTexture.ObtainedGenedies);
     public ItemCraftCondition Condition { get; private set; }
     public override bool Hidden => !Condition.IsCompleted;
+
     public override void SetStaticDefaults()
     {
         Achievement.SetCategory(AchievementCategory.Collector);

@@ -8,7 +8,6 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Early;
 using TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
@@ -218,8 +217,9 @@ public class VanillaChanges : GlobalItem
             case ItemID.TheHorsemansBlade:
                 if (player.altFunctionUse == ItemAlternativeFunctionID.ActivatedAndUsed)
                 {
-                    NewProj(ModContent.ProjectileType<HorsemenDive>(), damage * 2, default, velocity);
-                    CalUtils.AddCooldown(player, PumpkinDashCooldown.ID, CalUtils.SecondsToFrames(3));
+                    // TODO
+                    //NewProj(ModContent.ProjectileType<HorsemenDive>(), damage * 2, default, velocity);
+                    //  .AddCooldown(player, PumpkinDashCooldown.ID, SecondsToFrames(3));
                     return false;
                 }
 
@@ -272,8 +272,9 @@ public class VanillaChanges : GlobalItem
             ItemID.PhoenixBlaster => true,
             ItemID.CursedFlames => true,
             ItemID.BreakerBlade => true,
-            ItemID.TheHorsemansBlade => player.ownedProjectileCounts[ModContent.ProjectileType<HorsemenDive>()] <= 0 &&
-                                        !CalUtils.HasCooldown(player, PumpkinDashCooldown.ID),
+            // TODO
+            ItemID.TheHorsemansBlade => player.ownedProjectileCounts[ModContent.ProjectileType<HorsemenDive>()] <= 0,
+            //!.HasCooldown(player, PumpkinDashCooldown.ID),
             _ => base.AltFunctionUse(item, player),
         };
     }
@@ -283,9 +284,7 @@ public class VanillaChanges : GlobalItem
         switch (item.type)
         {
             case ItemID.HeatRay:
-                if (player.HasBuff(LaserResource.OverheatBuff))
-                    return false;
-                return true;
+                return !player.HasBuff(LaserResource.OverheatBuff);
         }
 
         return base.CanUseItem(item, player);
@@ -309,10 +308,12 @@ public class VanillaChanges : GlobalItem
             }
         }
 
+        return;
+
         void DoShotAnimation(float amount)
         {
             player.ChangeDir(Math.Sign((player.Additions().MouseWorld - player.Center).X));
-            float animProgress = 1f - player.itemTime / (float)player.itemTimeMax;
+            float animProgress = 1f - player.itemTime / (float) player.itemTimeMax;
             float rotation = (player.Center - player.Additions().MouseWorld).ToRotation() * player.gravDir +
                              MathHelper.PiOver2;
             if (animProgress < 0.4f)

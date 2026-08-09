@@ -50,9 +50,10 @@ public class HemoglobbedCapsule : ModItem
     {
         if (FindProjectile(out Projectile p, Item.shoot, player.whoAmI))
         {
-            if ((int)p.ai[0] == (int)HemoglobbedCapsuleThrown.BehaviorState.Aim)
+            if ((int) p.ai[0] == (int) HemoglobbedCapsuleThrown.BehaviorState.Aim)
                 return false;
         }
+
         return true;
     }
 }

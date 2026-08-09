@@ -36,14 +36,8 @@ public class SolarBrandSword : BaseIdleHoldoutProjectile
 
     public float AngularDamageFactor
     {
-        get
-        {
-            return Projectile.ai[1];
-        }
-        set
-        {
-            Projectile.ai[1] = value;
-        }
+        get { return Projectile.ai[1]; }
+        set { Projectile.ai[1] = value; }
     }
 
     public ref float FadeTimer => ref Projectile.AdditionsInfo().ExtraAI[1];
@@ -63,6 +57,7 @@ public class SolarBrandSword : BaseIdleHoldoutProjectile
     {
         writer.Write(Projectile.rotation);
     }
+
     public override void GetExtraAI(BinaryReader reader)
     {
         Projectile.rotation = reader.ReadSingle();
@@ -83,6 +78,7 @@ public class SolarBrandSword : BaseIdleHoldoutProjectile
     public Vector2 Base => Projectile.Center + PolarVector(-55, Projectile.rotation - PiOver2);
 
     public override bool ShouldDie() => false;
+
     public override void SafeAI()
     {
         if (Time == 0f)
@@ -115,7 +111,7 @@ public class SolarBrandSword : BaseIdleHoldoutProjectile
         {
             float mouseDistance = Center.Distance(Mouse);
             float distRatio = Utils.GetLerpValue(0f, 360f, mouseDistance, true);
-            float aimResponsiveness = 0.035f + 0.3f * (float)Math.Pow(distRatio, .33f);
+            float aimResponsiveness = 0.035f + 0.3f * (float) Math.Pow(distRatio, .33f);
             float newRotation = Projectile.rotation.AngleLerp(Center.AngleTo(Mouse) + PiOver2, aimResponsiveness);
             Projectile.rotation = newRotation;
             if (Projectile.rotation != Projectile.oldRot[1])
@@ -134,26 +130,31 @@ public class SolarBrandSword : BaseIdleHoldoutProjectile
 
         Projectile.Opacity = MakePoly(2.7f).InFunction(FadeInterpolant);
         Projectile.direction = Owner.direction;
-        Projectile.height = (int)Utils.Remap(FadeTimer, 0f, FadeTime, 0f, MaxHeight);
-        Projectile.width = (int)Utils.Remap(FadeTimer, 0f, FadeTime, 0f, 28);
+        Projectile.height = (int) Utils.Remap(FadeTimer, 0f, FadeTime, 0f, MaxHeight);
+        Projectile.width = (int) Utils.Remap(FadeTimer, 0f, FadeTime, 0f, 28);
 
         // Visuals
         Projectile.SetAnimation(8, 6);
         Lighting.AddLight(Base, Color.OrangeRed.ToVector3() * Projectile.Opacity);
         HandleDamage();
 
-        if (MathF.Abs(WrapAngle(Projectile.rotation - Projectile.oldRot[1])) > .4f && Projectile.soundDelay == 0 && Time > 6f)
+        if (MathF.Abs(WrapAngle(Projectile.rotation - Projectile.oldRot[1])) > .4f && Projectile.soundDelay == 0 &&
+            Time > 6f)
         {
             Vector2 vel = Projectile.velocity * 15f;
             if (this.RunLocal())
             {
-                Projectile.NewProj(Projectile.Center, vel, ModContent.ProjectileType<SolarBrandSparks>(), (int)(Projectile.damage * 0.2f), 0f, Owner.whoAmI, 0f, 0f, 0f);
-                Projectile.NewProj(Projectile.Center, vel * 2f, ModContent.ProjectileType<SolarBrandSparks>(), (int)(Projectile.damage * 0.35f), 0f, Owner.whoAmI, 0f, 0f, 0f);
+                Projectile.NewProj(Projectile.Center, vel, ModContent.ProjectileType<SolarBrandSparks>(),
+                    (int) (Projectile.damage * 0.2f), 0f, Owner.whoAmI, 0f, 0f, 0f);
+                Projectile.NewProj(Projectile.Center, vel * 2f, ModContent.ProjectileType<SolarBrandSparks>(),
+                    (int) (Projectile.damage * 0.35f), 0f, Owner.whoAmI, 0f, 0f, 0f);
             }
 
             for (int i = 0; i < 25; i++)
             {
-                ParticleRegistry.SpawnHeavySmokeParticle(Projectile.Center, vel.RotatedByRandom(.2f) * Main.rand.NextFloat(.1f, .3f), Main.rand.Next(20, 35), Main.rand.NextFloat(.4f, .8f), Color.OrangeRed);
+                ParticleRegistry.SpawnHeavySmokeParticle(Projectile.Center,
+                    vel.RotatedByRandom(.2f) * Main.rand.NextFloat(.1f, .3f), Main.rand.Next(20, 35),
+                    Main.rand.NextFloat(.4f, .8f), Color.OrangeRed);
             }
 
             SoundID.DD2_BetsyFireballShot.Play(Projectile.Center, 1.2f, 0f, .2f);
@@ -174,10 +175,10 @@ public class SolarBrandSword : BaseIdleHoldoutProjectile
 
         AngularDamageFactor = Lerp(AngularDamageFactor, deltaAngle, 0.08f);
 
-        float speedDamageScalar = 0.166f + (float)Math.Log(AngularDamageFactor / ((float)Math.PI / 30f) + 1.5f, 3.0);
+        float speedDamageScalar = 0.166f + (float) Math.Log(AngularDamageFactor / ((float) Math.PI / 30f) + 1.5f, 3.0);
         int damageWithChargeAndStats = Owner.GetWeaponDamage(Owner.HeldItem, false);
         float sizeDamageScalar = 1f;
-        Projectile.damage = (int)(damageWithChargeAndStats * speedDamageScalar * sizeDamageScalar);
+        Projectile.damage = (int) (damageWithChargeAndStats * speedDamageScalar * sizeDamageScalar);
     }
 
     public override void OnKill(int timeLeft)
@@ -194,19 +195,21 @@ public class SolarBrandSword : BaseIdleHoldoutProjectile
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        target.AddBuff(ModContent.BuffType<PlasmaIncineration>(), CalUtils.SecondsToFrames(3));
+        target.AddBuff(ModContent.BuffType<PlasmaIncineration>(), SecondsToFrames(3));
         if (AngularDamageFactor > 0.1f)
         {
             Vector2 start = target.Hitbox.ClosestPointInRect(Tip);
             for (int i = 0; i < 25; i++)
             {
-                Vector2 vel = trailPoints.Points[^4].SafeDirectionTo(trailPoints.Points[^1]).RotatedByRandom(.3f) * Main.rand.NextFloat(2f, 5f);
+                Vector2 vel = trailPoints.Points[^4].SafeDirectionTo(trailPoints.Points[^1]).RotatedByRandom(.3f) *
+                              Main.rand.NextFloat(2f, 5f);
                 int life = Main.rand.Next(30, 60);
                 float scale = Main.rand.NextFloat(.5f, .9f);
                 Color col = Color.OrangeRed;
                 ParticleRegistry.SpawnHeavySmokeParticle(start, vel, life, scale, col, 2f);
                 ParticleRegistry.SpawnGlowParticle(start, vel * .7f, life, scale * 60f, col, 1.6f);
             }
+
             SoundID.DD2_BetsyFireballImpact.Play(start, 1.2f, .3f, .1f);
         }
     }
@@ -223,7 +226,8 @@ public class SolarBrandSword : BaseIdleHoldoutProjectile
         Texture2D tex = Projectile.ThisProjectileTexture();
         Rectangle frame = tex.Frame(1, Main.projFrames[Type], 0, Projectile.frame);
         Vector2 orig = frame.Size() * .5f;
-        Main.spriteBatch.DrawBetter(tex, Projectile.Center, frame, Color.White * Projectile.Opacity, Projectile.rotation, orig, Projectile.scale);
+        Main.spriteBatch.DrawBetter(tex, Projectile.Center, frame, Color.White * Projectile.Opacity,
+            Projectile.rotation, orig, Projectile.scale);
 
         return false;
     }
@@ -245,10 +249,12 @@ public class SolarBrandSword : BaseIdleHoldoutProjectile
             {
                 ManagedShader shader = ShaderRegistry.SwordRipShader;
                 shader.TrySetParameter("flip", Math.Sign(WrapAngle(Projectile.rotation - Projectile.oldRot[1])) > 0);
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.SwordSlashTexture), 1, SamplerState.LinearWrap);
+                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.SwordSlashTexture), 1,
+                    SamplerState.LinearWrap);
                 trail.DrawTrail(shader, trailPoints.Points, 200, true);
             }
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.HeldProjectiles);
     }
 }

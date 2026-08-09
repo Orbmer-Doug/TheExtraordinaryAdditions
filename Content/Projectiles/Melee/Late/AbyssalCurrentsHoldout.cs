@@ -15,7 +15,6 @@ using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 using static Terraria.Main;
-using static CalamityMod.CalamityUtils;
 using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
@@ -52,28 +51,28 @@ public class AbyssalCurrentsHoldout : ModProjectile, IHasScreenShader
 
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
 
     public AbyssalState State
     {
-        get => (AbyssalState)Projectile.ai[1];
-        set => Projectile.ai[1] = (int)value;
+        get => (AbyssalState) Projectile.ai[1];
+        set => Projectile.ai[1] = (int) value;
     }
 
     public ref float OldArmRot => ref Projectile.ai[2];
 
     public int BackTime
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[0];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[0];
         set => Projectile.AdditionsInfo().ExtraAI[0] = value;
     }
 
     public float MeleeSpeed => Owner.GetTotalAttackSpeed(DamageClass.MeleeNoSpeed);
-    public int ReelTime => (int)(50 / MeleeSpeed);
-    public static readonly int ThrowTime = CalUtils.SecondsToFrames(4);
-    public int SpinTime => (int)(130 / MeleeSpeed);
+    public int ReelTime => (int) (50 / MeleeSpeed);
+    public static readonly int ThrowTime = SecondsToFrames(4);
+    public int SpinTime => (int) (130 / MeleeSpeed);
     public static int WhirlpoolGrow => 72;
     public static int WhirlpoolRecede => 50;
     public Vector2 Tip => Projectile.RotHitbox().TopRight;
@@ -101,7 +100,7 @@ public class AbyssalCurrentsHoldout : ModProjectile, IHasScreenShader
         {
             if (netMode != NetmodeID.Server)
             {
-                WaterShaderData ripple = (WaterShaderData)Filters.Scene["WaterDistortion"].GetShader();
+                WaterShaderData ripple = (WaterShaderData) Filters.Scene["WaterDistortion"].GetShader();
                 float waveSine = 0.1f * MathF.Sin(GlobalTimeWrappedHourly * 20f);
                 Vector2 ripplePos = Projectile.Center + Projectile.velocity * 7f;
                 Color waveData = new Color(0.5f, 0.1f * Math.Sign(waveSine) + 0.5f, 0f, 1f) * Math.Abs(waveSine);
@@ -373,12 +372,10 @@ public class AbyssalCurrentsHoldout : ModProjectile, IHasScreenShader
             shine.TrySetParameter("globalTime", GlobalTimeWrappedHourly * 5f);
             shine.TrySetParameter("resolution", res);
 
-            sb.EnterShaderRegionAlt();
-            shine.Render();
+            sb.EnterShaderRegion(shine.Effect);
             sb.Draw(noise, ToTarget(Tip, res), null, AbyssalCurrents.BrackishPalette[4] * 0.4f * fade,
                 Projectile.rotation, noise.Size() * 0.5f, 0, 0f);
-
-            sb.ExitShaderRegion();
+            sb.ResetToDefault();
         }
 
         if (State == AbyssalState.Chase)

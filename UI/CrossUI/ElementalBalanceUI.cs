@@ -25,7 +25,8 @@ public class ElementalBalanceUI : SmartUIState
     public static readonly Texture2D Index = AssetRegistry.GetTexture(AdditionsTexture.Index);
     public static readonly Texture2D Background = AssetRegistry.GetTexture(AdditionsTexture.Background);
 
-    public override int InsertionIndex(List<GameInterfaceLayer> layers) => layers.FindIndex(layer => layer.Name == "Vanilla: Mouse Text");
+    public override int InsertionIndex(List<GameInterfaceLayer> layers) =>
+        layers.FindIndex(layer => layer.Name == "Vanilla: Mouse Text");
 
     public float MoveCounter;
     public const int MoveTime = 35;
@@ -33,10 +34,12 @@ public class ElementalBalanceUI : SmartUIState
     public static bool visible;
     public override bool Visible => visible;
     private readonly int[] ElementCounters = new int[5];
+
     public override void OnInitialize()
     {
         MoveCounter = 0;
     }
+
     public override void Draw(SpriteBatch spriteBatch)
     {
         int held = Main.LocalPlayer.heldProj;
@@ -57,7 +60,8 @@ public class ElementalBalanceUI : SmartUIState
 
         bool button = AdditionsKeybinds.OpenCrossDiscUI.Current && balance.CircuitOverload <= 0;
 
-        Vector2 rightPos = new(Main.screenWidth / 2 + (300 * (2f - uiScale)), Main.screenHeight / 2 - (350 * (2f - uiScale)));
+        Vector2 rightPos = new(Main.screenWidth / 2 + (300 * (2f - uiScale)),
+            Main.screenHeight / 2 - (350 * (2f - uiScale)));
         Vector2 centerPos = new(Main.screenWidth / 2, Main.screenHeight / 2);
 
         float moveCompletion = InverseLerp(0f, MoveTime, MoveCounter);
@@ -65,39 +69,52 @@ public class ElementalBalanceUI : SmartUIState
         Vector2 position = Vector2.Lerp(rightPos, centerPos, Animators.Back.InOutFunction(moveCompletion));
 
         int adjustedMode = (element == Element.Neutral ? 1 :
-            element == Element.Cold ? 1 : element == Element.Heat ? 3 : element == Element.Shock ? 2 : element == Element.Wave ? 4 : 1) - 1;
+            element == Element.Cold ? 1 :
+            element == Element.Heat ? 3 :
+            element == Element.Shock ? 2 :
+            element == Element.Wave ? 4 : 1) - 1;
         Rectangle neutralIndexFrame = Index.Frame(4, 2, adjustedMode, 0);
         Color backgroundCol = Color.White * moveCompletion;
 
-        spriteBatch.Draw(Background, position, null, backgroundCol, 0f, Background.Size() / 2, moveCompletion * uiScale, 0, 0f);
+        spriteBatch.Draw(Background, position, null, backgroundCol, 0f, Background.Size() / 2, moveCompletion * uiScale,
+            0, 0f);
 
         Vector2 indexOrig = Index.Frame(4, 2, 0, 0).Size() / 2;
 
-        int distFromBackground = (int)(48 * moveCompletion * uiScale);
+        int distFromBackground = (int) (48 * moveCompletion * uiScale);
 
         // Ice
         Vector2 icePos = position - Vector2.UnitY * distFromBackground;
-        spriteBatch.Draw(Index, icePos, Index.Frame(4, 2, 0, 1), backgroundCol, 0f, indexOrig, moveCompletion * uiScale, 0, 0f);
+        spriteBatch.Draw(Index, icePos, Index.Frame(4, 2, 0, 1), backgroundCol, 0f, indexOrig, moveCompletion * uiScale,
+            0, 0f);
 
         // Shock
         Vector2 shockPos = position + Vector2.UnitX * distFromBackground;
-        spriteBatch.Draw(Index, shockPos, Index.Frame(4, 2, 1, 1), backgroundCol, 0f, indexOrig, moveCompletion * uiScale, 0, 0f);
+        spriteBatch.Draw(Index, shockPos, Index.Frame(4, 2, 1, 1), backgroundCol, 0f, indexOrig,
+            moveCompletion * uiScale, 0, 0f);
 
         // Fire
         Vector2 firePos = position + Vector2.UnitY * distFromBackground;
-        spriteBatch.Draw(Index, firePos, Index.Frame(4, 2, 2, 1), backgroundCol, 0f, indexOrig, moveCompletion * uiScale, 0, 0f);
+        spriteBatch.Draw(Index, firePos, Index.Frame(4, 2, 2, 1), backgroundCol, 0f, indexOrig,
+            moveCompletion * uiScale, 0, 0f);
 
         // Wave
         Vector2 wavePos = position - Vector2.UnitX * distFromBackground;
-        spriteBatch.Draw(Index, wavePos, Index.Frame(4, 2, 3, 1), backgroundCol, 0f, indexOrig, moveCompletion * uiScale, 0, 0f);
+        spriteBatch.Draw(Index, wavePos, Index.Frame(4, 2, 3, 1), backgroundCol, 0f, indexOrig,
+            moveCompletion * uiScale, 0, 0f);
 
         // Neutral
-        spriteBatch.Draw(Index, position, neutralIndexFrame, backgroundCol, 0f, indexOrig, moveCompletion * uiScale, 0, 0f);
+        spriteBatch.Draw(Index, position, neutralIndexFrame, backgroundCol, 0f, indexOrig, moveCompletion * uiScale, 0,
+            0f);
 
         // Check which side the mouse is on and highlight
         if (moveCompletion > 0f)
         {
-            Vector2[] mouseEdges = [MouseScreenHitbox.TopLeft(), MouseScreenHitbox.TopRight(), MouseScreenHitbox.BottomLeft(), MouseScreenHitbox.BottomRight()];
+            Vector2[] mouseEdges =
+            [
+                MouseScreenHitbox.TopLeft(), MouseScreenHitbox.TopRight(), MouseScreenHitbox.BottomLeft(),
+                MouseScreenHitbox.BottomRight()
+            ];
             int width = Main.screenWidth;
             Vector2 topLeft = position + new Vector2(-width, -width);
             Vector2 topRight = position + new Vector2(width, -width);
@@ -108,7 +125,9 @@ public class ElementalBalanceUI : SmartUIState
             bool fireSide = IsIntersecting(mouseEdges, [position, bottomRight, bottomLeft]);
             bool shockSide = IsIntersecting(mouseEdges, [position, topRight, bottomRight]);
             bool waveSide = IsIntersecting(mouseEdges, [position, topLeft, bottomLeft]);
-            bool neutralMiddle = new Rectangle((int)position.X - (ElementBase.Height / 2), (int)position.Y - (ElementBase.Height / 2), ElementBase.Height, ElementBase.Height).Intersects(MouseScreenHitbox);
+            bool neutralMiddle =
+                new Rectangle((int) position.X - (ElementBase.Height / 2), (int) position.Y - (ElementBase.Height / 2),
+                    ElementBase.Height, ElementBase.Height).Intersects(MouseScreenHitbox);
 
             if (neutralMiddle)
             {
@@ -120,11 +139,13 @@ public class ElementalBalanceUI : SmartUIState
 
                 if (moveCompletion >= 1f)
                 {
-                    stateAI = (int)Element.Neutral;
+                    stateAI = (int) Element.Neutral;
                     ElementCounters[0]++;
                 }
 
-                DrawElementOutline(spriteBatch, InverseLerp(0f, ShowTime, ElementCounters[0]) * uiScale * moveCompletion, position, Element.Neutral);
+                DrawElementOutline(spriteBatch,
+                    InverseLerp(0f, ShowTime, ElementCounters[0]) * uiScale * moveCompletion, position,
+                    Element.Neutral);
             }
             else if (iceSide)
             {
@@ -136,11 +157,12 @@ public class ElementalBalanceUI : SmartUIState
 
                 if (moveCompletion >= 1f)
                 {
-                    stateAI = (int)Element.Cold;
+                    stateAI = (int) Element.Cold;
                     ElementCounters[1]++;
                 }
 
-                DrawElementOutline(spriteBatch, InverseLerp(0f, ShowTime, ElementCounters[1]) * uiScale * moveCompletion, icePos, Element.Cold);
+                DrawElementOutline(spriteBatch,
+                    InverseLerp(0f, ShowTime, ElementCounters[1]) * uiScale * moveCompletion, icePos, Element.Cold);
             }
             else if (fireSide)
             {
@@ -152,11 +174,12 @@ public class ElementalBalanceUI : SmartUIState
 
                 if (moveCompletion >= 1f)
                 {
-                    stateAI = (int)Element.Heat;
+                    stateAI = (int) Element.Heat;
                     ElementCounters[2]++;
                 }
 
-                DrawElementOutline(spriteBatch, InverseLerp(0f, ShowTime, ElementCounters[2]) * uiScale * moveCompletion, firePos, Element.Heat);
+                DrawElementOutline(spriteBatch,
+                    InverseLerp(0f, ShowTime, ElementCounters[2]) * uiScale * moveCompletion, firePos, Element.Heat);
             }
             else if (shockSide)
             {
@@ -168,11 +191,12 @@ public class ElementalBalanceUI : SmartUIState
 
                 if (moveCompletion >= 1f)
                 {
-                    stateAI = (int)Element.Shock;
+                    stateAI = (int) Element.Shock;
                     ElementCounters[3]++;
                 }
 
-                DrawElementOutline(spriteBatch, InverseLerp(0f, ShowTime, ElementCounters[3]) * uiScale * moveCompletion, shockPos, Element.Shock);
+                DrawElementOutline(spriteBatch,
+                    InverseLerp(0f, ShowTime, ElementCounters[3]) * uiScale * moveCompletion, shockPos, Element.Shock);
             }
             else if (waveSide)
             {
@@ -184,11 +208,12 @@ public class ElementalBalanceUI : SmartUIState
 
                 if (moveCompletion >= 1f)
                 {
-                    stateAI = (int)Element.Wave;
+                    stateAI = (int) Element.Wave;
                     ElementCounters[4]++;
                 }
 
-                DrawElementOutline(spriteBatch, InverseLerp(0f, ShowTime, ElementCounters[4]) * uiScale * moveCompletion, wavePos, Element.Wave);
+                DrawElementOutline(spriteBatch,
+                    InverseLerp(0f, ShowTime, ElementCounters[4]) * uiScale * moveCompletion, wavePos, Element.Wave);
             }
         }
         else
@@ -199,10 +224,12 @@ public class ElementalBalanceUI : SmartUIState
 
         float baseScale = uiScale * invCompletion;
         Color baseCol = Color.White * invCompletion;
-        spriteBatch.Draw(ElementBase, position, null, baseCol, -MathHelper.PiOver2, ElementBase.Size() / 2, baseScale, 0, 0f);
+        spriteBatch.Draw(ElementBase, position, null, baseCol, -MathHelper.PiOver2, ElementBase.Size() / 2, baseScale,
+            0, 0f);
 
-        Rectangle fillRectangle = new(0, 0, (int)(Fill.Width * balance.ElementCompletion), Fill.Height);
-        spriteBatch.Draw(Fill, position, fillRectangle, baseCol, -MathHelper.PiOver2, Fill.Size() / 2, baseScale, 0, 0f);
+        Rectangle fillRectangle = new(0, 0, (int) (Fill.Width * balance.ElementCompletion), Fill.Height);
+        spriteBatch.Draw(Fill, position, fillRectangle, baseCol, -MathHelper.PiOver2, Fill.Size() / 2, baseScale, 0,
+            0f);
 
         switch (element)
         {
@@ -255,15 +282,18 @@ public class ElementalBalanceUI : SmartUIState
     }
 
     public static readonly Texture2D Overload = AssetRegistry.GetTexture(AdditionsTexture.Overlay);
+
     private void DrawOverload(Player player, ElementalBalance element)
     {
-        float flicker = Sin01(Main.GlobalTimeWrappedHourly * (player.GetModPlayer<ElementalBalance>().CircuitOverload > 0 ? 15f : 5f)) + .5f;
+        float flicker = Sin01(Main.GlobalTimeWrappedHourly *
+                              (player.GetModPlayer<ElementalBalance>().CircuitOverload > 0 ? 15f : 5f)) + .5f;
         float opacity = element.ElementCompletion * flicker;
         if (element.ElementCompletion >= .5f)
             opacity *= 2f;
 
         Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.None, Main.Rasterizer, null, Matrix.Identity);
+        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp,
+            DepthStencilState.None, Main.Rasterizer, null, Matrix.Identity);
         for (int i = 0; i < 4; i++)
         {
             Vector2 pos = new();
@@ -271,7 +301,8 @@ public class ElementalBalanceUI : SmartUIState
             SpriteEffects fx = SpriteEffects.None;
             float width = Main.screenWidth;
             float height = Main.screenHeight;
-            Rectangle frame = Overload.Frame(2, 1, player.GetModPlayer<ElementalBalance>().CircuitOverload > 0 ? 1 : 0, 0);
+            Rectangle frame = Overload.Frame(2, 1, player.GetModPlayer<ElementalBalance>().CircuitOverload > 0 ? 1 : 0,
+                0);
             float overWidth = frame.Width * .5f;
             float overHeight = frame.Height * .5f;
             switch (i)
@@ -298,10 +329,12 @@ public class ElementalBalanceUI : SmartUIState
                     break;
             }
 
-            Main.EntitySpriteDraw(Overload, new Vector2(width / 2, height / 2) + pos, frame, Color.White * opacity, rotation, frame.Size() * .5f, 1f, fx);
+            Main.EntitySpriteDraw(Overload, new Vector2(width / 2, height / 2) + pos, frame, Color.White * opacity,
+                rotation, frame.Size() * .5f, 1f, fx);
         }
-        Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, Main.Rasterizer, null, Matrix.Identity);
 
+        Main.spriteBatch.End();
+        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp,
+            DepthStencilState.None, Main.Rasterizer, null, Matrix.Identity);
     }
 }

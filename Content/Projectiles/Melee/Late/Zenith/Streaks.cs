@@ -58,9 +58,11 @@ public class Streaks : ModProjectile
 
             for (float i = .1f; i <= 2f; i += .1f)
             {
-                Main.spriteBatch.Draw(bloomTexture, ToTarget(Projectile.Center, scale * i), null, color * (2f - i), Projectile.rotation, bloomOrigin, 0, 0f);
+                Main.spriteBatch.Draw(bloomTexture, ToTarget(Projectile.Center, scale * i), null, color * (2f - i),
+                    Projectile.rotation, bloomOrigin, 0, 0f);
             }
         }
+
         PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.UnderProjectiles, BlendState.Additive);
         return false;
     }

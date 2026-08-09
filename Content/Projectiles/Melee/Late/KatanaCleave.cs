@@ -21,7 +21,10 @@ public class KatanaCleave : BaseSwordSwing
 
     public override int SwingTime => 30;
     public override int StopTimeFrames => 0;
-    public override float SwingAngle => TwoPi / (Swing switch { Power.Main => 4.5f, Power.Second => 4f, Power.Third => 3f, _ => 1f });
+
+    public override float SwingAngle =>
+        TwoPi / (Swing switch { Power.Main => 4.5f, Power.Second => 4f, Power.Third => 3f, _ => 1f });
+
     public enum Power
     {
         Main,
@@ -31,8 +34,8 @@ public class KatanaCleave : BaseSwordSwing
 
     public Power Swing
     {
-        get => (Power)Projectile.AdditionsInfo().ExtraAI[7];
-        set => Projectile.AdditionsInfo().ExtraAI[7] = (int)value;
+        get => (Power) Projectile.AdditionsInfo().ExtraAI[7];
+        set => Projectile.AdditionsInfo().ExtraAI[7] = (int) value;
     }
 
     public bool MadeBlade
@@ -89,7 +92,8 @@ public class KatanaCleave : BaseSwordSwing
         // swoosh
         if (Animation() >= .26f && !PlayedSound && !Main.dedServ)
         {
-            AdditionsSound.MediumSwing2.Play(Projectile.Center, .6f, Swing switch { Power.Main => 0f, Power.Second => -.3f, Power.Third => -.5f, _ => 0f }, .2f, 0, Name);
+            AdditionsSound.MediumSwing2.Play(Projectile.Center, .6f,
+                Swing switch { Power.Main => 0f, Power.Second => -.3f, Power.Third => -.5f, _ => 0f }, .2f, 0, Name);
             PlayedSound = true;
         }
 
@@ -100,12 +104,16 @@ public class KatanaCleave : BaseSwordSwing
         if (TimeStop <= 0f)
         {
             for (int i = 0; i < 2; i++)
-                points.Update(Projectile.Center + PolarVector(78f * Projectile.scale, Projectile.rotation - SwordRotation) + Owner.velocity - Center);
+                points.Update(Projectile.Center +
+                    PolarVector(78f * Projectile.scale, Projectile.rotation - SwordRotation) + Owner.velocity - Center);
         }
 
         if (SwingCompletion == .3f && !MadeBlade && Swing != Power.Third && this.RunLocal())
         {
-            KatanaCleave cleave = Main.projectile[Projectile.NewProj(Projectile.Center, Projectile.velocity, Type, Projectile.damage, Projectile.knockBack, Owner.whoAmI)].As<KatanaCleave>();
+            KatanaCleave cleave = Main
+                .projectile[
+                    Projectile.NewProj(Projectile.Center, Projectile.velocity, Type, Projectile.damage,
+                        Projectile.knockBack, Owner.whoAmI)].As<KatanaCleave>();
             cleave.SwingDir = SwingDir == SwingDirection.Up ? SwingDirection.Down : SwingDirection.Up;
             switch (Swing)
             {
@@ -118,6 +126,7 @@ public class KatanaCleave : BaseSwordSwing
                 case Power.Third:
                     break;
             }
+
             MadeBlade = true;
 
             Projectile.netUpdate = true;
@@ -178,13 +187,14 @@ public class KatanaCleave : BaseSwordSwing
         for (int i = 0; i < 30; i++)
         {
             float completion = InverseLerp(0f, 30, i);
-            ParticleRegistry.SpawnGlowParticle(start, Vector2.Zero, 50, 60f * completion, MulticolorLerp(completion, Color.DarkGray, Color.SlateGray, Color.LightSlateGray));
+            ParticleRegistry.SpawnGlowParticle(start, Vector2.Zero, 50, 60f * completion,
+                MulticolorLerp(completion, Color.DarkGray, Color.SlateGray, Color.LightSlateGray));
 
             Vector2 vel = SwordDir * Lerp(-20f, 20f, completion);
             if (vel == Vector2.Zero)
                 vel = SwordDir * 2f;
-            int life = (int)Lerp(10, 30, Convert01To010(completion));
-            float scale = (int)Lerp(.5f, 2f, Convert01To010(completion));
+            int life = (int) Lerp(10, 30, Convert01To010(completion));
+            float scale = (int) Lerp(.5f, 2f, Convert01To010(completion));
             ParticleRegistry.SpawnSparkParticle(start, vel, life, scale * 2f, Color.LightCyan);
         }
 
@@ -199,13 +209,14 @@ public class KatanaCleave : BaseSwordSwing
         for (int i = 0; i < 30; i++)
         {
             float completion = InverseLerp(0f, 30, i);
-            ParticleRegistry.SpawnGlowParticle(start, Vector2.Zero, 50, 60f * completion, MulticolorLerp(completion, Color.DarkGray, Color.SlateGray, Color.LightSlateGray));
+            ParticleRegistry.SpawnGlowParticle(start, Vector2.Zero, 50, 60f * completion,
+                MulticolorLerp(completion, Color.DarkGray, Color.SlateGray, Color.LightSlateGray));
 
             Vector2 vel = SwordDir * Lerp(-20f, 20f, completion);
             if (vel == Vector2.Zero)
                 vel = SwordDir * 2f;
-            int life = (int)Lerp(10, 30, Convert01To010(completion));
-            float scale = (int)Lerp(.5f, 2f, Convert01To010(completion));
+            int life = (int) Lerp(10, 30, Convert01To010(completion));
+            float scale = (int) Lerp(.5f, 2f, Convert01To010(completion));
             ParticleRegistry.SpawnSparkParticle(start, vel, life, scale * 2f, Color.LightCyan);
         }
 
@@ -217,7 +228,7 @@ public class KatanaCleave : BaseSwordSwing
     {
         // Make it a crit if the strike was with the very tip
         if (new RotatedRectangle(30f, Rect().Top - PolarVector(10f, Projectile.rotation - SwordRotation),
-            Rect().Top + PolarVector(10f, Projectile.rotation - SwordRotation)).Intersects(target.Hitbox))
+                Rect().Top + PolarVector(10f, Projectile.rotation - SwordRotation)).Intersects(target.Hitbox))
         {
             modifiers.SetCrit();
         }
@@ -249,6 +260,7 @@ public class KatanaCleave : BaseSwordSwing
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints points = new(40);
+
     public override bool PreDraw(ref Color lightColor)
     {
         // Determine the effects for drawing. These must be done here otherwise silly things WILL happen.
@@ -296,10 +308,12 @@ public class KatanaCleave : BaseSwordSwing
             for (int i = 0; i < amount; i++)
             {
                 Vector2 drawOffset = (TwoPi * i / amount).ToRotationVector2() * Convert01To010(SwingCompletion) * 3f;
-                Main.spriteBatch.Draw(Tex, Projectile.Center + drawOffset - Main.screenPosition, null, Color.White with { A = 0 } * .9f,
+                Main.spriteBatch.Draw(Tex, Projectile.Center + drawOffset - Main.screenPosition, null,
+                    Color.White with { A = 0 } * .9f,
                     Projectile.rotation + RotationOffset, origin, Projectile.scale, Effects, 0f);
             }
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;
     }
@@ -308,6 +322,7 @@ public class KatanaCleave : BaseSwordSwing
 public class KatanaSweep : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.KatanaCleave);
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 1;
@@ -322,9 +337,10 @@ public class KatanaSweep : ModProjectile
 
     public Player Owner => Main.player[Projectile.owner];
     public GlobalPlayer Modded => Owner.Additions();
+
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
 
@@ -342,8 +358,8 @@ public class KatanaSweep : ModProjectile
 
     public SweepStates State
     {
-        get => (SweepStates)Projectile.ai[1];
-        set => Projectile.ai[1] = (int)value;
+        get => (SweepStates) Projectile.ai[1];
+        set => Projectile.ai[1] = (int) value;
     }
 
     public bool Init
@@ -403,14 +419,17 @@ public class KatanaSweep : ModProjectile
         {
             case SweepStates.Slice:
                 Owner.velocity *= 0;
-                Owner.Center = Vector2.Lerp(Owner.Center, End, MakePoly(2f).InOutFunction(InverseLerp(0f, SliceTime, Time)));
-                Projectile.rotation = Projectile.rotation.SmoothAngleLerp(Projectile.velocity.ToRotation() + PiOver4, .2f, .4f);
+                Owner.Center = Vector2.Lerp(Owner.Center, End,
+                    MakePoly(2f).InOutFunction(InverseLerp(0f, SliceTime, Time)));
+                Projectile.rotation =
+                    Projectile.rotation.SmoothAngleLerp(Projectile.velocity.ToRotation() + PiOver4, .2f, .4f);
 
                 if (Time > SliceTime)
                 {
                     State = SweepStates.Hold;
                     Time = 0;
                 }
+
                 break;
             case SweepStates.Hold:
                 Owner.velocity *= 0;
@@ -424,6 +443,7 @@ public class KatanaSweep : ModProjectile
                     State = SweepStates.Whirlwind;
                     Time = 0;
                 }
+
                 break;
             case SweepStates.Whirlwind:
 
@@ -437,9 +457,11 @@ public class KatanaSweep : ModProjectile
                 {
                     if (this.RunLocal())
                     {
-                        Vector2 pos = Vector2.Lerp(InitialStart, End, Main.rand.NextFloat()) + Main.rand.NextVector2Circular(150f, 150f);
+                        Vector2 pos = Vector2.Lerp(InitialStart, End, Main.rand.NextFloat()) +
+                                      Main.rand.NextVector2Circular(150f, 150f);
                         Vector2 vel = Main.rand.NextVector2Circular(1f, 1f);
-                        Projectile.NewProj(pos, vel, ModContent.ProjectileType<KatanaSlice>(), (int)(Projectile.damage * .3f), 0f, Owner.whoAmI);
+                        Projectile.NewProj(pos, vel, ModContent.ProjectileType<KatanaSlice>(),
+                            (int) (Projectile.damage * .3f), 0f, Owner.whoAmI);
 
                         AdditionsSound.SwordSliceShort.Play(pos, .4f, .1f, 0f, 0, Name);
                     }
@@ -493,7 +515,8 @@ public class KatanaSweep : ModProjectile
             fx = SpriteEffects.FlipHorizontally;
         }
 
-        Main.spriteBatch.DrawBetter(tex, Projectile.Center, null, lightColor * Projectile.Opacity, Projectile.rotation + off, origin, Projectile.scale, fx);
+        Main.spriteBatch.DrawBetter(tex, Projectile.Center, null, lightColor * Projectile.Opacity,
+            Projectile.rotation + off, origin, Projectile.scale, fx);
 
         if (Init)
         {
@@ -505,7 +528,8 @@ public class KatanaSweep : ModProjectile
                 float opac = MakePoly(2f).InFunction(InverseLerp(20f, 0f, TotalTime)) * 3f;
                 Color col = Color.Lerp(Color.SlateGray, Color.Gray, Projectile.identity / 7f % 1f) * opac;
 
-                float width = InitialStart.Distance(End) * MakePoly(6f).OutFunction(InverseLerp(0f, SliceTime * 2, TotalTime));
+                float width = InitialStart.Distance(End) *
+                              MakePoly(6f).OutFunction(InverseLerp(0f, SliceTime * 2, TotalTime));
                 float height = Projectile.ThisProjectileTexture().Height / 3;
                 float rot = Projectile.velocity.ToRotation();
                 Vector2 size = new(width, height);
@@ -513,11 +537,14 @@ public class KatanaSweep : ModProjectile
 
                 for (float i = .5f; i < 1f; i += .05f)
                 {
-                    Main.spriteBatch.DrawBetterRect(tex, ToTarget(pos, size * i * .4f * opac), null, Color.White * opac, rot, origin);
+                    Main.spriteBatch.DrawBetterRect(tex, ToTarget(pos, size * i * .4f * opac), null, Color.White * opac,
+                        rot, origin);
                     Main.spriteBatch.DrawBetterRect(tex, ToTarget(pos, size * i), null, col, rot, origin);
-                    Main.spriteBatch.DrawBetterRect(tex, ToTarget(pos, size * i * 1.3f), null, Color.DarkSlateBlue * opac * .4f, rot, origin);
+                    Main.spriteBatch.DrawBetterRect(tex, ToTarget(pos, size * i * 1.3f), null,
+                        Color.DarkSlateBlue * opac * .4f, rot, origin);
                 }
             }
+
             PixelationSystem.QueueTextureRenderAction(slice, PixelationLayer.Dusts, BlendState.Additive);
         }
 
@@ -551,11 +578,13 @@ public class KatanaSlice : ModProjectile
     public const int MaxWidth = 1400;
     public float Interpolant => InverseLerp(0f, MaxTime, Time);
     public Point Size;
+
     public override void SendExtraAI(BinaryWriter writer)
     {
         writer.Write(Size.X);
         writer.Write(Size.Y);
     }
+
     public override void ReceiveExtraAI(BinaryReader reader)
     {
         Size.X = reader.ReadInt32();
@@ -566,8 +595,8 @@ public class KatanaSlice : ModProjectile
     {
         Projectile.rotation = Projectile.velocity.ToRotation();
 
-        int width = (int)MakePoly(3f).OutFunction.Evaluate(70f, MaxWidth, Interpolant);
-        int height = (int)MakePoly(3f).OutFunction.Evaluate(100f, 10f, Interpolant);
+        int width = (int) MakePoly(3f).OutFunction.Evaluate(70f, MaxWidth, Interpolant);
+        int height = (int) MakePoly(3f).OutFunction.Evaluate(100f, 10f, Interpolant);
         Size = new(width, height);
         Projectile.Opacity = MakePoly(2f).InFunction(InverseLerp(0f, 5f * Projectile.MaxUpdates, Projectile.timeLeft));
 
@@ -594,11 +623,16 @@ public class KatanaSlice : ModProjectile
 
             for (float i = .5f; i < 1f; i += .1f)
             {
-                Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Size.ToVector2() * i * .4f * Projectile.Opacity), null, Color.White * Projectile.Opacity, Projectile.rotation, origin);
-                Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Size.ToVector2() * i), null, col, Projectile.rotation, origin);
-                Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Size.ToVector2() * i * 1.3f), null, Color.DarkSlateBlue * Projectile.Opacity * .4f, Projectile.rotation, origin);
+                Main.spriteBatch.DrawBetterRect(tex,
+                    ToTarget(Projectile.Center, Size.ToVector2() * i * .4f * Projectile.Opacity), null,
+                    Color.White * Projectile.Opacity, Projectile.rotation, origin);
+                Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Size.ToVector2() * i), null, col,
+                    Projectile.rotation, origin);
+                Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Size.ToVector2() * i * 1.3f), null,
+                    Color.DarkSlateBlue * Projectile.Opacity * .4f, Projectile.rotation, origin);
             }
         }
+
         PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.Dusts, BlendState.Additive);
         return false;
     }

@@ -28,7 +28,7 @@ public class AdditionsGlobalProjectile : GlobalProjectile
 
         bool result = true;
         foreach (Delegate d in PreAIEvent.GetInvocationList())
-            result &= ((ProjectileConditionDelegate)d).Invoke(projectile);
+            result &= ((ProjectileConditionDelegate) d).Invoke(projectile);
 
         return result;
     }
@@ -75,7 +75,7 @@ public class AdditionsGlobalProjectile : GlobalProjectile
                             for (int i = 0; i <= 2; i++)
                             {
                                 int obj = projectile.NewProj(projectile.Center, Vector2.One, mini,
-                                    (int)(projectile.damage * .33f), 0f, player.whoAmI, i, projectile.whoAmI);
+                                    (int) (projectile.damage * .33f), 0f, player.whoAmI, i, projectile.whoAmI);
                                 Main.projectile[obj].AdditionsInfo().ExtraAI[1] = MathHelper.TwoPi * i / 3f;
                                 Main.projectile[obj].AdditionsInfo().ExtraAI[2] = Main.rand.NextFromList(-1, 1);
                             }
@@ -101,7 +101,7 @@ public class AdditionsGlobalProjectile : GlobalProjectile
             {
                 if (Main.myPlayer == projectile.owner && Main.rand.NextBool())
                     projectile.NewProj(projectile.Center, Main.rand.NextVector2CircularEdge(4f, 4f),
-                        ModContent.ProjectileType<TinyServant>(), (int)(projectile.damage * .25f), 0f,
+                        ModContent.ProjectileType<TinyServant>(), (int) (projectile.damage * .25f), 0f,
                         projectile.owner);
             }
                 break;

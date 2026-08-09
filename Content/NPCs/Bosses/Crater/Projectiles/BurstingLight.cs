@@ -10,6 +10,7 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 public class BurstingLight : ProjOwnedByNPC<Asterlin>
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.DrawScreenCheckFluff[Projectile.type] = 2500;
@@ -25,17 +26,18 @@ public class BurstingLight : ProjOwnedByNPC<Asterlin>
     }
 
     public int TotalTime => 18 + Asterlin.RotatedDicing_TelegraphTime;
-    public float TeleCompletion => (float)Asterlin.RotatedDicing_TelegraphTime / TotalTime;
+    public float TeleCompletion => (float) Asterlin.RotatedDicing_TelegraphTime / TotalTime;
 
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
 
     public Vector2 Size;
     public override void SendAI(BinaryWriter writer) => writer.WriteVector2(Size);
     public override void ReceiveAI(BinaryReader reader) => Size = reader.ReadVector2();
+
     public override void SafeAI()
     {
         if (Time > TotalTime)
@@ -45,11 +47,11 @@ public class BurstingLight : ProjOwnedByNPC<Asterlin>
             AdditionsSound.etherealHitCrunch.Play(Owner.Center, 1.8f, .1f, 0f, 1, Name);
 
         Projectile.rotation = Projectile.velocity.ToRotation();
-        Size.X = (int)new Animators.PiecewiseCurve()
+        Size.X = (int) new Animators.PiecewiseCurve()
             .AddStall(32f, TeleCompletion)
             .Add(32f, 10000, 1f, Animators.MakePoly(4f).OutFunction)
             .Evaluate(InverseLerp(0f, TotalTime, Time));
-        Size.Y = (int)new Animators.PiecewiseCurve()
+        Size.Y = (int) new Animators.PiecewiseCurve()
             .AddStall(32f, TeleCompletion)
             .Add(32f, 0f, 1f, Animators.MakePoly(2f).InOutFunction)
             .Evaluate(InverseLerp(0f, TotalTime, Time));
@@ -63,7 +65,8 @@ public class BurstingLight : ProjOwnedByNPC<Asterlin>
     {
         Vector2 start = Projectile.Center;
         Vector2 dir = Projectile.velocity.SafeNormalize(Vector2.Zero);
-        return targetHitbox.LineCollision(start, start + dir * Size.X / 2, Size.Y * .55f) || targetHitbox.LineCollision(start, start - dir * Size.X / 2, Size.Y * .55f);
+        return targetHitbox.LineCollision(start, start + dir * Size.X / 2, Size.Y * .55f) ||
+               targetHitbox.LineCollision(start, start - dir * Size.X / 2, Size.Y * .55f);
     }
 
     public override bool PreDraw(ref Color lightColor)
@@ -75,7 +78,8 @@ public class BurstingLight : ProjOwnedByNPC<Asterlin>
             {
                 Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
                 float anim = Animators.MakePoly(4f).InFunction.Evaluate(2f, 1f, telegraphCompletion);
-                Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Size * i * anim), null, Color.PaleGoldenrod.Lerp(Color.DarkGoldenrod, i), Projectile.rotation, tex.Size() / 2f);
+                Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Size * i * anim), null,
+                    Color.PaleGoldenrod.Lerp(Color.DarkGoldenrod, i), Projectile.rotation, tex.Size() / 2f);
             }
 
             Texture2D cap = AssetRegistry.GetTexture(AdditionsTexture.BloomLineCap);
@@ -93,10 +97,14 @@ public class BurstingLight : ProjOwnedByNPC<Asterlin>
             Vector2 middleOrigin = new(0, horiz.Height / 2f);
             Vector2 middleScale = new(a.Distance(b) / horiz.Width, thicknessScale);
             Color color = Color.PaleGoldenrod * fade;
-            Main.spriteBatch.Draw(horiz, a - Main.screenPosition, null, color, rotation, middleOrigin, middleScale, SpriteEffects.None, 0f);
-            Main.spriteBatch.Draw(cap, a - Main.screenPosition, null, color, rotation, capOrigin, thicknessScale, SpriteEffects.None, 0f);
-            Main.spriteBatch.Draw(cap, b - Main.screenPosition, null, color, rotation + MathHelper.Pi, capOrigin, thicknessScale, SpriteEffects.None, 0f);
+            Main.spriteBatch.Draw(horiz, a - Main.screenPosition, null, color, rotation, middleOrigin, middleScale,
+                SpriteEffects.None, 0f);
+            Main.spriteBatch.Draw(cap, a - Main.screenPosition, null, color, rotation, capOrigin, thicknessScale,
+                SpriteEffects.None, 0f);
+            Main.spriteBatch.Draw(cap, b - Main.screenPosition, null, color, rotation + MathHelper.Pi, capOrigin,
+                thicknessScale, SpriteEffects.None, 0f);
         }
+
         PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.UnderProjectiles, BlendState.Additive);
         return false;
     }

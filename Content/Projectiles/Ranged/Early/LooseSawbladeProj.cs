@@ -30,6 +30,7 @@ public class LooseSawbladeProj : ModProjectile, ILocalizedModType, IModType
 
     public ref float Time => ref Projectile.ai[0];
     public ref float EnemyID => ref Projectile.ai[1];
+
     public bool HitTile
     {
         get => Projectile.ai[2] == 1f;
@@ -43,11 +44,13 @@ public class LooseSawbladeProj : ModProjectile, ILocalizedModType, IModType
     public override void AI()
     {
         after ??= new(5, () => Projectile.Center);
-        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 255));
+        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0,
+            255));
 
         if (Main.rand.NextBool(3))
         {
-            int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Bone, Projectile.velocity.X * 0.25f, Projectile.velocity.Y * 0.25f, 0, default(Color), .5f);
+            int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Bone,
+                Projectile.velocity.X * 0.25f, Projectile.velocity.Y * 0.25f, 0, default(Color), .5f);
             Main.dust[d].position = Projectile.Center;
         }
 
@@ -56,7 +59,7 @@ public class LooseSawbladeProj : ModProjectile, ILocalizedModType, IModType
             Projectile.knockBack = 0f;
 
             // Stick to the target
-            NPC target = Main.npc[(int)EnemyID];
+            NPC target = Main.npc[(int) EnemyID];
 
             if (!target.active)
             {
@@ -82,6 +85,7 @@ public class LooseSawbladeProj : ModProjectile, ILocalizedModType, IModType
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D tex = Projectile.ThisProjectileTexture();
@@ -103,7 +107,9 @@ public class LooseSawbladeProj : ModProjectile, ILocalizedModType, IModType
         }
 
         for (int i = 0; i < 3; i++)
-            ParticleRegistry.SpawnBloodParticle(target.RotHitbox().RandomPoint(), Main.rand.NextVector2CircularLimited(11, 11, .2f, .8f), 20, Main.rand.NextFloat(.7f, 1f), Color.DarkRed);
+            ParticleRegistry.SpawnBloodParticle(target.RotHitbox().RandomPoint(),
+                Main.rand.NextVector2CircularLimited(11, 11, .2f, .8f), 20, Main.rand.NextFloat(.7f, 1f),
+                Color.DarkRed);
     }
 
     public override void OnKill(int timeLeft)
@@ -119,8 +125,9 @@ public class LooseSawbladeProj : ModProjectile, ILocalizedModType, IModType
 
     public override bool OnTileCollide(Vector2 oldVelocity)
     {
-        Collision.HitTiles(Projectile.Center, -oldVelocity * Main.rand.NextFloat(.4f, .9f), Projectile.width, Projectile.height);
-        SoundEngine.PlaySound(SoundID.Dig, (Vector2?)Projectile.position, null);
+        Collision.HitTiles(Projectile.Center, -oldVelocity * Main.rand.NextFloat(.4f, .9f), Projectile.width,
+            Projectile.height);
+        SoundEngine.PlaySound(SoundID.Dig, (Vector2?) Projectile.position, null);
 
         Projectile.velocity *= 0f;
         Projectile.Center += oldVelocity;

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -20,7 +19,7 @@ public class Birch : BaseSwordSwing
 
     public override void Defaults()
     {
-        Projectile.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
+        Projectile.DamageType = ModContent.GetInstance<MeleeNoSpeedDamageClass>();
     }
 
     public override float Animation()
@@ -41,7 +40,9 @@ public class Birch : BaseSwordSwing
 
     public RotatedRectangle BushRect()
     {
-        return new(40f * Projectile.scale, Projectile.Center + PolarVector(31f * Projectile.scale, Projectile.rotation - SwordRotation), Projectile.Center + PolarVector(82f * Projectile.scale, Projectile.rotation - SwordRotation));
+        return new(40f * Projectile.scale,
+            Projectile.Center + PolarVector(31f * Projectile.scale, Projectile.rotation - SwordRotation),
+            Projectile.Center + PolarVector(82f * Projectile.scale, Projectile.rotation - SwordRotation));
     }
 
     public override void SafeInitialize()
@@ -74,7 +75,8 @@ public class Birch : BaseSwordSwing
 
         if (Time % 2 == 1)
         {
-            after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.scale, Projectile.Opacity, Projectile.rotation, Effects, 100));
+            after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.scale, Projectile.Opacity,
+                Projectile.rotation, Effects, 100));
         }
 
         float scaleUp = MeleeScale * 3.5f;
@@ -111,7 +113,8 @@ public class Birch : BaseSwordSwing
 
         for (int i = 0; i < 2; i++)
         {
-            Dust d = Dust.NewDustPerfect(BushRect().RandomPoint(), 196, -SwordDir * 4f, 0, default, Main.rand.NextFloat(1.1f, 1.9f));
+            Dust d = Dust.NewDustPerfect(BushRect().RandomPoint(), 196, -SwordDir * 4f, 0, default,
+                Main.rand.NextFloat(1.1f, 1.9f));
             d.noGravity = true;
         }
     }
@@ -123,8 +126,10 @@ public class Birch : BaseSwordSwing
         for (int i = 0; i < 20; i++)
         {
             Dust.NewDustPerfect(start + Main.rand.NextVector2Circular(10f, 10f), DustID.WoodFurniture,
-                SwordDir.RotatedByRandom(.4f) * Main.rand.NextFloat(8f, 15f), 0, default, Main.rand.NextFloat(1.2f, 1.7f));
+                SwordDir.RotatedByRandom(.4f) * Main.rand.NextFloat(8f, 15f), 0, default,
+                Main.rand.NextFloat(1.2f, 1.7f));
         }
+
         ScreenShakeSystem.New(new(.4f, .3f), start);
     }
 
@@ -135,8 +140,10 @@ public class Birch : BaseSwordSwing
         for (int i = 0; i < 20; i++)
         {
             Dust.NewDustPerfect(start + Main.rand.NextVector2Circular(10f, 10f), DustID.WoodFurniture,
-                SwordDir.RotatedByRandom(.4f) * Main.rand.NextFloat(8f, 15f), 0, default, Main.rand.NextFloat(1.2f, 1.7f));
+                SwordDir.RotatedByRandom(.4f) * Main.rand.NextFloat(8f, 15f), 0, default,
+                Main.rand.NextFloat(1.2f, 1.7f));
         }
+
         ScreenShakeSystem.New(new(.4f, .3f), start);
     }
 
@@ -149,6 +156,7 @@ public class Birch : BaseSwordSwing
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         // Determine the effects for drawing. These must be done here otherwise silly things WILL happen.
@@ -173,7 +181,8 @@ public class Birch : BaseSwordSwing
         }
 
         // Not manually setting the rotation offset and sprite effects here caused a latency between frames where rarely a artifact would occur
-        after?.DrawFancySwordAfterimages(Tex, Projectile.Center, [Color.SaddleBrown * .8f * Brightness], origin, Effects, RotationOffset, Projectile.Opacity, Projectile.scale);
+        after?.DrawFancySwordAfterimages(Tex, Projectile.Center, [Color.SaddleBrown * .8f * Brightness], origin,
+            Effects, RotationOffset, Projectile.Opacity, Projectile.scale);
 
         Main.spriteBatch.Draw(Tex, Projectile.Center - Main.screenPosition, null, lightColor,
             Projectile.rotation + RotationOffset, origin, Projectile.scale, Effects, 0f);

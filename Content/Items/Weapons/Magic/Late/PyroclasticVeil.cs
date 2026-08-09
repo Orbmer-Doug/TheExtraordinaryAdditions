@@ -1,5 +1,4 @@
-﻿using CalamityMod.Items.Materials;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
@@ -54,8 +53,7 @@ public class PyroclasticVeil : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        recipe.AddIngredient(ModContent.ItemType<UnholyCore>(), 10);
-        recipe.AddIngredient(ModContent.ItemType<EssenceofHavoc>(), 12);
+        //TODO
         recipe.AddIngredient(ModContent.ItemType<TomeOfHellfire>(), 1);
         recipe.AddIngredient(ModContent.ItemType<Fireball>(), 1);
         recipe.AddIngredient(ItemID.LunarBar, 8);

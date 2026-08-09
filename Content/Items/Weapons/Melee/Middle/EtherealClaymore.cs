@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -28,7 +27,7 @@ public class EtherealClaymore : ModItem
         Item.knockBack = 1f;
         Item.autoReuse = true;
         Item.damage = 450;
-        Item.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
+        Item.DamageType = ModContent.GetInstance<MeleeNoSpeedDamageClass>();
         Item.noMelee = true;
         Item.noUseGraphic = true;
         Item.shootSpeed = 10;
@@ -69,7 +68,8 @@ public class EtherealClaymore : ModItem
         ParticleRegistry.SpawnThunderParticle(pos, 30, 1.6f, new(1f), 0f, Color.CornflowerBlue);
         for (int i = 0; i < 12; i++)
         {
-            ParticleRegistry.SpawnLightningArcParticle(pos, Main.rand.NextVector2CircularLimited(200f, 200f, .5f, 1f), Main.rand.Next(10, 20), Main.rand.NextFloat(.4f, .6f), Color.CornflowerBlue);
+            ParticleRegistry.SpawnLightningArcParticle(pos, Main.rand.NextVector2CircularLimited(200f, 200f, .5f, 1f),
+                Main.rand.Next(10, 20), Main.rand.NextFloat(.4f, .6f), Color.CornflowerBlue);
         }
     }
 }

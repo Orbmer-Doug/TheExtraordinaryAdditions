@@ -14,6 +14,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Late;
 public class StratagemMark : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Eagle500kgBomb);
+
     public override void SetDefaults()
     {
         Projectile.DamageType = DamageClass.Generic;
@@ -28,12 +29,14 @@ public class StratagemMark : ModProjectile
         get => Projectile.ai[0] == 1f;
         set => Projectile.ai[0] = value.ToInt();
     }
+
     public ref float Time => ref Projectile.ai[1];
     public ref float GroundTime => ref Projectile.ai[2];
 
     public const int ThrowTime = 40;
     public int Dir => Projectile.velocity.X.NonZeroSign();
     public float Completion => InverseLerp(0f, ThrowTime, Time);
+
     public float ThrowDisplacement()
     {
         return Projectile.velocity.ToRotation() + (MathHelper.PiOver2 * new PiecewiseCurve()
@@ -43,11 +46,13 @@ public class StratagemMark : ModProjectile
     }
 
     public Player Owner => Main.player[Projectile.owner];
-    public static readonly float CallInTime = CalUtils.SecondsToFrames(3.45f);
+    public static readonly float CallInTime = SecondsToFrames(3.45f);
+
     public override void AI()
     {
         if (trail == null || trail.Disposed)
-            trail = new(c => InverseLerp(0.015f, 0.09f, c) * 20f * InverseLerp(0f, 20f, GroundTime), (c, pos) => Color.Red * Fade, null, 40);
+            trail = new(c => InverseLerp(0.015f, 0.09f, c) * 20f * InverseLerp(0f, 20f, GroundTime),
+                (c, pos) => Color.Red * Fade, null, 40);
 
         if (Time < ThrowTime)
         {
@@ -57,11 +62,13 @@ public class StratagemMark : ModProjectile
             Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, rot - MathHelper.PiOver2);
             Projectile.Center = Owner.GetFrontHandPositionImproved() + PolarVector(Projectile.width / 2, rot);
         }
+
         if (Time == ThrowTime)
         {
             Projectile.tileCollide = true;
             Projectile.velocity *= 15f;
         }
+
         if (Time > ThrowTime)
         {
             Projectile.VelocityBasedRotation();
@@ -74,13 +81,14 @@ public class StratagemMark : ModProjectile
             cache.SetPoints(Projectile.Center.GetLaserControlPoints(Projectile.Center - Vector2.UnitY * 1000f, 40));
         }
         else
-            Projectile.timeLeft = (int)CallInTime + 5;
+            Projectile.timeLeft = (int) CallInTime + 5;
 
         Time++;
     }
 
     public float Fade => InverseLerp(0f, 15f, Projectile.timeLeft);
     public override bool ShouldUpdatePosition() => Time >= ThrowTime;
+
     public override bool OnTileCollide(Vector2 oldVelocity)
     {
         if (!HitGround)
@@ -110,6 +118,7 @@ public class StratagemMark : ModProjectile
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints cache = new(40);
+
     public override bool PreDraw(ref Color lightColor)
     {
         if (GroundTime > 0f)
@@ -123,6 +132,7 @@ public class StratagemMark : ModProjectile
                 shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DendriticNoise), 1);
                 trail.DrawTrail(shader, cache.Points, 80);
             }
+
             PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         }
 

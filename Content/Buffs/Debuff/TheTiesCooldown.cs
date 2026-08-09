@@ -3,6 +3,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace TheExtraordinaryAdditions.Content.Buffs.Debuff;
+
 public class TheTiesCooldown : ModBuff
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TheTiesCooldown);

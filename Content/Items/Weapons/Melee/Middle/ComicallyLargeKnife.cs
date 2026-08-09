@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Terraria;
+﻿using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -23,7 +22,7 @@ public class ComicallyLargeKnife : ModItem
         Item.knockBack = .6f;
         Item.autoReuse = true;
         Item.damage = 180;
-        Item.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
+        Item.DamageType = ModContent.GetInstance<MeleeNoSpeedDamageClass>();
         Item.noMelee = true;
         Item.noUseGraphic = true;
         Item.shoot = ModContent.ProjectileType<KnifeStab>();
@@ -31,7 +30,8 @@ public class ComicallyLargeKnife : ModItem
 
     public override bool CanUseItem(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback)
     {
         Projectile.NewProjectile(source, position, velocity, type, damage, knockback, player.whoAmI);
         return false;

@@ -22,4 +22,3 @@ public class StygainHeartTrophy : ModItem
         Item.value = Item.buyPrice(0, 1);
     }
 }
-

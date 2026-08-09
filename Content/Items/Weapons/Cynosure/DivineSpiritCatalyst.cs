@@ -1,5 +1,4 @@
-﻿using CalamityMod.Tiles.Furniture.CraftingStations;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using Terraria;
@@ -45,7 +44,8 @@ public class DivineSpiritCatalyst : ModItem
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
-        tooltips.ColorLocalization(Color.Lerp(Color.DarkSlateBlue * 1.15f, Color.DarkSlateGray * 1.1f, (float)Math.Sin(Main.GlobalTimeWrappedHourly)));
+        tooltips.ColorLocalization(Color.Lerp(Color.DarkSlateBlue * 1.15f, Color.DarkSlateGray * 1.1f,
+            (float) Math.Sin(Main.GlobalTimeWrappedHourly)));
     }
 
     public override void PostUpdate()
@@ -58,22 +58,26 @@ public class DivineSpiritCatalyst : ModItem
     {
         if (Item.velocity.X == 0f)
         {
-            float pulse = (float)Math.Cos(1.618034f * Main.GlobalTimeWrappedHourly * 2f) + (float)Math.Cos(Math.E * Main.GlobalTimeWrappedHourly * 1.7000000476837158);
+            float pulse = (float) Math.Cos(1.618034f * Main.GlobalTimeWrappedHourly * 2f) +
+                          (float) Math.Cos(Math.E * Main.GlobalTimeWrappedHourly * 1.7000000476837158);
             pulse = pulse * 0.25f + 0.5f;
-            pulse = (float)Math.Pow(pulse, 3.0);
+            pulse = (float) Math.Pow(pulse, 3.0);
             float num = MathHelper.Lerp(-0.3f, 1.2f, pulse);
             Color drawColor = Color.Lerp(Color.Violet, Color.DarkViolet, pulse);
             drawColor *= MathHelper.Lerp(0.35f, 0.67f, Convert01To010(pulse));
             float drawPositionOffset = num * baseScale * 8f;
             for (int i = 0; i < 3; i++)
             {
-                Vector2 drawPosition = baseDrawPosition + (MathHelper.TwoPi * i / 8f).ToRotationVector2() * drawPositionOffset;
-                spriteBatch.Draw(TextureAssets.Item[Item.type].Value, drawPosition, (Rectangle?)frame, drawColor, 0f, Vector2.Zero, baseScale, 0, 0f);
+                Vector2 drawPosition = baseDrawPosition +
+                                       (MathHelper.TwoPi * i / 8f).ToRotationVector2() * drawPositionOffset;
+                spriteBatch.Draw(TextureAssets.Item[Item.type].Value, drawPosition, (Rectangle?) frame, drawColor, 0f,
+                    Vector2.Zero, baseScale, 0, 0f);
             }
         }
     }
 
-    public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
+    public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation,
+        ref float scale, int whoAmI)
     {
         float brightness = Main.essScale * Main.rand.NextFloat(0.9f, 1.1f);
         Lighting.AddLight(Item.Center, 1.2f * brightness, 0.4f * brightness, 0.8f);
@@ -82,7 +86,8 @@ public class DivineSpiritCatalyst : ModItem
         return true;
     }
 
-    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor,
+        Color itemColor, Vector2 origin, float scale)
     {
         Item.velocity.X = 0f;
         DrawBackAfterimage(spriteBatch, position - frame.Size() * 0.5f, frame, scale);
@@ -96,7 +101,7 @@ public class DivineSpiritCatalyst : ModItem
         recipe.AddIngredient(ModContent.ItemType<UnparalleledCoalescence>());
         recipe.AddIngredient(ModContent.ItemType<RealitySeamstressesGlove>());
         recipe.AddIngredient(ModContent.ItemType<DeepestNadir>());
-        recipe.AddTile(ModContent.TileType<DraedonsForge>());
+        //TODO
         recipe.Register();
     }
 }

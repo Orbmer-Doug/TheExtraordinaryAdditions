@@ -5,16 +5,20 @@ using Terraria.ModLoader;
 
 namespace TheExtraordinaryAdditions.Core.Systems;
 
-
 public class OverrideHooksManager
 {
-    internal static MethodInfo SetDefaultsMethod => typeof(ProjectileLoader).GetMethod("SetDefaults", UniversalBindingFlags);
+    internal static MethodInfo SetDefaultsMethod =>
+        typeof(ProjectileLoader).GetMethod("SetDefaults", UniversalBindingFlags);
+
     public delegate void Orig_SetDefaultsDelegate(Projectile projectile, bool createModProjectile = true);
 
     internal static MethodInfo OnHitNPCMethod => typeof(ProjectileLoader).GetMethod("OnHitNPC", UniversalBindingFlags);
+
     public delegate void Orig_OnHitNPCDelegate(Projectile projectile, NPC target, in NPC.HitInfo hit, int damageDone);
 
-    internal static MethodInfo ModifyHitNPCMethod => typeof(ProjectileLoader).GetMethod("ModifyHitNPC", UniversalBindingFlags);
+    internal static MethodInfo ModifyHitNPCMethod =>
+        typeof(ProjectileLoader).GetMethod("ModifyHitNPC", UniversalBindingFlags);
+
     public delegate void Orig_ModifyHitNPCDelegate(Projectile projectile, NPC target, ref NPC.HitModifiers modifiers);
 }
 
@@ -27,14 +31,17 @@ public class OverrideSystemHooks : ModSystem
         MonoModHooks.Add(OverrideHooksManager.ModifyHitNPCMethod, ModifyHitNPCDetourMethod);
     }
 
-    internal static void SetDefaultsDetourMethod(OverrideHooksManager.Orig_SetDefaultsDelegate orig, Projectile projectile, bool createModProjectile = true)
+    internal static void SetDefaultsDetourMethod(OverrideHooksManager.Orig_SetDefaultsDelegate orig,
+        Projectile projectile, bool createModProjectile = true)
     {
         orig(projectile, createModProjectile);
-        if (projectile.ModProjectile == null && ProjectileOverride.BehaviorOverrideSet.TryGetValue(projectile.type, out ProjectileOverride container))
+        if (projectile.ModProjectile == null &&
+            ProjectileOverride.BehaviorOverrideSet.TryGetValue(projectile.type, out ProjectileOverride container))
             container.SetDefaults(projectile);
     }
 
-    internal static void OnHitNPCDetourMethod(OverrideHooksManager.Orig_OnHitNPCDelegate orig, Projectile projectile, NPC target, in NPC.HitInfo hit, int damageDone)
+    internal static void OnHitNPCDetourMethod(OverrideHooksManager.Orig_OnHitNPCDelegate orig, Projectile projectile,
+        NPC target, in NPC.HitInfo hit, int damageDone)
     {
         if (ProjectileOverride.BehaviorOverrideSet.TryGetValue(projectile.type, out ProjectileOverride container))
         {
@@ -46,7 +53,8 @@ public class OverrideSystemHooks : ModSystem
         orig(projectile, target, hit, damageDone);
     }
 
-    internal static void ModifyHitNPCDetourMethod(OverrideHooksManager.Orig_ModifyHitNPCDelegate orig, Projectile projectile, NPC target, ref NPC.HitModifiers modifiers)
+    internal static void ModifyHitNPCDetourMethod(OverrideHooksManager.Orig_ModifyHitNPCDelegate orig,
+        Projectile projectile, NPC target, ref NPC.HitModifiers modifiers)
     {
         if (ProjectileOverride.BehaviorOverrideSet.TryGetValue(projectile.type, out ProjectileOverride container))
         {

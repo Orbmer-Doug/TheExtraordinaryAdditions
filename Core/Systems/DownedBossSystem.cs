@@ -28,7 +28,7 @@ public class BossDownedSaveSystem : ModSystem
     public override void LoadWorldData(TagCompound tag)
     {
         downedRegistry.Clear();
-        downedRegistry.AddRange((List<string>)tag.GetList<string>(nameof(downedRegistry)));
+        downedRegistry.AddRange((List<string>) tag.GetList<string>(nameof(downedRegistry)));
     }
 
     public static void SetDefeatState<TBossType>(bool isDefeated) where TBossType : ModNPC
@@ -51,16 +51,18 @@ public class BossDownedSaveSystem : ModSystem
         downedRegistry.Contains(ModContent.GetModNPC(ModContent.NPCType<TBossType>()).Name);
 }
 
-public interface IBossDowned { }
+public interface IBossDowned
+{
+}
 
 public class GlobalBossDefeatMarker : GlobalNPC
 {
     public override void OnKill(NPC npc)
     {
         if (npc.ModNPC is not IBossDowned ||
-            BossDownedSaveSystem.downedRegistry.Contains(npc.ModNPC.Name)) 
+            BossDownedSaveSystem.downedRegistry.Contains(npc.ModNPC.Name))
             return;
-        
+
         string bossName = ModContent.GetModNPC(npc.type).Name;
         BossDownedSaveSystem.downedRegistry.Add(bossName);
         AdditionsNetcode.SyncBossDefeats(Main.myPlayer);

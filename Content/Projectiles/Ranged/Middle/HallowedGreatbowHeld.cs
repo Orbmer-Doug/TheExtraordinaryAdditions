@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using CalamityMod;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -46,6 +45,7 @@ public class HallowedGreatbowHeld : BaseIdleHoldoutProjectile
     public ref float OldStringCompletion => ref Projectile.AdditionsInfo().ExtraAI[0];
     public ref float TotalTime => ref Projectile.AdditionsInfo().ExtraAI[2];
     public int Dir => Projectile.velocity.X.NonZeroSign();
+
     public override void OnSpawn(IEntitySource source)
     {
         Switch = -1;
@@ -53,11 +53,13 @@ public class HallowedGreatbowHeld : BaseIdleHoldoutProjectile
     }
 
     public Vector2 arrowPos;
+
     public override void WriteExtraAI(BinaryWriter writer)
     {
         writer.WriteVector2(arrowPos);
         writer.Write(Projectile.rotation);
     }
+
     public override void GetExtraAI(BinaryReader reader)
     {
         arrowPos = reader.ReadVector2();
@@ -67,7 +69,9 @@ public class HallowedGreatbowHeld : BaseIdleHoldoutProjectile
     public override void SafeAI()
     {
         Item ammoItem = Owner.ChooseAmmo(Item);
-        Texture2D arrow = ammoItem != null ? ammoItem.ThisItemTexture() : AssetRegistry.GetTexture(AdditionsTexture.Pixel);
+        Texture2D arrow = ammoItem != null
+            ? ammoItem.ThisItemTexture()
+            : AssetRegistry.GetTexture(AdditionsTexture.Pixel);
 
         if (trail == null || trail.Disposed)
             trail = new(c => 2f, (c, pos) => Color.White, null, MaxPoints);
@@ -78,7 +82,9 @@ public class HallowedGreatbowHeld : BaseIdleHoldoutProjectile
                 Projectile.netUpdate = true;
             Projectile.spriteDirection = (Projectile.velocity.X > 0f).ToDirectionInt();
         }
-        Projectile.Center = Center + PolarVector(Projectile.width / 2 + 5f, Projectile.rotation) + PolarVector(10f * Dir, Projectile.rotation + MathHelper.PiOver2);
+
+        Projectile.Center = Center + PolarVector(Projectile.width / 2 + 5f, Projectile.rotation) +
+                            PolarVector(10f * Dir, Projectile.rotation + MathHelper.PiOver2);
         Projectile.rotation = Projectile.velocity.ToRotation();
         Owner.itemRotation = (Projectile.direction * Projectile.velocity).ToRotation();
         Owner.ChangeDir(Dir);
@@ -87,17 +93,21 @@ public class HallowedGreatbowHeld : BaseIdleHoldoutProjectile
         float close = InverseLerp(0f, 22f, Time);
 
         float armRot = Projectile.rotation + (.72f * Dir);
-        float reelAnim = Animators.MakePoly(2.2f).InFunction.Evaluate(armRot, armRot + (.7f * Dir), Switch != 0 ? reel : OldStringCompletion);
+        float reelAnim = Animators.MakePoly(2.2f).InFunction
+            .Evaluate(armRot, armRot + (.7f * Dir), Switch != 0 ? reel : OldStringCompletion);
         Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, reelAnim - MathHelper.PiOver2);
-        Owner.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.ThreeQuarters, Projectile.rotation + .2f * Dir - MathHelper.PiOver2);
+        Owner.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.ThreeQuarters,
+            Projectile.rotation + .2f * Dir - MathHelper.PiOver2);
 
         Vector2 centerString = PolarVector(13f, Projectile.rotation - MathHelper.Pi);
         Vector2 drawBack = PolarVector(ReelDist * StringCompletion, Projectile.rotation - MathHelper.Pi);
 
-        Vector2 top = Projectile.RotHitbox().Center + PolarVector(24f, Projectile.rotation - MathHelper.PiOver2) + centerString;
+        Vector2 top = Projectile.RotHitbox().Center + PolarVector(24f, Projectile.rotation - MathHelper.PiOver2) +
+                      centerString;
         Vector2 middle = Projectile.RotHitbox().Center + centerString + drawBack;
         arrowPos = middle + PolarVector(10f, Projectile.rotation);
-        Vector2 bottom = Projectile.RotHitbox().Center + PolarVector(-24f, Projectile.rotation - MathHelper.PiOver2) + centerString;
+        Vector2 bottom = Projectile.RotHitbox().Center + PolarVector(-24f, Projectile.rotation - MathHelper.PiOver2) +
+                         centerString;
 
         Points = [];
         cache ??= new(MaxPoints);
@@ -105,7 +115,8 @@ public class HallowedGreatbowHeld : BaseIdleHoldoutProjectile
             Points.Add(MultiLerp(InverseLerp(0f, MaxPoints, i), top, middle, bottom));
         cache.SetPoints(Points);
 
-        Vector2 pos = Projectile.RotHitbox().Center + PolarVector(6f * Dir, Projectile.rotation) + PolarVector(26f * Dir, Projectile.rotation - MathHelper.PiOver2);
+        Vector2 pos = Projectile.RotHitbox().Center + PolarVector(6f * Dir, Projectile.rotation) +
+                      PolarVector(26f * Dir, Projectile.rotation - MathHelper.PiOver2);
         Vector2 vel = Projectile.velocity.RotatedBy(-.3f * Dir).RotatedByRandom(-.2f) * Main.rand.NextFloat(1f, 4f);
         int life = Main.rand.Next(14, 22);
         float scale = Main.rand.NextFloat(.2f, .3f);
@@ -132,14 +143,16 @@ public class HallowedGreatbowHeld : BaseIdleHoldoutProjectile
                         Time = 0f;
                         this.Sync();
                     }
+
                     break;
                 case 1:
                     StringCompletion = Animators.MakePoly(2.2f).InFunction.Evaluate(0f, 1f, reel);
                     if (reel >= 1f || (this.RunLocal() && !Modded.MouseLeft.Current))
                     {
-                        Owner.PickAmmo(Item, out int type, out float speed, out int dmg, out float kb, out int ammo, Owner.ShouldConsumeAmmo(Item));
+                        Owner.PickAmmo(Item, out int type, out float speed, out int dmg, out float kb, out int ammo,
+                            Owner.ShouldConsumeAmmo(Item));
                         speed *= reel;
-                        dmg = (int)(dmg * MathHelper.Clamp(reel, .1f, 1f));
+                        dmg = (int) (dmg * MathHelper.Clamp(reel, .1f, 1f));
                         kb *= reel;
 
                         if (this.RunLocal())
@@ -147,17 +160,26 @@ public class HallowedGreatbowHeld : BaseIdleHoldoutProjectile
                             for (int i = 0; i < 2; i++)
                             {
                                 float shootOffsetAngle = MathHelper.Lerp(-0.1f, 0.1f, i / (2 - 1f));
-                                Vector2 shootVelocity = Projectile.velocity.RotatedByRandom(shootOffsetAngle) * Main.rand.NextFloat(.7f, 1f) * speed;
-                                Projectile.NewProj(arrowPos, shootVelocity, ModContent.ProjectileType<AcceleratingLight>(), dmg, kb, Owner.whoAmI, 0f, 0f, 30f * (.2f + reel));
+                                Vector2 shootVelocity = Projectile.velocity.RotatedByRandom(shootOffsetAngle) *
+                                                        Main.rand.NextFloat(.7f, 1f) * speed;
+                                Projectile.NewProj(arrowPos, shootVelocity,
+                                    ModContent.ProjectileType<AcceleratingLight>(), dmg, kb, Owner.whoAmI, 0f, 0f,
+                                    30f * (.2f + reel));
                             }
                         }
-                        SoundEngine.PlaySound(SoundID.Item5 with { Volume = Main.rand.NextFloat(.9f, 1.2f), PitchVariance = .1f, Identifier = Name }, arrowPos);
+
+                        SoundEngine.PlaySound(
+                            SoundID.Item5 with
+                            {
+                                Volume = Main.rand.NextFloat(.9f, 1.2f), PitchVariance = .1f, Identifier = Name
+                            }, arrowPos);
 
                         OldStringCompletion = StringCompletion;
                         Switch = 0;
                         Time = 0f;
                         this.Sync();
                     }
+
                     break;
             }
 
@@ -172,6 +194,7 @@ public class HallowedGreatbowHeld : BaseIdleHoldoutProjectile
     }
 
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         if (trail != null && !trail.Disposed && cache != null)
@@ -187,7 +210,9 @@ public class HallowedGreatbowHeld : BaseIdleHoldoutProjectile
             direction = SpriteEffects.FlipHorizontally;
             rotation += MathHelper.Pi;
         }
-        Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), rotation, origin, Projectile.scale, direction, 0f);
+
+        Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), rotation, origin,
+            Projectile.scale, direction, 0f);
 
         void draw()
         {
@@ -196,11 +221,15 @@ public class HallowedGreatbowHeld : BaseIdleHoldoutProjectile
             float opacity = Animators.MakePoly(2.4f).InFunction(InverseLerp(0f, 12f, TotalTime));
             if (Switch == 0)
                 opacity = 0f;
-            Vector2 size = (Vector2.One / arrow.Size()) * new Vector2(1f - (Switch == 1 ? InverseLerp(0f, ReelTime, Time) : 0f), 1f) * (55f * opacity);
+            Vector2 size = (Vector2.One / arrow.Size()) *
+                           new Vector2(1f - (Switch == 1 ? InverseLerp(0f, ReelTime, Time) : 0f), 1f) * (55f * opacity);
             float rot = Projectile.rotation - MathHelper.PiOver2;
-            Main.spriteBatch.Draw(arrow, arrowPos - Main.screenPosition, null, Color.Gold * opacity, rot, arrow.Size() / 2, size, 0, 0f);
-            Main.spriteBatch.Draw(bloom, arrowPos - Main.screenPosition, null, Color.Yellow * opacity, rot, bloom.Size() / 2, size, 0, 0f);
+            Main.spriteBatch.Draw(arrow, arrowPos - Main.screenPosition, null, Color.Gold * opacity, rot,
+                arrow.Size() / 2, size, 0, 0f);
+            Main.spriteBatch.Draw(bloom, arrowPos - Main.screenPosition, null, Color.Yellow * opacity, rot,
+                bloom.Size() / 2, size, 0, 0f);
         }
+
         PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.HeldProjectiles, BlendState.Additive);
 
         return false;

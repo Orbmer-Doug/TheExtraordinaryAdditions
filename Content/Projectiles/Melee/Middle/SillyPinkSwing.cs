@@ -16,6 +16,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 public class SillyPinkSwing : BaseSwordSwing
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SillyPinkHammer);
+
     public enum SillyState
     {
         Reel,
@@ -25,11 +26,11 @@ public class SillyPinkSwing : BaseSwordSwing
 
     public SillyState State
     {
-        get => (SillyState)Projectile.AdditionsInfo().ExtraAI[7];
-        set => Projectile.AdditionsInfo().ExtraAI[7] = (int)value;
+        get => (SillyState) Projectile.AdditionsInfo().ExtraAI[7];
+        set => Projectile.AdditionsInfo().ExtraAI[7] = (int) value;
     }
 
-    public int ReelTime => (int)(80f / MeleeSpeed);
+    public int ReelTime => (int) (80f / MeleeSpeed);
     public const int RecoilTime = 30;
     public override int SwingTime => 40;
     public override float SwingAngle => (3 * Pi / 2) / 2;
@@ -37,7 +38,8 @@ public class SillyPinkSwing : BaseSwordSwing
 
     public RotatedRectangle HeadRect()
     {
-        return new(32 * Projectile.scale, Projectile.Center + PolarVector(68f * Projectile.scale, Projectile.rotation - SwordRotation),
+        return new(32 * Projectile.scale,
+            Projectile.Center + PolarVector(68f * Projectile.scale, Projectile.rotation - SwordRotation),
             Projectile.Center + PolarVector(91f * Projectile.scale, Projectile.rotation - SwordRotation));
     }
 
@@ -79,10 +81,12 @@ public class SillyPinkSwing : BaseSwordSwing
             case SillyState.Reel:
                 if (this.RunLocal())
                 {
-                    Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Center.SafeDirectionTo(Modded.MouseWorld), .3f);
+                    Projectile.velocity = Vector2.SmoothStep(Projectile.velocity,
+                        Center.SafeDirectionTo(Modded.MouseWorld), .3f);
                     if (Projectile.velocity != Projectile.oldVelocity)
                         this.Sync();
                 }
+
                 InitialMouseAngle = Projectile.velocity.ToRotation();
                 Direction = Projectile.velocity.X.NonZeroSign();
 
@@ -99,7 +103,8 @@ public class SillyPinkSwing : BaseSwordSwing
                 Projectile.Opacity = InverseLerp(0f, 20f, Time);
                 break;
             case SillyState.Swing:
-                after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.scale, Projectile.Opacity, Projectile.rotation, Effects, 100, 0, 0f));
+                after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.scale, Projectile.Opacity,
+                    Projectile.rotation, Effects, 100, 0, 0f));
 
                 if (Animation() >= .16f & !PlayedSound)
                 {
@@ -114,7 +119,8 @@ public class SillyPinkSwing : BaseSwordSwing
                 Projectile.Opacity = InverseLerp(MaxTime, MaxTime - 30f, Time);
                 break;
             case SillyState.Recoil:
-                after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.scale, Projectile.Opacity, Projectile.rotation, Effects, 100, 0, 0f));
+                after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.scale, Projectile.Opacity,
+                    Projectile.rotation, Effects, 100, 0, 0f));
 
                 Projectile.rotation -= .09f * InverseLerp(RecoilTime, 0f, Time) * Direction;
                 if (Time > RecoilTime)
@@ -122,7 +128,6 @@ public class SillyPinkSwing : BaseSwordSwing
                 Projectile.Opacity = InverseLerp(RecoilTime, RecoilTime - 30f, Time);
                 break;
         }
-
     }
 
     public override void NPCHitEffects(in Vector2 start, in Vector2 end, NPC npc, NPC.HitInfo hit)
@@ -139,27 +144,33 @@ public class SillyPinkSwing : BaseSwordSwing
         if (this.RunLocal())
         {
             for (int i = 0; i < 2; i++)
-                Projectile.NewProj(pos, -SwordDir.RotatedByRandom(.4f) * Main.rand.NextFloat(5f, 12f), ProjectileID.PartyGirlGrenade, Projectile.damage, 0f, Owner.whoAmI);
+                Projectile.NewProj(pos, -SwordDir.RotatedByRandom(.4f) * Main.rand.NextFloat(5f, 12f),
+                    ProjectileID.PartyGirlGrenade, Projectile.damage, 0f, Owner.whoAmI);
         }
+
         for (int i = 0; i < 40; i++)
         {
             Dust.NewDustPerfect(pos, Main.rand.Next(12) switch
-            {
-                0 => DustID.FireworkFountain_Blue,
-                1 => DustID.FireworkFountain_Green,
-                2 => DustID.FireworkFountain_Pink,
-                3 => DustID.FireworkFountain_Red,
-                4 => DustID.FireworkFountain_Yellow,
-                5 => DustID.Confetti_Blue,
-                6 => DustID.Confetti_Green,
-                7 => DustID.Confetti_Pink,
-                8 => DustID.Confetti_Yellow,
-                _ => DustID.Confetti
-            }, -SwordDir.RotatedByRandom(.6f) * Main.rand.NextFloat(10f, 15f), 0, default, Main.rand.NextFloat(.8f, 1.2f));
+                {
+                    0 => DustID.FireworkFountain_Blue,
+                    1 => DustID.FireworkFountain_Green,
+                    2 => DustID.FireworkFountain_Pink,
+                    3 => DustID.FireworkFountain_Red,
+                    4 => DustID.FireworkFountain_Yellow,
+                    5 => DustID.Confetti_Blue,
+                    6 => DustID.Confetti_Green,
+                    7 => DustID.Confetti_Pink,
+                    8 => DustID.Confetti_Yellow,
+                    _ => DustID.Confetti
+                }, -SwordDir.RotatedByRandom(.6f) * Main.rand.NextFloat(10f, 15f), 0, default,
+                Main.rand.NextFloat(.8f, 1.2f));
         }
-        ParticleRegistry.SpawnDetailedBlastParticle(pos, Vector2.Zero, Vector2.One * 120f * Projectile.scale, Vector2.Zero, 40, Color.HotPink, null, Color.DeepPink, true);
+
+        ParticleRegistry.SpawnDetailedBlastParticle(pos, Vector2.Zero, Vector2.One * 120f * Projectile.scale,
+            Vector2.Zero, 40, Color.HotPink, null, Color.DeepPink, true);
         if (this.RunLocal())
-            Projectile.CreateFriendlyExplosion(pos, Vector2.One * 120f * Projectile.scale, Projectile.damage / 2, Projectile.knockBack / 2f, 2, 9);
+            Projectile.CreateFriendlyExplosion(pos, Vector2.One * 120f * Projectile.scale, Projectile.damage / 2,
+                Projectile.knockBack / 2f, 2, 9);
 
         Time = 0;
         State = SillyState.Recoil;
@@ -172,6 +183,7 @@ public class SillyPinkSwing : BaseSwordSwing
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         Vector2 origin;
@@ -194,7 +206,8 @@ public class SillyPinkSwing : BaseSwordSwing
             Effects = SpriteEffects.FlipHorizontally;
         }
 
-        after?.DrawFancySwordAfterimages(Tex, Projectile.Center, [Color.Pink * .8f * Brightness], origin, Effects, RotationOffset, Projectile.Opacity, Projectile.scale);
+        after?.DrawFancySwordAfterimages(Tex, Projectile.Center, [Color.Pink * .8f * Brightness], origin, Effects,
+            RotationOffset, Projectile.Opacity, Projectile.scale);
 
         Main.spriteBatch.Draw(Tex, Projectile.Center - Main.screenPosition, null, lightColor * Projectile.Opacity,
             Projectile.rotation + RotationOffset, origin, Projectile.scale, Effects, 0f);

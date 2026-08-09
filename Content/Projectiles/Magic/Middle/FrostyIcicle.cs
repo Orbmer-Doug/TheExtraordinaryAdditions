@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
-using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -29,13 +28,15 @@ public class FrostyIcicle : ModProjectile
     public Vector2 Offset;
     public const int Wait = 30;
     public Vector2[] InitialLocalPoints;
+
     public override void AI()
     {
         if (Time == 0f)
         {
             Projectile.width = Main.rand.Next(20, 30);
             Projectile.height = Main.rand.Next(50, 65);
-            List<Vector2> bolt = GetBoltPoints(Projectile.Center, Projectile.Center + Vector2.UnitY * Projectile.height, 20f, 2f);
+            List<Vector2> bolt = GetBoltPoints(Projectile.Center, Projectile.Center + Vector2.UnitY * Projectile.height,
+                20f, 2f);
             iciclePoints.SetPoints(bolt);
 
             // Store initial local offsets relative to Projectile.Center
@@ -49,10 +50,12 @@ public class FrostyIcicle : ModProjectile
         {
             if (this.RunLocal())
             {
-                Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.SafeDirectionTo(Owner.Additions().MouseWorld), .2f);
+                Projectile.velocity = Vector2.SmoothStep(Projectile.velocity,
+                    Projectile.SafeDirectionTo(Owner.Additions().MouseWorld), .2f);
                 if (Projectile.velocity != Projectile.oldVelocity)
                     this.Sync();
             }
+
             Projectile.Center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true) + Offset;
         }
         else if (Time == Wait)
@@ -63,7 +66,9 @@ public class FrostyIcicle : ModProjectile
         else if (Time > Wait)
         {
             if (Main.rand.NextBool())
-                ParticleRegistry.SpawnBloomPixelParticle(Projectile.RotHitbox().RandomPoint(), -Projectile.velocity * .1f, Main.rand.Next(30, 40), Main.rand.NextFloat(.2f, .4f), Color.SlateBlue, Color.DeepSkyBlue, null, .4f);
+                ParticleRegistry.SpawnBloomPixelParticle(Projectile.RotHitbox().RandomPoint(),
+                    -Projectile.velocity * .1f, Main.rand.Next(30, 40), Main.rand.NextFloat(.2f, .4f), Color.SlateBlue,
+                    Color.DeepSkyBlue, null, .4f);
             if (Time > (Wait + 10) && Projectile.velocity.Y < 20f)
                 Projectile.velocity.Y += .2f;
         }
@@ -95,12 +100,15 @@ public class FrostyIcicle : ModProjectile
         SoundID.Item27.Play(Projectile.Center, 1.1f, 0f, .1f, null, 20, Name);
         for (int i = 0; i < 20; i++)
         {
-            Dust.NewDustPerfect(Projectile.BaseRotHitbox().RandomPoint(), DustID.FrostHydra, Projectile.velocity * Main.rand.NextFloat(.1f, .2f), 0, default, Main.rand.NextFloat(.7f, 1.1f)).noGravity = true;
+            Dust.NewDustPerfect(Projectile.BaseRotHitbox().RandomPoint(), DustID.FrostHydra,
+                    Projectile.velocity * Main.rand.NextFloat(.1f, .2f), 0, default, Main.rand.NextFloat(.7f, 1.1f))
+                .noGravity = true;
         }
     }
 
     public OptimizedPrimitiveTrail icicle;
     public TrailPoints iciclePoints = new(50);
+
     public override bool PreDraw(ref Color lightColor)
     {
         if (icicle == null || icicle.Disposed || iciclePoints == null)

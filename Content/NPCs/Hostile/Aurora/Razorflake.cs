@@ -11,7 +11,7 @@ public class Razorflake : ProjOwnedByNPC<AuroraGuard>
 {
     public bool HitGround
     {
-        get => (int)Projectile.ai[1] == 1;
+        get => (int) Projectile.ai[1] == 1;
         set => Projectile.ai[1] = value.ToInt();
     }
 

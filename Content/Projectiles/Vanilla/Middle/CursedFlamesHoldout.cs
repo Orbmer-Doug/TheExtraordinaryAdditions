@@ -13,6 +13,7 @@ public class CursedFlamesHoldout : BaseIdleHoldoutProjectile
     public override string Texture => ItemID.CursedFlames.GetTerrariaItem();
     public override int AssociatedItemID => ItemID.CursedFlames;
     public override int IntendedProjectileType => ModContent.ProjectileType<CursedFlamesHoldout>();
+
     public override void Defaults()
     {
         Projectile.width = 28;
@@ -21,24 +22,29 @@ public class CursedFlamesHoldout : BaseIdleHoldoutProjectile
     }
 
     public ref float Time => ref Projectile.ai[0];
+
     public override void SafeAI()
     {
         Vector2 pos = Projectile.Center + PolarVector(10f, Projectile.rotation);
 
-        if (Time % Item.useAnimation == Item.useAnimation - 1 && Modded.SafeMouseLeft.Current && this.RunLocal() && TryUseMana(false))
+        if (Time % Item.useAnimation == Item.useAnimation - 1 && Modded.SafeMouseLeft.Current && this.RunLocal() &&
+            TryUseMana(false))
         {
             SoundEngine.PlaySound(SoundID.Item20, Projectile.Center);
             Vector2 vel = Projectile.velocity;
             vel *= Item.shootSpeed;
-            Projectile.NewProj(pos + vel, vel, ModContent.ProjectileType<RagingCursedFire>(), Item.damage, Item.knockBack, Owner.whoAmI);
+            Projectile.NewProj(pos + vel, vel, ModContent.ProjectileType<RagingCursedFire>(), Item.damage,
+                Item.knockBack, Owner.whoAmI);
         }
 
-        if (this.RunLocal() && Time % Item.useAnimation == Item.useAnimation - 1 && Modded.SafeMouseRight.Current && TryUseMana() && !Modded.MouseLeft.Current)
+        if (this.RunLocal() && Time % Item.useAnimation == Item.useAnimation - 1 && Modded.SafeMouseRight.Current &&
+            TryUseMana() && !Modded.MouseLeft.Current)
         {
             SoundEngine.PlaySound(SoundID.Item20 with { Pitch = -.45f, Volume = 1.1f }, Projectile.Center);
             Vector2 vel = Projectile.velocity;
             vel *= Item.shootSpeed * .44f;
-            Projectile.NewProj(pos + vel, vel, ModContent.ProjectileType<CursedEruption>(), (int)(Item.damage * 1.42f), (int)(Item.knockBack * 1.1f), Owner.whoAmI);
+            Projectile.NewProj(pos + vel, vel, ModContent.ProjectileType<CursedEruption>(), (int) (Item.damage * 1.42f),
+                (int) (Item.knockBack * 1.1f), Owner.whoAmI);
         }
 
         if (this.RunLocal())
@@ -62,7 +68,8 @@ public class CursedFlamesHoldout : BaseIdleHoldoutProjectile
         Rectangle frame = tex.Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame);
         SpriteEffects fx = Projectile.direction == -1 ? SpriteEffects.FlipVertically : SpriteEffects.None;
         Vector2 orig = new(0, tex.Height / 2);
-        Main.spriteBatch.DrawBetter(tex, Projectile.Center, frame, Projectile.GetAlpha(lightColor), Projectile.rotation, orig, 1, fx);
+        Main.spriteBatch.DrawBetter(tex, Projectile.Center, frame, Projectile.GetAlpha(lightColor), Projectile.rotation,
+            orig, 1, fx);
         return false;
     }
 }

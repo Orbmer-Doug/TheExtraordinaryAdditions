@@ -4,7 +4,6 @@ using System.IO;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -65,7 +64,8 @@ public class GunSwordSword : BaseSwordSwing
         // Update trails
         if (TimeStop <= 0f)
         {
-            after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.scale, Projectile.Opacity, Projectile.rotation, Effects, 205, 0, 0f));
+            after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.scale, Projectile.Opacity,
+                Projectile.rotation, Effects, 205, 0, 0f));
         }
 
         float scaleUp = MeleeScale * 1.15f;
@@ -123,7 +123,8 @@ public class GunSwordSword : BaseSwordSwing
             Vector2 close = npc.RotHitbox().GetClosestPoint(Rect().Center, true);
             for (int i = 0; i < 4; i++)
             {
-                Projectile.NewProj(close, SwordDir.RotatedByRandom(.6f) * Main.rand.NextFloat(7f, 10f), ModContent.ProjectileType<SplinteredBone>(), Projectile.damage / 4, 0f, Owner.whoAmI);
+                Projectile.NewProj(close, SwordDir.RotatedByRandom(.6f) * Main.rand.NextFloat(7f, 10f),
+                    ModContent.ProjectileType<SplinteredBone>(), Projectile.damage / 4, 0f, Owner.whoAmI);
             }
         }
 
@@ -142,7 +143,8 @@ public class GunSwordSword : BaseSwordSwing
             int life = Main.rand.Next(100, 125);
             float scale = Main.rand.NextFloat(.9f, 1.5f);
             Color color = Color.BlueViolet;
-            ParticleRegistry.SpawnSquishyPixelParticle(start + Main.rand.NextVector2Circular(10f, 10f), vel, life, scale, color, Color.Violet);
+            ParticleRegistry.SpawnSquishyPixelParticle(start + Main.rand.NextVector2Circular(10f, 10f), vel, life,
+                scale, color, Color.Violet);
         }
 
         ScreenShakeSystem.New(new(.1f, .1f), start);
@@ -151,6 +153,7 @@ public class GunSwordSword : BaseSwordSwing
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         // Determine the effects for drawing. These must be done here otherwise silly things WILL happen.
@@ -175,7 +178,8 @@ public class GunSwordSword : BaseSwordSwing
         }
 
         // Not manually setting the rotation offset and sprite effects here caused a latency between frames where rarely a artifact would occur
-        after?.DrawFancySwordAfterimages(Tex, Projectile.Center, [Color.DarkGray * 1.1f * Brightness], origin, Effects, RotationOffset, Projectile.Opacity, Projectile.scale);
+        after?.DrawFancySwordAfterimages(Tex, Projectile.Center, [Color.DarkGray * 1.1f * Brightness], origin, Effects,
+            RotationOffset, Projectile.Opacity, Projectile.scale);
 
         Main.spriteBatch.Draw(Tex, Projectile.Center - Main.screenPosition, null, lightColor,
             Projectile.rotation + RotationOffset, origin, Projectile.scale, Effects, 0f);
@@ -217,21 +221,25 @@ public class GunGunSword : ModProjectile
     public const int WaitFrame = 15;
     public const int FadeTime = 20;
     public ref float Time => ref Projectile.ai[0];
+
     public bool Engage
     {
         get => Projectile.ai[1] == 1f;
         set => Projectile.ai[1] = value.ToInt();
     }
+
     public ref float EngagedTime => ref Projectile.ai[2];
     public ref float Fade => ref Projectile.AdditionsInfo().ExtraAI[0];
     public ref float Wait => ref Projectile.AdditionsInfo().ExtraAI[1];
     public ref float Dist => ref Projectile.AdditionsInfo().ExtraAI[2];
     public ref float Recoil => ref Projectile.AdditionsInfo().ExtraAI[3];
+
     public int NPCIndex
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[4];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[4];
         set => Projectile.AdditionsInfo().ExtraAI[4] = value;
     }
+
     public NPC Target;
     public Player Owner => Main.player[Projectile.owner];
     public GlobalPlayer Modded => Owner.Additions();
@@ -240,11 +248,13 @@ public class GunGunSword : ModProjectile
     public Item Item => Owner.HeldItem;
     public Vector2 Offset;
     public Vector2 IntersectionPoint;
+
     public override void SendExtraAI(BinaryWriter writer)
     {
         writer.WriteVector2(Offset);
         writer.WriteVector2(IntersectionPoint);
     }
+
     public override void ReceiveExtraAI(BinaryReader reader)
     {
         Offset = reader.ReadVector2();
@@ -266,6 +276,7 @@ public class GunGunSword : ModProjectile
                 Projectile.velocity = Center.SafeDirectionTo(Modded.MouseWorld);
                 this.Sync();
             }
+
             AdditionsSound.SnakeRocketOut.Play(Projectile.Center, .6f);
         }
 
@@ -277,7 +288,9 @@ public class GunGunSword : ModProjectile
                 NPC target = Main.npc[NPCIndex] ?? null;
                 if (EngagedTime < WaitFrame)
                 {
-                    if (target != null && target.active && !Collision.SolidCollision(Owner.position, Owner.width, Owner.height) && target.velocity.Length() < 80f)
+                    if (target != null && target.active &&
+                        !Collision.SolidCollision(Owner.position, Owner.width, Owner.height) &&
+                        target.velocity.Length() < 80f)
                     {
                         IntersectionPoint = target.RotHitbox().GetClosestPoint(IntersectionPoint);
                         Owner.Center = target.RotHitbox().GetClosestPoint(IntersectionPoint) + Offset;
@@ -291,6 +304,7 @@ public class GunGunSword : ModProjectile
                         Fade++;
                     }
                 }
+
                 if (EngagedTime == WaitFrame)
                 {
                     Vector2 pos = target.RotHitbox().GetClosestPoint(Projectile.Center);
@@ -300,19 +314,24 @@ public class GunGunSword : ModProjectile
                         int life = Main.rand.Next(40, 60);
                         float scale = Main.rand.NextFloat(.8f, 1.5f);
                         Color col = Color.OrangeRed.Lerp(Color.Red, Main.rand.NextFloat(.3f, .8f));
-                        ParticleRegistry.SpawnBloomPixelParticle(pos, vel, life, scale, col, Color.White, null, 1.5f, 5);
-                        ParticleRegistry.SpawnMistParticle(pos, vel, scale, col, Color.DarkGray, Main.rand.NextFloat(190f, 240f));
+                        ParticleRegistry.SpawnBloomPixelParticle(pos, vel, life, scale, col, Color.White, null, 1.5f,
+                            5);
+                        ParticleRegistry.SpawnMistParticle(pos, vel, scale, col, Color.DarkGray,
+                            Main.rand.NextFloat(190f, 240f));
                         ParticleRegistry.SpawnGlowParticle(pos, vel * .8f, life / 3, scale * 92f, col, 1.7f);
                     }
-                    ParticleRegistry.SpawnDetailedBlastParticle(pos, Vector2.Zero, Vector2.One * 120f, Vector2.Zero, 30, Color.OrangeRed, null, Color.Red, true);
+
+                    ParticleRegistry.SpawnDetailedBlastParticle(pos, Vector2.Zero, Vector2.One * 120f, Vector2.Zero, 30,
+                        Color.OrangeRed, null, Color.Red, true);
                     ParticleRegistry.SpawnBlurParticle(pos, 60, .4f, 120f, .7f);
                     if (this.RunLocal())
-                        Projectile.CreateFriendlyExplosion(pos, Vector2.One * 120f, (int)(Projectile.damage * 1.5f), 8f, 8, 5);
+                        Projectile.CreateFriendlyExplosion(pos, Vector2.One * 120f, (int) (Projectile.damage * 1.5f),
+                            8f, 8, 5);
 
                     Owner.velocity -= Projectile.velocity * Utils.Remap(Owner.Distance(pos), 0f, 500f, 10f, 0f);
                     Modded.LungingDown = true;
-
-                    CalUtils.AddCooldown(Owner, SkullKaboomCooldown.ID, CalUtils.SecondsToFrames(3));
+                    //TODO
+                    //.AddCooldown(Owner, SkullKaboomCooldown.ID, SecondsToFrames(3));
                     AdditionsSound.SnakeRocket.Play(Projectile.Center, 1.4f);
                     Projectile.MaxUpdates = 2;
                     this.Sync();
@@ -335,26 +354,34 @@ public class GunGunSword : ModProjectile
             {
                 if (this.RunLocal())
                 {
-                    Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Center.SafeDirectionTo(Modded.MouseWorld), .4f);
+                    Projectile.velocity = Vector2.SmoothStep(Projectile.velocity,
+                        Center.SafeDirectionTo(Modded.MouseWorld), .4f);
                     if (Projectile.velocity != Projectile.oldVelocity)
                         this.Sync();
                 }
 
                 if (Wait == 0f && Owner.HasAmmo(Item) && Modded.SafeMouseRight.Current && this.RunLocal())
                 {
-                    Owner.PickAmmo(Item, out int type, out float speed, out int dmg, out float kb, out int ammoID, Owner.IsAmmoFreeThisShot(Item, Owner.ChooseAmmo(Item), Owner.ChooseAmmo(Item).type));
-                    Vector2 pos = Projectile.Center + PolarVector(16f, Projectile.rotation - PiOver4 + (PiOver2 * (Direction == 1 ? -1 : 1)));
-                    Vector2 vel = (Projectile.rotation - PiOver4).ToRotationVector2() * Clamp(speed, Item.shootSpeed, Item.shootSpeed * 2);
+                    Owner.PickAmmo(Item, out int type, out float speed, out int dmg, out float kb, out int ammoID,
+                        Owner.IsAmmoFreeThisShot(Item, Owner.ChooseAmmo(Item), Owner.ChooseAmmo(Item).type));
+                    Vector2 pos = Projectile.Center + PolarVector(16f,
+                        Projectile.rotation - PiOver4 + (PiOver2 * (Direction == 1 ? -1 : 1)));
+                    Vector2 vel = (Projectile.rotation - PiOver4).ToRotationVector2() *
+                                  Clamp(speed, Item.shootSpeed, Item.shootSpeed * 2);
 
                     for (int i = 0; i < 4; i++)
                     {
                         vel *= Main.rand.NextFloat(.8f, 1.2f);
-                        Projectile.NewProj(pos, vel.RotatedByRandom(.2f), ModContent.ProjectileType<SkeleShot>(), dmg, kb, Projectile.owner);
+                        Projectile.NewProj(pos, vel.RotatedByRandom(.2f), ModContent.ProjectileType<SkeleShot>(), dmg,
+                            kb, Projectile.owner);
                     }
 
                     for (int i = 0; i < 25; i++)
                     {
-                        ParticleRegistry.SpawnSparkParticle(pos, vel.RotatedByRandom(.2f) * Main.rand.NextFloat(1.2f, 1.9f), Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .5f), Color.Chocolate.Lerp(Color.OrangeRed, Main.rand.NextFloat(.4f, .5f)), false, true);
+                        ParticleRegistry.SpawnSparkParticle(pos,
+                            vel.RotatedByRandom(.2f) * Main.rand.NextFloat(1.2f, 1.9f), Main.rand.Next(20, 30),
+                            Main.rand.NextFloat(.4f, .5f),
+                            Color.Chocolate.Lerp(Color.OrangeRed, Main.rand.NextFloat(.4f, .5f)), false, true);
                     }
 
                     AdditionsSound.banditShot1B.Play(pos, .8f, .1f, .1f);
@@ -383,7 +410,8 @@ public class GunGunSword : ModProjectile
         Owner.heldProj = Projectile.whoAmI;
         Owner.SetDummyItemTime(2);
         Owner.ChangeDir(Direction);
-        Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, Projectile.rotation - PiOver4 - PiOver2);
+        Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full,
+            Projectile.rotation - PiOver4 - PiOver2);
         Owner.itemRotation = WrapAngle(Projectile.rotation);
 
         Time += Engage ? InverseLerp(6f, 0f, EngagedTime) : 1f;
@@ -409,9 +437,11 @@ public class GunGunSword : ModProjectile
     }
 
     public override bool? CanDamage() => Time < StabTime ? null : false;
+
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return targetHitbox.LineCollision(Projectile.BaseRotHitbox().BottomLeft, Projectile.BaseRotHitbox().TopRight, 16f);
+        return targetHitbox.LineCollision(Projectile.BaseRotHitbox().BottomLeft, Projectile.BaseRotHitbox().TopRight,
+            16f);
     }
 
     public override bool PreDraw(ref Color lightColor)
@@ -434,7 +464,8 @@ public class GunGunSword : ModProjectile
             fx = SpriteEffects.FlipHorizontally;
         }
 
-        Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, null, lightColor * Projectile.Opacity, rotation + rotOff, tex.Size() / 2, Projectile.scale, fx, 0f);
+        Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, null, lightColor * Projectile.Opacity,
+            rotation + rotOff, tex.Size() / 2, Projectile.scale, fx, 0f);
 
         return false;
     }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -16,6 +15,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
 public class LazerDrone : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.LazerDrone);
+
     public override void SetStaticDefaults()
     {
         Main.projFrames[Projectile.type] = 9;
@@ -42,13 +42,16 @@ public class LazerDrone : ModProjectile
         Projectile.minion = true;
         Projectile.DamageType = DamageClass.Summon;
     }
+
     public ref float Time => ref Projectile.ai[0];
     public ref float Charge => ref Projectile.ai[1];
+
     public int Wait
     {
-        get => (int)Projectile.ai[2];
+        get => (int) Projectile.ai[2];
         set => Projectile.ai[2] = value;
     }
+
     public const int FireWait = 30;
     public float ChargeCompletion => InverseLerp(0f, 120f, Charge);
     public Player Owner => Main.player[Projectile.owner];
@@ -57,6 +60,7 @@ public class LazerDrone : ModProjectile
     public Vector2 Tip;
     public bool RemoteBeingHeld => Owner.ownedProjectileCounts[ModContent.ProjectileType<RemoteHoldout>()] > 0;
     public override bool? CanDamage() => false;
+
     public override void AI()
     {
         if (!Owner.Available() && this.RunLocal())
@@ -67,7 +71,8 @@ public class LazerDrone : ModProjectile
 
         after ??= new(3, () => Projectile.Center);
         after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation,
-            0, 90, 3, 2f, Projectile.ThisProjectileTexture().Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame)));
+            0, 90, 3, 2f,
+            Projectile.ThisProjectileTexture().Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame)));
 
         Owner.AddBuff(ModContent.BuffType<LaserDrones>(), 3600);
         if (Modded.LaserDrones)
@@ -93,7 +98,8 @@ public class LazerDrone : ModProjectile
         }
 
         Vector2 vel = Projectile.rotation.ToRotationVector2();
-        Vector2 tip = Projectile.Center + PolarVector(18f, Projectile.rotation) + PolarVector(10f * vel.X.NonZeroSign(), Projectile.rotation + MathHelper.PiOver2);
+        Vector2 tip = Projectile.Center + PolarVector(18f, Projectile.rotation) +
+                      PolarVector(10f * vel.X.NonZeroSign(), Projectile.rotation + MathHelper.PiOver2);
         Tip = tip;
         bool notSummoning = !(Modded.SafeMouseLeft.Current && Modded.SafeMouseRight.Current) && this.RunLocal();
         if (RemoteBeingHeld)
@@ -102,25 +108,35 @@ public class LazerDrone : ModProjectile
             {
                 int frequency = MultiLerp(ChargeCompletion, 5, 4, 2);
                 if (Time % frequency == frequency - 1)
-                    ParticleRegistry.SpawnSparkleParticle(tip, -vel.RotatedByRandom(.3f) * Main.rand.NextFloat(2f, 8f), Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .6f), Color.Cyan, Color.White, ChargeCompletion * 1.6f);
+                    ParticleRegistry.SpawnSparkleParticle(tip, -vel.RotatedByRandom(.3f) * Main.rand.NextFloat(2f, 8f),
+                        Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .6f), Color.Cyan, Color.White,
+                        ChargeCompletion * 1.6f);
                 Charge++;
             }
         }
 
         Lighting.AddLight(tip, Color.Cyan.ToVector3() * ChargeCompletion);
         if (((RemoteBeingHeld && ((Modded.SafeMouseLeft.Current && Charge == 0f) ||
-            (!Modded.SafeMouseRight.Current && Charge > 0f))) || (!RemoteBeingHeld && Target != null)) && Wait <= 0 && Projectile.Opacity >= 1f && notSummoning && this.RunLocal())
+                                  (!Modded.SafeMouseRight.Current && Charge > 0f))) ||
+             (!RemoteBeingHeld && Target != null)) && Wait <= 0 && Projectile.Opacity >= 1f && notSummoning &&
+            this.RunLocal())
         {
             float power = MathHelper.Clamp(ChargeCompletion * 2.5f, 1f, 2.5f);
-            int dmg = (int)(Projectile.damage * power);
+            int dmg = (int) (Projectile.damage * power);
             float kb = Projectile.knockBack * power;
-            Projectile.NewProj(tip, vel, ModContent.ProjectileType<DroneLaser>(), dmg, kb, Owner.whoAmI, 0f, 0f, ChargeCompletion);
+            Projectile.NewProj(tip, vel, ModContent.ProjectileType<DroneLaser>(), dmg, kb, Owner.whoAmI, 0f, 0f,
+                ChargeCompletion);
             for (int i = 0; i < 20 + (20 * ChargeCompletion); i++)
             {
-                ParticleRegistry.SpawnGlowParticle(tip, Vector2.Zero, 9, .4f + (.4f * ChargeCompletion), Color.LightCyan, 1f);
-                ParticleRegistry.SpawnSquishyPixelParticle(tip, vel.RotatedByRandom(.2f) * Main.rand.NextFloat(2f, 10f), Main.rand.Next(80, 120), Main.rand.NextFloat(.8f, 1.2f), Color.Cyan, Color.LightCyan, 4, false);
+                ParticleRegistry.SpawnGlowParticle(tip, Vector2.Zero, 9, .4f + (.4f * ChargeCompletion),
+                    Color.LightCyan, 1f);
+                ParticleRegistry.SpawnSquishyPixelParticle(tip, vel.RotatedByRandom(.2f) * Main.rand.NextFloat(2f, 10f),
+                    Main.rand.Next(80, 120), Main.rand.NextFloat(.8f, 1.2f), Color.Cyan, Color.LightCyan, 4, false);
             }
-            ScreenShakeSystem.New(new(.09f + (.2f * ChargeCompletion), .1f + (.3f * ChargeCompletion), 512f + (400f * ChargeCompletion)), tip);
+
+            ScreenShakeSystem.New(
+                new(.09f + (.2f * ChargeCompletion), .1f + (.3f * ChargeCompletion), 512f + (400f * ChargeCompletion)),
+                tip);
 
             Projectile.velocity -= vel * (9f + (10f * ChargeCompletion));
 
@@ -140,11 +156,13 @@ public class LazerDrone : ModProjectile
         {
             Projectile.AI_GetMyGroupIndex(out var index, out var total);
 
-            float time = CalUtils.SecondsToFrames(5f);
+            float time = SecondsToFrames(5f);
             float cycle = Modded.GlobalTimer % time / time * MathF.Tau;
             float offset = MathF.Tau * InverseLerp(0f, total, index);
-            Vector2 dest = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true) + GetPointOnRotatedEllipse(300f, 110f, offset + cycle, cycle);
-            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.Center.SafeDirectionTo(dest) * MathHelper.Min(Projectile.Center.Distance(dest), 20f), .2f);
+            Vector2 dest = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true) +
+                           GetPointOnRotatedEllipse(300f, 110f, offset + cycle, cycle);
+            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity,
+                Projectile.Center.SafeDirectionTo(dest) * MathHelper.Min(Projectile.Center.Distance(dest), 20f), .2f);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
@@ -162,8 +180,10 @@ public class LazerDrone : ModProjectile
             for (int i = 0; i < 30; i++)
             {
                 Vector2 vel = Main.rand.NextVector2Circular(20f, 20f);
-                ParticleRegistry.SpawnSparkParticle(Projectile.Center, vel, Main.rand.Next(34, 46), Main.rand.NextFloat(.5f, 1.1f), Color.Cyan, true, true);
-                ParticleRegistry.SpawnGlowParticle(Projectile.Center, vel, Main.rand.Next(24, 30), Main.rand.NextFloat(.2f, .7f), Color.DarkCyan, 1f, true);
+                ParticleRegistry.SpawnSparkParticle(Projectile.Center, vel, Main.rand.Next(34, 46),
+                    Main.rand.NextFloat(.5f, 1.1f), Color.Cyan, true, true);
+                ParticleRegistry.SpawnGlowParticle(Projectile.Center, vel, Main.rand.Next(24, 30),
+                    Main.rand.NextFloat(.2f, .7f), Color.DarkCyan, 1f, true);
             }
 
             if (!Main.dedServ)
@@ -183,6 +203,7 @@ public class LazerDrone : ModProjectile
                     shootVelocity = (MathHelper.TwoPi * i / 10f + offsetAngle).ToRotationVector2() * 9f;
                     Gore.NewGore(Projectile.GetSource_Death(null), Projectile.Center, shootVelocity, rotar);
                 }
+
                 for (int i = 0; i < 2; i++)
                 {
                     shootVelocity = (MathHelper.TwoPi * i / 10f + offsetAngle).ToRotationVector2() * 9f;
@@ -193,6 +214,7 @@ public class LazerDrone : ModProjectile
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D texture = Projectile.ThisProjectileTexture();
@@ -208,7 +230,8 @@ public class LazerDrone : ModProjectile
         }
 
         after?.DrawFancyAfterimages(texture, [Color.Cyan]);
-        Main.spriteBatch.Draw(texture, drawPosition, frame, Projectile.GetAlpha(lightColor), rotation, origin, Projectile.scale, direction, 0f);
+        Main.spriteBatch.Draw(texture, drawPosition, frame, Projectile.GetAlpha(lightColor), rotation, origin,
+            Projectile.scale, direction, 0f);
 
         Main.spriteBatch.SetBlendState(BlendState.Additive);
         Texture2D bloom = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);

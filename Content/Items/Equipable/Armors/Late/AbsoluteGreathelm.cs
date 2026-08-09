@@ -1,9 +1,6 @@
-﻿using CalamityMod.Items.Materials;
-using CalamityMod.Tiles.Furniture.CraftingStations;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Early;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Late;
@@ -19,11 +16,8 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Late;
 public class AbsoluteGreathelm : ModItem, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AbsoluteGreathelm);
-    public static int HeadSlotID
-    {
-        get;
-        private set;
-    }
+    public static int HeadSlotID { get; private set; }
+
     public override void SetStaticDefaults()
     {
         HeadSlotID = Item.headSlot;
@@ -44,6 +38,7 @@ public class AbsoluteGreathelm : ModItem, ILocalizedModType, IModType
         {
             return legs.type == ModContent.ItemType<AbsoluteGreaves>();
         }
+
         return false;
     }
 
@@ -62,11 +57,7 @@ public class AbsoluteGreathelm : ModItem, ILocalizedModType, IModType
         string hotkey = AdditionsKeybinds.SetBonusHotKey.TooltipHotkeyString();
         player.setBonus = this.GetLocalization("SetBonus").Format(hotkey);
 
-        if (AdditionsKeybinds.SetBonusHotKey.JustPressed && !CalUtils.HasCooldown(player, AbsoluteCooldown.ID) && player.whoAmI == Main.myPlayer)
-        {
-            player.NewPlayerProj(player.Center, Vector2.Zero, ModContent.ProjectileType<WhiteVoid>(), (int)player.GetTotalDamage<GenericDamageClass>().ApplyTo(7000), 0f, Main.myPlayer);
-            CalUtils.AddCooldown(player, AbsoluteCooldown.ID, CalUtils.SecondsToFrames(15));
-        }
+//TODO
     }
 
     public override void UpdateEquip(Player player)
@@ -86,11 +77,7 @@ public class AbsoluteGreathelm : ModItem, ILocalizedModType, IModType
         recipe.AddIngredient(ModContent.ItemType<BlueTopHat>(), 1);
         recipe.AddIngredient(ModContent.ItemType<TremorGreathelm>(), 1);
         recipe.AddIngredient(ItemID.SolarFlareHelmet, 1);
-        recipe.AddIngredient(ModContent.ItemType<LifeAlloy>(), 3);
-        recipe.AddIngredient(ModContent.ItemType<RuinousSoul>(), 5);
-        recipe.AddIngredient(ModContent.ItemType<AscendantSpiritEssence>(), 2);
-        recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 10);
-        recipe.AddTile(ModContent.TileType<CosmicAnvil>());
+        //TODO
         recipe.Register();
     }
 }
@@ -122,7 +109,8 @@ public sealed class AbsoluteArmorPlayer : ModPlayer
                         Vector2 lightSpawnPosition = pos + Main.rand.NextVector2Unit() * lightSpawnOffset;
                         Vector2 lightSpawnVelocity = (pos - lightSpawnPosition) * 0.0411f;
                         float particleScale = Main.rand.NextFloat(.4f, 1.1f);
-                        ParticleRegistry.SpawnSparkParticle(lightSpawnPosition, lightSpawnVelocity, 40, particleScale, Color.AntiqueWhite, false, false, pos);
+                        ParticleRegistry.SpawnSparkParticle(lightSpawnPosition, lightSpawnVelocity, 40, particleScale,
+                            Color.AntiqueWhite, false, false, pos);
                     }
                 }
             }

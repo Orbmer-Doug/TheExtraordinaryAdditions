@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
@@ -15,6 +14,7 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 public class TheTechnicBlitzripper : ProjOwnedByNPC<Asterlin>
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TechnicBlitzripper);
+
     public override void SetDefaults()
     {
         Projectile.width = 210;
@@ -28,18 +28,22 @@ public class TheTechnicBlitzripper : ProjOwnedByNPC<Asterlin>
 
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
+
     public ref float Recoil => ref Projectile.ai[2];
     public ref float Heat => ref Projectile.AdditionsInfo().ExtraAI[0];
     public ref float ShootDelay => ref Projectile.AdditionsInfo().ExtraAI[1];
 
     public int Dir => Projectile.velocity.X.NonZeroSign();
-    public Vector2 Tip => Projectile.Center + PolarVector(105f, Projectile.rotation) + PolarVector(3f * Dir, Projectile.rotation - MathHelper.PiOver2);
+
+    public Vector2 Tip => Projectile.Center + PolarVector(105f, Projectile.rotation) +
+                          PolarVector(3f * Dir, Projectile.rotation - MathHelper.PiOver2);
 
     public override bool? CanDamage() => false;
     public override bool ShouldUpdatePosition() => false;
+
     public override void SafeAI()
     {
         if (ModOwner.TechnicBombBarrage_FadeTimer > 0)
@@ -51,12 +55,15 @@ public class TheTechnicBlitzripper : ProjOwnedByNPC<Asterlin>
         else
             Projectile.Opacity = Animators.MakePoly(2f).OutFunction(InverseLerp(0f, 30f, Time));
 
-        Vector2 offset = PolarVector(30f - (Recoil * 4), Projectile.rotation) + PolarVector(10f * Dir, Projectile.rotation - MathHelper.PiOver2);
+        Vector2 offset = PolarVector(30f - (Recoil * 4), Projectile.rotation) +
+                         PolarVector(10f * Dir, Projectile.rotation - MathHelper.PiOver2);
         Projectile.Center = ModOwner.RightHandPosition + offset;
-        Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.Center.SafeDirectionTo(ModOwner.ReticlePosition), .2f);
+        Projectile.velocity = Vector2.SmoothStep(Projectile.velocity,
+            Projectile.Center.SafeDirectionTo(ModOwner.ReticlePosition), .2f);
         Projectile.rotation = Projectile.velocity.ToRotation();
 
-        Heat = MathHelper.Clamp(Animators.MakePoly(3f).OutFunction.Evaluate(Heat, -.11f, .04f), 0f, TechnicBlitzripperProj.MaxHeat);
+        Heat = MathHelper.Clamp(Animators.MakePoly(3f).OutFunction.Evaluate(Heat, -.11f, .04f), 0f,
+            TechnicBlitzripperProj.MaxHeat);
         Recoil = MathHelper.Clamp(Animators.MakePoly(3f).OutFunction.Evaluate(Recoil, -.25f, .095f), 0f, 40f);
 
         if (ShootDelay > 0f)
@@ -72,18 +79,24 @@ public class TheTechnicBlitzripper : ProjOwnedByNPC<Asterlin>
         if (ShootDelay <= 0f)
         {
             if (this.RunServer())
-                SpawnProjectile(Tip, Projectile.velocity.SafeNormalize(Vector2.Zero) * 12f, ModContent.ProjectileType<TheLightripBullet>(), Asterlin.LightAttackDamage, 0f);
+                SpawnProjectile(Tip, Projectile.velocity.SafeNormalize(Vector2.Zero) * 12f,
+                    ModContent.ProjectileType<TheLightripBullet>(), Asterlin.LightAttackDamage, 0f);
 
             for (int i = 0; i < 12; i++)
-                ParticleRegistry.SpawnGlowParticle(Tip, Main.rand.NextVector2Circular(2f, 2f), Main.rand.Next(6, 12), Main.rand.NextFloat(30f, 60f), Color.LightCyan, 1.4f);
+                ParticleRegistry.SpawnGlowParticle(Tip, Main.rand.NextVector2Circular(2f, 2f), Main.rand.Next(6, 12),
+                    Main.rand.NextFloat(30f, 60f), Color.LightCyan, 1.4f);
 
             for (int i = 0; i < 8; i++)
             {
-                ParticleRegistry.SpawnTechyHolosquareParticle(Tip, Projectile.velocity.RotatedByRandom(.54f) * Main.rand.NextFloat(7f, 14f), Main.rand.Next(50, 90),
-                    Main.rand.NextFloat(.7f, 1.5f), Color.Cyan, Main.rand.NextFloat(.8f, 1.1f), Main.rand.NextFloat(1.3f, 1.8f));
-                ParticleRegistry.SpawnBloomLineParticle(Tip, Projectile.velocity.RotatedByRandom(.6f) * Main.rand.NextFloat(12f, 22f),
+                ParticleRegistry.SpawnTechyHolosquareParticle(Tip,
+                    Projectile.velocity.RotatedByRandom(.54f) * Main.rand.NextFloat(7f, 14f), Main.rand.Next(50, 90),
+                    Main.rand.NextFloat(.7f, 1.5f), Color.Cyan, Main.rand.NextFloat(.8f, 1.1f),
+                    Main.rand.NextFloat(1.3f, 1.8f));
+                ParticleRegistry.SpawnBloomLineParticle(Tip,
+                    Projectile.velocity.RotatedByRandom(.6f) * Main.rand.NextFloat(12f, 22f),
                     Main.rand.Next(10, 12), Main.rand.NextFloat(.3f, .5f), Color.Cyan);
-                ParticleRegistry.SpawnMistParticle(Tip, Projectile.velocity.RotatedByRandom(.4f) * Main.rand.NextFloat(7f, 10f),
+                ParticleRegistry.SpawnMistParticle(Tip,
+                    Projectile.velocity.RotatedByRandom(.4f) * Main.rand.NextFloat(7f, 10f),
                     Main.rand.NextFloat(.4f, .6f), Color.Cyan, Color.DarkCyan, Main.rand.NextFloat(50f, 180f));
             }
 
@@ -103,14 +116,17 @@ public class TheTechnicBlitzripper : ProjOwnedByNPC<Asterlin>
         Texture2D texture = Projectile.ThisProjectileTexture();
         Vector2 origin = texture.Size() * .5f;
         SpriteEffects effects = Dir == -1 ? SpriteEffects.FlipVertically : SpriteEffects.None;
-        Main.spriteBatch.DrawBetter(texture, Projectile.Center, null, Color.White.Lerp(Color.Cyan, 1f - Projectile.Opacity) * Projectile.Opacity, Projectile.rotation, texture.Size() / 2f, Projectile.scale, effects);
+        Main.spriteBatch.DrawBetter(texture, Projectile.Center, null,
+            Color.White.Lerp(Color.Cyan, 1f - Projectile.Opacity) * Projectile.Opacity, Projectile.rotation,
+            texture.Size() / 2f, Projectile.scale, effects);
 
         float comp = MathHelper.Lerp(0f, .7f, InverseLerp(0f, TechnicBlitzripperProj.MaxHeat, Heat));
         Texture2D glow = AssetRegistry.GetTexture(AdditionsTexture.TechnicBlitzripperHeat);
         for (int i = 0; i < 8; i++)
         {
             Vector2 off = (MathHelper.TwoPi * i / 8).ToRotationVector2() * 5f * comp;
-            Main.spriteBatch.DrawBetter(glow, Projectile.Center + off, null, Color.Cyan with { A = 0 } * comp * .8f, Projectile.rotation, glow.Size() / 2, Projectile.scale, effects);
+            Main.spriteBatch.DrawBetter(glow, Projectile.Center + off, null, Color.Cyan with { A = 0 } * comp * .8f,
+                Projectile.rotation, glow.Size() / 2, Projectile.scale, effects);
         }
 
         Texture2D invis = AssetRegistry.InvisTex;
@@ -118,7 +134,8 @@ public class TheTechnicBlitzripper : ProjOwnedByNPC<Asterlin>
         float sightsResolution = 2f;
         Color color = Color.Cyan * Projectile.Opacity;
 
-        Vector2 top = Projectile.Center + PolarVector(-12f, Projectile.rotation) + PolarVector(13f * Dir, Projectile.rotation - MathHelper.PiOver2);
+        Vector2 top = Projectile.Center + PolarVector(-12f, Projectile.rotation) +
+                      PolarVector(13f * Dir, Projectile.rotation - MathHelper.PiOver2);
 
         ManagedShader scope = ShaderRegistry.PixelatedSightLine;
         scope.TrySetParameter("noiseOffset", Main.GameUpdateCount * -0.003f);
@@ -134,10 +151,11 @@ public class TheTechnicBlitzripper : ProjOwnedByNPC<Asterlin>
         scope.TrySetParameter("bloomMaxOpacity", 0.4f);
         scope.TrySetParameter("bloomFadeStrength", 7f);
 
-        Main.spriteBatch.EnterShaderRegion(BlendState.Additive, scope.Effect);
+        Main.spriteBatch.EnterShaderRegion(scope.Effect, BlendState.Additive);
 
-        Main.EntitySpriteDraw(invis, top - Main.screenPosition, null, Color.White, 0f, invis.Size() * .5f, sightsSize * Projectile.Opacity, 0, 0f);
+        Main.EntitySpriteDraw(invis, top - Main.screenPosition, null, Color.White, 0f, invis.Size() * .5f,
+            sightsSize * Projectile.Opacity, 0, 0f);
 
-        Main.spriteBatch.ExitShaderRegion();
+        Main.spriteBatch.ResetToDefault();
     }
 }

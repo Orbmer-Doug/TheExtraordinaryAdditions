@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using CalamityMod;
 using Terraria;
 using TheExtraordinaryAdditions.Assets.Audio;
 using TheExtraordinaryAdditions.Core.DataStructures;
@@ -19,14 +18,16 @@ public class CondensedSoulMass : ProjOwnedByNPC<Asterlin>
 
     public const int AbsorbTime = 50;
     public ref float Time => ref Projectile.ai[0];
+
     public bool Touched
     {
-        get => (int)Projectile.ai[1] == 1;
+        get => (int) Projectile.ai[1] == 1;
         set => Projectile.ai[1] = value.ToInt();
     }
+
     public int PlayerIndex
     {
-        get => (int)Projectile.ai[2];
+        get => (int) Projectile.ai[2];
         set => Projectile.ai[2] = value;
     }
 
@@ -41,9 +42,11 @@ public class CondensedSoulMass : ProjOwnedByNPC<Asterlin>
     }
 
     public LoopedSoundInstance Holy;
+
     public override void SafeAI()
     {
-        Holy ??= LoopedSoundManager.CreateNew(new(AdditionsSound.holyLoop, () => 1.2f * Projectile.scale), () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
+        Holy ??= LoopedSoundManager.CreateNew(new(AdditionsSound.holyLoop, () => 1.2f * Projectile.scale),
+            () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
         Holy?.Update(Projectile.Center);
 
         Lighting.AddLight(Projectile.Center, Color.Gold.ToVector3() * 3f * Projectile.scale);
@@ -81,15 +84,22 @@ public class CondensedSoulMass : ProjOwnedByNPC<Asterlin>
                 AdditionsSound.BraveHeavyFireHit.Play(Projectile.Center, 1.2f);
                 ScreenShakeSystem.New(new(2f, 1f), Projectile.Center);
                 ParticleRegistry.SpawnBlurParticle(Projectile.Center, 40, .3f, 600f);
-                ParticleRegistry.SpawnDetailedBlastParticle(Projectile.Center, Vector2.Zero, Vector2.One * 600f, Vector2.Zero, 50, Color.Gold, RandomRotation(), Color.DarkGoldenrod);
-                ParticleRegistry.SpawnDetailedBlastParticle(Projectile.Center, Vector2.Zero, Vector2.One * 800f, Vector2.Zero, 40, Color.Gold * .6f, RandomRotation(), Color.DarkGoldenrod * .6f);
+                ParticleRegistry.SpawnDetailedBlastParticle(Projectile.Center, Vector2.Zero, Vector2.One * 600f,
+                    Vector2.Zero, 50, Color.Gold, RandomRotation(), Color.DarkGoldenrod);
+                ParticleRegistry.SpawnDetailedBlastParticle(Projectile.Center, Vector2.Zero, Vector2.One * 800f,
+                    Vector2.Zero, 40, Color.Gold * .6f, RandomRotation(), Color.DarkGoldenrod * .6f);
 
                 for (int i = 0; i < 50; i++)
                 {
-                    ParticleRegistry.SpawnGlowParticle(Projectile.Center, Vector2.Zero, 20, 130f, Color.LightGoldenrodYellow, 1.4f);
-                    ParticleRegistry.SpawnBloomLineParticle(Projectile.Center, Main.rand.NextVector2Circular(10f, 10f) + Main.rand.NextVector2Circular(22f, 22f), Main.rand.Next(37, 52), Main.rand.NextFloat(.6f, .8f), Color.Goldenrod);
+                    ParticleRegistry.SpawnGlowParticle(Projectile.Center, Vector2.Zero, 20, 130f,
+                        Color.LightGoldenrodYellow, 1.4f);
+                    ParticleRegistry.SpawnBloomLineParticle(Projectile.Center,
+                        Main.rand.NextVector2Circular(10f, 10f) + Main.rand.NextVector2Circular(22f, 22f),
+                        Main.rand.Next(37, 52), Main.rand.NextFloat(.6f, .8f), Color.Goldenrod);
                     ParticleRegistry.SpawnSquishyPixelParticle(Projectile.Center,
-                        Main.rand.NextVector2Circular(40f, 40f), Main.rand.Next(130, 150), Main.rand.NextFloat(1.5f, 5.1f), Color.Gold, Color.LightGoldenrodYellow, 4, false, false, Main.rand.NextFloat(-.1f, .1f));
+                        Main.rand.NextVector2Circular(40f, 40f), Main.rand.Next(130, 150),
+                        Main.rand.NextFloat(1.5f, 5.1f), Color.Gold, Color.LightGoldenrodYellow, 4, false, false,
+                        Main.rand.NextFloat(-.1f, .1f));
                 }
 
                 for (int i = -1; i <= 1; i += 2)
@@ -100,8 +110,12 @@ public class CondensedSoulMass : ProjOwnedByNPC<Asterlin>
                         {
                             Vector2 pos = Projectile.Center;
                             float speed = Utils.Remap(o, 0f, 15f, 1f, 50f);
-                            Vector2 horiz = (i == -1 ? -Vector2.UnitX * speed : Vector2.UnitX * speed).RotatedBy(Projectile.rotation);
-                            Vector2 vert = (a == -1 ? -Vector2.UnitY * speed : Vector2.UnitY * speed).RotatedBy(Projectile.rotation);
+                            Vector2 horiz =
+                                (i == -1 ? -Vector2.UnitX * speed : Vector2.UnitX * speed).RotatedBy(
+                                    Projectile.rotation);
+                            Vector2 vert =
+                                (a == -1 ? -Vector2.UnitY * speed : Vector2.UnitY * speed).RotatedBy(
+                                    Projectile.rotation);
                             float size = 160f * (1f - InverseLerp(1f, 12f, speed));
                             int life = 40;
                             Color col = Color.Lerp(Color.Gold, Color.DarkGoldenrod, .5f);
@@ -115,6 +129,7 @@ public class CondensedSoulMass : ProjOwnedByNPC<Asterlin>
                 ModOwner.Sync();
                 Projectile.Kill();
             }
+
             Time++;
         }
     }
@@ -124,15 +139,19 @@ public class CondensedSoulMass : ProjOwnedByNPC<Asterlin>
         Vector2 size = Projectile.Size;
         Main.spriteBatch.SetBlendState(BlendState.Additive);
         Texture2D t = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
-        Main.spriteBatch.DrawBetterRect(t, ToTarget(Projectile.Center, size * 1.5f * Projectile.scale), null, Color.Gold, 0f, t.Size() / 2, 0);
-        Main.spriteBatch.DrawBetterRect(t, ToTarget(Projectile.Center, size * 2.5f * Projectile.scale), null, Color.Gold, 0f, t.Size() / 2, 0);
-        Main.spriteBatch.ResetBlendState();
+        Main.spriteBatch.DrawBetterRect(t, ToTarget(Projectile.Center, size * 1.5f * Projectile.scale), null,
+            Color.Gold, 0f, t.Size() / 2, 0);
+        Main.spriteBatch.DrawBetterRect(t, ToTarget(Projectile.Center, size * 2.5f * Projectile.scale), null,
+            Color.Gold, 0f, t.Size() / 2, 0);
+        Main.spriteBatch.ResetToDefault();
 
         void draw()
         {
             Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
-            Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, size), null, Color.White * Projectile.scale, 0f, tex.Size() / 2, 0);
+            Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, size), null,
+                Color.White * Projectile.scale, 0f, tex.Size() / 2, 0);
         }
+
         ManagedShader shader = AssetRegistry.GetShader("SoulMass");
         shader.TrySetParameter("time", TimeSystem.RenderTime * .5f);
         shader.TrySetParameter("scale", Projectile.scale);

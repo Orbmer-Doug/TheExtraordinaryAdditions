@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -16,13 +15,15 @@ public class AncientRetaliation : ModProjectile, ILocalizedModType, IModType
     public ref float Time => ref Projectile.ai[0];
     public Player Owner => Main.player[Projectile.owner];
     public float RotationAmount => Utils.Remap(Time, 0f, Lifetime / 2, .044f, .001f);
+
     public int Direction
     {
-        get => (int)Projectile.ai[1];
+        get => (int) Projectile.ai[1];
         set => Projectile.ai[1] = value;
     }
 
     public const int Lifetime = 280;
+
     public override void SetDefaults()
     {
         Projectile.width = 18;
@@ -51,7 +52,8 @@ public class AncientRetaliation : ModProjectile, ILocalizedModType, IModType
 
         if (Time >= Lifetime / 2)
         {
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Owner.Center) * 35f, .85f);
+            Projectile.velocity =
+                Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Owner.Center) * 35f, .85f);
 
             Rectangle hitbox = Projectile.Hitbox;
             if (hitbox.Intersects(Owner.Hitbox))
@@ -67,20 +69,25 @@ public class AncientRetaliation : ModProjectile, ILocalizedModType, IModType
                     obj.velocity *= Main.rand.NextFloat(0.4f, 1f);
                     obj.noGravity = true;
                 }
+
                 Projectile.Kill();
             }
         }
+
         Time++;
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D texture = Projectile.ThisProjectileTexture();
         Vector2 origin = texture.Size() * 0.5f;
         Projectile.DrawProjectileBackglow(Color.Gold, 3f, 90, 10);
-        after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [Color.DarkGoldenrod, Color.Gold, Color.LightYellow], Projectile.Opacity);
-        Main.spriteBatch.DrawBetter(texture, Projectile.Center, null, Color.Goldenrod, Projectile.rotation, origin, Projectile.scale, 0);
+        after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(),
+            [Color.DarkGoldenrod, Color.Gold, Color.LightYellow], Projectile.Opacity);
+        Main.spriteBatch.DrawBetter(texture, Projectile.Center, null, Color.Goldenrod, Projectile.rotation, origin,
+            Projectile.scale, 0);
         return false;
     }
 }

@@ -15,12 +15,12 @@ public class LightrippingBeam : ProjOwnedByNPC<Asterlin>
 {
     public override string Texture => AssetRegistry.Invis;
 
-    public static readonly int TelegraphTime = CalUtils.SecondsToFrames(.8f);
-    public static readonly int BeamTime = CalUtils.SecondsToFrames(1.5f);
-    public static readonly int CollapseTime = CalUtils.SecondsToFrames(.25f);
+    public static readonly int TelegraphTime = SecondsToFrames(.8f);
+    public static readonly int BeamTime = SecondsToFrames(1.5f);
+    public static readonly int CollapseTime = SecondsToFrames(.25f);
 
-    public static readonly int PortalAppearTime = CalUtils.SecondsToFrames(.2f);
-    public static readonly int LaserExpandTime = CalUtils.SecondsToFrames(.3f);
+    public static readonly int PortalAppearTime = SecondsToFrames(.2f);
+    public static readonly int LaserExpandTime = SecondsToFrames(.3f);
 
     public static readonly int Lifetime = TelegraphTime + BeamTime + CollapseTime + PortalAppearTime + LaserExpandTime;
 
@@ -28,9 +28,10 @@ public class LightrippingBeam : ProjOwnedByNPC<Asterlin>
 
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
+
     public ref float LaserLength => ref Projectile.ai[1];
 
     public override void SetStaticDefaults()
@@ -59,9 +60,9 @@ public class LightrippingBeam : ProjOwnedByNPC<Asterlin>
 
         float lifeInterpolant = InverseLerp(0f, Lifetime, Time);
 
-        float portalPlusTelegraphEnd = (float)(PortalAppearTime + TelegraphTime) / Lifetime;
-        float laserExpandEnd = (float)(PortalAppearTime + TelegraphTime + LaserExpandTime) / Lifetime;
-        float beamEnd = (float)(PortalAppearTime + TelegraphTime + LaserExpandTime + BeamTime) / Lifetime;
+        float portalPlusTelegraphEnd = (float) (PortalAppearTime + TelegraphTime) / Lifetime;
+        float laserExpandEnd = (float) (PortalAppearTime + TelegraphTime + LaserExpandTime) / Lifetime;
+        float beamEnd = (float) (PortalAppearTime + TelegraphTime + LaserExpandTime + BeamTime) / Lifetime;
         float collapseEnd = 1f;
 
         LaserLength = new PiecewiseCurve()
@@ -73,7 +74,7 @@ public class LightrippingBeam : ProjOwnedByNPC<Asterlin>
 
         // Portal size
         Projectile.Opacity = new PiecewiseCurve()
-            .Add(0f, 1f, (float)PortalAppearTime / Lifetime, MakePoly(3f).OutFunction)
+            .Add(0f, 1f, (float) PortalAppearTime / Lifetime, MakePoly(3f).OutFunction)
             .AddStall(1f, beamEnd)
             .Add(1f, 0f, collapseEnd, MakePoly(4f).InOutFunction)
             .Evaluate(lifeInterpolant);
@@ -88,10 +89,12 @@ public class LightrippingBeam : ProjOwnedByNPC<Asterlin>
 
         if (Time >= TelegraphTime && Projectile.velocity != Vector2.Zero)
         {
-            trailPoints.SetPoints(Projectile.Center.GetLaserControlPoints(Projectile.Center + Projectile.velocity * LaserLength, 100));
+            trailPoints.SetPoints(
+                Projectile.Center.GetLaserControlPoints(Projectile.Center + Projectile.velocity * LaserLength, 100));
         }
         else
-            telePoints.SetPoints(Projectile.Center.GetLaserControlPoints(Projectile.Center + Projectile.velocity * MaxLength, 100));
+            telePoints.SetPoints(
+                Projectile.Center.GetLaserControlPoints(Projectile.Center + Projectile.velocity * MaxLength, 100));
 
         if (trail == null || trail.Disposed)
             trail = new(LaserWidthFunction, LaserColorFunction, null, 100);
@@ -107,14 +110,17 @@ public class LightrippingBeam : ProjOwnedByNPC<Asterlin>
 
         if (Time.BetweenNum(TelegraphTime, Lifetime - 10))
         {
-            Vector2 vel = Projectile.velocity.RotatedByRandom(Main.rand.NextFloat(.34f, .42f)) * Main.rand.NextFloat(150f, 980f);
-            ParticleRegistry.SpawnLightningArcParticle(Projectile.Center, vel, Main.rand.Next(10, 20), 1f, Color.DeepSkyBlue);
+            Vector2 vel = Projectile.velocity.RotatedByRandom(Main.rand.NextFloat(.34f, .42f)) *
+                          Main.rand.NextFloat(150f, 980f);
+            ParticleRegistry.SpawnLightningArcParticle(Projectile.Center, vel, Main.rand.Next(10, 20), 1f,
+                Color.DeepSkyBlue);
         }
     }
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return targetHitbox.LineCollision(Projectile.Center, Projectile.Center + Projectile.velocity * LaserLength, Projectile.Size.Length() * .7f);
+        return targetHitbox.LineCollision(Projectile.Center, Projectile.Center + Projectile.velocity * LaserLength,
+            Projectile.Size.Length() * .7f);
     }
 
     public override bool ShouldUpdatePosition() => false;
@@ -122,23 +128,28 @@ public class LightrippingBeam : ProjOwnedByNPC<Asterlin>
     public override bool? CanDamage() => Time >= TelegraphTime ? null : false;
 
     public float LaserWidthFunction(float _) => Projectile.width * Projectile.scale;
+
     public Color LaserColorFunction(SystemVector2 completionRatio, Vector2 position)
     {
         float colorInterpolant = Sin01(Main.GlobalTimeWrappedHourly * -3.2f + completionRatio.X * 23f);
-        return Color.Lerp(Color.Cyan * 1.2f, Color.DeepSkyBlue, colorInterpolant * 0.67f) * MathHelper.SmoothStep(1f, .8f, completionRatio.X);
+        return Color.Lerp(Color.Cyan * 1.2f, Color.DeepSkyBlue, colorInterpolant * 0.67f) *
+               MathHelper.SmoothStep(1f, .8f, completionRatio.X);
     }
 
     public float TelegraphCompletion => MakePoly(4f).OutFunction(InverseLerp(PortalAppearTime, TelegraphTime, Time));
     public float TelegraphWidthFunction(float completionRatio) => Projectile.width * TelegraphCompletion;
+
     public Color TelegraphColorFunction(SystemVector2 completionRatio, Vector2 position)
     {
-        return MulticolorLerp(completionRatio.X, Color.Cyan, Color.SkyBlue, Color.DeepSkyBlue) * .65f * MathHelper.Lerp(1f, 0f, TelegraphCompletion) * InverseLerp(0f, .08f, completionRatio.X);
+        return MulticolorLerp(completionRatio.X, Color.Cyan, Color.SkyBlue, Color.DeepSkyBlue) * .65f *
+               MathHelper.Lerp(1f, 0f, TelegraphCompletion) * InverseLerp(0f, .08f, completionRatio.X);
     }
 
     public OptimizedPrimitiveTrail trail;
     public OptimizedPrimitiveTrail telegraph;
     public TrailPoints trailPoints = new(100);
     public TrailPoints telePoints = new(100);
+
     public override bool PreDraw(ref Color lightColor)
     {
         void drawPortal()
@@ -158,11 +169,13 @@ public class LightrippingBeam : ProjOwnedByNPC<Asterlin>
             portal.TrySetParameter("secondColor", col2);
             portal.Render();
 
-            Main.spriteBatch.Draw(noiseTexture, drawPosition, null, Color.White, Projectile.rotation, origin, diskScale, SpriteEffects.None, 0f);
+            Main.spriteBatch.Draw(noiseTexture, drawPosition, null, Color.White, Projectile.rotation, origin, diskScale,
+                SpriteEffects.None, 0f);
 
             portal.TrySetParameter("secondColor", col2 * 2f);
             portal.Render();
-            Main.spriteBatch.Draw(noiseTexture, drawPosition, null, Color.White, Projectile.rotation, origin, diskScale, SpriteEffects.None, 0f);
+            Main.spriteBatch.Draw(noiseTexture, drawPosition, null, Color.White, Projectile.rotation, origin, diskScale,
+                SpriteEffects.None, 0f);
         }
 
         void drawTelegraph()
@@ -189,7 +202,8 @@ public class LightrippingBeam : ProjOwnedByNPC<Asterlin>
             }
         }
 
-        PixelationSystem.QueueTextureRenderAction(drawPortal, PixelationLayer.OverPlayers, null, ShaderRegistry.PortalShader);
+        PixelationSystem.QueueTextureRenderAction(drawPortal, PixelationLayer.OverPlayers, null,
+            ShaderRegistry.PortalShader);
         if (Time < TelegraphTime)
             PixelationSystem.QueuePrimitiveRenderAction(drawTelegraph, PixelationLayer.OverPlayers);
         else

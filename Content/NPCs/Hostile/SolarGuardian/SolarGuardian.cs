@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using CalamityMod;
 using Terraria;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
@@ -65,43 +64,43 @@ public class SolarGuardian : ModNPC
 
     public int Time
     {
-        get => (int)NPC.ai[0];
+        get => (int) NPC.ai[0];
         set => NPC.ai[0] = value;
     }
 
     public GuardianStates State
     {
-        get => (GuardianStates)NPC.ai[1];
-        set => NPC.ai[1] = (int)value;
+        get => (GuardianStates) NPC.ai[1];
+        set => NPC.ai[1] = (int) value;
     }
 
     public ref float Rotate => ref NPC.ai[2];
 
     public int FireCounter
     {
-        get => (int)NPC.ai[3];
+        get => (int) NPC.ai[3];
         set => NPC.ai[3] = value;
     }
 
     public int RotateDir
     {
-        get => (int)NPC.AdditionsInfo().ExtraAI[0];
+        get => (int) NPC.AdditionsInfo().ExtraAI[0];
         set => NPC.AdditionsInfo().ExtraAI[0] = value;
     }
 
     public static int SunrayDamage => DifficultyBasedValue(90, 170, 260);
-    public static float ChargeTime => CalUtils.SecondsToFrames(1.2f);
-    public static int FireWait => CalUtils.SecondsToFrames(.4f);
+    public static float ChargeTime => SecondsToFrames(1.2f);
+    public static int FireWait => SecondsToFrames(.4f);
     public static int FireCount => DifficultyBasedValue(2, 3, 4);
-    public static int ReelBackTime => CalUtils.SecondsToFrames(1.4f);
-    public static int DashTime => CalUtils.SecondsToFrames(.2f);
-    public static int SlowdownTime => CalUtils.SecondsToFrames(.8f);
+    public static int ReelBackTime => SecondsToFrames(1.4f);
+    public static int DashTime => SecondsToFrames(.2f);
+    public static int SlowdownTime => SecondsToFrames(.8f);
 
     public override void FindFrame(int frameHeight)
     {
         NPC.frameCounter += State == GuardianStates.Dash ? 0.4f : 0.15f;
         NPC.frameCounter %= Main.npcFrameCount[NPC.type];
-        NPC.frame.Y = (int)NPC.frameCounter * frameHeight;
+        NPC.frame.Y = (int) NPC.frameCounter * frameHeight;
     }
 
     public override void AI()
@@ -224,7 +223,7 @@ public class SolarGuardian : ModNPC
     public override void OnHitPlayer(Player target, Player.HurtInfo hurtInfo)
     {
         if (hurtInfo.Damage > 0)
-            target.AddBuff(BuffID.OnFire3, CalUtils.SecondsToFrames(4));
+            target.AddBuff(BuffID.OnFire3, SecondsToFrames(4));
     }
 
     public override void HitEffect(NPC.HitInfo hit)
@@ -240,8 +239,8 @@ public class SolarGuardian : ModNPC
         {
             for (int j = 0; j < 70; j++)
             {
-                Dust obj = Dust.NewDustDirect(NPC.position, (int)(NPC.width * NPC.scale),
-                    (int)(NPC.height * NPC.scale * 0.6f), DustID.SolarFlare, hit.HitDirection * 3f, -1f, 0,
+                Dust obj = Dust.NewDustDirect(NPC.position, (int) (NPC.width * NPC.scale),
+                    (int) (NPC.height * NPC.scale * 0.6f), DustID.SolarFlare, hit.HitDirection * 3f, -1f, 0,
                     default(Color), 6f);
                 obj.scale *= Main.rand.NextFloat(0.85f, 1.15f);
                 obj.fadeIn = 0.5f;

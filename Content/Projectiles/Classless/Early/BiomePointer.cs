@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.Linq;
-using CalamityMod;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -38,8 +37,8 @@ public class BiomePointer : BaseIdleHoldoutProjectile
 
     public BlockToPointTo Mode
     {
-        get => (BlockToPointTo)Projectile.ai[0];
-        set => Projectile.ai[0] = (ushort)value;
+        get => (BlockToPointTo) Projectile.ai[0];
+        set => Projectile.ai[0] = (ushort) value;
     }
 
     public override void OnSpawn(IEntitySource source)
@@ -53,6 +52,7 @@ public class BiomePointer : BaseIdleHoldoutProjectile
     public static List<(Vector2 coord, BlockToPointTo mode, Vector2 playerPos)> cachedCoords = [];
     public const float MaxPlayerDist = 1000f;
     public static readonly float maxRadius = MaxTiles * 16f;
+
     public override void SafeAI()
     {
         BiomePointerUI.CurrentlyViewing = true;
@@ -60,7 +60,8 @@ public class BiomePointer : BaseIdleHoldoutProjectile
         Projectile.timeLeft = 2;
         Projectile.Center = Vector2.Lerp(Projectile.Center, Owner.Center + new Vector2(Owner.direction * 20f, 0f), .8f);
         Projectile.rotation = Projectile.rotation.AngleLerp(Projectile.velocity.ToRotation(), .18f);
-        Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, Owner.direction == 1 ? -MathHelper.PiOver4 : MathHelper.PiOver4);
+        Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full,
+            Owner.direction == 1 ? -MathHelper.PiOver4 : MathHelper.PiOver4);
 
         if (this.RunLocal() && Modded.SafeMouseLeft.JustPressed)
         {
@@ -98,12 +99,13 @@ public class BiomePointer : BaseIdleHoldoutProjectile
                         // Check for valid tile or liquid
                         if (Mode == BlockToPointTo.Shimmer)
                         {
-                            if (tile.Get<LiquidData>().LiquidType == LiquidID.Shimmer && tile.Get<LiquidData>().Amount > 0)
+                            if (tile.Get<LiquidData>().LiquidType == LiquidID.Shimmer &&
+                                tile.Get<LiquidData>().Amount > 0)
                             {
                                 Coords.Add(worldCoord);
                             }
                         }
-                        else if (tile.HasTile && tile.TileType == (ushort)Mode)
+                        else if (tile.HasTile && tile.TileType == (ushort) Mode)
                         {
                             Coords.Add(worldCoord);
                         }
@@ -112,6 +114,7 @@ public class BiomePointer : BaseIdleHoldoutProjectile
                         if (Coords.Count >= 15)
                             goto FoundEnough;
                     }
+
                     currentRadius += stepSize;
                 }
 
@@ -141,6 +144,7 @@ public class BiomePointer : BaseIdleHoldoutProjectile
                 Vector2 shootVelocity = (MathHelper.TwoPi * i / count + offsetAngle).ToRotationVector2() * 5f;
                 ParticleRegistry.SpawnGlowParticle(Projectile.Center, shootVelocity, 30, 32f, Color.Green);
             }
+
             this.Sync();
         }
 

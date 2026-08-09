@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -41,25 +40,31 @@ public class AvragenMinion : ModProjectile
         Projectile.minion = true;
     }
 
-    public static readonly float CycleTime = CalUtils.SecondsToFrames(3f);
+    public static readonly float CycleTime = SecondsToFrames(3f);
+
     public enum AvraPhases
     {
         CurvedBeam,
         DaggerBarrage,
         ConsumingVortexes,
     }
+
     public ref float Timer => ref Projectile.ai[0];
+
     public AvraPhases Phase
     {
-        get => (AvraPhases)Projectile.ai[1];
-        set => Projectile.ai[1] = (int)value;
+        get => (AvraPhases) Projectile.ai[1];
+        set => Projectile.ai[1] = (int) value;
     }
+
     public ref float PhaseTimer => ref Projectile.ai[2];
+
     public bool Idling
     {
         get => Projectile.AdditionsInfo().ExtraAI[0] == 1f;
         set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
+
     public bool Cycling
     {
         get => Projectile.AdditionsInfo().ExtraAI[1] == 1f;
@@ -67,6 +72,7 @@ public class AvragenMinion : ModProjectile
     }
 
     public NPCTargeting.NPCSeekingData data => new(Projectile.Center, Sight, false, false);
+
     public override void AI()
     {
         if (!Owner.active || Owner.dead)
@@ -74,6 +80,7 @@ public class AvragenMinion : ModProjectile
             Modded.Avragen = false;
             return;
         }
+
         Owner.AddBuff(ModContent.BuffType<AvragenPresence>(), 3600);
         if (Modded.Avragen)
             Projectile.timeLeft = 2;
@@ -96,15 +103,15 @@ public class AvragenMinion : ModProjectile
             {
                 if (targets.Count >= 3)
                 {
-                    if (Phase == AvraPhases.ConsumingVortexes && PhaseTimer >= CalUtils.SecondsToFrames(3f))
+                    if (Phase == AvraPhases.ConsumingVortexes && PhaseTimer >= SecondsToFrames(3f))
                         ChangeState(AvraPhases.DaggerBarrage);
-                    else if (Phase == AvraPhases.DaggerBarrage && PhaseTimer >= CalUtils.SecondsToFrames(6f))
+                    else if (Phase == AvraPhases.DaggerBarrage && PhaseTimer >= SecondsToFrames(6f))
                         ChangeState(AvraPhases.ConsumingVortexes);
                 }
                 else
                 {
                     Cycling = true;
-                    if (PhaseTimer >= CalUtils.SecondsToFrames(3f))
+                    if (PhaseTimer >= SecondsToFrames(3f))
                     {
                         CycleToNextPhase();
                     }
@@ -133,7 +140,8 @@ public class AvragenMinion : ModProjectile
         }
 
         Vector2 dest = Owner.Center + new Vector2(0f, -200f);
-        Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.SafeDirectionTo(dest) * MathF.Min(Projectile.Distance(dest), 40f), .7f);
+        Projectile.velocity = Vector2.SmoothStep(Projectile.velocity,
+            Projectile.SafeDirectionTo(dest) * MathF.Min(Projectile.Distance(dest), 40f), .7f);
     }
 
     private bool HasCloseProximityEnemies(List<NPC> targets, int minCount, float safeDistance)
@@ -181,7 +189,8 @@ public class AvragenMinion : ModProjectile
             Main.projectile[laser].netUpdate = true;
         }
 
-        Projectile.rotation = Projectile.rotation.AngleLerp(Projectile.SafeDirectionTo(target.Center).ToRotation(), .2f);
+        Projectile.rotation =
+            Projectile.rotation.AngleLerp(Projectile.SafeDirectionTo(target.Center).ToRotation(), .2f);
     }
 
     public void Barrage(NPC target)
@@ -196,15 +205,21 @@ public class AvragenMinion : ModProjectile
             AdditionsSound.banditShot1A.Play(Projectile.Center, .9f, -.25f, .1f, 0);
             for (int i = 0; i < 4; i++)
             {
-                Utils.ChaseResults chase = Utils.GetChaseResults(Projectile.Center, Main.rand.NextFloat(18f, 26f), target.Center, target.velocity);
+                Utils.ChaseResults chase = Utils.GetChaseResults(Projectile.Center, Main.rand.NextFloat(18f, 26f),
+                    target.Center, target.velocity);
                 Vector2 vel = chase.ChaserVelocity.RotatedByRandom(.3f);
                 if (this.RunLocal())
-                    Projectile.NewProj(Projectile.Center, vel, ModContent.ProjectileType<FleetDaggers>(), Projectile.damage / 4, Projectile.knockBack, Owner.whoAmI);
+                    Projectile.NewProj(Projectile.Center, vel, ModContent.ProjectileType<FleetDaggers>(),
+                        Projectile.damage / 4, Projectile.knockBack, Owner.whoAmI);
 
                 for (int j = 0; j < 4; j++)
                 {
-                    ParticleRegistry.SpawnSquishyPixelParticle(Projectile.Center, vel.RotatedByRandom(.4f) * Main.rand.NextFloat(.5f, 1f), Main.rand.Next(70, 100), Main.rand.NextFloat(.4f, .9f), Color.Violet, Color.BlueViolet, 4);
-                    ParticleRegistry.SpawnGlowParticle(Projectile.Center, vel.RotatedByRandom(.3f) * Main.rand.NextFloat(.7f, 1.4f), Main.rand.Next(30, 50), Main.rand.NextFloat(.4f, .6f), Color.Violet, Main.rand.NextFloat(.8f, 1.5f));
+                    ParticleRegistry.SpawnSquishyPixelParticle(Projectile.Center,
+                        vel.RotatedByRandom(.4f) * Main.rand.NextFloat(.5f, 1f), Main.rand.Next(70, 100),
+                        Main.rand.NextFloat(.4f, .9f), Color.Violet, Color.BlueViolet, 4);
+                    ParticleRegistry.SpawnGlowParticle(Projectile.Center,
+                        vel.RotatedByRandom(.3f) * Main.rand.NextFloat(.7f, 1.4f), Main.rand.Next(30, 50),
+                        Main.rand.NextFloat(.4f, .6f), Color.Violet, Main.rand.NextFloat(.8f, 1.5f));
                 }
             }
         }
@@ -222,13 +237,20 @@ public class AvragenMinion : ModProjectile
             AdditionsSound.BraveSpecial1B.Play(Projectile.Center, 1.5f, -.1f, .2f, 0);
             Utils.ChaseResults chase = Utils.GetChaseResults(Projectile.Center, 20f, target.Center, target.velocity);
             if (this.RunLocal())
-                Projectile.NewProj(Projectile.Center, chase.ChaserVelocity, ModContent.ProjectileType<ConsumingVoid>(), Projectile.damage, Projectile.knockBack, Owner.whoAmI);
+                Projectile.NewProj(Projectile.Center, chase.ChaserVelocity, ModContent.ProjectileType<ConsumingVoid>(),
+                    Projectile.damage, Projectile.knockBack, Owner.whoAmI);
 
             for (int i = 0; i < 20; i++)
             {
-                ParticleRegistry.SpawnSquishyPixelParticle(Projectile.Center, Main.rand.NextVector2CircularEdge(20f, 20f), 100, Main.rand.NextFloat(.8f, 1.4f), Color.Violet, Color.BlueViolet, 10, false, false, Main.rand.NextFloat(-.2f, .2f));
-                ParticleRegistry.SpawnHeavySmokeParticle(Projectile.Center, chase.ChaserVelocity.RotatedByRandom(.4f) * Main.rand.NextFloat(.4f, 1.4f), Main.rand.Next(40, 50), Main.rand.NextFloat(.5f, 1.5f), Color.BlueViolet);
-                ParticleRegistry.SpawnGlowParticle(Projectile.Center, chase.ChaserVelocity.RotatedByRandom(.2f) * Main.rand.NextFloat(.3f, .7f), Main.rand.Next(40, 50), Main.rand.NextFloat(40f, 100f), Color.DarkViolet);
+                ParticleRegistry.SpawnSquishyPixelParticle(Projectile.Center,
+                    Main.rand.NextVector2CircularEdge(20f, 20f), 100, Main.rand.NextFloat(.8f, 1.4f), Color.Violet,
+                    Color.BlueViolet, 10, false, false, Main.rand.NextFloat(-.2f, .2f));
+                ParticleRegistry.SpawnHeavySmokeParticle(Projectile.Center,
+                    chase.ChaserVelocity.RotatedByRandom(.4f) * Main.rand.NextFloat(.4f, 1.4f), Main.rand.Next(40, 50),
+                    Main.rand.NextFloat(.5f, 1.5f), Color.BlueViolet);
+                ParticleRegistry.SpawnGlowParticle(Projectile.Center,
+                    chase.ChaserVelocity.RotatedByRandom(.2f) * Main.rand.NextFloat(.3f, .7f), Main.rand.Next(40, 50),
+                    Main.rand.NextFloat(40f, 100f), Color.DarkViolet);
             }
         }
     }
@@ -255,10 +277,13 @@ public class AvragenMinion : ModProjectile
 
         for (int i = 0; i < 4; i++)
         {
-            Vector2 position = Projectile.Center + Main.rand.NextVector2Circular(Projectile.width / 2, Projectile.height / 2);
-            ParticleRegistry.SpawnHeavySmokeParticle(position, Main.rand.NextVector2Circular(2f, 2f), Main.rand.Next(40, 50), Main.rand.NextFloat(.5f, 1.5f), Color.Violet);
+            Vector2 position = Projectile.Center +
+                               Main.rand.NextVector2Circular(Projectile.width / 2, Projectile.height / 2);
+            ParticleRegistry.SpawnHeavySmokeParticle(position, Main.rand.NextVector2Circular(2f, 2f),
+                Main.rand.Next(40, 50), Main.rand.NextFloat(.5f, 1.5f), Color.Violet);
             if (i % 2 == 0)
-                ParticleRegistry.SpawnGlowParticle(position, Main.rand.NextVector2CircularEdge(8f, 8f), Main.rand.Next(30, 40), Main.rand.NextFloat(30f, 150f), Color.BlueViolet);
+                ParticleRegistry.SpawnGlowParticle(position, Main.rand.NextVector2CircularEdge(8f, 8f),
+                    Main.rand.Next(30, 40), Main.rand.NextFloat(30f, 150f), Color.BlueViolet);
         }
 
         Vector2 offset = Main.rand.NextVector2Circular(Projectile.width, Projectile.height);
@@ -266,9 +291,11 @@ public class AvragenMinion : ModProjectile
 
         if (Main.rand.NextBool(5))
             ParticleRegistry.SpawnBloomPixelParticle(pos + offset * 2f, Main.rand.NextVector2Circular(4f, 4f),
-                Main.rand.Next(80, 140), Main.rand.NextFloat(.5f, 1.2f), Color.Violet, Color.DarkViolet, Projectile.Center, Main.rand.NextFloat(.9f, 1.5f));
+                Main.rand.Next(80, 140), Main.rand.NextFloat(.5f, 1.2f), Color.Violet, Color.DarkViolet,
+                Projectile.Center, Main.rand.NextFloat(.9f, 1.5f));
 
         if (Main.rand.NextBool(6))
-            ParticleRegistry.SpawnDustParticle(pos, Main.rand.NextVector2Circular(2f, 2f), Main.rand.Next(40, 60), Main.rand.NextFloat(.5f, 1.1f), Color.Violet, .1f, false, true, true);
+            ParticleRegistry.SpawnDustParticle(pos, Main.rand.NextVector2Circular(2f, 2f), Main.rand.Next(40, 60),
+                Main.rand.NextFloat(.5f, 1.1f), Color.Violet, .1f, false, true, true);
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.IO;
-using CalamityMod;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
@@ -17,6 +16,7 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Misc;
 public class GodDummyNPC : ModNPC
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GodDummyNPC);
+
     public override void SetStaticDefaults()
     {
         this.ExcludeFromBestiary();
@@ -107,8 +107,8 @@ public class GodDummyNPC : ModNPC
         if (this.RunServer())
         {
             int oldWidth = NPC.width;
-            int idealWidth = (int)(NPC.scale * 18);
-            int idealHeight = (int)(NPC.scale * 48);
+            int idealWidth = (int) (NPC.scale * 18);
+            int idealHeight = (int) (NPC.scale * 48);
             if (idealWidth != oldWidth)
             {
                 NPC.position.X += NPC.width / 2;
@@ -125,8 +125,10 @@ public class GodDummyNPC : ModNPC
         {
             NPC.Center += new Vector2(0f, MathF.Sin(TimeSystem.UpdateCount * .01f) * .5f);
             if (TimeSystem.UpdateCount % 2 == 1)
-                ParticleRegistry.SpawnGlowParticle(Vector2.Lerp(NPC.RotHitbox().BottomLeft, NPC.RotHitbox().BottomRight, Main.rand.NextFloat()),
-                    Main.rand.NextVector2Circular(1f, 1f), Main.rand.Next(20, 30), Main.rand.NextFloat(.2f, .4f), NotABossAround() == false ? Color.Red : Color.SaddleBrown);
+                ParticleRegistry.SpawnGlowParticle(
+                    Vector2.Lerp(NPC.RotHitbox().BottomLeft, NPC.RotHitbox().BottomRight, Main.rand.NextFloat()),
+                    Main.rand.NextVector2Circular(1f, 1f), Main.rand.Next(20, 30), Main.rand.NextFloat(.2f, .4f),
+                    NotABossAround() == false ? Color.Red : Color.SaddleBrown);
         }
     }
 
@@ -157,6 +159,7 @@ public class GodDummyNPC : ModNPC
             NPC.frameCounter = 0.0;
             NPC.frame.Y += frameHeight;
         }
+
         if (NPC.AdditionsInfo().ExtraAI[4] == -1f)
         {
             if (NPC.justHit && NPC.frame.Y > frameHeight * 2)
@@ -178,6 +181,7 @@ public class GodDummyNPC : ModNPC
             NPC.netUpdate = true;
             return false;
         }
+
         return true;
     }
 
@@ -198,10 +202,11 @@ public class GodDummyNPC : ModNPC
         SpriteEffects dir = (-NPC.direction).ToSpriteDirection();
         if (NPC.boss)
             NPC.DrawNPCBackglow(Color.Tan * .3f, 5f, dir, NPC.frame);
-        spriteBatch.Draw(texture, position, (Rectangle?)NPC.frame, NPC.GetAlpha(mainColor), NPC.rotation, origin, NPC.scale, dir, 0f);
+        spriteBatch.Draw(texture, position, (Rectangle?) NPC.frame, NPC.GetAlpha(mainColor), NPC.rotation, origin,
+            NPC.scale, dir, 0f);
 
         if (NPC.scale >= 2.5f)
-            Main.spriteBatch.ResetBlendState();
+            Main.spriteBatch.ResetToDefault();
 
         return false;
     }

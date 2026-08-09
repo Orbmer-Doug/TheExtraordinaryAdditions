@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Debuff;
@@ -23,7 +22,7 @@ public class SpoonSwing : BaseSwordSwing
 
     public override void Defaults()
     {
-        Projectile.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
+        Projectile.DamageType = ModContent.GetInstance<MeleeNoSpeedDamageClass>();
     }
 
     public enum SpoonState
@@ -35,8 +34,8 @@ public class SpoonSwing : BaseSwordSwing
 
     public SpoonState CurrentState
     {
-        get => (SpoonState)Projectile.AdditionsInfo().ExtraAI[7];
-        set => Projectile.AdditionsInfo().ExtraAI[7] = (float)value;
+        get => (SpoonState) Projectile.AdditionsInfo().ExtraAI[7];
+        set => Projectile.AdditionsInfo().ExtraAI[7] = (float) value;
     }
 
     public int GetSwingTime
@@ -56,6 +55,7 @@ public class SpoonSwing : BaseSwordSwing
     public override int SwingTime => GetSwingTime;
     public override int MaxUpdates => 10;
     public override bool? CanDamage() => SwingCompletion.BetweenNum(.2f, .94f, true) ? null : false;
+
     public float IdealSize
     {
         get
@@ -72,12 +72,14 @@ public class SpoonSwing : BaseSwordSwing
 
     private const float snapPoint = 0.45f;
     private const float retractionPoint = 0.6f;
+
     internal float PokeCurve() => new PiecewiseCurve()
         .Add(0f, 1f, Time * snapPoint, Circ.OutFunction)
         .Add(0f, 0f, Time * retractionPoint, MakePoly(1).InFunction)
         .Add(1f, -1f, 1f, MakePoly(4).InOutFunction).Evaluate(SwingCompletion);
 
     public const float ScoopAngle = -(Pi * 7f / 13f);
+
     internal float ScoopCurve() => new PiecewiseCurve()
         .Add(-.3f, -1f, .3f, MakePoly(2).OutFunction)
         .Add(-1f, .7f, .75f, MakePoly(3).InFunction)
@@ -123,7 +125,8 @@ public class SpoonSwing : BaseSwordSwing
     public override void SafeAI()
     {
         // Owner values
-        Projectile.Center = Owner.GetFrontHandPositionImproved() - PolarVector(10f, Projectile.rotation - SwordRotation);
+        Projectile.Center =
+            Owner.GetFrontHandPositionImproved() - PolarVector(10f, Projectile.rotation - SwordRotation);
         Owner.heldProj = Projectile.whoAmI;
         Owner.SetDummyItemTime(2);
         Owner.ChangeDir(Direction);
@@ -154,7 +157,8 @@ public class SpoonSwing : BaseSwordSwing
         // Update trails
         if (Time % 2 == 1)
         {
-            after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.scale, Projectile.Opacity, Projectile.rotation, Effects, 200, 3, Animation() * 3f));
+            after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.scale, Projectile.Opacity,
+                Projectile.rotation, Effects, 200, 3, Animation() * 3f));
         }
 
         float scaleUp = MeleeScale * IdealSize;
@@ -162,7 +166,8 @@ public class SpoonSwing : BaseSwordSwing
         {
             if (VanishTime <= 0)
             {
-                Projectile.scale = Lerp(Projectile.scale, MakePoly(3f).OutFunction(InverseLerp(0f, 10f * MaxUpdates, OverallTime)) * scaleUp, .1f);
+                Projectile.scale = Lerp(Projectile.scale,
+                    MakePoly(3f).OutFunction(InverseLerp(0f, 10f * MaxUpdates, OverallTime)) * scaleUp, .1f);
             }
             else
             {
@@ -189,7 +194,8 @@ public class SpoonSwing : BaseSwordSwing
         {
             if (Modded.SafeMouseLeft.Current && VanishTime <= 0)
             {
-                CurrentState = CurrentState == SpoonState.Poke ? SpoonState.Scoop : CurrentState == SpoonState.Scoop ? SpoonState.Smash : SpoonState.Poke;
+                CurrentState = CurrentState == SpoonState.Poke ? SpoonState.Scoop :
+                    CurrentState == SpoonState.Scoop ? SpoonState.Smash : SpoonState.Poke;
                 Initialized = false;
                 this.Sync();
             }
@@ -202,6 +208,7 @@ public class SpoonSwing : BaseSwordSwing
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         Vector2 origin;
@@ -225,7 +232,8 @@ public class SpoonSwing : BaseSwordSwing
         }
 
         float opacity = InverseLerp(0.016f, 0.07f, AngularVelocity);
-        after?.DrawFancySwordAfterimages(Tex, Projectile.Center, [Color.White * Brightness], origin, Effects, RotationOffset, Projectile.Opacity * opacity, Projectile.scale);
+        after?.DrawFancySwordAfterimages(Tex, Projectile.Center, [Color.White * Brightness], origin, Effects,
+            RotationOffset, Projectile.Opacity * opacity, Projectile.scale);
 
         Main.spriteBatch.Draw(Tex, Projectile.Center - Main.screenPosition, null, lightColor,
             Projectile.rotation + RotationOffset, origin, Projectile.scale, Effects, 0f);
@@ -235,7 +243,7 @@ public class SpoonSwing : BaseSwordSwing
 
     public override void NPCHitEffects(in Vector2 start, in Vector2 end, NPC npc, NPC.HitInfo hit)
     {
-        npc.AddBuff(ModContent.BuffType<DentedBySpoon>(), CalUtils.SecondsToFrames(4));
+        npc.AddBuff(ModContent.BuffType<DentedBySpoon>(), SecondsToFrames(4));
 
         switch (CurrentState)
         {
@@ -255,7 +263,7 @@ public class SpoonSwing : BaseSwordSwing
                 {
                     ParticleRegistry.SpawnBlurParticle(Projectile.Center, 40, .4f, 800f);
 
-                    int dmg = (int)Owner.GetTotalDamage<MeleeDamageClass>().ApplyTo(1000);
+                    int dmg = (int) Owner.GetTotalDamage<MeleeDamageClass>().ApplyTo(1000);
                     Projectile.NewProj(npc.Bottom, Vector2.Zero, type, dmg, 0f, Owner.whoAmI);
                 }
 

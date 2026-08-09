@@ -36,7 +36,7 @@ public readonly struct WeightedDict<T>
 
     public T GetRandom()
     {
-        float randomVal = (float)Main.rand.NextDouble() * totalWeight;
+        float randomVal = (float) Main.rand.NextDouble() * totalWeight;
         int left = 0;
         int right = cumulativeWeights.Length - 1;
 

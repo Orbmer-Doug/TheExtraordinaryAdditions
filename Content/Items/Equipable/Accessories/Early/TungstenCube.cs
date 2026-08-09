@@ -11,6 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Early;
 public class TungstenCube : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TungstenCube);
+
     public override void SetStaticDefaults()
     {
         CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1;

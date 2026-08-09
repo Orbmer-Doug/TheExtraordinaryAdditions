@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Summon;
@@ -12,6 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
 public class IztMinion : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.LokiShrinep);
+
     public override void SetStaticDefaults()
     {
         // This is necessary for right-click targeting
@@ -43,6 +43,7 @@ public class IztMinion : ModProjectile
     public Player Owner => Main.player[Projectile.owner];
     public ref float Timer => ref Projectile.ai[0];
     public ref float HitTime => ref Projectile.ai[1];
+
     public bool HasHitTarget
     {
         get => Projectile.ai[2] == 1f;
@@ -57,7 +58,8 @@ public class IztMinion : ModProjectile
         }
 
         after ??= new(5, () => Projectile.Center);
-        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 255));
+        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0,
+            255));
 
         // So it will lean slightly towards the direction it's moving
         Projectile.rotation = Projectile.velocity.X * 0.05f;
@@ -68,7 +70,9 @@ public class IztMinion : ModProjectile
         {
             if (HasHitTarget)
             {
-                Projectile.velocity = Projectile.velocity.RotatedBy((double)((Projectile.identity % 2f == 0f).ToDirectionInt() * 0.06f), default) * 0.93f;
+                Projectile.velocity =
+                    Projectile.velocity.RotatedBy((double) ((Projectile.identity % 2f == 0f).ToDirectionInt() * 0.06f),
+                        default) * 0.93f;
             }
             else
             {
@@ -76,8 +80,11 @@ public class IztMinion : ModProjectile
                 // Its funny when there is a bunch of enemies because they start to run down the chain individually
                 if (HitTime <= 0)
                 {
-                    Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.Center.SafeDirectionTo(target.Center) * 32f, 0.02f);
-                    ParticleRegistry.SpawnGlowParticle(Projectile.RandAreaInEntity(), -Projectile.velocity * Main.rand.NextFloat(.4f, .6f), 16, Main.rand.NextFloat(.09f, .2f), Color.Gold);
+                    Projectile.velocity = Vector2.Lerp(Projectile.velocity,
+                        Projectile.Center.SafeDirectionTo(target.Center) * 32f, 0.02f);
+                    ParticleRegistry.SpawnGlowParticle(Projectile.RandAreaInEntity(),
+                        -Projectile.velocity * Main.rand.NextFloat(.4f, .6f), 16, Main.rand.NextFloat(.09f, .2f),
+                        Color.Gold);
                 }
             }
         }
@@ -122,6 +129,7 @@ public class IztMinion : ModProjectile
         {
             Projectile.velocity = (Projectile.velocity * 37f + Projectile.SafeDirectionTo(origin) * 17f) / 40f;
         }
+
         if (!Projectile.WithinRange(origin, 1200f))
         {
             Projectile.position = origin;
@@ -141,6 +149,7 @@ public class IztMinion : ModProjectile
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [Color.Yellow], Projectile.Opacity);

@@ -36,7 +36,7 @@ public static class Animators
 
         // Scale t to select the correct segment
         float scaledT = t * segmentCount;
-        int segmentIndex = Math.Min((int)scaledT, segmentCount - 1);
+        int segmentIndex = Math.Min((int) scaledT, segmentCount - 1);
         float localT = scaledT - segmentIndex;
 
         Vector2 p0 = segmentIndex == 0 ? points[0] : points[segmentIndex - 1]; // First point (or previous)
@@ -65,7 +65,7 @@ public static class Animators
 
             for (int j = 0; j < segments; j++)
             {
-                float t = (float)j / segments;
+                float t = (float) j / segments;
                 splinePoints.Add(Vector2.CatmullRom(p0, p1, p2, p3, t));
             }
         }
@@ -432,7 +432,7 @@ public static class Animators
     public static void GetPrincipalAxes(in Quaternion quaternion, out float roll, out float pitch, out float yaw)
     {
         Matrix rotationMatrix = Matrix.CreateFromQuaternion(quaternion);
-        yaw = (float)Math.Atan2(rotationMatrix.M21, rotationMatrix.M11);
+        yaw = (float) Math.Atan2(rotationMatrix.M21, rotationMatrix.M11);
 
         float m33 = rotationMatrix.M33;
 
@@ -440,8 +440,8 @@ public static class Animators
         if (Math.Abs(m33) < 0.0001f)
             m33 = m33 >= 0 ? 0.0001f : -0.0001f;
 
-        pitch = (float)Math.Atan2(-rotationMatrix.M23, m33);
-        roll = (float)Math.Atan2(rotationMatrix.M13, m33);
+        pitch = (float) Math.Atan2(-rotationMatrix.M23, m33);
+        roll = (float) Math.Atan2(rotationMatrix.M13, m33);
     }
 
     // close enough, size is cut by √2/2 (~30% reduction) among j and k axis but im unsure how to formalize that
@@ -476,7 +476,7 @@ public static class Animators
 
         // Extract the 2D rotation angle from the matrix
         // M11 and M21 represent the cosine and sine of the Z-rotation
-        float angle = (float)Math.Atan2(rotationMatrix.M21, rotationMatrix.M11);
+        float angle = (float) Math.Atan2(rotationMatrix.M21, rotationMatrix.M11);
         return angle + startingRot;
     }
 
@@ -531,12 +531,12 @@ public static class Animators
         }
 
         // Calculate the angle and the coefficients
-        float theta0 = (float)Math.Acos(dot); // angle between input quaternions
+        float theta0 = (float) Math.Acos(dot); // angle between input quaternions
         float theta = theta0 * t;
         Quaternion q2_ = q2 - q1 * dot;
         q2_ = Quaternion.Normalize(q2_);
 
-        return q1 * (float)Math.Cos(theta) + q2_ * (float)Math.Sin(theta);
+        return q1 * (float) Math.Cos(theta) + q2_ * (float) Math.Sin(theta);
     }
 
     #endregion Quaternion

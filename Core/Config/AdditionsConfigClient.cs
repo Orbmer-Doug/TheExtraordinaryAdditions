@@ -12,14 +12,14 @@ public class AdditionsConfigClient : ModConfig
     /// <code>
     /// LoadModContent(token, mod => {
     ///     ContentInstance.Register(mod);
-	///		mod.loading = true;
-	///		mod.AutoloadConfig();
-	///		mod.PrepareAssets();
-	///		mod.Autoload();
-	///		mod.Load();
-	///		SystemLoader.OnModLoad(mod);
-	///		mod.loading = false;
-	///	});
+    ///		mod.loading = true;
+    ///		mod.AutoloadConfig();
+    ///		mod.PrepareAssets();
+    ///		mod.Autoload();
+    ///		mod.Load();
+    ///		SystemLoader.OnModLoad(mod);
+    ///		mod.loading = false;
+    ///	});
     /// </code>
     /// I suppose we must wait on the PR to merge
     /// </summary>
@@ -33,7 +33,6 @@ public class AdditionsConfigClient : ModConfig
     public override ConfigScope Mode => ConfigScope.ClientSide;
 
     [Header("Graphical")]
-
     [BackgroundColor(80, 250, 187, 192)]
     [SliderColor(42, 222, 162)]
     [DefaultValue(0.85f)]

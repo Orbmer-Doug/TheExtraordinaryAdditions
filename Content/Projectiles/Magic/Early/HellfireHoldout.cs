@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
@@ -31,7 +30,8 @@ public class HellfireHoldout : BaseHoldoutProjectile
         if (this.RunLocal())
         {
             float interpolant = Utils.GetLerpValue(5f, 40f, Projectile.Distance(Owner.Additions().MouseWorld), true);
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Owner.Additions().MouseWorld), interpolant);
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity,
+                Projectile.SafeDirectionTo(Owner.Additions().MouseWorld), interpolant);
             if (Projectile.oldVelocity != Projectile.velocity)
                 this.Sync();
         }
@@ -54,13 +54,17 @@ public class HellfireHoldout : BaseHoldoutProjectile
             {
                 for (int i = 0; i < Main.rand.Next(3, 5); i++)
                 {
-                    Vector2 newVelocity = (Projectile.SafeDirectionTo(Owner.Additions().MouseWorld) * 15f).RotatedByRandom(Main.rand.NextFloat(.24f, .4f)) * Main.rand.NextFloat(.7f, 1.05f);
+                    Vector2 newVelocity =
+                        (Projectile.SafeDirectionTo(Owner.Additions().MouseWorld) * 15f).RotatedByRandom(
+                            Main.rand.NextFloat(.24f, .4f)) * Main.rand.NextFloat(.7f, 1.05f);
 
                     int type = ModContent.ProjectileType<HellishNapalm>();
                     Projectile.NewProj(Projectile.Center, newVelocity, type, Projectile.damage, Projectile.knockBack);
 
                     for (int j = 0; j < 6; j++)
-                        ParticleRegistry.SpawnDustParticle(Projectile.Center, newVelocity.RotatedByRandom(.2f) * Main.rand.NextFloat(.6f, 1.2f), Main.rand.Next(20, 30), Main.rand.NextFloat(.3f, .5f), Color.OrangeRed, .1f, false, true);
+                        ParticleRegistry.SpawnDustParticle(Projectile.Center,
+                            newVelocity.RotatedByRandom(.2f) * Main.rand.NextFloat(.6f, 1.2f), Main.rand.Next(20, 30),
+                            Main.rand.NextFloat(.3f, .5f), Color.OrangeRed, .1f, false, true);
                 }
             }
         }
@@ -81,10 +85,12 @@ public class HellfireHoldout : BaseHoldoutProjectile
         {
             Vector2 drawOffset = (MathHelper.TwoPi * i / 6f).ToRotationVector2() * backglowArea;
             Color glowAlpha = Projectile.GetAlpha(backglowColor * Projectile.Opacity) with { A = 0 };
-            Main.spriteBatch.DrawBetter(tex, Projectile.Center + drawOffset, null, glowAlpha * 0.95f, Projectile.rotation, origin, Projectile.scale, effects);
+            Main.spriteBatch.DrawBetter(tex, Projectile.Center + drawOffset, null, glowAlpha * 0.95f,
+                Projectile.rotation, origin, Projectile.scale, effects);
         }
 
-        Main.spriteBatch.DrawBetter(tex, Projectile.Center, null, Projectile.GetAlpha(Color.White), Projectile.rotation, origin, Projectile.scale, effects);
+        Main.spriteBatch.DrawBetter(tex, Projectile.Center, null, Projectile.GetAlpha(Color.White), Projectile.rotation,
+            origin, Projectile.scale, effects);
         return false;
     }
 }

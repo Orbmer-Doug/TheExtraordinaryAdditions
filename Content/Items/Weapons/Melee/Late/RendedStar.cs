@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CalamityMod.Items.Materials;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -39,11 +38,14 @@ public class RendedStar : ModItem
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
-        tooltips.FirstOrDefault(n => n.Name == "Damage").Text = tooltips.FirstOrDefault(n => n.Name == "Damage").Text.Replace("damage", GetTextValue("Items.SolarBrand.Damage"));
+        tooltips.FirstOrDefault(n => n.Name == "Damage")?.Text = tooltips.FirstOrDefault(n => n.Name == "Damage")
+            ?.Text
+            .Replace("damage", GetTextValue("Items.SolarBrand.Damage"));
         tooltips.ColorLocalization(new(255, 72, 31));
     }
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback)
     {
         return false;
     }
@@ -52,8 +54,7 @@ public class RendedStar : ModItem
     {
         Recipe recipe = CreateRecipe();
         recipe.AddIngredient(ModContent.ItemType<Sunspot>(), 1);
-        recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 5);
-        recipe.AddIngredient(ModContent.ItemType<EssenceofHavoc>(), 12);
+        //TODO
         recipe.Register();
     }
 }

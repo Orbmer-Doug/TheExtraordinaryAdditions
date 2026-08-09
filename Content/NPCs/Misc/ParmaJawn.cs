@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Terraria;
+﻿using Terraria;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Utilities;
 using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
@@ -13,7 +12,8 @@ public class ParmaJawn : ProjOwnedByNPC<TheGiantSnailFromAncientTimes>
 
     public override void SetDefaults()
     {
-        Projectile.width = 97; Projectile.height = 148;
+        Projectile.width = 97;
+        Projectile.height = 148;
         Projectile.friendly = false;
         Projectile.hostile = true;
         Projectile.tileCollide = true;
@@ -34,7 +34,8 @@ public class ParmaJawn : ProjOwnedByNPC<TheGiantSnailFromAncientTimes>
 
     public override void OnKill(int timeLeft)
     {
-        ParticleRegistry.SpawnDetailedBlastParticle(Projectile.Center, Vector2.Zero, Vector2.One * 300f, Vector2.Zero, 30, Color.White, 0f, Color.LightGray);
+        ParticleRegistry.SpawnDetailedBlastParticle(Projectile.Center, Vector2.Zero, Vector2.One * 300f, Vector2.Zero,
+            30, Color.White, 0f, Color.LightGray);
 
         Projectile.ExpandHitboxBy(300);
         Projectile.Damage();

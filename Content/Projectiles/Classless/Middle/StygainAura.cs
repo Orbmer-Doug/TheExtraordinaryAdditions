@@ -13,6 +13,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 public class StygainAura : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 1;
@@ -30,9 +31,10 @@ public class StygainAura : ModProjectile
     public ref float Radius => ref Projectile.ai[0];
     public ref float Time => ref Projectile.ai[1];
     public ref float StoredDamage => ref Projectile.ai[2];
-    private static readonly float TotalTime = CalUtils.SecondsToFrames(3);
-    public static readonly int CooldownTime = CalUtils.SecondsToFrames(10);
+    private static readonly float TotalTime = SecondsToFrames(3);
+    public static readonly int CooldownTime = SecondsToFrames(10);
     public float Completion => InverseLerp(0f, 30f, Time) * InverseLerp(TotalTime, TotalTime - 20f, Time);
+
     public override void AI()
     {
         if (Time > TotalTime)
@@ -40,8 +42,10 @@ public class StygainAura : ModProjectile
             Projectile.Kill();
             return;
         }
+
         if (trail == null || trail.Disposed)
-            trail = new(c => 6f + StoredDamage * .002f, (c, pos) => Color.Lerp(Color.White, Color.Red * 1.4f, Completion + .3f), null, 40);
+            trail = new(c => 6f + StoredDamage * .002f,
+                (c, pos) => Color.Lerp(Color.White, Color.Red * 1.4f, Completion + .3f), null, 40);
 
         Time++;
 
@@ -72,6 +76,7 @@ public class StygainAura : ModProjectile
             {
                 ParticleRegistry.SpawnBloodStreakParticle(pos, vel, 40, Main.rand.NextFloat(.2f, .4f), Color.DarkRed);
             }
+
             ParticleRegistry.SpawnGlowParticle(pos, vel, 40, Main.rand.NextFloat(20f, 30f), Color.DarkRed);
         }
     }
@@ -79,25 +84,29 @@ public class StygainAura : ModProjectile
     public override void OnKill(int timeLeft)
     {
         if (!(Owner.lifeSteal <= 0f))
-            Owner.Heal((int)(StoredDamage * .002f));
+            Owner.Heal((int) (StoredDamage * .002f));
 
         if (StoredDamage >= 10000f)
         {
             Vector2 pos = Owner.Center + new Vector2(-4f * Owner.direction, -20f);
             Vector2 vel = pos.SafeDirectionTo(Owner.Additions().MouseWorld).SafeNormalize(Vector2.Zero);
             for (float i = 1f; i > 0f; i -= .2f)
-                ParticleRegistry.SpawnPulseRingParticle(Owner.Center, vel * (14f * i), 40, vel.ToRotation(), new(.5f, 1f), 0f, i * 320f, Color.Crimson);
+                ParticleRegistry.SpawnPulseRingParticle(Owner.Center, vel * (14f * i), 40, vel.ToRotation(),
+                    new(.5f, 1f), 0f, i * 320f, Color.Crimson);
             if (this.RunLocal())
-                Projectile.NewProj(pos, vel, ModContent.ProjectileType<SanguineRay>(), Projectile.damage * 2, 0f, Owner.whoAmI);
-            
+                Projectile.NewProj(pos, vel, ModContent.ProjectileType<SanguineRay>(), Projectile.damage * 2, 0f,
+                    Owner.whoAmI);
+
             AdditionsSound.VirtueAttack.Play(pos, .8f, -.3f);
         }
     }
 
-    public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => CalUtils.CircularHitboxCollision(Projectile.Center, Radius + 75, targetHitbox);
+    public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => CircularHitboxCollision(
+        Projectile.Center, Radius + 75, targetHitbox);
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints points = new(40);
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -112,6 +121,7 @@ public class StygainAura : ModProjectile
             prim.TrySetParameter("repeats", 10f);
             trail.DrawTrail(prim, points.Points, 100, true);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 
         return false;

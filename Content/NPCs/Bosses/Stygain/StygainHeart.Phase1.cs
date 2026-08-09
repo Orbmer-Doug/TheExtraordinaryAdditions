@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using CalamityMod;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -146,7 +145,7 @@ public sealed partial class StygainHeart
 
         if (NPC.justHit)
             NPC.netUpdate = true;
-        float lifeRatio = NPC.life / (float)NPC.lifeMax;
+        float lifeRatio = NPC.life / (float) NPC.lifeMax;
         float chargeSpeed = MathHelper.Lerp(30f, Main.getGoodWorld ? 60f : 45f, 1f - lifeRatio);
 
         ref float aimTimer = ref ExtraAI[2];
@@ -167,7 +166,7 @@ public sealed partial class StygainHeart
 
             chosenDirection = index[Main.rand.Next(0, index.Count - 1)];
 
-            Directions[(int)chosenDirection] = true;
+            Directions[(int) chosenDirection] = true;
 
             start = 1f;
             NPC.netUpdate = true;
@@ -241,7 +240,7 @@ public sealed partial class StygainHeart
                 if (HasDoneBloodBeacon || Main.getGoodWorld)
                     shootRate = 3;
 
-                if ((int)chargeTimer % shootRate == shootRate - 1)
+                if ((int) chargeTimer % shootRate == shootRate - 1)
                 {
                     for (int i = -1; i <= 1; i += 2)
                     {
@@ -355,7 +354,7 @@ public sealed partial class StygainHeart
     public void DoAttack_Assimilations(Player target, bool phase2)
     {
         ref float counter = ref ExtraAI[2];
-        int count = DifficultyBasedValue(2, 3) + (int)counter;
+        int count = DifficultyBasedValue(2, 3) + (int) counter;
         const int cycles = 4;
 
         const int life = SanguineAssimilation.TimeForBeam;

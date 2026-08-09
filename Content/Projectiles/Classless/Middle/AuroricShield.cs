@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.IO;
-using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -18,6 +17,7 @@ public class AuroricShield : ModProjectile
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AuroricShield);
 
     private const int MaxTime = 50;
+
     public override void SetDefaults()
     {
         Projectile.hostile = false;
@@ -34,6 +34,7 @@ public class AuroricShield : ModProjectile
     }
 
     public ref float Time => ref Projectile.ai[0];
+
     public bool Parried
     {
         get => Projectile.ai[1] == 1f;
@@ -43,12 +44,14 @@ public class AuroricShield : ModProjectile
     public Vector2 Offset;
     public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(Offset);
     public override void ReceiveExtraAI(BinaryReader reader) => Offset = reader.ReadVector2();
-    
+
     public Player Owner => Main.player[Projectile.owner];
+
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
         float _ = 0f;
-        return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.RotHitbox().Top, Projectile.RotHitbox().Bottom, Projectile.width, ref _);
+        return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(),
+            Projectile.RotHitbox().Top, Projectile.RotHitbox().Bottom, Projectile.width, ref _);
     }
 
     public override void AI()
@@ -65,7 +68,7 @@ public class AuroricShield : ModProjectile
 
         if (Time < 20f)
             Offset = Vector2.Lerp(new(0f, 50f), new(0f, 10f), Circ.InFunction(InverseLerp(0f, 20f, Time)));
-        else if ((int)Time == 30)
+        else if ((int) Time == 30)
             SoundID.Item1.Play(Projectile.Center, 1.1f, -.2f, .1f, null);
         else if (Time < 30f)
             Offset = Vector2.Lerp(new(0f, 10f), new(0f, 100f), Exp().OutFunction(InverseLerp(20f, 30f, Time)));
@@ -84,9 +87,11 @@ public class AuroricShield : ModProjectile
             float _ = 0f;
             foreach (Projectile p in Main.ActiveProjectiles)
             {
-                if (p == null || !p.active || p.Size.Length() > 300f || p.whoAmI == Projectile.whoAmI || !p.hostile || p.damage <= 1)
+                if (p == null || !p.active || p.Size.Length() > 300f || p.whoAmI == Projectile.whoAmI || !p.hostile ||
+                    p.damage <= 1)
                     continue;
-                if (!Collision.CheckAABBvLineCollision(p.Hitbox.TopLeft(), p.Hitbox.Size(), Projectile.RotHitbox().Top, Projectile.RotHitbox().Bottom, Projectile.width, ref _))
+                if (!Collision.CheckAABBvLineCollision(p.Hitbox.TopLeft(), p.Hitbox.Size(), Projectile.RotHitbox().Top,
+                        Projectile.RotHitbox().Bottom, Projectile.width, ref _))
                     continue;
 
                 if (!Parried)
@@ -122,10 +127,15 @@ public class AuroricShield : ModProjectile
             if (i % 2 == 1)
             {
                 ParticleRegistry.SpawnCloudParticle(pos, Projectile.velocity * Main.rand.NextFloat(2f, 10f),
-                    Color.LightCyan, Color.SlateBlue, Main.rand.Next(40, 120), Main.rand.NextFloat(.4f, .6f), Main.rand.NextFloat(.6f, 1f));
+                    Color.LightCyan, Color.SlateBlue, Main.rand.Next(40, 120), Main.rand.NextFloat(.4f, .6f),
+                    Main.rand.NextFloat(.6f, 1f));
             }
-            Dust.NewDustPerfect(pos, DustID.SilverCoin, Projectile.velocity.RotatedByRandom(.4f) * Main.rand.NextFloat(4f, 8f), 0, default, Main.rand.NextFloat(.6f, .8f));
-            ParticleRegistry.SpawnGlowParticle(pos, Projectile.velocity * Main.rand.NextFloat(4f, 10f), Main.rand.Next(18, 30), Main.rand.NextFloat(.4f, .7f), Color.SlateBlue);
+
+            Dust.NewDustPerfect(pos, DustID.SilverCoin,
+                Projectile.velocity.RotatedByRandom(.4f) * Main.rand.NextFloat(4f, 8f), 0, default,
+                Main.rand.NextFloat(.6f, .8f));
+            ParticleRegistry.SpawnGlowParticle(pos, Projectile.velocity * Main.rand.NextFloat(4f, 10f),
+                Main.rand.Next(18, 30), Main.rand.NextFloat(.4f, .7f), Color.SlateBlue);
         }
     }
 
@@ -149,8 +159,10 @@ public class AuroricShield : ModProjectile
     {
         Texture2D tex = Projectile.ThisProjectileTexture();
         Vector2 pos = Projectile.Center - Main.screenPosition;
-        Projectile.DrawProjectileBackglow(Color.DeepSkyBlue, 4f * Projectile.scale, (byte)(100 * Projectile.Opacity));
-        Main.spriteBatch.Draw(tex, pos, null, Lighting.GetColor(Projectile.Center.ToTileCoordinates()) * Projectile.Opacity, Projectile.rotation, tex.Size() / 2, Projectile.scale, 0, 0f);
+        Projectile.DrawProjectileBackglow(Color.DeepSkyBlue, 4f * Projectile.scale, (byte) (100 * Projectile.Opacity));
+        Main.spriteBatch.Draw(tex, pos, null,
+            Lighting.GetColor(Projectile.Center.ToTileCoordinates()) * Projectile.Opacity, Projectile.rotation,
+            tex.Size() / 2, Projectile.scale, 0, 0f);
         return false;
     }
 }

@@ -12,6 +12,7 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 public class SoulForgedRift : ProjOwnedByNPC<Asterlin>
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 400;
@@ -21,23 +22,19 @@ public class SoulForgedRift : ProjOwnedByNPC<Asterlin>
         Projectile.timeLeft = 9000000;
     }
 
-    public Quaternion Rotation
-    {
-        get;
-        set;
-    }
+    public Quaternion Rotation { get; set; }
 
     public ref float Animation => ref Projectile.ai[0];
 
     public int Time
     {
-        get => (int)Projectile.ai[1];
+        get => (int) Projectile.ai[1];
         set => Projectile.ai[1] = value;
     }
 
     public int RayIndex
     {
-        get => (int)Projectile.ai[2];
+        get => (int) Projectile.ai[2];
         set => Projectile.ai[2] = value;
     }
 
@@ -78,6 +75,7 @@ public class SoulForgedRift : ProjOwnedByNPC<Asterlin>
                 this.Sync();
             }
         }
+
         if (ray != null && ray.type == type)
         {
             Rotation = Animators.EulerAnglesConversion(1, 0f, ray.ai[2] /*SideAngle*/ - MathHelper.PiOver2);
@@ -85,13 +83,15 @@ public class SoulForgedRift : ProjOwnedByNPC<Asterlin>
 
         if (ModOwner.Hyperbeam_CurrentState == Asterlin.Hyperbeam_States.Fade)
         {
-            Projectile.Opacity = InverseLerp(Asterlin.Hyperbeam_FadeTime, Asterlin.Hyperbeam_FadeTime - 20f, ModOwner.AITimer);
+            Projectile.Opacity = InverseLerp(Asterlin.Hyperbeam_FadeTime, Asterlin.Hyperbeam_FadeTime - 20f,
+                ModOwner.AITimer);
             if (Projectile.Opacity <= 0f)
                 Projectile.Kill();
         }
         else
         {
-            Projectile.Opacity = Animators.MakePoly(4f).InFunction(InverseLerp(0f, Asterlin.Hyperbeam_PortalChargeTime, Time));
+            Projectile.Opacity = Animators.MakePoly(4f)
+                .InFunction(InverseLerp(0f, Asterlin.Hyperbeam_PortalChargeTime, Time));
             Projectile.scale = Animators.Sine.OutFunction(InverseLerp(0f, Asterlin.Hyperbeam_PortalChargeTime, Time));
         }
 
@@ -105,7 +105,8 @@ public class SoulForgedRift : ProjOwnedByNPC<Asterlin>
         {
             VertexPositionColorTexture[] quad = GenerateQuadClockwise(Projectile.Size, Color.White, true);
             ManagedShader projectionShader = AssetRegistry.GetShader("3DPortalProjection");
-            projectionShader.TrySetParameter("vertexMatrix", Get3DTextureMatrix(Projectile.Center, Rotation, Projectile.scale, 0f, 1));
+            projectionShader.TrySetParameter("vertexMatrix",
+                Get3DTextureMatrix(Projectile.Center, Rotation, Projectile.scale, 0f, 1));
             projectionShader.TrySetParameter("time", Animation);
             projectionShader.TrySetParameter("opacity", Projectile.Opacity);
             projectionShader.Render();
@@ -122,13 +123,15 @@ public class SoulForgedRift : ProjOwnedByNPC<Asterlin>
             gd.Textures[1] = Projectile.ThisProjectileTexture();
             gd.BlendState = BlendState.AlphaBlend;
 
-            gd.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, quad, 0, quad.Length, TextureQuadIndices, 0, TextureQuadIndices.Length / 3);
+            gd.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, quad, 0, quad.Length, TextureQuadIndices, 0,
+                TextureQuadIndices.Length / 3);
 
             gd.RasterizerState = prevRast;
             gd.SamplerStates[1] = prevState;
             gd.Textures[1] = prevTex;
             gd.BlendState = prevBlend;
         }
+
         PixelationSystem.QueueTextureRenderAction(portal, PixelationLayer.UnderPlayers);
         return false;
     }

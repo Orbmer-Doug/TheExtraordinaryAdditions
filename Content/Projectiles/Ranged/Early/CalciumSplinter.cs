@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -10,6 +9,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Early;
 public class CalciumSplinter : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CalciumSplinter);
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 14;
@@ -23,6 +23,7 @@ public class CalciumSplinter : ModProjectile
     }
 
     public ref float State => ref Projectile.ai[0];
+
     public bool HitGround
     {
         get => Projectile.ai[1] == 1f;
@@ -30,10 +31,12 @@ public class CalciumSplinter : ModProjectile
     }
 
     public FancyAfterimages after;
+
     public override void AI()
     {
         after ??= new(4, () => Projectile.Center);
-        after.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 240, 0, 0f, null, true, -.4f));
+        after.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0,
+            240, 0, 0f, null, true, -.4f));
 
         if (State == 0f)
         {
@@ -61,6 +64,7 @@ public class CalciumSplinter : ModProjectile
             Collision.HitTiles(Projectile.Center, -oldVelocity, Projectile.width, Projectile.height);
             HitGround = true;
         }
+
         State = 2f;
         return false;
     }

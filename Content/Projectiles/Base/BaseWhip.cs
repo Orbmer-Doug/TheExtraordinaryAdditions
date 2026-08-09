@@ -162,9 +162,9 @@ public abstract class BaseWhip : ModProjectile
     /// </summary>
     public void ProduceWaterRipples()
     {
-        WaterShaderData water = (WaterShaderData)Filters.Scene["WaterDistortion"].GetShader();
+        WaterShaderData water = (WaterShaderData) Filters.Scene["WaterDistortion"].GetShader();
         float power = TipSize;
-        float waveSine = 1f * (float)Math.Sin(Main.GlobalTimeWrappedHourly * 20f);
+        float waveSine = 1f * (float) Math.Sin(Main.GlobalTimeWrappedHourly * 20f);
         Vector2 size = new(18);
         Vector2 ripplePos = Tip;
         Color waveData = new Color(power, 0.1f * Math.Sign(waveSine) + 0.5f, 0f, 1f) * Math.Abs(waveSine);

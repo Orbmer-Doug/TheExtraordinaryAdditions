@@ -26,6 +26,7 @@ public class ProximityDart : ModProjectile
 
     public ref float Time => ref Projectile.ai[0];
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [lightColor]);
@@ -51,7 +52,8 @@ public class ProximityDart : ModProjectile
     public override void AI()
     {
         after ??= new(4, () => Projectile.Center);
-        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 255));
+        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0,
+            255));
 
         // The projectile is in the midst of exploding during the last 3 updates
         if (this.RunLocal() && Projectile.timeLeft <= 3)
@@ -67,8 +69,10 @@ public class ProximityDart : ModProjectile
         else
         {
             if (Time % 2f == 0f)
-                Dust.NewDustPerfect(Projectile.RotHitbox().Left + Main.rand.NextVector2Circular(3, 3), DustID.OrangeTorch, -Projectile.velocity * .4f);
+                Dust.NewDustPerfect(Projectile.RotHitbox().Left + Main.rand.NextVector2Circular(3, 3),
+                    DustID.OrangeTorch, -Projectile.velocity * .4f);
         }
+
         Projectile.FacingRight();
 
         Time++;
@@ -82,26 +86,31 @@ public class ProximityDart : ModProjectile
 
         for (int i = 0; i < 40; i++)
         {
-            ParticleRegistry.SpawnBloomPixelParticle(Projectile.Center, Main.rand.NextVector2Circular(7f, 7f), Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .7f), Color.OrangeRed, Color.White, null, 1.2f, 5);
-            ParticleRegistry.SpawnHeavySmokeParticle(Projectile.Center, Main.rand.NextVector2Circular(3f, 3f), Main.rand.Next(20, 50), Main.rand.NextFloat(.4f, .6f), Color.OrangeRed, Main.rand.NextFloat(.6f, 1.2f));
+            ParticleRegistry.SpawnBloomPixelParticle(Projectile.Center, Main.rand.NextVector2Circular(7f, 7f),
+                Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .7f), Color.OrangeRed, Color.White, null, 1.2f, 5);
+            ParticleRegistry.SpawnHeavySmokeParticle(Projectile.Center, Main.rand.NextVector2Circular(3f, 3f),
+                Main.rand.Next(20, 50), Main.rand.NextFloat(.4f, .6f), Color.OrangeRed, Main.rand.NextFloat(.6f, 1.2f));
         }
+
         Projectile.Resize(34, 14);
 
         // Finally, actually explode the tiles and walls
         if (this.RunLocal())
         {
             const int explosionRadius = 3;
-            int minTileX = (int)(Projectile.Center.X / 16f - explosionRadius);
-            int maxTileX = (int)(Projectile.Center.X / 16f + explosionRadius);
-            int minTileY = (int)(Projectile.Center.Y / 16f - explosionRadius);
-            int maxTileY = (int)(Projectile.Center.Y / 16f + explosionRadius);
+            int minTileX = (int) (Projectile.Center.X / 16f - explosionRadius);
+            int maxTileX = (int) (Projectile.Center.X / 16f + explosionRadius);
+            int minTileY = (int) (Projectile.Center.Y / 16f - explosionRadius);
+            int maxTileY = (int) (Projectile.Center.Y / 16f + explosionRadius);
 
             // Ensure that all tile coordinates are within the world bounds
             Utils.ClampWithinWorld(ref minTileX, ref minTileY, ref maxTileX, ref maxTileY);
 
             // These 2 methods handle actually mining the tiles and walls while honoring tile explosion conditions
-            bool explodeWalls = Projectile.ShouldWallExplode(Projectile.Center, explosionRadius, minTileX, maxTileX, minTileY, maxTileY);
-            Projectile.ExplodeTiles(Projectile.Center, explosionRadius, minTileX, maxTileX, minTileY, maxTileY, explodeWalls);
+            bool explodeWalls = Projectile.ShouldWallExplode(Projectile.Center, explosionRadius, minTileX, maxTileX,
+                minTileY, maxTileY);
+            Projectile.ExplodeTiles(Projectile.Center, explosionRadius, minTileX, maxTileX, minTileY, maxTileY,
+                explodeWalls);
         }
     }
 }

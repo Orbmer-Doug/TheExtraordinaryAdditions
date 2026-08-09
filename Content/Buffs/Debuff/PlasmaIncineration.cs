@@ -21,7 +21,7 @@ public class PlasmaIncineration : ModBuff
     {
         if (npc.GetGlobalNPC<AdditionsGlobalNPC>().PlasmaIncineration < npc.buffTime[buffIndex])
             npc.GetGlobalNPC<AdditionsGlobalNPC>().PlasmaIncineration = npc.buffTime[buffIndex];
-        
+
         npc.DelBuff(buffIndex);
         buffIndex--;
     }

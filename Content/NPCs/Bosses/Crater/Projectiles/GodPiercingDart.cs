@@ -18,7 +18,7 @@ public class GodPiercingDart : ProjOwnedByNPC<Asterlin>
 
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
 
@@ -46,11 +46,12 @@ public class GodPiercingDart : ProjOwnedByNPC<Asterlin>
         CooldownSlot = ImmunityCooldownID.Bosses;
     }
 
-    public override void SendAI(BinaryWriter writer) => writer.Write((int)Projectile.extraUpdates);
+    public override void SendAI(BinaryWriter writer) => writer.Write((int) Projectile.extraUpdates);
 
-    public override void ReceiveAI(BinaryReader reader) => Projectile.extraUpdates = (int)reader.ReadInt32();
+    public override void ReceiveAI(BinaryReader reader) => Projectile.extraUpdates = (int) reader.ReadInt32();
 
     public const float Supersonic = 34f;
+
     public override void SafeAI()
     {
         if (trail == null || trail.Disposed)
@@ -63,8 +64,10 @@ public class GodPiercingDart : ProjOwnedByNPC<Asterlin>
         Projectile.FacingUp();
 
         Vector2 start = Projectile.RotHitbox().Bottom;
-        float dist = Animators.MakePoly(3f).InOutFunction.Evaluate(Time, 0f, Supersonic, 0f, ExtendedTelegraph ? 2200f : 400f);
-        telePoints.SetPoints(start.GetLaserControlPoints(start + Projectile.velocity.SafeNormalize(Vector2.Zero) * dist, 30));
+        float dist = Animators.MakePoly(3f).InOutFunction
+            .Evaluate(Time, 0f, Supersonic, 0f, ExtendedTelegraph ? 2200f : 400f);
+        telePoints.SetPoints(start.GetLaserControlPoints(start + Projectile.velocity.SafeNormalize(Vector2.Zero) * dist,
+            30));
 
         if (Time < Supersonic)
         {
@@ -72,13 +75,17 @@ public class GodPiercingDart : ProjOwnedByNPC<Asterlin>
         }
         else if (Time == Supersonic)
         {
-            ParticleRegistry.SpawnPulseRingParticle(start, Projectile.velocity * .01f, 20, Projectile.velocity.ToRotation(), new(.4f, 1f), 0f, Projectile.height, Color.Cyan);
+            ParticleRegistry.SpawnPulseRingParticle(start, Projectile.velocity * .01f, 20,
+                Projectile.velocity.ToRotation(), new(.4f, 1f), 0f, Projectile.height, Color.Cyan);
 
             for (int i = 0; i < 12; i++)
             {
-                Vector2 vel = NextVector2EllipseEdge(Projectile.height * .4f, Projectile.height, Projectile.velocity.ToRotation()) * .2f;
-                ParticleRegistry.SpawnHeavySmokeParticle(start, vel, Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .6f), Color.Cyan.Lerp(Color.DarkCyan, Main.rand.NextFloat(0f, .4f)));
-                ParticleRegistry.SpawnBloomLineParticle(start, vel, Main.rand.Next(40, 50), Main.rand.NextFloat(.2f, .4f), Color.Cyan);
+                Vector2 vel = NextVector2EllipseEdge(Projectile.height * .4f, Projectile.height,
+                    Projectile.velocity.ToRotation()) * .2f;
+                ParticleRegistry.SpawnHeavySmokeParticle(start, vel, Main.rand.Next(20, 30),
+                    Main.rand.NextFloat(.4f, .6f), Color.Cyan.Lerp(Color.DarkCyan, Main.rand.NextFloat(0f, .4f)));
+                ParticleRegistry.SpawnBloomLineParticle(start, vel, Main.rand.Next(40, 50),
+                    Main.rand.NextFloat(.2f, .4f), Color.Cyan);
             }
 
             AdditionsSound.explo04.Play(start, .7f, .2f);
@@ -94,6 +101,7 @@ public class GodPiercingDart : ProjOwnedByNPC<Asterlin>
 
             points.Update(Projectile.RotHitbox().Top);
         }
+
         Time++;
 
         // Done twice to ensure no slip-ups (particulary when spawning in)
@@ -102,7 +110,8 @@ public class GodPiercingDart : ProjOwnedByNPC<Asterlin>
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return targetHitbox.LineCollision(Projectile.BaseRotHitbox().Bottom, Projectile.BaseRotHitbox().Top, Projectile.width);
+        return targetHitbox.LineCollision(Projectile.BaseRotHitbox().Bottom, Projectile.BaseRotHitbox().Top,
+            Projectile.width);
     }
 
     public float TrailWidthFunction(float completionRatio)
@@ -115,7 +124,9 @@ public class GodPiercingDart : ProjOwnedByNPC<Asterlin>
         return Color.Cyan * MathF.Sqrt(completion.X) * Projectile.Opacity;
     }
 
-    public float FadeAway => Animators.MakePoly(2f).InFunction.Evaluate(Time, Supersonic, Supersonic + (18f * Projectile.MaxUpdates), 1f, 0f);
+    public float FadeAway => Animators.MakePoly(2f).InFunction
+        .Evaluate(Time, Supersonic, Supersonic + (18f * Projectile.MaxUpdates), 1f, 0f);
+
     public float TelegraphWidthFunction(float completionRatio)
     {
         float width = Projectile.width * .5f * FadeAway;
@@ -129,7 +140,8 @@ public class GodPiercingDart : ProjOwnedByNPC<Asterlin>
         float endFadeOpacity = GetLerpBump(0f, .2f, 1f, .8f, completion.X);
 
         float telegraphInterpolant = InverseLerp(0f, Supersonic - 4f, Time);
-        Color telegraphColor = Color.Lerp(Color.LightCyan, Color.Cyan, MathF.Pow(telegraphInterpolant, 0.6f)) * telegraphInterpolant;
+        Color telegraphColor = Color.Lerp(Color.LightCyan, Color.Cyan, MathF.Pow(telegraphInterpolant, 0.6f)) *
+                               telegraphInterpolant;
 
         return telegraphColor * endFadeOpacity * FadeAway * .3f;
     }
@@ -154,15 +166,18 @@ public class GodPiercingDart : ProjOwnedByNPC<Asterlin>
             {
                 ManagedShader shader = ShaderRegistry.BaseLaserShader;
                 shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise), 1, SamplerState.LinearWrap);
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WavyBlotchNoise), 2, SamplerState.LinearWrap);
+                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WavyBlotchNoise), 2,
+                    SamplerState.LinearWrap);
                 trail.DrawTrail(shader, points.Points);
             }
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 
         Texture2D texture = Projectile.ThisProjectileTexture();
         Projectile.DrawProjectileBackglow(Color.LightCyan, 3f, 100, 10);
-        Main.spriteBatch.DrawBetter(texture, Projectile.Center, null, Projectile.GetAlpha(Color.White), Projectile.rotation, texture.Size() * 0.5f, Projectile.scale, 0);
+        Main.spriteBatch.DrawBetter(texture, Projectile.Center, null, Projectile.GetAlpha(Color.White),
+            Projectile.rotation, texture.Size() * 0.5f, Projectile.scale, 0);
 
         return false;
     }

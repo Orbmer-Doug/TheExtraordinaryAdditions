@@ -10,6 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 public class IchorSwirl : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.Size = new(32);
@@ -22,6 +23,7 @@ public class IchorSwirl : ModProjectile
     }
 
     public ref float Time => ref Projectile.ai[0];
+
     public override void AI()
     {
         Projectile.scale -= 0.002f;
@@ -34,7 +36,9 @@ public class IchorSwirl : ModProjectile
             if (Main.rand.NextBool(5))
             {
                 float scale = Main.rand.NextFloat(.4f, .8f);
-                ParticleRegistry.SpawnBloodParticle(Projectile.Center, Projectile.velocity.RotatedByRandom(.25f) * Main.rand.NextFloat(.3f, .6f), Main.rand.Next(25, 40), scale, Color.Gold);
+                ParticleRegistry.SpawnBloodParticle(Projectile.Center,
+                    Projectile.velocity.RotatedByRandom(.25f) * Main.rand.NextFloat(.3f, .6f), Main.rand.Next(25, 40),
+                    scale, Color.Gold);
             }
 
             int offset = 16;
@@ -51,6 +55,7 @@ public class IchorSwirl : ModProjectile
                 swirl.noGravity = true;
             }
         }
+
         Time++;
     }
 
@@ -64,11 +69,14 @@ public class IchorSwirl : ModProjectile
     public override void OnKill(int timeLeft)
     {
         SoundEngine.PlaySound(SoundID.Item14, Projectile.Center);
-        ParticleRegistry.SpawnDetailedBlastParticle(Projectile.Center, Vector2.Zero, Vector2.One * 72f, Vector2.Zero, 15, Color.Gold, null, Color.Goldenrod);
+        ParticleRegistry.SpawnDetailedBlastParticle(Projectile.Center, Vector2.Zero, Vector2.One * 72f, Vector2.Zero,
+            15, Color.Gold, null, Color.Goldenrod);
         for (int i = 0; i < 10; i++)
-            ParticleRegistry.SpawnMistParticle(Projectile.RandAreaInEntity(), RandomVelocity(4f, 2f, 10f), Main.rand.NextFloat(.2f, .4f), Color.Gold, Color.DarkGoldenrod, Main.rand.NextByte(130, 190));
+            ParticleRegistry.SpawnMistParticle(Projectile.RandAreaInEntity(), RandomVelocity(4f, 2f, 10f),
+                Main.rand.NextFloat(.2f, .4f), Color.Gold, Color.DarkGoldenrod, Main.rand.NextByte(130, 190));
 
         if (this.RunLocal())
-            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<IchorStreamBlast>(), (int)(Projectile.damage * .75f), 0f, Projectile.owner);
+            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<IchorStreamBlast>(),
+                (int) (Projectile.damage * .75f), 0f, Projectile.owner);
     }
 }

@@ -23,6 +23,7 @@ public sealed class ShaderRecompilationMonitor : ModSystem
     /// An arbitrary number to cap the maximum compiled files at once to prevent extreme memory bloat
     /// </summary>
     private const int MaxCompilingFiles = 100;
+
     public static readonly Queue<CompilingFile> CompilingFiles = [];
     private static readonly List<ShaderWatcher> ShaderWatchers = [];
     private static readonly Dictionary<string, DateTime> DebounceTimestamps = [];
@@ -35,12 +36,14 @@ public sealed class ShaderRecompilationMonitor : ModSystem
     /// A 500ms delay between queuing to prevent rapid-fire events
     /// </summary>
     private const double DebounceDelaySeconds = 0.5;
+
     private const double BurstDetectionWindowSeconds = 1.0;
     private const int BurstThreshold = 50;
 
     public static string CompilerDirectory => Path.Combine(Main.SavePath, "FXC");
 
     public record ShaderWatcher(string EffectsPath, string ModName, FileSystemWatcher FileWatcher);
+
     public record CompilingFile(string FilePath, bool CompileAsFilter);
 
     public override void PostUpdateEverything()
@@ -60,6 +63,7 @@ public sealed class ShaderRecompilationMonitor : ModSystem
                     BurstDetected = false; // Reset burst detection after clearing
                 }
             }
+
             return;
         }
 
@@ -73,10 +77,12 @@ public sealed class ShaderRecompilationMonitor : ModSystem
         {
             CompilingFiles.Clear();
         }
+
         lock (QueueTimestamps)
         {
             QueueTimestamps.Clear();
         }
+
         BurstDetected = false;
     }
 
@@ -99,6 +105,7 @@ public sealed class ShaderRecompilationMonitor : ModSystem
         {
             QueueTimestamps.Clear();
         }
+
         BurstDetected = false;
     }
 
@@ -141,10 +148,16 @@ public sealed class ShaderRecompilationMonitor : ModSystem
             return;
 
         foreach (string file in Directory.GetFiles(CompilerDirectory, "*.fx")
-            .Concat(Directory.GetFiles(CompilerDirectory, "*.xnb"))
-            .Concat(Directory.GetFiles(CompilerDirectory, "*.fxc")))
+                     .Concat(Directory.GetFiles(CompilerDirectory, "*.xnb"))
+                     .Concat(Directory.GetFiles(CompilerDirectory, "*.fxc")))
         {
-            try { File.Delete(file); } catch { }
+            try
+            {
+                File.Delete(file);
+            }
+            catch
+            {
+            }
         }
     }
 
@@ -159,7 +172,8 @@ public sealed class ShaderRecompilationMonitor : ModSystem
             IncludeSubdirectories = true,
             EnableRaisingEvents = true,
             NotifyFilter = NotifyFilters.Attributes | NotifyFilters.CreationTime | NotifyFilters.FileName |
-                          NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.Security
+                           NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.Size |
+                           NotifyFilters.Security
         };
         watcher.Changed += MarkFileAsNeedingCompilation;
         ShaderWatchers.Add(new(path, mod.Name, watcher));
@@ -290,7 +304,8 @@ public sealed class ShaderRecompilationMonitor : ModSystem
         }
         catch (Exception ex)
         {
-            Main.NewText($"Failed to copy '{Path.GetFileName(file.FilePath)}' to compiler: {ex.Message}", Color.OrangeRed);
+            Main.NewText($"Failed to copy '{Path.GetFileName(file.FilePath)}' to compiler: {ex.Message}",
+                Color.OrangeRed);
         }
     }
 
@@ -313,17 +328,20 @@ public sealed class ShaderRecompilationMonitor : ModSystem
         {
             QueueTimestamps.Enqueue(DateTime.Now);
 
-            while (QueueTimestamps.Count > 0 && (DateTime.Now - QueueTimestamps.Peek()).TotalSeconds > BurstDetectionWindowSeconds)
+            while (QueueTimestamps.Count > 0 &&
+                   (DateTime.Now - QueueTimestamps.Peek()).TotalSeconds > BurstDetectionWindowSeconds)
                 QueueTimestamps.Dequeue();
 
             if (QueueTimestamps.Count > BurstThreshold)
             {
                 BurstDetected = true;
-                Main.NewText("Detected excessive shader file changes. Compilation queue cleared to prevent overload.", Color.OrangeRed);
+                Main.NewText("Detected excessive shader file changes. Compilation queue cleared to prevent overload.",
+                    Color.OrangeRed);
                 lock (CompilingFiles)
                 {
                     CompilingFiles.Clear();
                 }
+
                 return;
             }
         }
@@ -335,6 +353,7 @@ public sealed class ShaderRecompilationMonitor : ModSystem
                 Main.NewText("Too many shader compilations queued.", Color.OrangeRed);
                 return;
             }
+
             if (!CompilingFiles.Any(f => f.FilePath == filePath))
                 CompilingFiles.Enqueue(new(filePath, filePath.Contains("\\Filters")));
         }

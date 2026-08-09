@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using CalamityMod;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -20,6 +19,7 @@ public class ShockJavelin : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ShockJavelin);
     private const int StartingLife = 200;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 18;
@@ -35,21 +35,25 @@ public class ShockJavelin : ModProjectile
     }
 
     public ref float FlailAmt => ref Projectile.localAI[0];
+
     public enum CurrentState
     {
         Thrown,
         HitEnemy,
         HitGround
     }
+
     public CurrentState State
     {
-        get => (CurrentState)Projectile.ai[0];
-        set => Projectile.ai[0] = (float)value;
+        get => (CurrentState) Projectile.ai[0];
+        set => Projectile.ai[0] = (float) value;
     }
+
     public ref float AccumulatedVel => ref Projectile.ai[1];
     public ref float EnemyID => ref Projectile.ai[2];
     private readonly List<int> PreviousNPCs = [-1];
     public ref float Timer => ref Projectile.localAI[1];
+
     public override void AI()
     {
         if (trail == null || trail.Disposed)
@@ -65,7 +69,8 @@ public class ShockJavelin : ModProjectile
             if (Timer > (StartingLife - Slow))
             {
                 AccumulatedVel -= .6f;
-                Projectile.Opacity = Projectile.scale = 1f - InverseLerp(StartingLife - Slow, StartingLife, Timer, true);
+                Projectile.Opacity =
+                    Projectile.scale = 1f - InverseLerp(StartingLife - Slow, StartingLife, Timer, true);
                 Projectile.velocity *= .6f;
                 Projectile.extraUpdates = 1;
             }
@@ -78,12 +83,13 @@ public class ShockJavelin : ModProjectile
             Timer++;
             return;
         }
+
         Projectile.velocity *= 0.91f;
 
         if (State == CurrentState.HitEnemy)
         {
             // Stick to the target
-            NPC target = Main.npc[(int)EnemyID];
+            NPC target = Main.npc[(int) EnemyID];
 
             if (!target.active)
             {
@@ -98,13 +104,15 @@ public class ShockJavelin : ModProjectile
                 if (Projectile.position != Projectile.oldPosition)
                     this.Sync();
             }
+
             AccumulatedVel -= 0.6f;
         }
 
         if (State == CurrentState.HitGround)
         {
             FlailAmt = MathHelper.Clamp(FlailAmt - 0.015f, 0f, 1f);
-            Projectile.rotation -= MathF.Sin(AccumulatedVel * (MathHelper.TwoPi * 2f)) * 0.4f * FlailAmt * Projectile.direction;
+            Projectile.rotation -= MathF.Sin(AccumulatedVel * (MathHelper.TwoPi * 2f)) * 0.4f * FlailAmt *
+                                   Projectile.direction;
             AccumulatedVel -= 0.6f;
         }
 
@@ -118,12 +126,13 @@ public class ShockJavelin : ModProjectile
         zap.Pitch = .18f;
         zap.PitchVariance = 0.3f;
         SoundStyle killSound = zap;
-        SoundEngine.PlaySound(killSound, (Vector2?)Projectile.Center, null);
+        SoundEngine.PlaySound(killSound, (Vector2?) Projectile.Center, null);
         for (int i = 0; i < 9; i++)
         {
             Color randomColor = Color.Lerp(Color.MediumPurple, Color.BlueViolet, Main.rand.NextFloat());
             randomColor.A = 0;
-            Dust.NewDustDirect(Projectile.Center - new Vector2(5f), 10, 10, DustID.AncientLight, 0f, 0f, 0, randomColor, 2f).noGravity = true; // 306
+            Dust.NewDustDirect(Projectile.Center - new Vector2(5f), 10, 10, DustID.AncientLight, 0f, 0f, 0, randomColor,
+                2f).noGravity = true; // 306
         }
     }
 
@@ -161,12 +170,14 @@ public class ShockJavelin : ModProjectile
     }
 
     private Vector2 offset;
+
     public override void SendExtraAI(BinaryWriter writer)
     {
         writer.Write(FlailAmt);
         writer.Write(Timer);
         writer.WriteVector2(offset);
     }
+
     public override void ReceiveExtraAI(BinaryReader reader)
     {
         FlailAmt = reader.ReadSingle();
@@ -178,11 +189,13 @@ public class ShockJavelin : ModProjectile
     {
         // Create some on hit particles
         Vector2 pos = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero) * Projectile.height * .5f;
-        ParticleRegistry.SpawnSparkleParticle(pos, Vector2.Zero, Main.rand.Next(12, 15), 3f, Color.White, Color.Purple, 1.4f);
+        ParticleRegistry.SpawnSparkleParticle(pos, Vector2.Zero, Main.rand.Next(12, 15), 3f, Color.White, Color.Purple,
+            1.4f);
         for (int i = 0; i < 14; i++)
         {
             Vector2 vel = -Projectile.velocity.RotatedByRandom(.12f) * Main.rand.NextFloat(2f, 5f);
-            ParticleRegistry.SpawnSparkParticle(pos, vel, Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .5f), Color.Purple.Lerp(Color.White, Main.rand.NextFloat(.4f, .6f)));
+            ParticleRegistry.SpawnSparkParticle(pos, vel, Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .5f),
+                Color.Purple.Lerp(Color.White, Main.rand.NextFloat(.4f, .6f)));
         }
 
         // Add the target to the list
@@ -236,7 +249,8 @@ public class ShockJavelin : ModProjectile
         return State == CurrentState.Thrown;
     }
 
-    public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
+    public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs,
+        List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
     {
         if (State == CurrentState.HitEnemy)
         {
@@ -250,6 +264,7 @@ public class ShockJavelin : ModProjectile
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints cache;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -265,6 +280,7 @@ public class ShockJavelin : ModProjectile
                 trail.DrawTrail(shader, cache.Points, 200, true);
             }
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 
         Texture2D texture = Projectile.ThisProjectileTexture();
@@ -277,23 +293,29 @@ public class ShockJavelin : ModProjectile
         Vector2 orig = texture.Size() * new Vector2(1f, 0.5f);
         for (int i = 0; i < 5; i++)
         {
-            Vector2 offset = new Vector2(1f).RotatedBy((double)(MathHelper.PiOver2 * i + Projectile.rotation), default);
-            Main.EntitySpriteDraw(texture, pos + offset * 2f, null, new Color(154, 92, 236, 0) * Projectile.Opacity, Projectile.rotation, orig, Projectile.scale, 0, 0f);
-            Main.EntitySpriteDraw(texture, pos + offset, null, new Color(234, 164, 244, 0) * Projectile.Opacity, Projectile.rotation, orig, Projectile.scale, 0, 0f);
+            Vector2 offset =
+                new Vector2(1f).RotatedBy((double) (MathHelper.PiOver2 * i + Projectile.rotation), default);
+            Main.EntitySpriteDraw(texture, pos + offset * 2f, null, new Color(154, 92, 236, 0) * Projectile.Opacity,
+                Projectile.rotation, orig, Projectile.scale, 0, 0f);
+            Main.EntitySpriteDraw(texture, pos + offset, null, new Color(234, 164, 244, 0) * Projectile.Opacity,
+                Projectile.rotation, orig, Projectile.scale, 0, 0f);
         }
 
-        Main.EntitySpriteDraw(texture, pos, null, lightColor * Projectile.Opacity, Projectile.rotation, orig, Projectile.scale, 0, 0f);
+        Main.EntitySpriteDraw(texture, pos, null, lightColor * Projectile.Opacity, Projectile.rotation, orig,
+            Projectile.scale, 0, 0f);
         return false;
     }
 
     internal float StripWidth(float c)
     {
-        return OptimizedPrimitiveTrail.HemisphereWidthFunct(c, MathHelper.SmoothStep(Projectile.height * .9f, 0f, c) * Projectile.scale * 1.5f);
+        return OptimizedPrimitiveTrail.HemisphereWidthFunct(c,
+            MathHelper.SmoothStep(Projectile.height * .9f, 0f, c) * Projectile.scale * 1.5f);
     }
 
     internal Color StripColor(SystemVector2 c, Vector2 position)
     {
-        Color color = Color.Lerp(new Color(234, 164, 244, 0), new Color(154, 92, 236, 128), Main.GlobalTimeWrappedHourly + c.X);
+        Color color = Color.Lerp(new Color(234, 164, 244, 0), new Color(154, 92, 236, 128),
+            Main.GlobalTimeWrappedHourly + c.X);
         float speed = Utils.GetLerpValue(0f, 60f, AccumulatedVel, true);
         return color * speed * Projectile.Opacity;
     }

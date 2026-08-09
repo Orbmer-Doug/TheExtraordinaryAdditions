@@ -1,6 +1,4 @@
-﻿using CalamityMod.Items.Materials;
-using CalamityMod.Rarities;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
@@ -27,8 +25,8 @@ public class FlorescenceRounds : ModItem
         Item.consumable = true;
         Item.knockBack = 1;
         Item.value = AdditionsGlobalItem.RarityWhiteBuyPrice;
-        Item.rare = ModContent.RarityType<Turquoise>();
-        Item.shoot = ModContent.ProjectileType<Florescence>();
+        //Item.rare = ModContent.RarityType<Turquoise>();
+        //Item.shoot = ModContent.ProjectileType<Florescence>();
         Item.shootSpeed = 20f;
         Item.ammo = AmmoID.Bullet;
     }
@@ -36,8 +34,7 @@ public class FlorescenceRounds : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe(120);
-        recipe.AddIngredient(ModContent.ItemType<UelibloomBar>(), 1);
-        recipe.AddIngredient(ModContent.ItemType<LivingShard>(), 1);
+        //TODO
         recipe.AddIngredient(ItemID.GrassSeeds, 5);
         recipe.AddIngredient(ItemID.ChlorophyteBullet, 60);
         recipe.AddCondition(Condition.NearWater);

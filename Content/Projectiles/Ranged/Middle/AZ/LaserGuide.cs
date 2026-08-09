@@ -10,6 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle.AZ;
 public class LaserGuide : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 8;
@@ -22,6 +23,7 @@ public class LaserGuide : ModProjectile
     }
 
     public Player Owner => Main.player[Projectile.owner];
+
     public override void AI()
     {
         for (int i = 0; i < Main.maxNPCs; i++)
@@ -32,8 +34,10 @@ public class LaserGuide : ModProjectile
                 Projectile.Kill();
             }
         }
+
         if (Projectile.ai[0]++ % Main.rand.Next(1, 4) == 0f)
-            ParticleRegistry.SpawnGlowParticle(Projectile.Center, Projectile.velocity * .01f, 20, 4f, TankHeadHoldout.GetTeamColor(Owner));
+            ParticleRegistry.SpawnGlowParticle(Projectile.Center, Projectile.velocity * .01f, 20, 4f,
+                TankHeadHoldout.GetTeamColor(Owner));
     }
 
     public override bool? CanCutTiles() => false;

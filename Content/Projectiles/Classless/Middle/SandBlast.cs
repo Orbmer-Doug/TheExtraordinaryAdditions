@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
@@ -12,6 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 public class SandBlast : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SandBlast);
+
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.TrailCacheLength[Projectile.type] = 4;
@@ -47,6 +47,7 @@ public class SandBlast : ModProjectile
         {
             Projectile.velocity *= .999f;
         }
+
         Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver2;
     }
 
@@ -58,15 +59,18 @@ public class SandBlast : ModProjectile
         const int amount = 36;
         for (int i = 0; i < amount; i++)
         {
-            Vector2 pos = (Vector2.Normalize(Projectile.velocity) * new Vector2(Projectile.width / 2f, Projectile.height) * 0.75f)
-                .RotatedBy((double)((i - (amount / 2 - 1)) * MathHelper.TwoPi / amount), default) + Projectile.Center;
+            Vector2 pos = (Vector2.Normalize(Projectile.velocity) *
+                           new Vector2(Projectile.width / 2f, Projectile.height) * 0.75f)
+                .RotatedBy((double) ((i - (amount / 2 - 1)) * MathHelper.TwoPi / amount), default) + Projectile.Center;
 
             Vector2 vel = pos - Projectile.Center;
-            int dust = Dust.NewDust(pos + vel, 0, 0, DustID.UnusedBrown, vel.X * 1.5f, vel.Y * 1.5f, 100, default, 1.2f);
+            int dust = Dust.NewDust(pos + vel, 0, 0, DustID.UnusedBrown, vel.X * 1.5f, vel.Y * 1.5f, 100, default,
+                1.2f);
             Main.dust[dust].noGravity = true;
             Main.dust[dust].noLight = true;
             Main.dust[dust].velocity = vel;
         }
+
         Projectile.maxPenetrate = -1;
         Projectile.penetrate = -1;
         Projectile.usesLocalNPCImmunity = true;
@@ -80,7 +84,8 @@ public class SandBlast : ModProjectile
         Vector2 drawPosition = Projectile.Center - Main.screenPosition;
         Vector2 origin = texture.Size() * 0.5f;
         Projectile.DrawProjectileBackglow(Color.Orange, 6f, 72, 7);
-        Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), Projectile.rotation, origin, Projectile.scale, 0, 0f);
+        Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), Projectile.rotation, origin,
+            Projectile.scale, 0, 0f);
         return false;
     }
 }

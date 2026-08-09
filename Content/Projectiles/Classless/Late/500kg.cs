@@ -30,7 +30,7 @@ public class _500kg : ModProjectile
 
     public bool HitGround
     {
-        get => (int)Projectile.ai[0] == 1;
+        get => (int) Projectile.ai[0] == 1;
         set => Projectile.ai[0] = value.ToInt();
     }
 

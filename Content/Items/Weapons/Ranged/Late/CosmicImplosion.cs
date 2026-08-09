@@ -1,8 +1,4 @@
-﻿using CalamityMod.Items;
-using CalamityMod.Items.Materials;
-using CalamityMod.Items.Weapons.Ranged;
-using CalamityMod.Rarities;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
@@ -35,8 +31,8 @@ public class CosmicImplosion : ModItem
         Item.autoReuse = true;
         Item.shoot = ModContent.ProjectileType<CosmicImplosionHoldout>();
         Item.shootSpeed = 24f;
-        Item.rare = ModContent.RarityType<Turquoise>();
-        Item.value = CalamityGlobalItem.RarityTurquoiseBuyPrice;
+        //Item.rare = ModContent.RarityType<Turquoise>();
+        //Item.value = CalamityGlobalItem.RarityTurquoiseBuyPrice;
         Item.UseSound = SoundID.Item1;
     }
 
@@ -50,8 +46,7 @@ public class CosmicImplosion : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        recipe.AddIngredient(ModContent.ItemType<EternalBlizzard>(), 1);
-        recipe.AddIngredient(ModContent.ItemType<DarkPlasma>(), 8);
+        //TODO
         recipe.AddTile(TileID.VoidMonolith);
         recipe.Register();
     }

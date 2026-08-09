@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -10,6 +9,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 public class InsigniaBlaze : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 8;
@@ -25,6 +25,7 @@ public class InsigniaBlaze : ModProjectile
     }
 
     public Player Owner => Main.player[Projectile.owner];
+
     public override void AI()
     {
         Projectile.DamageType = Owner.GetBestClass();
@@ -32,7 +33,8 @@ public class InsigniaBlaze : ModProjectile
         Vector2 vel = -Vector2.UnitY.RotatedByRandom(.4f) * Main.rand.NextFloat(2f, 5f);
         ParticleRegistry.SpawnGlowParticle(pos, Vector2.Zero, 14, 50f, Color.OrangeRed);
         ParticleRegistry.SpawnGlowParticle(pos, Vector2.Zero, 10, 40f, Color.Orange, 1f);
-        ParticleRegistry.SpawnSparkParticle(pos, vel * 2, Main.rand.Next(12, 15), Main.rand.NextFloat(.7f, .9f), Color.Chocolate);
+        ParticleRegistry.SpawnSparkParticle(pos, vel * 2, Main.rand.Next(12, 15), Main.rand.NextFloat(.7f, .9f),
+            Color.Chocolate);
         ParticleRegistry.SpawnCloudParticle(pos, vel, Color.OrangeRed, Color.Gray, 50, 40f, .4f);
     }
 
@@ -40,6 +42,6 @@ public class InsigniaBlaze : ModProjectile
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        target.AddBuff(BuffID.OnFire3, CalUtils.SecondsToFrames(2));
+        target.AddBuff(BuffID.OnFire3, SecondsToFrames(2));
     }
 }

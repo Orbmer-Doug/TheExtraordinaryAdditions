@@ -10,11 +10,15 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 public class CursedEruption : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
-    public override void SetStaticDefaults() { }
+
+    public override void SetStaticDefaults()
+    {
+    }
+
     public override void SetDefaults()
     {
         Projectile.width =
-        Projectile.height = 10;
+            Projectile.height = 10;
         Projectile.friendly = true;
         Projectile.DamageType = DamageClass.Magic;
         Projectile.penetrate = 3;
@@ -27,6 +31,7 @@ public class CursedEruption : ModProjectile
     }
 
     public ref float Time => ref Projectile.ai[0];
+
     public override void AI()
     {
         Time++;
@@ -50,7 +55,7 @@ public class CursedEruption : ModProjectile
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return CalUtils.CircularHitboxCollision(Projectile.Center, Projectile.width * 3f * Projectile.scale, targetHitbox);
+        return CircularHitboxCollision(Projectile.Center, Projectile.width * 3f * Projectile.scale, targetHitbox);
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)

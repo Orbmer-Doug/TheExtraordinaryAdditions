@@ -8,6 +8,7 @@ public class RaritySparkle : Behavior<RarityParticleInfo>
 {
     public override string TexturePath => AssetRegistry.GetTexturePath(AdditionsTexture.CritSpark);
     public static readonly Texture2D Bloom = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
+
     public RaritySparkle(Vector2 pos, Vector2 vel, int life, float scale, Color col)
     {
         Info.Position = pos;
@@ -30,6 +31,7 @@ public class RaritySparkle : Behavior<RarityParticleInfo>
     {
         Vector2 bloomScale = Info.Texture.Size() / Bloom.Size() + new Vector2(.05f);
         sb.Draw(Bloom, position, null, Info.DrawColor * .12f * Info.Opacity, 0f, Bloom.Size() / 2, bloomScale, 0, 0f);
-        sb.Draw(Info.Texture, position, null, Info.DrawColor * Info.Opacity, Info.Rotation, Info.Texture.Size() / 2, Info.Scale, 0, 0f);
+        sb.Draw(Info.Texture, position, null, Info.DrawColor * Info.Opacity, Info.Rotation, Info.Texture.Size() / 2,
+            Info.Scale, 0, 0f);
     }
 }

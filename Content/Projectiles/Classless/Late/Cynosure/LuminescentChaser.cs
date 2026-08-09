@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Terraria;
+﻿using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
@@ -38,11 +37,14 @@ public class LuminescentChaser : ModProjectile
     {
         if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, null, 20);
-        points.Update(GetTransformedScreenCoords(Projectile.Center) + Main.screenPosition); ;
+        points.Update(GetTransformedScreenCoords(Projectile.Center) + Main.screenPosition);
+        ;
 
         if (HasHitTarget)
         {
-            Projectile.velocity = Projectile.velocity.RotatedBy((double)((Projectile.identity % 2f == 0f).ToDirectionInt() * 0.06f)) * 0.93f;
+            Projectile.velocity =
+                Projectile.velocity.RotatedBy((double) ((Projectile.identity % 2f == 0f).ToDirectionInt() * 0.06f)) *
+                0.93f;
             if (Projectile.timeLeft >= 30)
                 Projectile.timeLeft = 30;
         }
@@ -51,7 +53,8 @@ public class LuminescentChaser : ModProjectile
         {
             NPC target = NPCTargeting.GetClosestNPC(new(Projectile.Center, 4000));
             if (target.CanHomeInto())
-                Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(target.Center + target.velocity * 10f) * 24f, .2f);
+                Projectile.velocity = Vector2.Lerp(Projectile.velocity,
+                    Projectile.SafeDirectionTo(target.Center + target.velocity * 10f) * 24f, .2f);
             else
                 Projectile.velocity *= .98f;
         }
@@ -97,6 +100,7 @@ public class LuminescentChaser : ModProjectile
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints points = new(20);
+
     public void DrawToTarget()
     {
         if (trail == null || points == null)

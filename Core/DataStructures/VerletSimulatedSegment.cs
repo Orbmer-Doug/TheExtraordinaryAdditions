@@ -29,9 +29,9 @@ public class VerletSimulatedSegment(Vector2 position, bool locked = false, Vecto
         // Update each segment
         foreach (VerletSimulatedSegment segment in segments)
         {
-            if (segment.Locked) 
+            if (segment.Locked)
                 continue;
-            
+
             Vector2 positionBeforeUpdate = segment.Position;
             segment.Position += segment.Position - segment.OldPosition;
             segment.Position += Vector2.UnitY * weight;

@@ -8,7 +8,6 @@ using TheExtraordinaryAdditions.Content.Projectiles.Classless.Early;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
-using static CalamityMod.CalamityUtils;
 using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Early;
@@ -36,23 +35,32 @@ public class FulminicEye : ModItem
 
     public int frameCounter;
     public int frame;
-    public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
+
+    public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation,
+        ref float scale, int whoAmI)
     {
         Texture2D texture = Item.ThisItemTexture();
-        spriteBatch.Draw(texture, Item.position - Main.screenPosition, Item.GetCurrentFrame(ref frame, ref frameCounter, 9, 6), lightColor, 0f, Vector2.Zero, 1f, 0, 0f);
+        spriteBatch.Draw(texture, Item.position - Main.screenPosition,
+            Item.GetCurrentFrame(ref frame, ref frameCounter, 9, 6), lightColor, 0f, Vector2.Zero, 1f, 0, 0f);
 
         Texture2D texture2 = AssetRegistry.GetTexture(AdditionsTexture.FulminicEye_Glow);
-        spriteBatch.Draw(texture2, Item.position - Main.screenPosition, Item.GetCurrentFrame(ref frame, ref frameCounter, 9, 6), Color.White, 0f, Vector2.Zero, 1f, 0, 0f);
+        spriteBatch.Draw(texture2, Item.position - Main.screenPosition,
+            Item.GetCurrentFrame(ref frame, ref frameCounter, 9, 6), Color.White, 0f, Vector2.Zero, 1f, 0, 0f);
         return false;
     }
 
-    public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
+    public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation,
+        float scale, int whoAmI)
     {
         Texture2D texture = Item.ThisItemTexture();
-        spriteBatch.Draw(texture, Item.position - Main.screenPosition, Item.GetCurrentFrame(ref frame, ref frameCounter, 9, 6, frameCounterUp: false), lightColor, 0f, Vector2.Zero, 1f, 0, 0f);
+        spriteBatch.Draw(texture, Item.position - Main.screenPosition,
+            Item.GetCurrentFrame(ref frame, ref frameCounter, 9, 6, frameCounterUp: false), lightColor, 0f,
+            Vector2.Zero, 1f, 0, 0f);
 
         Texture2D texture2 = AssetRegistry.GetTexture(AdditionsTexture.FulminicEye_Glow);
-        spriteBatch.Draw(texture2, Item.position - Main.screenPosition, Item.GetCurrentFrame(ref frame, ref frameCounter, 9, 6, frameCounterUp: false), Color.White, 0f, Vector2.Zero, 1f, 0, 0f);
+        spriteBatch.Draw(texture2, Item.position - Main.screenPosition,
+            Item.GetCurrentFrame(ref frame, ref frameCounter, 9, 6, frameCounterUp: false), Color.White, 0f,
+            Vector2.Zero, 1f, 0, 0f);
     }
 
     public override void UpdateAccessory(Player player, bool hideVisual)
@@ -66,6 +74,7 @@ public sealed class FulminicEyePlayer : ModPlayer
 {
     public bool Equipped;
     public override void ResetEffects() => Equipped = false;
+
     public override void PostUpdateMiscEffects()
     {
         if (!Equipped)
@@ -77,10 +86,13 @@ public sealed class FulminicEyePlayer : ModPlayer
             SoundEngine.PlaySound(SoundID.DD2_LightningAuraZap, Player.Center);
             Vector2 vel = Player.SafeDirectionTo(n.Center) * 10f;
             if (Main.myPlayer == Player.whoAmI)
-                Player.NewPlayerProj(Player.Center, n.Center.ToRectangle(6, 6).RandomRectangle(), ModContent.ProjectileType<FulminicSpark>(), 30, 1f, Player.whoAmI);
+                Player.NewPlayerProj(Player.Center, n.Center.ToRectangle(6, 6).RandomRectangle(),
+                    ModContent.ProjectileType<FulminicSpark>(), 30, 1f, Player.whoAmI);
 
             for (int i = 0; i < 12; i++)
-                ParticleRegistry.SpawnSparkParticle(Player.Center, vel.RotatedByRandom(.22f) * Main.rand.NextFloat(.4f, .8f), 20, Main.rand.NextFloat(.3f, .5f), Color.Purple);
+                ParticleRegistry.SpawnSparkParticle(Player.Center,
+                    vel.RotatedByRandom(.22f) * Main.rand.NextFloat(.4f, .8f), 20, Main.rand.NextFloat(.3f, .5f),
+                    Color.Purple);
         }
     }
 }

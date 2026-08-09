@@ -25,11 +25,7 @@ public class EverbladedSwing : BaseSwordSwing
     public ref float ForwardAngle => ref ProjInfo.ExtraAI[8];
     public ref float DesiredForwardAngle => ref ProjInfo.ExtraAI[9];
 
-    public Quaternion Rotation
-    {
-        get;
-        set;
-    }
+    public Quaternion Rotation { get; set; }
 
     internal enum Phase
     {
@@ -39,8 +35,8 @@ public class EverbladedSwing : BaseSwordSwing
 
     internal Phase CurrentPhase
     {
-        get => (Phase)ProjInfo.ExtraAI[10];
-        set => ProjInfo.ExtraAI[10] = (int)value;
+        get => (Phase) ProjInfo.ExtraAI[10];
+        set => ProjInfo.ExtraAI[10] = (int) value;
     }
 
     public override void WriteExtraAI(BinaryWriter writer)
@@ -50,6 +46,7 @@ public class EverbladedSwing : BaseSwordSwing
         writer.Write(Rotation.Z);
         writer.Write(Rotation.W);
     }
+
     public override void GetExtraAI(BinaryReader reader)
     {
         float x = reader.ReadSingle();
@@ -80,6 +77,7 @@ public class EverbladedSwing : BaseSwordSwing
                 AdditionsSound.BraveAttackDash03.Play(Owner.Center, 2f);
             }
         }
+
         points.Clear();
     }
 
@@ -98,6 +96,7 @@ public class EverbladedSwing : BaseSwordSwing
                 DoSlice();
                 break;
         }
+
         Projectile.Center = Owner.GetFrontHandPositionImproved();
         Rotation = EulerAnglesConversion(1, Projectile.rotation, ForwardAngle);
 
@@ -105,7 +104,8 @@ public class EverbladedSwing : BaseSwordSwing
         Owner.heldProj = Projectile.whoAmI;
         Owner.SetDummyItemTime(2);
         Owner.ChangeDir(Direction);
-        float armRot = (Rect().Left.SafeDirectionTo(Rect().Top).ToRotation() - PiOver2) * Owner.gravDir + (Owner.gravDir == -1 ? Pi : 0f);
+        float armRot = (Rect().Left.SafeDirectionTo(Rect().Top).ToRotation() - PiOver2) * Owner.gravDir +
+                       (Owner.gravDir == -1 ? Pi : 0f);
         Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, armRot);
         Owner.itemRotation = WrapAngle(Projectile.rotation);
 
@@ -168,6 +168,7 @@ public class EverbladedSwing : BaseSwordSwing
 
     public const int SliceTime = 45;
     public const int SpinTime = 150;
+
     public void DoSlice()
     {
         if (Time < SliceTime)
@@ -178,10 +179,12 @@ public class EverbladedSwing : BaseSwordSwing
             float size = rand.NextFloat(.5f, .9f);
             ParticleRegistry.SpawnBloomLineParticle(pos, vel, life, size, Color.Crimson);
             ParticleRegistry.SpawnSparkleParticle(pos, vel, life, size * .7f, Color.DarkRed, Color.Crimson);
-            ParticleRegistry.SpawnBloomPixelParticle(pos, vel, life * 2, size, Color.DarkRed, Color.Crimson, null, 1.4f, 9);
+            ParticleRegistry.SpawnBloomPixelParticle(pos, vel, life * 2, size, Color.DarkRed, Color.Crimson, null, 1.4f,
+                9);
 
             Projectile.rotation = SwordRotation;
-            Owner.velocity = Projectile.velocity * 100f * MakePoly(3f).InOutFunction.Evaluate(1f, 0f, InverseLerp(0f, SliceTime, Time));
+            Owner.velocity = Projectile.velocity * 100f *
+                             MakePoly(3f).InOutFunction.Evaluate(1f, 0f, InverseLerp(0f, SliceTime, Time));
             Modded.LungingDown = true;
         }
         else
@@ -194,7 +197,8 @@ public class EverbladedSwing : BaseSwordSwing
 
             Projectile.localNPCHitCooldown = 7 * MaxUpdates;
             float completion = MathF.Round(InverseLerp(SliceTime, SliceTime + SpinTime, Time), 2);
-            Projectile.rotation = (Pi * MakePoly(3.5f).InOutFunction(1f - completion) * (-4f * Direction)) + SwordRotation;
+            Projectile.rotation =
+                (Pi * MakePoly(3.5f).InOutFunction(1f - completion) * (-4f * Direction)) + SwordRotation;
             ForwardAngle = MakePoly(2f).InOutFunction.Evaluate(0f, PiOver2, completion);
 
             if (completion == .35f || completion == .57f)
@@ -206,9 +210,11 @@ public class EverbladedSwing : BaseSwordSwing
                 VanishTime++;
         }
     }
+
     public override float SwingOffset()
     {
-        return SwordRotation + SwingAngle * Animation() * (SwingDir != SwingDirection.Up).ToDirectionInt() * Direction * Owner.gravDir;
+        return SwordRotation + SwingAngle * Animation() * (SwingDir != SwingDirection.Up).ToDirectionInt() * Direction *
+            Owner.gravDir;
     }
 
     public override RotatedRectangle Rect()
@@ -227,7 +233,9 @@ public class EverbladedSwing : BaseSwordSwing
         Quaternion angleFix = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, -ThreePIOver4);
         Quaternion final = Quaternion.Multiply(Rotation, angleFix);
 
-        tip = Vector3.Transform(size3D, Quaternion.CreateFromRotationMatrix(Matrix.CreateFromQuaternion(final) * Matrix.CreateRotationZ(InitialMouseAngle)));
+        tip = Vector3.Transform(size3D,
+            Quaternion.CreateFromRotationMatrix(Matrix.CreateFromQuaternion(final) *
+                                                Matrix.CreateRotationZ(InitialMouseAngle)));
         begin = Projectile.Center;
         end = begin + new Vector2(tip.X, tip.Y);
         GetPrincipalAxes(final, out float roll, out float _, out float _);
@@ -246,13 +254,18 @@ public class EverbladedSwing : BaseSwordSwing
 
                 for (int i = 0; i < 24; i++)
                 {
-                    Vector2 vel = (Rect().Top.SafeDirectionTo(Rect().Bottom) * (SwingDir != SwingDirection.Up).ToDirectionInt() * Direction).RotatedByRandom(.3f) * rand.NextFloat(7f, 15f);
+                    Vector2 vel =
+                        (Rect().Top.SafeDirectionTo(Rect().Bottom) * (SwingDir != SwingDirection.Up).ToDirectionInt() *
+                         Direction).RotatedByRandom(.3f) * rand.NextFloat(7f, 15f);
                     float scale = rand.NextFloat(1f, 1.6f);
 
-                    ParticleRegistry.SpawnMistParticle(start, vel, scale, Color.Crimson, Color.DarkRed, rand.NextFloat(90f, 190f), rand.NextFloat(-.05f, .05f));
-                    ParticleRegistry.SpawnCloudParticle(start, vel, Color.Crimson, Color.Black, rand.Next(30, 50), rand.NextFloat(.1f, .3f), rand.NextFloat(.5f, .7f));
+                    ParticleRegistry.SpawnMistParticle(start, vel, scale, Color.Crimson, Color.DarkRed,
+                        rand.NextFloat(90f, 190f), rand.NextFloat(-.05f, .05f));
+                    ParticleRegistry.SpawnCloudParticle(start, vel, Color.Crimson, Color.Black, rand.Next(30, 50),
+                        rand.NextFloat(.1f, .3f), rand.NextFloat(.5f, .7f));
                     ParticleRegistry.SpawnBloodStreakParticle(start, vel, 20, .4f, Color.DarkRed);
-                    ParticleRegistry.SpawnBloodParticle(start, vel, rand.Next(50, 70), rand.NextFloat(.3f, .8f), Color.Red);
+                    ParticleRegistry.SpawnBloodParticle(start, vel, rand.Next(50, 70), rand.NextFloat(.3f, .8f),
+                        Color.Red);
                 }
 
                 if (this.RunLocal())
@@ -260,7 +273,8 @@ public class EverbladedSwing : BaseSwordSwing
                     for (int i = 0; i < 2; i++)
                     {
                         Vector2 pos = npc.RandAreaInEntity();
-                        HyperSlash slash = projectile[Projectile.NewProj(pos, Vector2.Zero, ModContent.ProjectileType<HyperSlash>(),
+                        HyperSlash slash = projectile[Projectile.NewProj(pos, Vector2.Zero,
+                            ModContent.ProjectileType<HyperSlash>(),
                             Projectile.damage, Projectile.knockBack, Owner.whoAmI)].As<HyperSlash>();
 
                         float dist = rand.NextFloat(400f, 500f);
@@ -282,7 +296,9 @@ public class EverbladedSwing : BaseSwordSwing
                 if (Time < SliceTime)
                 {
                     for (int i = 0; i < 4; i++)
-                        ParticleRegistry.SpawnBloodStreakParticle(start, Projectile.velocity.RotatedByRandom(.9f).SafeNormalize(Vector2.Zero) * rand.NextFloat(2f, 4f), rand.Next(50, 70), rand.NextFloat(.6f, 1.1f), Color.DarkRed);
+                        ParticleRegistry.SpawnBloodStreakParticle(start,
+                            Projectile.velocity.RotatedByRandom(.9f).SafeNormalize(Vector2.Zero) *
+                            rand.NextFloat(2f, 4f), rand.Next(50, 70), rand.NextFloat(.6f, 1.1f), Color.DarkRed);
 
                     ScreenShakeSystem.New(new(.4f, .3f), start);
                     AdditionsSound.IkeStab.Play(start, 1.4f, -.1f);
@@ -291,13 +307,19 @@ public class EverbladedSwing : BaseSwordSwing
                 {
                     for (int i = 0; i < 24; i++)
                     {
-                        Vector2 vel = (Rect().Top.SafeDirectionTo(Rect().Bottom) * (SwingDir != SwingDirection.Up).ToDirectionInt() * Direction).RotatedByRandom(.3f) * rand.NextFloat(7f, 15f);
+                        Vector2 vel =
+                            (Rect().Top.SafeDirectionTo(Rect().Bottom) *
+                             (SwingDir != SwingDirection.Up).ToDirectionInt() * Direction).RotatedByRandom(.3f) *
+                            rand.NextFloat(7f, 15f);
                         float scale = rand.NextFloat(1f, 1.6f);
 
-                        ParticleRegistry.SpawnMistParticle(start, vel, scale, Color.Crimson, Color.DarkRed, rand.NextFloat(90f, 190f), rand.NextFloat(-.05f, .05f));
-                        ParticleRegistry.SpawnCloudParticle(start, vel, Color.Crimson, Color.Black, rand.Next(30, 50), rand.NextFloat(.1f, .3f), rand.NextFloat(.5f, .7f));
+                        ParticleRegistry.SpawnMistParticle(start, vel, scale, Color.Crimson, Color.DarkRed,
+                            rand.NextFloat(90f, 190f), rand.NextFloat(-.05f, .05f));
+                        ParticleRegistry.SpawnCloudParticle(start, vel, Color.Crimson, Color.Black, rand.Next(30, 50),
+                            rand.NextFloat(.1f, .3f), rand.NextFloat(.5f, .7f));
                         ParticleRegistry.SpawnBloodStreakParticle(start, vel, 20, .4f, Color.DarkRed);
-                        ParticleRegistry.SpawnBloodParticle(start, vel, rand.Next(50, 70), rand.NextFloat(.3f, .8f), Color.Red);
+                        ParticleRegistry.SpawnBloodParticle(start, vel, rand.Next(50, 70), rand.NextFloat(.3f, .8f),
+                            Color.Red);
                     }
 
                     ScreenShakeSystem.New(new(.3f, .2f), start);
@@ -312,11 +334,15 @@ public class EverbladedSwing : BaseSwordSwing
     {
         for (int i = 0; i < 24; i++)
         {
-            Vector2 vel = (Rect().Top.SafeDirectionTo(Rect().Bottom) * (SwingDir != SwingDirection.Up).ToDirectionInt() * Direction).RotatedByRandom(.3f) * rand.NextFloat(7f, 15f);
+            Vector2 vel =
+                (Rect().Top.SafeDirectionTo(Rect().Bottom) * (SwingDir != SwingDirection.Up).ToDirectionInt() *
+                 Direction).RotatedByRandom(.3f) * rand.NextFloat(7f, 15f);
             float scale = rand.NextFloat(1f, 1.6f);
 
-            ParticleRegistry.SpawnMistParticle(start, vel, scale, Color.Crimson, Color.DarkRed, rand.NextFloat(90f, 190f), rand.NextFloat(-.05f, .05f));
-            ParticleRegistry.SpawnCloudParticle(start, vel, Color.Crimson, Color.Black, rand.Next(30, 50), rand.NextFloat(.1f, .3f), rand.NextFloat(.5f, .7f));
+            ParticleRegistry.SpawnMistParticle(start, vel, scale, Color.Crimson, Color.DarkRed,
+                rand.NextFloat(90f, 190f), rand.NextFloat(-.05f, .05f));
+            ParticleRegistry.SpawnCloudParticle(start, vel, Color.Crimson, Color.Black, rand.Next(30, 50),
+                rand.NextFloat(.1f, .3f), rand.NextFloat(.5f, .7f));
             ParticleRegistry.SpawnBloodStreakParticle(start, vel, 20, .4f, Color.DarkRed);
             ParticleRegistry.SpawnBloodParticle(start, vel, rand.Next(50, 70), rand.NextFloat(.3f, .8f), Color.Red);
         }
@@ -349,7 +375,8 @@ public class EverbladedSwing : BaseSwordSwing
         float angularVelocity = MathF.Abs(angularOffset);
         float afterimageOpacity = InverseLerp(0.012f, 0.07f, angularVelocity);
 
-        return MulticolorLerp(c.X, Color.Crimson.Lerp(Color.White, .4f), Color.Crimson, Color.Red, Color.DarkRed, Color.Black) * afterimageOpacity;
+        return MulticolorLerp(c.X, Color.Crimson.Lerp(Color.White, .4f), Color.Crimson, Color.Red, Color.DarkRed,
+            Color.Black) * afterimageOpacity;
     }
 
     public SystemVector2 OffsetFunct(float c) => -Projectile.Center.ToNumerics();
@@ -381,17 +408,21 @@ public class EverbladedSwing : BaseSwordSwing
             trailShader.TrySetParameter("firstColor", new Color(152, 15, 16));
             trailShader.TrySetParameter("secondaryColor", new Color(168, 50, 50));
             trailShader.TrySetParameter("tertiaryColor", new Color(173, 26, 16));
-            trailShader.TrySetParameter("flip", CurrentPhase == Phase.VisceralSlice && Owner.gravDir == -1 ? Direction == 1 : flip);
+            trailShader.TrySetParameter("flip",
+                CurrentPhase == Phase.VisceralSlice && Owner.gravDir == -1 ? Direction == 1 : flip);
 
-            trailShader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.SuperWavyPerlin), 0, SamplerState.LinearWrap);
+            trailShader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.SuperWavyPerlin), 0,
+                SamplerState.LinearWrap);
             trail.DrawTrail(trailShader, points.Points, -1, false, true,
                 Get3DOrthoPrimitiveMatrix(Projectile.Center, Rotation, Projectile.scale, InitialMouseAngle));
         }
 
         // Draw the main sword
-        DrawTextureIn3D(Tex, Projectile.Center, Rotation, Projectile.scale, InitialMouseAngle, Color.White, false, (Direction < 0 ? -(int)SwingDir : (int)SwingDir) * (int)Owner.gravDir);
+        DrawTextureIn3D(Tex, Projectile.Center, Rotation, Projectile.scale, InitialMouseAngle, Color.White, false,
+            (Direction < 0 ? -(int) SwingDir : (int) SwingDir) * (int) Owner.gravDir);
 
-        if ((CurrentPhase == Phase.VisceralSlice && Time > SliceTime + 25) || (CurrentPhase == Phase.Swinging && Time > 5f))
+        if ((CurrentPhase == Phase.VisceralSlice && Time > SliceTime + 25) ||
+            (CurrentPhase == Phase.Swinging && Time > 5f))
         {
             // Prepare the list of smoothened positions.
             const int oldPositionCount = 20;
@@ -404,7 +435,7 @@ public class EverbladedSwing : BaseSwordSwing
                 float endingRotation = Projectile.oldRot[i + 1] - Projectile.rotation - SwordRotation;
                 for (int j = 0; j < subdivisions; j++)
                 {
-                    float rotation = startingRotation.AngleLerp(endingRotation, j / (float)subdivisions);
+                    float rotation = startingRotation.AngleLerp(endingRotation, j / (float) subdivisions);
                     Vector2 trailVector = rotation.ToRotationVector2() * afterimageOffset;
                     trailPositions.Add(Projectile.Center + trailVector);
                 }

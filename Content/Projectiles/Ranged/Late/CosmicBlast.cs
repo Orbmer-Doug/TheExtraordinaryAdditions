@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using CalamityMod;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -12,6 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 public class CosmicBlast : ModProjectile, IHasScreenShader
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.Size = new(10);
@@ -29,6 +29,7 @@ public class CosmicBlast : ModProjectile, IHasScreenShader
     public override bool ShouldUpdatePosition() => false;
     public ManagedScreenShader Shader { get; private set; }
     public bool HasShader { get; private set; } = false;
+
     public void InitializeShader()
     {
         Shader = ScreenShaderPool.GetShader("ImplosionBlast");
@@ -37,6 +38,7 @@ public class CosmicBlast : ModProjectile, IHasScreenShader
     }
 
     public const float Radius = 200f;
+
     public void UpdateShader()
     {
         float anim = new Animators.PiecewiseCurve()
@@ -68,17 +70,20 @@ public class CosmicBlast : ModProjectile, IHasScreenShader
 
     public NPC Target;
     public Vector2 Offset;
+
     public override void SendExtraAI(BinaryWriter writer)
     {
         writer.WriteVector2(Offset);
     }
+
     public override void ReceiveExtraAI(BinaryReader reader)
     {
         Offset = reader.ReadVector2();
     }
 
     public ref float Time => ref Projectile.ai[0];
-    public static readonly int Life = CalUtils.SecondsToFrames(.9f);
+    public static readonly int Life = SecondsToFrames(.9f);
+
     public override void AI()
     {
         if (!HasShader)
@@ -94,7 +99,9 @@ public class CosmicBlast : ModProjectile, IHasScreenShader
 
         foreach (NPC npc in Main.ActiveNPCs)
         {
-            if (npc.CanHomeInto() && !npc.boss && npc.IsAnEnemy() && npc.realLife <= 0 && npc.Center.WithinRange(Projectile.Center, Radius * .8f) && npc.velocity.Length() > 1f && npc.knockBackResist != 0f && !npc.dontTakeDamage)
+            if (npc.CanHomeInto() && !npc.boss && npc.IsAnEnemy() && npc.realLife <= 0 &&
+                npc.Center.WithinRange(Projectile.Center, Radius * .8f) && npc.velocity.Length() > 1f &&
+                npc.knockBackResist != 0f && !npc.dontTakeDamage)
             {
                 npc.velocity *= .4f;
             }
@@ -115,12 +122,17 @@ public class CosmicBlast : ModProjectile, IHasScreenShader
             ParticleRegistry.SpawnBloomPixelParticle(pos, vel * .5f, life / 3, scale, col, Color.Gray, null, 1.3f, 9);
             col = Main.rand.NextBool() ? Color.Fuchsia : Color.Cyan;
 
-            ParticleRegistry.SpawnMistParticle(pos, vel * .1f + Main.rand.NextVector2Circular(9f, 9f), scale, col, Color.DarkViolet, Main.rand.NextFloat(190f, 230f));
-            ParticleRegistry.SpawnSparkleParticle(pos, vel * .4f + Main.rand.NextVector2Circular(3f, 3f), life + 10, scale, col, col == Color.Fuchsia ? Color.Cyan : Color.Fuchsia, 1.4f);
+            ParticleRegistry.SpawnMistParticle(pos, vel * .1f + Main.rand.NextVector2Circular(9f, 9f), scale, col,
+                Color.DarkViolet, Main.rand.NextFloat(190f, 230f));
+            ParticleRegistry.SpawnSparkleParticle(pos, vel * .4f + Main.rand.NextVector2Circular(3f, 3f), life + 10,
+                scale, col, col == Color.Fuchsia ? Color.Cyan : Color.Fuchsia, 1.4f);
         }
+
         if (this.RunLocal())
-            Projectile.NewProj(Projectile.Center, Projectile.velocity, ModContent.ProjectileType<CosmicBlastHidden>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
-        ParticleRegistry.SpawnPulseRingParticle(pos, Vector2.Zero, 20, 0f, Vector2.One, 0f, 400f, Color.DarkViolet, true);
+            Projectile.NewProj(Projectile.Center, Projectile.velocity, ModContent.ProjectileType<CosmicBlastHidden>(),
+                Projectile.damage, Projectile.knockBack, Projectile.owner);
+        ParticleRegistry.SpawnPulseRingParticle(pos, Vector2.Zero, 20, 0f, Vector2.One, 0f, 400f, Color.DarkViolet,
+            true);
         AdditionsSound.CeaselessVoidDeath.Play(Projectile.Center, 1, .4f, 0f, 10, Name);
         ParticleRegistry.SpawnChromaticAberration(pos, 130, 1f, 500f);
         ReleaseShader();
@@ -130,6 +142,7 @@ public class CosmicBlast : ModProjectile, IHasScreenShader
 public class CosmicBlastHidden : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.Size = new(CosmicBlast.Radius);
@@ -139,6 +152,7 @@ public class CosmicBlastHidden : ModProjectile
         Projectile.timeLeft = 5;
         Projectile.penetrate = -1;
     }
+
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
     {
         modifiers.DefenseEffectiveness *= 0f;

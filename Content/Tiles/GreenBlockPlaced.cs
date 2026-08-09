@@ -7,6 +7,7 @@ namespace TheExtraordinaryAdditions.Content.Tiles;
 public class GreenBlockPlaced : ModTile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GreenBlockPlaced);
+
     public override void SetStaticDefaults()
     {
         Main.tileSolid[Type] = true;

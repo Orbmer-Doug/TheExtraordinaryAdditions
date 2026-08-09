@@ -29,26 +29,31 @@ public class ObsidianMaceProj : ModProjectile
     }
 
     public ref float Time => ref Projectile.ai[0];
+
     public MaceState State
     {
-        get => (MaceState)Projectile.ai[1];
-        set => Projectile.ai[1] = (int)value;
+        get => (MaceState) Projectile.ai[1];
+        set => Projectile.ai[1] = (int) value;
     }
+
     public float Speed => Owner.GetTotalAttackSpeed(DamageClass.Melee);
     public ref float Spin => ref Projectile.AdditionsInfo().ExtraAI[0];
+
     public int InitDir
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[1];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[1];
         set => Projectile.AdditionsInfo().ExtraAI[1] = value;
     }
+
     public bool Init
     {
         get => Projectile.AdditionsInfo().ExtraAI[2] == 1f;
         set => Projectile.AdditionsInfo().ExtraAI[2] = value.ToInt();
     }
+
     public int CollisionCounter
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[3];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[3];
         set => Projectile.AdditionsInfo().ExtraAI[3] = value;
     }
 
@@ -114,120 +119,129 @@ public class ObsidianMaceProj : ModProjectile
         switch (State)
         {
             case MaceState.Spinning:
+            {
+                shouldOwnerHitCheck = true;
+                if (this.RunLocal())
                 {
-                    shouldOwnerHitCheck = true;
-                    if (this.RunLocal())
+                    Vector2 unitVectorTowardsMouse = mountedCenter.DirectionTo(Modded.MouseWorld)
+                        .SafeNormalize(Vector2.UnitX * Owner.direction);
+                    Owner.ChangeDir(InitDir);
+
+                    if (!Owner.channel)
                     {
-                        Vector2 unitVectorTowardsMouse = mountedCenter.DirectionTo(Modded.MouseWorld).SafeNormalize(Vector2.UnitX * Owner.direction);
-                        Owner.ChangeDir(InitDir);
-
-                        if (!Owner.channel)
-                        {
-                            SoundID.Item1.Play(Projectile.Center, .9f, -.4f);
-                            State = MaceState.LaunchingForward;
-                            Time = 0f;
-                            Projectile.velocity = unitVectorTowardsMouse * LaunchSpeed + Owner.velocity;
-                            Projectile.Center = mountedCenter;
-                            this.Sync();
-                            Projectile.ResetLocalNPCHitImmunity();
-                            Projectile.localNPCHitCooldown = MovingHitCooldown;
-                            break;
-                        }
-                    }
-
-                    Spin = (Spin + (Terraria.Utils.Remap(Time, 0f, TotalSpeedUpTime / Speed, 1f, 4.8f * Speed))) % TotalSpeedUpTime;
-                    float theta = Terraria.Utils.Remap(Spin, InitDir < 0f ? TotalSpeedUpTime : 0f, InitDir < 0f ? 0f : TotalSpeedUpTime, 0f, MathHelper.TwoPi);
-                    Projectile.Center = Owner.GetFrontHandPositionImproved() + GetPointOnRotatedEllipse(150f, 80f, InitDir == -1 ? MathHelper.Pi : 0f, theta);
-
-                    if (Main.rand.NextBool())
-                        ParticleRegistry.SpawnGlowParticle(Projectile.Center, (Projectile.rotation + MathHelper.PiOver2).ToRotationVector2() * Main.rand.NextFloat(2f, 5f),
-                            Main.rand.Next(30, 50), Main.rand.NextFloat(20f, 40f), Color.DarkViolet, .6f);
-
-                    Projectile.localNPCHitCooldown = SpinHitCooldown; // set the hit speed to the spinning hit speed
-                    Time++;
-                    this.Sync();
-                    break;
-                }
-
-            case MaceState.LaunchingForward:
-                {
-                    bool shouldSwitchToRetracting = Time++ >= LaunchTimeLimit;
-                    shouldSwitchToRetracting |= Projectile.Distance(mountedCenter) >= MaxLaunchLength;
-                    if (Owner.controlUseItem)
-                    {
-                        State = MaceState.Dropping;
+                        SoundID.Item1.Play(Projectile.Center, .9f, -.4f);
+                        State = MaceState.LaunchingForward;
                         Time = 0f;
-                        Projectile.netUpdate = true;
-                        Projectile.velocity *= 0.2f;
+                        Projectile.velocity = unitVectorTowardsMouse * LaunchSpeed + Owner.velocity;
+                        Projectile.Center = mountedCenter;
+                        this.Sync();
+                        Projectile.ResetLocalNPCHitImmunity();
+                        Projectile.localNPCHitCooldown = MovingHitCooldown;
                         break;
                     }
+                }
 
-                    if (shouldSwitchToRetracting)
-                    {
-                        State = MaceState.Retracting;
-                        Time = 0f;
-                        Projectile.netUpdate = true;
-                        Projectile.velocity *= 0.3f;
-                    }
+                Spin = (Spin + (Terraria.Utils.Remap(Time, 0f, TotalSpeedUpTime / Speed, 1f, 4.8f * Speed))) %
+                       TotalSpeedUpTime;
+                float theta = Terraria.Utils.Remap(Spin, InitDir < 0f ? TotalSpeedUpTime : 0f,
+                    InitDir < 0f ? 0f : TotalSpeedUpTime, 0f, MathHelper.TwoPi);
+                Projectile.Center = Owner.GetFrontHandPositionImproved() +
+                                    GetPointOnRotatedEllipse(150f, 80f, InitDir == -1 ? MathHelper.Pi : 0f, theta);
 
-                    Owner.ChangeDir((Owner.Center.X < Projectile.Center.X).ToDirectionInt());
-                    Projectile.localNPCHitCooldown = MovingHitCooldown;
+                if (Main.rand.NextBool())
+                    ParticleRegistry.SpawnGlowParticle(Projectile.Center,
+                        (Projectile.rotation + MathHelper.PiOver2).ToRotationVector2() * Main.rand.NextFloat(2f, 5f),
+                        Main.rand.Next(30, 50), Main.rand.NextFloat(20f, 40f), Color.DarkViolet, .6f);
 
-                    Vector2 pos = Projectile.RandAreaInEntity();
-                    Vector2 vel = -Projectile.velocity * Main.rand.NextFloat(.1f, .4f);
-                    Color col = Color.Violet.Lerp(Color.DarkViolet, Main.rand.NextFloat());
-                    ParticleRegistry.SpawnBloomPixelParticle(pos, vel, Main.rand.Next(30, 50), Main.rand.NextFloat(.5f, 1.1f), col, Color.White.Lerp(Color.Purple, .4f), null, 1.4f, 3);
+                Projectile.localNPCHitCooldown = SpinHitCooldown; // set the hit speed to the spinning hit speed
+                Time++;
+                this.Sync();
+                break;
+            }
+
+            case MaceState.LaunchingForward:
+            {
+                bool shouldSwitchToRetracting = Time++ >= LaunchTimeLimit;
+                shouldSwitchToRetracting |= Projectile.Distance(mountedCenter) >= MaxLaunchLength;
+                if (Owner.controlUseItem)
+                {
+                    State = MaceState.Dropping;
+                    Time = 0f;
+                    Projectile.netUpdate = true;
+                    Projectile.velocity *= 0.2f;
                     break;
                 }
+
+                if (shouldSwitchToRetracting)
+                {
+                    State = MaceState.Retracting;
+                    Time = 0f;
+                    Projectile.netUpdate = true;
+                    Projectile.velocity *= 0.3f;
+                }
+
+                Owner.ChangeDir((Owner.Center.X < Projectile.Center.X).ToDirectionInt());
+                Projectile.localNPCHitCooldown = MovingHitCooldown;
+
+                Vector2 pos = Projectile.RandAreaInEntity();
+                Vector2 vel = -Projectile.velocity * Main.rand.NextFloat(.1f, .4f);
+                Color col = Color.Violet.Lerp(Color.DarkViolet, Main.rand.NextFloat());
+                ParticleRegistry.SpawnBloomPixelParticle(pos, vel, Main.rand.Next(30, 50),
+                    Main.rand.NextFloat(.5f, 1.1f), col, Color.White.Lerp(Color.Purple, .4f), null, 1.4f, 3);
+                break;
+            }
 
             case MaceState.Retracting:
+            {
+                Vector2 unitVectorTowardsOwner = Projectile.DirectionTo(mountedCenter).SafeNormalize(Vector2.Zero);
+                if (Projectile.Distance(mountedCenter) <= MaxRetractSpeed)
                 {
-                    Vector2 unitVectorTowardsOwner = Projectile.DirectionTo(mountedCenter).SafeNormalize(Vector2.Zero);
-                    if (Projectile.Distance(mountedCenter) <= MaxRetractSpeed)
-                    {
-                        Projectile.Kill();
-                        return;
-                    }
-
-                    if (Owner.controlUseItem)
-                    {
-                        State = MaceState.Dropping;
-                        Time = 0f;
-                        Projectile.netUpdate = true;
-                        Projectile.velocity *= 0.2f;
-                    }
-                    else
-                    {
-                        Projectile.velocity *= 0.98f;
-                        Projectile.velocity = Projectile.velocity.MoveTowards(unitVectorTowardsOwner * MaxRetractSpeed, RetractAcceleration);
-                        Owner.ChangeDir((Owner.Center.X < Projectile.Center.X).ToDirectionInt());
-                    }
-                    break;
+                    Projectile.Kill();
+                    return;
                 }
+
+                if (Owner.controlUseItem)
+                {
+                    State = MaceState.Dropping;
+                    Time = 0f;
+                    Projectile.netUpdate = true;
+                    Projectile.velocity *= 0.2f;
+                }
+                else
+                {
+                    Projectile.velocity *= 0.98f;
+                    Projectile.velocity = Projectile.velocity.MoveTowards(unitVectorTowardsOwner * MaxRetractSpeed,
+                        RetractAcceleration);
+                    Owner.ChangeDir((Owner.Center.X < Projectile.Center.X).ToDirectionInt());
+                }
+
+                break;
+            }
 
             case MaceState.ForcedRetracting:
+            {
+                Projectile.tileCollide = false;
+                Vector2 unitVectorTowardsOwner = Projectile.DirectionTo(mountedCenter).SafeNormalize(Vector2.Zero);
+                if (Projectile.Distance(mountedCenter) <= MaxForcedRetractSpeed)
                 {
-                    Projectile.tileCollide = false;
-                    Vector2 unitVectorTowardsOwner = Projectile.DirectionTo(mountedCenter).SafeNormalize(Vector2.Zero);
-                    if (Projectile.Distance(mountedCenter) <= MaxForcedRetractSpeed)
-                    {
-                        Projectile.Kill();
-                        return;
-                    }
-
-                    Projectile.velocity *= 0.98f;
-                    Projectile.velocity = Projectile.velocity.MoveTowards(unitVectorTowardsOwner * MaxForcedRetractSpeed, ForcedRetractAcceleration);
-                    Vector2 target = Projectile.Center + Projectile.velocity;
-                    Vector2 value = mountedCenter.DirectionFrom(target).SafeNormalize(Vector2.Zero);
-                    if (Vector2.Dot(unitVectorTowardsOwner, value) < 0f)
-                    {
-                        Projectile.Kill();
-                        return;
-                    }
-
-                    Owner.ChangeDir((Owner.Center.X < Projectile.Center.X).ToDirectionInt());
-                    break;
+                    Projectile.Kill();
+                    return;
                 }
+
+                Projectile.velocity *= 0.98f;
+                Projectile.velocity = Projectile.velocity.MoveTowards(unitVectorTowardsOwner * MaxForcedRetractSpeed,
+                    ForcedRetractAcceleration);
+                Vector2 target = Projectile.Center + Projectile.velocity;
+                Vector2 value = mountedCenter.DirectionFrom(target).SafeNormalize(Vector2.Zero);
+                if (Vector2.Dot(unitVectorTowardsOwner, value) < 0f)
+                {
+                    Projectile.Kill();
+                    return;
+                }
+
+                Owner.ChangeDir((Owner.Center.X < Projectile.Center.X).ToDirectionInt());
+                break;
+            }
 
             case MaceState.Ricochet:
                 if (Time++ >= RicochetTimeLimit)
@@ -243,6 +257,7 @@ public class ObsidianMaceProj : ModProjectile
                     Projectile.velocity.X *= 0.95f;
                     Owner.ChangeDir((Owner.Center.X < Projectile.Center.X).ToDirectionInt());
                 }
+
                 break;
 
             case MaceState.Dropping:
@@ -258,13 +273,15 @@ public class ObsidianMaceProj : ModProjectile
                     Projectile.velocity.X *= 0.95f;
                     Owner.ChangeDir((Owner.Center.X < Projectile.Center.X).ToDirectionInt());
                 }
+
                 break;
         }
 
         Projectile.direction = (Projectile.velocity.X > 0f).ToDirectionInt();
         Projectile.spriteDirection = Projectile.direction;
         Projectile.ownerHitCheck = shouldOwnerHitCheck;
-        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 0, 0, 0f, null, true, .3f));
+        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 0,
+            0, 0f, null, true, .3f));
 
         bool freeRotation = State == MaceState.Ricochet || State == MaceState.Dropping;
         if (freeRotation)
@@ -284,7 +301,8 @@ public class ObsidianMaceProj : ModProjectile
         Owner.heldProj = Projectile.whoAmI;
         Owner.SetDummyItemTime(2);
 
-        Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, freeRotation ? Center.AngleTo(Projectile.Center) : Projectile.rotation + MathHelper.PiOver2);
+        Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full,
+            freeRotation ? Center.AngleTo(Projectile.Center) : Projectile.rotation + MathHelper.PiOver2);
     }
 
     public override bool? CanDamage() => Projectile.Opacity >= 1f ? null : false;
@@ -299,7 +317,8 @@ public class ObsidianMaceProj : ModProjectile
             return;
 
         if (this.RunLocal())
-            Projectile.NewProj(Projectile.Center, Projectile.velocity, ModContent.ProjectileType<ObsidianPow>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
+            Projectile.NewProj(Projectile.Center, Projectile.velocity, ModContent.ProjectileType<ObsidianPow>(),
+                Projectile.damage, Projectile.knockBack, Projectile.owner);
         State = MaceState.Ricochet;
 
         // Has hit target and rebound off it
@@ -308,6 +327,7 @@ public class ObsidianMaceProj : ModProjectile
         {
             bounceFactor = 0.4f;
         }
+
         if (State == MaceState.LaunchingForward)
             Projectile.position -= velocity;
 
@@ -362,7 +382,8 @@ public class ObsidianMaceProj : ModProjectile
 
             for (int i = 0; i < 24; i++)
             {
-                ParticleRegistry.SpawnSparkParticle(Projectile.Center, Projectile.velocity.RotatedByRandom(.5f) * Main.rand.NextFloat(.5f, .9f),
+                ParticleRegistry.SpawnSparkParticle(Projectile.Center,
+                    Projectile.velocity.RotatedByRandom(.5f) * Main.rand.NextFloat(.5f, .9f),
                     Main.rand.Next(24, 34), Main.rand.NextFloat(.5f, .9f), new(25, 35, 58));
             }
 
@@ -382,7 +403,8 @@ public class ObsidianMaceProj : ModProjectile
         }
 
         // Force retraction if stuck on tiles while retracting
-        if (State != MaceState.Spinning && State != MaceState.Ricochet && State != MaceState.Dropping && CollisionCounter >= 10f)
+        if (State != MaceState.Spinning && State != MaceState.Ricochet && State != MaceState.Dropping &&
+            CollisionCounter >= 10f)
         {
             State = MaceState.ForcedRetracting;
             Projectile.netUpdate = true;
@@ -417,6 +439,7 @@ public class ObsidianMaceProj : ModProjectile
     }
 
     public FancyAfterimages after;
+
     public void DrawChain()
     {
         Vector2 hand = Owner.GetFrontHandPositionImproved();
@@ -436,7 +459,7 @@ public class ObsidianMaceProj : ModProjectile
 
         while (chainLengthRemainingToDraw > 0f)
         {
-            Color chainDrawColor = Lighting.GetColor((int)chainDrawPosition.X / 16, (int)(chainDrawPosition.Y / 16f));
+            Color chainDrawColor = Lighting.GetColor((int) chainDrawPosition.X / 16, (int) (chainDrawPosition.Y / 16f));
 
             Texture2D chainTextureToDraw = chain;
             if (chainCount >= 4)
@@ -449,7 +472,8 @@ public class ObsidianMaceProj : ModProjectile
                 chainDrawColor = Color.White;
             }
 
-            Main.spriteBatch.Draw(chainTextureToDraw, chainDrawPosition - Main.screenPosition, null, chainDrawColor, chainRotation, chainOrigin, 1f, SpriteEffects.None, 0f);
+            Main.spriteBatch.Draw(chainTextureToDraw, chainDrawPosition - Main.screenPosition, null, chainDrawColor,
+                chainRotation, chainOrigin, 1f, SpriteEffects.None, 0f);
 
             chainDrawPosition += normalized * chainSegmentLength;
             chainCount++;
@@ -469,6 +493,7 @@ public class ObsidianMaceProj : ModProjectile
 public class ObsidianPow : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.Size = new(90);
@@ -489,10 +514,13 @@ public class ObsidianPow : ModProjectile
             for (int i = 0; i < 30; i++)
             {
                 Vector2 vel = NextVector2Ellipse(90f * .3f, 90f, Projectile.velocity.ToRotation());
-                ParticleRegistry.SpawnSparkParticle(Projectile.Center, vel * .2f, Main.rand.Next(30, 40), Main.rand.NextFloat(.5f, 1f), Color.Violet);
+                ParticleRegistry.SpawnSparkParticle(Projectile.Center, vel * .2f, Main.rand.Next(30, 40),
+                    Main.rand.NextFloat(.5f, 1f), Color.Violet);
             }
+
             for (int i = 0; i < 3; i++)
-                ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 30, Projectile.velocity.ToRotation(), new(.3f, 1f), 0f, 90f, Color.DarkViolet);
+                ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 30,
+                    Projectile.velocity.ToRotation(), new(.3f, 1f), 0f, 90f, Color.DarkViolet);
 
             Projectile.ai[0] = 1f;
         }

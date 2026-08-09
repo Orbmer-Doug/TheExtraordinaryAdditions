@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CalamityMod;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -132,31 +131,31 @@ public class AuroraGuard : ModNPC, IBossDowned
     public static readonly int HeavyBlastDamage = DifficultyBasedValue(90, 120, 136, 152, 228, 250);
     public static readonly int SkewerDamage = DifficultyBasedValue(90, 138, 161, 184, 276, 300);
 
-    public static readonly int ShootTime = CalUtils.SecondsToFrames(5f);
+    public static readonly int ShootTime = SecondsToFrames(5f);
     public static readonly int ShootWait = DifficultyBasedValue(10, 9, 7, 6, 5, 4);
     public static readonly float ShootSpeed = DifficultyBasedValue(8f, 10f, 12f, 14f, 15f, 16f);
 
-    public static readonly int TimeForBigShot = DifficultyBasedValue(CalUtils.SecondsToFrames(3.1f),
-        CalUtils.SecondsToFrames(2.9f), CalUtils.SecondsToFrames(2.74f), CalUtils.SecondsToFrames(2.67f),
-        CalUtils.SecondsToFrames(2.6f), CalUtils.SecondsToFrames(2.4f));
+    public static readonly int TimeForBigShot = DifficultyBasedValue(SecondsToFrames(3.1f),
+        SecondsToFrames(2.9f), SecondsToFrames(2.74f), SecondsToFrames(2.67f),
+        SecondsToFrames(2.6f), SecondsToFrames(2.4f));
 
-    public static readonly int TimeToRise = DifficultyBasedValue(CalUtils.SecondsToFrames(2.1f),
-        CalUtils.SecondsToFrames(1.9f), CalUtils.SecondsToFrames(1.8f), CalUtils.SecondsToFrames(1.67f),
-        CalUtils.SecondsToFrames(1.5f), CalUtils.SecondsToFrames(1.4f));
+    public static readonly int TimeToRise = DifficultyBasedValue(SecondsToFrames(2.1f),
+        SecondsToFrames(1.9f), SecondsToFrames(1.8f), SecondsToFrames(1.67f),
+        SecondsToFrames(1.5f), SecondsToFrames(1.4f));
 
     public static readonly int SkewerWait = DifficultyBasedValue(70, 60, 50, 40, 30, 20);
 
     #endregion
 
-    public static readonly int FirstBreak = CalUtils.SecondsToFrames(0f);
-    public static readonly int SecondBreak = CalUtils.SecondsToFrames(.850f);
-    public static readonly int FinalBreak = CalUtils.SecondsToFrames(1.7f);
-    public static readonly int Scream = CalUtils.SecondsToFrames(3.2f);
-    public static readonly int AwakenTime = CalUtils.SecondsToFrames(5f);
+    public static readonly int FirstBreak = SecondsToFrames(0f);
+    public static readonly int SecondBreak = SecondsToFrames(.850f);
+    public static readonly int FinalBreak = SecondsToFrames(1.7f);
+    public static readonly int Scream = SecondsToFrames(3.2f);
+    public static readonly int AwakenTime = SecondsToFrames(5f);
 
-    public static readonly int KablooeyMarker = CalUtils.SecondsToFrames(7.462f);
+    public static readonly int KablooeyMarker = SecondsToFrames(7.462f);
 
-    public static readonly Color SlateBlue = new(112, 128, 144);
+    public static Color SlateBlue = new(112, 128, 144);
     public static readonly Color MauveBright = new(147, 143, 173);
     public static readonly Color Lavender = new(173, 151, 189);
     public static readonly Color PastelViolet = new(186, 135, 209);
@@ -169,19 +168,19 @@ public class AuroraGuard : ModNPC, IBossDowned
 
     public int AttackTimer
     {
-        get => (int)NPC.ai[0];
+        get => (int) NPC.ai[0];
         set => NPC.ai[0] = value;
     }
 
     public AttackState CurrentState
     {
-        get => (AttackState)NPC.ai[1];
-        set => NPC.ai[1] = (int)value;
+        get => (AttackState) NPC.ai[1];
+        set => NPC.ai[1] = (int) value;
     }
 
     public int GlacierIndex
     {
-        get => (int)NPC.ai[2];
+        get => (int) NPC.ai[2];
         set => NPC.ai[2] = value;
     }
 
@@ -193,14 +192,14 @@ public class AuroraGuard : ModNPC, IBossDowned
 
     public SpriteEffects HeadFlip
     {
-        get => (SpriteEffects)NPC.AdditionsInfo().ExtraAI[5];
-        set => NPC.AdditionsInfo().ExtraAI[5] = (int)value;
+        get => (SpriteEffects) NPC.AdditionsInfo().ExtraAI[5];
+        set => NPC.AdditionsInfo().ExtraAI[5] = (int) value;
     }
 
     public SpriteEffects BodyFlip
     {
-        get => (SpriteEffects)NPC.AdditionsInfo().ExtraAI[6];
-        set => NPC.AdditionsInfo().ExtraAI[6] = (int)value;
+        get => (SpriteEffects) NPC.AdditionsInfo().ExtraAI[6];
+        set => NPC.AdditionsInfo().ExtraAI[6] = (int) value;
     }
 
     public ref float VerticalVisualOffset => ref NPC.AdditionsInfo().ExtraAI[7];
@@ -239,7 +238,7 @@ public class AuroraGuard : ModNPC, IBossDowned
 
     public int StruggleSign
     {
-        get => (int)NPC.AdditionsInfo().ExtraAI[15];
+        get => (int) NPC.AdditionsInfo().ExtraAI[15];
         set => NPC.AdditionsInfo().ExtraAI[15] = value;
     }
 
@@ -248,8 +247,8 @@ public class AuroraGuard : ModNPC, IBossDowned
 
     public Movements Movement
     {
-        get => (Movements)NPC.AdditionsInfo().ExtraAI[18];
-        set => NPC.AdditionsInfo().ExtraAI[18] = (int)value;
+        get => (Movements) NPC.AdditionsInfo().ExtraAI[18];
+        set => NPC.AdditionsInfo().ExtraAI[18] = (int) value;
     }
 
     public Vector2 HeadCenter => VisualCenter + PolarVector(-28f, BodyRotation + PiOver2) +
@@ -298,7 +297,7 @@ public class AuroraGuard : ModNPC, IBossDowned
         orig(self);
         if (FindNPC(out NPC npc, ModContent.NPCType<AuroraGuard>()))
         {
-            if ((int)npc.ai[1] != (int)AttackState.Idle)
+            if ((int) npc.ai[1] != (int) AttackState.Idle)
                 Main.newMusic = MusicLoader.GetMusicSlot(AdditionsMain.Instance,
                     AssetRegistry.GetMusicPath(AdditionsSound.FrigidGale));
         }
@@ -410,7 +409,7 @@ public class AuroraGuard : ModNPC, IBossDowned
             }
         }
 
-        SelectNextAttack(GlacierIndex >= 0 && GlacierIndex < Main.maxNPCs && (int)Main.npc[GlacierIndex].ai[3] == 1,
+        SelectNextAttack(GlacierIndex >= 0 && GlacierIndex < Main.maxNPCs && (int) Main.npc[GlacierIndex].ai[3] == 1,
             AttackState.Awaken);
     }
 
@@ -604,7 +603,7 @@ public class AuroraGuard : ModNPC, IBossDowned
         float interpolant = InverseLerp(0f, TimeForBigShot - 50, AttackTimer);
 
         // Charge effects
-        int wait = (int)Lerp(7, 1, interpolant);
+        int wait = (int) Lerp(7, 1, interpolant);
         if (AttackTimer % wait == (wait - 1) && AttackTimer < TimeForBigShot)
         {
             Vector2 pos = GunPos + Main.rand.NextVector2CircularEdge(100f, 100f);
@@ -670,7 +669,7 @@ public class AuroraGuard : ModNPC, IBossDowned
             }
         }
 
-        SelectNextAttack(AttackTimer >= CalUtils.SecondsToFrames(8f), AttackState.Skittering);
+        SelectNextAttack(AttackTimer >= SecondsToFrames(8f), AttackState.Skittering);
     }
 
     public void DoBehavior_GoKablooey()
@@ -1052,7 +1051,8 @@ public class AuroraGuard : ModNPC, IBossDowned
     public int GravityState(out bool touchingFloor, out bool insideSolids, out bool acceptTopSurfaces)
     {
         Rectangle targetHitbox = NPC.targetRect;
-        acceptTopSurfaces = FloorHeight >= (float)targetHitbox.Bottom - 6; // Accept platforms if not above the players 
+        acceptTopSurfaces =
+            FloorHeight >= (float) targetHitbox.Bottom - 6; // Accept platforms if not above the players 
 
         insideSolids = SolidCollisionFix(CollisionBoxOrigin, CollisionBoxWidth, CollisionBoxHeight, acceptTopSurfaces);
         bool upperBodyInSolids = SolidCollisionFix(CollisionBoxOrigin, CollisionBoxWidth, CollisionBoxHeight - 4,
@@ -1276,12 +1276,12 @@ public class AuroraGuard : ModNPC, IBossDowned
         scope.TrySetParameter("bloomMaxOpacity", 0.4f);
         scope.TrySetParameter("bloomFadeStrength", 7f);
 
-        Main.spriteBatch.EnterShaderRegion(BlendState.Additive, scope.Effect);
+        Main.spriteBatch.EnterShaderRegion(scope.Effect, BlendState.Additive);
 
         Main.EntitySpriteDraw(texture, sightPos - Main.screenPosition, null, Color.White, 0f, texture.Size() * .5f,
             sightsSize, 0);
 
-        Main.spriteBatch.ExitShaderRegion();
+        Main.spriteBatch.ResetToDefault();
     }
 
     public void DrawBarrelHeat()
@@ -1314,10 +1314,10 @@ public class AuroraGuard : ModNPC, IBossDowned
         shine.TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly * 3.8f);
         shine.TrySetParameter("resolution", res / 2);
 
-        sb.EnterShaderRegionAlt();
+        sb.EnterShaderRegion();
         shine.Render("AutoloadPass", true, false);
         sb.Draw(tex, ToTarget(NPC.Center, res), null, Icey * 0.4f * fade, 0f, tex.Size() / 2, 0, 0f);
-        sb.ExitShaderRegion();
+        sb.ResetToDefault();
     }
 
     #endregion

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using CalamityMod;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -26,8 +25,8 @@ public class HemoglobbedCapsuleThrown : ModProjectile
 
     public BehaviorState CurrentState
     {
-        get => (BehaviorState)Projectile.ai[0];
-        set => Projectile.ai[0] = (int)value;
+        get => (BehaviorState) Projectile.ai[0];
+        set => Projectile.ai[0] = (int) value;
     }
 
     public Player Owner => Main.player[Projectile.owner];
@@ -73,8 +72,10 @@ public class HemoglobbedCapsuleThrown : ModProjectile
         }
 
         Projectile.SetAnimation(13, 6);
-        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 120, 4, 1f,
-            AssetRegistry.GetTexture(AdditionsTexture.HemoglobbedCapsule).Frame(1, Main.projFrames[Type], 0, Projectile.frame), false, .15f));
+        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0,
+            120, 4, 1f,
+            AssetRegistry.GetTexture(AdditionsTexture.HemoglobbedCapsule)
+                .Frame(1, Main.projFrames[Type], 0, Projectile.frame), false, .15f));
         Time++;
     }
 
@@ -93,14 +94,16 @@ public class HemoglobbedCapsuleThrown : ModProjectile
         if (this.RunLocal())
         {
             float aimInterpolant = Utils.GetLerpValue(5f, 25f, Owner.Distance(Modded.MouseWorld), true);
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Owner.SafeDirectionTo(Modded.MouseWorld), aimInterpolant);
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Owner.SafeDirectionTo(Modded.MouseWorld),
+                aimInterpolant);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
 
         Projectile.rotation = Projectile.velocity.ToRotation() - MathHelper.PiOver2;
         Owner.ChangeDir((Projectile.velocity.X > 0f).ToDirectionInt());
-        float frontArmRotation = Projectile.rotation + MathHelper.PiOver2 - animationCompletion * Owner.direction * 0.64f;
+        float frontArmRotation =
+            Projectile.rotation + MathHelper.PiOver2 - animationCompletion * Owner.direction * 0.64f;
         if (Owner.direction == 1)
             frontArmRotation += MathHelper.Pi;
 
@@ -118,7 +121,8 @@ public class HemoglobbedCapsuleThrown : ModProjectile
             {
                 Vector2 pos = Projectile.Center + Main.rand.NextVector2CircularEdge(40f, 40f);
                 Vector2 vel = pos.SafeDirectionTo(Projectile.Center);
-                Dust.NewDustPerfect(pos, DustID.CrimsonTorch, vel * Main.rand.NextFloat(5f, 7f), 0, default, Main.rand.NextFloat(2f, 3f)).noGravity = true;
+                Dust.NewDustPerfect(pos, DustID.CrimsonTorch, vel * Main.rand.NextFloat(5f, 7f), 0, default,
+                    Main.rand.NextFloat(2f, 3f)).noGravity = true;
             }
 
             SoundID.DD2_BetsyFireballShot.Play(Projectile.Center, .87f, -.38f);
@@ -153,6 +157,7 @@ public class HemoglobbedCapsuleThrown : ModProjectile
                     blood.velocity = angularOffset.ToRotationVector2() * 5.4f;
                     blood.scale = 1.6f;
                 }
+
                 angularOffset += MathHelper.TwoPi / dustCount;
                 blood.velocity += Projectile.velocity * Main.rand.NextFloat(0.5f);
             }
@@ -168,9 +173,12 @@ public class HemoglobbedCapsuleThrown : ModProjectile
                 {
                     Vector2 pos = Projectile.Center + Main.rand.NextVector2CircularEdge(40f, 40f);
                     Vector2 vel = Projectile.velocity * Main.rand.NextFloat(.1f, .5f);
-                    Dust.NewDustPerfect(pos, DustID.Blood, vel * Main.rand.NextFloat(1f, 1.2f), 0, default, Main.rand.NextFloat(2f, 3f)).noGravity = true;
+                    Dust.NewDustPerfect(pos, DustID.Blood, vel * Main.rand.NextFloat(1f, 1.2f), 0, default,
+                        Main.rand.NextFloat(2f, 3f)).noGravity = true;
                 }
-                SoundEngine.PlaySound(SoundID.DD2_BetsyFireballImpact with { Pitch = -.3f, Volume = 1.1f }, Projectile.Center);
+
+                SoundEngine.PlaySound(SoundID.DD2_BetsyFireballImpact with { Pitch = -.3f, Volume = 1.1f },
+                    Projectile.Center);
                 CurrentState = BehaviorState.Fire;
                 Time = 0f;
                 Projectile.netUpdate = true;
@@ -188,7 +196,8 @@ public class HemoglobbedCapsuleThrown : ModProjectile
             Projectile.timeLeft = 200;
 
         if (NPCTargeting.TryGetClosestNPC(new(Projectile.Center, 400, true, true), out NPC npc))
-            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.SafeDirectionTo(npc.Center) * 14f, .13f);
+            Projectile.velocity =
+                Vector2.SmoothStep(Projectile.velocity, Projectile.SafeDirectionTo(npc.Center) * 14f, .13f);
 
         Projectile.VelocityBasedRotation();
         Projectile.Opacity = InverseLerp(0f, 20f, Projectile.timeLeft);
@@ -198,20 +207,25 @@ public class HemoglobbedCapsuleThrown : ModProjectile
     {
         for (int i = 0; i < 50; i++)
         {
-            ParticleRegistry.SpawnDustParticle(Projectile.Center + Main.rand.NextVector2Circular(Projectile.width / 2, Projectile.width / 2),
-                Main.rand.NextVector2Circular(4f, 4f), Main.rand.Next(30, 40), Main.rand.NextFloat(.7f, 1.1f), Color.Crimson, Main.rand.NextFloat(-.1f, .1f), false, true, true);
-            ParticleRegistry.SpawnBloodParticle(Projectile.RandAreaInEntity(), Main.rand.NextVector2Circular(10f, 10f), Main.rand.Next(30, 50), Main.rand.NextFloat(.7f, 1.2f), Color.DarkRed);
+            ParticleRegistry.SpawnDustParticle(
+                Projectile.Center + Main.rand.NextVector2Circular(Projectile.width / 2, Projectile.width / 2),
+                Main.rand.NextVector2Circular(4f, 4f), Main.rand.Next(30, 40), Main.rand.NextFloat(.7f, 1.1f),
+                Color.Crimson, Main.rand.NextFloat(-.1f, .1f), false, true, true);
+            ParticleRegistry.SpawnBloodParticle(Projectile.RandAreaInEntity(), Main.rand.NextVector2Circular(10f, 10f),
+                Main.rand.Next(30, 50), Main.rand.NextFloat(.7f, 1.2f), Color.DarkRed);
         }
 
         AdditionsSound.Rapture.Play(Projectile.Center, 1.2f, -.1f);
         ScreenShakeSystem.New(new(.6f, .6f, 3000f), Projectile.Center);
         if (this.RunLocal())
-            Projectile.NewProj(Projectile.Center, Vector2.UnitY, ModContent.ProjectileType<LesserBloodBeacon>(), Projectile.damage / 2, 0f);
+            Projectile.NewProj(Projectile.Center, Vector2.UnitY, ModContent.ProjectileType<LesserBloodBeacon>(),
+                Projectile.damage / 2, 0f);
     }
 
     public override bool? CanDamage() => CurrentState == BehaviorState.Aim ? false : null;
-    
+
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         Color baseColor = Projectile.GetAlpha(lightColor);
@@ -222,23 +236,27 @@ public class HemoglobbedCapsuleThrown : ModProjectile
         Vector2 origin = frame.Size() * 0.5f;
         SpriteEffects direction = Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
 
-        after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [Color.Black, Color.DarkRed * 1.5f, Color.DarkRed], Projectile.Opacity);
+        after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(),
+            [Color.Black, Color.DarkRed * 1.5f, Color.DarkRed], Projectile.Opacity);
 
         float backglowWidth = CrimsonFormInterpolant * 7f;
         if (backglowWidth <= 0.5f)
             backglowWidth = 0f;
 
         Color backglowColor = Color.IndianRed;
-        backglowColor = Color.Lerp(backglowColor, Color.Red, Utils.GetLerpValue(0.7f, 1f, CrimsonFormInterpolant, true) * 0.56f) * 0.4f;
+        backglowColor = Color.Lerp(backglowColor, Color.Red,
+            Utils.GetLerpValue(0.7f, 1f, CrimsonFormInterpolant, true) * 0.56f) * 0.4f;
         backglowColor.A = 20;
 
         for (int i = 0; i < 10; i++)
         {
             Vector2 drawOffset = (MathHelper.TwoPi * i / 10f).ToRotationVector2() * backglowWidth;
-            Main.spriteBatch.Draw(orbTexture, drawPosition + drawOffset, frame, backglowColor, Projectile.rotation, origin, Projectile.scale, direction, 0f);
+            Main.spriteBatch.Draw(orbTexture, drawPosition + drawOffset, frame, backglowColor, Projectile.rotation,
+                origin, Projectile.scale, direction, 0f);
         }
 
-        Main.spriteBatch.Draw(orbTexture, drawPosition, frame, baseColor, Projectile.rotation, origin, Projectile.scale, direction, 0f);
+        Main.spriteBatch.Draw(orbTexture, drawPosition, frame, baseColor, Projectile.rotation, origin, Projectile.scale,
+            direction, 0f);
         return false;
     }
 }

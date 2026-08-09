@@ -40,7 +40,8 @@ public class NPCDrops : GlobalNPC
             case NPCID.Mothron:
                 npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<EclipsedDuo>(), 4));
                 break;
-            case NPCID.RustyArmoredBonesAxe | NPCID.RustyArmoredBonesFlail | NPCID.RustyArmoredBonesSword | NPCID.RustyArmoredBonesSwordNoArmor:
+            case NPCID.RustyArmoredBonesAxe | NPCID.RustyArmoredBonesFlail | NPCID.RustyArmoredBonesSword |
+                 NPCID.RustyArmoredBonesSwordNoArmor:
                 npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<Threadripper>(), 8));
                 npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<WitheredShredder>(), 8));
                 break;

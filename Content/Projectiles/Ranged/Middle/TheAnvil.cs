@@ -28,14 +28,15 @@ public class TheAnvil : ModProjectile
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        Projectile.damage = (int)(Projectile.damage * 0.7f);
+        Projectile.damage = (int) (Projectile.damage * 0.7f);
     }
 
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
+
     public bool Crashed
     {
         get => Projectile.ai[1] == 1f;
@@ -43,20 +44,25 @@ public class TheAnvil : ModProjectile
     }
 
     private const float CrashSpeed = 18f;
+
     public override bool OnTileCollide(Vector2 oldVelocity)
     {
         // Crash
         if (oldVelocity.Y >= CrashSpeed)
         {
             SoundID.DD2_OgreGroundPound.Play(Projectile.Center, Main.rand.NextFloat(1.2f, 1.6f), -.2f, .1f, null, 10);
-            Projectile.CreateFriendlyExplosion(Projectile.Center.Lerp(Projectile.Bottom, .25f), new(Projectile.width * 4, Projectile.height), Projectile.damage / 2, Projectile.knockBack, 7, 8);
+            Projectile.CreateFriendlyExplosion(Projectile.Center.Lerp(Projectile.Bottom, .25f),
+                new(Projectile.width * 4, Projectile.height), Projectile.damage / 2, Projectile.knockBack, 7, 8);
 
             for (int i = 0; i < 70; i++)
             {
                 Vector2 pos = Projectile.BottomLeft.Lerp(Projectile.BottomRight, Main.rand.NextFloat());
-                Vector2 vel = -Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.45f) * Main.rand.NextFloat(8.4f, 15.8f);
-                ParticleRegistry.SpawnSparkParticle(pos, vel, Main.rand.Next(30, 50), Main.rand.NextFloat(.6f, 1.7f), Color.Chocolate, true, true);
+                Vector2 vel = -Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.45f) *
+                              Main.rand.NextFloat(8.4f, 15.8f);
+                ParticleRegistry.SpawnSparkParticle(pos, vel, Main.rand.Next(30, 50), Main.rand.NextFloat(.6f, 1.7f),
+                    Color.Chocolate, true, true);
             }
+
             ScreenShakeSystem.New(new(.05f, .1f), Projectile.Center);
 
             Projectile.velocity = Vector2.Zero;
@@ -66,12 +72,15 @@ public class TheAnvil : ModProjectile
         }
 
         // Sliding sparks
-        else if ((oldVelocity.X.BetweenNum(-14, -1f, true) || oldVelocity.X.BetweenNum(1f, 14f, true)) && Time % 2f == 0f)
+        else if ((oldVelocity.X.BetweenNum(-14, -1f, true) || oldVelocity.X.BetweenNum(1f, 14f, true)) &&
+                 Time % 2f == 0f)
         {
             for (int i = 0; i < 10; i++)
             {
                 Vector2 pos = Projectile.BottomLeft.Lerp(Projectile.BottomRight, Main.rand.NextFloat());
-                ParticleRegistry.SpawnSparkParticle(pos, -Projectile.velocity.RotatedByRandom(.45f) * Main.rand.NextFloat(.1f, .5f), 40, Main.rand.NextFloat(.4f, 1f), Color.Chocolate);
+                ParticleRegistry.SpawnSparkParticle(pos,
+                    -Projectile.velocity.RotatedByRandom(.45f) * Main.rand.NextFloat(.1f, .5f), 40,
+                    Main.rand.NextFloat(.4f, 1f), Color.Chocolate);
             }
 
             Projectile.velocity *= .99f;
@@ -79,13 +88,18 @@ public class TheAnvil : ModProjectile
 
         else if (Projectile.velocity.Length() == 0f && !Crashed)
         {
-            ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 10, 0f, new(1f), 0f, 120f, Color.Gray);
-            SoundStyle impactSound = SoundID.DD2_ExplosiveTrapExplode with { Pitch = -.1f, Volume = 1.1f, MaxInstances = 50 };
+            ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 10, 0f, new(1f), 0f, 120f,
+                Color.Gray);
+            SoundStyle impactSound = SoundID.DD2_ExplosiveTrapExplode with
+            {
+                Pitch = -.1f, Volume = 1.1f, MaxInstances = 50
+            };
             SoundEngine.PlaySound(impactSound, Projectile.Center);
 
             Crashed = true;
             Projectile.netUpdate = true;
         }
+
         return false;
     }
 
@@ -102,12 +116,14 @@ public class TheAnvil : ModProjectile
     public override void AI()
     {
         after ??= new(10, () => Projectile.Center);
-        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 0, 0, 0f, null, false, .2f));
+        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 0,
+            0, 0f, null, false, .2f));
 
         if (Time == 20f)
         {
             for (int i = 0; i < 3; i++)
-                ParticleRegistry.SpawnMenacingParticle(Projectile.RandAreaInEntity(), Vector2.UnitY * -Main.rand.NextFloat(3f, 6f), 30, .5f, Color.Fuchsia);
+                ParticleRegistry.SpawnMenacingParticle(Projectile.RandAreaInEntity(),
+                    Vector2.UnitY * -Main.rand.NextFloat(3f, 6f), 30, .5f, Color.Fuchsia);
         }
 
         if (Time > 20f && !Crashed)
@@ -118,10 +134,12 @@ public class TheAnvil : ModProjectile
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         Point p = Projectile.Center.ToTileCoordinates();
-        after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [Color.Chocolate], Lighting.Brightness(p.X, p.Y));
+        after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [Color.Chocolate],
+            Lighting.Brightness(p.X, p.Y));
         Projectile.DrawBaseProjectile(lightColor);
         return false;
     }

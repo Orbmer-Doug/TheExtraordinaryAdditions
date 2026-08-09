@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Summon;
@@ -10,6 +9,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
 public class BatSummon : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BatSummon);
+
     public override void SetStaticDefaults()
     {
         Main.projFrames[Projectile.type] = 5;

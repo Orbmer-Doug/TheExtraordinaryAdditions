@@ -13,7 +13,9 @@ public class RarityHolosquare : Behavior<RarityParticleInfo>
     public Rectangle TechFrame;
     public float Strength;
     public override bool UseAdditive => true;
-    public RarityHolosquare(Vector2 pos, Vector2 vel, int life, float scale, Color color, float opacity = 1f, float strength = 1.5f)
+
+    public RarityHolosquare(Vector2 pos, Vector2 vel, int life, float scale, Color color, float opacity = 1f,
+        float strength = 1.5f)
     {
         Info.Position = pos;
         Info.Velocity = vel;
@@ -47,6 +49,7 @@ public class RarityHolosquare : Behavior<RarityParticleInfo>
                 break;
         }
     }
+
     public override void Update()
     {
         if (Info.Time < 3f)
@@ -60,12 +63,15 @@ public class RarityHolosquare : Behavior<RarityParticleInfo>
 
         Info.Rotation = Info.Velocity.ToRotation();
     }
+
     public override void Draw(SpriteBatch sb, Vector2 position, DrawableTooltipLine line = null)
     {
-        DrawChromaticAberration(Vector2.UnitX.RotatedBy(Info.Rotation, default), Strength, delegate (Vector2 offset, Color colorMod)
-        {
-            sb.Draw(Info.Texture, position + offset, (Rectangle?)TechFrame,
-                Info.DrawColor.MultiplyRGB(colorMod) * Info.Opacity, Info.Rotation, TechFrame.Size() / 2f, new Vector2(Info.Scale, 1f), 0, 0f);
-        });
+        DrawChromaticAberration(Vector2.UnitX.RotatedBy(Info.Rotation, default), Strength,
+            delegate(Vector2 offset, Color colorMod)
+            {
+                sb.Draw(Info.Texture, position + offset, (Rectangle?) TechFrame,
+                    Info.DrawColor.MultiplyRGB(colorMod) * Info.Opacity, Info.Rotation, TechFrame.Size() / 2f,
+                    new Vector2(Info.Scale, 1f), 0, 0f);
+            });
     }
 }

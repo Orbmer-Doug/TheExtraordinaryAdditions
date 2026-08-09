@@ -27,6 +27,7 @@ public class SnareHoldout : BaseHoldoutProjectile
 
     public const float MaxRadius = 220f;
     public const int SporeWait = 40;
+
     public override void SafeAI()
     {
         if (this.RunLocal())
@@ -52,19 +53,26 @@ public class SnareHoldout : BaseHoldoutProjectile
 
         Projectile.Opacity = InverseLerp(0f, 20f, Time);
 
-        if (Mouse.Distance(Projectile.Center) < MaxRadius && Time % SporeWait == SporeWait - 1f && Owner.HeldItem.CheckManaBetter(Owner, 3, true))
+        if (Mouse.Distance(Projectile.Center) < MaxRadius && Time % SporeWait == SporeWait - 1f &&
+            Owner.HeldItem.CheckManaBetter(Owner, 3, true))
         {
             for (int i = 0; i < 3; i++)
             {
-                Vector2 newVelocity = (Center.SafeDirectionTo(Mouse) * 12f).RotatedByRandom(.3f) * Main.rand.NextFloat(.1f, .7f);
+                Vector2 newVelocity = (Center.SafeDirectionTo(Mouse) * 12f).RotatedByRandom(.3f) *
+                                      Main.rand.NextFloat(.1f, .7f);
 
                 for (int j = 0; j < 14; j++)
                 {
-                    ParticleRegistry.SpawnDustParticle(Projectile.Center, Main.rand.NextVector2Circular(8f, 8f), Main.rand.Next(20, 30), Main.rand.NextFloat(.8f, 1.2f), Color.LawnGreen, .1f, false, true, true);
+                    ParticleRegistry.SpawnDustParticle(Projectile.Center, Main.rand.NextVector2Circular(8f, 8f),
+                        Main.rand.Next(20, 30), Main.rand.NextFloat(.8f, 1.2f), Color.LawnGreen, .1f, false, true,
+                        true);
 
-                    ParticleRegistry.SpawnMistParticle(Mouse, newVelocity * Main.rand.NextFloat(1.2f, 1.4f), Main.rand.NextFloat(.35f, .67f), Color.LawnGreen, Color.Olive, Main.rand.NextFloat(100f, 140f));
+                    ParticleRegistry.SpawnMistParticle(Mouse, newVelocity * Main.rand.NextFloat(1.2f, 1.4f),
+                        Main.rand.NextFloat(.35f, .67f), Color.LawnGreen, Color.Olive, Main.rand.NextFloat(100f, 140f));
                 }
-                ParticleRegistry.SpawnPulseRingParticle(Mouse, newVelocity.SafeNormalize(Vector2.Zero), 20, newVelocity.ToRotation(), new(.5f, 1f), 0f, 60f, Color.LawnGreen);
+
+                ParticleRegistry.SpawnPulseRingParticle(Mouse, newVelocity.SafeNormalize(Vector2.Zero), 20,
+                    newVelocity.ToRotation(), new(.5f, 1f), 0f, 60f, Color.LawnGreen);
 
                 int type = ModContent.ProjectileType<SnareGas>();
 
@@ -93,6 +101,7 @@ public class SnareHoldout : BaseHoldoutProjectile
             if (npc != null && npc.Distance(Projectile.Center) < Radius)
                 npc.AddBuff(BuffID.Poisoned, 60);
         }
+
         Time++;
     }
 
@@ -102,7 +111,8 @@ public class SnareHoldout : BaseHoldoutProjectile
         Rectangle frame = texture.Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame);
         SpriteEffects effects = FixedDirection();
         Vector2 origin = frame.Size() * 0.5f;
-        Main.spriteBatch.DrawBetter(texture, Projectile.Center, frame, Projectile.GetAlpha(lightColor), Projectile.rotation, origin, Projectile.scale, effects);
+        Main.spriteBatch.DrawBetter(texture, Projectile.Center, frame, Projectile.GetAlpha(lightColor),
+            Projectile.rotation, origin, Projectile.scale, effects);
         return false;
     }
 }

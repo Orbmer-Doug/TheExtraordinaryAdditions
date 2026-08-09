@@ -41,10 +41,10 @@ public class EclipseWhip : BaseWhip
         Purple,
     }
 
-    public static int Phase => (int)MathHelper.Clamp(Main.moonType, 0, 8);
+    public static int Phase => (int) MathHelper.Clamp(Main.moonType, 0, 8);
 
     public Color[] MoonColors =
-        [
+    [
         new Color(148, 143, 132),
         new Color(199, 159, 95),
         new Color(157, 197, 143),
@@ -54,7 +54,7 @@ public class EclipseWhip : BaseWhip
         new Color(255, 188, 228),
         new Color(231, 181, 40),
         new Color(140, 94, 167)
-        ];
+    ];
 
     public static readonly Color[] EclipsePalette =
     [
@@ -76,16 +76,20 @@ public class EclipseWhip : BaseWhip
     {
         if (Completion.BetweenNum(.2f, .8f))
         {
-            Vector2 vel = OutwardVel.RotatedBy(MathHelper.PiOver2 * Owner.direction * Owner.gravDir).RotatedByRandom(.2f) * Main.rand.NextFloat(2f, 7f);
+            Vector2 vel =
+                OutwardVel.RotatedBy(MathHelper.PiOver2 * Owner.direction * Owner.gravDir).RotatedByRandom(.2f) *
+                Main.rand.NextFloat(2f, 7f);
             if (!Moon)
             {
                 Color col = EclipsePalette[Main.rand.Next(EclipsePalette.Length)];
-                ParticleRegistry.SpawnDustParticle(Tip, vel, Main.rand.Next(30, 40), Main.rand.NextFloat(.4f, .7f), col, .1f, false, true, false, false);
+                ParticleRegistry.SpawnDustParticle(Tip, vel, Main.rand.Next(30, 40), Main.rand.NextFloat(.4f, .7f), col,
+                    .1f, false, true, false, false);
             }
             else
             {
                 Color col = MoonColors[Phase];
-                ParticleRegistry.SpawnBloomPixelParticle(Tip, vel * .9f, Main.rand.Next(30, 50), Main.rand.NextFloat(.5f, .8f), col, Color.White, null, 1.2f, 4);
+                ParticleRegistry.SpawnBloomPixelParticle(Tip, vel * .9f, Main.rand.Next(30, 50),
+                    Main.rand.NextFloat(.5f, .8f), col, Color.White, null, 1.2f, 4);
             }
         }
     }
@@ -97,9 +101,12 @@ public class EclipseWhip : BaseWhip
             for (int i = 0; i < 15; i++)
             {
                 Color col = EclipsePalette[i % EclipsePalette.Length];
-                ParticleRegistry.SpawnSquishyPixelParticle(Tip, Main.rand.NextVector2Circular(10f, 10f), Main.rand.Next(60, 90), Main.rand.NextFloat(1f, 1.6f), col, col * 1.8f, 5);
-                ParticleRegistry.SpawnHeavySmokeParticle(Tip, Main.rand.NextVector2Circular(5f, 5f), Main.rand.Next(40, 50), Main.rand.NextFloat(.5f, .7f), col, 1.4f);
+                ParticleRegistry.SpawnSquishyPixelParticle(Tip, Main.rand.NextVector2Circular(10f, 10f),
+                    Main.rand.Next(60, 90), Main.rand.NextFloat(1f, 1.6f), col, col * 1.8f, 5);
+                ParticleRegistry.SpawnHeavySmokeParticle(Tip, Main.rand.NextVector2Circular(5f, 5f),
+                    Main.rand.Next(40, 50), Main.rand.NextFloat(.5f, .7f), col, 1.4f);
             }
+
             if (this.RunLocal())
                 Projectile.CreateFriendlyExplosion(Tip, new(70), Projectile.damage / 2, Projectile.knockBack, 10, 20);
             SoundID.DD2_BetsyFireballImpact.Play(Tip, 1f, .1f);
@@ -109,8 +116,10 @@ public class EclipseWhip : BaseWhip
             for (int i = 0; i < 10; i++)
             {
                 Color col = StarPalette[i % StarPalette.Length];
-                ParticleRegistry.SpawnSparkleParticle(Tip, Main.rand.NextVector2Circular(7f, 7f), Main.rand.Next(50, 80), Main.rand.NextFloat(.5f, .9f), col, col * 1.8f, 1.4f);
+                ParticleRegistry.SpawnSparkleParticle(Tip, Main.rand.NextVector2Circular(7f, 7f),
+                    Main.rand.Next(50, 80), Main.rand.NextFloat(.5f, .9f), col, col * 1.8f, 1.4f);
             }
+
             SoundID.Item153.Play(Tip, 1f, .14f);
         }
     }
@@ -130,13 +139,15 @@ public class EclipseWhip : BaseWhip
         {
             for (int i = 0; i < 20; i++)
             {
-                ParticleRegistry.SpawnGlowParticle(pos + Main.rand.NextVector2Circular(8, 8), vel.RotatedByRandom(.6f) * Main.rand.NextFloat(2f, 6f),
-                    Main.rand.Next(40, 90), Main.rand.NextFloat(20f, 40f), MoonColors[Phase], Main.rand.NextFloat(.8f, 1.5f));
+                ParticleRegistry.SpawnGlowParticle(pos + Main.rand.NextVector2Circular(8, 8),
+                    vel.RotatedByRandom(.6f) * Main.rand.NextFloat(2f, 6f),
+                    Main.rand.Next(40, 90), Main.rand.NextFloat(20f, 40f), MoonColors[Phase],
+                    Main.rand.NextFloat(.8f, 1.5f));
             }
         }
 
         target.AddBuff(ModContent.BuffType<Eclipsed>(), 180);
-        Projectile.damage = (int)(Projectile.damage * .8f);
+        Projectile.damage = (int) (Projectile.damage * .8f);
     }
 
     public override void ModifyNPCEffects(NPC target, ref NPC.HitModifiers modifiers, in Vector2 pos, in int index)
@@ -179,7 +190,8 @@ public class EclipseWhip : BaseWhip
             if (Line != null && !Line.Disposed)
             {
                 ManagedShader shader = ShaderRegistry.CrunchyLaserShader;
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DarkTurbulentNoise), 1, SamplerState.LinearWrap);
+                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DarkTurbulentNoise), 1,
+                    SamplerState.LinearWrap);
                 Line.DrawTrail(shader, WhipPoints.Points);
             }
         }
@@ -204,6 +216,7 @@ public class EclipseWhip : BaseWhip
                     Main.spriteBatch.DrawBetterRect(tex, targ, null, EclipsePalette[i] * completion, 0f, orig);
                 }
             }
+
             PixelationSystem.QueueTextureRenderAction(glow, PixelationLayer.OverProjectiles, BlendState.Additive);
         }
         else
@@ -248,7 +261,8 @@ public class EclipseWhip : BaseWhip
                     Vector2 orig = frame.Size() / 2;
                     SpriteEffects flip = Owner.direction < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
 
-                    Main.spriteBatch.DrawBetter(tex, pos, frame, color, rotation, orig, tip ? Projectile.scale : 1f, flip);
+                    Main.spriteBatch.DrawBetter(tex, pos, frame, color, rotation, orig, tip ? Projectile.scale : 1f,
+                        flip);
                 }
             }
         }

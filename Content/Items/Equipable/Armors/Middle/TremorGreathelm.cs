@@ -2,7 +2,6 @@
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
@@ -43,17 +42,22 @@ public class TremorGreathelm : ModItem
         string hotkey = AdditionsKeybinds.SetBonusHotKey.TooltipHotkeyString();
         player.setBonus = this.GetLocalization("SetBonus").Format(hotkey);
 
-        if (AdditionsKeybinds.SetBonusHotKey.JustPressed && player.whoAmI == Main.myPlayer && !CalUtils.HasCooldown(player, TremorCooldown.ID))
+/*TODO
+        if (AdditionsKeybinds.SetBonusHotKey.JustPressed && player.whoAmI == Main.myPlayer && !.HasCooldown(player,
+            TremorCooldown.ID))
         {
             for (int i = 0; i < 3; i++)
             {
-                Vector2 vel = (MathHelper.TwoPi * i / Main.rand.Next(3, 5) + RandomRotation()).ToRotationVector2() * 16f;
-                int p = player.NewPlayerProj(player.Center, vel, ModContent.ProjectileType<TremorSpike>(), 120, 1f, player.whoAmI);
+                Vector2 vel = (MathHelper.TwoPi * i / Main.rand.Next(3, 5) + RandomRotation()).ToRotationVector2() *
+                              16f;
+                int p = player.NewPlayerProj(player.Center, vel, ModContent.ProjectileType<TremorSpike>(), 120, 1f,
+                    player.whoAmI);
 
                 SoundID.NPCHit42.Play(player.Center, 1f, 0f, .1f);
             }
-            CalUtils.AddCooldown(player, TremorCooldown.ID, CalUtils.SecondsToFrames(5));
+            .AddCooldown(player, TremorCooldown.ID, SecondsToFrames(5));
         }
+        */
 
         player.aggro += 400;
     }
@@ -64,6 +68,7 @@ public class TremorGreathelm : ModItem
         {
             return legs.type == ModContent.ItemType<TremorSheathe>();
         }
+
         return false;
     }
 

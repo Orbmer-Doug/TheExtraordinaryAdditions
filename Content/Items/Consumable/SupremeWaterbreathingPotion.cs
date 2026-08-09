@@ -10,12 +10,14 @@ namespace TheExtraordinaryAdditions.Content.Items.Consumable;
 public class SupremeWaterbreathingPotion : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SupremeWaterbreathingPotion);
+
     public override void SetStaticDefaults()
     {
         Item.ResearchUnlockCount = 20;
 
         // Dust that will appear in these colors when the item with ItemUseStyleID.DrinkLiquid is used
-        ItemID.Sets.DrinkParticleColors[Type] = [
+        ItemID.Sets.DrinkParticleColors[Type] =
+        [
             new Color(235, 141, 0),
             new Color(222, 146, 31),
             new Color(227, 173, 91)
@@ -36,8 +38,9 @@ public class SupremeWaterbreathingPotion : ModItem
         Item.rare = ItemRarityID.Orange;
         Item.value = AdditionsGlobalItem.RarityWhiteBuyPrice;
         Item.buffType = ModContent.BuffType<SupremeWaterbreathing>();
-        Item.buffTime = CalUtils.SecondsToFrames(260);
+        Item.buffTime = SecondsToFrames(260);
     }
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();

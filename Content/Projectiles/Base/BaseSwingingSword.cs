@@ -38,7 +38,7 @@ public abstract class BaseSwordSwing : ModProjectile
 
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
 
@@ -49,7 +49,7 @@ public abstract class BaseSwordSwing : ModProjectile
 
     public bool PlayedSound
     {
-        get => (int)Projectile.ai[2] == 1;
+        get => (int) Projectile.ai[2] == 1;
         set => Projectile.ai[2] = value.ToInt();
     }
 
@@ -59,7 +59,7 @@ public abstract class BaseSwordSwing : ModProjectile
 
     public bool Initialized
     {
-        get => (int)ProjInfo.ExtraAI[3] == 1;
+        get => (int) ProjInfo.ExtraAI[3] == 1;
         set => ProjInfo.ExtraAI[3] = value.ToInt();
     }
 
@@ -68,16 +68,16 @@ public abstract class BaseSwordSwing : ModProjectile
 
     public SwingDirection SwingDir
     {
-        get => (SwingDirection)ProjInfo.ExtraAI[6];
-        set => ProjInfo.ExtraAI[6] = (int)value;
+        get => (SwingDirection) ProjInfo.ExtraAI[6];
+        set => ProjInfo.ExtraAI[6] = (int) value;
     }
 
     public float[] OldRotations = new float[5];
 
     public SpriteEffects Effects
     {
-        get => (SpriteEffects)Projectile.spriteDirection;
-        set => Projectile.spriteDirection = (int)value;
+        get => (SpriteEffects) Projectile.spriteDirection;
+        set => Projectile.spriteDirection = (int) value;
     }
 
     public int Direction
@@ -114,9 +114,9 @@ public abstract class BaseSwordSwing : ModProjectile
     public virtual float SwordRotation => PiOver4;
     public virtual float SwingAngle => TwoPi / 3f;
     public virtual int SwingTime => 40;
-    public int MaxTime => (int)(SwingTime * MaxUpdates / MeleeSpeed);
+    public int MaxTime => (int) (SwingTime * MaxUpdates / MeleeSpeed);
     public virtual int StopTimeFrames => 4;
-    public virtual float StopTime => (StopTimeFrames - (int)((MeleeSpeed - 1) * 5f)) * MaxUpdates;
+    public virtual float StopTime => (StopTimeFrames - (int) ((MeleeSpeed - 1) * 5f)) * MaxUpdates;
 
     /// <summary>
     /// The difference in rotation based on the last frame.
@@ -159,9 +159,9 @@ public abstract class BaseSwordSwing : ModProjectile
 
     public sealed override void SendExtraAI(BinaryWriter writer)
     {
-        writer.Write((sbyte)Projectile.direction);
+        writer.Write((sbyte) Projectile.direction);
         writer.Write(Projectile.rotation);
-        writer.Write((sbyte)Projectile.spriteDirection);
+        writer.Write((sbyte) Projectile.spriteDirection);
         WriteExtraAI(writer);
     }
 
@@ -356,9 +356,9 @@ public abstract class BaseSwordSwing : ModProjectile
     /// </summary>
     public void ProduceWaterRipples()
     {
-        WaterShaderData water = (WaterShaderData)Filters.Scene["WaterDistortion"].GetShader();
+        WaterShaderData water = (WaterShaderData) Filters.Scene["WaterDistortion"].GetShader();
         const float power = 12f;
-        float waveSine = 1f * (float)Math.Sin(Main.GlobalTimeWrappedHourly * 20f);
+        float waveSine = 1f * (float) Math.Sin(Main.GlobalTimeWrappedHourly * 20f);
         Vector2 size = Projectile.Size / 2f;
         Vector2 ripplePos = Rect().Center;
         Color waveData = new Color(power, 0.1f * Math.Sign(waveSine) + 0.5f, 0f, 1f) * Math.Abs(waveSine);

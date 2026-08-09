@@ -58,10 +58,7 @@ public class DivineLightning : ModProjectile
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        float amt = .75f;
-        if (target.IsThanatos())
-            amt = .5f;
-        Projectile.damage = (int)(Projectile.damage * amt);
+        Projectile.damage = (int) (Projectile.damage * .75f);
     }
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
@@ -71,7 +68,7 @@ public class DivineLightning : ModProjectile
             foreach (Line line in list)
             {
                 const int width = 8;
-                if (new Rectangle((int)line.A.X - width / 2, (int)line.A.Y - width / 2, width, width).Intersects(
+                if (new Rectangle((int) line.A.X - width / 2, (int) line.A.Y - width / 2, width, width).Intersects(
                         targetHitbox))
                     return true;
             }

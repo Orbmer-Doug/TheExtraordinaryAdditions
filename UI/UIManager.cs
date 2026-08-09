@@ -12,6 +12,7 @@ public class UIManager : ModSystem
 {
     public List<UserInterface> UserInterfaces = [];
     public List<SmartUIState> UIStates = [];
+
     public override void Load()
     {
         if (Main.dedServ)
@@ -25,7 +26,7 @@ public class UIManager : ModSystem
             // Dont attempt to load abstact types
             if (!type.IsAbstract && type.IsSubclassOf(typeof(SmartUIState)))
             {
-                SmartUIState state = (SmartUIState)Activator.CreateInstance(type, null);
+                SmartUIState state = (SmartUIState) Activator.CreateInstance(type, null);
                 UserInterface userInterface = new();
                 userInterface.SetState(state);
                 state.UserInterface = userInterface;
@@ -43,15 +44,17 @@ public class UIManager : ModSystem
         UIStates = null;
     }
 
-    public static void AddLayer(List<GameInterfaceLayer> layers, UIState state, int index, bool visible, InterfaceScaleType scaleType)
+    public static void AddLayer(List<GameInterfaceLayer> layers, UIState state, int index, bool visible,
+        InterfaceScaleType scaleType)
     {
-        layers.Insert(index, new LegacyGameInterfaceLayer("The Extraordinary Additions" + state == null ? "Unknown" : state.ToString(), () =>
-        {
-            if (visible)
-                state.Draw(Main.spriteBatch);
+        layers.Insert(index, new LegacyGameInterfaceLayer(
+            "The Extraordinary Additions" + state == null ? "Unknown" : state.ToString(), () =>
+            {
+                if (visible)
+                    state.Draw(Main.spriteBatch);
 
-            return true;
-        }, scaleType));
+                return true;
+            }, scaleType));
     }
 
     public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
@@ -67,7 +70,7 @@ public class UIManager : ModSystem
     {
         foreach (UserInterface eachState in UserInterfaces)
         {
-            if (eachState?.CurrentState != null && ((SmartUIState)eachState.CurrentState).Visible)
+            if (eachState?.CurrentState != null && ((SmartUIState) eachState.CurrentState).Visible)
                 eachState.Update(gameTime);
         }
     }

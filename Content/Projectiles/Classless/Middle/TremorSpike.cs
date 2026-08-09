@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.IO;
-using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -16,6 +15,7 @@ public class TremorSpike : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
     private static readonly int Lifetime = 300;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 16;
@@ -41,12 +41,14 @@ public class TremorSpike : ModProjectile
         public float Rotation = rotation;
         public float Opacity = opacity;
     }
+
     public List<SegmentData> Segments = [];
 
     public ref float Timer => ref Projectile.ai[0];
     public ref float Wait => ref Projectile.ai[1];
 
     private Vector2 MousePos;
+
     public override void SendExtraAI(BinaryWriter writer) =>
         writer.WriteVector2(MousePos);
 
@@ -67,7 +69,8 @@ public class TremorSpike : ModProjectile
         {
             if (this.RunLocal())
             {
-                Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(MousePos) * 15f, .2f);
+                Projectile.velocity =
+                    Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(MousePos) * 15f, .2f);
                 if (Projectile.velocity != Projectile.oldVelocity)
                     this.Sync();
             }
@@ -76,13 +79,17 @@ public class TremorSpike : ModProjectile
         {
             if (Projectile.localAI[1] == 0f)
             {
-                ParticleRegistry.SpawnDetailedBlastParticle(Projectile.Center, Vector2.Zero, new Vector2(Main.rand.NextFloat(.67f, 1f), 1f) * 60f, Vector2.Zero, 20, Color.Gray);
-                Projectile.CreateFriendlyExplosion(Projectile.Center, Vector2.Zero, Projectile.damage, Projectile.knockBack, 10, 6, Vector2.One * 60f);
+                ParticleRegistry.SpawnDetailedBlastParticle(Projectile.Center, Vector2.Zero,
+                    new Vector2(Main.rand.NextFloat(.67f, 1f), 1f) * 60f, Vector2.Zero, 20, Color.Gray);
+                Projectile.CreateFriendlyExplosion(Projectile.Center, Vector2.Zero, Projectile.damage,
+                    Projectile.knockBack, 10, 6, Vector2.One * 60f);
                 for (int i = 0; i < 20; i++)
                 {
                     Vector2 vel = Main.rand.NextVector2CircularLimited(10f, 10f, .5f, 1f);
-                    Dust.NewDustPerfect(Projectile.Center + Main.rand.NextVector2Circular(6f, 6f), DustID.Stone, vel, 0, default, Main.rand.NextFloat(.4f, .6f));
-                    ParticleRegistry.SpawnSparkParticle(Projectile.Center, vel * Main.rand.NextFloat(.9f, 1.4f), Main.rand.Next(16, 30), Main.rand.NextFloat(.4f, .8f), Color.Gray);
+                    Dust.NewDustPerfect(Projectile.Center + Main.rand.NextVector2Circular(6f, 6f), DustID.Stone, vel, 0,
+                        default, Main.rand.NextFloat(.4f, .6f));
+                    ParticleRegistry.SpawnSparkParticle(Projectile.Center, vel * Main.rand.NextFloat(.9f, 1.4f),
+                        Main.rand.Next(16, 30), Main.rand.NextFloat(.4f, .8f), Color.Gray);
                 }
 
                 AdditionsSound.AsterlinHit.Play(Projectile.Center, Main.rand.NextFloat(.8f, 1.2f), 0f, .14f);
@@ -106,7 +113,8 @@ public class TremorSpike : ModProjectile
             float shake = Utils.GetLerpValue(Lifetime * .8f, Lifetime, Timer, true);
             data.Position += Main.rand.NextVector2CircularEdge(shake, shake);
 
-            Segments[i] = new SegmentData(data.Position, data.Rotation, GetLerpBump(0f, 9f, Lifetime, Lifetime - 9f, Timer));
+            Segments[i] = new SegmentData(data.Position, data.Rotation,
+                GetLerpBump(0f, 9f, Lifetime, Lifetime - 9f, Timer));
         }
     }
 
@@ -115,7 +123,8 @@ public class TremorSpike : ModProjectile
         for (int i = 0; i < 20; i++)
         {
             Vector2 vel = -Projectile.velocity.RotatedByRandom(.25f) * Main.rand.NextFloat(.5f, 1.1f);
-            Dust.NewDustPerfect(Projectile.Center + Main.rand.NextVector2Circular(16f, 16f), DustID.Stone, vel, 0, default, Main.rand.NextFloat(.4f, .6f));
+            Dust.NewDustPerfect(Projectile.Center + Main.rand.NextVector2Circular(16f, 16f), DustID.Stone, vel, 0,
+                default, Main.rand.NextFloat(.4f, .6f));
         }
     }
 
@@ -124,8 +133,10 @@ public class TremorSpike : ModProjectile
         foreach (SegmentData pos in Segments)
         {
             Vector2 position = pos.Position + Main.rand.NextVector2Circular(16f, 16f);
-            Dust.NewDustPerfect(position, DustID.Stone, Main.rand.NextVector2Circular(2f, 2f), Main.rand.Next(0, 100), default, Main.rand.NextFloat(.6f, 1f));
+            Dust.NewDustPerfect(position, DustID.Stone, Main.rand.NextVector2Circular(2f, 2f), Main.rand.Next(0, 100),
+                default, Main.rand.NextFloat(.6f, 1f));
         }
+
         Segments.Clear();
     }
 
@@ -133,9 +144,10 @@ public class TremorSpike : ModProjectile
     {
         foreach (SegmentData seg in Segments)
         {
-            if (new Rectangle((int)seg.Position.X, (int)seg.Position.Y, 16, 16).Intersects(targetHitbox))
+            if (new Rectangle((int) seg.Position.X, (int) seg.Position.Y, 16, 16).Intersects(targetHitbox))
                 return true;
         }
+
         return false;
     }
 

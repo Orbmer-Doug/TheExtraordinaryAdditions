@@ -13,6 +13,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Early;
 public class DarkArrow : ModProjectile
 {
     public override string Texture => ProjectileID.UnholyArrow.GetTerrariaProj();
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 10;
@@ -29,6 +30,7 @@ public class DarkArrow : ModProjectile
 
     public Player Owner => Main.player[Projectile.owner];
     public ref float Time => ref Projectile.AdditionsInfo().ExtraAI[0];
+
     public override void AI()
     {
         Projectile.FacingUp();
@@ -36,7 +38,8 @@ public class DarkArrow : ModProjectile
         Vector2 pos = Projectile.Center + Projectile.velocity + PolarVector(12f, Projectile.velocity.ToRotation());
         if (Main.rand.NextBool(5))
         {
-            Dust.NewDustPerfect(pos, DustID.Demonite, Main.rand.NextVector2Circular(2f, 2f), 150, default, Main.rand.NextFloat(.9f, 1.15f));
+            Dust.NewDustPerfect(pos, DustID.Demonite, Main.rand.NextVector2Circular(2f, 2f), 150, default,
+                Main.rand.NextFloat(.9f, 1.15f));
         }
 
         Projectile.alpha -= 25;
@@ -47,13 +50,18 @@ public class DarkArrow : ModProjectile
         {
             Vector2 orbVel = Main.rand.NextVector2Circular(2f, 2f);
             if (this.RunLocal())
-                Projectile.NewProj(pos, orbVel, ModContent.ProjectileType<CorruptOrb>(), (int)(Projectile.damage * .4f), Projectile.knockBack * .4f, Projectile.owner);
+                Projectile.NewProj(pos, orbVel, ModContent.ProjectileType<CorruptOrb>(),
+                    (int) (Projectile.damage * .4f), Projectile.knockBack * .4f, Projectile.owner);
             for (int i = 0; i < 12; i++)
-                ParticleRegistry.SpawnSquishyPixelParticle(pos, orbVel.RotatedByRandom(.3f) * Main.rand.NextFloat(.6f, .9f), Main.rand.Next(70, 120), Main.rand.NextFloat(.8f, 1.2f), Color.Violet, Color.DarkViolet, 5);
+                ParticleRegistry.SpawnSquishyPixelParticle(pos,
+                    orbVel.RotatedByRandom(.3f) * Main.rand.NextFloat(.6f, .9f), Main.rand.Next(70, 120),
+                    Main.rand.NextFloat(.8f, 1.2f), Color.Violet, Color.DarkViolet, 5);
         }
 
         if (trail == null || trail.Disposed)
-            trail = new(c => Projectile.width, (c, pos) => Color.Violet.Lerp(Color.DarkViolet, MathHelper.SmoothStep(1f, 0f, c.X)) * MathHelper.SmoothStep(1f, 0f, c.X), null, 5);
+            trail = new(c => Projectile.width,
+                (c, pos) => Color.Violet.Lerp(Color.DarkViolet, MathHelper.SmoothStep(1f, 0f, c.X)) *
+                            MathHelper.SmoothStep(1f, 0f, c.X), null, 5);
         points ??= new(5);
         points.Update(Projectile.Center + Projectile.velocity - PolarVector(12f, Projectile.velocity.ToRotation()));
 
@@ -75,6 +83,7 @@ public class DarkArrow : ModProjectile
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints points;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void prim()
@@ -82,6 +91,7 @@ public class DarkArrow : ModProjectile
             if (trail != null && !trail.Disposed)
                 trail.DrawTrail(ShaderRegistry.StandardPrimitiveShader, points.Points, 50, true);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(prim, PixelationLayer.UnderProjectiles);
 
         Projectile.DrawBaseProjectile(lightColor);

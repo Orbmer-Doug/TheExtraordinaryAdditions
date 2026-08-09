@@ -1,7 +1,4 @@
-﻿using CalamityMod.Items.Materials;
-using CalamityMod.Items.Placeables;
-using System.Collections.Generic;
-using CalamityMod.Items.Placeables.FurnitureVoid;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -17,6 +14,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
 public class NitrogenCoolingPack : ModItem, ILocalizedModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.NitrogenCoolingPack);
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(new Color(138, 204, 255));
@@ -39,7 +37,9 @@ public class NitrogenCoolingPack : ModItem, ILocalizedModType
         LaserResource modPlayer = player.GetModPlayer<LaserResource>();
 
         player.GetModPlayer<NitrogenCoolingPackPlayer>().Equipped = true;
-        player.buffImmune[BuffID.OnFire & BuffID.OnFire3 & BuffID.Burning & BuffID.Frostburn & BuffID.Frostburn2 & BuffID.Frozen & BuffID.Slow & BuffID.Chilled] = true;
+        player.buffImmune[
+            BuffID.OnFire & BuffID.OnFire3 & BuffID.Burning & BuffID.Frostburn & BuffID.Frostburn2 & BuffID.Frozen &
+            BuffID.Slow & BuffID.Chilled] = true;
         player.resistCold = true;
         modPlayer.HeatRegenRate *= 2f;
         player.GetArmorPenetration(DamageClass.Generic) += 10;
@@ -47,10 +47,8 @@ public class NitrogenCoolingPack : ModItem, ILocalizedModType
 
     public override void AddRecipes()
     {
+        // TODO
         Recipe recipe = CreateRecipe();
-        recipe.AddIngredient(ModContent.ItemType<SmoothVoidstone>(), 75);
-        recipe.AddIngredient(ModContent.ItemType<CryonicBar>(), 10);
-        recipe.AddIngredient(ModContent.ItemType<EssenceofEleum>(), 8);
         recipe.AddTile(TileID.MythrilAnvil);
         recipe.Register();
     }
@@ -76,11 +74,13 @@ public sealed class NitrogenCoolingPackPlayer : ModPlayer
         if (Counter >= 20)
         {
             Vector2 pos = Player.RotatedRelativePoint(Player.MountedCenter)
-                + PolarVector(10f * Player.direction, Player.fullRotation + MathHelper.Pi)
-                + PolarVector(4f * Player.direction * Player.gravDir, Player.fullRotation + MathHelper.PiOver2);
+                          + PolarVector(10f * Player.direction, Player.fullRotation + MathHelper.Pi)
+                          + PolarVector(4f * Player.direction * Player.gravDir,
+                              Player.fullRotation + MathHelper.PiOver2);
             Vector2 vel = Main.rand.NextVector2CircularEdge(5f, 5f);
             if (Main.myPlayer == Player.whoAmI)
-                Player.NewPlayerProj(pos, vel, ModContent.ProjectileType<IcyShards>(), DamageSoftCap(item.damage, 150), 1f, Main.myPlayer);
+                Player.NewPlayerProj(pos, vel, ModContent.ProjectileType<IcyShards>(), DamageSoftCap(item.damage, 150),
+                    1f, Main.myPlayer);
             Counter = 0;
         }
     }

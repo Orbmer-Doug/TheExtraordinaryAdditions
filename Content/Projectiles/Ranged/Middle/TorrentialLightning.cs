@@ -13,6 +13,7 @@ public class TorrentialLightning : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
     public const int Life = 60;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 16;
@@ -37,8 +38,11 @@ public class TorrentialLightning : ModProjectile
     {
         if (Time == 0f)
         {
-            Vector2 end = LaserCollision(Projectile.Center, Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero) * MathHelper.Max(700f, 1500f * Power), CollisionTarget.Tiles);
-            Branches = CreateLightningBranch(Projectile.Center, end, (int)Utils.MultiLerp(Power, 0, 1, 2, 3, 4, 5), MathHelper.Max(.5f, Power * 2f));
+            Vector2 end = LaserCollision(Projectile.Center,
+                Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero) *
+                MathHelper.Max(700f, 1500f * Power), CollisionTarget.Tiles);
+            Branches = CreateLightningBranch(Projectile.Center, end, (int) Utils.MultiLerp(Power, 0, 1, 2, 3, 4, 5),
+                MathHelper.Max(.5f, Power * 2f));
         }
 
         Projectile.Opacity = 1f - Completion;
@@ -55,7 +59,8 @@ public class TorrentialLightning : ModProjectile
             foreach (Line line in list)
             {
                 int width = 8;
-                if (new Rectangle((int)line.A.X - width / 2, (int)line.A.Y - width / 2, width, width).Intersects(targetHitbox))
+                if (new Rectangle((int) line.A.X - width / 2, (int) line.A.Y - width / 2, width, width).Intersects(
+                        targetHitbox))
                     return true;
             }
         }
@@ -72,8 +77,9 @@ public class TorrentialLightning : ModProjectile
         {
             foreach (Line line in list)
             {
-                PixelationSystem.QueueTextureRenderAction(() => line.Draw(MulticolorLerp(Completion, Color.White, Color.LightCyan, Color.Cyan, Color.DarkCyan)
-                    * Projectile.Opacity), PixelationLayer.OverNPCs, BlendState.Additive);
+                PixelationSystem.QueueTextureRenderAction(() =>
+                    line.Draw(MulticolorLerp(Completion, Color.White, Color.LightCyan, Color.Cyan, Color.DarkCyan)
+                              * Projectile.Opacity), PixelationLayer.OverNPCs, BlendState.Additive);
             }
         }
 

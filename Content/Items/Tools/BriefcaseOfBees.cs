@@ -12,10 +12,12 @@ namespace TheExtraordinaryAdditions.Content.Items.Tools;
 public class BriefcaseOfBees : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BriefcaseOfBees);
+
     public override void SetStaticDefaults()
     {
         CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1;
     }
+
     public override void SetDefaults()
     {
         Item.damage = 0;
@@ -39,16 +41,20 @@ public class BriefcaseOfBees : ModItem
     {
         for (int i = 0; i < 50; i++)
         {
-            int THEBEESHAVEMANIFESTED = NPC.NewNPC(Item.GetSource_FromAI(), (int)player.Center.X, (int)player.Center.Y, NPCID.Bee);
-            Main.npc[THEBEESHAVEMANIFESTED].velocity = Main.rand.NextVector2CircularEdge(18f, 18f) * Main.rand.NextFloat(0f, 1f);
+            int THEBEESHAVEMANIFESTED = NPC.NewNPC(Item.GetSource_FromAI(), (int) player.Center.X,
+                (int) player.Center.Y, NPCID.Bee);
+            Main.npc[THEBEESHAVEMANIFESTED].velocity =
+                Main.rand.NextVector2CircularEdge(18f, 18f) * Main.rand.NextFloat(0f, 1f);
             Main.npc[THEBEESHAVEMANIFESTED].npcSlots = .1f;
             if (Main.netMode == NetmodeID.MultiplayerClient)
                 NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, THEBEESHAVEMANIFESTED);
         }
+
         return true;
     }
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback) => false;
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback) => false;
 
     public override void AddRecipes()
     {

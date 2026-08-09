@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Core.DataStructures;
@@ -20,13 +19,13 @@ public class ExsanguinationLance : ProjOwnedByNPC<StygainHeart>
 
     public bool Free
     {
-        get => (int)Projectile.ai[1] == 1;
+        get => (int) Projectile.ai[1] == 1;
         set => Projectile.ai[1] = value.ToInt();
     }
 
     public bool Released
     {
-        get => (int)Projectile.ai[2] == 1;
+        get => (int) Projectile.ai[2] == 1;
         set => Projectile.ai[2] = value.ToInt();
     }
 

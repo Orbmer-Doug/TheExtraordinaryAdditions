@@ -18,8 +18,10 @@ public class SpecteriteMask : ModItem
     public override void SetStaticDefaults()
     {
         ArmorIDs.Head.Sets.DrawHead[Item.headSlot] = false; // Don't draw the head at all. Used by Space Creature Mask
-        ArmorIDs.Head.Sets.DrawHatHair[Item.headSlot] = false; // Draw hair as if a hat was covering the top. Used by Wizards Hat
-        ArmorIDs.Head.Sets.DrawFullHair[Item.headSlot] = false; // Draw all hair as normal. Used by Mime Mask, Sunglasses
+        ArmorIDs.Head.Sets.DrawHatHair[Item.headSlot] =
+            false; // Draw hair as if a hat was covering the top. Used by Wizards Hat
+        ArmorIDs.Head.Sets.DrawFullHair[Item.headSlot] =
+            false; // Draw all hair as normal. Used by Mime Mask, Sunglasses
         ArmorIDs.Head.Sets.DrawsBackHairWithoutHeadgear[Item.headSlot] = false;
     }
 
@@ -43,7 +45,8 @@ public class SpecteriteMask : ModItem
         player.setBonus = this.GetLocalization("SetBonus").Format(hotkey);
 
         int type = ModContent.ProjectileType<ShroomiteDash>();
-        if (AdditionsKeybinds.SetBonusHotKey.Current && player.CountOwnerProjectiles(type) <= 0 && player.whoAmI == Main.myPlayer)
+        if (AdditionsKeybinds.SetBonusHotKey.Current && player.CountOwnerProjectiles(type) <= 0 &&
+            player.whoAmI == Main.myPlayer)
             player.NewPlayerProj(player.Center, Vector2.Zero, type, 500, 10f, player.whoAmI);
 
         player.GetModPlayer<SpecteritePlayer>().Equipped = true;
@@ -55,6 +58,7 @@ public class SpecteriteMask : ModItem
         {
             return legs.type == ModContent.ItemType<SpecteriteGreaves>();
         }
+
         return false;
     }
 
@@ -106,9 +110,13 @@ public sealed class SpecteritePlayer : ModPlayer
         bool active = Player.active && !Player.DeadOrGhost;
         if (active && Player.velocity.Length() != 0 && !Player.mount.Active)
         {
-            Vector2 randPos = Player.RotatedRelativePoint(Player.MountedCenter) + PolarVector(Player.height / 2 * Player.gravDir, Player.fullRotation + MathHelper.PiOver2) + PolarVector(Main.rand.NextFloat(-Player.width / 2, Player.width / 2), Player.fullRotation);
+            Vector2 randPos = Player.RotatedRelativePoint(Player.MountedCenter) +
+                              PolarVector(Player.height / 2 * Player.gravDir,
+                                  Player.fullRotation + MathHelper.PiOver2) + PolarVector(
+                                  Main.rand.NextFloat(-Player.width / 2, Player.width / 2), Player.fullRotation);
             Vector2 vel = -Player.velocity.RotatedByRandom(.18f) * Main.rand.NextFloat(.3f, .5f);
-            ParticleRegistry.SpawnMistParticle(randPos, vel, Main.rand.NextFloat(.5f, .8f), new(85, 89, 225), new(8, 35, 97), Main.rand.NextByte(98, 182), .05f);
+            ParticleRegistry.SpawnMistParticle(randPos, vel, Main.rand.NextFloat(.5f, .8f), new(85, 89, 225),
+                new(8, 35, 97), Main.rand.NextByte(98, 182), .05f);
         }
     }
 }

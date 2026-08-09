@@ -8,6 +8,7 @@ using TheExtraordinaryAdditions.Content.Items.Tools;
 using TheExtraordinaryAdditions.Content.NPCs.Misc;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.UI.GodDummyUI;
+
 //using static Terraria.ModLoader.BackupIO;
 
 namespace TheExtraordinaryAdditions.Core.Netcode;
@@ -31,7 +32,7 @@ public class AdditionsNetcode
     {
         try
         {
-            AdditionsModMessageType msgType = (AdditionsModMessageType)reader.ReadByte();
+            AdditionsModMessageType msgType = (AdditionsModMessageType) reader.ReadByte();
             switch (msgType)
             {
                 case AdditionsModMessageType.SyncSuperBloodMoon:
@@ -62,6 +63,7 @@ public class AdditionsNetcode
                         int spawnedNPC = NPC.NewNPC(new EntitySource_WorldEvent(), x, y, npcType, Target: player);
                         NetMessage.SendData(MessageID.SyncNPC, -1, player, null, spawnedNPC);
                     }
+
                     break;
 
                 case AdditionsModMessageType.SpawnGodDummy:
@@ -74,7 +76,8 @@ public class AdditionsNetcode
                     float rotation = reader.ReadSingle();
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
-                        int index = NPC.NewNPC(new EntitySource_WorldEvent(), x2, y2, ModContent.NPCType<GodDummyNPC>());
+                        int index = NPC.NewNPC(new EntitySource_WorldEvent(), x2, y2,
+                            ModContent.NPCType<GodDummyNPC>());
                         NPC dum = Main.npc[index];
                         dum.life = dum.lifeMax = life;
                         dum.defense = defense;
@@ -84,6 +87,7 @@ public class AdditionsNetcode
                         dum.netUpdate = true;
                         NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, index);
                     }
+
                     break;
 
                 case AdditionsModMessageType.DeleteGodDummy:
@@ -95,11 +99,15 @@ public class AdditionsNetcode
         catch (Exception e)
         {
             if (e is EndOfStreamException eose)
-                AdditionsMain.Instance.Logger.Error("Failed to parse Additions packet: Packet was too short, missing data, or otherwise corrupt.", eose);
+                AdditionsMain.Instance.Logger.Error(
+                    "Failed to parse Additions packet: Packet was too short, missing data, or otherwise corrupt.",
+                    eose);
             else if (e is ObjectDisposedException ode)
-                AdditionsMain.Instance.Logger.Error("Failed to parse Additions packet: Packet reader disposed or destroyed.", ode);
+                AdditionsMain.Instance.Logger.Error(
+                    "Failed to parse Additions packet: Packet reader disposed or destroyed.", ode);
             else if (e is IOException ioe)
-                AdditionsMain.Instance.Logger.Error("Failed to parse Additions packet: An unknown I/O error occurred.", ioe);
+                AdditionsMain.Instance.Logger.Error("Failed to parse Additions packet: An unknown I/O error occurred.",
+                    ioe);
             else
                 throw; // this either will crash the game or be caught by TML's packet policing
         }
@@ -111,7 +119,7 @@ public class AdditionsNetcode
             return;
 
         ModPacket netMessage = AdditionsMain.Instance.GetPacket();
-        netMessage.Write((byte)AdditionsModMessageType.SyncSuperBloodMoon);
+        netMessage.Write((byte) AdditionsModMessageType.SyncSuperBloodMoon);
         netMessage.Write(sender);
         netMessage.Write(SuperBloodMoonSystem.SuperBloodMoon);
 
@@ -124,7 +132,7 @@ public class AdditionsNetcode
             return;
 
         ModPacket netMessage = AdditionsMain.Instance.GetPacket();
-        netMessage.Write((byte)AdditionsModMessageType.SyncBossDefeats);
+        netMessage.Write((byte) AdditionsModMessageType.SyncBossDefeats);
         netMessage.Write(sender);
         netMessage.Write(BossDownedSaveSystem.downedRegistry.Count);
         for (int i = 0; i < BossDownedSaveSystem.downedRegistry.Count; i++)
@@ -137,14 +145,15 @@ public class AdditionsNetcode
     {
         if (Main.netMode == NetmodeID.SinglePlayer)
         {
-            NPC.NewNPC(new EntitySource_WorldEvent(), (int)spawnPosition.X, (int)spawnPosition.Y, npcType, Target: player.whoAmI);
+            NPC.NewNPC(new EntitySource_WorldEvent(), (int) spawnPosition.X, (int) spawnPosition.Y, npcType,
+                Target: player.whoAmI);
             return;
         }
 
         ModPacket netMessage = AdditionsMain.Instance.GetPacket();
-        netMessage.Write((byte)AdditionsModMessageType.SpawnNPCOnPlayer);
-        netMessage.Write((int)spawnPosition.X);
-        netMessage.Write((int)spawnPosition.Y);
+        netMessage.Write((byte) AdditionsModMessageType.SpawnNPCOnPlayer);
+        netMessage.Write((int) spawnPosition.X);
+        netMessage.Write((int) spawnPosition.Y);
         netMessage.Write(npcType);
         netMessage.Write(player.whoAmI);
         netMessage.Send();
@@ -154,7 +163,9 @@ public class AdditionsNetcode
     {
         if (Main.netMode == NetmodeID.SinglePlayer)
         {
-            NPC dum = Main.npc[NPC.NewNPC(new EntitySource_WorldEvent(), (int)spawnPosition.X, (int)spawnPosition.Y, ModContent.NPCType<GodDummyNPC>())];
+            NPC dum = Main.npc[
+                NPC.NewNPC(new EntitySource_WorldEvent(), (int) spawnPosition.X, (int) spawnPosition.Y,
+                    ModContent.NPCType<GodDummyNPC>())];
             dum.life = dum.lifeMax = DummyUI.MaxLife;
             dum.defense = DummyUI.Defense;
             dum.scale = DummyUI.Size;
@@ -164,9 +175,9 @@ public class AdditionsNetcode
         }
 
         ModPacket netMessage = AdditionsMain.Instance.GetPacket();
-        netMessage.Write((byte)AdditionsModMessageType.SpawnGodDummy);
-        netMessage.Write((int)spawnPosition.X);
-        netMessage.Write((int)spawnPosition.Y);
+        netMessage.Write((byte) AdditionsModMessageType.SpawnGodDummy);
+        netMessage.Write((int) spawnPosition.X);
+        netMessage.Write((int) spawnPosition.Y);
         netMessage.Write(DummyUI.MaxLife);
         netMessage.Write(DummyUI.Defense);
         netMessage.Write(DummyUI.Size);

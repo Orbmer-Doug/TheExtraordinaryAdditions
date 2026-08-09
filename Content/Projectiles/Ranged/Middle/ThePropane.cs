@@ -12,6 +12,7 @@ public class ThePropane : ModProjectile
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ThePropane);
     private const int ExplosionWidthHeight = 250;
     public ref float Time => ref Projectile.ai[0];
+
     private bool Big
     {
         get => Projectile.ai[1] == 1f;
@@ -48,6 +49,7 @@ public class ThePropane : ModProjectile
             SoundStyle impactSound = SoundID.DD2_FlameburstTowerShot;
             SoundEngine.PlaySound(impactSound with { Volume = .9f, PitchVariance = .15f }, Projectile.Center);
         }
+
         Projectile.soundDelay = 20;
 
         return false;
@@ -75,8 +77,12 @@ public class ThePropane : ModProjectile
             {
                 Vector2 val = Projectile.Center + PolarVector(38f, Projectile.rotation);
 
-                Dust.NewDustPerfect(val, DustID.Torch, -Vector2.UnitY.RotatedByRandom(.2f) * Main.rand.NextFloat(1f, 2f), 0, default, Main.rand.NextFloat(1.5f, 1.8f)).noGravity = true;
-                Dust.NewDustPerfect(val, DustID.Smoke, -Vector2.UnitY.RotatedByRandom(.45f) * Main.rand.NextFloat(2.4f, 4f), 0, default, Main.rand.NextFloat(2f, 2.2f)).noGravity = true;
+                Dust.NewDustPerfect(val, DustID.Torch,
+                    -Vector2.UnitY.RotatedByRandom(.2f) * Main.rand.NextFloat(1f, 2f), 0, default,
+                    Main.rand.NextFloat(1.5f, 1.8f)).noGravity = true;
+                Dust.NewDustPerfect(val, DustID.Smoke,
+                    -Vector2.UnitY.RotatedByRandom(.45f) * Main.rand.NextFloat(2.4f, 4f), 0, default,
+                    Main.rand.NextFloat(2f, 2.2f)).noGravity = true;
             }
         }
 
@@ -105,7 +111,7 @@ public class ThePropane : ModProjectile
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         if (Big)
-            Projectile.damage = (int)(Projectile.damage * .85f);
+            Projectile.damage = (int) (Projectile.damage * .85f);
     }
 
     public override void OnKill(int timeLeft)
@@ -118,8 +124,10 @@ public class ThePropane : ModProjectile
             Color color = Color.Lerp(Color.OrangeRed, Color.Chocolate, Main.rand.NextFloat(.2f, .6f));
             float opacity = Main.rand.NextFloat(2f, 3f);
             Vector2 pos = Projectile.Center + Main.rand.NextVector2Circular(Projectile.width / 2, Projectile.width / 2);
-            ParticleRegistry.SpawnHeavySmokeParticle(pos, Main.rand.NextVector2Circular(2f, 2f), 40, Main.rand.NextFloat(.5f, 1f), color, opacity);
-            ParticleRegistry.SpawnGlowParticle(pos, Main.rand.NextVector2Circular(2f, 2f), Main.rand.Next(20, 30), Main.rand.NextFloat(.5f, 1f), color, opacity);
+            ParticleRegistry.SpawnHeavySmokeParticle(pos, Main.rand.NextVector2Circular(2f, 2f), 40,
+                Main.rand.NextFloat(.5f, 1f), color, opacity);
+            ParticleRegistry.SpawnGlowParticle(pos, Main.rand.NextVector2Circular(2f, 2f), Main.rand.Next(20, 30),
+                Main.rand.NextFloat(.5f, 1f), color, opacity);
         }
 
         Projectile.Resize(86, 20);

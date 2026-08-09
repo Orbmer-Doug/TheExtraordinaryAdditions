@@ -9,21 +9,23 @@ namespace TheExtraordinaryAdditions.Core.Utilities;
 public static class PrimitiveUtils
 {
     public static readonly short[] TextureQuadIndices = [0, 1, 2, 2, 3, 0];
+
     public static void LogDeviceInfo(this GraphicsDevice g)
     {
         ($"BlendFactor: {g.BlendFactor}" +
-            $" BlendState: {g.BlendState}" +
-            $" DepthStencilState: {g.DepthStencilState}" +
-            $" DisplayMode: {g.DisplayMode}" +
-            $" GraphicsDeviceStatus: {g.GraphicsDeviceStatus}" +
-            $" GraphicsProfile: {g.GraphicsProfile}" +
-            $" IsDisposed: {g.IsDisposed}" +
-            $" RasterizerState: {g.RasterizerState}" +
-            $" ScissorRectangle: {g.ScissorRectangle}" +
-            $" Viewport: {g.Viewport}").Log();
+         $" BlendState: {g.BlendState}" +
+         $" DepthStencilState: {g.DepthStencilState}" +
+         $" DisplayMode: {g.DisplayMode}" +
+         $" GraphicsDeviceStatus: {g.GraphicsDeviceStatus}" +
+         $" GraphicsProfile: {g.GraphicsProfile}" +
+         $" IsDisposed: {g.IsDisposed}" +
+         $" RasterizerState: {g.RasterizerState}" +
+         $" ScissorRectangle: {g.ScissorRectangle}" +
+         $" Viewport: {g.Viewport}").Log();
     }
 
     #region 2D
+
     public static void Get2DMatrices(out Matrix effectWorld, out Matrix effectProjection, out Matrix effectView)
     {
         // Screen bounds
@@ -42,17 +44,20 @@ public static class PrimitiveUtils
         effectView *= Matrix.CreateRotationZ(Pi);
 
         // Account for the inverted gravity effect
-        if ((int)Main.LocalPlayer.gravDir == -1)
+        if ((int) Main.LocalPlayer.gravDir == -1)
             effectView *= Matrix.CreateScale(1f, -1f, 1f) * Matrix.CreateTranslation(0f, height, 0f);
 
         // And account for the current zoom
         effectView *= zoomScaleMatrix;
 
-        effectProjection = Matrix.CreateOrthographicOffCenter(0f, Main.screenWidth * zoom.X, 0f, Main.screenHeight * zoom.Y, 0f, 1f) * zoomScaleMatrix;
+        effectProjection =
+            Matrix.CreateOrthographicOffCenter(0f, Main.screenWidth * zoom.X, 0f, Main.screenHeight * zoom.Y, 0f, 1f) *
+            zoomScaleMatrix;
         effectWorld = Matrix.CreateTranslation(new Vector3(-Main.screenPosition, 0));
     }
 
-    public static void GetPixelated2DMatrices(out Matrix effectWorld, out Matrix effectProjection, out Matrix effectView)
+    public static void GetPixelated2DMatrices(out Matrix effectWorld, out Matrix effectProjection,
+        out Matrix effectView)
     {
         effectWorld = Matrix.CreateTranslation(new Vector3(-Main.screenPosition, 0));
         effectProjection = Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, -1, 1);
@@ -62,14 +67,17 @@ public static class PrimitiveUtils
     public static Matrix GetCustomSkyBackgroundMatrix()
     {
         Matrix transformationMatrix = Main.BackgroundViewMatrix.TransformationMatrix;
-        Vector3 translationDirection = new(1f, Main.BackgroundViewMatrix.Effects.HasFlag(SpriteEffects.FlipVertically) ? -1f : 1f, 1f);
+        Vector3 translationDirection = new(1f,
+            Main.BackgroundViewMatrix.Effects.HasFlag(SpriteEffects.FlipVertically) ? -1f : 1f, 1f);
 
         transformationMatrix.Translation -= Main.BackgroundViewMatrix.ZoomMatrix.Translation * translationDirection;
         return transformationMatrix;
     }
+
     #endregion
 
     #region 3D
+
     public static short[] GenerateCylinderIndices(int baseVertexOffset, int widthSegments, int heightSegments)
     {
         int numIndices = widthSegments * heightSegments * 6 * 2;
@@ -88,12 +96,12 @@ public static class PrimitiveUtils
                     int lowerLeft = upperLeft + widthSegments + 1;
                     int lowerRight = lowerLeft + 1;
 
-                    indices[indexOffset + (i * widthSegments + j) * 6 + 0] = (short)upperLeft;
-                    indices[indexOffset + (i * widthSegments + j) * 6 + 1] = (short)lowerRight;
-                    indices[indexOffset + (i * widthSegments + j) * 6 + 2] = (short)lowerLeft;
-                    indices[indexOffset + (i * widthSegments + j) * 6 + 3] = (short)upperLeft;
-                    indices[indexOffset + (i * widthSegments + j) * 6 + 4] = (short)upperRight;
-                    indices[indexOffset + (i * widthSegments + j) * 6 + 5] = (short)lowerRight;
+                    indices[indexOffset + (i * widthSegments + j) * 6 + 0] = (short) upperLeft;
+                    indices[indexOffset + (i * widthSegments + j) * 6 + 1] = (short) lowerRight;
+                    indices[indexOffset + (i * widthSegments + j) * 6 + 2] = (short) lowerLeft;
+                    indices[indexOffset + (i * widthSegments + j) * 6 + 3] = (short) upperLeft;
+                    indices[indexOffset + (i * widthSegments + j) * 6 + 4] = (short) upperRight;
+                    indices[indexOffset + (i * widthSegments + j) * 6 + 5] = (short) lowerRight;
                 }
             }
 
@@ -104,7 +112,9 @@ public static class PrimitiveUtils
         return indices;
     }
 
-    public static void FillCylinderVertices(float thickness, Matrix rotationMatrix, Color baseColor, Vector3 start, Vector3 end, Span<VertexPositionColorTexture> vertices, int widthSegments, int heightSegments, float widthFactor = 1f, int vertexStartOffset = 0)
+    public static void FillCylinderVertices(float thickness, Matrix rotationMatrix, Color baseColor, Vector3 start,
+        Vector3 end, Span<VertexPositionColorTexture> vertices, int widthSegments, int heightSegments,
+        float widthFactor = 1f, int vertexStartOffset = 0)
     {
         float widthStep = 1f / widthSegments;
         float heightStep = 1f / heightSegments;
@@ -129,8 +139,9 @@ public static class PrimitiveUtils
                 else
                 {
                     float term = (heightInterpolant - 1f + percentageFromEnd) / percentageFromEnd;
-                    width = thickness * (float)Math.Sqrt(1f - term * term * term);
+                    width = thickness * (float) Math.Sqrt(1f - term * term * term);
                 }
+
                 width *= widthFactor;
 
                 for (int j = 0; j <= widthSegments; j++)
@@ -169,7 +180,7 @@ public static class PrimitiveUtils
 
         Matrix effectProjection = Matrix.CreatePerspectiveFieldOfView(
             ToRadians(fov),
-            (float)width / height, // Aspect ratio
+            (float) width / height, // Aspect ratio
             1f, 3000f); // Near and far planes
 
         // Position in world
@@ -177,31 +188,41 @@ public static class PrimitiveUtils
         return effectWorld * effectView * effectProjection;
     }
 
-    public static Matrix Get3DOrthoPrimitiveMatrix(Vector2 center, Quaternion quaternion, float size, float startRot = 0f, int horizontalDir = 1)
+    public static Matrix Get3DOrthoPrimitiveMatrix(Vector2 center, Quaternion quaternion, float size,
+        float startRot = 0f, int horizontalDir = 1)
     {
         Matrix mainZoom = Main.GameViewMatrix.ZoomMatrix;
-        Matrix invertedZoom = Matrix.Invert(Matrix.CreateScale(Main.GameViewMatrix.Zoom.X, Main.GameViewMatrix.Zoom.Y, 1f));
+        Matrix invertedZoom =
+            Matrix.Invert(Matrix.CreateScale(Main.GameViewMatrix.Zoom.X, Main.GameViewMatrix.Zoom.Y, 1f));
 
         Vector2 screenPos = center - Main.screenPosition; // Convert to screen position
         screenPos = Vector2.Transform(screenPos, Matrix.Invert(mainZoom)); // Account for zoom
 
-        Matrix translation = Matrix.CreateTranslation(new Vector3(screenPos.X, screenPos.Y, 0f)) * mainZoom; // zoom again...
-        Matrix projection = Matrix.CreateOrthographicOffCenter(0f, Main.screenWidth, Main.screenHeight, 0f, -450f, 450f) * invertedZoom; // AGAIN
+        Matrix translation =
+            Matrix.CreateTranslation(new Vector3(screenPos.X, screenPos.Y, 0f)) * mainZoom; // zoom again...
+        Matrix projection =
+            Matrix.CreateOrthographicOffCenter(0f, Main.screenWidth, Main.screenHeight, 0f, -450f, 450f) *
+            invertedZoom; // AGAIN
 
         // Apply rotation, scaling, and flipping
         Matrix rotation = Matrix.CreateFromQuaternion(quaternion) * Matrix.CreateRotationZ(startRot);
         Matrix scale = Matrix.CreateScale(size);
         Matrix vertexMatrix = rotation * scale * translation * projection;
         if (horizontalDir == -1)
-            vertexMatrix = Matrix.CreateReflection(new Plane(Vector3.UnitX, 1f)) * Matrix.CreateRotationZ(PiOver2) * vertexMatrix;
+            vertexMatrix = Matrix.CreateReflection(new Plane(Vector3.UnitX, 1f)) * Matrix.CreateRotationZ(PiOver2) *
+                           vertexMatrix;
 
         return vertexMatrix;
     }
 
-    public static Matrix Get3DTextureMatrix(Vector2 center, Quaternion quaternion, float size, float startRot = 0f, int horizontalDir = 1)
+    public static Matrix Get3DTextureMatrix(Vector2 center, Quaternion quaternion, float size, float startRot = 0f,
+        int horizontalDir = 1)
     {
-        Matrix translation = Matrix.CreateTranslation(new Vector3(center.X - Main.screenPosition.X, center.Y - Main.screenPosition.Y, 0f));
-        Matrix projection = Matrix.CreateOrthographicOffCenter(0f, Main.screenWidth, Main.screenHeight, 0f, -450f, 450f);
+        Matrix translation =
+            Matrix.CreateTranslation(
+                new Vector3(center.X - Main.screenPosition.X, center.Y - Main.screenPosition.Y, 0f));
+        Matrix projection =
+            Matrix.CreateOrthographicOffCenter(0f, Main.screenWidth, Main.screenHeight, 0f, -450f, 450f);
         Matrix view = translation * Main.GameViewMatrix.TransformationMatrix * projection;
 
         // Apply rotation, scaling, and flipping
@@ -209,12 +230,14 @@ public static class PrimitiveUtils
         Matrix scale = Matrix.CreateScale(size);
         Matrix vertexMatrix = rotation * scale * view;
         if (horizontalDir == -1)
-            vertexMatrix = Matrix.CreateReflection(new Plane(Vector3.UnitX, 1f)) * Matrix.CreateRotationZ(PiOver2) * vertexMatrix;
+            vertexMatrix = Matrix.CreateReflection(new Plane(Vector3.UnitX, 1f)) * Matrix.CreateRotationZ(PiOver2) *
+                           vertexMatrix;
 
         return vertexMatrix;
     }
 
-    public static Matrix Get3DPerspectiveTextureMatrix(Vector2 center, Quaternion quaternion, float startRot, float size, int horizontalDir = 1, float cameraDist = 1000f, float fov = 50f)
+    public static Matrix Get3DPerspectiveTextureMatrix(Vector2 center, Quaternion quaternion, float startRot,
+        float size, int horizontalDir = 1, float cameraDist = 1000f, float fov = 50f)
     {
         int width = Main.screenWidth;
         int height = Main.screenHeight;
@@ -229,29 +252,33 @@ public static class PrimitiveUtils
 
         view *= Matrix.CreateTranslation(0f, -height, 0f); // Adjust for Y being down
         view *= Matrix.CreateRotationZ(Pi); // Flip to match orientation
-        if ((int)Main.LocalPlayer.gravDir == -1)
+        if ((int) Main.LocalPlayer.gravDir == -1)
             view *= Matrix.CreateScale(1f, -1f, 1f);
         view *= zoomScaleMatrix;
 
         Matrix projection = Matrix.CreatePerspectiveFieldOfView(
             ToRadians(fov),
-            (float)width / height, // Aspect ratio
+            (float) width / height, // Aspect ratio
             1f, 3000f); // Near and far planes
 
         // Position in world
-        Matrix world = Matrix.CreateTranslation(new Vector3(center.X - Main.screenPosition.X, center.Y - Main.screenPosition.Y, 0f));
+        Matrix world =
+            Matrix.CreateTranslation(
+                new Vector3(center.X - Main.screenPosition.X, center.Y - Main.screenPosition.Y, 0f));
 
         // Apply rotation, scaling, and flipping
         Matrix rotation = Matrix.CreateFromQuaternion(quaternion) * Matrix.CreateRotationZ(startRot);
         Matrix scale = Matrix.CreateScale(size);
         Matrix objectMatrix = rotation * scale;
         if (horizontalDir == -1)
-            objectMatrix = Matrix.CreateReflection(new Plane(Vector3.UnitX, 1f)) * Matrix.CreateRotationZ(PiOver2) * objectMatrix;
+            objectMatrix = Matrix.CreateReflection(new Plane(Vector3.UnitX, 1f)) * Matrix.CreateRotationZ(PiOver2) *
+                           objectMatrix;
 
         return objectMatrix * world * view * projection;
     }
 
-    public static VertexPositionColorTexture[] GenerateQuadClockwise(Vector2 quadArea, Color? color = null, bool center = false)
+    public static VertexPositionColorTexture[] GenerateQuadClockwise(Vector2 quadArea, Color? color = null,
+        bool center = false)
     {
         Vector3 topLeftPos;
         Vector3 topRightPos;
@@ -283,7 +310,8 @@ public static class PrimitiveUtils
         return [topLeft, topRight, bottomRight, bottomLeft];
     }
 
-    public static VertexPositionColorTexture[] GenerateQuadClockwise(Vector2 quadArea, Vector3 position, Quaternion rotation, Color? color = null, bool center = false)
+    public static VertexPositionColorTexture[] GenerateQuadClockwise(Vector2 quadArea, Vector3 position,
+        Quaternion rotation, Color? color = null, bool center = false)
     {
         Vector3 topLeftPos;
         Vector3 topRightPos;
@@ -333,11 +361,13 @@ public static class PrimitiveUtils
     /// <param name="rotation">The quaternion to use to define 3D rotation</param>
     /// <param name="scale">The scale of this</param>
     /// <param name="start">The starting 2D rotation for the quaternion</param>
-    public static void DrawTextureIn3D(Texture2D texture, Vector2 pos, Quaternion rotation, float scale, float start, Color? color = null, bool center = false, int horizontalDir = 1)
+    public static void DrawTextureIn3D(Texture2D texture, Vector2 pos, Quaternion rotation, float scale, float start,
+        Color? color = null, bool center = false, int horizontalDir = 1)
     {
         VertexPositionColorTexture[] quad = GenerateQuadClockwise(texture.Size(), color, center);
         ManagedShader projectionShader = AssetRegistry.GetShader("PrimitiveProjection");
-        projectionShader.TrySetParameter("vertexMatrix", Get3DTextureMatrix(pos, rotation, scale, start, horizontalDir));
+        projectionShader.TrySetParameter("vertexMatrix",
+            Get3DTextureMatrix(pos, rotation, scale, start, horizontalDir));
         projectionShader.Render();
 
         GraphicsDevice gd = Main.instance.GraphicsDevice;
@@ -350,11 +380,13 @@ public static class PrimitiveUtils
         gd.SamplerStates[1] = SamplerState.PointClamp;
         gd.Textures[1] = texture;
 
-        gd.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, quad, 0, quad.Length, TextureQuadIndices, 0, TextureQuadIndices.Length / 3);
+        gd.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, quad, 0, quad.Length, TextureQuadIndices, 0,
+            TextureQuadIndices.Length / 3);
 
         gd.RasterizerState = prevRast;
         gd.SamplerStates[1] = prevState;
         gd.Textures[1] = prevTex;
     }
+
     #endregion
 }

@@ -2,7 +2,6 @@
 using ReLogic.Content;
 using System;
 using System.IO;
-using CalamityMod;
 using Terraria;
 using Terraria.Enums;
 using Terraria.GameContent;
@@ -28,6 +27,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla;
 public class FancyTool : ModProjectile, ILocalizedModType, IModType
 {
     #region Variables
+
     public sealed override string Texture => AssetRegistry.Invis;
     public Player Owner => Main.player[Projectile.owner];
     public GlobalPlayer Modded => Owner.Additions();
@@ -36,35 +36,43 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
     public Texture2D Tex => Item.ThisItemTexture();
     public ref float Time => ref Projectile.ai[0];
     public ref float OverallTime => ref Projectile.ai[1];
+
     public bool PlayedSound
     {
         get => Projectile.ai[2] == 1f;
         set => Projectile.ai[2] = value.ToInt();
     }
+
     public ref float VanishTime => ref ProjInfo.ExtraAI[0];
     public ref float RotationOffset => ref ProjInfo.ExtraAI[2];
+
     public bool Initialized
     {
         get => ProjInfo.ExtraAI[3] == 1f;
         set => ProjInfo.ExtraAI[3] = value.ToInt();
     }
+
     public ref float InitialMouseAngle => ref ProjInfo.ExtraAI[4];
     public ref float InitialAngle => ref ProjInfo.ExtraAI[5];
+
     public SwingDirection SwingDir
     {
-        get => (SwingDirection)ProjInfo.ExtraAI[6];
-        set => ProjInfo.ExtraAI[6] = (int)value;
+        get => (SwingDirection) ProjInfo.ExtraAI[6];
+        set => ProjInfo.ExtraAI[6] = (int) value;
     }
+
     public SpriteEffects Effects
     {
-        get => (SpriteEffects)Projectile.spriteDirection;
-        set => Projectile.spriteDirection = (int)value;
+        get => (SpriteEffects) Projectile.spriteDirection;
+        set => Projectile.spriteDirection = (int) value;
     }
+
     public int Direction
     {
         get => Projectile.direction;
         set => Projectile.direction = value;
     }
+
     public const int MaxUpdates = 3;
 
     /// <summary>
@@ -74,13 +82,16 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
 
     public const float ToolRotation = PiOver4;
     public float Scale => 1.1f * Owner.GetAdjustedItemScale(Item);
-    public int MaxTime => (int)(Item.useAnimation * Owner.pickSpeed * MaxUpdates / Owner.GetTotalAttackSpeed(Projectile.DamageType));
+
+    public int MaxTime => (int) (Item.useAnimation * Owner.pickSpeed * MaxUpdates /
+                                 Owner.GetTotalAttackSpeed(Projectile.DamageType));
 
     public float SwingCompletion => InverseLerp(0f, MaxTime, Time, true);
     public Vector2 ToolDir;
 
     public const float Wait = .2f;
     public const float Swing = .8f;
+
     public float Animation()
     {
         return new PiecewiseCurve()
@@ -92,35 +103,48 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
 
     public float SwingOffset()
     {
-        return ToolRotation + InitialMouseAngle + (PiOver2 + .2f) * Animation() * (SwingDir != SwingDirection.Up).ToDirectionInt() * Direction;
+        return ToolRotation + InitialMouseAngle + (PiOver2 + .2f) * Animation() *
+            (SwingDir != SwingDirection.Up).ToDirectionInt() * Direction;
     }
 
     public RotatedRectangle Rect()
     {
         float width = MathF.Min(Tex?.Height ?? 1, Tex?.Width ?? 1) / 3 * Projectile.scale;
         float height = Sqrt((Tex?.Height ?? 1).Squared() + (Tex?.Width ?? 1).Squared()) * Projectile.scale;
-        return new(width, Projectile.Center, Projectile.Center + PolarVector(height, Projectile.rotation - ToolRotation));
+        return new(width, Projectile.Center,
+            Projectile.Center + PolarVector(height, Projectile.rotation - ToolRotation));
     }
+
     #endregion
 
     #region Netwerking
+
     public sealed override void SendExtraAI(BinaryWriter writer)
     {
-        writer.Write((sbyte)Projectile.direction);
-        writer.Write((float)Projectile.rotation);
-        writer.Write((sbyte)Projectile.spriteDirection);
+        writer.Write((sbyte) Projectile.direction);
+        writer.Write((float) Projectile.rotation);
+        writer.Write((sbyte) Projectile.spriteDirection);
         WriteExtraAI(writer);
     }
+
     public sealed override void ReceiveExtraAI(BinaryReader reader)
     {
-        Projectile.direction = (sbyte)reader.ReadSByte();
-        Projectile.rotation = (float)reader.ReadSingle();
-        Projectile.spriteDirection = (sbyte)reader.ReadSByte();
+        Projectile.direction = (sbyte) reader.ReadSByte();
+        Projectile.rotation = (float) reader.ReadSingle();
+        Projectile.spriteDirection = (sbyte) reader.ReadSByte();
         GetExtraAI(reader);
     }
-    public virtual void WriteExtraAI(BinaryWriter writer) { }
-    public virtual void GetExtraAI(BinaryReader reader) { }
+
+    public virtual void WriteExtraAI(BinaryWriter writer)
+    {
+    }
+
+    public virtual void GetExtraAI(BinaryReader reader)
+    {
+    }
+
     #endregion
+
     public sealed override void SetStaticDefaults()
     {
         ProjectileID.Sets.TrailCacheLength[Type] = 5;
@@ -130,6 +154,7 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
         ProjectileID.Sets.AllowsContactDamageFromJellyfish[Type] = true;
         ProjectileID.Sets.CanDistortWater[Type] = false; // Manual
     }
+
     public sealed override void SetDefaults()
     {
         Projectile.DamageType = DamageClass.MeleeNoSpeed;
@@ -170,7 +195,8 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
 
     public override void CutTiles()
     {
-        bool[] tileCutIgnorance = Owner.GetTileCutIgnorance(allowRegrowth: Item.type == ItemID.StaffofRegrowth || Item.type == ItemID.AcornAxe, Projectile.trap);
+        bool[] tileCutIgnorance = Owner.GetTileCutIgnorance(
+            allowRegrowth: Item.type == ItemID.StaffofRegrowth || Item.type == ItemID.AcornAxe, Projectile.trap);
         DelegateMethods.tilecut_0 = TileCuttingContext.AttackProjectile;
         DelegateMethods.tileCutIgnore = tileCutIgnorance;
         Utils.PlotTileLine(Rect().BottomLeft, Rect().TopRight, Rect().Width, DelegateMethods.CutTiles);
@@ -191,9 +217,11 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
     #endregion
 
     public FancyAfterimages after;
+
     public sealed override void AI()
     {
-        if (this.RunLocal() && (!Owner.Available() || Item == null || (Item.pick <= 0 && Item.axe <= 0 && Item.hammer <= 0)))
+        if (this.RunLocal() &&
+            (!Owner.Available() || Item == null || (Item.pick <= 0 && Item.axe <= 0 && Item.hammer <= 0)))
         {
             Projectile.Kill();
             return;
@@ -233,7 +261,8 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
         Projectile.damage = Item.damage;
         Projectile.knockBack = Item.knockBack;
         Owner.heldProj = Projectile.whoAmI;
-        Owner.SetCompositeArmFront(true, 0, (Projectile.rotation - PiOver4 - PiOver2) * Owner.gravDir + (Owner.gravDir == -1 ? Pi : 0f));
+        Owner.SetCompositeArmFront(true, 0,
+            (Projectile.rotation - PiOver4 - PiOver2) * Owner.gravDir + (Owner.gravDir == -1 ? Pi : 0f));
         Owner.toolTime = 4; // Nuh-uh
         Projectile.timeLeft = 1000;
 
@@ -258,8 +287,9 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
         if (SwingCompletion >= 1f)
         {
             if ((this.RunLocal() &&
-                (Owner.altFunctionUse == ItemAlternativeFunctionID.None && Modded.SafeMouseLeft.Current) ||
-                (Owner.altFunctionUse == ItemAlternativeFunctionID.ActivatedAndUsed && Modded.SafeMouseRight.Current)) && VanishTime <= 0)
+                 (Owner.altFunctionUse == ItemAlternativeFunctionID.None && Modded.SafeMouseLeft.Current) ||
+                 (Owner.altFunctionUse == ItemAlternativeFunctionID.ActivatedAndUsed &&
+                  Modded.SafeMouseRight.Current)) && VanishTime <= 0)
             {
                 Owner.SetDummyItemTime(Owner.itemAnimationMax);
                 SwingDir = SwingDir == SwingDirection.Up ? SwingDirection.Down : SwingDirection.Up;
@@ -288,23 +318,28 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
                     bool? overrideCanPlace = null;
                     int? forcedRandom = null;
                     TileObject objectData = default(TileObject);
-                    Owner.FigureOutWhatToPlace(Main.tile[tile], Item, out int tileToCreate, out int previewPlaceStyle, out overrideCanPlace, out forcedRandom);
+                    Owner.FigureOutWhatToPlace(Main.tile[tile], Item, out int tileToCreate, out int previewPlaceStyle,
+                        out overrideCanPlace, out forcedRandom);
                     PlantLoader.CheckAndInjectModSapling(tile.X, tile.Y, ref tileToCreate, ref previewPlaceStyle);
                     if (overrideCanPlace.HasValue)
                         canPlace = overrideCanPlace.Value;
                     else if (!TileLoader.CanPlace(tile.X, tile.Y, tileToCreate))
                         canPlace = false;
-                    else if (TileObjectData.CustomPlace(tileToCreate, previewPlaceStyle) && tileToCreate != 82 && tileToCreate != 227)
+                    else if (TileObjectData.CustomPlace(tileToCreate, previewPlaceStyle) && tileToCreate != 82 &&
+                             tileToCreate != 227)
                     {
                         newObjectType = true;
-                        canPlace = TileObject.CanPlace(tile.X, tile.Y, (ushort)tileToCreate, previewPlaceStyle, Owner.direction, out objectData, onlyCheck: false, forcedRandom);
+                        canPlace = TileObject.CanPlace(tile.X, tile.Y, (ushort) tileToCreate, previewPlaceStyle,
+                            Owner.direction, out objectData, onlyCheck: false, forcedRandom);
                     }
                     else
                         canPlace = Owner.PlaceThing_Tiles_BlockPlacementForAssortedThings(canPlace);
+
                     if (canPlace)
                         Owner.PlaceThing_Tiles_PlaceIt(newObjectType, objectData, tileToCreate);
                     if (Main.netMode == NetmodeID.MultiplayerClient)
-                        NetMessage.SendData(MessageID.TileManipulation, -1, -1, null, 1, tile.X, tile.Y, tileToCreate, Item.placeStyle);
+                        NetMessage.SendData(MessageID.TileManipulation, -1, -1, null, 1, tile.X, tile.Y, tileToCreate,
+                            Item.placeStyle);
                 }
             }
 
@@ -312,7 +347,8 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
             PlayedSound = true;
         }
 
-        bool side = Direction == 1 && SwingDir == SwingDirection.Down || Direction == -1 && SwingDir == SwingDirection.Up;
+        bool side = Direction == 1 && SwingDir == SwingDirection.Down ||
+                    Direction == -1 && SwingDir == SwingDirection.Up;
         RotationOffset = side ? 0f : PiOver2;
         Effects = side ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
 
@@ -328,7 +364,9 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
             Item.UpdateItem_VisualEffects();
             ItemSpecificLogic();
         }
-        ToolDir = (Projectile.rotation - ToolRotation + PiOver2).ToRotationVector2() * (SwingDir != SwingDirection.Up).ToDirectionInt() * Direction;
+
+        ToolDir = (Projectile.rotation - ToolRotation + PiOver2).ToRotationVector2() *
+                  (SwingDir != SwingDirection.Up).ToDirectionInt() * Direction;
 
         if (!Main.dedServ)
             ProduceWaterRipples();
@@ -344,7 +382,8 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
         {
             Point target = ToolModifierUtils.GetTileTarget(Owner);
             if (Main.tile[target].HasTile)
-                Owner.PlaceThing_Tiles_BlockPlacementForAssortedThings(!TileLoader.CanPlace(target.X, target.Y, Main.tile[target].TileType));
+                Owner.PlaceThing_Tiles_BlockPlacementForAssortedThings(!TileLoader.CanPlace(target.X, target.Y,
+                    Main.tile[target].TileType));
         }
 
         if (this.RunLocal())
@@ -353,7 +392,9 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
             {
                 int num = Owner.itemAnimationMax;
                 if (CanDamage() == null && OverallTime % 4 == 3)
-                    Projectile.NewProjectile(Owner.GetProjectileSource_Item(Item), Rect().RandomPoint(), ToolDir * Main.rand.NextFloat(12f, 20f), ProjectileID.Mushroom, Item.damage / 2, 0f, Owner.whoAmI);
+                    Projectile.NewProjectile(Owner.GetProjectileSource_Item(Item), Rect().RandomPoint(),
+                        ToolDir * Main.rand.NextFloat(12f, 20f), ProjectileID.Mushroom, Item.damage / 2, 0f,
+                        Owner.whoAmI);
             }
         }
     }
@@ -363,9 +404,9 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
     /// </summary>
     public void ProduceWaterRipples()
     {
-        WaterShaderData water = (WaterShaderData)Filters.Scene["WaterDistortion"].GetShader();
+        WaterShaderData water = (WaterShaderData) Filters.Scene["WaterDistortion"].GetShader();
         float power = 11f;
-        float waveSine = 1f * (float)Math.Sin(Main.GlobalTimeWrappedHourly * 20f);
+        float waveSine = 1f * (float) Math.Sin(Main.GlobalTimeWrappedHourly * 20f);
         Vector2 size = Projectile.Size / 2f;
         Vector2 ripplePos = Rect().Center;
         Color waveData = new Color(power, 0.1f * Math.Sign(waveSine) + 0.5f, 0f, 1f) * Math.Abs(waveSine);
@@ -399,6 +440,7 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
             RotationOffset = PiOver2;
             Effects = SpriteEffects.FlipHorizontally;
         }
+
         Vector2 pos = Projectile.Center - Main.screenPosition;
         Color col = lightColor * Projectile.Opacity;
         Color glow = Color.White * Projectile.Opacity;
@@ -411,7 +453,8 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
         if (Item.Name.Contains("Solar") || Item.Name.Contains("Molten"))
             col = glow;
 
-        after?.DrawFancySwordAfterimages(Tex, Projectile.Center, [col], origin, Effects, RotationOffset, Projectile.Opacity, Projectile.scale);
+        after?.DrawFancySwordAfterimages(Tex, Projectile.Center, [col], origin, Effects, RotationOffset,
+            Projectile.Opacity, Projectile.scale);
         Main.spriteBatch.Draw(tex, pos, frame, col, rot, origin, scale, Effects, 0f);
 
         if (Item.glowMask >= 0)
@@ -419,10 +462,12 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
             Asset<Texture2D> glowmask = TextureAssets.GlowMask[Item.glowMask];
             if (!glowmask.IsDisposed && glowmask.IsLoaded && glowmask != null)
             {
-                after?.DrawFancySwordAfterimages(glowmask.Value, Projectile.Center, [glow], origin, Effects, RotationOffset, Projectile.Opacity, Projectile.scale);
+                after?.DrawFancySwordAfterimages(glowmask.Value, Projectile.Center, [glow], origin, Effects,
+                    RotationOffset, Projectile.Opacity, Projectile.scale);
                 Main.spriteBatch.Draw(glowmask.Value, pos, frame, glow, rot, origin, scale, Effects, 0f);
             }
         }
+
         return false;
     }
 }

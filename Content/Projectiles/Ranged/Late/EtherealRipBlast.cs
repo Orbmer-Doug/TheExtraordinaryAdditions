@@ -1,5 +1,4 @@
 ﻿using System;
-using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -46,8 +45,10 @@ public class EtherealRipBlast : ModProjectile
         cache.Update(Projectile.Center + Projectile.velocity);
 
         if (Projectile.FinalExtraUpdate())
-            ParticleRegistry.SpawnTechyHolosquareParticle(Projectile.Center + Main.rand.NextVector2Circular(30f * Projectile.scale, 30f * Projectile.scale),
-                -Projectile.velocity * Main.rand.NextFloat(.2f, .4f), Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .9f), Color.Cyan);
+            ParticleRegistry.SpawnTechyHolosquareParticle(
+                Projectile.Center + Main.rand.NextVector2Circular(30f * Projectile.scale, 30f * Projectile.scale),
+                -Projectile.velocity * Main.rand.NextFloat(.2f, .4f), Main.rand.Next(20, 30),
+                Main.rand.NextFloat(.4f, .9f), Color.Cyan);
 
         Projectile.scale = Projectile.Opacity = GetLerpBump(0f, 30f, Timeleft, Timeleft - 15f, Time);
         Projectile.rotation = Projectile.velocity.ToRotation();
@@ -59,13 +60,15 @@ public class EtherealRipBlast : ModProjectile
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         if (Projectile.damage > 1000)
-            Projectile.damage = (int)(Projectile.damage * .95f);
+            Projectile.damage = (int) (Projectile.damage * .95f);
 
         if (this.RunLocal())
-            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<LightripBlast>(), (int)(Projectile.damage * .5f), Projectile.knockBack, Projectile.owner);
+            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<LightripBlast>(),
+                (int) (Projectile.damage * .5f), Projectile.knockBack, Projectile.owner);
 
         for (int i = 0; i < 20; i++)
-            ParticleRegistry.SpawnSparkParticle(Projectile.Center, -Projectile.velocity.RotatedByRandom(.1f) * i * .1f, 30, .6f, Color.White, true);
+            ParticleRegistry.SpawnSparkParticle(Projectile.Center, -Projectile.velocity.RotatedByRandom(.1f) * i * .1f,
+                30, .6f, Color.White, true);
     }
 
     public override void OnKill(int timeLeft)
@@ -84,17 +87,13 @@ public class EtherealRipBlast : ModProjectile
     {
         modifiers.ScalingArmorPenetration += 1f;
         modifiers.DefenseEffectiveness *= 0f;
-
-        if (target.IsThanatos())
-        {
-            modifiers.FinalDamage *= .85f;
-        }
     }
 
     public Color ColorFunction(SystemVector2 completionRatio, Vector2 position)
     {
-        float fadeOpacity = Math.Min(Projectile.timeLeft / (float)cache.Points.Length, 1f);
-        return Color.Lerp(Color.Cyan, Color.DeepSkyBlue, .4f) * fadeOpacity * MathHelper.SmoothStep(1f, 0f, completionRatio.X);
+        float fadeOpacity = Math.Min(Projectile.timeLeft / (float) cache.Points.Length, 1f);
+        return Color.Lerp(Color.Cyan, Color.DeepSkyBlue, .4f) * fadeOpacity *
+               MathHelper.SmoothStep(1f, 0f, completionRatio.X);
     }
 
     public float WidthFunction(float c)
@@ -104,6 +103,7 @@ public class EtherealRipBlast : ModProjectile
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints cache = new(100);
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -117,6 +117,7 @@ public class EtherealRipBlast : ModProjectile
             shader.TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly * 12f);
             trail.DrawTrail(shader, cache.Points, 80);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;
     }

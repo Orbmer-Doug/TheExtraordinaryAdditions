@@ -11,6 +11,7 @@ public class FulminicSpark : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
     public const int Life = 60;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 16;
@@ -30,6 +31,7 @@ public class FulminicSpark : ModProjectile
 
     private List<Line> Branches = [];
     public override bool ShouldUpdatePosition() => false;
+
     public override void AI()
     {
         if (Time == 0f)
@@ -49,7 +51,8 @@ public class FulminicSpark : ModProjectile
         foreach (Line line in Branches)
         {
             int width = 16;
-            if (new Rectangle((int)line.A.X - width / 2, (int)line.A.Y - width / 2, width, width).Intersects(targetHitbox))
+            if (new Rectangle((int) line.A.X - width / 2, (int) line.A.Y - width / 2, width, width).Intersects(
+                    targetHitbox))
                 return true;
         }
 
@@ -62,9 +65,11 @@ public class FulminicSpark : ModProjectile
             return false;
         foreach (Line line in Branches)
         {
-            PixelationSystem.QueueTextureRenderAction(() => line.Draw(MulticolorLerp(Completion, Color.White, Color.LightPink, Color.Violet, Color.DarkViolet)
-                * Projectile.Opacity), PixelationLayer.OverNPCs, BlendState.Additive);
+            PixelationSystem.QueueTextureRenderAction(() =>
+                line.Draw(MulticolorLerp(Completion, Color.White, Color.LightPink, Color.Violet, Color.DarkViolet)
+                          * Projectile.Opacity), PixelationLayer.OverNPCs, BlendState.Additive);
         }
+
         return false;
     }
 }

@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using CalamityMod;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
@@ -25,6 +24,7 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
     public override int AssociatedItemID => ModContent.ItemType<UnparalleledCoalescence>();
     public override int IntendedProjectileType => ModContent.ProjectileType<CoalescenceHoldout>();
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.UnparalleledCoalescence);
+
     public override void Defaults()
     {
         Projectile.width = 62;
@@ -42,40 +42,46 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
     public List<Vector2> Points = [];
     public const int MaxPoints = 50;
     public const float ReelDist = 30f;
-    public static readonly float ReelTime = CalUtils.SecondsToFrames(3.5f);
+    public static readonly float ReelTime = SecondsToFrames(3.5f);
     public ref float Time => ref Projectile.ai[0];
     public ref float Switch => ref Projectile.ai[1];
     public ref float StringCompletion => ref Projectile.ai[2];
     public ref float OldStringCompletion => ref Projectile.AdditionsInfo().ExtraAI[0];
     public ref float TotalTime => ref Projectile.AdditionsInfo().ExtraAI[2];
+
     public bool Init
     {
         get => Projectile.AdditionsInfo().ExtraAI[3] == 1f;
         set => Projectile.AdditionsInfo().ExtraAI[3] = value.ToInt();
     }
+
     public int StateCounter
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[4];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[4];
         set => Projectile.AdditionsInfo().ExtraAI[4] = value;
     }
+
     public CoalescenceState CurrentState
     {
-        get => (CoalescenceState)StateCounter;
-        set => StateCounter = (int)value;
+        get => (CoalescenceState) StateCounter;
+        set => StateCounter = (int) value;
     }
+
     public int LeadArrowIndex
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[5];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[5];
         set => Projectile.AdditionsInfo().ExtraAI[5] = value;
     }
+
     public int SecondArrowIndex
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[6];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[6];
         set => Projectile.AdditionsInfo().ExtraAI[6] = value;
     }
+
     public int ThirdArrowIndex
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[7];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[7];
         set => Projectile.AdditionsInfo().ExtraAI[7] = value;
     }
 
@@ -90,6 +96,7 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
     {
         writer.Write(Projectile.rotation);
     }
+
     public override void GetExtraAI(BinaryReader reader)
     {
         Projectile.rotation = reader.ReadSingle();
@@ -97,11 +104,13 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
 
     public int Dir => Projectile.velocity.X.NonZeroSign();
     public DivinityArrow[] Arrows = new DivinityArrow[3];
+
     public override void SafeAI()
     {
         Projectile.extraUpdates = 0;
         if (line == null || line.Disposed)
-            line = new(c => 3f, (c, pos) => Color.Lerp(Color.Gold, Color.Goldenrod, c.X + Main.GlobalTimeWrappedHourly), null, MaxPoints);
+            line = new(c => 3f, (c, pos) => Color.Lerp(Color.Gold, Color.Goldenrod, c.X + Main.GlobalTimeWrappedHourly),
+                null, MaxPoints);
 
         if (this.RunLocal())
         {
@@ -109,17 +118,20 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
             if (Projectile.velocity != Projectile.oldVelocity)
                 Projectile.netUpdate = true;
         }
+
         Owner.ChangeDir(Dir);
         Projectile.rotation = Projectile.velocity.ToRotation();
         Projectile.spriteDirection = (Projectile.velocity.X > 0f).ToDirectionInt();
-        Projectile.Center = Center + PolarVector(35f, Projectile.rotation) + PolarVector(10f * Dir * Owner.gravDir, Projectile.rotation + PiOver2);
+        Projectile.Center = Center + PolarVector(35f, Projectile.rotation) +
+                            PolarVector(10f * Dir * Owner.gravDir, Projectile.rotation + PiOver2);
         Owner.itemRotation = (Projectile.direction * Projectile.velocity).ToRotation();
 
         float reel = InverseLerp(0f, ReelTime, Time);
         float close = InverseLerp(0f, 22f, Time);
 
         float armRot = Projectile.rotation + .595f * Dir;
-        float reelAnim = MakePoly(2.2f).InFunction.Evaluate(armRot, armRot + .73f * Dir, Switch != 0 ? reel : OldStringCompletion);
+        float reelAnim = MakePoly(2.2f).InFunction
+            .Evaluate(armRot, armRot + .73f * Dir, Switch != 0 ? reel : OldStringCompletion);
         Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, reelAnim);
         Owner.SetBackHandBetter(Player.CompositeArmStretchAmount.ThreeQuarters, Projectile.rotation + (.2f * Dir));
 
@@ -130,7 +142,8 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
         Vector2 middle = Projectile.RotHitbox().Center + centerString + drawBack;
         Lighting.AddLight(middle, Color.Gold.ToVector3() * .7f);
 
-        Vector2 bottom = Projectile.RotHitbox().Center + PolarVector(-35f, Projectile.rotation - PiOver2) + centerString;
+        Vector2 bottom = Projectile.RotHitbox().Center + PolarVector(-35f, Projectile.rotation - PiOver2) +
+                         centerString;
 
         Points = [];
         cache ??= new(MaxPoints);
@@ -156,6 +169,7 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
                         Time = 0f;
                         this.Sync();
                     }
+
                     break;
                 case 1:
                     StringCompletion = MakePoly(2.2f).InFunction.Evaluate(0f, 1f, reel);
@@ -165,11 +179,16 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
                         if (this.RunLocal())
                         {
                             LeadArrowIndex = Projectile.NewProj(middle, Projectile.velocity.SafeNormalize(Vector2.Zero),
-                                ModContent.ProjectileType<DivinityArrow>(), Projectile.damage, Projectile.knockBack, Owner.whoAmI, Projectile.whoAmI, 0f, 0);
-                            SecondArrowIndex = Projectile.NewProj(middle, Projectile.velocity.SafeNormalize(Vector2.Zero),
-                                ModContent.ProjectileType<DivinityArrow>(), Projectile.damage, Projectile.knockBack, Owner.whoAmI, Projectile.whoAmI, 0f, 1);
-                            ThirdArrowIndex = Projectile.NewProj(middle, Projectile.velocity.SafeNormalize(Vector2.Zero),
-                                ModContent.ProjectileType<DivinityArrow>(), Projectile.damage, Projectile.knockBack, Owner.whoAmI, Projectile.whoAmI, 0f, -1);
+                                ModContent.ProjectileType<DivinityArrow>(), Projectile.damage, Projectile.knockBack,
+                                Owner.whoAmI, Projectile.whoAmI, 0f, 0);
+                            SecondArrowIndex = Projectile.NewProj(middle,
+                                Projectile.velocity.SafeNormalize(Vector2.Zero),
+                                ModContent.ProjectileType<DivinityArrow>(), Projectile.damage, Projectile.knockBack,
+                                Owner.whoAmI, Projectile.whoAmI, 0f, 1);
+                            ThirdArrowIndex = Projectile.NewProj(middle,
+                                Projectile.velocity.SafeNormalize(Vector2.Zero),
+                                ModContent.ProjectileType<DivinityArrow>(), Projectile.damage, Projectile.knockBack,
+                                Owner.whoAmI, Projectile.whoAmI, 0f, -1);
                         }
 
                         Init = true;
@@ -183,13 +202,15 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
                         {
                             int index = p == 0 ? LeadArrowIndex : p == 1 ? SecondArrowIndex : ThirdArrowIndex;
                             DivinityArrow arrow = Main.projectile[index].As<DivinityArrow>();
-                            ParticleRegistry.SpawnSparkleParticle(arrow.TipOfArrow, Vector2.Zero, 20, 3.5f, Color.Gold, Color.DarkGoldenrod, 1.5f, 1.2f);
+                            ParticleRegistry.SpawnSparkleParticle(arrow.TipOfArrow, Vector2.Zero, 20, 3.5f, Color.Gold,
+                                Color.DarkGoldenrod, 1.5f, 1.2f);
                         }
 
                         CurrentState = CoalescenceState.Richochet;
                         AdditionsSound.etherealBlazeStart.Play(middle, .7f, -.2f);
                         this.Sync();
                     }
+
                     if (reelPercent == .66f)
                     {
                         for (int p = 0; p < 3; p++)
@@ -204,8 +225,12 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
                                     {
                                         Vector2 pos = arrow.TipOfArrow;
                                         float speed = Main.rand.NextFloat(1f, 12f);
-                                        Vector2 horiz = (i == -1 ? -Vector2.UnitX * speed : Vector2.UnitX * speed).RotatedBy(Projectile.rotation);
-                                        Vector2 vert = (a == -1 ? -Vector2.UnitY * speed : Vector2.UnitY * speed).RotatedBy(Projectile.rotation);
+                                        Vector2 horiz =
+                                            (i == -1 ? -Vector2.UnitX * speed : Vector2.UnitX * speed).RotatedBy(
+                                                Projectile.rotation);
+                                        Vector2 vert =
+                                            (a == -1 ? -Vector2.UnitY * speed : Vector2.UnitY * speed).RotatedBy(
+                                                Projectile.rotation);
                                         float size = 80.3f * (1f - InverseLerp(1f, 12f, speed));
                                         int life = 30;
                                         Color col = Color.Lerp(Color.Gold, Color.Red, .5f);
@@ -220,6 +245,7 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
                         AdditionsSound.etherealBlazeStart.Play(middle);
                         this.Sync();
                     }
+
                     if (reelPercent == .99f)
                     {
                         for (int p = 0; p < 3; p++)
@@ -227,17 +253,19 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
                             int index = p == 0 ? LeadArrowIndex : p == 1 ? SecondArrowIndex : ThirdArrowIndex;
                             DivinityArrow arrow = Main.projectile[index].As<DivinityArrow>();
                             float pulseScale = pulseScale = p == 0 ? 1.15f : p == 1 ? .75f : .5f;
-                            ParticleRegistry.SpawnPulseRingParticle(arrow.TipOfArrow, Vector2.Zero, 30, arrow.Projectile.rotation, new(1f, .4f), 0f, 360f * pulseScale, Color.Gold, true);
+                            ParticleRegistry.SpawnPulseRingParticle(arrow.TipOfArrow, Vector2.Zero, 30,
+                                arrow.Projectile.rotation, new(1f, .4f), 0f, 360f * pulseScale, Color.Gold, true);
                         }
 
                         CurrentState = CoalescenceState.Blast;
                         AdditionsSound.etherealBlazeStart.Play(middle, 1.5f, .2f);
                         this.Sync();
                     }
+
                     for (int p = 0; p < 3; p++)
                     {
                         int index = p == 0 ? LeadArrowIndex : p == 1 ? SecondArrowIndex : ThirdArrowIndex;
-                        Main.projectile[index].ai[1] = (int)CurrentState;
+                        Main.projectile[index].ai[1] = (int) CurrentState;
                     }
 
                     if (!Modded.MouseLeft.Current && this.RunLocal())
@@ -249,12 +277,14 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
                         {
                             for (int i = 0; i < 20; i++)
                             {
-                                Vector2 vel = Projectile.velocity.RotatedByRandom(.3f) * speed * Main.rand.NextFloat(.8f, 1.6f);
+                                Vector2 vel = Projectile.velocity.RotatedByRandom(.3f) * speed *
+                                              Main.rand.NextFloat(.8f, 1.6f);
                                 int life = Main.rand.Next(30, 40);
                                 float scale = Main.rand.NextFloat(.9f, 1.7f);
                                 Color color = Color.Gold.Lerp(Color.Goldenrod, Main.rand.NextFloat(.3f, .6f));
                                 ParticleRegistry.SpawnSparkParticle(middle, vel, life, scale, color);
-                                ParticleRegistry.SpawnSquishyLightParticle(middle, vel * 1.7f, life / 2, scale * 1.1f, color);
+                                ParticleRegistry.SpawnSquishyLightParticle(middle, vel * 1.7f, life / 2, scale * 1.1f,
+                                    color);
                             }
                         }
 
@@ -263,7 +293,8 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
                             int index = p == 0 ? LeadArrowIndex : p == 1 ? SecondArrowIndex : ThirdArrowIndex;
                             DivinityArrow arrow = Main.projectile[index].As<DivinityArrow>();
                             arrow.Release = true;
-                            arrow.Projectile.velocity = (arrow.Projectile.rotation - PiOver2).ToRotationVector2() * speed;
+                            arrow.Projectile.velocity =
+                                (arrow.Projectile.rotation - PiOver2).ToRotationVector2() * speed;
                             arrow.Projectile.netUpdate = true;
                         }
 
@@ -274,6 +305,7 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
                         Time = 0f;
                         this.Sync();
                     }
+
                     break;
             }
 
@@ -289,6 +321,7 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
 
     public OptimizedPrimitiveTrail line;
     public TrailPoints cache;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -300,6 +333,7 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
             strings.TrySetParameter("heatInterpolant", 10f);
             line.DrawTrail(strings, cache.Points, 150);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.HeldProjectiles);
 
         Texture2D texture = Projectile.ThisProjectileTexture();
@@ -309,8 +343,10 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
         SpriteEffects direction = FixedDirection();
 
         // Draw the main bow
-        Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), rotation, origin, Projectile.scale, direction, 0f);
-        Main.spriteBatch.Draw(AssetRegistry.GetTexture(AdditionsTexture.UnparalleledCoalescence_Glow), drawPosition, null, Projectile.GetAlpha(Color.White), rotation, origin, Projectile.scale, direction, 0f);
+        Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), rotation, origin,
+            Projectile.scale, direction, 0f);
+        Main.spriteBatch.Draw(AssetRegistry.GetTexture(AdditionsTexture.UnparalleledCoalescence_Glow), drawPosition,
+            null, Projectile.GetAlpha(Color.White), rotation, origin, Projectile.scale, direction, 0f);
         return false;
     }
 }

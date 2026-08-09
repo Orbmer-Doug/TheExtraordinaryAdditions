@@ -4,26 +4,9 @@ namespace TheExtraordinaryAdditions.Core.CrossCompatibility;
 
 public class ModReferences : ModSystem
 {
-    public static Mod Fables
-    {
-        get;
-        private set;
-    }
-    public static Mod BossChecklist
-    {
-        get;
-        private set;
-    }
-    public static Mod Infernum
-    {
-        get;
-        private set;
-    }
-    public static Mod WotG
-    {
-        get;
-        private set;
-    }
+    public static Mod Fables { get; private set; }
+    public static Mod BossChecklist { get; private set; }
+    public static Mod WotG { get; private set; }
 
     public override void Load()
     {
@@ -31,14 +14,12 @@ public class ModReferences : ModSystem
             Fables = fablesssomgg;
         if (ModLoader.TryGetMod("BossChecklist", out Mod bcl))
             BossChecklist = bcl;
-        if (ModLoader.TryGetMod("Infernum", out Mod inf))
-            Infernum = inf;
         if (ModLoader.TryGetMod("NoxusBoss", out Mod knocksus))
             WotG = knocksus;
     }
 
     public override void Unload()
     {
-        Fables = BossChecklist = Infernum = WotG = null;
+        Fables = BossChecklist = WotG = null;
     }
 }

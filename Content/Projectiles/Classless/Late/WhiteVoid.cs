@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -11,10 +10,10 @@ public class WhiteVoid : ModProjectile, IHasScreenShader
 {
     public bool IsEntityActive() => Projectile.active;
     public ref float Time => ref Projectile.ai[0];
-    public static readonly int Lifetime = CalUtils.SecondsToFrames(1.2f);
-    public static readonly int DisappearTime = CalUtils.SecondsToFrames(0.11f);
-    public static readonly int FillInTime = CalUtils.SecondsToFrames(0.25f);
-    public static readonly int FillInDelay = CalUtils.SecondsToFrames(0.42f);
+    public static readonly int Lifetime = SecondsToFrames(1.2f);
+    public static readonly int DisappearTime = SecondsToFrames(0.11f);
+    public static readonly int FillInTime = SecondsToFrames(0.25f);
+    public static readonly int FillInDelay = SecondsToFrames(0.42f);
     public override string Texture => AssetRegistry.Invis;
     public Player Owner => Main.player[Projectile.owner];
 
@@ -33,10 +32,10 @@ public class WhiteVoid : ModProjectile, IHasScreenShader
         if (Owner.Available())
             Projectile.Center = Owner.RotatedRelativePoint(Owner.MountedCenter);
 
-        if ((int)Time == FillInDelay)
+        if ((int) Time == FillInDelay)
             AdditionsSound.HeavyWhooshShort.Play(Projectile.Center, 1.1f, .1f, .1f, 20, Name);
 
-        Projectile.ExpandHitboxBy((int)Animators.MakePoly(3f).InFunction
+        Projectile.ExpandHitboxBy((int) Animators.MakePoly(3f).InFunction
             .Evaluate(Time, Lifetime, Lifetime - DisappearTime, 0f, 400f));
 
         Time++;
@@ -63,7 +62,7 @@ public class WhiteVoid : ModProjectile, IHasScreenShader
         Shader.TrySetParameter("screenPos", GetTransformedScreenCoords(Projectile.Center));
         Shader.TrySetParameter("screenSize", Main.ScreenSize.ToVector2());
         Shader.TrySetParameter("edgeColor", Color.AntiqueWhite * fade);
-        Shader.TrySetParameter("radius", (float)Projectile.width / Main.screenWidth * Main.GameViewMatrix.Zoom.X);
+        Shader.TrySetParameter("radius", (float) Projectile.width / Main.screenWidth * Main.GameViewMatrix.Zoom.X);
         Shader.TrySetParameter("scale", scale);
         Shader.TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly);
         Shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FlameMap2), 1, SamplerState.LinearWrap);
@@ -101,6 +100,6 @@ public class WhiteVoid : ModProjectile, IHasScreenShader
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return CalUtils.CircularHitboxCollision(Projectile.Center, Projectile.width / 3, targetHitbox);
+        return CircularHitboxCollision(Projectile.Center, Projectile.width / 3, targetHitbox);
     }
 }

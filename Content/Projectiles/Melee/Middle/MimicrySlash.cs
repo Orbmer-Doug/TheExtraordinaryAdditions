@@ -63,7 +63,8 @@ public class MimicrySlash : BaseSwordSwing
         // Update trails
         if (TimeStop <= 0f)
         {
-            old.Update(Rect().Bottom + PolarVector(65f * Projectile.scale, Projectile.rotation - SwordRotation) + Owner.velocity - Center);
+            old.Update(Rect().Bottom + PolarVector(65f * Projectile.scale, Projectile.rotation - SwordRotation) +
+                Owner.velocity - Center);
         }
 
         float scaleUp = MeleeScale * 1.15f;
@@ -118,7 +119,8 @@ public class MimicrySlash : BaseSwordSwing
             float scale = Main.rand.NextFloat(30f, 40f);
             Color color = Color.Crimson;
             ParticleRegistry.SpawnGlowParticle(start, vel * .6f, life, scale, color, .6f);
-            ParticleRegistry.SpawnMistParticle(start, vel * Main.rand.NextFloat(.6f, 1.4f), Main.rand.NextFloat(.6f, .8f), color, Color.DarkRed, Main.rand.NextFloat(120f, 200f));
+            ParticleRegistry.SpawnMistParticle(start, vel * Main.rand.NextFloat(.6f, 1.4f),
+                Main.rand.NextFloat(.6f, .8f), color, Color.DarkRed, Main.rand.NextFloat(120f, 200f));
         }
 
         if (Projectile.numHits <= 0)
@@ -139,8 +141,10 @@ public class MimicrySlash : BaseSwordSwing
             float scale = Main.rand.NextFloat(30f, 40f);
             Color color = Color.Crimson;
             ParticleRegistry.SpawnGlowParticle(start, vel * .6f, life, scale, color, .6f);
-            ParticleRegistry.SpawnMistParticle(start, vel, Main.rand.NextFloat(.4f, .6f), color, Color.DarkRed, Main.rand.NextFloat(120f, 200f));
+            ParticleRegistry.SpawnMistParticle(start, vel, Main.rand.NextFloat(.4f, .6f), color, Color.DarkRed,
+                Main.rand.NextFloat(120f, 200f));
         }
+
         TimeStop = StopTime;
     }
 
@@ -162,10 +166,12 @@ public class MimicrySlash : BaseSwordSwing
                 {
                     ParticleRegistry.SpawnGlowParticle(pos, vel, life / 2, scale, color, .3f);
                 }
+
                 ParticleRegistry.SpawnMistParticle(pos, vel, scale, color, Color.DarkRed, Main.rand.NextByte(90, 230));
                 if (i % 4 == 3)
                 {
-                    ParticleRegistry.SpawnBloodStreakParticle(pos, vel.SafeNormalize(Vector2.Zero), life, scale / 2, color);
+                    ParticleRegistry.SpawnBloodStreakParticle(pos, vel.SafeNormalize(Vector2.Zero), life, scale / 2,
+                        color);
                 }
             }
 

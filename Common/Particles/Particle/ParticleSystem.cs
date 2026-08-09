@@ -110,16 +110,17 @@ public unsafe struct ParticleData
     public CollisionTypes AllowedCollisions;
     public ParticleTypes Type;
     private byte blendStateIndex;
-    
+
     public PixelationLayer PixelationLayer => PixelationLayer.Dusts;
     public readonly bool Active => Time < Lifetime;
-    public readonly int Direction => (sbyte)(Velocity.X >= 0 ? 1 : -1);
+    public readonly int Direction => (sbyte) (Velocity.X >= 0 ? 1 : -1);
     public Span<byte> CustomData => MemoryMarshal.CreateSpan(ref customData[0], CustomDataSize);
+
     public Span<Vector2> OldPositions =>
         MemoryMarshal.CreateSpan(ref Unsafe.As<float, Vector2>(ref oldPositions[0]), MaxOldPositions);
 
     public readonly BlendState EffectiveBlendState => blendStateIndex == 0
-        ? ParticleRegistry.GetDefinition((byte)Type).BlendState
+        ? ParticleRegistry.GetDefinition((byte) Type).BlendState
         : ParticleSystem.SupportedBlendStates[blendStateIndex - 1];
 
     /// <summary>
@@ -137,11 +138,11 @@ public unsafe struct ParticleData
                 $"Type {typeof(T).Name} exceeds CustomData size ({CustomDataSize} bytes) by {sizeof(T)}.");
         return ref MemoryMarshal.AsRef<T>(CustomData);
     }
-    
+
     public void SetBlendState(BlendState state)
     {
         int index = Array.IndexOf(ParticleSystem.SupportedBlendStates, state);
-        blendStateIndex = (byte)(index == -1 ? 0 : index + 1);
+        blendStateIndex = (byte) (index == -1 ? 0 : index + 1);
     }
 }
 
@@ -205,7 +206,7 @@ public sealed class ParticleSystem : ModSystem
 
     // Type-specific behavior
     public static readonly ParticleTypeDefinition[] TypeDefinitions =
-        new ParticleTypeDefinition[(int)(GetLastEnumValue<ParticleTypes>() + 1)];
+        new ParticleTypeDefinition[(int) (GetLastEnumValue<ParticleTypes>() + 1)];
 
     public ParticleData[] GetParticles() => particles;
     public ulong[] GetPresenceMask() => presenceMask;
@@ -241,7 +242,7 @@ public sealed class ParticleSystem : ModSystem
         particles[index].Init = new(particle.Velocity, particle.Position, particle.Opacity, particle.Scale,
             particle.Color);
         particles[index].Time = 0;
-        TypeDefinitions[(byte)particle.Type].OnSpawn?.Invoke(ref particles[index]);
+        TypeDefinitions[(byte) particle.Type].OnSpawn?.Invoke(ref particles[index]);
         activeCount++;
     }
 
@@ -284,13 +285,13 @@ public sealed class ParticleSystem : ModSystem
 
                     // Core update
                     p.Time++;
-                    p.TimeRatio = (float)p.Time / p.Lifetime;
-                    p.LifetimeRatio = (float)(p.Lifetime - p.Time) / p.Lifetime;
+                    p.TimeRatio = (float) p.Time / p.Lifetime;
+                    p.LifetimeRatio = (float) (p.Lifetime - p.Time) / p.Lifetime;
 
                     // Movement and collision
                     p.OldVelocity = p.Velocity;
 
-                    ParticleTypeDefinition def = TypeDefinitions[(byte)p.Type];
+                    ParticleTypeDefinition def = TypeDefinitions[(byte) p.Type];
                     if (p.AllowedCollisions != CollisionTypes.None)
                     {
                         bool collide = false;
@@ -327,9 +328,9 @@ public sealed class ParticleSystem : ModSystem
                         {
                             foreach (Projectile proj in Main.ActiveProjectiles)
                             {
-                                if (proj == null) 
+                                if (proj == null)
                                     continue;
-                                
+
                                 Rectangle temp = p.Hitbox;
                                 p.Velocity = ResolveCollision(ref temp, proj.RotHitbox(), p.Velocity, out collide);
                             }
@@ -354,7 +355,7 @@ public sealed class ParticleSystem : ModSystem
                     p.Position += p.Velocity;
 
                     def.Update(ref p);
-                    p.Hitbox = new Rectangle((int)(p.Position.X - p.Width / 2f), (int)(p.Position.Y - p.Height / 2f),
+                    p.Hitbox = new Rectangle((int) (p.Position.X - p.Width / 2f), (int) (p.Position.Y - p.Height / 2f),
                         p.Width / 4, p.Height / 4);
 
                     if ((!(Vector2.DistanceSquared(p.Position, screenCenter) >= maxParticleDistanceSqr) ||
@@ -408,7 +409,7 @@ public sealed class ParticleSystem : ModSystem
             foreach (int index in ActiveParticles)
             {
                 ref ParticleData p = ref particles[index];
-                ParticleTypeDefinition def = TypeDefinitions[(byte)p.Type];
+                ParticleTypeDefinition def = TypeDefinitions[(byte) p.Type];
 
                 if (def.CanCull)
                 {
@@ -418,9 +419,9 @@ public sealed class ParticleSystem : ModSystem
                         continue;
                 }
 
-                if (p.EffectiveBlendState != blendState) 
+                if (p.EffectiveBlendState != blendState)
                     continue;
-                
+
                 DrawTypes type = def.DrawType;
                 if (type != DrawTypes.Manual)
                 {
@@ -441,7 +442,7 @@ public sealed class ParticleSystem : ModSystem
                     }
                 }
                 else
-                    TypeDefinitions[(byte)p.Type].Draw(ref p, sb);
+                    TypeDefinitions[(byte) p.Type].Draw(ref p, sb);
             }
 
             sb.End();
@@ -519,7 +520,7 @@ public static class ParticleRegistry
         // Load all definitions into the particle system
         foreach (ParticleDefinition definition in Definitions)
         {
-            ParticleSystem.TypeDefinitions[(byte)definition.Type] = definition.Definition;
+            ParticleSystem.TypeDefinitions[(byte) definition.Type] = definition.Definition;
         }
     }
 
@@ -548,9 +549,10 @@ public static class ParticleRegistry
             },
             draw: static (ref p, sb) =>
             {
-                Texture2D texture = TypeDefinitions[(byte)ParticleTypes.Blood].Texture;
+                Texture2D texture = TypeDefinitions[(byte) ParticleTypes.Blood].Texture;
                 float verticalStretch = Utils.GetLerpValue(0f, 24f, Math.Abs(p.Velocity.Y), clamped: true) * 0.84f;
-                float brightness = MathF.Pow(Lighting.Brightness((int)(p.Position.X / 16f), (int)(p.Position.Y / 16f)),
+                float brightness = MathF.Pow(
+                    Lighting.Brightness((int) (p.Position.X / 16f), (int) (p.Position.Y / 16f)),
                     0.15f);
                 Vector2 scale = new Vector2(1f, verticalStretch + 1f) * p.Scale * 0.1f;
                 sb.DrawBetter(texture, p.Position, null, p.Color * p.Opacity * brightness, p.Rotation,
@@ -591,11 +593,11 @@ public static class ParticleRegistry
             },
             draw: static (ref p, sb) =>
             {
-                Texture2D texture = TypeDefinitions[(byte)ParticleTypes.BloodStreak].Texture;
+                Texture2D texture = TypeDefinitions[(byte) ParticleTypes.BloodStreak].Texture;
                 float brightness =
                     MathF.Pow(Lighting.Brightness(p.Position.ToTileCoordinates().X, p.Position.ToTileCoordinates().Y),
                         0.15f);
-                Rectangle frame = texture.Frame(1, 3, 0, (int)(p.LifetimeRatio * 3f));
+                Rectangle frame = texture.Frame(1, 3, 0, (int) (p.LifetimeRatio * 3f));
                 Vector2 origin = frame.Size() * 0.5f;
                 sb.DrawBetter(texture, p.Position, frame, p.Color * brightness * p.Opacity, p.Rotation, origin,
                     p.Scale);
@@ -637,7 +639,7 @@ public static class ParticleRegistry
             },
             draw: static (ref p, sb) =>
             {
-                Texture2D texture = TypeDefinitions[(byte)ParticleTypes.BloomLine].Texture;
+                Texture2D texture = TypeDefinitions[(byte) ParticleTypes.BloomLine].Texture;
                 Vector2 scale = new Vector2(0.5f, 1.6f) * p.Scale;
                 for (float i = .25f; i < 1f; i += .25f)
                 {
@@ -717,7 +719,7 @@ public static class ParticleRegistry
             draw: static (ref p, sb) =>
             {
                 ref BloomPixelData custom = ref p.GetCustomData<BloomPixelData>();
-                Texture2D pixel = TypeDefinitions[(byte)ParticleTypes.SquishyPixel].Texture;
+                Texture2D pixel = TypeDefinitions[(byte) ParticleTypes.SquishyPixel].Texture;
                 Texture2D bloom = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
                 SpriteEffects direction = p.Direction.ToSpriteDirection();
                 Vector2 bloomOrigin = bloom.Size() / 2f;
@@ -783,7 +785,7 @@ public static class ParticleRegistry
         custom.HomeInDestination = homeInDestination;
         custom.Gravity = gravity;
         custom.Intense = intense;
-        custom.TrailLength = Math.Min(trailLength, (byte)10); // Cap at OldPositions length
+        custom.TrailLength = Math.Min(trailLength, (byte) 10); // Cap at OldPositions length
         custom.VelMult = velocity.Length();
 
         SafeSpawn(particle);
@@ -857,7 +859,7 @@ public static class ParticleRegistry
             },
             draw: static (ref p, sb) =>
             {
-                Texture2D texture = TypeDefinitions[(byte)ParticleTypes.BulletCasing].Texture;
+                Texture2D texture = TypeDefinitions[(byte) ParticleTypes.BulletCasing].Texture;
                 sb.DrawBetter(texture, p.Position, null, Lighting.GetColor(p.Position.ToTileCoordinates()) * p.Opacity,
                     p.Rotation, texture.Size() / 2, p.Scale);
 
@@ -897,7 +899,7 @@ public static class ParticleRegistry
         {
             Position = position,
             Velocity = velocity,
-            Lifetime = CalUtils.SecondsToFrames(5),
+            Lifetime = SecondsToFrames(5),
             Scale = scale,
             Color = Color.White,
             Width = 20,
@@ -933,7 +935,7 @@ public static class ParticleRegistry
             },
             draw: static (ref p, sb) =>
             {
-                Texture2D texture = TypeDefinitions[(byte)ParticleTypes.CartoonAnger].Texture;
+                Texture2D texture = TypeDefinitions[(byte) ParticleTypes.CartoonAnger].Texture;
                 sb.DrawBetter(texture, p.Position, null, p.Color * p.Opacity, p.Rotation, texture.Size() / 2f, p.Scale);
             },
             drawType: DrawTypes.Manual
@@ -1039,7 +1041,8 @@ public static class ParticleRegistry
                     _ => AssetRegistry.GetTexture(AdditionsTexture.NebulaGas1)
                 };
 
-                float brightness = MathF.Pow(Lighting.Brightness((int)(p.Position.X / 16f), (int)(p.Position.Y / 16f)),
+                float brightness = MathF.Pow(
+                    Lighting.Brightness((int) (p.Position.X / 16f), (int) (p.Position.Y / 16f)),
                     0.15f) * 0.9f;
                 Color col = p.Color * p.Opacity * (custom.LightEffected ? brightness : 1f);
                 sb.DrawBetterRect(texture, ToTarget(p.Position, new(p.Scale * 2f)), null, col, p.Rotation,
@@ -1199,7 +1202,7 @@ public static class ParticleRegistry
             draw: static (ref p, sb) =>
             {
                 ref CrosscodeBollData data = ref p.GetCustomData<CrosscodeBollData>();
-                Texture2D texture = TypeDefinitions[(byte)ParticleTypes.CrossCodeBoll].Texture;
+                Texture2D texture = TypeDefinitions[(byte) ParticleTypes.CrossCodeBoll].Texture;
 
                 int x = 48 * p.Frame;
                 int y = 0;
@@ -1430,7 +1433,7 @@ public static class ParticleRegistry
             draw: static (ref p, sb) =>
             {
                 ref CrosscodeHitData data = ref p.GetCustomData<CrosscodeHitData>();
-                Texture2D texture = TypeDefinitions[(byte)ParticleTypes.CrossCodeHit].Texture;
+                Texture2D texture = TypeDefinitions[(byte) ParticleTypes.CrossCodeHit].Texture;
 
                 int x = 128 * p.Frame;
                 int y = 0;
@@ -1547,7 +1550,7 @@ public static class ParticleRegistry
             update: static (ref p) => { p.Rotation = p.Velocity.ToRotation(); },
             draw: static (ref p, sb) =>
             {
-                Texture2D texture = TypeDefinitions[(byte)ParticleTypes.Debug].Texture;
+                Texture2D texture = TypeDefinitions[(byte) ParticleTypes.Debug].Texture;
                 sb.DrawBetterRect(texture, ToTarget(p.Position, p.Scale, p.Scale), null, p.Color, p.Rotation,
                     texture.Size() / 2);
             },
@@ -1607,7 +1610,7 @@ public static class ParticleRegistry
                 ref DetailedBlastData custom = ref p.GetCustomData<DetailedBlastData>();
                 Texture2D tex = custom.AltTex
                     ? AssetRegistry.GetTexture(AdditionsTexture.DetailedBlast2)
-                    : TypeDefinitions[(byte)ParticleTypes.DetailedBlast].Texture;
+                    : TypeDefinitions[(byte) ParticleTypes.DetailedBlast].Texture;
                 Vector2 scale = Vector2.Lerp(custom.From, custom.To, Animators.Circ.OutFunction(p.TimeRatio));
                 Rectangle target = ToTarget(p.Position, scale);
                 if (custom.AuraCol.HasValue)
@@ -1687,7 +1690,7 @@ public static class ParticleRegistry
             draw: static (ref p, sb) =>
             {
                 ref DustData custom = ref p.GetCustomData<DustData>();
-                Texture2D texture = TypeDefinitions[(byte)ParticleTypes.Dust].Texture;
+                Texture2D texture = TypeDefinitions[(byte) ParticleTypes.Dust].Texture;
                 Rectangle frame = new(12 * p.Frame, 0, 12, 10);
                 Vector2 orig = frame.Size() / 2f;
                 sb.DrawBetter(texture, p.Position, frame, p.Color * p.Opacity, p.Rotation, orig, p.Scale);
@@ -1814,7 +1817,7 @@ public static class ParticleRegistry
             },
             draw: static (ref p, sb) =>
             {
-                Texture2D texture = TypeDefinitions[(byte)ParticleTypes.Glow].Texture;
+                Texture2D texture = TypeDefinitions[(byte) ParticleTypes.Glow].Texture;
                 Vector2 orig = texture.Size() / 2f;
                 sb.DrawBetterRect(texture, ToTarget(p.Position, p.Scale, p.Scale), null, p.Color * p.Opacity * .3f,
                     p.Rotation, orig);
@@ -1877,8 +1880,8 @@ public static class ParticleRegistry
             },
             draw: static (ref p, sb) =>
             {
-                Texture2D texture = TypeDefinitions[(byte)ParticleTypes.HeavySmoke].Texture;
-                int timeFrame = (int)Math.Floor(p.Time / (p.Lifetime / 6f));
+                Texture2D texture = TypeDefinitions[(byte) ParticleTypes.HeavySmoke].Texture;
+                int timeFrame = (int) Math.Floor(p.Time / (p.Lifetime / 6f));
                 Rectangle frame = new(p.Frame * 80, timeFrame * 80, 80, 80);
                 SpriteEffects visualDirection = p.Direction.ToSpriteDirection();
                 sb.DrawBetter(texture, p.Position, frame, p.Color * p.Opacity, p.Rotation, frame.Size() * 0.5f, p.Scale,
@@ -1977,7 +1980,7 @@ public static class ParticleRegistry
             isPrimitive: true
         ));
     }
-    
+
     private static float ArcWidthFunction(LightningArcContext context, float completionRatio)
     {
         float lifetimeSquish = GetLerpBump(0.1f, 0.35f, 1f, 0.75f, context.TimeRatio);
@@ -2016,7 +2019,8 @@ public static class ParticleRegistry
             if (Main.rand.NextBool(100))
                 arcProtrudeDistance *= 3f;
 
-            Vector2 arcOffset = custom.Vel.SafeNormalize(Vector2.Zero).RotatedBy(arcProtrudeAngleOffset) * arcProtrudeDistance;
+            Vector2 arcOffset = custom.Vel.SafeNormalize(Vector2.Zero).RotatedBy(arcProtrudeAngleOffset) *
+                                arcProtrudeDistance;
             custom.PointsX[i] += arcOffset.X;
             custom.PointsY[i] += arcOffset.Y;
         }
@@ -2068,7 +2072,7 @@ public static class ParticleRegistry
             },
             draw: static (ref p, sb) =>
             {
-                Texture2D texture = TypeDefinitions[(byte)ParticleTypes.Menacing].Texture;
+                Texture2D texture = TypeDefinitions[(byte) ParticleTypes.Menacing].Texture;
                 sb.DrawBetter(texture, p.Position, null, p.Color * p.Opacity, p.Rotation, texture.Size() / 2, p.Scale);
             },
             drawType: DrawTypes.Manual
@@ -2129,7 +2133,7 @@ public static class ParticleRegistry
             },
             draw: static (ref p, sb) =>
             {
-                Texture2D texture = TypeDefinitions[(byte)ParticleTypes.Mist].Texture;
+                Texture2D texture = TypeDefinitions[(byte) ParticleTypes.Mist].Texture;
                 Rectangle frame = texture.Frame(1, 3, 0, p.Frame);
                 sb.DrawBetter(texture, p.Position, frame, p.Color with { A = 0 }, p.Rotation, frame.Size() * .5f,
                     p.Scale, p.Direction.ToSpriteDirection());
@@ -2146,7 +2150,7 @@ public static class ParticleRegistry
             Position = position,
             Velocity = velocity,
             Scale = scale,
-            Lifetime = CalUtils.SecondsToFrames(2),
+            Lifetime = SecondsToFrames(2),
             Frame = Main.rand.Next(3),
             Type = ParticleTypes.Mist,
         };
@@ -2178,7 +2182,7 @@ public static class ParticleRegistry
                 ref PulseRingData custom = ref p.GetCustomData<PulseRingData>();
                 p.Scale = Animators.MakePoly(4).OutFunction
                     .Evaluate(custom.OriginalScale, custom.FinalScale, p.TimeRatio);
-                p.Opacity = (float)Math.Sin(MathHelper.PiOver2 + p.TimeRatio * MathHelper.PiOver2);
+                p.Opacity = (float) Math.Sin(MathHelper.PiOver2 + p.TimeRatio * MathHelper.PiOver2);
                 p.Color = custom.BaseColor * p.Opacity;
                 Lighting.AddLight(p.Position, p.Color.ToVector3() * InverseLerp(0f, custom.FinalScale, p.Scale));
                 p.Velocity *= 0.95f;
@@ -2188,7 +2192,7 @@ public static class ParticleRegistry
                 ref PulseRingData custom = ref p.GetCustomData<PulseRingData>();
                 Texture2D tex = custom.UseAltTexture
                     ? AssetRegistry.GetTexture(AdditionsTexture.HollowCircleFancy)
-                    : TypeDefinitions[(byte)ParticleTypes.PulseRing].Texture;
+                    : TypeDefinitions[(byte) ParticleTypes.PulseRing].Texture;
                 sb.DrawBetterRect(tex, ToTarget(p.Position, p.Scale * custom.Squish), null, p.Color, p.Rotation,
                     tex.Size() / 2f);
             },
@@ -2284,7 +2288,7 @@ public static class ParticleRegistry
             draw: static (ref p, sb) =>
             {
                 Rectangle frame = new(0, 26 * p.Frame, 26, 26);
-                sb.DrawBetter(TypeDefinitions[(byte)ParticleTypes.Snowflake].Texture, p.Position, frame,
+                sb.DrawBetter(TypeDefinitions[(byte) ParticleTypes.Snowflake].Texture, p.Position, frame,
                     Color.White * p.Opacity, p.Rotation, frame.Size() / 2, p.Scale);
             },
             drawType: DrawTypes.Manual
@@ -2352,7 +2356,7 @@ public static class ParticleRegistry
             },
             draw: static (ref p, sb) =>
             {
-                Texture2D texture = TypeDefinitions[(byte)ParticleTypes.Spark].Texture;
+                Texture2D texture = TypeDefinitions[(byte) ParticleTypes.Spark].Texture;
                 sb.DrawBetter(texture, p.Position, null, p.Color * p.Opacity * 0.15f, p.Rotation, texture.Size() / 2,
                     new Vector2(0.5f, 1.4f) * p.Scale * 2f);
                 sb.DrawBetter(texture, p.Position, null, Color.Lerp(Color.White, p.Color, 0.2f) * p.Opacity * 0.5f,
@@ -2411,9 +2415,9 @@ public static class ParticleRegistry
             draw: static (ref p, sb) =>
             {
                 ref SparkleParticleData custom = ref p.GetCustomData<SparkleParticleData>();
-                Texture2D sparkTexture = TypeDefinitions[(byte)ParticleTypes.Sparkle].Texture;
+                Texture2D sparkTexture = TypeDefinitions[(byte) ParticleTypes.Sparkle].Texture;
                 Texture2D bloomTexture = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
-                float properBloomSize = sparkTexture.Height / (float)bloomTexture.Height + 0.05f;
+                float properBloomSize = sparkTexture.Height / (float) bloomTexture.Height + 0.05f;
                 sb.DrawBetter(bloomTexture, p.Position, null, custom.BloomColor * p.Opacity * 0.5f, 0f,
                     bloomTexture.Size() / 2f, p.Scale * custom.BloomScale * properBloomSize);
                 sb.DrawBetter(sparkTexture, p.Position, null, p.Color * p.Opacity, p.Rotation, sparkTexture.Size() / 2f,
@@ -2468,14 +2472,14 @@ public static class ParticleRegistry
             },
             draw: static (ref p, sb) =>
             {
-                Texture2D texture = TypeDefinitions[(byte)ParticleTypes.SquishyLight].Texture;
+                Texture2D texture = TypeDefinitions[(byte) ParticleTypes.SquishyLight].Texture;
                 ref SquishyLightParticleData custom = ref p.GetCustomData<SquishyLightParticleData>();
                 float squish = MathHelper.Clamp(p.Velocity.Length() / 10f * custom.SquishStrength, 1f,
                     custom.MaxSquish);
                 float rotation = p.Velocity.ToRotation() + MathHelper.PiOver2;
                 Vector2 scale = new Vector2(p.Scale - p.Scale * squish * 0.3f, p.Scale * squish) * 0.6f;
                 float properBloomSize =
-                    texture.Height / (float)AssetRegistry.GetTexture(AdditionsTexture.GlowSoft).Height;
+                    texture.Height / (float) AssetRegistry.GetTexture(AdditionsTexture.GlowSoft).Height;
                 sb.DrawBetter(AssetRegistry.GetTexture(AdditionsTexture.GlowSoft), p.Position, null,
                     p.Color * p.Opacity * 0.8f, rotation,
                     AssetRegistry.GetTexture(AdditionsTexture.GlowSoft).Size() / 2f, scale * 2f * properBloomSize);
@@ -2537,7 +2541,7 @@ public static class ParticleRegistry
             },
             draw: static (ref p, sb) =>
             {
-                Texture2D texture = TypeDefinitions[(byte)ParticleTypes.SquishyPixel].Texture;
+                Texture2D texture = TypeDefinitions[(byte) ParticleTypes.SquishyPixel].Texture;
                 ref SquishyPixelData custom = ref p.GetCustomData<SquishyPixelData>();
                 Texture2D bloom = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
                 Vector2 orig = texture.Size() / 2;
@@ -2587,7 +2591,7 @@ public static class ParticleRegistry
         custom.BloomColor = bloomCol;
         custom.Gravity = fall;
         custom.Rot = velRot;
-        custom.TrailLength = Math.Min(trailLength, (byte)10);
+        custom.TrailLength = Math.Min(trailLength, (byte) 10);
         SafeSpawn(particle);
     }
 
@@ -2607,7 +2611,7 @@ public static class ParticleRegistry
             update: static (ref p) =>
             {
                 ref TechyHolosquareParticleData custom = ref p.GetCustomData<TechyHolosquareParticleData>();
-                p.Opacity = (float)Math.Pow(p.LifetimeRatio, 0.5) * custom.Strength;
+                p.Opacity = (float) Math.Pow(p.LifetimeRatio, 0.5) * custom.Strength;
                 Lighting.AddLight(p.Position, p.Color.ToVector3() * p.Opacity);
                 p.Rotation = p.Velocity.ToRotation();
                 p.Velocity *= 0.875f;
@@ -2616,7 +2620,7 @@ public static class ParticleRegistry
             draw: static (ref p, sb) =>
             {
                 ref TechyHolosquareParticleData custom = ref p.GetCustomData<TechyHolosquareParticleData>();
-                Texture2D texture = TypeDefinitions[(byte)ParticleTypes.TechyHolosquare].Texture;
+                Texture2D texture = TypeDefinitions[(byte) ParticleTypes.TechyHolosquare].Texture;
 
                 for (int i = -1; i <= 1; i++)
                 {
@@ -2702,11 +2706,11 @@ public static class ParticleRegistry
             },
             draw: static (ref p, sb) =>
             {
-                Texture2D texture = TypeDefinitions[(byte)ParticleTypes.Thunder].Texture;
+                Texture2D texture = TypeDefinitions[(byte) ParticleTypes.Thunder].Texture;
                 ref ThunderParticleData custom = ref p.GetCustomData<ThunderParticleData>();
                 Vector2 shake = Vector2.One.RotatedByRandom(MathHelper.TwoPi) * p.LifetimeRatio * custom.ShakePower;
                 Vector2 origin = new(texture.Width / 2f, texture.Height);
-                Color drawColor = Color.Lerp(Color.White, p.Color, p.Time / (float)p.Lifetime);
+                Color drawColor = Color.Lerp(Color.White, p.Color, p.Time / (float) p.Lifetime);
                 SpriteEffects flip = Main.GlobalTimeWrappedHourly % 30f < 15f
                     ? SpriteEffects.FlipHorizontally
                     : SpriteEffects.None;
@@ -2762,7 +2766,7 @@ public static class ParticleRegistry
             },
             draw: static (ref p, sb) =>
             {
-                Texture2D texture = TypeDefinitions[(byte)ParticleTypes.Twinkle].Texture;
+                Texture2D texture = TypeDefinitions[(byte) ParticleTypes.Twinkle].Texture;
                 ref TwinkleParticleData custom = ref p.GetCustomData<TwinkleParticleData>();
                 Vector2 scale = custom.ScaleFactor * p.Opacity * 0.1f;
                 scale *= MathF.Sin(Main.GlobalTimeWrappedHourly * 30f + p.Time * 0.08f) * 0.125f + 1f;
@@ -2818,7 +2822,7 @@ public static class ParticleRegistry
         custom.ScaleFactor = scaleFactor;
         SafeSpawn(particle);
     }
-    
+
     #endregion
 }
 

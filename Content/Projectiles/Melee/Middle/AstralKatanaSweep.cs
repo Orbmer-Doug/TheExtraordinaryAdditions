@@ -5,7 +5,6 @@ using System.IO;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -19,9 +18,11 @@ using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.Par
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
+//TODO
 public class AstralKatanaSweep : BaseSwordSwing
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ImpureAstralKatanas);
+
     public static readonly Color[] AstralOrangePalette =
     [
         new(255, 164, 94),
@@ -39,13 +40,13 @@ public class AstralKatanaSweep : BaseSwordSwing
 
     public bool Orange
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[7] == 1;
+        get => (int) Projectile.AdditionsInfo().ExtraAI[7] == 1;
         set => Projectile.AdditionsInfo().ExtraAI[7] = value.ToInt();
     }
 
     public bool NoReset
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[8] == 1;
+        get => (int) Projectile.AdditionsInfo().ExtraAI[8] == 1;
         set => Projectile.AdditionsInfo().ExtraAI[8] = value.ToInt();
     }
 
@@ -97,9 +98,10 @@ public class AstralKatanaSweep : BaseSwordSwing
             AdditionsSound.MediumSwing.Play(Projectile.Center, .6f, 0f, .2f, 20, Name);
             PlayedSound = true;
         }
-        if (!Orange && (int)Time == (int)(MaxTime * .5f))
+
+        if (!Orange && (int) Time == (int) (MaxTime * .5f))
             Projectile.NewProj(Center, Projectile.velocity * 9f, ModContent.ProjectileType<AstralKatanaSlice>(),
-                (int)(Projectile.damage * .75f), .4f, Projectile.owner);
+                (int) (Projectile.damage * .75f), .4f, Projectile.owner);
 
         if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, (c) => Center.ToNumerics(), 25);
@@ -150,7 +152,8 @@ public class AstralKatanaSweep : BaseSwordSwing
 
         for (int i = 0; i < 2; i++)
         {
-            Vector2 pos = Vector2.Lerp(Rect().Bottom + PolarVector(16f, Projectile.rotation - SwordRotation), Rect().Top, Main.rand.NextFloat());
+            Vector2 pos = Vector2.Lerp(Rect().Bottom + PolarVector(16f, Projectile.rotation - SwordRotation),
+                Rect().Top, Main.rand.NextFloat());
             Vector2 vel = -SwordDir * Main.rand.NextFloat(4f, 8f);
             int life = Main.rand.Next(19, 25);
             float scale = Main.rand.NextFloat(.4f, .8f);
@@ -174,10 +177,14 @@ public class AstralKatanaSweep : BaseSwordSwing
 
             float scale = Main.rand.NextFloat(1.2f, 1.9f);
             Color color = ColorFunct(new(0f, Main.rand.NextFloat()), Vector2.Zero);
-            ParticleRegistry.SpawnCloudParticle(start, vel.RotatedByRandom(.35f) * .8f, color, color * .3f, Main.rand.Next(30, 40), Main.rand.NextFloat(40f, 80f), .7f, 1);
-            ParticleRegistry.SpawnGlowParticle(start, vel.RotatedByRandom(.25f), Main.rand.Next(20, 30), Main.rand.NextFloat(.2f, .5f), color, .5f);
-            ParticleRegistry.SpawnSparkleParticle(start, vel * Main.rand.NextFloat(1.9f, 2.8f), Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .7f), color, color * 2f, 1.4f);
+            ParticleRegistry.SpawnCloudParticle(start, vel.RotatedByRandom(.35f) * .8f, color, color * .3f,
+                Main.rand.Next(30, 40), Main.rand.NextFloat(40f, 80f), .7f, 1);
+            ParticleRegistry.SpawnGlowParticle(start, vel.RotatedByRandom(.25f), Main.rand.Next(20, 30),
+                Main.rand.NextFloat(.2f, .5f), color, .5f);
+            ParticleRegistry.SpawnSparkleParticle(start, vel * Main.rand.NextFloat(1.9f, 2.8f), Main.rand.Next(20, 30),
+                Main.rand.NextFloat(.4f, .7f), color, color * 2f, 1.4f);
         }
+
         npc.velocity += SwordDir * Item.knockBack * npc.knockBackResist;
 
         ScreenShakeSystem.New(new(.1f, .1f), start);
@@ -194,7 +201,8 @@ public class AstralKatanaSweep : BaseSwordSwing
             int life = Main.rand.Next(100, 125);
             float scale = Main.rand.NextFloat(.9f, 1.5f);
             Color color = Color.BlueViolet;
-            ParticleRegistry.SpawnSquishyPixelParticle(start + Main.rand.NextVector2Circular(10f, 10f), vel, life, scale, color, Color.Violet);
+            ParticleRegistry.SpawnSquishyPixelParticle(start + Main.rand.NextVector2Circular(10f, 10f), vel, life,
+                scale, color, Color.Violet);
         }
 
         ScreenShakeSystem.New(new(.1f, .1f), start);
@@ -206,7 +214,7 @@ public class AstralKatanaSweep : BaseSwordSwing
     {
         // Make it a crit if the strike was with the very tip
         if (new RotatedRectangle(30f, Rect().Top - PolarVector(10f, Projectile.rotation - SwordRotation),
-            Rect().Top + PolarVector(10f, Projectile.rotation - SwordRotation)).Intersects(target.Hitbox))
+                Rect().Top + PolarVector(10f, Projectile.rotation - SwordRotation)).Intersects(target.Hitbox))
         {
             modifiers.SetCrit();
         }
@@ -272,7 +280,8 @@ public class AstralKatanaSweep : BaseSwordSwing
         SpriteEffects effects = Effects;
 
         LayeredDrawSystem.QueueDrawAction(sword, Orange ? PixelationLayer.UnderPlayers : PixelationLayer.OverPlayers);
-        PixelationSystem.QueuePrimitiveRenderAction(draw, Orange ? PixelationLayer.UnderPlayers : PixelationLayer.OverPlayers);
+        PixelationSystem.QueuePrimitiveRenderAction(draw,
+            Orange ? PixelationLayer.UnderPlayers : PixelationLayer.OverPlayers);
         return false;
 
         void sword()
@@ -289,6 +298,7 @@ public class AstralKatanaThrow : ModProjectile
     private const int Lifetime = 400;
     private const int NonLungeWait = 3;
     private const int LungeWait = 5;
+
     public override void SetDefaults()
     {
         Projectile.width = 10;
@@ -312,29 +322,34 @@ public class AstralKatanaThrow : ModProjectile
         HitGround,
         Lunging,
     }
+
     public CurrentState State
     {
-        get => (CurrentState)Projectile.ai[0];
-        set => Projectile.ai[0] = (float)value;
+        get => (CurrentState) Projectile.ai[0];
+        set => Projectile.ai[0] = (float) value;
     }
+
     public ref float AccumulatedVel => ref Projectile.ai[1];
     public ref float EnemyID => ref Projectile.ai[2];
 
     public int Time
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[0];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[0];
         set => Projectile.AdditionsInfo().ExtraAI[0] = value;
     }
+
     public int Dir
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[1];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[1];
         set => Projectile.AdditionsInfo().ExtraAI[1] = value;
     }
+
     public int InitDir
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[2];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[2];
         set => Projectile.AdditionsInfo().ExtraAI[2] = value;
     }
+
     public ref float LungeTime => ref Projectile.AdditionsInfo().ExtraAI[3];
     public ref float SavedAngle => ref Projectile.AdditionsInfo().ExtraAI[4];
 
@@ -342,6 +357,7 @@ public class AstralKatanaThrow : ModProjectile
     public float Completion => InverseLerp(0f, ThrowTime, Time);
     public Player Owner => Main.player[Projectile.owner];
     public GlobalPlayer Modded => Owner.Additions();
+
     public float ThrowDisplacement()
     {
         return Projectile.velocity.ToRotation() + (2.1f * new PiecewiseCurve()
@@ -360,7 +376,8 @@ public class AstralKatanaThrow : ModProjectile
     public RotatedRectangle Rect()
     {
         Point point = (Projectile.position + Projectile.velocity).ToPoint();
-        return new Rectangle(point.X, point.Y, Projectile.width, Projectile.height).ToRotated(Projectile.rotation + PiOver4);
+        return new Rectangle(point.X, point.Y, Projectile.width, Projectile.height).ToRotated(Projectile.rotation +
+            PiOver4);
     }
 
     public override void AI()
@@ -376,10 +393,12 @@ public class AstralKatanaThrow : ModProjectile
             Projectile.timeLeft = Lifetime;
             if (this.RunLocal())
             {
-                Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, center.SafeDirectionTo(Owner.Additions().MouseWorld), .3f);
+                Projectile.velocity = Vector2.SmoothStep(Projectile.velocity,
+                    center.SafeDirectionTo(Owner.Additions().MouseWorld), .3f);
                 if (Projectile.velocity != Projectile.oldVelocity)
                     this.Sync();
             }
+
             if (Time == 0)
                 InitDir = Projectile.velocity.X.NonZeroSign();
             float rot = ThrowDisplacement();
@@ -397,11 +416,13 @@ public class AstralKatanaThrow : ModProjectile
                     Projectile.velocity = center.SafeDirectionTo(Owner.Additions().MouseWorld) * 6f;
                 this.Sync();
             }
+
             return;
         }
 
         Vector2 dest = Rect().Bottom;
-        Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, (LungeTime <= 0 ? center.AngleTo(dest) : SavedAngle));
+        Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full,
+            (LungeTime <= 0 ? center.AngleTo(dest) : SavedAngle));
         if (LungeTime <= 0)
         {
             Dir = (Projectile.Center.X > Owner.Center.X).ToDirectionInt();
@@ -458,8 +479,10 @@ public class AstralKatanaThrow : ModProjectile
                     Projectile.Kill();
                     return;
                 }
+
                 AdditionsSound.BraveDashStart.Play(center, 1f, .1f);
-                CalUtils.AddCooldown(Owner, AstralDashCooldown.ID, CalUtils.SecondsToFrames(LungeWait));
+                //TODO
+                //    .AddCooldown(Owner, AstralDashCooldown.ID, SecondsToFrames(LungeWait));
                 SavedAngle = center.AngleTo(dest);
                 State = CurrentState.Lunging;
                 Time = 0;
@@ -483,7 +506,8 @@ public class AstralKatanaThrow : ModProjectile
             {
                 if (LungeTime == 0 && this.RunLocal())
                 {
-                    AstralKatanaSweep sweep = Main.projectile[Projectile.NewProj(Projectile.Center, center.SafeDirectionTo(dest), ModContent.ProjectileType<AstralKatanaSweep>(),
+                    AstralKatanaSweep sweep = Main.projectile[Projectile.NewProj(Projectile.Center,
+                        center.SafeDirectionTo(dest), ModContent.ProjectileType<AstralKatanaSweep>(),
                         Projectile.damage * 2, Projectile.knockBack, Owner.whoAmI)].As<AstralKatanaSweep>();
                     sweep.Orange = true;
                     sweep.NoReset = true;
@@ -500,7 +524,8 @@ public class AstralKatanaThrow : ModProjectile
                     LungeTime = timeLunging;
                 }
 
-                if (Projectile.numUpdates.BetweenNum(0, 4) && MathF.Abs((Owner.position - Owner.oldPosition).Length()) > 3f)
+                if (Projectile.numUpdates.BetweenNum(0, 4) &&
+                    MathF.Abs((Owner.position - Owner.oldPosition).Length()) > 3f)
                 {
                     Owner.GiveIFrames(2);
                     for (int i = 0; i < 2; i++)
@@ -509,8 +534,10 @@ public class AstralKatanaThrow : ModProjectile
                         Vector2 vel = -dest.SafeDirectionTo(Owner.Center) * Main.rand.NextFloat(4f, 8f);
                         int life = Main.rand.Next(19, 25);
                         float scale = Main.rand.NextFloat(.4f, .8f);
-                        Color color = MulticolorLerp(Main.rand.NextFloat(), AstralKatanaSweep.AstralBluePalette.FastUnion(AstralKatanaSweep.AstralOrangePalette));
-                        ParticleRegistry.SpawnSquishyPixelParticle(pos, vel, life * 3, scale * 2f, color, Color.White, 4);
+                        Color color = MulticolorLerp(Main.rand.NextFloat(),
+                            AstralKatanaSweep.AstralBluePalette.FastUnion(AstralKatanaSweep.AstralOrangePalette));
+                        ParticleRegistry.SpawnSquishyPixelParticle(pos, vel, life * 3, scale * 2f, color, Color.White,
+                            4);
                     }
                 }
             }
@@ -525,7 +552,7 @@ public class AstralKatanaThrow : ModProjectile
         if (State == CurrentState.HitEnemy)
         {
             // Stick to the target
-            NPC target = Main.npc[(int)EnemyID];
+            NPC target = Main.npc[(int) EnemyID];
 
             if (!target.active)
             {
@@ -540,6 +567,7 @@ public class AstralKatanaThrow : ModProjectile
                 if (Projectile.position != Projectile.oldPosition)
                     this.Sync();
             }
+
             AccumulatedVel -= 0.6f;
         }
 
@@ -551,8 +579,9 @@ public class AstralKatanaThrow : ModProjectile
 
     public override void OnKill(int timeLeft)
     {
-        if (State != CurrentState.Lunging)
-            CalUtils.AddCooldown(Owner, AstralDashCooldown.ID, CalUtils.SecondsToFrames(NonLungeWait));
+        //TODO
+        //if (State != CurrentState.Lunging)
+        //  .AddCooldown(Owner, AstralDashCooldown.ID, SecondsToFrames(NonLungeWait));
     }
 
     private void SetCollided(bool stick)
@@ -589,11 +618,13 @@ public class AstralKatanaThrow : ModProjectile
     {
         // Create some on hit particles
         Vector2 pos = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero) * Projectile.height * .5f;
-        ParticleRegistry.SpawnSparkleParticle(pos, Vector2.Zero, Main.rand.Next(12, 15), 3f, Color.White, Color.Purple, 1.4f);
+        ParticleRegistry.SpawnSparkleParticle(pos, Vector2.Zero, Main.rand.Next(12, 15), 3f, Color.White, Color.Purple,
+            1.4f);
         for (int i = 0; i < 14; i++)
         {
             Vector2 vel = -Projectile.velocity.RotatedByRandom(.12f) * Main.rand.NextFloat(2f, 5f);
-            ParticleRegistry.SpawnSparkParticle(pos, vel, Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .5f), Color.Purple.Lerp(Color.White, Main.rand.NextFloat(.4f, .6f)));
+            ParticleRegistry.SpawnSparkParticle(pos, vel, Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .5f),
+                Color.Purple.Lerp(Color.White, Main.rand.NextFloat(.4f, .6f)));
         }
 
         // Set the sticking variables
@@ -614,7 +645,8 @@ public class AstralKatanaThrow : ModProjectile
         return State == CurrentState.Thrown;
     }
 
-    public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
+    public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs,
+        List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
     {
         if (State == CurrentState.HitEnemy)
         {
@@ -633,11 +665,13 @@ public class AstralKatanaThrow : ModProjectile
 
     internal Color ColorFunct(SystemVector2 c, Vector2 position)
     {
-        return MulticolorLerp(c.X, AstralKatanaSweep.AstralBluePalette) * InverseLerp(0f, 60f, AccumulatedVel) * Projectile.Opacity;
+        return MulticolorLerp(c.X, AstralKatanaSweep.AstralBluePalette) * InverseLerp(0f, 60f, AccumulatedVel) *
+               Projectile.Opacity;
     }
 
     public TrailPoints cache;
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -649,6 +683,7 @@ public class AstralKatanaThrow : ModProjectile
                 trail.DrawTrail(shader, cache.Points);
             }
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 
         Texture2D texture = Projectile.ThisProjectileTexture();
@@ -673,10 +708,12 @@ public class AstralKatanaThrow : ModProjectile
             off = PiOver2;
             fx = SpriteEffects.FlipHorizontally;
         }
+
         if (State != CurrentState.Throwing)
             origin = texture.Size() / 2;
 
-        Main.spriteBatch.DrawBetter(texture, pos, null, lightColor * Projectile.Opacity, Projectile.rotation + off, origin, Projectile.scale, fx);
+        Main.spriteBatch.DrawBetter(texture, pos, null, lightColor * Projectile.Opacity, Projectile.rotation + off,
+            origin, Projectile.scale, fx);
         return false;
     }
 }

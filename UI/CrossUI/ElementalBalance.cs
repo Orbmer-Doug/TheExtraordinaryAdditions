@@ -60,6 +60,7 @@ public class ElementalBalance : ModPlayer
             ElementalResourceCurrent -= 1;
             ElementalResourceRegenTimer = 0;
         }
+
         ElementalResourceCurrent = Utils.Clamp(ElementalResourceCurrent, 0, MaxAmount);
     }
 

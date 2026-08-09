@@ -10,6 +10,7 @@ public class UniqueRarity : ModRarity
 {
     public override Color RarityColor => Color.BlueViolet;
     internal static List<Behavior<RarityParticleInfo>> SparkleList = [];
+
     public static void DrawCustomTooltipLine(DrawableTooltipLine line)
     {
         CustomRaritySystem.GetTextDimensions(in line, out Vector2 textSize, out Rectangle textRect);

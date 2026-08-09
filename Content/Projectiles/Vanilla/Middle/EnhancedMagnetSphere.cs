@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using CalamityMod;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -36,6 +35,7 @@ public class EnhancedMagnetSphere : ModProjectile
     public const float ArcDistance = 750f;
     public const float ArcWidth = 4f;
     public const int FadeTime = 15;
+
     public override void AI()
     {
         // Create some light
@@ -47,15 +47,18 @@ public class EnhancedMagnetSphere : ModProjectile
         if (Projectile.timeLeft < FadeTime)
         {
             Projectile.velocity *= .985f;
-            Vector2 pos = Projectile.Center + Main.rand.NextVector2Circular(Projectile.width, Projectile.height) * Projectile.scale;
+            Vector2 pos = Projectile.Center +
+                          Main.rand.NextVector2Circular(Projectile.width, Projectile.height) * Projectile.scale;
             Vector2 vel = RandomVelocity(2f, 2f, 5f);
             int lifetime = Main.rand.Next(14, 28);
             float scale = Main.rand.NextFloat(.5f, 1f) * Projectile.scale;
             Color color = Color.Lerp(Color.Cyan, Color.DarkCyan, interpolant);
             ParticleRegistry.SpawnSparkleParticle(pos, vel, lifetime, scale, color, color * 2, 1.1f);
         }
+
         Time++;
     }
+
     public override bool OnTileCollide(Vector2 oldVelocity)
     {
         // Bounce off of tiles
@@ -76,6 +79,7 @@ public class EnhancedMagnetSphere : ModProjectile
     {
         return 4f * Convert01To010(completionRatio) * Projectile.scale;
     }
+
     internal Color ColorFunction(SystemVector2 completionRatio, Vector2 position)
     {
         float opacity = 0f;
@@ -108,7 +112,8 @@ public class EnhancedMagnetSphere : ModProjectile
         void draw()
         {
             Vector2 start = Projectile.Center;
-            Vector2 end = start + Projectile.SafeDirectionTo(destination) * (start.Distance(destination) - Projectile.width);
+            Vector2 end = start + Projectile.SafeDirectionTo(destination) *
+                (start.Distance(destination) - Projectile.width);
             List<Line> lightning = CreateBolt(start, end, 1f, 20f);
             TrailPoints final = new(lightning.Count * 2);
             List<Vector2> ends = [];
@@ -118,6 +123,7 @@ public class EnhancedMagnetSphere : ModProjectile
                 ends.Add(line.A);
                 ends.Add(line.B);
             }
+
             final.SetPoints(ends);
 
             ManagedShader shader = ShaderRegistry.SpecialLightningTrail;
@@ -126,9 +132,11 @@ public class EnhancedMagnetSphere : ModProjectile
             OptimizedPrimitiveTrail trail = new(WidthFunction, ColorFunction, null, final.Count + 10);
             trail.DrawTrail(shader, final.Points, 30);
 
-            OptimizedPrimitiveTrail trail2 = new(BackgroundWidthFunction, BackgroundColorFunction, null, final.Count + 10);
+            OptimizedPrimitiveTrail trail2 = new(BackgroundWidthFunction, BackgroundColorFunction, null,
+                final.Count + 10);
             trail.DrawTrail(shader, final.Points, 30);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
     }
 
@@ -169,7 +177,8 @@ public class EnhancedMagnetSphere : ModProjectile
         shader.TrySetParameter("edgeBlendStrength", 4f);
         shader.TrySetParameter("resolution", Projectile.Size);
 
-        PixelationSystem.QueueTextureRenderAction(DrawMagnetField, PixelationLayer.OverPlayers, BlendState.Additive, shader, nameof(EnhancedMagnetSphere));
+        PixelationSystem.QueueTextureRenderAction(DrawMagnetField, PixelationLayer.OverPlayers, BlendState.Additive,
+            shader, nameof(EnhancedMagnetSphere));
         return false;
     }
 

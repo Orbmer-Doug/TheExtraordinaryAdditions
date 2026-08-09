@@ -10,7 +10,7 @@ using TheExtraordinaryAdditions.Core.Graphics;
 
 namespace TheExtraordinaryAdditions.Core.Systems;
 
-// Primarily from Calamity Fables
+// Primarily from Fables
 // TODO: Shaders? Opacity delegate?
 
 /// <summary>
@@ -30,13 +30,13 @@ public struct TextSnippet
     public static Vector2 RandomDisplacement(int character) => Main.rand.NextVector2Circular(2f, 2f);
 
     public static Vector2 SmallWaveDisplacement(int character) => new Vector2(0,
-        (float)Math.Sin(Main.GlobalTimeWrappedHourly * 2.5f + character * 0.8f) * 2.5f);
+        (float) Math.Sin(Main.GlobalTimeWrappedHourly * 2.5f + character * 0.8f) * 2.5f);
 
     public static Vector2 WaveDisplacement(int character) => new Vector2(0,
-        (float)Math.Sin(Main.GlobalTimeWrappedHourly * 4f + character * 0.8f) * 4f);
+        (float) Math.Sin(Main.GlobalTimeWrappedHourly * 4f + character * 0.8f) * 4f);
 
     public static Vector2 WaveEmphasisDisplacement(int character) => new Vector2(0,
-        -4f * MathHelper.Clamp(((float)Math.Sin(-Main.GlobalTimeWrappedHourly * 4f + character * 0.2f) - 0.7f) / 0.3f,
+        -4f * MathHelper.Clamp(((float) Math.Sin(-Main.GlobalTimeWrappedHourly * 4f + character * 0.2f) - 0.7f) / 0.3f,
             0f, 1f));
 
     public static Vector2 AppearSuddenly(int character, float progress) => Vector2.Zero;
@@ -352,7 +352,7 @@ public sealed class AwesomeSentence
                 totalSeconds += snippet.Duration;
         }
 
-        return (int)(totalSeconds * 60f);
+        return (int) (totalSeconds * 60f);
     }
 
     public bool GetCurrentSnippet(float progression, out int index, out TextSnippet? current)

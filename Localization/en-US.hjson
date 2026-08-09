@@ -400,7 +400,6 @@ Mods: {
 			CyberDart.DisplayName: Cyber Dart
 			CyberPierce.DisplayName: Cyber Pierce
 			StarFlares.DisplayName: Star Flares
-			qwer.DisplayName: qwer
 			LightningNode.DisplayName: Lightning Node
 			Node.DisplayName: Node
 			AstralKatanaSlice.DisplayName: Astral Katana Slice
@@ -2251,7 +2250,6 @@ Mods: {
 				Headers: {
 					Graphical: Graphical
 					UI: UI
-					goop: goop Header
 				}
 
 				VisualIntensity: {

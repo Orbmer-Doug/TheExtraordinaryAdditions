@@ -11,6 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
 public class CallerOfBirdsCall : BaseHoldoutProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CallerOfBirds);
+
     public override void Defaults()
     {
         Projectile.Size = new(46, 56);
@@ -21,6 +22,7 @@ public class CallerOfBirdsCall : BaseHoldoutProjectile
     }
 
     public ref float Time => ref Projectile.ai[0];
+
     public override void SafeAI()
     {
         if (this.RunLocal())
@@ -29,11 +31,13 @@ public class CallerOfBirdsCall : BaseHoldoutProjectile
             if (Projectile.velocity != Projectile.oldVelocity)
                 Projectile.netUpdate = true;
         }
+
         Projectile.rotation = -MathHelper.PiOver4;
         Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, Projectile.rotation - MathHelper.PiOver4);
         Owner.SetBackHandBetter(0, Projectile.velocity.ToRotation());
         Owner.ChangeDir(Projectile.velocity.X.NonZeroSign());
-        Projectile.Center = Owner.GetFrontHandPositionImproved() + Vector2.UnitY * Animators.MakePoly(4f).InFunction.Evaluate(Time, 0f, 20f, 0f, -30f);
+        Projectile.Center = Owner.GetFrontHandPositionImproved() +
+                            Vector2.UnitY * Animators.MakePoly(4f).InFunction.Evaluate(Time, 0f, 20f, 0f, -30f);
 
         if (this.RunLocal() && Time % 4 == 3)
         {
@@ -48,12 +52,14 @@ public class CallerOfBirdsCall : BaseHoldoutProjectile
                     vel.Y *= -1f;
 
                 vel *= Item.shootSpeed;
-                Projectile.NewProj(position, vel, ModContent.ProjectileType<Pigeon>(), Projectile.damage / 3, 0f, Owner.whoAmI);
+                Projectile.NewProj(position, vel, ModContent.ProjectileType<Pigeon>(), Projectile.damage / 3, 0f,
+                    Owner.whoAmI);
             }
-
         }
+
         if (Time % 16 == 15)
-            SoundID.Zombie11.Play(Projectile.Center + Main.rand.NextVector2Circular(40f, 40f), .5f, 0f, .4f, null, 50, Name);
+            SoundID.Zombie11.Play(Projectile.Center + Main.rand.NextVector2Circular(40f, 40f), .5f, 0f, .4f, null, 50,
+                Name);
 
         Time++;
     }

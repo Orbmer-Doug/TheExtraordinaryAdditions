@@ -31,7 +31,7 @@ public class GammaRay : ModProjectile
         Projectile.penetrate = -1;
     }
 
-    public Projectile ProjOwner => Main.projectile[(int)Projectile.ai[0]];
+    public Projectile ProjOwner => Main.projectile[(int) Projectile.ai[0]];
     public ref float Time => ref Projectile.ai[1];
     public ref float RayLength => ref Projectile.ai[2];
     public ref float Fade => ref Projectile.AdditionsInfo().ExtraAI[0];

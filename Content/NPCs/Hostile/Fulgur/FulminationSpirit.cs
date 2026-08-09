@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
 using Terraria.Audio;
@@ -89,35 +88,35 @@ public class FulminationSpirit : ModNPC
     {
         NPC.frameCounter += 0.15f;
         NPC.frameCounter %= Main.npcFrameCount[NPC.type];
-        NPC.frame.Y = (int)NPC.frameCounter * frameHeight;
+        NPC.frame.Y = (int) NPC.frameCounter * frameHeight;
     }
 
     public static int VoltDamage =>
         !Main.hardMode ? DifficultyBasedValue(26, 52, 78) : DifficultyBasedValue(70, 140, 210);
 
     public static int FireWait => DifficultyBasedValue(90, 70, 60);
-    public static int StartFindingTarget => CalUtils.SecondsToFrames(3);
-    public static int MaxFindingTargetTime => CalUtils.SecondsToFrames(6);
-    public static int FindingTargetWait => CalUtils.SecondsToFrames(4);
+    public static int StartFindingTarget => SecondsToFrames(3);
+    public static int MaxFindingTargetTime => SecondsToFrames(6);
+    public static int FindingTargetWait => SecondsToFrames(4);
     public static float MaxSpeed => 7f;
     public static float BounceFactor => 0.7f;
     public static float MaxDistanceForSpeedBoost => 600f;
 
     public int Time
     {
-        get => (int)NPC.ai[0];
+        get => (int) NPC.ai[0];
         set => NPC.ai[0] = value;
     }
 
     public int FireTime
     {
-        get => (int)NPC.ai[1];
+        get => (int) NPC.ai[1];
         set => NPC.ai[1] = value;
     }
 
     public int CantHitTimer
     {
-        get => (int)NPC.ai[2];
+        get => (int) NPC.ai[2];
         set => NPC.ai[2] = value;
     }
 
@@ -131,12 +130,12 @@ public class FulminationSpirit : ModNPC
 
         Vector2 destination = target.Center - Vector2.UnitY * NPC.height;
         Vector2 snappedTargetPos = new Vector2(
-            (int)(destination.X / 8f) * 8,
-            (int)(destination.Y / 8f) * 8
+            (int) (destination.X / 8f) * 8,
+            (int) (destination.Y / 8f) * 8
         );
         Vector2 snappedNpcPos = new Vector2(
-            (int)(NPC.Center.X / 8f) * 8,
-            (int)(NPC.Center.Y / 8f) * 8
+            (int) (NPC.Center.X / 8f) * 8,
+            (int) (NPC.Center.Y / 8f) * 8
         );
 
         // Calculate direction vector from NPC to target
@@ -234,9 +233,9 @@ public class FulminationSpirit : ModNPC
         FireTime++;
 
         Vector2 tilePosition = NPC.Center / 16f;
-        if (!WorldGen.SolidTile((int)tilePosition.X, (int)tilePosition.Y))
+        if (!WorldGen.SolidTile((int) tilePosition.X, (int) tilePosition.Y))
         {
-            Lighting.AddLight((int)tilePosition.X, (int)tilePosition.Y, 0.5f, 0f, 0.5f);
+            Lighting.AddLight((int) tilePosition.X, (int) tilePosition.Y, 0.5f, 0f, 0.5f);
         }
 
         // Handle collision with tiles

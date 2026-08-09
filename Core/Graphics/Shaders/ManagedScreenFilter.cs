@@ -352,7 +352,7 @@ public sealed class ScreenShaderUpdates : ModSystem
         RenderTarget2D target2 = screenTarget1;
 
         // Handle gravity flipping
-        if ((int)Main.player[Main.myPlayer].gravDir == -1)
+        if ((int) Main.player[Main.myPlayer].gravDir == -1)
         {
             target1 = AuxiliaryTarget;
             Main.instance.GraphicsDevice.SetRenderTarget(target1);

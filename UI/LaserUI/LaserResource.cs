@@ -11,7 +11,9 @@ public class LaserResource : ModPlayer
 {
     public static int OverheatBuff = ModContent.BuffType<Overheat>();
     public const int OverheatBuffTime = 870;
-    public static SoundStyle OverheatSound = AssetRegistry.GetSound(AdditionsSound.AdrenalineMajorLoss) with { Volume = 1.5f };
+
+    public static SoundStyle OverheatSound =
+        AssetRegistry.GetSound(AdditionsSound.AdrenalineMajorLoss) with { Volume = 1.5f };
 
     public int HeatCurrent;
     public const int HeatMaximum = 100;
@@ -61,6 +63,7 @@ public class LaserResource : ModPlayer
         {
             HoldingLaserWeapon = true;
         }
+
         if (Player.HeldItem != null && Player.HeldItem.type == ItemID.HeatRay)
             HoldingLaserWeapon = true;
 
@@ -70,8 +73,10 @@ public class LaserResource : ModPlayer
             HeatCurrent -= 1;
             HeatRegenTimer = 0;
         }
+
         HeatCurrent = Utils.Clamp(HeatCurrent, 0, HeatMax2);
     }
+
     public override void PostUpdate()
     {
         if (Main.myPlayer == Player.whoAmI && Player.creativeGodMode)
@@ -79,6 +84,7 @@ public class LaserResource : ModPlayer
     }
 
     public static bool CanFire(Player player) => !player.HasBuff(OverheatBuff);
+
     public static void ApplyLaserOverheating(Player player)
     {
         LaserResource laser = player.GetModPlayer<LaserResource>();

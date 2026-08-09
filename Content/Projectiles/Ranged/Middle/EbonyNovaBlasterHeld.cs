@@ -29,6 +29,7 @@ public class EbonyNovaBlasterHeld : BaseIdleHoldoutProjectile
 
     public Vector2 Tip => Projectile.Center + PolarVector(57f, Projectile.rotation);
     public int Dir => Projectile.velocity.X.NonZeroSign();
+
     public override void SafeAI()
     {
         Projectile.Opacity = InverseLerp(0f, 8f, Time);
@@ -50,6 +51,7 @@ public class EbonyNovaBlasterHeld : BaseIdleHoldoutProjectile
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
+
         Projectile.Center = Center + PolarVector(38f - Recoil, Projectile.rotation);
 
         if ((this.RunLocal() && Modded.SafeMouseLeft.Current) && Wait <= 0f)
@@ -57,11 +59,13 @@ public class EbonyNovaBlasterHeld : BaseIdleHoldoutProjectile
             AdditionsSound.ImpSmash.Play(Tip, .6f, 0f, .15f, 2, Name);
             Vector2 vel = Projectile.velocity.SafeNormalize(Vector2.Zero);
             if (this.RunLocal())
-                Projectile.NewProj(Tip, vel * 2f, ModContent.ProjectileType<EbonySnipe>(), Projectile.damage, Projectile.knockBack, Owner.whoAmI);
+                Projectile.NewProj(Tip, vel * 2f, ModContent.ProjectileType<EbonySnipe>(), Projectile.damage,
+                    Projectile.knockBack, Owner.whoAmI);
             Recoil = 20f;
             Wait = WaitTime;
             this.Sync();
         }
+
         Recoil = MathHelper.Clamp(Animators.MakePoly(3f).OutFunction.Evaluate(Recoil, -.25f, .03f), 0f, 20f);
         if (Wait > 0f)
             Wait--;
@@ -74,7 +78,8 @@ public class EbonyNovaBlasterHeld : BaseIdleHoldoutProjectile
         Texture2D texture = Projectile.ThisProjectileTexture();
         Vector2 drawPosition = Projectile.Center - Main.screenPosition;
         SpriteEffects effects = FixedDirection();
-        Main.EntitySpriteDraw(texture, drawPosition, null, Projectile.GetAlpha(Color.White), Projectile.rotation, texture.Size() * 0.5f, Projectile.scale, effects, 0);
+        Main.EntitySpriteDraw(texture, drawPosition, null, Projectile.GetAlpha(Color.White), Projectile.rotation,
+            texture.Size() * 0.5f, Projectile.scale, effects, 0);
         return false;
     }
 }

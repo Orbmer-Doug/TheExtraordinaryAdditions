@@ -1,7 +1,4 @@
-﻿using CalamityMod.Items.Materials;
-using CalamityMod.Items.Weapons.Summon;
-using CalamityMod.Tiles.Furniture.CraftingStations;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
@@ -39,7 +36,8 @@ public class Avragen : ModItem, ILocalizedModType, IModType
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
-        tooltips.ColorLocalization(Color.Lerp(Color.Violet, Color.PaleVioletRed, (float)MathF.Sin(Main.GlobalTimeWrappedHourly * 6f)));
+        tooltips.ColorLocalization(Color.Lerp(Color.Violet, Color.PaleVioletRed,
+            (float) MathF.Sin(Main.GlobalTimeWrappedHourly * 6f)));
     }
 
     public override bool CanUseItem(Player player)
@@ -48,23 +46,25 @@ public class Avragen : ModItem, ILocalizedModType, IModType
         {
             return player.maxMinions >= 12;
         }
+
         return false;
     }
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback)
     {
         player.AddBuff(Item.buffType, 2);
-        int minion = Projectile.NewProjectile((IEntitySource)(object)source, Main.MouseWorld, Utils.NextVector2Circular(Main.rand, 2f, 2f), ModContent.ProjectileType<AvragenMinion>(), damage, knockback, player.whoAmI, 0f, 0f, 0f);
+        int minion = Projectile.NewProjectile((IEntitySource) (object) source, Main.MouseWorld,
+            Main.rand.NextVector2Circular(2f, 2f), ModContent.ProjectileType<AvragenMinion>(), damage, knockback,
+            player.whoAmI, 0f, 0f, 0f);
         return false;
     }
 
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        recipe.AddIngredient(ModContent.ItemType<YharonsKindleStaff>(), 1);
-        recipe.AddIngredient(ModContent.ItemType<EndoHydraStaff>(), 1);
-        recipe.AddIngredient(ModContent.ItemType<ShadowspecBar>(), 5);
-        recipe.AddTile(ModContent.TileType<DraedonsForge>());
+
+        //TODO
         recipe.Register();
     }
 }

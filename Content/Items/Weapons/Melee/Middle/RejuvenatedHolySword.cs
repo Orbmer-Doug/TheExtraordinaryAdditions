@@ -36,9 +36,13 @@ public class RejuvenatedHolySword : ModItem
 
     public override bool AltFunctionUse(Player player) => true;
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback)
     {
-        HolySwordSwing swing = Main.projectile[Projectile.NewProjectile(source, position, velocity, type, damage, knockback, player.whoAmI, 0f, 0f)].As<HolySwordSwing>();
+        HolySwordSwing swing = Main
+            .projectile[
+                Projectile.NewProjectile(source, position, velocity, type, damage, knockback, player.whoAmI, 0f, 0f)]
+            .As<HolySwordSwing>();
         swing.Mark = player.Additions().SafeMouseRight.Current;
         return false;
     }

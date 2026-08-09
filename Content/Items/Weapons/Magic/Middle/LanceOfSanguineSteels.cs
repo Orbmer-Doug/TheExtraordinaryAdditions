@@ -9,6 +9,7 @@ using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Middle;
+
 public class LanceOfSanguineSteels : ModItem, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.LanceOfSanguineSteels);
@@ -44,9 +45,11 @@ public class LanceOfSanguineSteels : ModItem, ILocalizedModType, IModType
         tooltips.ColorLocalization(new Color(235, 64, 52));
     }
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback)
     {
-        Projectile.NewProjectile((IEntitySource)(object)source, position, Vector2.Zero, type, damage, knockback, player.whoAmI, 0f, 0f, 0f);
+        Projectile.NewProjectile((IEntitySource) (object) source, position, Vector2.Zero, type, damage, knockback,
+            player.whoAmI, 0f, 0f, 0f);
         return false;
     }
 

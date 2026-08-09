@@ -9,6 +9,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Pets;
 public class TVRemote : ModItem, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TVRemote);
+
     public override void SetDefaults()
     {
         Item.damage = 0;

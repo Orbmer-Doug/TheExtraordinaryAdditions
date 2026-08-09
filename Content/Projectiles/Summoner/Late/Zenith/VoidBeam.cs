@@ -15,6 +15,7 @@ public class VoidBeam : ModProjectile
     public Player Owner => Main.player[Projectile.owner];
     public GlobalPlayer ModdedOwner => Owner.Additions();
     public ref float Time => ref Projectile.ai[0];
+
     public Projectile Proj
     {
         get
@@ -24,6 +25,7 @@ public class VoidBeam : ModProjectile
                 if (p != null && p.identity == Projectile.ai[1] && p.owner == Projectile.owner)
                     return p;
             }
+
             return null;
         }
     }
@@ -36,12 +38,14 @@ public class VoidBeam : ModProjectile
         get => Projectile.AdditionsInfo().ExtraAI[0] == 1f;
         set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
+
     public ref float FadeTime => ref Projectile.AdditionsInfo().ExtraAI[1];
 
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.DrawScreenCheckFluff[Type] = 3000;
     }
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 120;
@@ -64,7 +68,9 @@ public class VoidBeam : ModProjectile
         else
             Projectile.timeLeft = 2;
 
-        points.SetPoints(Projectile.Center.GetLaserControlPoints(Projectile.Center + Proj.rotation.ToRotationVector2() * Length, 50));
+        points.SetPoints(
+            Projectile.Center.GetLaserControlPoints(Projectile.Center + Proj.rotation.ToRotationVector2() * Length,
+                50));
         if (laser == null || laser.Disposed)
             laser = new(WidthFunct, ColorFunct, null, 50);
         Projectile.Center = Proj.Center;
@@ -75,15 +81,18 @@ public class VoidBeam : ModProjectile
         if (Fade)
             FadeTime++;
 
-        Length = Animators.MakePoly(4f).InOutFunction.Evaluate(0f, MaxLength, Fade ? FadeInterpolant : InverseLerp(0f, 30f, Time));
+        Length = Animators.MakePoly(4f).InOutFunction
+            .Evaluate(0f, MaxLength, Fade ? FadeInterpolant : InverseLerp(0f, 30f, Time));
         Time++;
     }
 
     public float FadeInterpolant => InverseLerp(30f, 0f, FadeTime);
+
     public float WidthFunct(float c)
     {
         return OptimizedPrimitiveTrail.HemisphereWidthFunct(c,
-            15f + Animators.MakePoly(10f).OutFunction(MathHelper.SmoothStep(0f, 1f, c)) * Projectile.height * FadeInterpolant);
+            15f + Animators.MakePoly(10f).OutFunction(MathHelper.SmoothStep(0f, 1f, c)) * Projectile.height *
+            FadeInterpolant);
     }
 
     public Color ColorFunct(SystemVector2 c, Vector2 position)
@@ -98,6 +107,7 @@ public class VoidBeam : ModProjectile
 
     public OptimizedPrimitiveTrail laser;
     public TrailPoints points = new(50);
+
     public override bool PreDraw(ref Color lightColor)
     {
         void beam()
@@ -110,6 +120,7 @@ public class VoidBeam : ModProjectile
                 laser.DrawTrail(shader, points.Points, 100);
             }
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(beam, PixelationLayer.OverProjectiles);
         return false;
     }

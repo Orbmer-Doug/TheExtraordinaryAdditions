@@ -9,6 +9,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 public class CryingEye : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CryingEye);
+
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.YoyosLifeTimeMultiplier[Projectile.type] = -1f;
@@ -32,7 +33,8 @@ public class CryingEye : ModProjectile
         Projectile.rotation += .3f;
         Vector2 val = Projectile.position - Main.player[Projectile.owner].position;
         if (Projectile.AdditionsInfo().ExtraAI[0]++ % 10f == 0f && this.RunLocal())
-            Projectile.NewProj(Projectile.Center, Vector2.UnitY.RotatedByRandom(.2f) * Main.rand.NextFloat(3f, 9f), ModContent.ProjectileType<CryingTear>(), Projectile.damage / 2, 0f, Projectile.owner);
+            Projectile.NewProj(Projectile.Center, Vector2.UnitY.RotatedByRandom(.2f) * Main.rand.NextFloat(3f, 9f),
+                ModContent.ProjectileType<CryingTear>(), Projectile.damage / 2, 0f, Projectile.owner);
         if (val.Length() > 3200f)
             Projectile.Kill();
     }
@@ -52,6 +54,7 @@ public class CryingEye : ModProjectile
     public override void PostAI()
     {
         if (Main.rand.NextBool(4))
-            Dust.NewDustPerfect(Projectile.RandAreaInEntity(), DustID.Water, Vector2.UnitY * 4f, 0, default, Main.rand.NextFloat(.5f, 1.6f));
+            Dust.NewDustPerfect(Projectile.RandAreaInEntity(), DustID.Water, Vector2.UnitY * 4f, 0, default,
+                Main.rand.NextFloat(.5f, 1.6f));
     }
 }

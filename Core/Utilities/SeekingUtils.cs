@@ -1,11 +1,7 @@
-﻿using CalamityMod.NPCs.AquaticScourge;
-using CalamityMod.NPCs.DevourerofGods;
-using CalamityMod.NPCs.ExoMechs.Thanatos;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using CalamityMod;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -21,7 +17,8 @@ public static class SeekingUtils
     /// Calculates the velocity needed for a chaser to intercept a target, accounting for the target's velocity
     /// </summary>
     /// <returns>The velocity vector for the chaser to intercept the target, or towards the target's predicted position if interception is impossible within constraints</returns>
-    public static Vector2 GetHomingVelocity(Vector2 chaserPos, Vector2 targetPos, Vector2 targetVel, float chaserSpeed, float maxPredictionFrames = float.MaxValue)
+    public static Vector2 GetHomingVelocity(Vector2 chaserPos, Vector2 targetPos, Vector2 targetVel, float chaserSpeed,
+        float maxPredictionFrames = float.MaxValue)
     {
         if (chaserSpeed <= 0f)
             return Vector2.Zero;
@@ -69,17 +66,19 @@ public static class SeekingUtils
         List<Projectile> otherProjs = [];
         foreach (Projectile other in Main.ActiveProjectiles)
         {
-            if (otherProjs.Count >= limit || other.whoAmI == proj.whoAmI || other.type != proj.type || !proj.WithinRange(other.Center, dist))
+            if (otherProjs.Count >= limit || other.whoAmI == proj.whoAmI || other.type != proj.type ||
+                !proj.WithinRange(other.Center, dist))
                 continue;
 
             otherProjs.Add(other);
         }
 
-        if (!sort) 
+        if (!sort)
             return otherProjs;
-        
+
         otherProjs = otherProjs.DistinctBy(n => n.Distance(proj.Center)).ToList();
-        otherProjs.Sort((a, b) => Vector2.Distance(a.Center, proj.Center) > Vector2.Distance(b.Center, proj.Center) ? 1 : -1);
+        otherProjs.Sort((a, b) =>
+            Vector2.Distance(a.Center, proj.Center) > Vector2.Distance(b.Center, proj.Center) ? 1 : -1);
 
         return otherProjs;
     }
@@ -88,9 +87,9 @@ public static class SeekingUtils
     {
         foreach (Projectile proj in Main.ActiveProjectiles)
         {
-            if (!projectileIDs.Contains(proj.type)) 
+            if (!projectileIDs.Contains(proj.type))
                 continue;
-            
+
             if (setToInactive)
             {
                 proj.active = false;
@@ -111,6 +110,7 @@ public static class SeekingUtils
 
             count++;
         }
+
         return count;
     }
 
@@ -121,6 +121,7 @@ public static class SeekingUtils
             if (p.type == type)
                 return true;
         }
+
         return false;
     }
 
@@ -132,6 +133,7 @@ public static class SeekingUtils
             if (projectile.type == type)
                 projs.Add(projectile);
         }
+
         return projs;
     }
 
@@ -143,6 +145,7 @@ public static class SeekingUtils
             if (projectile.type == type && projectile.owner == player.whoAmI)
                 projs.Add(projectile);
         }
+
         return projs;
     }
 
@@ -154,6 +157,7 @@ public static class SeekingUtils
             if (projectile.type == type)
                 count++;
         }
+
         return count;
     }
 
@@ -165,6 +169,7 @@ public static class SeekingUtils
             if (projectile.type == type && projectile.owner == player.whoAmI)
                 count++;
         }
+
         return count;
     }
 
@@ -201,25 +206,14 @@ public static class SeekingUtils
         }
     }
 
-    public static bool IsEater(this NPC target) => target.type >= NPCID.EaterofWorldsHead && target.type <= NPCID.EaterofWorldsTail;
+    public static bool IsEater(this NPC target) =>
+        target.type >= NPCID.EaterofWorldsHead && target.type <= NPCID.EaterofWorldsTail;
 
-    public static bool IsDestroyer(this NPC target) => target.type >= NPCID.TheDestroyer && target.type <= NPCID.TheDestroyerTail;
+    public static bool IsDestroyer(this NPC target) =>
+        target.type >= NPCID.TheDestroyer && target.type <= NPCID.TheDestroyerTail;
 
-    public static bool IsThanatos(this NPC target) => target.type == ModContent.NPCType<ThanatosBody1>() ||
-        target.type == ModContent.NPCType<ThanatosBody2>() ||
-        target.type == ModContent.NPCType<ThanatosTail>() ||
-        target.type == ModContent.NPCType<ThanatosHead>();
-
-    public static bool IsAquaticScoog(this NPC target) => target.type == ModContent.NPCType<AquaticScourgeBody>() ||
-        target.type == ModContent.NPCType<AquaticScourgeBodyAlt>() ||
-        target.type == ModContent.NPCType<AquaticScourgeTail>() ||
-        target.type == ModContent.NPCType<AquaticScourgeHead>();
-
-    public static bool IsDevourer(this NPC target) => target.type == ModContent.NPCType<DevourerofGodsBody>() ||
-        target.type == ModContent.NPCType<DevourerofGodsTail>() ||
-        target.type == ModContent.NPCType<DevourerofGodsHead>();
-
-    public static bool IsWormBoss(this NPC target) => target.IsThanatos() || target.IsDevourer() || target.IsAquaticScoog() || target.IsDestroyer() || target.IsEater();
+    public static bool IsWormBoss(this NPC target) => target.IsDestroyer() ||
+                                                      target.IsEater();
 
     public static bool AnyBosses()
     {
@@ -284,6 +278,7 @@ public static class SeekingUtils
 }
 
 #region Targeting
+
 public static class NPCTargeting
 {
     /// <param name="Origin">Where to start at</param>
@@ -292,7 +287,12 @@ public static class NPCTargeting
     /// <param name="BossPriority">Whether to prioritize NPC's classified as a boss</param>
     /// <param name="ExemptTargets">Blacklist certain NPC's</param>
     [StructLayout(LayoutKind.Auto)]
-    public readonly record struct NPCSeekingData(Vector2 Origin, int Radius, bool LOS = false, bool BossPriority = false, HashSet<NPC> ExemptTargets = null);
+    public readonly record struct NPCSeekingData(
+        Vector2 Origin,
+        int Radius,
+        bool LOS = false,
+        bool BossPriority = false,
+        HashSet<NPC> ExemptTargets = null);
 
     private static bool IsValidTarget(NPC npc, Vector2 origin, float radiusSquared, NPCSeekingData data)
     {
@@ -318,7 +318,8 @@ public static class NPCTargeting
     public static NPC MinionHoming(NPCSeekingData data, Player owner, bool checksRange = false)
     {
         // Validate owner and target index
-        if (owner == null || !owner.whoAmI.WithinBounds(byte.MaxValue) || !owner.MinionAttackTargetNPC.WithinBounds(Main.maxNPCs))
+        if (owner == null || !owner.whoAmI.WithinBounds(byte.MaxValue) ||
+            !owner.MinionAttackTargetNPC.WithinBounds(Main.maxNPCs))
         {
             return GetClosestNPC(data);
         }
@@ -329,7 +330,8 @@ public static class NPCTargeting
         {
             bool canHit = !data.LOS || Collision.CanHit(data.Origin, 1, 1, targetNPC.Center, 1, 1);
             float extraDistance = (targetNPC.width + targetNPC.height) / 2f; // Average of width/height
-            bool distCheck = !checksRange || Vector2.Distance(data.Origin, targetNPC.Center) < data.Radius + extraDistance;
+            bool distCheck = !checksRange ||
+                             Vector2.Distance(data.Origin, targetNPC.Center) < data.Radius + extraDistance;
 
             if (canHit && distCheck)
                 return targetNPC;
@@ -387,14 +389,16 @@ public static class NPCTargeting
             if (data.BossPriority && (npc.boss || npc.type == NPCID.WallofFleshEye))
             {
                 if (!(distSquared < minBossDistSquared) &&
-                    (Math.Abs(distSquared - minBossDistSquared) > .01f || !(npc.whoAmI < closestBoss?.whoAmI))) continue;
+                    (Math.Abs(distSquared - minBossDistSquared) > .01f || !(npc.whoAmI < closestBoss?.whoAmI)))
+                    continue;
                 minBossDistSquared = distSquared;
                 closestBoss = npc;
             }
             else
             {
                 if (!(distSquared < minNonBossDistSquared) &&
-                    (Math.Abs(distSquared - minNonBossDistSquared) > .01f || !(npc.whoAmI < closestNonBoss?.whoAmI))) continue;
+                    (Math.Abs(distSquared - minNonBossDistSquared) > .01f ||
+                     !(npc.whoAmI < closestNonBoss?.whoAmI))) continue;
                 minNonBossDistSquared = distSquared;
                 closestNonBoss = npc;
             }
@@ -457,7 +461,8 @@ public static class NPCTargeting
             if (data.BossPriority && (npc.boss || npc.type == NPCID.WallofFleshEye))
             {
                 if (!(distSquared > maxBossDistSquared) &&
-                    (Math.Abs(distSquared - maxBossDistSquared) > .01f || !(npc.whoAmI < farthestBoss?.whoAmI))) continue;
+                    (Math.Abs(distSquared - maxBossDistSquared) > .01f ||
+                     !(npc.whoAmI < farthestBoss?.whoAmI))) continue;
                 maxBossDistSquared = distSquared;
                 farthestBoss = npc;
             }
@@ -674,7 +679,12 @@ public static class ProjectileTargeting
     /// <param name="Type">When a type is specified, the method will only look for this projectile</param>
     /// <param name="ExemptTargets">Blacklist certain Projectiles</param>
     [StructLayout(LayoutKind.Auto)]
-    public readonly record struct ProjectileSeekingData(Vector2 Origin, int Radius, bool LOS = false, int Type = int.MinValue, HashSet<Projectile> ExemptTargets = null);
+    public readonly record struct ProjectileSeekingData(
+        Vector2 Origin,
+        int Radius,
+        bool LOS = false,
+        int Type = int.MinValue,
+        HashSet<Projectile> ExemptTargets = null);
 
     private static bool IsValidTarget(Projectile proj, Vector2 origin, float radiusSquared, ProjectileSeekingData data)
     {
@@ -734,8 +744,11 @@ public static class ProjectileTargeting
                 continue;
 
             float distSquared = Vector2.DistanceSquared(origin, proj.Center);
-            if (distSquared < minDistSquared || distSquared == minDistSquared && IsPriorityProjectile(proj, data.Type) && !IsPriorityProjectile(closest, data.Type) ||
-                distSquared == minDistSquared && IsPriorityProjectile(closest, data.Type) == IsPriorityProjectile(proj, data.Type) && proj.whoAmI < closest.whoAmI)
+            if (distSquared < minDistSquared || distSquared == minDistSquared &&
+                IsPriorityProjectile(proj, data.Type) && !IsPriorityProjectile(closest, data.Type) ||
+                distSquared == minDistSquared &&
+                IsPriorityProjectile(closest, data.Type) == IsPriorityProjectile(proj, data.Type) &&
+                proj.whoAmI < closest.whoAmI)
             {
                 minDistSquared = distSquared;
                 closest = proj;
@@ -786,8 +799,11 @@ public static class ProjectileTargeting
                 continue;
 
             float distSquared = Vector2.DistanceSquared(origin, proj.Center);
-            if (distSquared > maxDistSquared || distSquared == maxDistSquared && IsPriorityProjectile(proj, data.Type) && !IsPriorityProjectile(farthest, data.Type) ||
-                distSquared == maxDistSquared && IsPriorityProjectile(farthest, data.Type) == IsPriorityProjectile(proj, data.Type) && proj.whoAmI < farthest.whoAmI)
+            if (distSquared > maxDistSquared || distSquared == maxDistSquared &&
+                IsPriorityProjectile(proj, data.Type) && !IsPriorityProjectile(farthest, data.Type) ||
+                distSquared == maxDistSquared &&
+                IsPriorityProjectile(farthest, data.Type) == IsPriorityProjectile(proj, data.Type) &&
+                proj.whoAmI < farthest.whoAmI)
             {
                 maxDistSquared = distSquared;
                 farthest = proj;
@@ -825,8 +841,11 @@ public static class ProjectileTargeting
                     neighbors++;
             }
 
-            if (neighbors > maxNeighbors || neighbors == maxNeighbors && IsPriorityProjectile(proj, data.Type) && !IsPriorityProjectile(bestProj, data.Type) ||
-                neighbors == maxNeighbors && IsPriorityProjectile(bestProj, data.Type) == IsPriorityProjectile(proj, data.Type) && proj.whoAmI < bestProj.whoAmI)
+            if (neighbors > maxNeighbors || neighbors == maxNeighbors && IsPriorityProjectile(proj, data.Type) &&
+                !IsPriorityProjectile(bestProj, data.Type) ||
+                neighbors == maxNeighbors &&
+                IsPriorityProjectile(bestProj, data.Type) == IsPriorityProjectile(proj, data.Type) &&
+                proj.whoAmI < bestProj.whoAmI)
             {
                 maxNeighbors = neighbors;
                 bestProj = proj;
@@ -844,7 +863,11 @@ public static class PlayerTargeting
     /// <param name="LOS">Check for line of sight?</param>
     /// <param name="ExemptTargets">Blacklist certain Players</param>
     [StructLayout(LayoutKind.Auto)]
-    public readonly record struct PlayerSeekingData(Vector2 Origin, int Radius, bool LOS = false, HashSet<Player> ExemptTargets = null);
+    public readonly record struct PlayerSeekingData(
+        Vector2 Origin,
+        int Radius,
+        bool LOS = false,
+        HashSet<Player> ExemptTargets = null);
 
     private static bool IsValidTarget(Player player, Vector2 origin, float radiusSquared, PlayerSeekingData data)
     {
@@ -923,7 +946,8 @@ public static class PlayerTargeting
                 continue;
 
             float distSquared = Vector2.DistanceSquared(origin, player.Center);
-            if (distSquared < minPlayerDistSquared || distSquared == minPlayerDistSquared && player.whoAmI < closest?.whoAmI)
+            if (distSquared < minPlayerDistSquared ||
+                distSquared == minPlayerDistSquared && player.whoAmI < closest?.whoAmI)
             {
                 minPlayerDistSquared = distSquared;
                 closest = player;
@@ -973,6 +997,7 @@ public static class PlayerTargeting
                 if (player.DeadOrGhost)
                     npc.TryTrackingTarget(ref distance, ref realDist, ref t, ref tankTarget, player.whoAmI);
             }
+
             npc.SetTargetTrackingValues(faceTarget, realDist, tankTarget);
         }
 
@@ -986,4 +1011,5 @@ public static class PlayerTargeting
         return false;
     }
 }
+
 #endregion

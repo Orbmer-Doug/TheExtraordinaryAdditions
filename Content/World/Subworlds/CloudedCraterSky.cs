@@ -46,8 +46,8 @@ public class CloudyCraterSky : CustomSky
         #region Vanilla Sky Calculations
 
         bool dayTime = Main.dayTime;
-        float dayCompletion = (float)(time / dayLength);
-        float nightCompletion = (float)(time / nightLength);
+        float dayCompletion = (float) (time / dayLength);
+        float nightCompletion = (float) (time / nightLength);
 
         int screenWidth = instance.GraphicsDevice.Viewport.Width;
         int screenHeight = instance.GraphicsDevice.Viewport.Height;
@@ -84,9 +84,9 @@ public class CloudyCraterSky : CustomSky
 
         // Sun and Moon positions
         int num2 = sceneArea.bgTopY;
-        int sunX = (int)(dayCompletion * (sceneArea.totalWidth + sunTexture.Width * 2)) - sunTexture.Width;
+        int sunX = (int) (dayCompletion * (sceneArea.totalWidth + sunTexture.Width * 2)) - sunTexture.Width;
         int sunY = 0;
-        int moonX = (int)(nightCompletion * (sceneArea.totalWidth + moonTexture.Width * 2)) - moonTexture.Width;
+        int moonX = (int) (nightCompletion * (sceneArea.totalWidth + moonTexture.Width * 2)) - moonTexture.Width;
         int moonY = 0;
 
         if (dayTime)
@@ -94,14 +94,14 @@ public class CloudyCraterSky : CustomSky
             double num10 = dayCompletion < .5f
                 ? Math.Pow(1.0 - dayCompletion * 2.0, 2.0)
                 : Math.Pow((dayCompletion - 0.5) * 2.0, 2.0);
-            sunY = (int)(num2 + num10 * 250.0 + 180.0);
+            sunY = (int) (num2 + num10 * 250.0 + 180.0);
         }
         else
         {
             double num11 = nightCompletion < .5f
                 ? Math.Pow(1.0 - nightCompletion * 2.0, 2.0)
                 : Math.Pow((nightCompletion - 0.5) * 2.0, 2.0);
-            moonY = (int)(num2 + num11 * 250.0 + 180.0);
+            moonY = (int) (num2 + num11 * 250.0 + 180.0);
         }
 
         // Convert pixel positions to normalized screen coordinates (0.0 to 1.0)
@@ -127,7 +127,7 @@ public class CloudyCraterSky : CustomSky
         cloudShader.TrySetParameter("SunPosition", sunPosition);
         cloudShader.TrySetParameter("MoonPosition", moonPosition);
         cloudShader.TrySetParameter("IsDay", dayTime);
-        cloudShader.TrySetParameter("GravDir", (int)LocalPlayer.gravDir != 1);
+        cloudShader.TrySetParameter("GravDir", (int) LocalPlayer.gravDir != 1);
         cloudShader.TrySetParameter("Time", GlobalTimeWrappedHourly);
         cloudShader.TrySetParameter("SkyColor",
             new Vector4(Vector3.Max(new Vector3(.2f, .2f, .2f), ColorOfTheSkies.ToVector3()), intensity));

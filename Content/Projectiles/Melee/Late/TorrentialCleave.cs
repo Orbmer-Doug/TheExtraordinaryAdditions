@@ -38,8 +38,8 @@ public class TorrentialCleave : BaseSwordSwing
 
     public TorrentialSwings State
     {
-        get => (TorrentialSwings)Projectile.AdditionsInfo().ExtraAI[7];
-        set => Projectile.AdditionsInfo().ExtraAI[7] = (int)value;
+        get => (TorrentialSwings) Projectile.AdditionsInfo().ExtraAI[7];
+        set => Projectile.AdditionsInfo().ExtraAI[7] = (int) value;
     }
 
     public override float Animation()
@@ -80,7 +80,8 @@ public class TorrentialCleave : BaseSwordSwing
 
         Projectile.rotation = SwingOffset();
         Owner.SetFrontHandBetter(0, Projectile.rotation - SwordRotation);
-        Projectile.Center = Owner.GetFrontHandPositionImproved() - PolarVector(10f, Projectile.rotation - SwordRotation);
+        Projectile.Center =
+            Owner.GetFrontHandPositionImproved() - PolarVector(10f, Projectile.rotation - SwordRotation);
 
         // swoosh
         if (Animation() >= .26f && !PlayedSound)
@@ -91,6 +92,7 @@ public class TorrentialCleave : BaseSwordSwing
             }
             else
                 AdditionsSound.HeavySwordSwing.Play(Projectile.Center, 1.6f, 0f, .1f);
+
             PlayedSound = true;
         }
 
@@ -100,13 +102,16 @@ public class TorrentialCleave : BaseSwordSwing
         // Update trails
         if (TimeStop <= 0f)
         {
-            old.Update(Rect().Center + PolarVector(64f * Projectile.scale, Projectile.rotation - SwordRotation) + Owner.velocity - Center);
+            old.Update(Rect().Center + PolarVector(64f * Projectile.scale, Projectile.rotation - SwordRotation) +
+                Owner.velocity - Center);
         }
 
         float scaleUp = MeleeScale * IdealSize;
         if (VanishTime <= 0)
         {
-            Projectile.scale = Lerp(Projectile.scale, MakePoly(3f).OutFunction(InverseLerp(0f, 10f * MaxUpdates, OverallTime)) * scaleUp, OverallTime > (10 * MaxUpdates) ? .1f : 1f);
+            Projectile.scale = Lerp(Projectile.scale,
+                MakePoly(3f).OutFunction(InverseLerp(0f, 10f * MaxUpdates, OverallTime)) * scaleUp,
+                OverallTime > (10 * MaxUpdates) ? .1f : 1f);
         }
         else
         {
@@ -128,7 +133,9 @@ public class TorrentialCleave : BaseSwordSwing
                     TorrentialSwings.Up2 => TorrentialSwings.HeavyDown,
                     _ => TorrentialSwings.Up
                 };
-                SwingDir = (State == TorrentialSwings.Up || State == TorrentialSwings.Up2) ? SwingDirection.Up : SwingDirection.Down;
+                SwingDir = (State == TorrentialSwings.Up || State == TorrentialSwings.Up2)
+                    ? SwingDirection.Up
+                    : SwingDirection.Down;
                 Initialized = false;
             }
             else
@@ -156,7 +163,8 @@ public class TorrentialCleave : BaseSwordSwing
             ParticleRegistry.SpawnMistParticle(start, vel, scale, smokeColor, smokeColor * -.5f, 190);
             if (big)
             {
-                ParticleRegistry.SpawnBloomLineParticle(start, vel.RotatedByRandom(.5f) * 2f, life / 2, scale * 1.2f, smokeColor);
+                ParticleRegistry.SpawnBloomLineParticle(start, vel.RotatedByRandom(.5f) * 2f, life / 2, scale * 1.2f,
+                    smokeColor);
                 ParticleRegistry.SpawnGlowParticle(start, vel * .4f, life, scale * 60f, smokeColor, .7f);
             }
         }
@@ -168,7 +176,7 @@ public class TorrentialCleave : BaseSwordSwing
 
         Projectile.NewProj(npc.Center, Vector2.Zero, ModContent.ProjectileType<TorrentialStrikeSpawner>(),
             Projectile.damage, 0f, Projectile.owner, npc.whoAmI, 0, big ? 5 : 10);
-        
+
         ScreenShakeSystem.New(new(big ? .6f : .4f, .3f, 1400f), start);
         npc.velocity += SwordDir * Item.knockBack * npc.knockBackResist;
         TimeStop = StopTime;
@@ -184,8 +192,10 @@ public class TorrentialCleave : BaseSwordSwing
             float scale = Main.rand.NextFloat(30f, 40f);
             Color color = Color.Crimson;
             ParticleRegistry.SpawnGlowParticle(start, vel * .6f, life, scale, color, .6f);
-            ParticleRegistry.SpawnMistParticle(start, vel, Main.rand.NextFloat(.4f, .6f), color, Color.DarkRed, Main.rand.NextFloat(120f, 200f));
+            ParticleRegistry.SpawnMistParticle(start, vel, Main.rand.NextFloat(.4f, .6f), color, Color.DarkRed,
+                Main.rand.NextFloat(120f, 200f));
         }
+
         TimeStop = StopTime;
     }
 
@@ -242,32 +252,36 @@ public class TorrentialCleave : BaseSwordSwing
 public class TorrentialStrikeSpawner : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
-        Projectile.hostile = 
-            Projectile.friendly = 
-            Projectile.tileCollide = false;
+        Projectile.hostile =
+            Projectile.friendly =
+                Projectile.tileCollide = false;
         Projectile.timeLeft = 31;
         Projectile.noEnchantmentVisuals = Projectile.ignoreWater = true;
     }
 
     public int Index
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
+
     public int Time
     {
-        get => (int)Projectile.ai[1];
+        get => (int) Projectile.ai[1];
         set => Projectile.ai[1] = value;
     }
+
     public int Wait
     {
-        get => (int)Projectile.ai[2];
+        get => (int) Projectile.ai[2];
         set => Projectile.ai[2] = value;
     }
-    
+
     public NPC Target => Main.npc?[Index];
+
     public override void AI()
     {
         if (Target is not { active: true })
@@ -282,8 +296,9 @@ public class TorrentialStrikeSpawner : ModProjectile
         {
             float size = MathF.Max(Target.Size.X, Target.Size.Y);
             Vector2 pos = Target.Center + Main.rand.NextVector2CircularLimited(size + 200f, size + 200f, .85f, 1f);
-            Vector2 vel = GetHomingVelocity(pos, Target.RandAreaInEntity(), Target.velocity, Main.rand.NextFloat(20f, 30f));
-            Projectile.NewProj(pos, vel, ModContent.ProjectileType<TorrentialStrike>(), (int)(Projectile.damage * .1f),
+            Vector2 vel = GetHomingVelocity(pos, Target.RandAreaInEntity(), Target.velocity,
+                Main.rand.NextFloat(20f, 30f));
+            Projectile.NewProj(pos, vel, ModContent.ProjectileType<TorrentialStrike>(), (int) (Projectile.damage * .1f),
                 0f, Projectile.owner);
             for (int i = 0; i < 35; i++)
             {
@@ -300,7 +315,7 @@ public class TorrentialStrikeSpawner : ModProjectile
 
             AdditionsSound.etherealReleaseA.Play(pos, .8f, -.1f, .2f, 20);
         }
-        
+
         Time++;
     }
 
@@ -316,8 +331,8 @@ public class TorrentialStrike : ModProjectile
         Projectile.Size = new(40);
         Projectile.penetrate = 1;
         Projectile.localNPCHitCooldown = -1;
-        Projectile.hostile = 
-                Projectile.tileCollide = false;
+        Projectile.hostile =
+            Projectile.tileCollide = false;
         Projectile.usesLocalNPCImmunity =
             Projectile.noEnchantmentVisuals =
                 Projectile.friendly =
@@ -328,18 +343,19 @@ public class TorrentialStrike : ModProjectile
     }
 
     private const int MaxFadeTime = 30;
+
     public int FadeTime
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
 
     public bool Hit
     {
-        get => (int)Projectile.ai[1] == 1;
+        get => (int) Projectile.ai[1] == 1;
         set => Projectile.ai[1] = value.ToInt();
     }
-    
+
     public override void AI()
     {
         if (trail == null || trail.Disposed)
@@ -351,6 +367,7 @@ public class TorrentialStrike : ModProjectile
             {
                 Projectile.Kill();
             }
+
             Projectile.velocity *= .85f;
             FadeTime++;
         }
@@ -369,20 +386,22 @@ public class TorrentialStrike : ModProjectile
         float fade = InverseLerp(MaxFadeTime, 0, FadeTime);
         return AbyssalCurrents.BrackishPalette[0] * (1 - c.X) * fade * 2f;
     }
-    
+
     public OptimizedPrimitiveTrail trail;
     public TrailPoints points = new(20);
+
     public override bool PreDraw(ref Color lightColor)
     {
         void render()
         {
             if (trail == null || trail.Disposed || points == null)
                 return;
-            
+
             ManagedShader shader = ShaderRegistry.WaterCurrent;
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DendriticNoiseZoomedOut), 1);
             trail.DrawTrail(shader, points.Points, 100, true);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(render, PixelationLayer.OverProjectiles);
         return false;
     }

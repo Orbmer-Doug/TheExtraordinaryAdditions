@@ -11,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Late;
 
 public class CryogenicBlast : ModProjectile
 {
-    public static readonly float Lifetime = CalUtils.SecondsToFrames(.4f);
+    public static readonly float Lifetime = SecondsToFrames(.4f);
 
     public ref float Radius => ref Projectile.ai[1];
 
@@ -23,6 +23,7 @@ public class CryogenicBlast : ModProjectile
     }
 
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.DrawScreenCheckFluff[Projectile.type] = 1200;
@@ -35,7 +36,7 @@ public class CryogenicBlast : ModProjectile
         Projectile.penetrate = -1;
         Projectile.tileCollide = false;
         Projectile.ignoreWater = true;
-        Projectile.timeLeft = (int)Lifetime;
+        Projectile.timeLeft = (int) Lifetime;
         Projectile.scale = 0.001f;
 
         Projectile.hostile = false;
@@ -61,15 +62,17 @@ public class CryogenicBlast : ModProjectile
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return CalUtils.CircularHitboxCollision(Projectile.Center, Radius * 0.5f, targetHitbox);
+        return CircularHitboxCollision(Projectile.Center, Radius * 0.5f, targetHitbox);
     }
 
     public override bool PreDraw(ref Color lightColor)
     {
         Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearWrap, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearWrap,
+            DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
         Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.CrackedNoise);
-        DrawData explosionDrawData = new(tex, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), Color.White * Projectile.Opacity);
+        DrawData explosionDrawData = new(tex, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight),
+            Color.White * Projectile.Opacity);
 
         ManagedShader shockwaveShader = ShaderRegistry.LightShockwave;
         shockwaveShader.TrySetParameter("mainColor", DetermineExplosionColor().ToVector3());

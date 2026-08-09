@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -24,8 +23,8 @@ public class CollapsingStar : ModProjectile, IHasScreenShader
     public const float IdealScale = 750f;
 
     // Stars collapse really fast, in fact (outer wilds you lied to me)
-    public static readonly int CollapseTime = CalUtils.SecondsToFrames(.45f);
-    public static readonly float GrowTime = CalUtils.SecondsToFrames(5f);
+    public static readonly int CollapseTime = SecondsToFrames(.45f);
+    public static readonly float GrowTime = SecondsToFrames(5f);
 
     public Player Owner => Main.player[Projectile.owner];
     public GlobalPlayer ModdedOwner => Owner.Additions();
@@ -63,18 +62,18 @@ public class CollapsingStar : ModProjectile, IHasScreenShader
 
     public int OverallTimer
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[0];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[0];
         set => Projectile.AdditionsInfo().ExtraAI[0] = value;
     }
 
     private bool IsCollapsing
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[1] == 1;
+        get => (int) Projectile.AdditionsInfo().ExtraAI[1] == 1;
         set => Projectile.AdditionsInfo().ExtraAI[1] = value.ToInt();
     }
 
     public ref float OldScale => ref Projectile.AdditionsInfo().ExtraAI[2];
-    public Projectile Genedies => Main.projectile[(int)Projectile.AdditionsInfo().ExtraAI[3]];
+    public Projectile Genedies => Main.projectile[(int) Projectile.AdditionsInfo().ExtraAI[3]];
 
     public LoopedSoundInstance slot;
 
@@ -138,7 +137,7 @@ public class CollapsingStar : ModProjectile, IHasScreenShader
             OldScale = Projectile.scale;
         }
 
-        Projectile.ExpandHitboxBy((int)Projectile.scale);
+        Projectile.ExpandHitboxBy((int) Projectile.scale);
 
         UpdateFlares();
 
@@ -226,7 +225,7 @@ public class CollapsingStar : ModProjectile, IHasScreenShader
         if (this.RunLocal())
         {
             Projectile.NewProj(pos, Vector2.Zero, ModContent.ProjectileType<KilonovaShockwave>(),
-                (int)Owner.GetTotalDamage(DamageClass.Generic).ApplyTo(150000), 50f, Projectile.owner);
+                (int) Owner.GetTotalDamage(DamageClass.Generic).ApplyTo(150000), 50f, Projectile.owner);
             Projectile.NewProj(pos, Vector2.Zero, ModContent.ProjectileType<Kilonova>(), 0, 0f, owner);
         }
     }
@@ -340,7 +339,7 @@ public class CollapsingStar : ModProjectile, IHasScreenShader
         shader.Render("AutoloadPass", false, false);
         Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, new(Projectile.scale)), null, Color.White, 0f,
             tex.Size() / 2f);
-        Main.spriteBatch.ExitShaderRegion();
+        Main.spriteBatch.ResetToDefault();
     }
 
     public List<SolarFlare> Flares = [];
@@ -403,9 +402,9 @@ public class CollapsingStar : ModProjectile, IHasScreenShader
 
     private void DrawFlares()
     {
-        if (Flares.Count == 0) 
+        if (Flares.Count == 0)
             return;
-        
+
         foreach (SolarFlare flare in Flares)
         {
             void draw()
@@ -432,7 +431,7 @@ public class CollapsingStar : ModProjectile, IHasScreenShader
                 float scale = Main.rand.NextFloat(520f, 850f);
                 for (float i = .75f; i < 1.5f; i += .25f)
                 {
-                    Flares.Add(new(rand, PolarVector(1f, rot).RotatedByRandom(.2f), (int)(life * i), scale * i));
+                    Flares.Add(new(rand, PolarVector(1f, rot).RotatedByRandom(.2f), (int) (life * i), scale * i));
                 }
             }
             else

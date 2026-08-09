@@ -34,7 +34,7 @@ public class RadiantPulser : ProjOwnedByNPC<Asterlin>
 
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
 
@@ -51,8 +51,8 @@ public class RadiantPulser : ProjOwnedByNPC<Asterlin>
 
     public State CurrentState
     {
-        get => (State)Projectile.AdditionsInfo().ExtraAI[0];
-        set => Projectile.AdditionsInfo().ExtraAI[0] = (int)value;
+        get => (State) Projectile.AdditionsInfo().ExtraAI[0];
+        set => Projectile.AdditionsInfo().ExtraAI[0] = (int) value;
     }
 
     public ref float TargetAngle => ref Projectile.AdditionsInfo().ExtraAI[1];
@@ -60,13 +60,13 @@ public class RadiantPulser : ProjOwnedByNPC<Asterlin>
 
     public int FireCount
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[3];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[3];
         set => Projectile.AdditionsInfo().ExtraAI[3] = value;
     }
 
     public int StateTime
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[4];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[4];
         set => Projectile.AdditionsInfo().ExtraAI[4] = value;
     }
 
@@ -74,7 +74,7 @@ public class RadiantPulser : ProjOwnedByNPC<Asterlin>
 
     public bool NotMain
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[6] == 1;
+        get => (int) Projectile.AdditionsInfo().ExtraAI[6] == 1;
         set => Projectile.AdditionsInfo().ExtraAI[6] = value.ToInt();
     }
 
@@ -174,7 +174,7 @@ public class RadiantPulser : ProjOwnedByNPC<Asterlin>
                 {
                     if (this.RunServer())
                     {
-                        for (int i = (int)(-Length / 2f); i < (int)(Length / 2f); i += Asterlin.RotatedDicing_Spacing)
+                        for (int i = (int) (-Length / 2f); i < (int) (Length / 2f); i += Asterlin.RotatedDicing_Spacing)
                         {
                             Vector2 pos = Projectile.Center + dir * i;
                             Vector2 vel = new(-dir.Y, dir.X);
@@ -200,7 +200,9 @@ public class RadiantPulser : ProjOwnedByNPC<Asterlin>
 
                     if (!NotMain)
                         ModOwner.RotatedDicing_Cycle++;
-                    CurrentState = ModOwner.RotatedDicing_Cycle >= Asterlin.RotatedDicing_Cycles ? State.Fade : State.Positioning;
+                    CurrentState = ModOwner.RotatedDicing_Cycle >= Asterlin.RotatedDicing_Cycles
+                        ? State.Fade
+                        : State.Positioning;
                     Projectile.netUpdate = true;
                 }
 

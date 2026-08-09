@@ -13,7 +13,9 @@ namespace TheExtraordinaryAdditions.UI;
 
 public class BiomePointerUI : SmartUIState
 {
-    public override int InsertionIndex(List<GameInterfaceLayer> layers) => layers.FindIndex(layer => layer.Name == "Vanilla: Mouse Text");
+    public override int InsertionIndex(List<GameInterfaceLayer> layers) =>
+        layers.FindIndex(layer => layer.Name == "Vanilla: Mouse Text");
+
     public override InterfaceScaleType Scale => InterfaceScaleType.None;
 
     internal static float NoTileCompletion = 0f;
@@ -22,6 +24,7 @@ public class BiomePointerUI : SmartUIState
     internal static float ClickCooldown = 0f;
     internal static bool CurrentlyViewing;
     public override bool Visible => CurrentlyViewing;
+
     public override void Draw(SpriteBatch spriteBatch)
     {
         Player player = Main.LocalPlayer;
@@ -57,7 +60,8 @@ public class BiomePointerUI : SmartUIState
 
         float interpolant = 1f - InverseLerp(0f, 1f, Scroll);
         Vector2 finalScale = backgroundScale * interpolant;
-        Color drawCol = proj.GetAlpha(Color.White.Lerp(Color.Red, NoTileCompletion).Lerp(Color.Green, TileCompletion)) * interpolant;
+        Color drawCol = proj.GetAlpha(Color.White.Lerp(Color.Red, NoTileCompletion).Lerp(Color.Green, TileCompletion)) *
+                        interpolant;
 
         switch (pointer.Mode)
         {
@@ -81,9 +85,19 @@ public class BiomePointerUI : SmartUIState
 
     public static readonly Texture2D arrow = AssetRegistry.GetTexture(AdditionsTexture.BiomePointer);
     public static readonly Texture2D back = AssetRegistry.GetTexture(AdditionsTexture.BiomePointerBackground);
-    public static readonly Texture2D marble = ModContent.Request<Texture2D>(ItemID.Marble.GetTerrariaItem(), AssetRequestMode.ImmediateLoad).Value;
-    public static readonly Texture2D granite = ModContent.Request<Texture2D>(ItemID.Granite.GetTerrariaItem(), AssetRequestMode.ImmediateLoad).Value;
-    public static readonly Texture2D mushroom = ModContent.Request<Texture2D>(ItemID.MushroomGrassSeeds.GetTerrariaItem(), AssetRequestMode.ImmediateLoad).Value;
-    public static readonly Texture2D hive = ModContent.Request<Texture2D>(ItemID.Hive.GetTerrariaItem(), AssetRequestMode.ImmediateLoad).Value;
-    public static readonly Texture2D shimmer = ModContent.Request<Texture2D>(ItemID.ShimmerBlock.GetTerrariaItem(), AssetRequestMode.ImmediateLoad).Value;
+
+    public static readonly Texture2D marble =
+        ModContent.Request<Texture2D>(ItemID.Marble.GetTerrariaItem(), AssetRequestMode.ImmediateLoad).Value;
+
+    public static readonly Texture2D granite = ModContent
+        .Request<Texture2D>(ItemID.Granite.GetTerrariaItem(), AssetRequestMode.ImmediateLoad).Value;
+
+    public static readonly Texture2D mushroom = ModContent
+        .Request<Texture2D>(ItemID.MushroomGrassSeeds.GetTerrariaItem(), AssetRequestMode.ImmediateLoad).Value;
+
+    public static readonly Texture2D hive =
+        ModContent.Request<Texture2D>(ItemID.Hive.GetTerrariaItem(), AssetRequestMode.ImmediateLoad).Value;
+
+    public static readonly Texture2D shimmer = ModContent
+        .Request<Texture2D>(ItemID.ShimmerBlock.GetTerrariaItem(), AssetRequestMode.ImmediateLoad).Value;
 }

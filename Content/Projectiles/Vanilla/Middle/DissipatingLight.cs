@@ -8,13 +8,14 @@ public class DissipatingLight : ModProjectile, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.Invis;
     public Player Owner => Main.player[Projectile.owner];
+
     public override void SetDefaults()
     {
         Projectile.DamageType = DamageClass.Ranged;
         Projectile.friendly = true;
         Projectile.hostile = false;
         Projectile.width =
-        Projectile.height = 60;
+            Projectile.height = 60;
         Projectile.alpha = 255;
         Projectile.ignoreWater = true;
         Projectile.tileCollide = false;

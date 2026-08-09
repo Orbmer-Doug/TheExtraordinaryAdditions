@@ -37,15 +37,17 @@ public class BouncyIcicle : ModProjectile
     public override void AI()
     {
         after ??= new(5, () => Projectile.Center);
-        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 255));
+        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0,
+            255));
 
         Lighting.AddLight(Projectile.Center, Color.DarkBlue.ToVector3() * .6f);
 
         if (Projectile.velocity.Length() < 30f)
             Projectile.velocity *= 1.015f;
-        
-        if ((int)Projectile.ai[0]++ % 2 == 1)
-            ParticleRegistry.SpawnMistParticle(Projectile.Center, Projectile.velocity * Main.rand.NextFloat(.2f, .5f), Main.rand.NextFloat(.4f, .8f), Color.DarkBlue, Color.DarkSlateBlue, 190);
+
+        if ((int) Projectile.ai[0]++ % 2 == 1)
+            ParticleRegistry.SpawnMistParticle(Projectile.Center, Projectile.velocity * Main.rand.NextFloat(.2f, .5f),
+                Main.rand.NextFloat(.4f, .8f), Color.DarkBlue, Color.DarkSlateBlue, 190);
 
         Projectile.FacingRight();
     }
@@ -63,7 +65,8 @@ public class BouncyIcicle : ModProjectile
 
         for (int i = 0; i < 10; i++)
         {
-            Dust dust = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, DustID.IceGolem, 0f, 0f, 100, default, 2f);
+            Dust dust = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, DustID.IceGolem,
+                0f, 0f, 100, default, 2f);
             dust.noGravity = true;
             dust.velocity *= 3f;
         }
@@ -78,15 +81,18 @@ public class BouncyIcicle : ModProjectile
 
     public override void OnKill(int timeLeft)
     {
-        Collision.HitTiles(Projectile.position + Projectile.velocity, Projectile.velocity, Projectile.width, Projectile.height);
+        Collision.HitTiles(Projectile.position + Projectile.velocity, Projectile.velocity, Projectile.width,
+            Projectile.height);
         AdditionsSound.ColdBallThrow.Play(Projectile.Center, .4f, 0f, .2f, 10);
 
         for (int i = 0; i < 20; i++)
-            ParticleRegistry.SpawnDustParticle(Projectile.BaseRotHitbox().Right, -Projectile.velocity.RotatedByRandom(.4f) * Main.rand.NextFloat(.2f, .3f),
+            ParticleRegistry.SpawnDustParticle(Projectile.BaseRotHitbox().Right,
+                -Projectile.velocity.RotatedByRandom(.4f) * Main.rand.NextFloat(.2f, .3f),
                 Main.rand.Next(30, 40), Main.rand.NextFloat(.4f, .8f), Color.DarkSlateBlue, .1f, false, true);
     }
-    
+
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D texture = Projectile.ThisProjectileTexture();
@@ -94,7 +100,8 @@ public class BouncyIcicle : ModProjectile
 
         Vector2 drawPosition = Projectile.Center - Main.screenPosition;
         SpriteEffects direction = Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
-        Main.EntitySpriteDraw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), Projectile.rotation, texture.Size() * 0.5f, Projectile.scale, direction);
+        Main.EntitySpriteDraw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), Projectile.rotation,
+            texture.Size() * 0.5f, Projectile.scale, direction);
         return false;
     }
 }

@@ -34,7 +34,7 @@ public class AdditionsGlobalTile : GlobalTile
         int tileID = ParanoidTileRetrieval(x, y).TileType;
         bool result = false;
         foreach (Delegate d in IsTileUnbreakableEvent.GetInvocationList())
-            result |= ((TileConditionDelegate)d).Invoke(x, y, tileID);
+            result |= ((TileConditionDelegate) d).Invoke(x, y, tileID);
 
         return result;
     }

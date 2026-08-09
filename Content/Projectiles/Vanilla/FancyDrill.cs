@@ -16,6 +16,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla;
 public class FancyDrill : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetStaticDefaults()
     {
         // Prevent jittering when the player walks up slopes and such
@@ -35,10 +36,12 @@ public class FancyDrill : ModProjectile
         Projectile.friendly = true;
         Projectile.netImportant = true;
     }
+
     public override void SendExtraAI(BinaryWriter writer)
     {
         writer.Write(Projectile.rotation);
     }
+
     public override void ReceiveExtraAI(BinaryReader reader)
     {
         Projectile.rotation = reader.ReadSingle();
@@ -49,6 +52,7 @@ public class FancyDrill : ModProjectile
     public GlobalPlayer Modded => Owner.Additions();
     public Item Drill => Owner.HeldItem;
     public int Dir => Projectile.velocity.X.NonZeroSign();
+
     public RotatedRectangle Rect()
     {
         Vector2 size = new(Projectile.width, Projectile.height);
@@ -66,10 +70,12 @@ public class FancyDrill : ModProjectile
         Vector2 center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
         if (this.RunLocal())
         {
-            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, center.SafeDirectionTo(Modded.MouseWorld), .7f);
+            Projectile.velocity =
+                Vector2.SmoothStep(Projectile.velocity, center.SafeDirectionTo(Modded.MouseWorld), .7f);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
+
         Projectile.rotation = Projectile.velocity.ToRotation();
         Projectile.Center = center + PolarVector(Projectile.width / 2, Projectile.rotation);
         Projectile.width = Drill.ThisItemTexture().Width;
@@ -81,7 +87,8 @@ public class FancyDrill : ModProjectile
         Owner.heldProj = Projectile.whoAmI;
         Owner.itemRotation = (Projectile.velocity * Dir).ToRotation();
         Owner.ChangeDir(Dir);
-        Owner.SetCompositeArmFront(true, 0, (Projectile.rotation - PiOver2) * Owner.gravDir + (Owner.gravDir == -1 ? Pi : 0f));
+        Owner.SetCompositeArmFront(true, 0,
+            (Projectile.rotation - PiOver2) * Owner.gravDir + (Owner.gravDir == -1 ? Pi : 0f));
         Owner.toolTime = 4; // Nuh-uh
         Projectile.timeLeft = 1000;
 
@@ -90,8 +97,9 @@ public class FancyDrill : ModProjectile
             SoundID.Item22.Play(Projectile.Center, 1f, 0f, .05f);
             if (Owner.whoAmI == Main.myPlayer)
                 SolidCollision(Rect(), 4f);
-            Projectile.soundDelay = (int)Clamp(35 - Drill.useTime, 4, 100);
+            Projectile.soundDelay = (int) Clamp(35 - Drill.useTime, 4, 100);
         }
+
         Projectile.Opacity = InverseLerp(0f, 10f, Time);
 
         // Gives the drill a slight jiggle
@@ -100,8 +108,11 @@ public class FancyDrill : ModProjectile
         // Spawning dust
         if (Main.rand.NextBool(10) && Projectile.Opacity >= 1f)
         {
-            ParticleRegistry.SpawnMistParticle(Rect().RandomPoint(), -Projectile.velocity * Main.rand.NextFloat(.5f, 2f), Main.rand.NextFloat(.1f, .3f), Color.Gray, Color.DarkGray, Main.rand.NextFloat(100f, 255f), Main.rand.NextFloat(-.2f, .3f));
+            ParticleRegistry.SpawnMistParticle(Rect().RandomPoint(),
+                -Projectile.velocity * Main.rand.NextFloat(.5f, 2f), Main.rand.NextFloat(.1f, .3f), Color.Gray,
+                Color.DarkGray, Main.rand.NextFloat(100f, 255f), Main.rand.NextFloat(-.2f, .3f));
         }
+
         Time++;
     }
 
@@ -114,21 +125,21 @@ public class FancyDrill : ModProjectile
         Vector2 bottomRight = rect.BottomRight;
 
         // Determine the number of samples to take along the width and height
-        int widthSamples = (int)(rect.Width / sampleIncrement);
-        int heightSamples = (int)(rect.Height / sampleIncrement);
+        int widthSamples = (int) (rect.Width / sampleIncrement);
+        int heightSamples = (int) (rect.Height / sampleIncrement);
 
         // Sample points in the area
         for (int i = 0; i <= widthSamples; i++)
         {
             // Lerp between the sides
-            float interpolant = (float)i / widthSamples;
+            float interpolant = (float) i / widthSamples;
             Vector2 left = Vector2.Lerp(topLeft, bottomLeft, interpolant);
             Vector2 right = Vector2.Lerp(topRight, bottomRight, interpolant);
 
             for (int j = 0; j <= heightSamples; j++)
             {
                 // Lerp inbetween the side interpolants
-                Vector2 samplePoint = Vector2.Lerp(left, right, (float)j / heightSamples);
+                Vector2 samplePoint = Vector2.Lerp(left, right, (float) j / heightSamples);
 
                 // Convert to tile coordinates
                 Point tilePoint = ClampToWorld(samplePoint.ToTileCoordinates(), true);
@@ -149,8 +160,10 @@ public class FancyDrill : ModProjectile
                         return;
 
                     for (int f = 0; f < 12; f++)
-                        ParticleRegistry.SpawnSparkParticle(tilePoint.ToWorldCoordinates(), Main.rand.NextVector2Circular(9f, 9f),
-                            Main.rand.Next(12, 22), Main.rand.NextFloat(.4f, .6f), Color.Chocolate.Lerp(Color.OrangeRed, Main.rand.NextFloat()), true, true);
+                        ParticleRegistry.SpawnSparkParticle(tilePoint.ToWorldCoordinates(),
+                            Main.rand.NextVector2Circular(9f, 9f),
+                            Main.rand.Next(12, 22), Main.rand.NextFloat(.4f, .6f),
+                            Color.Chocolate.Lerp(Color.OrangeRed, Main.rand.NextFloat()), true, true);
                 }
             }
         }
@@ -161,6 +174,7 @@ public class FancyDrill : ModProjectile
         DelegateMethods.tilecut_0 = TileCuttingContext.AttackProjectile;
         Utils.PlotTileLine(Rect().Bottom, Rect().Top, Rect().Width, DelegateMethods.CutTiles);
     }
+
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
         float _ = 0f;
@@ -196,7 +210,8 @@ public class FancyDrill : ModProjectile
         {
             Asset<Texture2D> glowmask = TextureAssets.GlowMask[Drill.glowMask];
             if (!glowmask.IsDisposed && glowmask.IsLoaded && glowmask != null)
-                Main.spriteBatch.Draw(glowmask.Value, pos, frame, Color.White * Projectile.Opacity, rotation, orig, scale, direction, 0f);
+                Main.spriteBatch.Draw(glowmask.Value, pos, frame, Color.White * Projectile.Opacity, rotation, orig,
+                    scale, direction, 0f);
         }
 
         return false;

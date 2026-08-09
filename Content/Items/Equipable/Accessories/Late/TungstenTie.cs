@@ -1,5 +1,4 @@
-﻿using CalamityMod.Items.Materials;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
@@ -75,7 +74,7 @@ public class TungstenTie : ModItem
 
             if (Main.myPlayer == player.whoAmI)
             {
-                int damage = (int)player.GetDamage(DamageClass.Generic).ApplyTo(350f);
+                int damage = (int) player.GetDamage(DamageClass.Generic).ApplyTo(350f);
                 Projectile.NewProjectileDirect(player.GetSource_Accessory(Item, null), center, Vector2.Zero,
                     tie, damage, 3f, player.whoAmI);
                 for (int i = 0; i < 65; i++)
@@ -85,6 +84,7 @@ public class TungstenTie : ModItem
                     Dust dust = Dust.NewDustPerfect(center, DustID.AncientLight, shootVelocity, default, default, 1.6f);
                     dust.noGravity = true;
                 }
+
                 break;
             }
         }
@@ -93,7 +93,8 @@ public class TungstenTie : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 10);
+        //TODO
+        //recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 10);
         recipe.AddIngredient(ModContent.ItemType<AshersWhiteTie>(), 1);
         recipe.AddIngredient(ModContent.ItemType<TungstenCube>(), 1);
         recipe.AddTile(TileID.ClayBlock);
@@ -108,7 +109,8 @@ public sealed class TungstenTiePlayer : ModPlayer
     public bool Equipped;
     public override void ResetEffects() => Equipped = false;
 
-    public override bool PreKill(double damage, int hitDirection, bool pvp, ref bool playSound, ref bool genDust, ref PlayerDeathReason damageSource)
+    public override bool PreKill(double damage, int hitDirection, bool pvp, ref bool playSound, ref bool genDust,
+        ref PlayerDeathReason damageSource)
     {
         if (Equipped && !Player.HasBuff<TheTiesCooldown>() && !Player.GetModPlayer<AshersWhiteTiePlayer>().Equipped)
         {
@@ -117,16 +119,18 @@ public sealed class TungstenTiePlayer : ModPlayer
             {
                 ParticleRegistry.SpawnPulseRingParticle(Player.Center, Vector2.Zero, 20, RandomRotation(), new(.5f, 1f),
                     0f, .15f, Color.DarkGray);
-                ParticleRegistry.SpawnSparkParticle(Player.Center, Main.rand.NextVector2CircularLimited(12, 12f, .4f, 1f),
+                ParticleRegistry.SpawnSparkParticle(Player.Center,
+                    Main.rand.NextVector2CircularLimited(12, 12f, .4f, 1f),
                     40, Main.rand.NextFloat(.4f, .6f), Color.Gray);
             }
+
             ParticleRegistry.SpawnThunderParticle(Player.Center, 140, 1.5f, new(1f), 0f, Color.WhiteSmoke);
 
             Player.Heal(100);
             if (Player.statLife > Player.statLifeMax2)
                 Player.statLife = Player.statLifeMax2;
 
-            Player.AddBuff(ModContent.BuffType<TheTiesCooldown>(), CalUtils.SecondsToFrames(210));
+            Player.AddBuff(ModContent.BuffType<TheTiesCooldown>(), SecondsToFrames(210));
             return false;
         }
 

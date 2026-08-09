@@ -1,9 +1,6 @@
-﻿using CalamityMod.Items.Materials;
-using CalamityMod.Tiles.Furniture.CraftingStations;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using CalamityMod.Items.Placeables;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -61,7 +58,11 @@ public class Exingenedies : ModItem
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
-        tooltips.DrawHeldShiftTooltip([new(Name, this.GetLocalization("Shift").Format(AdditionsKeybinds.SetBonusHotKey.TooltipHotkeyString(), AdditionsKeybinds.MiscHotKey.TooltipHotkeyString()))]);
+        tooltips.DrawHeldShiftTooltip([
+            new(Name,
+                this.GetLocalization("Shift").Format(AdditionsKeybinds.SetBonusHotKey.TooltipHotkeyString(),
+                    AdditionsKeybinds.MiscHotKey.TooltipHotkeyString()))
+        ]);
         tooltips.IntegrateHotkey(AdditionsKeybinds.MiscHotKey, "[KEY]");
         tooltips.IntegrateHotkey(AdditionsKeybinds.SetBonusHotKey, "[KEY2]");
     }
@@ -74,7 +75,8 @@ public class Exingenedies : ModItem
             drawOffset.X += DrawLine(line, drawOffset, "");
 
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.SamplerStateForCursor, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.SamplerStateForCursor,
+                DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
 
             // Apply glitch effects to a sentence
             ManagedShader displace = ShaderRegistry.NoiseDisplacement;
@@ -88,10 +90,12 @@ public class Exingenedies : ModItem
             drawOffset.Y += DrawLine(line, drawOffset, this.GetLocalization("Line").Value);
 
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.SamplerStateForCursor, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.SamplerStateForCursor,
+                DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
 
             return false;
         }
+
         return true;
     }
 
@@ -103,24 +107,30 @@ public class Exingenedies : ModItem
         Vector2 textPosition = new Vector2(line.X, line.Y) + drawOffset;
 
         // Get an offset to the afterimageOffset based on a sine wave
-        float sine = (float)((1f + Math.Sin(Main.GlobalTimeWrappedHourly * 2.5f)) * 0.5f);
+        float sine = (float) ((1f + Math.Sin(Main.GlobalTimeWrappedHourly * 2.5f)) * 0.5f);
         float sineOffset = MathHelper.Lerp(0.4f, 0.775f, sine);
 
         // Draw text backglow effects
         for (int i = 0; i < 12; i++)
         {
             Vector2 afterimageOffset = (MathHelper.TwoPi * i / 12f).ToRotationVector2() * (2f * sineOffset);
-            ChatManager.DrawColorCodedString(Main.spriteBatch, line.Font, text, (textPosition + afterimageOffset).RotatedBy(MathHelper.TwoPi * (i / 12)), textOuterColor * 0.9f, line.Rotation, line.Origin, line.BaseScale);
+            ChatManager.DrawColorCodedString(Main.spriteBatch, line.Font, text,
+                (textPosition + afterimageOffset).RotatedBy(MathHelper.TwoPi * (i / 12)), textOuterColor * 0.9f,
+                line.Rotation, line.Origin, line.BaseScale);
         }
-        ChatManager.DrawColorCodedString(Main.spriteBatch, line.Font, text, textPosition, Color.DarkSlateBlue, line.Rotation, line.Origin, line.BaseScale);
+
+        ChatManager.DrawColorCodedString(Main.spriteBatch, line.Font, text, textPosition, Color.DarkSlateBlue,
+            line.Rotation, line.Origin, line.BaseScale);
 
         return line.Font.MeasureString(text).X * line.BaseScale.X;
     }
 
-    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor,
+        Color itemColor, Vector2 origin, float scale)
     {
         Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, null, Main.UIScaleMatrix);
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, null,
+            Main.UIScaleMatrix);
 
         ManagedShader shader = AssetRegistry.GetShader("GenediesFlame");
         shader.TrySetParameter("Time", Main.GlobalTimeWrappedHourly);
@@ -135,7 +145,8 @@ public class Exingenedies : ModItem
         return false;
     }
 
-    public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
+    public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation,
+        ref float scale, int whoAmI)
     {
         ManagedShader shader = AssetRegistry.GetShader("GenediesFlame");
         shader.TrySetParameter("Time", Main.GlobalTimeWrappedHourly);
@@ -147,7 +158,8 @@ public class Exingenedies : ModItem
         void draw()
         {
             Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
-            Main.spriteBatch.Draw(tex, Item.position - Main.screenPosition, null, Color.White, 0f, tex.Size() / 2f, 500f, 0, 0f);
+            Main.spriteBatch.Draw(tex, Item.position - Main.screenPosition, null, Color.White, 0f, tex.Size() / 2f,
+                500f, 0, 0f);
         }
     }
 
@@ -164,9 +176,7 @@ public class Exingenedies : ModItem
     {
         Recipe recipe = CreateRecipe();
         recipe.AddIngredient(ModContent.ItemType<DivineSpiritCatalyst>(), 1);
-        recipe.AddIngredient(ModContent.ItemType<ShadowspecBar>(), 10);
-        recipe.AddIngredient(ModContent.ItemType<Rock>());
-        recipe.AddTile(ModContent.TileType<DraedonsForge>());
+        //TODO
         recipe.Register();
     }
 }

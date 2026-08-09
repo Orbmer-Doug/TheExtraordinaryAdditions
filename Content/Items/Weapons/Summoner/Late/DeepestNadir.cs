@@ -1,6 +1,4 @@
-﻿using CalamityMod.Items.Materials;
-using CalamityMod.Tiles.Furniture.CraftingStations;
-using Terraria;
+﻿using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -37,7 +35,8 @@ public class DeepestNadir : ModItem
         return player.ownedProjectileCounts[Item.shoot] <= 0;
     }
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback)
     {
         for (int i = 0; i < 4; i++)
             player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI);
@@ -65,9 +64,7 @@ public class DeepestNadir : ModItem
         recipe.AddIngredient(ModContent.ItemType<EclipsedDuo>(), 1);
         recipe.AddIngredient(ItemID.ScytheWhip, 1);
         recipe.AddIngredient(ItemID.RainbowWhip, 1);
-        recipe.AddIngredient(ModContent.ItemType<DarkPlasma>(), 8);
-        recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 5);
-        recipe.AddTile(ModContent.TileType<CosmicAnvil>());
+        //TODO
         recipe.Register();
     }
 }

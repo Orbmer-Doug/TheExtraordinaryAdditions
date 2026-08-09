@@ -14,6 +14,7 @@ public class ObsidianShot : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ObsidianShot);
     public ref float Time => ref Projectile.ai[0];
+
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.TrailCacheLength[Projectile.type] = 10;
@@ -84,6 +85,7 @@ public class ObsidianShot : ModProjectile
         Projectile.velocity *= .7f;
         Projectile.damage = Projectile.damage / 2;
     }
+
     public override bool OnTileCollide(Vector2 oldVelocity)
     {
         SoundEngine.PlaySound(SoundID.Dig, Projectile.Center, null);
@@ -94,7 +96,11 @@ public class ObsidianShot : ModProjectile
     public OptimizedPrimitiveTrail trail;
     public TrailPoints cache;
     private float WidthFunct(float c) => Projectile.height / 2 * MathHelper.SmoothStep(1f, 0f, c);
-    private Color ColorFunct(SystemVector2 c, Vector2 position) => MulticolorLerp(MathHelper.SmoothStep(1f, 0f, c.X), Color.Violet, Color.BlueViolet, Color.DarkViolet) * Projectile.Opacity;
+
+    private Color ColorFunct(SystemVector2 c, Vector2 position) =>
+        MulticolorLerp(MathHelper.SmoothStep(1f, 0f, c.X), Color.Violet, Color.BlueViolet, Color.DarkViolet) *
+        Projectile.Opacity;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -105,6 +111,7 @@ public class ObsidianShot : ModProjectile
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Pixel), 1);
             trail.DrawTrail(shader, cache.Points, 30);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 
         return false;

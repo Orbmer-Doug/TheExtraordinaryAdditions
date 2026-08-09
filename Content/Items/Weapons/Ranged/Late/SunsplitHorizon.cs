@@ -1,5 +1,4 @@
-﻿using CalamityMod.Items.Materials;
-using Terraria;
+﻿using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
@@ -51,8 +50,7 @@ public class SunsplitHorizon : ModItem
         Recipe recipe = CreateRecipe();
         recipe.AddIngredient(ItemID.Flamethrower, 1);
         recipe.AddIngredient(ModContent.ItemType<PlasmaCore>(), 1);
-        recipe.AddIngredient(ModContent.ItemType<DivineGeode>(), 10);
-        recipe.AddIngredient(ModContent.ItemType<EssenceofHavoc>(), 12);
+        //TODO
         recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();
     }

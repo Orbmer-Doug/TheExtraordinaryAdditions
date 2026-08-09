@@ -10,7 +10,6 @@ public class AdditionsConfigServer : ModConfig
     public override ConfigScope Mode => ConfigScope.ServerSide;
 
     [Header("Gameplay")]
-
     [BackgroundColor(80, 250, 187, 192)]
     [SliderColor(42, 222, 162)]
     [DefaultValue(true)]

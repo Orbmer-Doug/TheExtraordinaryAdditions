@@ -10,6 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Early;
 public class CalciumShot : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 2;
@@ -22,6 +23,7 @@ public class CalciumShot : ModProjectile
     }
 
     public TrailPoints cache;
+
     public override void AI()
     {
         if (Projectile.velocity != Vector2.Zero)
@@ -35,6 +37,7 @@ public class CalciumShot : ModProjectile
         if (Projectile.ai[0]++ >= 10 && cache.Points.AllPointsEqual())
             Projectile.Kill();
     }
+
     public override bool OnTileCollide(Vector2 oldVelocity)
     {
         Projectile.velocity = Vector2.Zero;
@@ -58,6 +61,7 @@ public class CalciumShot : ModProjectile
     }
 
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -68,6 +72,7 @@ public class CalciumShot : ModProjectile
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Pixel), 1);
             trail.DrawTrail(shader, cache.Points, 30);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;
     }

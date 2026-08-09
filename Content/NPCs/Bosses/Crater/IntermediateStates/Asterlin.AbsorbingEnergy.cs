@@ -51,7 +51,7 @@ public partial class Asterlin
                 if (absorb[i] == null || absorb[i].Disposed)
                     absorb[i] = new(_ => 24f * mass.scale,
                         (c, _) => MulticolorLerp(1f - c.X, Color.White, Color.Gold, Color.DarkGoldenrod) *
-                                    NPC.Opacity, null, 100);
+                                  NPC.Opacity, null, 100);
             }
 
             for (int i = 0; i < points.Length; i++)
@@ -65,7 +65,8 @@ public partial class Asterlin
                         0 => -.5f,
                         1 => .8f,
                         _ => 1.8f
-                    }), mass.Center
+                    }),
+                    mass.Center
                 ];
                 for (int j = 0; j < 100; j++)
                     points[i].SetPoint(j,

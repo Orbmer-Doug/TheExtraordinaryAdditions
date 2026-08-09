@@ -30,18 +30,22 @@ public class BreakerBladeCrush : BaseSwordSwing
 
     public BladeState State
     {
-        get => (BladeState)Projectile.AdditionsInfo().ExtraAI[7];
-        set => Projectile.AdditionsInfo().ExtraAI[7] = (int)value;
+        get => (BladeState) Projectile.AdditionsInfo().ExtraAI[7];
+        set => Projectile.AdditionsInfo().ExtraAI[7] = (int) value;
     }
 
     public bool SpecialAttack => Modded.AtMaxLimit;
+
     public bool Beam
     {
         get => Projectile.AdditionsInfo().ExtraAI[9] == 1f;
         set => Projectile.AdditionsInfo().ExtraAI[9] = value.ToInt();
     }
 
-    public override int SwingTime => Beam ? CalUtils.SecondsToFrames(.8f) : SpecialAttack ? CalUtils.SecondsToFrames(.4f) : CalUtils.SecondsToFrames(.6f);
+    public override int SwingTime => Beam ? SecondsToFrames(.8f)
+        : SpecialAttack ? SecondsToFrames(.4f)
+        : SecondsToFrames(.6f);
+
     public const float BladeLength = 122f;
     public Color Brightest => Color.White.Lerp(Color.Violet, .2f);
     public Color Bright => SpecialAttack ? new(163, 222, 250) : new(85, 237, 71);
@@ -76,13 +80,16 @@ public class BreakerBladeCrush : BaseSwordSwing
                 if (Animation() >= .26f && !PlayedSound && !Main.dedServ)
                 {
                     SoundStyle val = Beam ? AssetRegistry.GetSound(AdditionsSound.BreakerBeam) :
-                    SpecialAttack ? AssetRegistry.GetSound(AdditionsSound.BreakerSwingSpecial) : AssetRegistry.GetSound(AdditionsSound.BreakerSwing);
+                        SpecialAttack ? AssetRegistry.GetSound(AdditionsSound.BreakerSwingSpecial) :
+                        AssetRegistry.GetSound(AdditionsSound.BreakerSwing);
                     val.Play(Projectile.Center, .6f * Projectile.scale, -.15f, .15f, null, 10, Name);
 
                     if (Beam && this.RunLocal())
                     {
-                        Projectile.NewProj(Projectile.Center, Vector2.UnitX * 15 * Direction, ModContent.ProjectileType<BreakerBeam>(),
-                            Projectile.damage, Projectile.knockBack * .25f, Projectile.owner, 0f, Owner.CheckSolidGround().ToInt(), 0f, SpecialAttack.ToInt());
+                        Projectile.NewProj(Projectile.Center, Vector2.UnitX * 15 * Direction,
+                            ModContent.ProjectileType<BreakerBeam>(),
+                            Projectile.damage, Projectile.knockBack * .25f, Projectile.owner, 0f,
+                            Owner.CheckSolidGround().ToInt(), 0f, SpecialAttack.ToInt());
 
                         if (Modded.AtMaxLimit)
                         {
@@ -92,15 +99,18 @@ public class BreakerBladeCrush : BaseSwordSwing
 
                     PlayedSound = true;
                 }
+
                 Projectile.rotation = SwingOffset();
 
                 if (VanishTime <= 0)
                 {
-                    Projectile.scale = MakePoly(3f).OutFunction(InverseLerp(0f, 10f * MaxUpdates, OverallTime)) * MeleeScale;
+                    Projectile.scale = MakePoly(3f).OutFunction(InverseLerp(0f, 10f * MaxUpdates, OverallTime)) *
+                                       MeleeScale;
                 }
                 else
                 {
-                    Projectile.scale = MakePoly(4f).OutFunction.Evaluate(VanishTime, 0f, 18f * MaxUpdates, MeleeScale, 0f);
+                    Projectile.scale = MakePoly(4f).OutFunction
+                        .Evaluate(VanishTime, 0f, 18f * MaxUpdates, MeleeScale, 0f);
                     if (Projectile.scale <= 0f)
                         KillEffect();
                     VanishTime++;
@@ -137,7 +147,8 @@ public class BreakerBladeCrush : BaseSwordSwing
                     () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
                 charge.Update(Projectile.Center);
 
-                Projectile.rotation = Projectile.rotation.AngleLerp(Direction == 1 ? SwordRotation : Pi + SwordRotation, .2f);
+                Projectile.rotation =
+                    Projectile.rotation.AngleLerp(Direction == 1 ? SwordRotation : Pi + SwordRotation, .2f);
                 Owner.velocity.X = 0f;
                 Projectile.scale = Projectile.Opacity = Exp().OutFunction(InverseLerp(0f, 30f, Time));
                 Modded.BreakerLimit += .02f;
@@ -150,8 +161,10 @@ public class BreakerBladeCrush : BaseSwordSwing
 
                 if (Time % 2f == 1f)
                 {
-                    Color yellow = MulticolorLerp(Main.rand.NextFloat(), new Color(251, 250, 228), new Color(236, 239, 183), new Color(217, 218, 166));
-                    Color blue = MulticolorLerp(Main.rand.NextFloat(), new Color(189, 248, 249), new Color(157, 223, 224), new Color(125, 201, 196));
+                    Color yellow = MulticolorLerp(Main.rand.NextFloat(), new Color(251, 250, 228),
+                        new Color(236, 239, 183), new Color(217, 218, 166));
+                    Color blue = MulticolorLerp(Main.rand.NextFloat(), new Color(189, 248, 249),
+                        new Color(157, 223, 224), new Color(125, 201, 196));
                     Color col = Main.rand.NextBool() ? yellow : blue;
 
                     Vector2 pos = Owner.RandAreaInEntity();
@@ -161,6 +174,7 @@ public class BreakerBladeCrush : BaseSwordSwing
 
                     ParticleRegistry.SpawnSparkParticle(pos, vel, life, scale, col);
                 }
+
                 break;
         }
     }
@@ -180,12 +194,14 @@ public class BreakerBladeCrush : BaseSwordSwing
         else
         {
             Modded.BreakerLimit += hit.Damage * .01f;
-            SoundStyle val = firstStrike ? AssetRegistry.GetSound(AdditionsSound.BreakerHit2) :
-                AssetRegistry.GetSound(AdditionsSound.BreakerHit1);
+            SoundStyle val = firstStrike
+                ? AssetRegistry.GetSound(AdditionsSound.BreakerHit2)
+                : AssetRegistry.GetSound(AdditionsSound.BreakerHit1);
             val.Play(Projectile.Center, .3f, -.15f, .15f);
         }
 
-        ParticleRegistry.SpawnTwinkleParticle(start, Vector2.Zero, 20, new(Main.rand.NextFloat(.9f, 1.4f)), Bright, 4, default, RandomRotation());
+        ParticleRegistry.SpawnTwinkleParticle(start, Vector2.Zero, 20, new(Main.rand.NextFloat(.9f, 1.4f)), Bright, 4,
+            default, RandomRotation());
     }
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
@@ -198,6 +214,7 @@ public class BreakerBladeCrush : BaseSwordSwing
     }
 
     public float WidthFunct(float c) => 80f;
+
     public Color ColorFunct(SystemVector2 c, Vector2 pos)
     {
         float opacity = InverseLerp(0.018f, 0.07f, AngularVelocity);
@@ -206,6 +223,7 @@ public class BreakerBladeCrush : BaseSwordSwing
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints points = new(20);
+
     public override bool PreDraw(ref Color lightColor)
     {
         // Determine the effects for drawing. These must be done here otherwise silly things WILL happen.

@@ -15,6 +15,7 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Arid;
 public class DuneProwler : ModNPC
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.DuneProwlerAssault);
+
     public override void SetStaticDefaults()
     {
         Main.npcFrameCount[NPC.type] = 52;
@@ -39,11 +40,10 @@ public class DuneProwler : ModNPC
     public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
     {
         bestiaryEntry.Info.AddRange([
-                BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Desert,
+            BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Desert,
 
-                new FlavorTextBestiaryInfoElement(this.GetLocalizedValue("Bestiary"))
-            ]);
-
+            new FlavorTextBestiaryInfoElement(this.GetLocalizedValue("Bestiary"))
+        ]);
     }
 
     public override void FindFrame(int frameHeight)
@@ -56,10 +56,12 @@ public class DuneProwler : ModNPC
                 NPC.frame.Y = NPC.frame.Y + frameHeight;
                 NPC.frameCounter = 0.0;
             }
+
             if (NPC.frame.Y >= frameHeight * 13)
             {
                 NPC.frame.Y = frameHeight;
             }
+
             return;
         }
 
@@ -69,6 +71,7 @@ public class DuneProwler : ModNPC
             NPC.frameCounter = 0.0;
             NPC.frame.Y = NPC.frame.Y + frameHeight;
         }
+
         if (NPC.velocity.Y == 0f)
         {
             if (NPC.direction == 1)
@@ -81,6 +84,7 @@ public class DuneProwler : ModNPC
                 NPC.frame.Y = 0;
                 return;
             }
+
             if (NPC.frame.Y < frameHeight)
                 NPC.frame.Y = frameHeight;
             if (NPC.frame.Y > frameHeight * 13)
@@ -100,6 +104,7 @@ public class DuneProwler : ModNPC
     public ref float StuckTimer => ref NPC.ai[3];
     public ref float MaxSpeed => ref NPC.AdditionsInfo().ExtraAI[0];
     public ref float MoveDirectionTimer => ref NPC.AdditionsInfo().ExtraAI[1];
+
     public override void AI()
     {
         const float minSpeedForTurn = .1f;
@@ -124,10 +129,12 @@ public class DuneProwler : ModNPC
         MaxSpeed = baseMaxSpeed + Math.Min(maxSpeedIncrease, MoveDirectionTimer * speedIncreasePerFrame);
 
         if (MaxSpeed > 4f && NPC.velocity.Y == 0)
-            Dust.NewDustPerfect(Vector2.Lerp(NPC.RotHitbox().BottomLeft, NPC.RotHitbox().BottomRight, Main.rand.NextFloat()), DustID.Cloud, -NPC.velocity.RotatedByRandom(.1f) * .2f, 50, default, 1.5f);
+            Dust.NewDustPerfect(
+                Vector2.Lerp(NPC.RotHitbox().BottomLeft, NPC.RotHitbox().BottomRight, Main.rand.NextFloat()),
+                DustID.Cloud, -NPC.velocity.RotatedByRandom(.1f) * .2f, 50, default, 1.5f);
 
         // Initial directionY adjustment if NPC is exactly at player's feet level
-        if (target.position.Y + (float)target.height == NPC.position.Y + (float)NPC.height)
+        if (target.position.Y + (float) target.height == NPC.position.Y + (float) NPC.height)
         {
             NPC.directionY = -1;
         }
@@ -148,30 +155,36 @@ public class DuneProwler : ModNPC
         bool useStuckDetection = true;
         if (!isSpecialTypeForStuckLogic && useStuckDetection)
         {
-            if (NPC.velocity.Y == 0f && ((NPC.velocity.X > 0f && NPC.direction < 0) || (NPC.velocity.X < 0f && NPC.direction > 0)))
+            if (NPC.velocity.Y == 0f &&
+                ((NPC.velocity.X > 0f && NPC.direction < 0) || (NPC.velocity.X < 0f && NPC.direction > 0)))
             {
                 shouldTurnAround = true;
             }
-            if (NPC.position.X == NPC.oldPosition.X || StuckTimer >= (float)stuckTimerMax || shouldTurnAround)
+
+            if (NPC.position.X == NPC.oldPosition.X || StuckTimer >= (float) stuckTimerMax || shouldTurnAround)
             {
                 StuckTimer += 1f;
             }
-            else if ((double)Math.Abs(NPC.velocity.X) > 0.9 && StuckTimer > 0f)
+            else if ((double) Math.Abs(NPC.velocity.X) > 0.9 && StuckTimer > 0f)
             {
                 StuckTimer -= 1f;
             }
-            if (StuckTimer > (float)(stuckTimerMax * 10))
+
+            if (StuckTimer > (float) (stuckTimerMax * 10))
             {
                 StuckTimer = 0f;
             }
+
             if (NPC.justHit)
             {
                 StuckTimer = 0f;
             }
-            if (StuckTimer == (float)stuckTimerMax)
+
+            if (StuckTimer == (float) stuckTimerMax)
             {
                 NPC.netUpdate = true;
             }
+
             playerHitbox = target.Hitbox;
             if (playerHitbox.Intersects(NPC.Hitbox))
             {
@@ -180,12 +193,14 @@ public class DuneProwler : ModNPC
         }
 
         // Check if not stuck and not discouraged to pursue
-        if (StuckTimer < (float)stuckTimerMax && NPC.DespawnEncouragement_AIStyle3_Fighters_NotDiscouraged(NPC.type, NPC.position, NPC))
+        if (StuckTimer < (float) stuckTimerMax &&
+            NPC.DespawnEncouragement_AIStyle3_Fighters_NotDiscouraged(NPC.type, NPC.position, NPC))
         {
             if (NPC.shimmerTransparency < 1f)
             {
                 // Random sound plays, check with something like Main.rand.Next(1000) == 0)
             }
+
             NPC.TargetClosest();
             if (NPC.directionY > 0 && target.Center.Y <= NPC.Bottom.Y)
             {
@@ -212,6 +227,7 @@ public class DuneProwler : ModNPC
             {
                 IdleTimer = 0f;
             }
+
             if (NPC.direction == 0)
             {
                 NPC.direction = 1;
@@ -231,6 +247,7 @@ public class DuneProwler : ModNPC
             {
                 NPC.velocity.X *= 0.8f;
             }
+
             NPC.velocity.X += 0.1f;
             if (NPC.velocity.X > MaxSpeed)
             {
@@ -243,6 +260,7 @@ public class DuneProwler : ModNPC
             {
                 NPC.velocity.X *= 0.8f;
             }
+
             NPC.velocity.X -= 0.1f;
             if (NPC.velocity.X < -MaxSpeed)
             {
@@ -252,12 +270,12 @@ public class DuneProwler : ModNPC
 
         if (NPC.velocity.Y == 0f || forceJump)
         {
-            int tileYBelow = (int)(NPC.position.Y + (float)NPC.height + 7f) / 16;
-            int tileYAbove = (int)(NPC.position.Y - 9f) / 16;
-            int tileXLeft = (int)NPC.position.X / 16;
-            int tileXRight = (int)(NPC.position.X + (float)NPC.width) / 16;
-            int tileXCenterLeft = (int)(NPC.position.X + 8f) / 16;
-            int tileXCenterRight = (int)(NPC.position.X + (float)NPC.width - 8f) / 16;
+            int tileYBelow = (int) (NPC.position.Y + (float) NPC.height + 7f) / 16;
+            int tileYAbove = (int) (NPC.position.Y - 9f) / 16;
+            int tileXLeft = (int) NPC.position.X / 16;
+            int tileXRight = (int) (NPC.position.X + (float) NPC.width) / 16;
+            int tileXCenterLeft = (int) (NPC.position.X + 8f) / 16;
+            int tileXCenterRight = (int) (NPC.position.X + (float) NPC.width - 8f) / 16;
             bool missingTilesBelow = false;
             for (int tileX = tileXCenterLeft; tileX <= tileXCenterRight; tileX++)
             {
@@ -266,20 +284,26 @@ public class DuneProwler : ModNPC
                     missingTilesBelow = true;
                     continue;
                 }
-                if (Main.tile[tileX, tileYAbove] != null && Main.tile[tileX, tileYAbove].HasUnactuatedTile && Main.tileSolid[Main.tile[tileX, tileYAbove].type])
+
+                if (Main.tile[tileX, tileYAbove] != null && Main.tile[tileX, tileYAbove].HasUnactuatedTile &&
+                    Main.tileSolid[Main.tile[tileX, tileYAbove].type])
                 {
                     onGround = false;
                     break;
                 }
-                if (!missingTilesBelow && tileX >= tileXLeft && tileX <= tileXRight && Main.tile[tileX, tileYBelow].HasUnactuatedTile && Main.tileSolid[Main.tile[tileX, tileYBelow].type])
+
+                if (!missingTilesBelow && tileX >= tileXLeft && tileX <= tileXRight &&
+                    Main.tile[tileX, tileYBelow].HasUnactuatedTile && Main.tileSolid[Main.tile[tileX, tileYBelow].type])
                 {
                     onGround = true;
                 }
             }
+
             if (!onGround && NPC.velocity.Y < 0f)
             {
                 NPC.velocity.Y = 0f;
             }
+
             if (missingTilesBelow)
             {
                 return;
@@ -293,46 +317,67 @@ public class DuneProwler : ModNPC
             {
                 directionOffset = -1;
             }
+
             if (NPC.velocity.X > 0f)
             {
                 directionOffset = 1;
             }
+
             Vector2 projectedPosition = NPC.position;
             projectedPosition.X += NPC.velocity.X;
-            int tileXCheck = (int)((projectedPosition.X + (float)(NPC.width / 2) + (float)((NPC.width / 2 + 1) * directionOffset)) / 16f);
-            int tileYCheck = (int)((projectedPosition.Y + (float)NPC.height - 1f) / 16f);
+            int tileXCheck = (int) ((projectedPosition.X + (float) (NPC.width / 2) +
+                                     (float) ((NPC.width / 2 + 1) * directionOffset)) / 16f);
+            int tileYCheck = (int) ((projectedPosition.Y + (float) NPC.height - 1f) / 16f);
             if (WorldGen.InWorld(tileXCheck, tileYCheck, 4))
             {
-                if ((float)(tileXCheck * 16) < projectedPosition.X + (float)NPC.width && (float)(tileXCheck * 16 + 16) > projectedPosition.X
-                    && ((Main.tile[tileXCheck, tileYCheck].HasUnactuatedTile && !Main.tile[tileXCheck, tileYCheck].TopSlope
-                    && !Main.tile[tileXCheck, tileYCheck - 1].TopSlope && Main.tileSolid[Main.tile[tileXCheck, tileYCheck].type]
-                    && !Main.tileSolidTop[Main.tile[tileXCheck, tileYCheck].type]) || (Main.tile[tileXCheck, tileYCheck - 1].IsHalfBlock
-                    && Main.tile[tileXCheck, tileYCheck - 1].HasUnactuatedTile)) && (!Main.tile[tileXCheck, tileYCheck - 1].HasUnactuatedTile
-                    || !Main.tileSolid[Main.tile[tileXCheck, tileYCheck - 1].type] || Main.tileSolidTop[Main.tile[tileXCheck, tileYCheck - 1].type]
-                    || (Main.tile[tileXCheck, tileYCheck - 1].IsHalfBlock && (!Main.tile[tileXCheck, tileYCheck - 4].HasUnactuatedTile
-                    || !Main.tileSolid[Main.tile[tileXCheck, tileYCheck - 4].type] || Main.tileSolidTop[Main.tile[tileXCheck, tileYCheck - 4].type])))
-                    && (!Main.tile[tileXCheck, tileYCheck - 2].HasUnactuatedTile || !Main.tileSolid[Main.tile[tileXCheck, tileYCheck - 2].type]
-                    || Main.tileSolidTop[Main.tile[tileXCheck, tileYCheck - 2].type]) && (!Main.tile[tileXCheck, tileYCheck - 3].HasUnactuatedTile
-                    || !Main.tileSolid[Main.tile[tileXCheck, tileYCheck - 3].type] || Main.tileSolidTop[Main.tile[tileXCheck, tileYCheck - 3].type])
-                    && (!Main.tile[tileXCheck - directionOffset, tileYCheck - 3].HasUnactuatedTile || !Main.tileSolid[Main.tile[tileXCheck - directionOffset, tileYCheck - 3].type]))
+                if ((float) (tileXCheck * 16) < projectedPosition.X + (float) NPC.width &&
+                    (float) (tileXCheck * 16 + 16) > projectedPosition.X
+                    && ((Main.tile[tileXCheck, tileYCheck].HasUnactuatedTile && !Main.tile[tileXCheck, tileYCheck]
+                                                                                 .TopSlope
+                                                                             && !Main.tile[tileXCheck, tileYCheck - 1]
+                                                                                 .TopSlope &&
+                                                                             Main.tileSolid[
+                                                                                 Main.tile[tileXCheck, tileYCheck].type]
+                                                                             && !Main.tileSolidTop[
+                                                                                 Main.tile[tileXCheck,
+                                                                                     tileYCheck].type]) ||
+                        (Main.tile[tileXCheck, tileYCheck - 1].IsHalfBlock
+                         && Main.tile[tileXCheck, tileYCheck - 1].HasUnactuatedTile)) &&
+                    (!Main.tile[tileXCheck, tileYCheck - 1].HasUnactuatedTile
+                     || !Main.tileSolid[Main.tile[tileXCheck, tileYCheck - 1].type] ||
+                     Main.tileSolidTop[Main.tile[tileXCheck, tileYCheck - 1].type]
+                     || (Main.tile[tileXCheck, tileYCheck - 1].IsHalfBlock &&
+                         (!Main.tile[tileXCheck, tileYCheck - 4].HasUnactuatedTile
+                          || !Main.tileSolid[Main.tile[tileXCheck, tileYCheck - 4].type] ||
+                          Main.tileSolidTop[Main.tile[tileXCheck, tileYCheck - 4].type])))
+                    && (!Main.tile[tileXCheck, tileYCheck - 2].HasUnactuatedTile ||
+                        !Main.tileSolid[Main.tile[tileXCheck, tileYCheck - 2].type]
+                        || Main.tileSolidTop[Main.tile[tileXCheck, tileYCheck - 2].type]) &&
+                    (!Main.tile[tileXCheck, tileYCheck - 3].HasUnactuatedTile
+                     || !Main.tileSolid[Main.tile[tileXCheck, tileYCheck - 3].type] ||
+                     Main.tileSolidTop[Main.tile[tileXCheck, tileYCheck - 3].type])
+                    && (!Main.tile[tileXCheck - directionOffset, tileYCheck - 3].HasUnactuatedTile ||
+                        !Main.tileSolid[Main.tile[tileXCheck - directionOffset, tileYCheck - 3].type]))
                 {
                     float groundY = tileYCheck * 16;
                     if (Main.tile[tileXCheck, tileYCheck].IsHalfBlock)
                     {
                         groundY += 8f;
                     }
+
                     if (Main.tile[tileXCheck, tileYCheck - 1].IsHalfBlock)
                     {
                         groundY -= 8f;
                     }
-                    if (groundY < projectedPosition.Y + (float)NPC.height)
+
+                    if (groundY < projectedPosition.Y + (float) NPC.height)
                     {
-                        float heightDifference = projectedPosition.Y + (float)NPC.height - groundY;
+                        float heightDifference = projectedPosition.Y + (float) NPC.height - groundY;
                         float maxStepHeight = 16.1f;
                         if (heightDifference <= maxStepHeight)
                         {
-                            NPC.gfxOffY += NPC.position.Y + (float)NPC.height - groundY;
-                            NPC.position.Y = groundY - (float)NPC.height;
+                            NPC.gfxOffY += NPC.position.Y + (float) NPC.height - groundY;
+                            NPC.position.Y = groundY - (float) NPC.height;
                             if (heightDifference < 9f)
                             {
                                 NPC.stepSpeed = 1f;
@@ -349,22 +394,24 @@ public class DuneProwler : ModNPC
 
         if (onGround)
         {
-            int tileXObstacle = (int)((NPC.position.X + (float)(NPC.width / 2) + (float)(15 * NPC.direction)) / 16f);
-            int tileYObstacle = (int)((NPC.position.Y + (float)NPC.height - 15f) / 16f);
+            int tileXObstacle = (int) ((NPC.position.X + (float) (NPC.width / 2) + (float) (15 * NPC.direction)) / 16f);
+            int tileYObstacle = (int) ((NPC.position.Y + (float) NPC.height - 15f) / 16f);
 
-            if (Main.tile[tileXObstacle, tileYObstacle - 1].HasUnactuatedTile && (TileLoader.IsClosedDoor(Main.tile[tileXObstacle, tileYObstacle - 1])
-                || Main.tile[tileXObstacle, tileYObstacle - 1].type == 388) && canOpenDoors)
+            if (Main.tile[tileXObstacle, tileYObstacle - 1].HasUnactuatedTile &&
+                (TileLoader.IsClosedDoor(Main.tile[tileXObstacle, tileYObstacle - 1])
+                 || Main.tile[tileXObstacle, tileYObstacle - 1].type == 388) && canOpenDoors)
             {
                 DoorAttemptTimer += 1f;
                 StuckTimer = 0f;
                 if (DoorAttemptTimer >= 60f)
                 {
-                    NPC.velocity.X = 0.5f * (float)(-NPC.direction);
+                    NPC.velocity.X = 0.5f * (float) (-NPC.direction);
                     int doorOpenIncrement = 5;
                     if (Main.tile[tileXObstacle, tileYObstacle - 1].type == 388)
                     {
                         doorOpenIncrement = 2;
                     }
+
                     DoorInteractionTimer += doorOpenIncrement;
 
                     DoorAttemptTimer = 0f;
@@ -386,11 +433,14 @@ public class DuneProwler : ModNPC
                                 StuckTimer = stuckTimerMax;
                                 NPC.netUpdate = true;
                             }
+
                             if (this.RunClient() && opened)
                             {
-                                NetMessage.SendData(MessageID.ToggleDoorState, -1, -1, null, 0, tileXObstacle, tileYObstacle - 1, NPC.direction);
+                                NetMessage.SendData(MessageID.ToggleDoorState, -1, -1, null, 0, tileXObstacle,
+                                    tileYObstacle - 1, NPC.direction);
                             }
                         }
+
                         if (Main.tile[tileXObstacle, tileYObstacle - 1].type == 388)
                         {
                             bool opened = WorldGen.ShiftTallGate(tileXObstacle, tileYObstacle - 1, closing: false);
@@ -399,9 +449,11 @@ public class DuneProwler : ModNPC
                                 StuckTimer = stuckTimerMax;
                                 NPC.netUpdate = true;
                             }
+
                             if (this.RunClient() && opened)
                             {
-                                NetMessage.SendData(MessageID.ToggleDoorState, -1, -1, null, 4, tileXObstacle, tileYObstacle - 1);
+                                NetMessage.SendData(MessageID.ToggleDoorState, -1, -1, null, 4, tileXObstacle,
+                                    tileYObstacle - 1);
                             }
                         }
                     }
@@ -410,11 +462,14 @@ public class DuneProwler : ModNPC
             else
             {
                 int spriteDirectionAdjusted = NPC.spriteDirection;
-                if ((NPC.velocity.X < 0f && spriteDirectionAdjusted == -1) || (NPC.velocity.X > 0f && spriteDirectionAdjusted == 1))
+                if ((NPC.velocity.X < 0f && spriteDirectionAdjusted == -1) ||
+                    (NPC.velocity.X > 0f && spriteDirectionAdjusted == 1))
                 {
-                    if (NPC.height >= 32 && Main.tile[tileXObstacle, tileYObstacle - 2].HasUnactuatedTile && Main.tileSolid[Main.tile[tileXObstacle, tileYObstacle - 2].type])
+                    if (NPC.height >= 32 && Main.tile[tileXObstacle, tileYObstacle - 2].HasUnactuatedTile &&
+                        Main.tileSolid[Main.tile[tileXObstacle, tileYObstacle - 2].type])
                     {
-                        if (Main.tile[tileXObstacle, tileYObstacle - 3].HasUnactuatedTile && Main.tileSolid[Main.tile[tileXObstacle, tileYObstacle - 3].type])
+                        if (Main.tile[tileXObstacle, tileYObstacle - 3].HasUnactuatedTile &&
+                            Main.tileSolid[Main.tile[tileXObstacle, tileYObstacle - 3].type])
                         {
                             NPC.velocity.Y = -8f;
                             NPC.netUpdate = true;
@@ -425,20 +480,25 @@ public class DuneProwler : ModNPC
                             NPC.netUpdate = true;
                         }
                     }
-                    else if (Main.tile[tileXObstacle, tileYObstacle - 1].HasUnactuatedTile && Main.tileSolid[Main.tile[tileXObstacle, tileYObstacle - 1].type])
+                    else if (Main.tile[tileXObstacle, tileYObstacle - 1].HasUnactuatedTile &&
+                             Main.tileSolid[Main.tile[tileXObstacle, tileYObstacle - 1].type])
                     {
                         NPC.velocity.Y = -6f;
                         NPC.netUpdate = true;
                     }
-                    else if (NPC.position.Y + (float)NPC.height - (float)(tileYObstacle * 16) > 20f && Main.tile[tileXObstacle, tileYObstacle].HasUnactuatedTile
-                        && !Main.tile[tileXObstacle, tileYObstacle].TopSlope && Main.tileSolid[Main.tile[tileXObstacle, tileYObstacle].type])
+                    else if (NPC.position.Y + (float) NPC.height - (float) (tileYObstacle * 16) > 20f &&
+                             Main.tile[tileXObstacle, tileYObstacle].HasUnactuatedTile
+                             && !Main.tile[tileXObstacle, tileYObstacle].TopSlope &&
+                             Main.tileSolid[Main.tile[tileXObstacle, tileYObstacle].type])
                     {
                         NPC.velocity.Y = -5f;
                         NPC.netUpdate = true;
                     }
-                    else if (NPC.directionY < 0 && NPC.type != 67 && (!Main.tile[tileXObstacle, tileYObstacle + 1].HasUnactuatedTile
-                        || !Main.tileSolid[Main.tile[tileXObstacle, tileYObstacle + 1].type]) && (!Main.tile[tileXObstacle + NPC.direction, tileYObstacle + 1].HasUnactuatedTile
-                        || !Main.tileSolid[Main.tile[tileXObstacle + NPC.direction, tileYObstacle + 1].type]))
+                    else if (NPC.directionY < 0 && NPC.type != 67 &&
+                             (!Main.tile[tileXObstacle, tileYObstacle + 1].HasUnactuatedTile
+                              || !Main.tileSolid[Main.tile[tileXObstacle, tileYObstacle + 1].type]) &&
+                             (!Main.tile[tileXObstacle + NPC.direction, tileYObstacle + 1].HasUnactuatedTile
+                              || !Main.tileSolid[Main.tile[tileXObstacle + NPC.direction, tileYObstacle + 1].type]))
                     {
                         NPC.velocity.Y = -8f;
                         NPC.velocity.X *= 1.5f;
@@ -456,22 +516,24 @@ public class DuneProwler : ModNPC
                     }
 
                     if (NPC.velocity.Y == 0f && target.Bottom.Y < NPC.Top.Y
-                        && Math.Abs(NPC.Center.X - target.Center.X) < (float)(target.width * 3) && Collision.CanHit(NPC, target))
+                                             && Math.Abs(NPC.Center.X - target.Center.X) < (float) (target.width * 3) &&
+                                             Collision.CanHit(NPC, target))
                     {
                         if (NPC.velocity.Y == 0f)
                         {
                             int maxJumpHeightTiles = 6;
-                            if (target.Bottom.Y > NPC.Top.Y - (float)(maxJumpHeightTiles * 16))
+                            if (target.Bottom.Y > NPC.Top.Y - (float) (maxJumpHeightTiles * 16))
                             {
                                 NPC.velocity.Y = -7.9f;
                             }
                             else
                             {
-                                int tileXCenter = (int)(NPC.Center.X / 16f);
-                                int tileYBottom = (int)(NPC.Bottom.Y / 16f) - 1;
+                                int tileXCenter = (int) (NPC.Center.X / 16f);
+                                int tileYBottom = (int) (NPC.Bottom.Y / 16f) - 1;
                                 for (int tileY = tileYBottom; tileY > tileYBottom - maxJumpHeightTiles; tileY--)
                                 {
-                                    if (Main.tile[tileXCenter, tileY].HasUnactuatedTile && TileID.Sets.Platforms[Main.tile[tileXCenter, tileY].type])
+                                    if (Main.tile[tileXCenter, tileY].HasUnactuatedTile &&
+                                        TileID.Sets.Platforms[Main.tile[tileXCenter, tileY].type])
                                     {
                                         NPC.velocity.Y = -7.9f;
                                         break;
@@ -497,7 +559,8 @@ public class DuneProwler : ModNPC
         if (hurtInfo.Damage > 0)
         {
             if (NPC.velocity.X > 7f)
-                ParticleRegistry.SpawnPulseRingParticle(NPC.direction == 1 ? NPC.Right : NPC.Left, Vector2.Zero, 30, 0f, new(.5f, 1f), 0f, 60f, Color.Gray);
+                ParticleRegistry.SpawnPulseRingParticle(NPC.direction == 1 ? NPC.Right : NPC.Left, Vector2.Zero, 30, 0f,
+                    new(.5f, 1f), 0f, 60f, Color.Gray);
             MoveDirectionTimer = 0f;
             NPC.velocity.X = 0f;
             NPC.netUpdate = true;
@@ -520,13 +583,16 @@ public class DuneProwler : ModNPC
     {
         for (int i = 0; i < 3; i++)
         {
-            Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Bone, hit.HitDirection, -1f, 0, default(Color), 1f);
+            Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Bone, hit.HitDirection, -1f, 0, default(Color),
+                1f);
         }
+
         if (NPC.life <= 0)
         {
             for (int j = 0; j < 25; j++)
             {
-                Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Bone, hit.HitDirection, -2f, 0, default(Color), 1f);
+                Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Bone, hit.HitDirection, -2f, 0, default(Color),
+                    1f);
             }
         }
     }
@@ -657,7 +723,7 @@ public class DuneProwler : ModNPC
                 NPC.direction = 1;
             }
         }
-        
+
 
         if (NPC.velocity.X < -MaxSpeed || NPC.velocity.X > MaxSpeed)
         {

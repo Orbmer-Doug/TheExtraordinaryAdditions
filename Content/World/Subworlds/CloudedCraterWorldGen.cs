@@ -8,7 +8,7 @@ namespace TheExtraordinaryAdditions.Content.World.Subworlds;
 
 public static class CloudedCraterWorldGen
 {
-    internal static ushort MeteorTile = (ushort)ModContent.TileType<MeteorBlockPlaced>();
+    internal static ushort MeteorTile = (ushort) ModContent.TileType<MeteorBlockPlaced>();
 
     public const int DirtDepth = 100; // Minimum terrain thickness at center
     public const int CraterDepth = 200; // Height difference between center and edges
@@ -55,7 +55,7 @@ public static class CloudedCraterWorldGen
 
             // Add noise for jaggedness
             float noise = FractalBrownianMotion(x * SurfaceMapMagnification, 0, seed, 3) * MaxNoiseHeight;
-            int topY = (int)(baseTopY + noise * noiseInterpolant); // Final surface Y
+            int topY = (int) (baseTopY + noise * noiseInterpolant); // Final surface Y
 
             // Place meteor tiles from surface to bottom
             for (int y = topY; y < Main.maxTilesY; y++)
@@ -78,9 +78,9 @@ public static class CloudedCraterWorldGen
         // Find the surface at spawnX
         for (int y = 0; y < Main.maxTilesY; y++)
         {
-            if (!Main.tile[spawnX, y].HasTile) 
+            if (!Main.tile[spawnX, y].HasTile)
                 continue;
-            
+
             spawnY = y - 1; // Spawn just above surface
             break;
         }

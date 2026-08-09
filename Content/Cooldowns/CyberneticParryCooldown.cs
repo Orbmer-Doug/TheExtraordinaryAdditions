@@ -1,4 +1,4 @@
-﻿using CalamityMod.Cooldowns;
+﻿/*
 using Terraria.Localization;
 
 namespace TheExtraordinaryAdditions.Content.Cooldowns;
@@ -13,3 +13,6 @@ public class CyberneticParryCooldown : CooldownHandler
     public override Color CooldownStartColor => Color.DarkCyan;
     public override Color CooldownEndColor => Color.SkyBlue;
 }
+*/
+
+

@@ -24,11 +24,13 @@ public class SuperheatedPlasmaBeam : ModProjectile, ILocalizedModType, IModType
         {
             for (int i = 0; i < Main.maxProjectiles; i++)
             {
-                if (Main.projectile[i].identity == Projectile.ai[0] && Main.projectile[i].active && Main.projectile[i].owner == Projectile.owner)
+                if (Main.projectile[i].identity == Projectile.ai[0] && Main.projectile[i].active &&
+                    Main.projectile[i].owner == Projectile.owner)
                 {
                     return Main.projectile[i];
                 }
             }
+
             return null;
         }
     }
@@ -37,10 +39,12 @@ public class SuperheatedPlasmaBeam : ModProjectile, ILocalizedModType, IModType
     public ref float Time => ref Projectile.ai[2];
 
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.DrawScreenCheckFluff[Type] = 1200;
     }
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 32;
@@ -76,7 +80,9 @@ public class SuperheatedPlasmaBeam : ModProjectile, ILocalizedModType, IModType
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
-        Projectile.Center = ProjOwner.Center + Vector2.UnitY.RotatedBy(ProjOwner.rotation) * -7f + ProjOwner.velocity.SafeNormalize(Vector2.UnitY) * ProjOwner.width * .5f;
+
+        Projectile.Center = ProjOwner.Center + Vector2.UnitY.RotatedBy(ProjOwner.rotation) * -7f +
+                            ProjOwner.velocity.SafeNormalize(Vector2.UnitY) * ProjOwner.width * .5f;
 
         if (this.RunLocal())
         {
@@ -86,19 +92,21 @@ public class SuperheatedPlasmaBeam : ModProjectile, ILocalizedModType, IModType
 
         Vector2 start = Projectile.Center;
         Vector2 expected = start + Projectile.velocity * 2100f;
-        Vector2 end = LaserCollision(start, expected, CollisionTarget.Tiles, out CollisionTarget hit, WidthFunction(.5f));
+        Vector2 end = LaserCollision(start, expected, CollisionTarget.Tiles, out CollisionTarget hit,
+            WidthFunction(.5f));
         cache.SetPoints(start.GetLaserControlPoints(end, 100));
         if (end != expected && hit == CollisionTarget.Tiles)
         {
             Vector2 endOfLaser = cache.Points[^1];
-            Vector2 vel = endOfLaser.SafeDirectionTo(ProjOwner.Center).RotatedByRandom(.55f) * Main.rand.NextFloat(5f, 14f);
+            Vector2 vel = endOfLaser.SafeDirectionTo(ProjOwner.Center).RotatedByRandom(.55f) *
+                          Main.rand.NextFloat(5f, 14f);
             if (Main.rand.NextBool())
             {
                 ParticleRegistry.SpawnCloudParticle(endOfLaser, vel, Color.OrangeRed, Color.DarkOrange, 120, 1f, .8f);
             }
 
             Vector2 pos = endOfLaser + Utils.NextVector2Circular(Main.rand, 10f, 10f);
-            ShaderParticleRegistry.SpawnMoltenParticle(pos, (int)(WidthFunction(1f - Main.rand.NextFloat(.1f)) + 20f));
+            ShaderParticleRegistry.SpawnMoltenParticle(pos, (int) (WidthFunction(1f - Main.rand.NextFloat(.1f)) + 20f));
         }
 
         Time++;
@@ -114,7 +122,8 @@ public class SuperheatedPlasmaBeam : ModProjectile, ILocalizedModType, IModType
 
     private Color ColorFunction(SystemVector2 completionRatio, Vector2 position)
     {
-        return MulticolorLerp(completionRatio.X, Color.White, Color.Chocolate, Color.OrangeRed, Color.OrangeRed * 1.2f) * InverseLerp(0f, .01f, completionRatio.X);
+        return MulticolorLerp(completionRatio.X, Color.White, Color.Chocolate, Color.OrangeRed,
+            Color.OrangeRed * 1.2f) * InverseLerp(0f, .01f, completionRatio.X);
     }
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
@@ -122,7 +131,8 @@ public class SuperheatedPlasmaBeam : ModProjectile, ILocalizedModType, IModType
         return targetHitbox.LineCollision(cache.Points[0], cache.Points[^1], WidthFunction(1f));
     }
 
-    public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
+    public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs,
+        List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
     {
         overWiresUI.Add(index);
     }
@@ -133,7 +143,8 @@ public class SuperheatedPlasmaBeam : ModProjectile, ILocalizedModType, IModType
         for (int i = 0; i < 6; i++)
         {
             Vector2 vel = endOfLaser.SafeDirectionTo(ProjOwner.Center) * Main.rand.NextFloat(2f, 5f);
-            ParticleRegistry.SpawnGlowParticle(target.RandAreaInEntity(), vel, Main.rand.Next(18, 26), Main.rand.NextFloat(.5f, .8f), Color.Lerp(Color.Red, Color.OrangeRed, Main.rand.NextFloat(.4f, .9f)));
+            ParticleRegistry.SpawnGlowParticle(target.RandAreaInEntity(), vel, Main.rand.Next(18, 26),
+                Main.rand.NextFloat(.5f, .8f), Color.Lerp(Color.Red, Color.OrangeRed, Main.rand.NextFloat(.4f, .9f)));
         }
 
         target.AddBuff(ModContent.BuffType<PlasmaIncineration>(), 150, false);
@@ -143,6 +154,7 @@ public class SuperheatedPlasmaBeam : ModProjectile, ILocalizedModType, IModType
 
     public TrailPoints cache = new(100);
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -151,10 +163,12 @@ public class SuperheatedPlasmaBeam : ModProjectile, ILocalizedModType, IModType
                 return;
 
             ManagedShader shader = ShaderRegistry.FlameTrail;
-            shader.TrySetParameter("heatInterpolant", .2f + Utils.Turn01ToCyclic010(Main.GlobalTimeWrappedHourly * .5f));
+            shader.TrySetParameter("heatInterpolant",
+                .2f + Utils.Turn01ToCyclic010(Main.GlobalTimeWrappedHourly * .5f));
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FlameMap2), 1);
             trail.DrawTrail(shader, cache.Points, 250);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;
     }

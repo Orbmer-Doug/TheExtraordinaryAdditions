@@ -17,6 +17,7 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Friendly;
 public class CreepyOldMan : ModNPC
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CreepyOldMan);
+
     public override void SetStaticDefaults()
     {
         Main.npcFrameCount[Type] = 25;
@@ -69,8 +70,8 @@ public class CreepyOldMan : ModNPC
     public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
     {
         bestiaryEntry.Info.AddRange([
-                BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Underground,
-                new FlavorTextBestiaryInfoElement(this.GetLocalizedValue("Bestiary")),
+            BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Underground,
+            new FlavorTextBestiaryInfoElement(this.GetLocalizedValue("Bestiary")),
         ]);
     }
 
@@ -83,13 +84,15 @@ public class CreepyOldMan : ModNPC
         {
             for (int i = 0; i < 30; i++)
             {
-                ParticleRegistry.SpawnGlowParticle(NPC.RandAreaInEntity(), Vector2.UnitY * -Main.rand.NextFloat(4f, 10f), 20, .5f, Color.White, 1f, true);
+                ParticleRegistry.SpawnGlowParticle(NPC.RandAreaInEntity(),
+                    Vector2.UnitY * -Main.rand.NextFloat(4f, 10f), 20, .5f, Color.White, 1f, true);
             }
         }
         else
         {
             for (int i = 0; i < 60; i++)
-                Dust.NewDustPerfect(NPC.RandAreaInEntity(), DustID.Cloud, Main.rand.NextVector2Circular(3f, 3f), Main.rand.Next(0, 120), default, Main.rand.NextFloat(.7f, 1.2f));
+                Dust.NewDustPerfect(NPC.RandAreaInEntity(), DustID.Cloud, Main.rand.NextVector2Circular(3f, 3f),
+                    Main.rand.Next(0, 120), default, Main.rand.NextFloat(.7f, 1.2f));
         }
     }
 
@@ -104,7 +107,8 @@ public class CreepyOldMan : ModNPC
 
     public override float SpawnChance(NPCSpawnInfo spawnInfo)
     {
-        if (spawnInfo.Player.ZoneDirtLayerHeight && spawnInfo.Player.inventory.Any(item => item.type >= ItemRarityID.Yellow) && NPC.downedPlantBoss)
+        if (spawnInfo.Player.ZoneDirtLayerHeight &&
+            spawnInfo.Player.inventory.Any(item => item.type >= ItemRarityID.Yellow) && NPC.downedPlantBoss)
             return 0.11f;
 
         return 0f;
@@ -167,13 +171,15 @@ public class CreepyOldMan : ModNPC
         {
             attackDelay = 12;
         }
+
         if (NPC.localAI[3] > attackDelay)
         {
             attackDelay = 24;
         }
     }
 
-    public override void TownNPCAttackProjSpeed(ref float multiplier, ref float gravityCorrection, ref float randomOffset)
+    public override void TownNPCAttackProjSpeed(ref float multiplier, ref float gravityCorrection,
+        ref float randomOffset)
     {
         multiplier = 10f;
         randomOffset = 0.2f;
@@ -191,6 +197,7 @@ public class CreepyOldMan : ModNPC
 public class OldManBubble : ModEmoteBubble
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CreepOldManBubble);
+
     public override void SetStaticDefaults()
     {
         AddToCategory(EmoteID.Category.Town);

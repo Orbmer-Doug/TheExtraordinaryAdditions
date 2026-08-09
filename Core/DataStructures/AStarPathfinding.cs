@@ -5,7 +5,7 @@ using Terraria.ID;
 
 namespace TheExtraordinaryAdditions.Core.DataStructures;
 
-// Entire credit goes to Calamity Fables (and a little sebastion lague)
+// Entire credit goes to Fables (and a little sebastion lague)
 public static partial class AStarPathfinding
 {
     public static bool OffsetPositionsToValidNavigation(TileNavigableDelegate navigation, Vector2 start, Vector2 end,
@@ -119,13 +119,13 @@ public static partial class AStarPathfinding
         universallyUnnavigable = true;
         if (!from.HasValue)
             return SolidCreatureNavigation(p, null, out universallyUnnavigable);
-        
+
         // Can't navigate if you don't have the height clearance
         for (int i = 0; i < SolidCreatureNavigHeight; i++)
         {
-            if (RaytraceTo(from.Value.X, from.Value.Y - i, p.X, p.Y - i, i == 0)) 
+            if (RaytraceTo(from.Value.X, from.Value.Y - i, p.X, p.Y - i, i == 0))
                 continue;
-            
+
             universallyUnnavigable = false;
             return false;
         }

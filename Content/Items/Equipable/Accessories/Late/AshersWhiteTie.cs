@@ -14,6 +14,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Late;
 public class AshersWhiteTie : ModItem, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AshersWhiteTie);
+
     public override void SetDefaults()
     {
         Item.width = 16;
@@ -53,7 +54,7 @@ public class AshersWhiteTie : ModItem, ILocalizedModType, IModType
 
             if (Main.myPlayer == player.whoAmI)
             {
-                int damage = (int)player.GetDamage(DamageClass.Generic).ApplyTo(250f);
+                int damage = (int) player.GetDamage(DamageClass.Generic).ApplyTo(250f);
                 Projectile.NewProjectileDirect(player.GetSource_Accessory(Item, null), center, Vector2.Zero,
                     tie, damage, 3f, player.whoAmI);
                 for (int i = 0; i < 40; i++)
@@ -63,6 +64,7 @@ public class AshersWhiteTie : ModItem, ILocalizedModType, IModType
                     Dust dust = Dust.NewDustPerfect(center, DustID.AncientLight, shootVelocity, default, default, 1.6f);
                     dust.noGravity = true;
                 }
+
                 break;
             }
         }
@@ -74,7 +76,8 @@ public sealed class AshersWhiteTiePlayer : ModPlayer
     public bool Equipped;
     public override void ResetEffects() => Equipped = false;
 
-    public override bool PreKill(double damage, int hitDirection, bool pvp, ref bool playSound, ref bool genDust, ref PlayerDeathReason damageSource)
+    public override bool PreKill(double damage, int hitDirection, bool pvp, ref bool playSound, ref bool genDust,
+        ref PlayerDeathReason damageSource)
     {
         if (Equipped && !Player.HasBuff<TheTiesCooldown>() && !Player.GetModPlayer<TungstenTiePlayer>().Equipped)
         {
@@ -82,15 +85,17 @@ public sealed class AshersWhiteTiePlayer : ModPlayer
             for (int l = 0; l < 50; l++)
             {
                 Vector2 vel = Main.rand.NextVector2CircularLimited(10f, 10f, .7f, 1f) * Main.rand.NextFloat(.6f, 1f);
-                ParticleRegistry.SpawnGlowParticle(Player.Center, vel, 30, Main.rand.NextFloat(.5f, .8f), Color.FloralWhite);
+                ParticleRegistry.SpawnGlowParticle(Player.Center, vel, 30, Main.rand.NextFloat(.5f, .8f),
+                    Color.FloralWhite);
             }
+
             ParticleRegistry.SpawnThunderParticle(Player.Center, 134, 1f, new(1f), 0f, Color.WhiteSmoke);
 
             Player.Heal(100);
             if (Player.statLife > Player.statLifeMax2)
                 Player.statLife = Player.statLifeMax2;
 
-            Player.AddBuff(ModContent.BuffType<TheTiesCooldown>(), CalUtils.SecondsToFrames(270));
+            Player.AddBuff(ModContent.BuffType<TheTiesCooldown>(), SecondsToFrames(270));
             return false;
         }
 

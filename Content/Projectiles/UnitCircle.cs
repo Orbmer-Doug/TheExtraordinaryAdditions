@@ -2,7 +2,6 @@
 using ReLogic.Graphics;
 using System;
 using System.Collections.Generic;
-using CalamityMod;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
@@ -41,6 +40,7 @@ public class UnitCircle : ModProjectile
     // Define the owner
     public Player Owner => Main.player[Projectile.owner];
     public ref float Time => ref Projectile.ai[2];
+
     public override void AI()
     {
         // Set position
@@ -79,8 +79,10 @@ public class UnitCircle : ModProjectile
     {
         DynamicSpriteFont font = FontAssets.MouseText.Value;
         Vector2 finalPos = center;
-        ChatManager.DrawColorCodedStringWithShadow(sb, font, txt, finalPos, color, rot, Vector2.Zero, new Vector2(1f), -1f, 2f);
+        ChatManager.DrawColorCodedStringWithShadow(sb, font, txt, finalPos, color, rot, Vector2.Zero, new Vector2(1f),
+            -1f, 2f);
     }
+
     public override string Texture => AssetRegistry.Invis;
     private const int RayCount = 16;
 
@@ -98,8 +100,9 @@ public class UnitCircle : ModProjectile
         circle.TrySetParameter("secondColor", Color.Lerp(Color.DarkOrange, Color.OrangeRed, .5f));
         circle.Render();
 
-        Main.EntitySpriteDraw(telegraphBase, Projectile.Center - Main.screenPosition, null, lightColor, 0f, telegraphBase.Size() / 2f, scale, 0, 0f);
-        Main.spriteBatch.ExitShaderRegion();
+        Main.EntitySpriteDraw(telegraphBase, Projectile.Center - Main.screenPosition, null, lightColor, 0f,
+            telegraphBase.Size() / 2f, scale, 0, 0f);
+        Main.spriteBatch.ResetToDefault();
 
         for (int i = 0; i < Degrees.Count; i++)
         {
@@ -108,13 +111,15 @@ public class UnitCircle : ModProjectile
 
             // Create the lines
             TrailPoints points = new(10);
-            points.SetPoints(Projectile.Center.GetLaserControlPoints(Projectile.Center + PolarVector(scale / 2, rot), 10));
+            points.SetPoints(
+                Projectile.Center.GetLaserControlPoints(Projectile.Center + PolarVector(scale / 2, rot), 10));
             OptimizedPrimitiveTrail trail = new(c => 6f, (c, pos) => Color.IndianRed * .6f, null, 10);
             trail.DrawTrail(ShaderRegistry.StandardPrimitiveShader, points.Points, -1, false, false);
 
             float textRot = 0f;
 
             #region Text
+
             float xDist = 200f;
             Vector2 pos = Projectile.Center + (rot.ToRotationVector2() * xDist) - Main.screenPosition;
 
@@ -303,6 +308,7 @@ public class UnitCircle : ModProjectile
 
             #endregion Text
         }
+
         return false;
     }
 }

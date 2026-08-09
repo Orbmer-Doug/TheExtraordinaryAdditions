@@ -34,14 +34,17 @@ public class DroneLaser : ModProjectile
     public Vector2 Start => Projectile.Center;
     public Vector2 End;
     public const float MaxDist = 1400f;
+
     public bool HitSomething
     {
         get => Projectile.ai[0] == 1f;
         set => Projectile.ai[0] = value.ToInt();
     }
+
     public ref float Time => ref Projectile.ai[1];
     public ref float ChargeCompletion => ref Projectile.ai[2];
     public override bool ShouldUpdatePosition() => false;
+
     public override void SendExtraAI(BinaryWriter writer)
     {
         writer.WriteVector2(End);
@@ -54,12 +57,14 @@ public class DroneLaser : ModProjectile
 
     public override void AI()
     {
-        Projectile.width = Projectile.height = 10 + (int)(10 * ChargeCompletion);
+        Projectile.width = Projectile.height = 10 + (int) (10 * ChargeCompletion);
 
         if (trail == null || trail.Disposed)
-            trail = new(c => OptimizedPrimitiveTrail.HemisphereWidthFunct(c, Projectile.height * Projectile.scale), (c, pos) => Color.Cyan * Projectile.scale, null, 50);
+            trail = new(c => OptimizedPrimitiveTrail.HemisphereWidthFunct(c, Projectile.height * Projectile.scale),
+                (c, pos) => Color.Cyan * Projectile.scale, null, 50);
 
-        Vector2 expected = Start + Projectile.velocity.SafeNormalize(Vector2.Zero) * Animators.MakePoly(2.8f).OutFunction.Evaluate(Time, 0f, 17f, 0f, MaxDist);
+        Vector2 expected = Start + Projectile.velocity.SafeNormalize(Vector2.Zero) *
+            Animators.MakePoly(2.8f).OutFunction.Evaluate(Time, 0f, 17f, 0f, MaxDist);
         End = LaserCollision(Start, expected, CollisionTarget.Tiles | CollisionTarget.NPCs);
 
         if (End != expected && !HitSomething)
@@ -83,6 +88,7 @@ public class DroneLaser : ModProjectile
 
     public TrailPoints cache;
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -93,6 +99,7 @@ public class DroneLaser : ModProjectile
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DarkTurbulentNoise), 1);
             trail.DrawTrail(shader, cache.Points);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;
     }

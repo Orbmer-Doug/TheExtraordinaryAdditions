@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Core.DataStructures;
@@ -16,6 +15,7 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 30;
@@ -29,14 +29,16 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
 
     public bool NotFree
     {
-        get => (int)Projectile.ai[1] == 1;
+        get => (int) Projectile.ai[1] == 1;
         set => Projectile.ai[1] = value.ToInt();
     }
+
     public int Time
     {
-        get => (int)Projectile.ai[2];
+        get => (int) Projectile.ai[2];
         set => Projectile.ai[2] = value;
     }
+
     public ref float Rot => ref Projectile.AdditionsInfo().ExtraAI[0];
     public ref float SavedDistance => ref Projectile.AdditionsInfo().ExtraAI[1];
     public ref float BeamTimer => ref Projectile.AdditionsInfo().ExtraAI[2];
@@ -49,6 +51,7 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
             return null;
         return false;
     }
+
     public override bool ShouldUpdatePosition()
     {
         return !(BeamTimer > 0f);
@@ -57,6 +60,7 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
     public const int TimeForBeam = 95;
     public const int TotalBeamTime = 35;
     public const int Lifetime = TimeForBeam + TotalBeamTime;
+
     private void GetPoints(out Vector2 start, out Vector2 end)
     {
         float interpolant = Utils.Remap(BeamTimer, 0f, 15f, 0f, 1f);
@@ -82,8 +86,11 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
             for (int i = 0; i < 5; i++)
             {
                 Vector2 squish = new(Main.rand.NextFloat(.6f, 1f), 1f);
-                ParticleRegistry.SpawnDetailedBlastParticle(Projectile.Center, Vector2.Zero, squish * (150f + (i + 20 * i)), Vector2.Zero, 18 + i * 3, Color.DarkRed.Lerp(Color.Crimson, Main.rand.NextFloat(.4f, .6f)));
-                ParticleRegistry.SpawnCloudParticle(Projectile.Center, Main.rand.NextVector2Circular(3f, 3f), Color.Crimson, Color.DarkRed, 40, Main.rand.NextFloat(.3f, .5f), .6f, 1);
+                ParticleRegistry.SpawnDetailedBlastParticle(Projectile.Center, Vector2.Zero,
+                    squish * (150f + (i + 20 * i)), Vector2.Zero, 18 + i * 3,
+                    Color.DarkRed.Lerp(Color.Crimson, Main.rand.NextFloat(.4f, .6f)));
+                ParticleRegistry.SpawnCloudParticle(Projectile.Center, Main.rand.NextVector2Circular(3f, 3f),
+                    Color.Crimson, Color.DarkRed, 40, Main.rand.NextFloat(.3f, .5f), .6f, 1);
             }
 
             if (this.RunServer())
@@ -107,13 +114,15 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
             Projectile.velocity = Projectile.SafeDirectionTo(Target.Center);
 
             Vector2 start2 = Projectile.Center;
-            Vector2 end2 = start + Projectile.SafeDirectionTo(Target.Center).SafeNormalize(Vector2.Zero) * (1800f * InverseLerp(0f, TimeForBeam / 2f, Time));
+            Vector2 end2 = start + Projectile.SafeDirectionTo(Target.Center).SafeNormalize(Vector2.Zero) *
+                (1800f * InverseLerp(0f, TimeForBeam / 2f, Time));
 
             basePoints.SetPoints(start2.GetLaserControlPoints(end2, 40));
         }
         else if (Time == TimeForBeam)
         {
-            AssetRegistry.GetSound(AdditionsSound.etherealHit3).Play(Projectile.Center, .6f, -.4f, .1f, new(-.4f, 0f), 4);
+            AssetRegistry.GetSound(AdditionsSound.etherealHit3)
+                .Play(Projectile.Center, .6f, -.4f, .1f, new(-.4f, 0f), 4);
             SavedDistance = start.Distance(Target.Center);
             this.Sync();
         }
@@ -122,7 +131,8 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
             BeamTimer++;
             Vector2 veloc = end.SafeDirectionTo(start).RotatedByRandom(.45f) * Main.rand.NextFloat(4f, 16f);
             Color color = Color.Lerp(Color.Crimson, Color.IndianRed, Main.rand.NextFloat(.1f, 1f)) * OpacityInterpolant;
-            ParticleRegistry.SpawnSparkParticle(end, veloc, Main.rand.Next(15, 25), Main.rand.NextFloat(.3f, .9f), color);
+            ParticleRegistry.SpawnSparkParticle(end, veloc, Main.rand.Next(15, 25), Main.rand.NextFloat(.3f, .9f),
+                color);
 
             basePoints.SetPoints(start.GetLaserControlPoints(end, 40));
         }
@@ -134,23 +144,29 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
     }
 
     public float OpacityInterpolant => 1f - InverseLerp(20f, TotalBeamTime, BeamTimer);
+
     public float WidthFunction(float c)
     {
         return MathHelper.SmoothStep(Projectile.width, 0f, c);
     }
+
     public Color ColorFunction(SystemVector2 c, Vector2 position)
     {
         float colorInterpolant = Sin01(-9f * Main.GlobalTimeWrappedHourly);
         return Color.Lerp(Color.Crimson, Color.DarkRed, 0.55f * colorInterpolant) * OpacityInterpolant;
     }
+
     public float TeleCompletion => InverseLerp(0f, TimeForBeam - 10f, Time);
+
     public float TeleWidthFunction(float c)
     {
         return MathHelper.SmoothStep(Projectile.height + 4f, 0f, c) * (1f - TeleCompletion);
     }
+
     public Color TeleColorFunction(SystemVector2 c, Vector2 position)
     {
-        Color col = MulticolorLerp(Cos01(c.X + Main.GlobalTimeWrappedHourly * 4f), Color.MediumVioletRed, Color.Crimson * 2f, Color.IndianRed * 1.4f);
+        Color col = MulticolorLerp(Cos01(c.X + Main.GlobalTimeWrappedHourly * 4f), Color.MediumVioletRed,
+            Color.Crimson * 2f, Color.IndianRed * 1.4f);
         col *= 1f - TeleCompletion;
         col *= .3f;
         col *= GetLerpBump(.05f, .1f, 1f, .9f, c.X);
@@ -165,6 +181,7 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
     public OptimizedPrimitiveTrail beam;
     public OptimizedPrimitiveTrail tele;
     public TrailPoints basePoints;
+
     public override bool PreDraw(ref Color lightColor)
     {
         if (Owner == null || Owner.active == false)
@@ -191,6 +208,7 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
                 }
             }
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 
         void flare()
@@ -211,14 +229,16 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
                 }
             }
         }
+
         LayeredDrawSystem.QueueDrawAction(flare, PixelationLayer.OverPlayers, BlendState.Additive);
 
-        Main.spriteBatch.PrepareForShaders();
+        Main.spriteBatch.EnterShaderRegion();
         Texture2D pixel = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
 
         Vector2 pos = Projectile.Center - Main.screenPosition;
         Vector2 scale = Projectile.Size * 2.4f / pixel.Size() * OpacityInterpolant;
-        Color color = MulticolorLerp(Sin01(Main.GlobalTimeWrappedHourly), Color.Crimson, Color.Crimson * 1.5f, Color.Crimson.Lerp(Color.DarkRed, .5f)) * OpacityInterpolant;
+        Color color = MulticolorLerp(Sin01(Main.GlobalTimeWrappedHourly), Color.Crimson, Color.Crimson * 1.5f,
+            Color.Crimson.Lerp(Color.DarkRed, .5f)) * OpacityInterpolant;
 
         ManagedShader sphere = ShaderRegistry.MagicSphere;
         sphere.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FractalNoise), 1, SamplerState.LinearWrap);
@@ -241,6 +261,7 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
 
     public override void OnKill(int timeLeft)
     {
-        ParticleRegistry.SpawnTwinkleParticle(Projectile.Center, Vector2.Zero, 30, new(Main.rand.NextFloat(1.4f, 2f)), Color.Crimson, 4);
+        ParticleRegistry.SpawnTwinkleParticle(Projectile.Center, Vector2.Zero, 30, new(Main.rand.NextFloat(1.4f, 2f)),
+            Color.Crimson, 4);
     }
 }

@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -36,7 +35,8 @@ public class HomingSkull : ModProjectile
         Projectile.SetAnimation(3, 2);
 
         if (NPCTargeting.TryGetClosestNPC(new(Projectile.Center, 300, true), out NPC target))
-            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.SafeDirectionTo(target.Center) * 5f, .07f);
+            Projectile.velocity =
+                Vector2.SmoothStep(Projectile.velocity, Projectile.SafeDirectionTo(target.Center) * 5f, .07f);
 
         Vector2 vel = Projectile.velocity * .2f;
         int time = Main.rand.Next(10, 20);
@@ -68,7 +68,8 @@ public class HomingSkull : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        Projectile.DrawBaseProjectile(Projectile.GetAlpha(lightColor), Projectile.direction == -1 ? SpriteEffects.FlipVertically : SpriteEffects.None);
+        Projectile.DrawBaseProjectile(Projectile.GetAlpha(lightColor),
+            Projectile.direction == -1 ? SpriteEffects.FlipVertically : SpriteEffects.None);
         return false;
     }
 }

@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -11,18 +10,20 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 public class CryingTear : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BloodParticle2);
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 30;
         Projectile.hostile = false;
         Projectile.friendly = true;
         Projectile.tileCollide = true;
-        Projectile.timeLeft = CalUtils.SecondsToFrames(3);
+        Projectile.timeLeft = SecondsToFrames(3);
         Projectile.DamageType = DamageClass.MeleeNoSpeed;
         Projectile.penetrate = 1;
     }
 
     public ref float Time => ref Projectile.ai[0];
+
     public override void AI()
     {
         Projectile.FacingUp();
@@ -31,7 +32,8 @@ public class CryingTear : ModProjectile
         if (Time > 20f)
         {
             if (NPCTargeting.TryGetClosestNPC(new(Projectile.Center, 400, true, true), out NPC target))
-                Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(target.Center + target.velocity) * 9f, .1f);
+                Projectile.velocity = Vector2.Lerp(Projectile.velocity,
+                    Projectile.SafeDirectionTo(target.Center + target.velocity) * 9f, .1f);
         }
 
         Time++;
@@ -41,7 +43,8 @@ public class CryingTear : ModProjectile
     {
         for (int i = 0; i < 12; i++)
         {
-            ParticleRegistry.SpawnBloodParticle(Projectile.Center, -Projectile.velocity.RotatedByRandom(1.8f) * Main.rand.NextFloat(.2f, .6f),
+            ParticleRegistry.SpawnBloodParticle(Projectile.Center,
+                -Projectile.velocity.RotatedByRandom(1.8f) * Main.rand.NextFloat(.2f, .6f),
                 Main.rand.Next(20, 40), Main.rand.NextFloat(.5f, .8f), Color.DarkBlue.Lerp(Color.Aqua, .3f));
         }
     }
@@ -53,8 +56,10 @@ public class CryingTear : ModProjectile
             Texture2D texture = Projectile.ThisProjectileTexture();
             Color color = Color.DarkBlue;
             float squish = MathHelper.Clamp(Projectile.velocity.Length() / 10f * 3f, 1f, 5f);
-            Main.spriteBatch.DrawBetter(texture, Projectile.Center, null, color, Projectile.rotation, texture.Size() * 0.5f, new Vector2(1f, 1f * squish) * .08f);
+            Main.spriteBatch.DrawBetter(texture, Projectile.Center, null, color, Projectile.rotation,
+                texture.Size() * 0.5f, new Vector2(1f, 1f * squish) * .08f);
         }
+
         PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;
     }

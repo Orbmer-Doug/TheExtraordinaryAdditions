@@ -31,9 +31,10 @@ public class JudgementHammer : ProjOwnedByNPC<Asterlin>
 
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
+
     public bool Free
     {
         get => Projectile.ai[1] == 1;
@@ -41,31 +42,34 @@ public class JudgementHammer : ProjOwnedByNPC<Asterlin>
     }
 
     public ref float RotationOffset => ref Projectile.ai[2];
+
     public SpriteEffects Effects
     {
-        get => (SpriteEffects)Projectile.spriteDirection;
-        set => Projectile.spriteDirection = (int)value;
+        get => (SpriteEffects) Projectile.spriteDirection;
+        set => Projectile.spriteDirection = (int) value;
     }
+
     public int Direction
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[0];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[0];
         set => Projectile.AdditionsInfo().ExtraAI[0] = value;
     }
+
     public static readonly float SwingAngle = TwoPi / 3f;
     public float ReelCompletion => InverseLerp(0f, Asterlin.Cleave_HammerReelTime, ModOwner.AITimer);
 
     public override void SendAI(BinaryWriter writer)
     {
-        writer.Write((float)Projectile.rotation);
-        writer.Write((sbyte)Projectile.spriteDirection);
-        writer.Write((int)Projectile.MaxUpdates);
+        writer.Write((float) Projectile.rotation);
+        writer.Write((sbyte) Projectile.spriteDirection);
+        writer.Write((int) Projectile.MaxUpdates);
     }
 
     public override void ReceiveAI(BinaryReader reader)
     {
-        Projectile.rotation = (float)reader.ReadSingle();
-        Projectile.spriteDirection = (sbyte)reader.ReadSByte();
-        Projectile.MaxUpdates = (int)reader.ReadInt32();
+        Projectile.rotation = (float) reader.ReadSingle();
+        Projectile.spriteDirection = (sbyte) reader.ReadSByte();
+        Projectile.MaxUpdates = (int) reader.ReadInt32();
     }
 
     public override bool? CanDamage() => Free ? null : false;
@@ -73,7 +77,8 @@ public class JudgementHammer : ProjOwnedByNPC<Asterlin>
 
     public RotatedRectangle Rect()
     {
-        return new(100f, Projectile.Center, Projectile.Center + (Projectile.rotation - PiOver4).ToRotationVector2() * 148f);
+        return new(100f, Projectile.Center,
+            Projectile.Center + (Projectile.rotation - PiOver4).ToRotationVector2() * 148f);
     }
 
     public override void SafeAI()
@@ -88,7 +93,8 @@ public class JudgementHammer : ProjOwnedByNPC<Asterlin>
         else
         {
             after ??= new(12, () => Projectile.Center);
-            after.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, 1f, Projectile.rotation, Effects, 0, 2, 0f, null, false, 0f));
+            after.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, 1f, Projectile.rotation, Effects, 0, 2, 0f,
+                null, false, 0f));
             Projectile.VelocityBasedRotation(.01f);
             Projectile.velocity.X *= .991f;
             Projectile.velocity.Y = Clamp(Projectile.velocity.Y + .3f, -40f, 40f);
@@ -101,10 +107,12 @@ public class JudgementHammer : ProjOwnedByNPC<Asterlin>
     public override void OnHitPlayer(Player target, Player.HurtInfo info)
     {
         if (Free)
-            target.KillMe(PlayerDeathReason.ByCustomReason(GetNetworkText($"Status.Death.AsterlinDeath3", target.name)), int.MaxValue, Direction);
+            target.KillMe(PlayerDeathReason.ByCustomReason(GetNetworkText($"Status.Death.AsterlinDeath3", target.name)),
+                int.MaxValue, Direction);
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D tex = Projectile.ThisProjectileTexture();
@@ -135,14 +143,21 @@ public class JudgementHammer : ProjOwnedByNPC<Asterlin>
         {
             for (int i = 0; i < 8; i++)
             {
-                Vector2 offset = ((TwoPi * InverseLerp(0f, 8, i) + Main.GlobalTimeWrappedHourly * Utils.Remap(j, 0, 3, 4f, 1.8f)).ToRotationVector2() * Utils.Remap(j, 0, 3, 5f, 25f));
-                Color color = MulticolorLerp(InverseLerp(0f, 3, j), Color.PaleGoldenrod, Color.Gold, Color.DarkGoldenrod) with { A = 0 } * ReelCompletion * Utils.Remap(j, 0, 3, .9f, .3f);
+                Vector2 offset =
+                    ((TwoPi * InverseLerp(0f, 8, i) + Main.GlobalTimeWrappedHourly * Utils.Remap(j, 0, 3, 4f, 1.8f))
+                        .ToRotationVector2() * Utils.Remap(j, 0, 3, 5f, 25f));
+                Color color =
+                    MulticolorLerp(InverseLerp(0f, 3, j), Color.PaleGoldenrod, Color.Gold, Color.DarkGoldenrod) with
+                    {
+                        A = 0
+                    } * ReelCompletion * Utils.Remap(j, 0, 3, .9f, .3f);
                 Main.spriteBatch.Draw(tex, Projectile.Center + offset - Main.screenPosition, null, color,
-                Projectile.rotation + RotationOffset, origin, Projectile.scale, Effects, 0f);
+                    Projectile.rotation + RotationOffset, origin, Projectile.scale, Effects, 0f);
             }
         }
+
         Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, null, Color.White,
-                    Projectile.rotation + RotationOffset, origin, Projectile.scale, Effects, 0f);
+            Projectile.rotation + RotationOffset, origin, Projectile.scale, Effects, 0f);
         return false;
     }
 }

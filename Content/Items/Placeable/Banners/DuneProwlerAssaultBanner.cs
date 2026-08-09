@@ -6,5 +6,4 @@ public class DuneProwlerAssaultBanner : BaseBannerItem
 {
     public override int BannerTileStyle => 1;
     public override int BannerKillRequirement => 50;
-
 }

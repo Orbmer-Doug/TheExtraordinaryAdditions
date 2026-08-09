@@ -1,6 +1,4 @@
-﻿using CalamityMod.Items.Materials;
-using System.Collections.Generic;
-using CalamityMod;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -37,7 +35,7 @@ public class EverbladedHeaven : ModItem
         Item.UseSound = null;
         Item.rare = ModContent.RarityType<BloodWroughtRarity>();
         Item.value = AdditionsGlobalItem.UniqueRarityPrice;
-        Item.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
+        Item.DamageType = ModContent.GetInstance<MeleeNoSpeedDamageClass>();
         Item.shoot = ModContent.ProjectileType<EverbladedSwing>();
         Item.noMelee = true;
         Item.noUseGraphic = true;
@@ -53,9 +51,12 @@ public class EverbladedHeaven : ModItem
 
     public override bool AltFunctionUse(Player player) => true;
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback)
     {
-        EverbladedSwing swing = Main.projectile[player.NewPlayerProj(position, velocity, type, damage, 0f, player.whoAmI)].As<EverbladedSwing>();
+        EverbladedSwing swing = Main
+            .projectile[player.NewPlayerProj(position, velocity, type, damage, 0f, player.whoAmI)]
+            .As<EverbladedSwing>();
         if (player.Additions().SafeMouseRight.Current)
             swing.CurrentPhase = EverbladedSwing.Phase.VisceralSlice;
 
@@ -67,7 +68,7 @@ public class EverbladedHeaven : ModItem
         Recipe recipe = CreateRecipe();
         recipe.AddIngredient(ModContent.ItemType<TripleKatanas>(), 1);
         recipe.AddIngredient(ModContent.ItemType<Mimicry>(), 1);
-        recipe.AddIngredient(ModContent.ItemType<ShadowspecBar>(), 10);
+        //TODO
         recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();
     }

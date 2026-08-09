@@ -12,6 +12,7 @@ public class FulgurZap : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
     private const int Life = 30;
+
     public override void SetDefaults()
     {
         Projectile.DamageType = DamageClass.Magic;
@@ -27,6 +28,7 @@ public class FulgurZap : ModProjectile
     }
 
     public ref float Time => ref Projectile.ai[0];
+
     public Vector2 End
     {
         get => new(Projectile.ai[1], Projectile.ai[2]);
@@ -39,6 +41,7 @@ public class FulgurZap : ModProjectile
 
     public float Completion => Animators.MakePoly(6f).OutFunction(InverseLerp(0f, Life, Time));
     public override bool ShouldUpdatePosition() => false;
+
     public override void AI()
     {
         if (trail == null || trail.Disposed)
@@ -64,9 +67,13 @@ public class FulgurZap : ModProjectile
     }
 
     public float WidthFunct(float c) => 10f * Convert01To010(c) * Projectile.Opacity;
-    public Color ColorFunct(SystemVector2 c, Vector2 pos) => MulticolorLerp(Completion, Color.White, Color.LightCyan, Color.Cyan, Color.DarkCyan) * Projectile.Opacity;
+
+    public Color ColorFunct(SystemVector2 c, Vector2 pos) =>
+        MulticolorLerp(Completion, Color.White, Color.LightCyan, Color.Cyan, Color.DarkCyan) * Projectile.Opacity;
+
     public TrailPoints points;
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -78,6 +85,7 @@ public class FulgurZap : ModProjectile
                 trail.DrawTrail(shader, points.Points);
             }
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;
     }

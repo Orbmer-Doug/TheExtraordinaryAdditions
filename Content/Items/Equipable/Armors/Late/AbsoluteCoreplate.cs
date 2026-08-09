@@ -1,6 +1,4 @@
-﻿using CalamityMod.Items.Materials;
-using CalamityMod.Tiles.Furniture.CraftingStations;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Early;
@@ -14,15 +12,13 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Late;
 public class AbsoluteCoreplate : ModItem, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AbsoluteCoreplate);
-    public static int BodySlotID
-    {
-        get;
-        private set;
-    }
+    public static int BodySlotID { get; private set; }
+
     public override void SetStaticDefaults()
     {
         BodySlotID = Item.bodySlot;
     }
+
     public override void SetDefaults()
     {
         Item.width = 38;
@@ -49,11 +45,7 @@ public class AbsoluteCoreplate : ModItem, ILocalizedModType, IModType
         recipe.AddIngredient(ModContent.ItemType<BlueTuxedo>(), 1);
         recipe.AddIngredient(ModContent.ItemType<TremorPlating>(), 1);
         recipe.AddIngredient(ItemID.SolarFlareBreastplate, 1);
-        recipe.AddIngredient(ModContent.ItemType<LifeAlloy>(), 3);
-        recipe.AddIngredient(ModContent.ItemType<RuinousSoul>(), 5);
-        recipe.AddIngredient(ModContent.ItemType<AscendantSpiritEssence>(), 3);
-        recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 14);
-        recipe.AddTile(ModContent.TileType<CosmicAnvil>());
+        //TODO
         recipe.Register();
     }
 }

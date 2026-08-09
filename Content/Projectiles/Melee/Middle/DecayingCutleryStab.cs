@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using CalamityMod;
 using Terraria;
 using Terraria.Audio;
 using Terraria.Enums;
@@ -30,7 +29,7 @@ public class DecayingCutleryStab : ModProjectile
 
     public int StabCounter
     {
-        get => (int)Projectile.ai[1];
+        get => (int) Projectile.ai[1];
         set => Projectile.ai[1] = value;
     }
 
@@ -51,6 +50,7 @@ public class DecayingCutleryStab : ModProjectile
         get => Projectile.AdditionsInfo().ExtraAI[1] == 1f;
         set => Projectile.AdditionsInfo().ExtraAI[1] = value.ToInt();
     }
+
     public ref float VanishTimer => ref Projectile.AdditionsInfo().ExtraAI[2];
 
     public int StabTime
@@ -71,12 +71,14 @@ public class DecayingCutleryStab : ModProjectile
 
     public int Dir => Projectile.velocity.X.NonZeroSign();
     public float AngularVel => MathF.Abs(Projectile.rotation - Projectile.oldRot[1]);
+
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.TrailingMode[Type] = 2;
         ProjectileID.Sets.TrailCacheLength[Type] = 20;
         ProjectileID.Sets.HeldProjDoesNotUsePlayerGfxOffY[Type] = true;
     }
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 76;
@@ -89,9 +91,11 @@ public class DecayingCutleryStab : ModProjectile
         Projectile.penetrate = -1;
         Projectile.MaxUpdates = MaxUpdates;
     }
+
     public Player Owner => Main.player[Projectile.owner];
     public GlobalPlayer Modded => Owner.Additions();
     public Vector2 Center => Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
+
     public override void AI()
     {
         if (!Owner.Available())
@@ -105,7 +109,8 @@ public class DecayingCutleryStab : ModProjectile
             Hit = false;
             Projectile.ResetLocalNPCHitImmunity();
             Time = 0f;
-            Projectile.velocity = Center.SafeDirectionTo(Modded.MouseWorld).RotatedByRandom(StabCounter == 4 ? 0f : .15f);
+            Projectile.velocity =
+                Center.SafeDirectionTo(Modded.MouseWorld).RotatedByRandom(StabCounter == 4 ? 0f : .15f);
             Init = true;
             Projectile.netUpdate = true;
         }
@@ -164,6 +169,7 @@ public class DecayingCutleryStab : ModProjectile
             return new(Projectile.Center - size / 2, size, Projectile.rotation - MathHelper.PiOver4);
         }
     }
+
     public RotatedRectangle TipRect
     {
         get
@@ -176,7 +182,9 @@ public class DecayingCutleryStab : ModProjectile
     public void DoStab()
     {
         if (Time == 0f)
-            SoundEngine.PlaySound(SoundID.Item7 with { Identifier = Name, PitchVariance = .2f, Volume = Main.rand.NextFloat(1f, 1.5f) }, Rect.Right);
+            SoundEngine.PlaySound(
+                SoundID.Item7 with { Identifier = Name, PitchVariance = .2f, Volume = Main.rand.NextFloat(1f, 1.5f) },
+                Rect.Right);
 
         float pierce = new PiecewiseCurve()
             .Add(-20f, 70f, .7f, MakePoly(7).OutFunction)
@@ -185,7 +193,8 @@ public class DecayingCutleryStab : ModProjectile
 
         if (Completion < .7f)
         {
-            Dust.NewDustPerfect(TipRect.RandomPoint(), DustID.Ichor, null, 0, default, Main.rand.NextFloat(.4f, .8f)).noGravity = true;
+            Dust.NewDustPerfect(TipRect.RandomPoint(), DustID.Ichor, null, 0, default, Main.rand.NextFloat(.4f, .8f))
+                .noGravity = true;
         }
 
         Projectile.Center = Center + Projectile.velocity * pierce;
@@ -202,20 +211,33 @@ public class DecayingCutleryStab : ModProjectile
 
         if (AngularVel > .1f && Completion > .2f)
         {
-            ParticleRegistry.SpawnSquishyPixelParticle(TipRect.RandomPoint(), (Rect.Rotation + MathHelper.PiOver2).ToRotationVector2() * Main.rand.NextFloat(4f, 6f), Main.rand.Next(90, 130), Main.rand.NextFloat(1.5f, 1.8f), Color.Gold, Color.Goldenrod, 0);
+            ParticleRegistry.SpawnSquishyPixelParticle(TipRect.RandomPoint(),
+                (Rect.Rotation + MathHelper.PiOver2).ToRotationVector2() * Main.rand.NextFloat(4f, 6f),
+                Main.rand.Next(90, 130), Main.rand.NextFloat(1.5f, 1.8f), Color.Gold, Color.Goldenrod, 0);
 
             if (Time % 3 == 2)
             {
                 Vector2 pos = Rect.Right;
                 Vector2 vel = Rect.Left.SafeDirectionTo(pos) * Main.rand.NextFloat(7f, 10f);
-                Projectile.NewProj(pos, vel, ModContent.ProjectileType<IchorGlobule>(), Projectile.damage / 3, Projectile.knockBack / 2, Owner.whoAmI);
+                Projectile.NewProj(pos, vel, ModContent.ProjectileType<IchorGlobule>(), Projectile.damage / 3,
+                    Projectile.knockBack / 2, Owner.whoAmI);
                 for (int i = 0; i < 12; i++)
                 {
                     if (Main.rand.NextBool())
-                        ParticleRegistry.SpawnBloodParticle(pos, vel.RotatedByRandom(.4) * Main.rand.NextFloat(.4f, .6f), Main.rand.Next(30, 50), Main.rand.NextFloat(.4f, .7f), Color.Gold);
-                    ParticleRegistry.SpawnGlowParticle(pos, vel.RotatedByRandom(.23f) * Main.rand.NextFloat(.3f, .6f), Main.rand.Next(40, 60), Main.rand.NextFloat(.3f, .5f), Color.Gold, Main.rand.NextFloat(.8f, 1f));
+                        ParticleRegistry.SpawnBloodParticle(pos,
+                            vel.RotatedByRandom(.4) * Main.rand.NextFloat(.4f, .6f), Main.rand.Next(30, 50),
+                            Main.rand.NextFloat(.4f, .7f), Color.Gold);
+                    ParticleRegistry.SpawnGlowParticle(pos, vel.RotatedByRandom(.23f) * Main.rand.NextFloat(.3f, .6f),
+                        Main.rand.Next(40, 60), Main.rand.NextFloat(.3f, .5f), Color.Gold,
+                        Main.rand.NextFloat(.8f, 1f));
                 }
-                SoundEngine.PlaySound(SoundID.Item17 with { Volume = Main.rand.NextFloat(.8f, 1.2f), Identifier = Name, PitchVariance = .2f, MaxInstances = 10 }, pos);
+
+                SoundEngine.PlaySound(
+                    SoundID.Item17 with
+                    {
+                        Volume = Main.rand.NextFloat(.8f, 1.2f), Identifier = Name, PitchVariance = .2f,
+                        MaxInstances = 10
+                    }, pos);
             }
         }
 
@@ -278,6 +300,7 @@ public class DecayingCutleryStab : ModProjectile
             Color color = Color.Gold.Lerp(Color.Yellow, Main.rand.NextFloat(.2f, .5f));
             ParticleRegistry.SpawnSquishyPixelParticle(pos, vel, life, scale, color, color * 2f, 4, true, true);
         }
+
         ScreenShakeSystem.New(new(.1f, .1f), pos);
 
         target.AddBuff(BuffID.Ichor, Main.rand.Next(120, 190));
@@ -316,6 +339,7 @@ public class DecayingCutleryStab : ModProjectile
 public class DecayingCutleryPlayer : ModPlayer
 {
     public int HitCount;
+
     public override void UpdateDead()
     {
         HitCount = 0;

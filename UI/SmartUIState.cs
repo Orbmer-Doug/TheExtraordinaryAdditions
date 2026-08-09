@@ -13,7 +13,9 @@ public abstract class SmartUIState : UIState
 
     public virtual InterfaceScaleType Scale { get; set; } = InterfaceScaleType.UI;
 
-    public virtual void Unload() { }
+    public virtual void Unload()
+    {
+    }
 
     internal void AddElement(UIElement element, Point position, int width, int height)
     {
@@ -23,6 +25,7 @@ public abstract class SmartUIState : UIState
         element.Height.Set(height, 0);
         Append(element);
     }
+
     internal void AddElement(UIElement element, Point position, int width, int height, UIElement appendTo)
     {
         element.Left.Set(position.X, 0);
@@ -33,8 +36,12 @@ public abstract class SmartUIState : UIState
     }
 
     #region SmartUIElement Mitosis
+
     #region XButton1
-    public virtual void SafeXButton1MouseUp(UIMouseEvent evt) { }
+
+    public virtual void SafeXButton1MouseUp(UIMouseEvent evt)
+    {
+    }
 
     public sealed override void XButton1MouseUp(UIMouseEvent evt)
     {
@@ -42,7 +49,9 @@ public abstract class SmartUIState : UIState
         SafeXButton1MouseUp(evt);
     }
 
-    public virtual void SafeXButton1MouseDown(UIMouseEvent evt) { }
+    public virtual void SafeXButton1MouseDown(UIMouseEvent evt)
+    {
+    }
 
     public sealed override void XButton1MouseDown(UIMouseEvent evt)
     {
@@ -50,24 +59,33 @@ public abstract class SmartUIState : UIState
         SafeXButton1MouseDown(evt);
     }
 
-    public virtual void SafeXButton1Click(UIMouseEvent evt) { }
+    public virtual void SafeXButton1Click(UIMouseEvent evt)
+    {
+    }
 
     public sealed override void XButton1Click(UIMouseEvent evt)
     {
         base.XButton1Click(evt);
         SafeXButton1Click(evt);
     }
-    public virtual void SafeXButton1DoubleClick(UIMouseEvent evt) { }
+
+    public virtual void SafeXButton1DoubleClick(UIMouseEvent evt)
+    {
+    }
 
     public sealed override void XButton1DoubleClick(UIMouseEvent evt)
     {
         base.XButton1DoubleClick(evt);
         SafeXButton1DoubleClick(evt);
     }
+
     #endregion
 
     #region XButton2
-    public virtual void SafeXButton2MouseUp(UIMouseEvent evt) { }
+
+    public virtual void SafeXButton2MouseUp(UIMouseEvent evt)
+    {
+    }
 
     public sealed override void XButton2MouseUp(UIMouseEvent evt)
     {
@@ -75,7 +93,9 @@ public abstract class SmartUIState : UIState
         SafeXButton2MouseUp(evt);
     }
 
-    public virtual void SafeXButton2MouseDown(UIMouseEvent evt) { }
+    public virtual void SafeXButton2MouseDown(UIMouseEvent evt)
+    {
+    }
 
     public sealed override void XButton2MouseDown(UIMouseEvent evt)
     {
@@ -83,7 +103,9 @@ public abstract class SmartUIState : UIState
         SafeXButton2MouseDown(evt);
     }
 
-    public virtual void SafeXButton2Click(UIMouseEvent evt) { }
+    public virtual void SafeXButton2Click(UIMouseEvent evt)
+    {
+    }
 
     public sealed override void XButton2Click(UIMouseEvent evt)
     {
@@ -91,17 +113,23 @@ public abstract class SmartUIState : UIState
         SafeXButton2Click(evt);
     }
 
-    public virtual void SafeXButton2DoubleClick(UIMouseEvent evt) { }
+    public virtual void SafeXButton2DoubleClick(UIMouseEvent evt)
+    {
+    }
 
     public sealed override void XButton2DoubleClick(UIMouseEvent evt)
     {
         base.XButton2DoubleClick(evt);
         SafeXButton2DoubleClick(evt);
     }
+
     #endregion
 
     #region LMB
-    public virtual void SafeMouseUp(UIMouseEvent evt) { }
+
+    public virtual void SafeMouseUp(UIMouseEvent evt)
+    {
+    }
 
     public sealed override void LeftMouseUp(UIMouseEvent evt)
     {
@@ -109,7 +137,9 @@ public abstract class SmartUIState : UIState
         SafeMouseUp(evt);
     }
 
-    public virtual void SafeMouseDown(UIMouseEvent evt) { }
+    public virtual void SafeMouseDown(UIMouseEvent evt)
+    {
+    }
 
     public sealed override void LeftMouseDown(UIMouseEvent evt)
     {
@@ -117,7 +147,9 @@ public abstract class SmartUIState : UIState
         SafeMouseDown(evt);
     }
 
-    public virtual void SafeClick(UIMouseEvent evt) { }
+    public virtual void SafeClick(UIMouseEvent evt)
+    {
+    }
 
     public sealed override void LeftClick(UIMouseEvent evt)
     {
@@ -125,17 +157,23 @@ public abstract class SmartUIState : UIState
         SafeClick(evt);
     }
 
-    public virtual void SafeDoubleClick(UIMouseEvent evt) { }
+    public virtual void SafeDoubleClick(UIMouseEvent evt)
+    {
+    }
 
     public sealed override void LeftDoubleClick(UIMouseEvent evt)
     {
         base.LeftDoubleClick(evt);
         SafeDoubleClick(evt);
     }
+
     #endregion
 
     #region RMB
-    public virtual void SafeRightMouseUp(UIMouseEvent evt) { }
+
+    public virtual void SafeRightMouseUp(UIMouseEvent evt)
+    {
+    }
 
     public sealed override void RightMouseUp(UIMouseEvent evt)
     {
@@ -143,7 +181,9 @@ public abstract class SmartUIState : UIState
         SafeRightMouseUp(evt);
     }
 
-    public virtual void SafeRightMouseDown(UIMouseEvent evt) { }
+    public virtual void SafeRightMouseDown(UIMouseEvent evt)
+    {
+    }
 
     public sealed override void RightMouseDown(UIMouseEvent evt)
     {
@@ -151,7 +191,9 @@ public abstract class SmartUIState : UIState
         SafeRightMouseDown(evt);
     }
 
-    public virtual void SafeRightClick(UIMouseEvent evt) { }
+    public virtual void SafeRightClick(UIMouseEvent evt)
+    {
+    }
 
     public sealed override void RightClick(UIMouseEvent evt)
     {
@@ -159,17 +201,23 @@ public abstract class SmartUIState : UIState
         SafeRightClick(evt);
     }
 
-    public virtual void SafeRightDoubleClick(UIMouseEvent evt) { }
+    public virtual void SafeRightDoubleClick(UIMouseEvent evt)
+    {
+    }
 
     public sealed override void RightDoubleClick(UIMouseEvent evt)
     {
         base.RightDoubleClick(evt);
         SafeRightDoubleClick(evt);
     }
+
     #endregion
 
     #region MMB
-    public virtual void SafeMiddleMouseUp(UIMouseEvent evt) { }
+
+    public virtual void SafeMiddleMouseUp(UIMouseEvent evt)
+    {
+    }
 
     public sealed override void MiddleMouseUp(UIMouseEvent evt)
     {
@@ -177,7 +225,9 @@ public abstract class SmartUIState : UIState
         SafeMiddleMouseUp(evt);
     }
 
-    public virtual void SafeMiddleMouseDown(UIMouseEvent evt) { }
+    public virtual void SafeMiddleMouseDown(UIMouseEvent evt)
+    {
+    }
 
     public sealed override void MiddleMouseDown(UIMouseEvent evt)
     {
@@ -185,7 +235,9 @@ public abstract class SmartUIState : UIState
         SafeMiddleMouseDown(evt);
     }
 
-    public virtual void SafeMiddleClick(UIMouseEvent evt) { }
+    public virtual void SafeMiddleClick(UIMouseEvent evt)
+    {
+    }
 
     public sealed override void MiddleClick(UIMouseEvent evt)
     {
@@ -193,17 +245,23 @@ public abstract class SmartUIState : UIState
         SafeMiddleClick(evt);
     }
 
-    public virtual void SafeMiddleDoubleClick(UIMouseEvent evt) { }
+    public virtual void SafeMiddleDoubleClick(UIMouseEvent evt)
+    {
+    }
 
     public sealed override void MiddleDoubleClick(UIMouseEvent evt)
     {
         base.MiddleDoubleClick(evt);
         SafeMiddleDoubleClick(evt);
     }
+
     #endregion
 
     #region Misc
-    public virtual void SafeMouseOver(UIMouseEvent evt) { }
+
+    public virtual void SafeMouseOver(UIMouseEvent evt)
+    {
+    }
 
     public sealed override void MouseOver(UIMouseEvent evt)
     {
@@ -211,7 +269,9 @@ public abstract class SmartUIState : UIState
         SafeMouseOver(evt);
     }
 
-    public virtual void SafeUpdate(GameTime gameTime) { }
+    public virtual void SafeUpdate(GameTime gameTime)
+    {
+    }
 
     public sealed override void Update(GameTime gameTime)
     {
@@ -219,13 +279,16 @@ public abstract class SmartUIState : UIState
         SafeUpdate(gameTime);
     }
 
-    public virtual void SafeScrollWheel(UIScrollWheelEvent evt) { }
+    public virtual void SafeScrollWheel(UIScrollWheelEvent evt)
+    {
+    }
 
     public sealed override void ScrollWheel(UIScrollWheelEvent evt)
     {
         base.ScrollWheel(evt);
         SafeScrollWheel(evt);
     }
+
     #endregion
 
     #endregion SmartUIElement Mitosis

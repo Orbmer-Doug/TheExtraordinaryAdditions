@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Summon;
@@ -12,6 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Late;
 public class SuperIztMinion : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.LokiShrinep);
+
     public override void SetStaticDefaults()
     {
         // This is necessary for right-click targeting
@@ -24,8 +24,8 @@ public class SuperIztMinion : ModProjectile
     public sealed override void SetDefaults()
     {
         Projectile.scale = 1.8f;
-        Projectile.width = (int)(78 * Projectile.scale);
-        Projectile.height = (int)(22 * Projectile.scale);
+        Projectile.width = (int) (78 * Projectile.scale);
+        Projectile.height = (int) (22 * Projectile.scale);
         Projectile.tileCollide = false;
         Projectile.friendly = true;
         Projectile.minion = true;
@@ -43,6 +43,7 @@ public class SuperIztMinion : ModProjectile
     public Player Owner => Main.player[Projectile.owner];
     public ref float Timer => ref Projectile.ai[0];
     public ref float HitTime => ref Projectile.ai[1];
+
     public bool HasHitTarget
     {
         get => Projectile.ai[2] == 1f;
@@ -55,7 +56,8 @@ public class SuperIztMinion : ModProjectile
             return;
 
         after ??= new(5, () => Projectile.Center);
-        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.scale, Projectile.Opacity, Projectile.rotation, 0, 40, 2, 2f, null, false, -.1f));
+        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.scale, Projectile.Opacity,
+            Projectile.rotation, 0, 40, 2, 2f, null, false, -.1f));
 
         // So it will lean slightly towards the direction it's moving
         Projectile.rotation = Projectile.velocity.X * 0.05f;
@@ -65,7 +67,8 @@ public class SuperIztMinion : ModProjectile
         if (target != null)
         {
             if (HasHitTarget)
-                Projectile.velocity = Terraria.Utils.RotatedBy(Projectile.velocity, (double)((Projectile.identity % 2f == 0f).ToDirectionInt() * 0.06f), default(Vector2)) * 0.93f;
+                Projectile.velocity = Terraria.Utils.RotatedBy(Projectile.velocity,
+                    (double) ((Projectile.identity % 2f == 0f).ToDirectionInt() * 0.06f), default(Vector2)) * 0.93f;
             else
                 TargetPosition(target.Center);
         }
@@ -110,6 +113,7 @@ public class SuperIztMinion : ModProjectile
         {
             Projectile.velocity = (Projectile.velocity * 37f + Projectile.SafeDirectionTo(origin) * 17f) / 40f;
         }
+
         if (!Projectile.WithinRange(origin, 1200f))
         {
             Projectile.position = origin;
@@ -122,7 +126,8 @@ public class SuperIztMinion : ModProjectile
         if (!HasHitTarget)
         {
             if (this.RunLocal())
-                Projectile.NewProj(target.RandAreaInEntity(), Vector2.Zero, ModContent.ProjectileType<LokiBoom>(), Projectile.damage, 0f, Projectile.owner);
+                Projectile.NewProj(target.RandAreaInEntity(), Vector2.Zero, ModContent.ProjectileType<LokiBoom>(),
+                    Projectile.damage, 0f, Projectile.owner);
             HitTime = 50;
             Projectile.velocity *= 2f;
             HasHitTarget = true;
@@ -137,15 +142,19 @@ public class SuperIztMinion : ModProjectile
         if (HitTime <= 0)
         {
             float flySpeed = 60f;
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(target) * flySpeed, 0.02f);
-            ParticleRegistry.SpawnGlowParticle(Projectile.RandAreaInEntity(), -Projectile.velocity * .5f, 30, Main.rand.NextFloat(.05f, .09f), Color.Yellow, 1f);
+            Projectile.velocity =
+                Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(target) * flySpeed, 0.02f);
+            ParticleRegistry.SpawnGlowParticle(Projectile.RandAreaInEntity(), -Projectile.velocity * .5f, 30,
+                Main.rand.NextFloat(.05f, .09f), Color.Yellow, 1f);
         }
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
-        after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [Color.Gold, Color.Goldenrod, Color.PaleGoldenrod], Projectile.Opacity);
+        after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(),
+            [Color.Gold, Color.Goldenrod, Color.PaleGoldenrod], Projectile.Opacity);
         Projectile.DrawProjectileBackglow(Color.Gold, 2f, 30);
         Projectile.DrawBaseProjectile(Color.White);
         return false;

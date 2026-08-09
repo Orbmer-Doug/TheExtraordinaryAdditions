@@ -13,7 +13,7 @@ public partial class Asterlin
 
         if (StateMachine != null)
         {
-            writer.Write((int)CurrentState);
+            writer.Write((int) CurrentState);
             writer.Write(AITimer);
         }
 
@@ -29,7 +29,7 @@ public partial class Asterlin
 
         if (StateMachine != null)
         {
-            AsterlinAIType receivedState = (AsterlinAIType)reader.ReadInt32();
+            AsterlinAIType receivedState = (AsterlinAIType) reader.ReadInt32();
             int receivedTime = reader.ReadInt32();
             StateMachine.StateStack.Clear();
             CurrentState = receivedState;

@@ -13,6 +13,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Late;
 public class GodGauntlet : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GodGauntlet);
+
     public override void SetStaticDefaults()
     {
         ArmorIDs.Wing.Sets.Stats[Item.wingSlot] = new WingStats(400, 15f, 5f, false, -1f, 1f);
@@ -23,11 +24,11 @@ public class GodGauntlet : ModItem
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         var line = new TooltipLine(Mod, "GodGauntlet", "\'You know what silas its not too bad of a idea\'\n" +
-            "Counts as wings\n" +
-            "Hiding this accessory causes you to be immortal, give infinite flight time, and have 30+ minion slots\n" +
-            "Press the throw button to remove every entity in the world...\n" +
-            "Press quick mana to get the coords of your mouse!\n" +
-            "-Developer Tool-".ColoredText(Color.Pink))
+                                                       "Counts as wings\n" +
+                                                       "Hiding this accessory causes you to be immortal, give infinite flight time, and have 30+ minion slots\n" +
+                                                       "Press the throw button to remove every entity in the world...\n" +
+                                                       "Press quick mana to get the coords of your mouse!\n" +
+                                                       "-Developer Tool-".ColoredText(Color.Pink))
         {
             OverrideColor = Color.Lerp(Color.Ivory, Color.AntiqueWhite, .5f)
         };
@@ -45,7 +46,8 @@ public class GodGauntlet : ModItem
         Item.maxStack = 1;
     }
 
-    public override void VerticalWingSpeeds(Player player, ref float ascentWhenFalling, ref float ascentWhenRising, ref float maxCanAscendMultiplier, ref float maxAscentMultiplier, ref float constantAscend)
+    public override void VerticalWingSpeeds(Player player, ref float ascentWhenFalling, ref float ascentWhenRising,
+        ref float maxCanAscendMultiplier, ref float maxAscentMultiplier, ref float constantAscend)
     {
         ascentWhenFalling = 1f;
         ascentWhenRising = 0.175f;

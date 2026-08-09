@@ -11,6 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
 public class BlueTuxedo : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BlueTuxedo);
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(Color.AliceBlue);

@@ -1,6 +1,4 @@
-﻿using CalamityMod.Items.Materials;
-using CalamityMod.Tiles.Furniture.CraftingStations;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -56,10 +54,11 @@ public class CrossDisc : ModItem
         {
             OverrideColor = new Color(237, 119, 0)
         };
-        TooltipLine whatdoyoumeannotearth = new TooltipLine(Mod, "CrossDisc", this.GetLocalization("WhatDoYouMeanNotEarth").Value)
-        {
-            OverrideColor = new Color(61, 227, 83)
-        };
+        TooltipLine whatdoyoumeannotearth =
+            new TooltipLine(Mod, "CrossDisc", this.GetLocalization("WhatDoYouMeanNotEarth").Value)
+            {
+                OverrideColor = new Color(61, 227, 83)
+            };
         tooltips.DrawHeldShiftTooltip([feelingiceolated, lightningreturns, playingwithfire, whatdoyoumeannotearth]);
         tooltips.ColorLocalization(new Color(132, 173, 217));
     }
@@ -71,7 +70,8 @@ public class CrossDisc : ModItem
         if (Main.rand.NextBool(4))
         {
             Dust dust = Dust.NewDustPerfect(Item.RandAreaInEntity(), DustID.AncientLight,
-                -Vector2.UnitY.RotatedByRandom(.5f) * Main.rand.NextFloat(2.8f, 3.4f), 0, Color.LightBlue, Main.rand.NextFloat(.85f, 1.15f));
+                -Vector2.UnitY.RotatedByRandom(.5f) * Main.rand.NextFloat(2.8f, 3.4f), 0, Color.LightBlue,
+                Main.rand.NextFloat(.85f, 1.15f));
             dust.fadeIn = .9f;
             dust.noGravity = true;
         }
@@ -79,7 +79,10 @@ public class CrossDisc : ModItem
 
     public override bool CanShoot(Player player) => false;
     public override bool? UseItem(Player player) => false;
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback) => false;
+
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback) => false;
+
     public override bool AllowPrefix(int pre) => false;
 
     public override void AddRecipes()
@@ -88,10 +91,7 @@ public class CrossDisc : ModItem
         recipe.AddIngredient(ItemID.LightDisc, 1);
         recipe.AddIngredient(ItemID.RedDye, 1);
         recipe.AddIngredient(ItemID.Silk, 3);
-        recipe.AddIngredient(ModContent.ItemType<MysteriousCircuitry>(), 15);
-        recipe.AddIngredient(ModContent.ItemType<AscendantSpiritEssence>(), 4);
-        recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 5);
-        recipe.AddTile(ModContent.TileType<CosmicAnvil>());
+        //TODO
         recipe.Register();
     }
 }

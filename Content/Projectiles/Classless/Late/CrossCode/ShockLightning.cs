@@ -54,7 +54,7 @@ public class ShockLightning : ModProjectile
             Projectile.velocity = Main.rand.NextBool() ? Vector2.UnitX : -Vector2.UnitX;
         }
 
-        Projectile.frame = (int)MathHelper.Lerp(0, 5, InverseLerp(Lifetime, 0f, Projectile.timeLeft));
+        Projectile.frame = (int) MathHelper.Lerp(0, 5, InverseLerp(Lifetime, 0f, Projectile.timeLeft));
         Time++;
     }
 

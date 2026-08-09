@@ -40,14 +40,17 @@ public class VoidBlast : ModProjectile
             ParticleRegistry.SpawnChromaticAberration(Projectile.Center, Lifetime, 1.24f, 150f);
             for (int i = 0; i < 25; i++)
                 ParticleRegistry.SpawnMistParticle(Projectile.Center, Main.rand.NextVector2Circular(20f, 20f),
-                    Main.rand.NextFloat(.7f, 1.4f), Color.Violet, Color.DarkViolet, Main.rand.NextFloat(150f, 220f), Main.rand.NextFloat(-.1f, .1f));
+                    Main.rand.NextFloat(.7f, 1.4f), Color.Violet, Color.DarkViolet, Main.rand.NextFloat(150f, 220f),
+                    Main.rand.NextFloat(-.1f, .1f));
         }
 
         if (circle == null || circle.Disposed)
             circle = new(WidthFunct, ColorFunct, null, points.Count);
 
         for (int i = 0; i < points.Count; i++)
-            points.SetPoint(i, Projectile.Center + ((MathHelper.TwoPi + (MathF.Sqrt(2f) / 2f)) * InverseLerp(0f, points.Count, i)).ToRotationVector2() * Radius);
+            points.SetPoint(i,
+                Projectile.Center + ((MathHelper.TwoPi + (MathF.Sqrt(2f) / 2f)) * InverseLerp(0f, points.Count, i))
+                .ToRotationVector2() * Radius);
 
         Vector2 pos = points.Points[Main.rand.Next(0, points.Count - 1)];
         int life = Main.rand.Next(30, 40);
@@ -59,7 +62,8 @@ public class VoidBlast : ModProjectile
 
         for (int i = 0; i < 2; i++)
             ParticleRegistry.SpawnMistParticle(Projectile.Center, Vector2.Zero,
-                Main.rand.NextFloat(.65f, 1f), Color.Violet, Color.DarkViolet, Main.rand.NextFloat(150f, 220f), Main.rand.NextFloat(-.1f, .1f));
+                Main.rand.NextFloat(.65f, 1f), Color.Violet, Color.DarkViolet, Main.rand.NextFloat(150f, 220f),
+                Main.rand.NextFloat(-.1f, .1f));
 
         Time++;
     }
@@ -71,7 +75,8 @@ public class VoidBlast : ModProjectile
 
     public Color ColorFunct(SystemVector2 c, Vector2 pos)
     {
-        Color col = MulticolorLerp(Completion, Color.White.Lerp(Color.Violet, .5f), Color.Violet, Color.DarkViolet, Color.Black);
+        Color col = MulticolorLerp(Completion, Color.White.Lerp(Color.Violet, .5f), Color.Violet, Color.DarkViolet,
+            Color.Black);
         return col * MathHelper.Lerp(2f, .5f, Completion);
     }
 
@@ -89,6 +94,7 @@ public class VoidBlast : ModProjectile
                 circle.DrawTrail(shader, points.Points, 300, true);
             }
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(blast, PixelationLayer.OverPlayers);
 
         return false;

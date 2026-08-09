@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -29,6 +28,7 @@ public class SplinteredBone : ModProjectile
     private ref float Time => ref Projectile.ai[1];
     private ref float State => ref Projectile.ai[2];
     private const int Fall = 25;
+
     public override bool? CanHitNPC(NPC target)
     {
         if (Time > Fall)
@@ -40,7 +40,8 @@ public class SplinteredBone : ModProjectile
     public override void AI()
     {
         after ??= new(4, () => Projectile.Center);
-        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 255));
+        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0,
+            255));
 
         if (State == 0f)
         {
@@ -48,11 +49,12 @@ public class SplinteredBone : ModProjectile
             if (Time > Fall && Projectile.velocity.Y < 16f)
                 Projectile.velocity.Y += .2f;
         }
+
         if (State == 1f)
         {
             Projectile.velocity = Vector2.Zero;
         }
-        
+
         Projectile.StickyProjAI(15);
         Time++;
     }
@@ -81,6 +83,7 @@ public class SplinteredBone : ModProjectile
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [lightColor], Projectile.Opacity);

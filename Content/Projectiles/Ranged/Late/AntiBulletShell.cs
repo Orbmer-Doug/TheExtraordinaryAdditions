@@ -12,6 +12,7 @@ public class AntiBulletShell : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AntiBulletShell);
     private const int Lifetime = 400;
+
     public override void SetDefaults()
     {
         Projectile.width = 50;
@@ -27,6 +28,7 @@ public class AntiBulletShell : ModProjectile
 
     public int Time;
     public bool TouchedGrass;
+
     public override void AI()
     {
         Time++;
@@ -36,12 +38,14 @@ public class AntiBulletShell : ModProjectile
         {
             Projectile.VelocityBasedRotation(0f);
         }
+
         Projectile.velocity.Y -= 0.055f;
         Projectile.velocity.X *= 0.992f;
 
         if (Time < 240)
         {
-            Vector2 pos = Projectile.Center + Vector2.UnitX.RotatedBy(Projectile.rotation) * Main.rand.NextFloat(-Projectile.width * .5f, Projectile.width * .5f);
+            Vector2 pos = Projectile.Center + Vector2.UnitX.RotatedBy(Projectile.rotation) *
+                Main.rand.NextFloat(-Projectile.width * .5f, Projectile.width * .5f);
             Vector2 vel = Vector2.UnitY * -Main.rand.NextFloat(3f, 6f);
             float size = Main.rand.NextFloat(.5f, .9f);
             int type = Main.rand.NextBool() ? DustID.SteampunkSteam : DustID.Smoke;
@@ -70,7 +74,8 @@ public class AntiBulletShell : ModProjectile
     {
         float interpolant = Utils.GetLerpValue(Lifetime - 240f, Lifetime, Projectile.timeLeft, true);
         Projectile.DrawBaseProjectile(lightColor);
-        Projectile.DrawProjectileBackglow(Color.Lerp(Color.Chocolate, Color.Chocolate * 2f, interpolant) * interpolant, interpolant * 3f);
+        Projectile.DrawProjectileBackglow(Color.Lerp(Color.Chocolate, Color.Chocolate * 2f, interpolant) * interpolant,
+            interpolant * 3f);
         return false;
     }
 }

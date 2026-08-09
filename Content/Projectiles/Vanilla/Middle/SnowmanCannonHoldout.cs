@@ -15,15 +15,18 @@ public class SnowmanCannonHoldout : BaseIdleHoldoutProjectile
     public override int AssociatedItemID => ItemID.SnowmanCannon;
     public override int IntendedProjectileType => ModContent.ProjectileType<SnowmanCannonHoldout>();
     public override string Texture => ItemID.SnowmanCannon.GetTerrariaItem();
+
     public override void Defaults()
     {
         Projectile.width = 58;
         Projectile.height = 32;
         Projectile.DamageType = DamageClass.Ranged;
     }
+
     public ref float Time => ref Projectile.ai[0];
     private const float Offset = 30f;
     public ref float OffsetLength => ref Projectile.ai[1];
+
     public override void SafeAI()
     {
         if (Projectile.ai[2] == 0f)
@@ -36,29 +39,31 @@ public class SnowmanCannonHoldout : BaseIdleHoldoutProjectile
 
         if (this.RunLocal())
         {
-            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Center.SafeDirectionTo(Mouse) * Projectile.Size.Length(), 0.4f);
+            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity,
+                Center.SafeDirectionTo(Mouse) * Projectile.Size.Length(), 0.4f);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
 
-        if (this.RunLocal() && Modded.SafeMouseLeft.Current && Time % Item.useTime == Item.useTime - 1 && TryUseAmmo(out int projToShoot, out float speed, out int dmg, out float kb, out int ammoID))
+        if (this.RunLocal() && Modded.SafeMouseLeft.Current && Time % Item.useTime == Item.useTime - 1 &&
+            TryUseAmmo(out int projToShoot, out float speed, out int dmg, out float kb, out int ammoID))
         {
             Vector2 vel = Projectile.velocity.SafeNormalize(Vector2.Zero) * speed;
             int typeOf = projToShoot switch
             {
-                ProjectileID.RocketSnowmanI => (int)SnowmanRocket.RocketType.One,
-                ProjectileID.RocketSnowmanII => (int)SnowmanRocket.RocketType.Two,
-                ProjectileID.RocketSnowmanIII => (int)SnowmanRocket.RocketType.Three,
-                ProjectileID.RocketSnowmanIV => (int)SnowmanRocket.RocketType.Four,
-                ProjectileID.DrySnowmanRocket => (int)SnowmanRocket.RocketType.Dry,
-                ProjectileID.WetSnowmanRocket => (int)SnowmanRocket.RocketType.Wet,
-                ProjectileID.HoneySnowmanRocket => (int)SnowmanRocket.RocketType.Honey,
-                ProjectileID.LavaSnowmanRocket => (int)SnowmanRocket.RocketType.Lava,
-                ProjectileID.ClusterSnowmanRocketI => (int)SnowmanRocket.RocketType.Cluster1,
-                ProjectileID.ClusterSnowmanRocketII => (int)SnowmanRocket.RocketType.Cluster2,
-                ProjectileID.MiniNukeSnowmanRocketI => (int)SnowmanRocket.RocketType.MiniNuke1,
-                ProjectileID.MiniNukeSnowmanRocketII => (int)SnowmanRocket.RocketType.MiniNuke2,
-                _ => (int)SnowmanRocket.RocketType.One
+                ProjectileID.RocketSnowmanI => (int) SnowmanRocket.RocketType.One,
+                ProjectileID.RocketSnowmanII => (int) SnowmanRocket.RocketType.Two,
+                ProjectileID.RocketSnowmanIII => (int) SnowmanRocket.RocketType.Three,
+                ProjectileID.RocketSnowmanIV => (int) SnowmanRocket.RocketType.Four,
+                ProjectileID.DrySnowmanRocket => (int) SnowmanRocket.RocketType.Dry,
+                ProjectileID.WetSnowmanRocket => (int) SnowmanRocket.RocketType.Wet,
+                ProjectileID.HoneySnowmanRocket => (int) SnowmanRocket.RocketType.Honey,
+                ProjectileID.LavaSnowmanRocket => (int) SnowmanRocket.RocketType.Lava,
+                ProjectileID.ClusterSnowmanRocketI => (int) SnowmanRocket.RocketType.Cluster1,
+                ProjectileID.ClusterSnowmanRocketII => (int) SnowmanRocket.RocketType.Cluster2,
+                ProjectileID.MiniNukeSnowmanRocketI => (int) SnowmanRocket.RocketType.MiniNuke1,
+                ProjectileID.MiniNukeSnowmanRocketII => (int) SnowmanRocket.RocketType.MiniNuke2,
+                _ => (int) SnowmanRocket.RocketType.One
             };
             Projectile.NewProj(right, vel, ModContent.ProjectileType<SnowmanRocket>(), dmg, kb, Owner.whoAmI, typeOf);
 
@@ -89,7 +94,9 @@ public class SnowmanCannonHoldout : BaseIdleHoldoutProjectile
 
         Vector2 center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
         Vector2 offset = Projectile.rotation.ToRotationVector2() * OffsetLength;
-        Projectile.Center = center + offset - PolarVector(6f, Projectile.rotation) + PolarVector(10f * Owner.direction * Owner.gravDir, Projectile.rotation - MathHelper.PiOver2);
+        Projectile.Center = center + offset - PolarVector(6f, Projectile.rotation) +
+                            PolarVector(10f * Owner.direction * Owner.gravDir,
+                                Projectile.rotation - MathHelper.PiOver2);
 
         Time++;
     }
@@ -98,8 +105,9 @@ public class SnowmanCannonHoldout : BaseIdleHoldoutProjectile
     {
         Texture2D tex = Projectile.ThisProjectileTexture();
         SpriteEffects effects = Projectile.direction.ToSpriteDirection();
-        float rotation = Projectile.rotation + ((Projectile.spriteDirection == -1) ? ((float)Math.PI) : 0f);
-        Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, null, lightColor * Projectile.Opacity, rotation, tex.Size() / 2, Projectile.scale, effects, 0f);
+        float rotation = Projectile.rotation + ((Projectile.spriteDirection == -1) ? ((float) Math.PI) : 0f);
+        Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, null, lightColor * Projectile.Opacity,
+            rotation, tex.Size() / 2, Projectile.scale, effects, 0f);
         return false;
     }
 }

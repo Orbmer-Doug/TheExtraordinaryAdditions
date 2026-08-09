@@ -11,6 +11,7 @@ public class CrosscodeRarity : ModRarity
     public override Color RarityColor => new(255, 72, 0);
 
     internal static List<Behavior<RarityParticleInfo>> PixelList = [];
+
     public static void DrawCustomTooltipLine(DrawableTooltipLine tooltipLine)
     {
         CustomRaritySystem.GetTextDimensions(tooltipLine, out Vector2 size, out Rectangle rect);
@@ -20,7 +21,8 @@ public class CrosscodeRarity : ModRarity
             Vector2 vel = Vector2.UnitY.RotatedByRandom(.8f) * Main.rand.NextFloat(-4f, 4f);
             int life = Main.rand.Next(40, 60);
             float scale = Main.rand.NextFloat(.4f, .9f);
-            CustomRaritySystem.Spawn(ref PixelList, new RarityPixel(rect.RandomRectangle(), vel, life, scale, Color.Cyan, Color.LightSkyBlue));
+            CustomRaritySystem.Spawn(ref PixelList,
+                new RarityPixel(rect.RandomRectangle(), vel, life, scale, Color.Cyan, Color.LightSkyBlue));
         }
 
         if (Main.rand.NextBool(12))

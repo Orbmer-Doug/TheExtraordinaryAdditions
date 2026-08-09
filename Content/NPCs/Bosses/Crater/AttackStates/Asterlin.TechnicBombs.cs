@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
-using CalamityMod;
 using Terraria;
 using Terraria.Enums;
 using Terraria.ModLoader;
@@ -33,14 +32,14 @@ public partial class Asterlin
         StateMachine.RegisterStateBehavior(AsterlinAIType.TechnicBombBarrage, DoBehavior_TechnicBombBarrage);
     }
 
-    public static int TechnicBombBarrage_FireTime => CalUtils.SecondsToFrames(15f);
-    public static int TechnicBombBarrage_WaitTime => CalUtils.SecondsToFrames(1f);
+    public static int TechnicBombBarrage_FireTime => SecondsToFrames(15f);
+    public static int TechnicBombBarrage_WaitTime => SecondsToFrames(1f);
     public static int TechnicBombBarrage_TotalTime => TechnicBombBarrage_FireTime + TechnicBombBarrage_WaitTime;
     public static int TechnicBombBarrage_BombReleaseRate => DifficultyBasedValue(30, 28, 27, 25, 24, 21);
 
     public int TechnicBombBarrage_FadeTimer
     {
-        get => (int)ExtraAI[0];
+        get => (int) ExtraAI[0];
         set => ExtraAI[0] = value;
     }
 
@@ -49,7 +48,7 @@ public partial class Asterlin
 
     public int CurrentBombTargetIndex
     {
-        get => (int)ExtraAI[3];
+        get => (int) ExtraAI[3];
         set => ExtraAI[3] = value;
     }
 
@@ -204,7 +203,7 @@ public partial class Asterlin
             }
         }
 
-        Main.spriteBatch.ResetBlendState();
+        Main.spriteBatch.ResetToDefault();
 
         ManagedShader shader = AssetRegistry.GetShader("ForcefieldLimited");
         shader.TrySetParameter("direction", 0f);
@@ -213,10 +212,10 @@ public partial class Asterlin
         shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WavyBlotchNoise), 1, SamplerState.LinearWrap);
         float size = 100f * interpol;
 
-        Main.spriteBatch.EnterShaderRegion(BlendState.Additive, shader.Effect);
+        Main.spriteBatch.EnterShaderRegion(shader.Effect, BlendState.Additive);
         shader.Render();
         Main.spriteBatch.Draw(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise),
             ToTarget(ReticlePosition - new Vector2(size / 2), new Vector2(size)), Color.White);
-        Main.spriteBatch.ExitShaderRegion();
+        Main.spriteBatch.ResetToDefault();
     }
 }

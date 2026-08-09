@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CalamityMod;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
@@ -41,7 +40,7 @@ public class SeamstressDraw : ModProjectile
 
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
 
@@ -114,8 +113,8 @@ public class SeamstressDraw : ModProjectile
                     CollisionShape shape = CollisionShape.Build(points.Points, CurrentType);
                     foreach (NPC npc in Main.ActiveNPCs)
                     {
-                        if (!npc.IsAnEnemy() || !npc.Hitbox.Intersects(new Rectangle((int)Main.screenPosition.X,
-                                (int)Main.screenPosition.Y, Main.screenWidth, Main.screenHeight)))
+                        if (!npc.IsAnEnemy() || !npc.Hitbox.Intersects(new Rectangle((int) Main.screenPosition.X,
+                                (int) Main.screenPosition.Y, Main.screenWidth, Main.screenHeight)))
                             continue;
 
                         Rectangle rect = npc.Hitbox;
@@ -339,7 +338,7 @@ public class SeamstressDraw : ModProjectile
     /// </summary>
     private static bool IsApproximateLine(ReadOnlySpan<Vector2> pts, float maxDeviation)
     {
-        if (pts.Length <= 2) 
+        if (pts.Length <= 2)
             return true;
 
         Vector2 start = pts[0];
@@ -347,7 +346,7 @@ public class SeamstressDraw : ModProjectile
         Vector2 dir = end - start;
         float len = dir.Length();
 
-        if (len < 1f) 
+        if (len < 1f)
             return false; // degenerate point cloud
 
         foreach (Vector2 pt in pts[1..^1])
@@ -383,7 +382,7 @@ public class SeamstressDraw : ModProjectile
     private static List<Vector2> DouglasPeucker(ReadOnlySpan<Vector2> pts, float epsilon)
     {
         if (pts.Length <= 2)
-            return [..pts.ToArray()];
+            return [.. pts.ToArray()];
 
         // Find the point furthest from the start to the end of the line
         float maxDist = 0f;

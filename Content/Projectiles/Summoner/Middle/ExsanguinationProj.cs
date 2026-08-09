@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using TheExtraordinaryAdditions.Common.Particles.Shader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
@@ -16,21 +15,25 @@ public class ExsanguinationProj : BaseWhip
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ExsanguinationProj);
     public override int SegmentSkip => 3;
+
     public override void Defaults()
     {
         Projectile.Size = new(600, 250);
     }
 
-    public static readonly int TotalEmbedTime = CalUtils.SecondsToFrames(5);
+    public static readonly int TotalEmbedTime = SecondsToFrames(5);
+
     public bool AbleToHit
     {
-        get => (int)Projectile.ai[2] == 1;
+        get => (int) Projectile.ai[2] == 1;
         set => Projectile.ai[2] = value.ToInt();
     }
+
     public ref float ClickTimer => ref Projectile.AdditionsInfo().ExtraAI[0];
+
     public bool Embedded
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[1] == 1;
+        get => (int) Projectile.AdditionsInfo().ExtraAI[1] == 1;
         set => Projectile.AdditionsInfo().ExtraAI[1] = value.ToInt();
     }
 
@@ -75,7 +78,8 @@ public class ExsanguinationProj : BaseWhip
             }
 
             Projectile.velocity = Projectile.SafeDirectionTo(target.Center);
-            Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, Projectile.velocity.ToRotation() - MathHelper.PiOver2);
+            Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full,
+                Projectile.velocity.ToRotation() - MathHelper.PiOver2);
 
             if (EmbedTime > TotalEmbedTime || target.life <= 0 || target == null || target.active == false)
             {
@@ -95,7 +99,8 @@ public class ExsanguinationProj : BaseWhip
                 for (int i = 0; i < 2; i++)
                 {
                     ShaderParticleRegistry.SpawnStygainParticle(Tip,
-                        OutwardVel.RotatedBy(MathHelper.PiOver2 * Owner.direction * Owner.gravDir).RotatedByRandom(.1f) * Main.rand.NextFloat(1f, 6f), Main.rand.Next(40, 55));
+                        OutwardVel.RotatedBy(MathHelper.PiOver2 * Owner.direction * Owner.gravDir)
+                            .RotatedByRandom(.1f) * Main.rand.NextFloat(1f, 6f), Main.rand.Next(40, 55));
                 }
             }
         }
@@ -119,13 +124,16 @@ public class ExsanguinationProj : BaseWhip
                 LineBrightness = 1f;
 
                 Owner.Heal(Main.rand.Next(1, 3));
-                ParticleRegistry.SpawnDetailedBlastParticle(pos, Vector2.Zero, Vector2.One * 105f, Vector2.Zero, 30, Color.Crimson);
+                ParticleRegistry.SpawnDetailedBlastParticle(pos, Vector2.Zero, Vector2.One * 105f, Vector2.Zero, 30,
+                    Color.Crimson);
                 for (int i = 0; i < 20; i++)
                 {
                     Vector2 cir = Main.rand.NextVector2Circular(12f, 12f);
                     if (i % 2f == 0f)
-                        ParticleRegistry.SpawnGlowParticle(pos, cir, Main.rand.Next(15, 25), Main.rand.NextFloat(20f, 50f), Color.Crimson);
-                    ParticleRegistry.SpawnBloodParticle(pos, cir, Main.rand.Next(30, 50), Main.rand.NextFloat(.7f, 1f), Color.Crimson);
+                        ParticleRegistry.SpawnGlowParticle(pos, cir, Main.rand.Next(15, 25),
+                            Main.rand.NextFloat(20f, 50f), Color.Crimson);
+                    ParticleRegistry.SpawnBloodParticle(pos, cir, Main.rand.Next(30, 50), Main.rand.NextFloat(.7f, 1f),
+                        Color.Crimson);
                 }
             }
             else
@@ -149,7 +157,8 @@ public class ExsanguinationProj : BaseWhip
     public Color LineColor2(SystemVector2 completion, Vector2 position)
     {
         float progress = MakePoly(3).OutFunction(1 - completion.X);
-        return Color.Lerp(Color.DarkRed, Color.Crimson, MakePoly(3).InFunction(1 - progress)) * LineBrightness * progress;
+        return Color.Lerp(Color.DarkRed, Color.Crimson, MakePoly(3).InFunction(1 - progress)) * LineBrightness *
+               progress;
     }
 
     public override float LineWidth(float completion)
@@ -216,7 +225,8 @@ public class ExsanguinationProj : BaseWhip
                 Vector2 orig = frame.Size() / 2;
                 SpriteEffects flip = Owner.direction < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
 
-                Main.spriteBatch.DrawBetter(texture, pos, frame, color, rotation, orig, tip ? Projectile.scale : 1f, flip);
+                Main.spriteBatch.DrawBetter(texture, pos, frame, color, rotation, orig, tip ? Projectile.scale : 1f,
+                    flip);
             }
         }
     }

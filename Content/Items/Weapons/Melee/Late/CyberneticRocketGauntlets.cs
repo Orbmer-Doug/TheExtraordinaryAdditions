@@ -66,7 +66,8 @@ public class CyberneticRocketGauntlets : ModItem
             if (sequence.StartsWith("L"))
                 player.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, -MathHelper.PiOver2);
             if (sequence.StartsWith("R"))
-                player.SetBackHandBetter(Player.CompositeArmStretchAmount.Full, player.direction == -1 ? MathHelper.Pi : 0f);
+                player.SetBackHandBetter(Player.CompositeArmStretchAmount.Full,
+                    player.direction == -1 ? MathHelper.Pi : 0f);
         }
     }
 
@@ -94,7 +95,8 @@ public class CyberneticRocketGauntlets : ModItem
 
         if (state != null)
         {
-            CyberneticSwing swing = Main.projectile[Projectile.NewProjectile(new EntitySource_ItemUse_WithAmmo(player, Item, Item.ammo),
+            CyberneticSwing swing = Main.projectile[Projectile.NewProjectile(
+                new EntitySource_ItemUse_WithAmmo(player, Item, Item.ammo),
                 player.Center, player.Center.SafeDirectionTo(player.Additions().MouseWorld),
                 Item.shoot, Item.damage, Item.knockBack, Main.myPlayer, 0f, 0f, 0f)].As<CyberneticSwing>();
             swing.State = state.Value;
@@ -106,7 +108,9 @@ public class CyberneticRocketGauntlets : ModItem
     public override bool CanUseItem(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
     public override bool AltFunctionUse(Player player) => false;
     public override bool CanShoot(Player player) => false;
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback) => false;
+
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback) => false;
 
     public override void PostUpdate()
     {

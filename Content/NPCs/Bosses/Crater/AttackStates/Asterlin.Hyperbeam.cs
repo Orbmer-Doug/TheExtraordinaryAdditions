@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using CalamityMod;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
@@ -27,7 +26,7 @@ public partial class Asterlin
     public static int Hyperbeam_PortalWait => 30;
     public static int Hyperbeam_BeamBuildTime => 90;
     public static int Hyperbeam_FireInterval => DifficultyBasedValue(50, 40, 35, 32, 30, 28);
-    public static int Hyperbeam_BeamTime => CalUtils.SecondsToFrames(18f);
+    public static int Hyperbeam_BeamTime => SecondsToFrames(18f);
     public static float Hyperbeam_MovementSharpness => DifficultyBasedValue(.009f, .011f, .019f, .02f);
     public static float Hyperbeam_MovementSpeed => DifficultyBasedValue(34f, 38f, 40f, 42f, 44f, 46f);
     public static int Hyperbeam_FadeTime => 75;
@@ -42,13 +41,13 @@ public partial class Asterlin
 
     public Hyperbeam_States Hyperbeam_CurrentState
     {
-        get => (Hyperbeam_States)ExtraAI[0];
-        set => ExtraAI[0] = (int)value;
+        get => (Hyperbeam_States) ExtraAI[0];
+        set => ExtraAI[0] = (int) value;
     }
 
     public int Hyperbeam_TotalTime
     {
-        get => (int)ExtraAI[1];
+        get => (int) ExtraAI[1];
         set => ExtraAI[1] = value;
     }
 

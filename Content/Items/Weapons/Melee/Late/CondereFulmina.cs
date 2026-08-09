@@ -1,5 +1,4 @@
-﻿using CalamityMod.Items.Materials;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent;
@@ -28,7 +27,7 @@ public class CondereFulmina : ModItem
         Item.value = AdditionsGlobalItem.RarityPurpleBuyPrice;
         Item.useStyle = ItemUseStyleID.Swing;
         Item.useAnimation =
-        Item.useTime = 30;
+            Item.useTime = 30;
         Item.UseSound = SoundID.Item1;
         Item.autoReuse = true;
         Item.consumable = false;
@@ -51,13 +50,17 @@ public class CondereFulmina : ModItem
     public override void PostUpdate()
     {
         if (TimeSystem.UpdateCount % 4 == 3)
-            ParticleRegistry.SpawnLightningArcParticle(Vector2.Lerp(Item.BottomLeft, Item.TopRight, Main.rand.NextFloat()),
-                Main.rand.NextVector2CircularLimited(100f, 100f, .9f, 1.4f), 10, Main.rand.NextFloat(.4f, .8f), Color.Cyan);
+            ParticleRegistry.SpawnLightningArcParticle(
+                Vector2.Lerp(Item.BottomLeft, Item.TopRight, Main.rand.NextFloat()),
+                Main.rand.NextVector2CircularLimited(100f, 100f, .9f, 1.4f), 10, Main.rand.NextFloat(.4f, .8f),
+                Color.Cyan);
     }
 
-    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor,
+        Color itemColor, Vector2 origin, float scale)
     {
-        DrawInventoryCustomScale(spriteBatch, TextureAssets.Item[Type].Value, position, frame, drawColor, itemColor, origin, scale, 0.2f, new Vector2(0f, 0f));
+        DrawInventoryCustomScale(spriteBatch, TextureAssets.Item[Type].Value, position, frame, drawColor,
+            origin, scale, 0.2f, new Vector2(0f, 0f));
         return false;
     }
 
@@ -66,8 +69,7 @@ public class CondereFulmina : ModItem
         Recipe recipe = CreateRecipe();
         recipe.AddIngredient(ItemID.MagnetSphere, 1);
         recipe.AddIngredient(ItemID.FragmentVortex, 16);
-        recipe.AddIngredient(ModContent.ItemType<StormlionMandible>(), 5);
-        recipe.AddIngredient(ModContent.ItemType<ArmoredShell>(), 7);
+        //TODO
         recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();
     }

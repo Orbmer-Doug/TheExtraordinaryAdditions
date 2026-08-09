@@ -19,6 +19,7 @@ public class BrewingLightningStrike : ModProjectile, ILocalizedModType, IModType
     public ref float BaseTurnAngleRatio => ref Projectile.ai[1];
     public ref float AccumulatedXMovementSpeeds => ref Projectile.ai[2];
     public ref float StoredY => ref Projectile.AdditionsInfo().ExtraAI[0];
+
     public bool Init
     {
         get => Projectile.AdditionsInfo().ExtraAI[1] == 1;
@@ -28,6 +29,7 @@ public class BrewingLightningStrike : ModProjectile, ILocalizedModType, IModType
     public override string Texture => AssetRegistry.Invis;
     public Player Owner => Main.player[Projectile.owner];
     public GlobalPlayer ModdedOwner => Owner.Additions();
+
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.DrawScreenCheckFluff[Type] = 1000;
@@ -58,6 +60,7 @@ public class BrewingLightningStrike : ModProjectile, ILocalizedModType, IModType
     {
         writer.Write(Projectile.tileCollide);
     }
+
     public override void ReceiveExtraAI(BinaryReader reader)
     {
         Projectile.tileCollide = reader.ReadBoolean();
@@ -75,9 +78,11 @@ public class BrewingLightningStrike : ModProjectile, ILocalizedModType, IModType
             {
                 StoredY = ModdedOwner.MouseWorld.Y;
             }
+
             Init = true;
             this.Sync();
         }
+
         if (Projectile.Center.Y > StoredY && !Projectile.tileCollide)
         {
             Projectile.tileCollide = true;
@@ -95,7 +100,7 @@ public class BrewingLightningStrike : ModProjectile, ILocalizedModType, IModType
 
             // Make the lightning branch off in seperate ways
             float originalSpeed = MathHelper.Min(20f, Projectile.velocity.Length());
-            UnifiedRandom unifiedRandom = new((int)BaseTurnAngleRatio);
+            UnifiedRandom unifiedRandom = new((int) BaseTurnAngleRatio);
             int turnTries = 0;
             Vector2 newBaseDirection = -Vector2.UnitY;
             Vector2 potentialBaseDirection;
@@ -112,20 +117,21 @@ public class BrewingLightningStrike : ModProjectile, ILocalizedModType, IModType
                 if (potentialBaseDirection.Y > -0.02f)
                     canChangeLightningDirection = false;
 
-                if (Math.Abs(potentialBaseDirection.X * (Projectile.extraUpdates + 1) * 2f * originalSpeed + AccumulatedXMovementSpeeds) > Projectile.MaxUpdates * lightningTurnRandomnessFactor)
+                if (Math.Abs(potentialBaseDirection.X * (Projectile.extraUpdates + 1) * 2f * originalSpeed +
+                             AccumulatedXMovementSpeeds) > Projectile.MaxUpdates * lightningTurnRandomnessFactor)
                     canChangeLightningDirection = false;
 
                 if (canChangeLightningDirection)
                     newBaseDirection = potentialBaseDirection;
 
                 turnTries++;
-            }
-            while (turnTries < 60);
+            } while (turnTries < 60);
 
             if (Projectile.velocity != Vector2.Zero)
             {
                 AccumulatedXMovementSpeeds += newBaseDirection.X * (Projectile.extraUpdates + 1) * 2f * originalSpeed;
-                Projectile.velocity = newBaseDirection.RotatedBy(InitialVelocityAngle + MathHelper.PiOver2) * originalSpeed;
+                Projectile.velocity = newBaseDirection.RotatedBy(InitialVelocityAngle + MathHelper.PiOver2) *
+                                      originalSpeed;
                 Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver2;
             }
         }
@@ -140,14 +146,17 @@ public class BrewingLightningStrike : ModProjectile, ILocalizedModType, IModType
 
     public Color ColorFunction(SystemVector2 completionRatio, Vector2 position)
     {
-        return MulticolorLerp(Sin01(Projectile.identity / 3f + completionRatio.X * 20f + Main.GlobalTimeWrappedHourly * 1.1f),
-            Color.Purple, Color.MediumPurple, Color.AntiqueWhite) * Projectile.Opacity * GetLerpBump(0f, .05f, .95f, .15f, completionRatio.X);
+        return MulticolorLerp(
+                   Sin01(Projectile.identity / 3f + completionRatio.X * 20f + Main.GlobalTimeWrappedHourly * 1.1f),
+                   Color.Purple, Color.MediumPurple, Color.AntiqueWhite) * Projectile.Opacity *
+               GetLerpBump(0f, .05f, .95f, .15f, completionRatio.X);
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        ParticleRegistry.SpawnSparkleParticle(Projectile.Center, Vector2.Zero, 9, 2.5f, Color.Pink, Color.White, 1.4f, .2f);
-        Projectile.damage = (int)(Projectile.damage * .985f);
+        ParticleRegistry.SpawnSparkleParticle(Projectile.Center, Vector2.Zero, 9, 2.5f, Color.Pink, Color.White, 1.4f,
+            .2f);
+        Projectile.damage = (int) (Projectile.damage * .985f);
     }
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
@@ -157,6 +166,7 @@ public class BrewingLightningStrike : ModProjectile, ILocalizedModType, IModType
 
     public TrailPoints cache = new(50);
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -168,6 +178,7 @@ public class BrewingLightningStrike : ModProjectile, ILocalizedModType, IModType
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.SuperPerlin), 1);
             trail.DrawTrail(shader, cache.Points, 50);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;
     }

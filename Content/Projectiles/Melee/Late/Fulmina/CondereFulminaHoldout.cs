@@ -30,10 +30,11 @@ public class CondereFulminaHoldout : ModProjectile
         Aiming,
         Firing,
     }
+
     public FulminaState State
     {
-        get => (FulminaState)Projectile.ai[1];
-        set => Projectile.ai[1] = (int)value;
+        get => (FulminaState) Projectile.ai[1];
+        set => Projectile.ai[1] = (int) value;
     }
 
     public enum FulminaCharge
@@ -44,10 +45,11 @@ public class CondereFulminaHoldout : ModProjectile
         Third,
         Fourth,
     }
+
     public FulminaCharge Charge
     {
-        get => (FulminaCharge)Projectile.ai[2];
-        set => Projectile.ai[2] = (int)value;
+        get => (FulminaCharge) Projectile.ai[2];
+        set => Projectile.ai[2] = (int) value;
     }
 
     public ref float OldArmRot => ref Projectile.AdditionsInfo().ExtraAI[0];
@@ -61,6 +63,7 @@ public class CondereFulminaHoldout : ModProjectile
     {
         ProjectileID.Sets.HeldProjDoesNotUsePlayerGfxOffY[Type] = true;
     }
+
     public override void SetDefaults()
     {
         Projectile.Size = new(184);
@@ -89,12 +92,14 @@ public class CondereFulminaHoldout : ModProjectile
                     if (Projectile.velocity != Projectile.oldVelocity)
                         this.Sync();
                 }
+
                 Projectile.Center = Owner.GetFrontHandPositionImproved();
                 Projectile.rotation = Projectile.velocity.ToRotation() + PiOver4;
                 OwnerDefaults();
 
                 float vel = Projectile.velocity.ToRotation();
-                float reelAnim = Animators.MakePoly(3f).InOutFunction.Evaluate(vel, vel - (2f * Dir * Owner.gravDir), InverseLerp(0f, ReelTime, Time));
+                float reelAnim = Animators.MakePoly(3f).InOutFunction.Evaluate(vel, vel - (2f * Dir * Owner.gravDir),
+                    InverseLerp(0f, ReelTime, Time));
                 Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, reelAnim);
                 OldArmRot = reelAnim;
 
@@ -105,66 +110,90 @@ public class CondereFulminaHoldout : ModProjectile
                         {
                             for (int i = 0; i < 10; i++)
                             {
-                                ParticleRegistry.SpawnSparkParticle(Tip, Main.rand.NextVector2CircularLimited(5f, 5f, .4f, 1f), Main.rand.Next(15, 20), Main.rand.NextFloat(1.4f, 1.7f), Color.Cyan);
-                                ParticleRegistry.SpawnBloomPixelParticle(Tip, RandomVelocity(1f, 1f, 4f), Main.rand.Next(30, 50), Main.rand.NextFloat(.1f, .3f), Color.Cyan, Color.White);
+                                ParticleRegistry.SpawnSparkParticle(Tip,
+                                    Main.rand.NextVector2CircularLimited(5f, 5f, .4f, 1f), Main.rand.Next(15, 20),
+                                    Main.rand.NextFloat(1.4f, 1.7f), Color.Cyan);
+                                ParticleRegistry.SpawnBloomPixelParticle(Tip, RandomVelocity(1f, 1f, 4f),
+                                    Main.rand.Next(30, 50), Main.rand.NextFloat(.1f, .3f), Color.Cyan, Color.White);
                             }
 
                             SoundID.DD2_LightningAuraZap.Play(Tip, 1.3f, .1f);
                             Charge = FulminaCharge.First;
                         }
+
                         break;
                     case FulminaCharge.First:
                         if (Time >= (Charge1 + Charge2))
                         {
                             for (int i = 0; i < 3; i++)
-                                ParticleRegistry.SpawnLightningArcParticle(Tip, Main.rand.NextVector2CircularLimited(60f, 60f, .5f, 1f), Main.rand.Next(8, 11), Main.rand.NextFloat(.1f, .4f), Color.Cyan);
+                                ParticleRegistry.SpawnLightningArcParticle(Tip,
+                                    Main.rand.NextVector2CircularLimited(60f, 60f, .5f, 1f), Main.rand.Next(8, 11),
+                                    Main.rand.NextFloat(.1f, .4f), Color.Cyan);
 
                             for (int i = 0; i < 20; i++)
                             {
-                                ParticleRegistry.SpawnSparkParticle(Tip, Main.rand.NextVector2CircularLimited(20f, 20f, .4f, 1f), Main.rand.Next(15, 20), Main.rand.NextFloat(1.4f, 1.7f), Color.Cyan);
-                                ParticleRegistry.SpawnBloomPixelParticle(Tip, RandomVelocity(1f, 1f, 5f), Main.rand.Next(40, 60), Main.rand.NextFloat(.1f, .3f), Color.Cyan, Color.White);
+                                ParticleRegistry.SpawnSparkParticle(Tip,
+                                    Main.rand.NextVector2CircularLimited(20f, 20f, .4f, 1f), Main.rand.Next(15, 20),
+                                    Main.rand.NextFloat(1.4f, 1.7f), Color.Cyan);
+                                ParticleRegistry.SpawnBloomPixelParticle(Tip, RandomVelocity(1f, 1f, 5f),
+                                    Main.rand.Next(40, 60), Main.rand.NextFloat(.1f, .3f), Color.Cyan, Color.White);
                             }
 
                             SoundID.DD2_LightningAuraZap.Play(Tip, 1.7f, 0f);
                             Charge = FulminaCharge.Second;
                         }
+
                         break;
                     case FulminaCharge.Second:
                         if (Time >= (Charge1 + Charge2 + Charge3))
                         {
                             for (int i = 0; i < 5; i++)
-                                ParticleRegistry.SpawnLightningArcParticle(Tip, Main.rand.NextVector2CircularLimited(80f, 80f, .5f, 1f), Main.rand.Next(8, 11), Main.rand.NextFloat(.2f, .5f), Color.Cyan);
+                                ParticleRegistry.SpawnLightningArcParticle(Tip,
+                                    Main.rand.NextVector2CircularLimited(80f, 80f, .5f, 1f), Main.rand.Next(8, 11),
+                                    Main.rand.NextFloat(.2f, .5f), Color.Cyan);
 
                             for (int i = 0; i < 30; i++)
                             {
-                                ParticleRegistry.SpawnSparkParticle(Tip, Main.rand.NextVector2CircularLimited(20f, 20f, .4f, 1f), Main.rand.Next(15, 22), Main.rand.NextFloat(1.4f, 1.7f), Color.Cyan);
-                                ParticleRegistry.SpawnBloomPixelParticle(Tip, RandomVelocity(1f, 2f, 7f), Main.rand.Next(40, 60), Main.rand.NextFloat(.1f, .3f), Color.Cyan, Color.White);
+                                ParticleRegistry.SpawnSparkParticle(Tip,
+                                    Main.rand.NextVector2CircularLimited(20f, 20f, .4f, 1f), Main.rand.Next(15, 22),
+                                    Main.rand.NextFloat(1.4f, 1.7f), Color.Cyan);
+                                ParticleRegistry.SpawnBloomPixelParticle(Tip, RandomVelocity(1f, 2f, 7f),
+                                    Main.rand.Next(40, 60), Main.rand.NextFloat(.1f, .3f), Color.Cyan, Color.White);
                             }
 
                             SoundID.DD2_LightningAuraZap.Play(Tip, 2.3f, -.1f);
                             Charge = FulminaCharge.Third;
                         }
+
                         break;
                     case FulminaCharge.Third:
                         if (Time >= (Charge1 + Charge2 + Charge3 + Charge4))
                         {
                             for (int i = 0; i < 6; i++)
-                                ParticleRegistry.SpawnLightningArcParticle(Tip, Main.rand.NextVector2CircularLimited(100f, 100f, .5f, 1f), Main.rand.Next(8, 11), Main.rand.NextFloat(.3f, .6f), Color.Cyan);
+                                ParticleRegistry.SpawnLightningArcParticle(Tip,
+                                    Main.rand.NextVector2CircularLimited(100f, 100f, .5f, 1f), Main.rand.Next(8, 11),
+                                    Main.rand.NextFloat(.3f, .6f), Color.Cyan);
 
                             for (int i = 0; i < 50; i++)
                             {
-                                ParticleRegistry.SpawnSparkParticle(Tip, Main.rand.NextVector2CircularLimited(20f, 20f, .4f, 1f), Main.rand.Next(20, 25), Main.rand.NextFloat(1.4f, 1.7f), Color.Cyan);
+                                ParticleRegistry.SpawnSparkParticle(Tip,
+                                    Main.rand.NextVector2CircularLimited(20f, 20f, .4f, 1f), Main.rand.Next(20, 25),
+                                    Main.rand.NextFloat(1.4f, 1.7f), Color.Cyan);
                             }
+
                             ParticleRegistry.SpawnBlurParticle(Tip, 30, .4f, 200f);
 
                             AdditionsSound.LightningStrike.Play(Tip, 1f, 0f);
                             Charge = FulminaCharge.Fourth;
                         }
+
                         break;
                     case FulminaCharge.Fourth:
 
                         if (Time % 2 == 1)
-                            ParticleRegistry.SpawnLightningArcParticle(Tip, Main.rand.NextVector2CircularLimited(200f, 200f, .5f, 1f), Main.rand.Next(8, 11), Main.rand.NextFloat(.4f, .8f), Color.Cyan);
+                            ParticleRegistry.SpawnLightningArcParticle(Tip,
+                                Main.rand.NextVector2CircularLimited(200f, 200f, .5f, 1f), Main.rand.Next(8, 11),
+                                Main.rand.NextFloat(.4f, .8f), Color.Cyan);
                         break;
                 }
 
@@ -181,9 +210,11 @@ public class CondereFulminaHoldout : ModProjectile
                     Time = 0f;
 
                     Projectile.MaxUpdates = 2;
-                    Projectile.velocity = Projectile.Center.SafeDirectionTo(Modded.MouseWorld) * (Charge == FulminaCharge.First || Charge == FulminaCharge.Second ? 22f : 34f);
+                    Projectile.velocity = Projectile.Center.SafeDirectionTo(Modded.MouseWorld) *
+                                          (Charge == FulminaCharge.First || Charge == FulminaCharge.Second ? 22f : 34f);
                     this.Sync();
                 }
+
                 break;
 
             case FulminaState.Firing:
@@ -206,15 +237,18 @@ public class CondereFulminaHoldout : ModProjectile
                         for (int j = 0; j < 3; j++)
                         {
                             float comp = InverseLerp(0f, 3, j);
-                            Vector2 dir = -Projectile.velocity.RotatedBy(Lerp(.5f, 0f, comp) * i) * Lerp(.4f, .8f, comp);
+                            Vector2 dir = -Projectile.velocity.RotatedBy(Lerp(.5f, 0f, comp) * i) *
+                                          Lerp(.4f, .8f, comp);
                             float scale = Lerp(1.1f, 2f, comp);
                             ParticleRegistry.SpawnSparkParticle(Tip, dir, 40, scale, Color.DeepSkyBlue);
                         }
                     }
                 }
+
                 after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, 1f, Projectile.rotation, 0, 90));
                 break;
         }
+
         Time++;
 
         TotalTime++;
@@ -222,10 +256,14 @@ public class CondereFulminaHoldout : ModProjectile
 
     public void SummonLightning(NPC target)
     {
-        Vector2 pos = target.Center - new Vector2(Main.rand.NextFloat(-150f, 150f), Main.screenHeight + Main.rand.NextFloat(-180f, 180f));
+        Vector2 pos = target.Center - new Vector2(Main.rand.NextFloat(-150f, 150f),
+            Main.screenHeight + Main.rand.NextFloat(-180f, 180f));
         Vector2 vel = Vector2.UnitY;
         int type = ModContent.ProjectileType<HonedLightning>();
-        HonedLightning lightning = Main.projectile[Projectile.NewProj(pos, vel, type, Projectile.damage, Projectile.knockBack, Owner.whoAmI, 0f, TotalTime)].As<HonedLightning>();
+        HonedLightning lightning = Main
+            .projectile[
+                Projectile.NewProj(pos, vel, type, Projectile.damage, Projectile.knockBack, Owner.whoAmI, 0f,
+                    TotalTime)].As<HonedLightning>();
         lightning.End = target.RandAreaInEntity();
         lightning.Sync();
     }
@@ -235,7 +273,10 @@ public class CondereFulminaHoldout : ModProjectile
         if (!this.RunLocal())
             return;
 
-        LightningChain chain = Main.projectile[Projectile.NewProj(Tip, Vector2.Zero, ModContent.ProjectileType<LightningChain>(), Projectile.damage, 0f, Projectile.owner, 0f, TotalTime)].As<LightningChain>();
+        LightningChain chain = Main
+            .projectile[
+                Projectile.NewProj(Tip, Vector2.Zero, ModContent.ProjectileType<LightningChain>(), Projectile.damage,
+                    0f, Projectile.owner, 0f, TotalTime)].As<LightningChain>();
 
         for (int i = 0; i < (Charge == FulminaCharge.First || Charge == FulminaCharge.Second ? 1 : 2); i++)
             SummonLightning(target);
@@ -247,6 +288,7 @@ public class CondereFulminaHoldout : ModProjectile
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D tex = Projectile.ThisProjectileTexture();
@@ -255,7 +297,8 @@ public class CondereFulminaHoldout : ModProjectile
         if (State == FulminaState.Firing)
             after?.DrawFancyAfterimages(tex, [Color.Cyan]);
 
-        Main.spriteBatch.DrawBetter(tex, Projectile.Center, null, Color.White, Projectile.rotation, orig, Projectile.scale);
+        Main.spriteBatch.DrawBetter(tex, Projectile.Center, null, Color.White, Projectile.rotation, orig,
+            Projectile.scale);
 
         return false;
     }

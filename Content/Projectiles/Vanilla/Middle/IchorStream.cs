@@ -9,10 +9,11 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 public class IchorStream : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.width =
-        Projectile.height = 32;
+            Projectile.height = 32;
         Projectile.hostile = false;
         Projectile.friendly = true;
         Projectile.penetrate = 5;
@@ -23,6 +24,7 @@ public class IchorStream : ModProjectile
     }
 
     public ref float Time => ref Projectile.ai[0];
+
     public override void AI()
     {
         Projectile.scale -= 0.002f;
@@ -35,7 +37,8 @@ public class IchorStream : ModProjectile
             if (Main.rand.NextBool(5))
             {
                 float scale = Main.rand.NextFloat(.4f, .8f);
-                ParticleRegistry.SpawnBloodParticle(Projectile.Center, Projectile.velocity.RotatedByRandom(.25f) * Main.rand.NextFloat(.3f, .6f),
+                ParticleRegistry.SpawnBloodParticle(Projectile.Center,
+                    Projectile.velocity.RotatedByRandom(.25f) * Main.rand.NextFloat(.3f, .6f),
                     Main.rand.Next(25, 40), scale, Color.Gold);
             }
 
@@ -54,6 +57,7 @@ public class IchorStream : ModProjectile
                 fall.velocity += Projectile.velocity / 2;
             }
         }
+
         Time++;
     }
 

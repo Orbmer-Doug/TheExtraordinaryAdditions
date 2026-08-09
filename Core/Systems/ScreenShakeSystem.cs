@@ -16,6 +16,7 @@ namespace TheExtraordinaryAdditions.Core.Systems;
 public readonly struct ScreenShake
 {
     public delegate float PowerDelegate(float progress);
+
     public const float DefaultRange = 1024f;
 
     public readonly float Power;
@@ -57,7 +58,10 @@ public sealed class ScreenShakeSystem : ModSystem
         }
 
         public float TimeLeft => MathF.Max(0f, EndTime - TimeSystem.RenderTime);
-        public float Progress => Style.LengthInSeconds > 0f ? MathHelper.Clamp((TimeSystem.RenderTime - StartTime) / Style.LengthInSeconds, 0f, 1f) : 1f;
+
+        public float Progress => Style.LengthInSeconds > 0f
+            ? MathHelper.Clamp((TimeSystem.RenderTime - StartTime) / Style.LengthInSeconds, 0f, 1f)
+            : 1f;
     }
 
     public static readonly float ScreenShakeStrength = AdditionsConfigClient.Instance.ScreenshakePower;

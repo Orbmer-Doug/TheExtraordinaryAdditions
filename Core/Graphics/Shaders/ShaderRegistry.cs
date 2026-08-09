@@ -7,17 +7,23 @@
 public static class ShaderRegistry
 {
     #region Filter Shorthands
+
     public static ManagedScreenShader GaussianBlur => AssetRegistry.GetFilter("GaussianBlur");
+
     #endregion Filter Shorthands
 
     #region Shader Shorthands
+
     public static ManagedShader PixelatedSightLine => AssetRegistry.GetShader("PixelatedSightLine");
     public static ManagedShader SpreadTelegraph => AssetRegistry.GetShader("SpreadTelegraph");
     public static ManagedShader Swing => AssetRegistry.GetShader("Swing");
     public static ManagedShader Forcefield => AssetRegistry.GetShader("Forcefield");
     public static ManagedShader ForcefieldLimited => AssetRegistry.GetShader("ForcefieldLimited");
     public static ManagedShader ForcefieldUnique => AssetRegistry.GetShader("ForcefieldUnique");
-    public static ManagedShader AdditiveFusableParticleEdgeShader => AssetRegistry.GetShader("AdditiveFusableParticleEdgeShader");
+
+    public static ManagedShader AdditiveFusableParticleEdgeShader =>
+        AssetRegistry.GetShader("AdditiveFusableParticleEdgeShader");
+
     public static ManagedShader AppearShader => AssetRegistry.GetShader("AppearShader");
     public static ManagedShader AsterlinDeathrayShader => AssetRegistry.GetShader("AsterlinDeathrayShader");
     public static ManagedShader BaseLaserShader => AssetRegistry.GetShader("BaseLaserShader");

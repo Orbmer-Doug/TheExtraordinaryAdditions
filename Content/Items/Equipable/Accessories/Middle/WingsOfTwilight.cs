@@ -13,6 +13,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
 public class WingsOfTwilight : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.WingsOfTwilight);
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(new Color(158, 149, 25));
@@ -42,6 +43,7 @@ public class WingsOfTwilight : ModItem
             player.GetArmorPenetration<MeleeDamageClass>() += 8;
             player.GetAttackSpeed<MeleeDamageClass>() += .08f;
         }
+
         if (dmg == DamageClass.Ranged)
             player.GetCritChance<RangedDamageClass>() += 10f;
         if (dmg == DamageClass.Magic)
@@ -54,7 +56,8 @@ public class WingsOfTwilight : ModItem
             int xOff = 4;
             if (player.direction == 1)
                 xOff = -40;
-            Dust dust = Main.dust[Dust.NewDust(new Vector2(player.position.X + player.width / 2 + xOff, player.position.Y + player.height / 2 - 15f),
+            Dust dust = Main.dust[Dust.NewDust(
+                new Vector2(player.position.X + player.width / 2 + xOff, player.position.Y + player.height / 2 - 15f),
                 30, 30, DustID.AmberBolt, 0f, 0f, 100, default, 1f)];
             dust.noGravity = true;
             dust.velocity *= 0.3f;
@@ -62,6 +65,7 @@ public class WingsOfTwilight : ModItem
                 dust.fadeIn = 2f;
             dust.shader = GameShaders.Armor.GetSecondaryShader(player.cWings, player);
         }
+
         player.noFallDmg = true;
     }
 

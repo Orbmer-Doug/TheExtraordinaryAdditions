@@ -18,11 +18,12 @@ public class CrystalShard : ModProjectile
     }
 
     private const int Lifetime = 600;
+
     public override void SetDefaults()
     {
         Projectile.ignoreWater = true;
         Projectile.width =
-        Projectile.height = 8;
+            Projectile.height = 8;
         Projectile.friendly = true;
         Projectile.alpha = 50;
         Projectile.scale = 1.2f;
@@ -34,6 +35,7 @@ public class CrystalShard : ModProjectile
 
     public ref float Time => ref Projectile.ai[0];
     public FancyAfterimages fancy;
+
     public override void AI()
     {
         fancy ??= new(5, () => Projectile.Center);
@@ -48,7 +50,9 @@ public class CrystalShard : ModProjectile
             ParticleRegistry.SpawnSparkleParticle(Projectile.RandAreaInEntity(), Vector2.Zero, Main.rand.Next(18, 22),
                 Main.rand.NextFloat(.3f, .45f), new(155, 44, 111), new(136, 29, 94), Main.rand.NextFloat(.9f, 1.2f));
         }
-        fancy?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.scale, Projectile.Opacity, Projectile.rotation, 0, 10, 4, 1f - Projectile.Opacity, null, false, -.1f));
+
+        fancy?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.scale, Projectile.Opacity,
+            Projectile.rotation, 0, 10, 4, 1f - Projectile.Opacity, null, false, -.1f));
 
         Projectile.velocity *= 0.985f;
         if (Time > 130f)
@@ -74,8 +78,10 @@ public class CrystalShard : ModProjectile
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         for (int i = 0; i < 8; i++)
-            ParticleRegistry.SpawnSparkParticle(Projectile.Center, Main.rand.NextVector2Circular(5f, 5f), Main.rand.Next(20, 30),
-                Main.rand.NextFloat(.35f, .45f), Color.Lerp(new(74, 128, 164), new(155, 44, 111), Main.rand.NextFloat()), false, true);
+            ParticleRegistry.SpawnSparkParticle(Projectile.Center, Main.rand.NextVector2Circular(5f, 5f),
+                Main.rand.Next(20, 30),
+                Main.rand.NextFloat(.35f, .45f),
+                Color.Lerp(new(74, 128, 164), new(155, 44, 111), Main.rand.NextFloat()), false, true);
     }
 
     public override bool PreDraw(ref Color lightColor)
@@ -83,9 +89,11 @@ public class CrystalShard : ModProjectile
         void draw()
         {
             Projectile.DrawBaseProjectile(Lighting.GetColor(Projectile.Center.ToTileCoordinates()));
-            fancy?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [new(0, 39, 65), new(0, 73, 121), new(74, 128, 164)],
-                Lighting.Brightness((int)Projectile.Center.X / 16, (int)Projectile.Center.Y / 16));
+            fancy?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(),
+                [new(0, 39, 65), new(0, 73, 121), new(74, 128, 164)],
+                Lighting.Brightness((int) Projectile.Center.X / 16, (int) Projectile.Center.Y / 16));
         }
+
         PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;
     }

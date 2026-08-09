@@ -22,8 +22,8 @@ public partial class Asterlin
         StateMachine.RegisterStateBehavior(AsterlinAIType.Barrage, DoBehavior_Barrage);
     }
 
-    public static int Barrage_AttackTime => CalUtils.SecondsToFrames(8f);
-    public static int Barrage_FadeTime => CalUtils.SecondsToFrames(.8f);
+    public static int Barrage_AttackTime => SecondsToFrames(8f);
+    public static int Barrage_FadeTime => SecondsToFrames(.8f);
     public static int Barrage_BeamRate => DifficultyBasedValue(30, 14, 13, 12, 10, 8);
     public static int Barrage_HoverTime => 40;
     public static int Barrage_BeamExpandTime => 44;

@@ -1,5 +1,4 @@
-﻿using CalamityMod.Items.Potions;
-using Terraria;
+﻿using Terraria;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
@@ -14,7 +13,6 @@ using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Late;
 using TheExtraordinaryAdditions.Content.NPCs.BossBars;
 using TheExtraordinaryAdditions.Core.Utilities;
-using static CalamityMod.DropHelper;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
@@ -23,6 +21,7 @@ public partial class Asterlin
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Asterlin_BossChecklist);
     public override string BossHeadTexture => AssetRegistry.GetTexturePath(AdditionsTexture.Asterlin_Head_Boss);
+
     public override void SetStaticDefaults()
     {
         NPCID.Sets.TrailingMode[NPC.type] = 3;
@@ -48,7 +47,7 @@ public partial class Asterlin
     {
         bestiaryEntry.Info.AddRange(
         [
-                BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Sky,
+            BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Sky,
             new FlavorTextBestiaryInfoElement(this.GetLocalizedValue("Bestiary"))
         ]);
     }
@@ -68,7 +67,10 @@ public partial class Asterlin
         NPC.boss = true;
         NPC.noGravity = false;
         NPC.noTileCollide = false;
-        NPC.HitSound = AssetRegistry.GetSound(AdditionsSound.AsterlinHit) with { Volume = 1f, PitchVariance = .2f, PitchRange = new(-.2f, 0f) };
+        NPC.HitSound = AssetRegistry.GetSound(AdditionsSound.AsterlinHit) with
+        {
+            Volume = 1f, PitchVariance = .2f, PitchRange = new(-.2f, 0f)
+        };
         NPC.DeathSound = null;
         NPC.value = Item.buyPrice(50) / 5f;
         NPC.BossBar = ModContent.GetInstance<AsterlinBossbar>();
@@ -85,17 +87,9 @@ public partial class Asterlin
 
     public const string LocalizedKey = "NPCs.Asterlin.";
 
-    public static int MaskID
-    {
-        get;
-        private set;
-    }
+    public static int MaskID { get; private set; }
 
-    public static int RelicID
-    {
-        get;
-        private set;
-    }
+    public static int RelicID { get; private set; }
 
     public override void Load()
     {
@@ -119,6 +113,7 @@ public partial class Asterlin
     // For any high speed attacks we dont want the hitbox to skip over players
     public int ExtraUpdates;
     public int NumUpdates;
+
     private static void MoreUpdates(On_NPC.orig_UpdateNPC orig, NPC self, int i)
     {
         if (self.type == ModContent.NPCType<Asterlin>())
@@ -136,6 +131,7 @@ public partial class Asterlin
     }
 
     public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position) => false;
+
     public override void BossHeadSlot(ref int index)
     {
         // Make the head icon disappear if invisible
@@ -147,10 +143,11 @@ public partial class Asterlin
     {
         // Unfortunately, theres no way to check the total amount of players between both worlds
         // And due to the shenanigans described in Asterlin.AbsorbingEnergy, it wont capture the correct amount of players
-        NPC.lifeMax = (int)(NPC.lifeMax * 0.8f * balance * bossAdjustment);
+        NPC.lifeMax = (int) (NPC.lifeMax * 0.8f * balance * bossAdjustment);
     }
 
-    public override void BossLoot(ref int potionType) => potionType = ModContent.ItemType<OmegaHealingPotion>();
+//TODO
+    public override void BossLoot(ref int potionType) => potionType = ItemID.AaronsBreastplate;
 
     public override void ModifyNPCLoot(NPCLoot npcLoot)
     {
@@ -165,11 +162,11 @@ public partial class Asterlin
             ModContent.ItemType<TesselesticMeltdown>(),
             ModContent.ItemType<LivingStarFlare>(),
         ];
-        normalRule.Add(CalamityStyle(NormalWeaponDropRateFraction, itemIDs));
+        normalRule.Add(DropHelper.PityStyle(DropHelper.NormalWeaponDropRateFraction, itemIDs));
         normalRule.Add(MaskID, 10);
 
         npcLoot.Add(ModContent.ItemType<LockedCyberneticSword>(), 10);
-        npcLoot.DefineConditionalDropSet(RevAndMaster).Add(RelicID);
+        npcLoot.DefineConditionalDropSet(new Conditions.IsMasterMode()).Add(RelicID);
         npcLoot.Add(ItemDropRule.MasterModeDropOnAllPlayers(ModContent.ItemType<TVRemote>()));
     }
 }

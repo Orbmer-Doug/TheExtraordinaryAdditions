@@ -11,14 +11,17 @@ public class AcceleratingLight : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
     public ref float Time => ref Projectile.ai[0];
+
     public bool HitTarget
     {
         get => Projectile.ai[1] == 1f;
         set => Projectile.ai[1] = value.ToInt();
     }
+
     public ref float MaxSpeed => ref Projectile.ai[2];
 
     public const int Life = 200;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 14;
@@ -35,10 +38,12 @@ public class AcceleratingLight : ModProjectile
     }
 
     public TrailPoints cache;
+
     public override void AI()
     {
         if (trail == null || trail.Disposed)
-            trail = new(c => Projectile.height / 2 * GetLerpBump(0f, .2f, 1f, .2f, c), (c, pos) => Color.Gold, null, 15);
+            trail = new(c => Projectile.height / 2 * GetLerpBump(0f, .2f, 1f, .2f, c), (c, pos) => Color.Gold, null,
+                15);
 
         float lifeRatio = GetLerpBump(0f, 20f, Life, Life - 20f, Time) * InverseLerp(0f, 30f, Projectile.timeLeft);
         Projectile.Opacity = lifeRatio;
@@ -64,6 +69,7 @@ public class AcceleratingLight : ModProjectile
     }
 
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -74,6 +80,7 @@ public class AcceleratingLight : ModProjectile
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.StreakMagma), 1);
             trail.DrawTrail(shader, cache.Points, 60);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;
     }

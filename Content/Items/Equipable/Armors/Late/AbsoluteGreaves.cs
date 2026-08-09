@@ -1,6 +1,4 @@
-﻿using CalamityMod.Items.Materials;
-using CalamityMod.Tiles.Furniture.CraftingStations;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Early;
@@ -14,11 +12,8 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Late;
 public class AbsoluteGreaves : ModItem, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AbsoluteGreaves);
-    public static int LegsSlotID
-    {
-        get;
-        private set;
-    }
+    public static int LegsSlotID { get; private set; }
+
     public override void SetStaticDefaults()
     {
         LegsSlotID = Item.legSlot;
@@ -51,11 +46,7 @@ public class AbsoluteGreaves : ModItem, ILocalizedModType, IModType
         recipe.AddIngredient(ModContent.ItemType<BlueLeggings>(), 1);
         recipe.AddIngredient(ModContent.ItemType<TremorSheathe>(), 1);
         recipe.AddIngredient(ItemID.SolarFlareLeggings, 1);
-        recipe.AddIngredient(ModContent.ItemType<LifeAlloy>(), 3);
-        recipe.AddIngredient(ModContent.ItemType<RuinousSoul>(), 5);
-        recipe.AddIngredient(ModContent.ItemType<AscendantSpiritEssence>(), 2);
-        recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 12);
-        recipe.AddTile(ModContent.TileType<CosmicAnvil>());
+        //TODO
         recipe.Register();
     }
 }

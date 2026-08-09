@@ -31,7 +31,7 @@ public partial class GlobalPlayer
     public float OldMouseWorldDistance;
 
     public bool CanUseMouseButton => !Main.mapFullscreen
-        && !Player.mouseInterface && !PlayerInput.WritingText && Main.hasFocus;
+                                     && !Player.mouseInterface && !PlayerInput.WritingText && Main.hasFocus;
 
     public void UpdateMouse()
     {
@@ -39,8 +39,10 @@ public partial class GlobalPlayer
         {
             TriggersPack trigger = PlayerInput.Triggers;
             MouseLeft = new(trigger.JustPressed.MouseLeft, trigger.Current.MouseLeft, trigger.JustReleased.MouseLeft);
-            MouseRight = new(trigger.JustPressed.MouseRight, trigger.Current.MouseRight, trigger.JustReleased.MouseRight);
-            MouseMiddle = new(trigger.JustPressed.MouseMiddle, trigger.Current.MouseMiddle, trigger.JustReleased.MouseMiddle);
+            MouseRight = new(trigger.JustPressed.MouseRight, trigger.Current.MouseRight,
+                trigger.JustReleased.MouseRight);
+            MouseMiddle = new(trigger.JustPressed.MouseMiddle, trigger.Current.MouseMiddle,
+                trigger.JustReleased.MouseMiddle);
 
             SafeMouseLeft = new(
                 trigger.JustPressed.MouseLeft && CanUseMouseButton,
@@ -58,10 +60,12 @@ public partial class GlobalPlayer
                 trigger.JustReleased.MouseMiddle && CanUseMouseButton);
 
             MouseScreen = new Vector2(PlayerInput.MouseX, PlayerInput.MouseY);
-            Vector2 transform = Vector2.Transform(MouseScreen, Matrix.Invert(Main.GameViewMatrix?.ZoomMatrix ?? Matrix.Identity));
+            Vector2 transform = Vector2.Transform(MouseScreen,
+                Matrix.Invert(Main.GameViewMatrix?.ZoomMatrix ?? Matrix.Identity));
             MouseWorld = transform + Main.screenPosition + (Main.screenPosition - Main.screenLastPosition);
-            if ((int)Player.gravDir == -1)
-                MouseWorld.Y = Main.screenPosition.Y + (Main.screenPosition - Main.screenLastPosition).Y + Main.screenHeight - transform.Y;
+            if ((int) Player.gravDir == -1)
+                MouseWorld.Y = Main.screenPosition.Y + (Main.screenPosition - Main.screenLastPosition).Y +
+                    Main.screenHeight - transform.Y;
 
             if (OldMouseWorld == null)
             {
@@ -69,6 +73,7 @@ public partial class GlobalPlayer
                 for (int i = 0; i < 15; i++)
                     OldMouseWorld[i] = MouseWorld;
             }
+
             for (int j = OldMouseWorld.Length - 1; j > 0; j--)
                 OldMouseWorld[j] = OldMouseWorld[j - 1];
             OldMouseWorld[0] = MouseWorld;

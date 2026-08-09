@@ -32,13 +32,18 @@ public sealed partial class StygainHeart
             float completion = 1f - InverseLerp(0f, totalTime, MassTimer);
             for (int i = 0; i < 6; i++)
             {
-                Vector2 pos = MassPosition + (MathHelper.TwoPi * i / 6 + ((MathHelper.TwoPi * completion * MassSpinDir) + MassSpinStart)).ToRotationVector2() * (completion * 400f);
-                Vector2 vel = pos.SafeDirectionTo(MassPosition).RotatedByRandom(.15f) * (Main.rand.NextFloat(1f, 6f) * completion);
+                Vector2 pos = MassPosition +
+                              (MathHelper.TwoPi * i / 6 +
+                               ((MathHelper.TwoPi * completion * MassSpinDir) + MassSpinStart)).ToRotationVector2() *
+                              (completion * 400f);
+                Vector2 vel = pos.SafeDirectionTo(MassPosition).RotatedByRandom(.15f) *
+                              (Main.rand.NextFloat(1f, 6f) * completion);
                 int life = Main.rand.Next(20, 40);
                 float scale = Main.rand.NextFloat(.4f, .6f);
                 Color col = Color.Crimson.Lerp(Color.Red, Main.rand.NextFloat(.4f, .6f)) * completion;
                 ParticleRegistry.SpawnHeavySmokeParticle(pos, vel, life, scale, col, .7f);
-                ParticleRegistry.SpawnHeavySmokeParticle(pos, vel * 1.3f, life, scale * 1.8f, col.Lerp(Color.OrangeRed, .2f), .5f, true, .1f);
+                ParticleRegistry.SpawnHeavySmokeParticle(pos, vel * 1.3f, life, scale * 1.8f,
+                    col.Lerp(Color.OrangeRed, .2f), .5f, true, .1f);
             }
         }
 
@@ -52,12 +57,14 @@ public sealed partial class StygainHeart
 
             for (int i = 0; i < 50; i++)
             {
-                Vector2 vel = (MathHelper.TwoPi * i / 50 + RandomRotation()).ToRotationVector2() * Main.rand.NextFloat(3f, 16f);
+                Vector2 vel = (MathHelper.TwoPi * i / 50 + RandomRotation()).ToRotationVector2() *
+                              Main.rand.NextFloat(3f, 16f);
 
                 ParticleRegistry.SpawnHeavySmokeParticle(MassPosition, vel * .2f, Main.rand.Next(70, 100),
                     Main.rand.NextFloat(.4f, 1f), Color.Crimson, Main.rand.NextFloat(.6f, .8f));
 
-                ParticleRegistry.SpawnBloomPixelParticle(MassPosition, vel, Main.rand.Next(50, 120), Main.rand.NextFloat(.4f, 1.1f), Color.DarkRed, Color.Crimson, null, 2f);
+                ParticleRegistry.SpawnBloomPixelParticle(MassPosition, vel, Main.rand.Next(50, 120),
+                    Main.rand.NextFloat(.4f, 1.1f), Color.DarkRed, Color.Crimson, null, 2f);
             }
 
             StartMakingMass = false;
@@ -105,7 +112,8 @@ public sealed partial class StygainHeart
         float posX = target.position.X + target.width / 2f - position.X;
         float posY = target.position.Y + target.height / 2f - position.Y;
 
-        NPC.rotation = NPC.rotation.AngleLerp(MathF.Atan2(posY, posX) + (posX.NonZeroSign() < 0 ? MathHelper.Pi : 0f), weight);
+        NPC.rotation = NPC.rotation.AngleLerp(MathF.Atan2(posY, posX) + (posX.NonZeroSign() < 0 ? MathHelper.Pi : 0f),
+            weight);
         NPC.spriteDirection = posX.NonZeroSign();
     }
 }

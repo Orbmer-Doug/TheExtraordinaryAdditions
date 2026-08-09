@@ -1,5 +1,4 @@
-﻿using CalamityMod.Items.Materials;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent;
@@ -53,9 +52,11 @@ public class AntiMatterCannon : ModItem
 
     public override bool CanShoot(Player player) => false;
 
-    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor,
+        Color itemColor, Vector2 origin, float scale)
     {
-        DrawInventoryCustomScale(spriteBatch, TextureAssets.Item[Type].Value, position, frame, drawColor, itemColor, origin, scale, 0.145f, new Vector2(0f, 0f));
+        DrawInventoryCustomScale(spriteBatch, TextureAssets.Item[Type].Value, position, frame, drawColor,
+            origin, scale, 0.145f, new Vector2(0f, 0f));
         return false;
     }
 
@@ -65,8 +66,7 @@ public class AntiMatterCannon : ModItem
         recipe.AddIngredient(ItemID.SniperRifle, 1);
         recipe.AddIngredient(ItemID.FragmentSolar, 12);
         recipe.AddIngredient(ItemID.LunarBar, 30);
-        recipe.AddIngredient(ModContent.ItemType<EssenceofSunlight>(), 12);
-        recipe.AddIngredient(ModContent.ItemType<DivineGeode>(), 14);
+        //TODO
         recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();
     }

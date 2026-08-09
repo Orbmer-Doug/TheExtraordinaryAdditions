@@ -12,6 +12,7 @@ public class SpoonShockwave : ModProjectile
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GlowParticleSmall);
 
     public const int Life = 150;
+
     public override void SetDefaults()
     {
         Projectile.width = 36;
@@ -31,6 +32,7 @@ public class SpoonShockwave : ModProjectile
     public Vector2 Size;
     public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(Size);
     public override void ReceiveExtraAI(BinaryReader reader) => Size = reader.ReadVector2();
+
     public override void AI()
     {
         Projectile.Opacity = GetLerpBump(0f, 30f, Life, Life - 50f, Time);
@@ -43,7 +45,8 @@ public class SpoonShockwave : ModProjectile
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
         Vector2 size = new(Size.X / 2, 10);
-        Rectangle rect = new((int)(Projectile.Center.X - size.X / 2), (int)(Projectile.Center.Y - size.Y / 2), (int)size.X, (int)size.Y);
+        Rectangle rect = new((int) (Projectile.Center.X - size.X / 2), (int) (Projectile.Center.Y - size.Y / 2),
+            (int) size.X, (int) size.Y);
         return rect.Intersects(targetHitbox);
     }
 
@@ -54,8 +57,10 @@ public class SpoonShockwave : ModProjectile
             Texture2D tex = Projectile.ThisProjectileTexture();
             Vector2 orig = tex.Size() / 2;
             for (float i = .9f; i < 1.3f; i += .1f)
-                Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Size * i), null, Color.White * Projectile.Opacity, 0f, orig);
+                Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Size * i), null,
+                    Color.White * Projectile.Opacity, 0f, orig);
         }
+
         PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.OverNPCs, BlendState.Additive);
 
         return false;

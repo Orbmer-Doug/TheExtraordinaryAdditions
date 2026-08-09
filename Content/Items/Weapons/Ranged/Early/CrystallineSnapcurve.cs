@@ -18,6 +18,7 @@ public class CrystallineSnapcurve : ModItem
     }
 
     public const int TotalTime = 100;
+
     public override void SetDefaults()
     {
         Item.damage = 50;
@@ -38,7 +39,7 @@ public class CrystallineSnapcurve : ModItem
         Item.value = AdditionsGlobalItem.RarityGreenBuyPrice;
         Item.rare = ItemRarityID.Green;
     }
-    
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(Color.LightCyan);

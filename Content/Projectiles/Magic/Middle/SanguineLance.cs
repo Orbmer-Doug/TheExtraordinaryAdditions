@@ -18,6 +18,7 @@ public class SanguineLance : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SanguineLance);
     private const int StartingLife = 200;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 18;
@@ -41,8 +42,8 @@ public class SanguineLance : ModProjectile
 
     public CurrentState State
     {
-        get => (CurrentState)Projectile.ai[0];
-        set => Projectile.ai[0] = (float)value;
+        get => (CurrentState) Projectile.ai[0];
+        set => Projectile.ai[0] = (float) value;
     }
 
     public ref float AccumulatedVel => ref Projectile.ai[1];
@@ -80,7 +81,8 @@ public class SanguineLance : ModProjectile
             if (Timer > (StartingLife - Slow))
             {
                 AccumulatedVel -= .6f;
-                Projectile.Opacity = Projectile.scale = 1f - InverseLerp(StartingLife - Slow, StartingLife, Timer, true);
+                Projectile.Opacity =
+                    Projectile.scale = 1f - InverseLerp(StartingLife - Slow, StartingLife, Timer, true);
                 Projectile.velocity *= .6f;
                 Projectile.extraUpdates = 1;
             }
@@ -89,17 +91,19 @@ public class SanguineLance : ModProjectile
                 Projectile.Opacity = InverseLerp(0f, 30f, Timer);
                 AccumulatedVel += Projectile.velocity.Length() * 0.05f;
             }
+
             Projectile.rotation = Projectile.velocity.ToRotation();
 
             Timer++;
             return;
         }
+
         Projectile.velocity *= 0.91f;
 
         if (State == CurrentState.HitEnemy)
         {
             // Stick to the target
-            NPC target = Main.npc[(int)EnemyID];
+            NPC target = Main.npc[(int) EnemyID];
 
             if (!target.active)
             {
@@ -117,13 +121,15 @@ public class SanguineLance : ModProjectile
                 offset += Projectile.velocity * .85f;
                 StickTime++;
             }
+
             AccumulatedVel -= 0.6f;
         }
 
         if (State == CurrentState.HitGround)
         {
             FlailAmt = MathHelper.Clamp(FlailAmt - 0.015f, 0f, 1f);
-            Projectile.rotation -= MathF.Sin(AccumulatedVel * (MathHelper.TwoPi * 2f)) * 0.2f * FlailAmt * Projectile.direction;
+            Projectile.rotation -= MathF.Sin(AccumulatedVel * (MathHelper.TwoPi * 2f)) * 0.2f * FlailAmt *
+                                   Projectile.direction;
             AccumulatedVel -= 0.6f;
         }
 
@@ -163,7 +169,8 @@ public class SanguineLance : ModProjectile
             if (i < 4)
                 ParticleRegistry.SpawnBloodStreakParticle(pos, Projectile.velocity.SafeNormalize(Vector2.Zero),
                     Main.rand.Next(30, 45), Main.rand.NextFloat(.4f, .5f), Color.DarkRed);
-            ParticleRegistry.SpawnGlowParticle(pos, Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.3f) * Main.rand.NextFloat(4f, 9f),
+            ParticleRegistry.SpawnGlowParticle(pos,
+                Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.3f) * Main.rand.NextFloat(4f, 9f),
                 Main.rand.Next(30, 50), Main.rand.NextFloat(20f, 30f), Color.DarkRed, .8f);
         }
 
@@ -184,7 +191,8 @@ public class SanguineLance : ModProjectile
         return State == CurrentState.Thrown ? null : false;
     }
 
-    public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
+    public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs,
+        List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
     {
         if (State == CurrentState.HitEnemy)
         {
@@ -198,7 +206,8 @@ public class SanguineLance : ModProjectile
 
     public float WidthFunct(float c)
     {
-        return OptimizedPrimitiveTrail.HemisphereWidthFunct(c, MathHelper.SmoothStep(Projectile.height * .9f, 0f, c) * Projectile.scale * 1.5f);
+        return OptimizedPrimitiveTrail.HemisphereWidthFunct(c,
+            MathHelper.SmoothStep(Projectile.height * .9f, 0f, c) * Projectile.scale * 1.5f);
     }
 
     public Color ColorFunct(SystemVector2 c, Vector2 position)
@@ -210,6 +219,7 @@ public class SanguineLance : ModProjectile
 
     public TrailPoints cache;
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -225,6 +235,7 @@ public class SanguineLance : ModProjectile
                 trail.DrawTrail(shader, cache.Points, 200, true);
             }
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 
         Texture2D texture = Projectile.ThisProjectileTexture();
@@ -239,10 +250,12 @@ public class SanguineLance : ModProjectile
         {
             Vector2 drawOffset = (MathHelper.TwoPi * i / 8 + Main.GlobalTimeWrappedHourly).ToRotationVector2() * 5f;
             Color col = Color.DarkRed with { A = 0 } * 0.95f * Animators.MakePoly(4f).OutFunction(Projectile.Opacity);
-            Main.spriteBatch.Draw(texture, drawPosition + drawOffset, null, col, Projectile.rotation, orig, Projectile.scale, 0, 0f);
+            Main.spriteBatch.Draw(texture, drawPosition + drawOffset, null, col, Projectile.rotation, orig,
+                Projectile.scale, 0, 0f);
         }
 
-        Main.EntitySpriteDraw(texture, pos, null, lightColor * Projectile.Opacity, Projectile.rotation, orig, Projectile.scale, 0, 0f);
+        Main.EntitySpriteDraw(texture, pos, null, lightColor * Projectile.Opacity, Projectile.rotation, orig,
+            Projectile.scale, 0, 0f);
         return false;
     }
 }

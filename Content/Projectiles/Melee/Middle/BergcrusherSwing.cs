@@ -25,9 +25,9 @@ public class BergcrusherSwing : BaseSwordSwing
     {
         if (SwingDir == SwingDirection.Down)
             return new PiecewiseCurve()
-            .Add(-1f, -1.2f, .45f, MakePoly(3f).InFunction)
-            .Add(-1.2f, 1f, 1f, MakePoly(5f).OutFunction)
-            .Evaluate(InverseLerp(0f, MaxTime, Time));
+                .Add(-1f, -1.2f, .45f, MakePoly(3f).InFunction)
+                .Add(-1.2f, 1f, 1f, MakePoly(5f).OutFunction)
+                .Evaluate(InverseLerp(0f, MaxTime, Time));
 
         return new PiecewiseCurve()
             .Add(-1f, -.8f, .45f, MakePoly(3f).InFunction)
@@ -54,7 +54,8 @@ public class BergcrusherSwing : BaseSwordSwing
 
     public RotatedRectangle BladeRect()
     {
-        Vector2 start = Rect().Bottom + PolarVector(53f, Projectile.rotation) + PolarVector(47f, Projectile.rotation - PiOver2);
+        Vector2 start = Rect().Bottom + PolarVector(53f, Projectile.rotation) +
+                        PolarVector(47f, Projectile.rotation - PiOver2);
         Vector2 end = start + PolarVector(66f, Projectile.rotation) + PolarVector(62f, Projectile.rotation - PiOver2);
         return new RotatedRectangle(66f, start, end);
     }
@@ -75,7 +76,8 @@ public class BergcrusherSwing : BaseSwordSwing
         if (Animation() >= .26f && !PlayedSound)
         {
             if (this.RunLocal())
-                Projectile.NewProj(Center, Projectile.velocity * 14f, ModContent.ProjectileType<Bergwave>(), (int)(Projectile.damage * .5f), .3f, Owner.whoAmI);
+                Projectile.NewProj(Center, Projectile.velocity * 14f, ModContent.ProjectileType<Bergwave>(),
+                    (int) (Projectile.damage * .5f), .3f, Owner.whoAmI);
             AdditionsSound.BraveIceSlash.Play(Projectile.Center, 1f, -.2f, .1f);
             PlayedSound = true;
         }
@@ -133,10 +135,12 @@ public class BergcrusherSwing : BaseSwordSwing
             Vector2 vel = -SwordDir * Main.rand.NextFloat(2f, 4f);
             int life = Main.rand.Next(19, 25);
             float scale = Main.rand.NextFloat(.4f, .8f);
-            Color color = MulticolorLerp(Main.rand.NextFloat(0.2f, 0.8f), Color.Cyan, Color.DeepSkyBlue, Color.CornflowerBlue, Color.Violet);
+            Color color = MulticolorLerp(Main.rand.NextFloat(0.2f, 0.8f), Color.Cyan, Color.DeepSkyBlue,
+                Color.CornflowerBlue, Color.Violet);
 
             ParticleRegistry.SpawnDustParticle(pos, vel, life, scale, color);
-            Dust.NewDustPerfect(pos + Main.rand.NextVector2Circular(30f, 30f), DustID.SilverCoin, vel, 0, default, Main.rand.NextFloat(.7f, .9f));
+            Dust.NewDustPerfect(pos + Main.rand.NextVector2Circular(30f, 30f), DustID.SilverCoin, vel, 0, default,
+                Main.rand.NextFloat(.7f, .9f));
         }
 
         // Account for flask
@@ -151,15 +155,18 @@ public class BergcrusherSwing : BaseSwordSwing
             Vector2 vel = SwordDir.RotatedByRandom(.31f) * Main.rand.NextFloat(1f, 5f);
             int life = Main.rand.Next(100, 125);
             float scale = Main.rand.NextFloat(50.2f, 60.9f);
-            Color color = MulticolorLerp(Main.rand.NextFloat(0.2f, 0.8f), Color.Cyan, Color.DeepSkyBlue, Color.CornflowerBlue, Color.Lerp(Color.Violet, Color.Blue, .5f), Color.DarkCyan);
+            Color color = MulticolorLerp(Main.rand.NextFloat(0.2f, 0.8f), Color.Cyan, Color.DeepSkyBlue,
+                Color.CornflowerBlue, Color.Lerp(Color.Violet, Color.Blue, .5f), Color.DarkCyan);
             ParticleRegistry.SpawnCloudParticle(start, vel, color, Color.DarkSlateBlue, life, scale, .8f);
-            Dust.NewDustPerfect(start, DustID.SilverCoin, vel * Main.rand.NextFloat(.4f, .6f), Main.rand.Next(20, 50), default, Main.rand.NextFloat(.8f, 1.5f));
+            Dust.NewDustPerfect(start, DustID.SilverCoin, vel * Main.rand.NextFloat(.4f, .6f), Main.rand.Next(20, 50),
+                default, Main.rand.NextFloat(.8f, 1.5f));
         }
 
         for (int i = 0; i < (npc.boss ? 4 : 2); i++)
         {
             if (this.RunLocal())
-                Projectile.NewProj(npc.RandAreaInEntity(), SwordDir.RotatedByRandom(.4f) * Main.rand.NextFloat(8f, 14f), ModContent.ProjectileType<BergIcicle>(), (int)(Projectile.damage * .3f), 0f, Projectile.owner);
+                Projectile.NewProj(npc.RandAreaInEntity(), SwordDir.RotatedByRandom(.4f) * Main.rand.NextFloat(8f, 14f),
+                    ModContent.ProjectileType<BergIcicle>(), (int) (Projectile.damage * .3f), 0f, Projectile.owner);
         }
 
         if (SwingDir == SwingDirection.Down)
@@ -178,9 +185,11 @@ public class BergcrusherSwing : BaseSwordSwing
             Vector2 vel = SwordDir.RotatedByRandom(.31f) * Main.rand.NextFloat(1f, 5f);
             int life = Main.rand.Next(100, 125);
             float scale = Main.rand.NextFloat(50.2f, 60.9f);
-            Color color = MulticolorLerp(Main.rand.NextFloat(0.2f, 0.8f), Color.Cyan, Color.DeepSkyBlue, Color.CornflowerBlue, Color.Lerp(Color.Violet, Color.Blue, .5f), Color.DarkCyan);
+            Color color = MulticolorLerp(Main.rand.NextFloat(0.2f, 0.8f), Color.Cyan, Color.DeepSkyBlue,
+                Color.CornflowerBlue, Color.Lerp(Color.Violet, Color.Blue, .5f), Color.DarkCyan);
             ParticleRegistry.SpawnCloudParticle(start, vel, color, Color.DarkSlateBlue, life, scale, .8f);
-            Dust.NewDustPerfect(start, DustID.SilverCoin, vel * Main.rand.NextFloat(.4f, .6f), Main.rand.Next(20, 50), default, Main.rand.NextFloat(.8f, 1.5f));
+            Dust.NewDustPerfect(start, DustID.SilverCoin, vel * Main.rand.NextFloat(.4f, .6f), Main.rand.Next(20, 50),
+                default, Main.rand.NextFloat(.8f, 1.5f));
         }
 
         AdditionsSound.ColdPunch.Play(Projectile.Center, .9f, 0f, .11f);

@@ -6,7 +6,6 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Early;
 using TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
@@ -28,11 +27,13 @@ public class AdditionsGlobalItem : GlobalItem
 
     public static event ModifyTooltipsDelegate ModifyTooltipsEvent;
 
-    public delegate bool PreDrawInInventoryDelegate(Item item, SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale);
+    public delegate bool PreDrawInInventoryDelegate(Item item, SpriteBatch spriteBatch, Vector2 position,
+        Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale);
 
     public static event PreDrawInInventoryDelegate PreDrawInInventoryEvent;
 
-    public delegate bool PreDrawInWorldDelegate(Item item, SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI);
+    public delegate bool PreDrawInWorldDelegate(Item item, SpriteBatch spriteBatch, Color lightColor, Color alphaColor,
+        ref float rotation, ref float scale, int whoAmI);
 
     public static event PreDrawInWorldDelegate PreDrawInWorldEvent;
 
@@ -62,7 +63,7 @@ public class AdditionsGlobalItem : GlobalItem
 
         bool result = true;
         foreach (Delegate d in CanUseItemEvent.GetInvocationList())
-            result &= ((CanItemDoActionWithPlayerDelegate)d).Invoke(item, player);
+            result &= ((CanItemDoActionWithPlayerDelegate) d).Invoke(item, player);
 
         return result;
     }
@@ -74,6 +75,7 @@ public class AdditionsGlobalItem : GlobalItem
     }
 
     #region Prices
+
     public static readonly int RarityWhiteBuyPrice = Item.buyPrice(0, 0, 10, 0);
 
     public static readonly int RarityBlueBuyPrice = Item.buyPrice(0, 0, 70, 0);
@@ -137,17 +139,21 @@ public class AdditionsGlobalItem : GlobalItem
                 {
                     return LaserRarityPrice;
                 }
+
                 if (rarity == ModContent.RarityType<UniqueRarity>())
                 {
                     return UniqueRarityPrice;
                 }
+
                 if (rarity == ModContent.RarityType<LegendaryRarity>())
                 {
                     return LegendaryRarityPrice;
                 }
+
                 return 0;
         }
     }
+
     #endregion Prices
 
     public override bool OnPickup(Item item, Player player)
@@ -161,6 +167,7 @@ public class AdditionsGlobalItem : GlobalItem
             if (Main.myPlayer == player.whoAmI)
                 player.HealEffect(5, true);
         }
+
         return true;
     }
 
@@ -169,7 +176,8 @@ public class AdditionsGlobalItem : GlobalItem
         ModifyTooltipsEvent?.Invoke(item, tooltips);
     }
 
-    public override bool PreDrawInWorld(Item item, SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
+    public override bool PreDrawInWorld(Item item, SpriteBatch spriteBatch, Color lightColor, Color alphaColor,
+        ref float rotation, ref float scale, int whoAmI)
     {
         Player player = Main.LocalPlayer;
 
@@ -179,12 +187,14 @@ public class AdditionsGlobalItem : GlobalItem
 
         bool result = true;
         foreach (Delegate d in PreDrawInWorldEvent.GetInvocationList())
-            result &= ((PreDrawInWorldDelegate)d).Invoke(item, spriteBatch, lightColor, alphaColor, ref rotation, ref scale, whoAmI);
+            result &= ((PreDrawInWorldDelegate) d).Invoke(item, spriteBatch, lightColor, alphaColor, ref rotation,
+                ref scale, whoAmI);
 
         return result;
     }
 
-    public override bool PreDrawInInventory(Item item, SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+    public override bool PreDrawInInventory(Item item, SpriteBatch spriteBatch, Vector2 position, Rectangle frame,
+        Color drawColor, Color itemColor, Vector2 origin, float scale)
     {
         // Use default behavior if the event has no subscribers.
         if (PreDrawInInventoryEvent is null)
@@ -192,7 +202,8 @@ public class AdditionsGlobalItem : GlobalItem
 
         bool result = true;
         foreach (Delegate d in PreDrawInInventoryEvent.GetInvocationList())
-            result &= ((PreDrawInInventoryDelegate)d).Invoke(item, spriteBatch, position, frame, drawColor, itemColor, origin, scale);
+            result &= ((PreDrawInInventoryDelegate) d).Invoke(item, spriteBatch, position, frame, drawColor, itemColor,
+                origin, scale);
 
         return result;
     }

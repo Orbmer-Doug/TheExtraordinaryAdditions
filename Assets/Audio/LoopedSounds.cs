@@ -16,6 +16,7 @@ public readonly struct AdditionsLoopedSound
         Volume = volume ?? (() => 1f);
         Pitch = pitch ?? (() => 0f);
     }
+
     public AdditionsLoopedSound(AdditionsSound sound, Func<float> volume = null, Func<float> pitch = null)
     {
         Style = AssetRegistry.GetSound(sound) with { MaxInstances = 0, PauseBehavior = PauseBehavior.PauseWithGame };
@@ -23,8 +24,11 @@ public readonly struct AdditionsLoopedSound
         Pitch = pitch ?? (() => 0f);
     }
 
-    public static bool NPCNotActive(NPC npc) => !npc.active || Main.gameMenu || Main.dedServ || !SoundEngine.IsAudioSupported;
-    public static bool ProjectileNotActive(Projectile proj) => !proj.active || Main.gameMenu || Main.dedServ || !SoundEngine.IsAudioSupported;
+    public static bool NPCNotActive(NPC npc) =>
+        !npc.active || Main.gameMenu || Main.dedServ || !SoundEngine.IsAudioSupported;
+
+    public static bool ProjectileNotActive(Projectile proj) =>
+        !proj.active || Main.gameMenu || Main.dedServ || !SoundEngine.IsAudioSupported;
 
     public readonly SoundStyle Style;
     public readonly Func<float> Volume;
@@ -39,6 +43,7 @@ public sealed class LoopedSoundManager : ModSystem
     {
         On_SoundEngine.Update += UpdateLoopedSounds;
     }
+
     public override void OnModUnload()
     {
         On_SoundEngine.Update -= UpdateLoopedSounds;
@@ -79,16 +84,19 @@ public sealed class LoopedSoundManager : ModSystem
         orig();
     }
 
-    public static LoopedSoundInstance CreateNew(AdditionsLoopedSound loopingSound, Func<bool> terminationCondition = null, Func<bool> activeCondition = null)
+    public static LoopedSoundInstance CreateNew(AdditionsLoopedSound loopingSound,
+        Func<bool> terminationCondition = null, Func<bool> activeCondition = null)
     {
         LoopedSoundInstance sound = new(loopingSound, terminationCondition ?? (() => false), activeCondition);
         LoopedSounds.Add(sound);
         return sound;
     }
 
-    public static LoopedSoundInstance CreateNew(AdditionsLoopedSound startingSound, AdditionsLoopedSound loopingSound, Func<bool> terminationCondition = null, Func<bool> activeCondition = null)
+    public static LoopedSoundInstance CreateNew(AdditionsLoopedSound startingSound, AdditionsLoopedSound loopingSound,
+        Func<bool> terminationCondition = null, Func<bool> activeCondition = null)
     {
-        LoopedSoundInstance sound = new(startingSound, loopingSound, terminationCondition ?? (() => false), activeCondition);
+        LoopedSoundInstance sound = new(startingSound, loopingSound, terminationCondition ?? (() => false),
+            activeCondition);
         LoopedSounds.Add(sound);
         return sound;
     }
@@ -103,54 +111,29 @@ public sealed class LoopedSoundInstance
     /// <summary>
     /// Useful for cases where a sound is emitted by an entity but should cease when that entity is gone
     /// </summary>
-    public Func<bool> TerminationCondition
-    {
-        get;
-    }
+    public Func<bool> TerminationCondition { get; }
 
-    public Func<bool> ActiveCondition
-    {
-        get;
-    }
+    public Func<bool> ActiveCondition { get; }
 
-    public SlotId StartingSoundSlot
-    {
-        get;
-        private set;
-    }
+    public SlotId StartingSoundSlot { get; private set; }
 
-    public SlotId LoopingSoundSlot
-    {
-        get;
-        private set;
-    }
+    public SlotId LoopingSoundSlot { get; private set; }
 
     public bool UsesStartingSound => startSound is not null;
 
-    public bool HasStartingSoundBeenStarted
-    {
-        get;
-        private set;
-    }
+    public bool HasStartingSoundBeenStarted { get; private set; }
 
-    public bool HasLoopSoundBeenStarted
-    {
-        get;
-        private set;
-    }
+    public bool HasLoopSoundBeenStarted { get; private set; }
 
-    public bool HasBeenStopped
-    {
-        get;
-        internal set;
-    }
+    public bool HasBeenStopped { get; internal set; }
 
     public bool IsBeingPlayed => SoundEngine.TryGetActiveSound(LoopingSoundSlot, out _);
 
     /// <summary>
     /// Do not use this constructor manually. Utilize <see cref="LoopedSoundManager.CreateNew(AdditionsLoopedSound, Func{bool}, Func{bool})"/>
     /// </summary>
-    internal LoopedSoundInstance(AdditionsLoopedSound loopingSound, Func<bool> terminationCondition, Func<bool> activeCondition = null)
+    internal LoopedSoundInstance(AdditionsLoopedSound loopingSound, Func<bool> terminationCondition,
+        Func<bool> activeCondition = null)
     {
         loopSound = loopingSound;
         TerminationCondition = terminationCondition;
@@ -162,7 +145,8 @@ public sealed class LoopedSoundInstance
     /// <summary>
     /// Do not use this constructor manually. Utilize <see cref="LoopedSoundManager.CreateNew(AdditionsLoopedSound, AdditionsLoopedSound, Func{bool}, Func{bool})"/>
     /// </summary>
-    internal LoopedSoundInstance(AdditionsLoopedSound startingSound, AdditionsLoopedSound loopingSound, Func<bool> terminationCondition, Func<bool> activeCondition = null)
+    internal LoopedSoundInstance(AdditionsLoopedSound startingSound, AdditionsLoopedSound loopingSound,
+        Func<bool> terminationCondition, Func<bool> activeCondition = null)
         : this(loopingSound, terminationCondition, activeCondition)
     {
         startSound = startingSound;
@@ -176,7 +160,8 @@ public sealed class LoopedSoundInstance
         // If a starting sound should be used, play that first, and wait for it to end before playing the looping sound
         if (!HasLoopSoundBeenStarted && isActive && !IsBeingPlayed)
         {
-            bool hasStartEnded = HasStartingSoundBeenStarted && (!SoundEngine.TryGetActiveSound(StartingSoundSlot, out ActiveSound s) || !s.IsPlaying);
+            bool hasStartEnded = HasStartingSoundBeenStarted &&
+                                 (!SoundEngine.TryGetActiveSound(StartingSoundSlot, out ActiveSound s) || !s.IsPlaying);
 
             if (UsesStartingSound && !HasStartingSoundBeenStarted)
             {
@@ -206,6 +191,7 @@ public sealed class LoopedSoundInstance
             else
                 s1.Resume();
         }
+
         if (SoundEngine.TryGetActiveSound(LoopingSoundSlot, out ActiveSound s2))
         {
             s2.Position = soundPosition;

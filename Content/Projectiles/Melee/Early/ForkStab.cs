@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.IO;
-using CalamityMod;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -58,16 +57,18 @@ public class ForkStab : ModProjectile
         writer.WriteVector2(offset);
         writer.WriteVector2(stabVec);
     }
+
     public override void ReceiveExtraAI(BinaryReader reader)
     {
         offset = reader.ReadVector2();
         stabVec = reader.ReadVector2();
     }
+
     public override void SetDefaults()
     {
         Projectile.friendly = true;
         Projectile.hostile = false;
-        Projectile.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
+        Projectile.DamageType = ModContent.GetInstance<MeleeNoSpeedDamageClass>();
         Projectile.tileCollide = false;
         Projectile.width = Projectile.height = 64;
         Projectile.penetrate = -1;
@@ -80,7 +81,8 @@ public class ForkStab : ModProjectile
     {
         if (Projectile.localAI[0] == 0f)
         {
-            Projectile.timeLeft = (int)(Owner.HeldItem.useAnimation * (1f / Owner.GetTotalAttackSpeed(Projectile.DamageType)));
+            Projectile.timeLeft =
+                (int) (Owner.HeldItem.useAnimation * (1f / Owner.GetTotalAttackSpeed(Projectile.DamageType)));
             MaxTimeLeft = Projectile.timeLeft;
             Projectile.localAI[0] = 1f;
         }
@@ -91,7 +93,7 @@ public class ForkStab : ModProjectile
         Projectile.velocity = Vector2.Normalize(Projectile.velocity);
         Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver4;
 
-        int stabTimer = (int)MaxTimeLeft - Projectile.timeLeft;
+        int stabTimer = (int) MaxTimeLeft - Projectile.timeLeft;
 
         if (!Fading)
         {
@@ -103,9 +105,11 @@ public class ForkStab : ModProjectile
                 {
                     if (this.RunLocal())
                     {
-                        Projectile.velocity = Owner.SafeDirectionTo(Owner.Additions().MouseWorld).RotatedByRandom(0.25f);
+                        Projectile.velocity =
+                            Owner.SafeDirectionTo(Owner.Additions().MouseWorld).RotatedByRandom(0.25f);
                         this.Sync();
                     }
+
                     stabVec = new Vector2(Main.rand.NextFloat(90, 150), 0);
                     hitNPCs.Clear();
                 }
@@ -114,29 +118,32 @@ public class ForkStab : ModProjectile
                 if (stabTimer < totalTime * 0.5f)
                 {
                     float lerper = stabTimer / (totalTime * 0.5f);
-                    offset = Vector2.Lerp(new Vector2(dist, 0), stabVec, Circ.OutFunction(lerper)).RotatedBy(Projectile.rotation - MathHelper.PiOver4);
+                    offset = Vector2.Lerp(new Vector2(dist, 0), stabVec, Circ.OutFunction(lerper))
+                        .RotatedBy(Projectile.rotation - MathHelper.PiOver4);
                 }
                 else
                 {
                     if (!PlayedSound)
                     {
                         afterImages.Add(new AfterimageData(Projectile.Center, Projectile.rotation, 20));
-                        SoundEngine.PlaySound(SoundID.DD2_GhastlyGlaivePierce with { Pitch = 1f, PitchVariance = .2f }, Owner.Center, null);
+                        SoundEngine.PlaySound(SoundID.DD2_GhastlyGlaivePierce with { Pitch = 1f, PitchVariance = .2f },
+                            Owner.Center, null);
                         PlayedSound = true;
                         this.Sync();
                     }
 
-                    float lerper = (stabTimer - totalTime * 0.5f) / (float)(totalTime * 0.5f);
-                    offset = Vector2.Lerp(stabVec, new Vector2(dist, 0), Circ.OutFunction(lerper)).RotatedBy(Projectile.rotation - MathHelper.PiOver4);
+                    float lerper = (stabTimer - totalTime * 0.5f) / (float) (totalTime * 0.5f);
+                    offset = Vector2.Lerp(stabVec, new Vector2(dist, 0), Circ.OutFunction(lerper))
+                        .RotatedBy(Projectile.rotation - MathHelper.PiOver4);
                 }
             }
             else
             {
                 PlayedSound = false;
                 AmountStabs++;
-                Projectile.timeLeft = (int)MaxTimeLeft;
+                Projectile.timeLeft = (int) MaxTimeLeft;
 
-                stretch = (Player.CompositeArmStretchAmount)Main.rand.Next(4);
+                stretch = (Player.CompositeArmStretchAmount) Main.rand.Next(4);
                 this.Sync();
             }
 
@@ -174,7 +181,8 @@ public class ForkStab : ModProjectile
         {
             for (int k = 0; k < 7; k++)
             {
-                Vector2 vel = Projectile.Center.DirectionTo(Owner.Center).RotatedByRandom(0.35f) * Main.rand.NextFloat(2f, 8f);
+                Vector2 vel = Projectile.Center.DirectionTo(Owner.Center).RotatedByRandom(0.35f) *
+                              Main.rand.NextFloat(2f, 8f);
                 Dust.NewDustPerfect(pos, DustID.Blood, vel, 0, default, Main.rand.NextFloat(1f, 1.4f));
             }
         }
@@ -182,8 +190,10 @@ public class ForkStab : ModProjectile
         {
             for (int k = 0; k < 10; k++)
             {
-                Vector2 vel = Projectile.Center.DirectionTo(Owner.Center).RotatedByRandom(0.35f) * Main.rand.NextFloat(5f, 12f);
-                ParticleRegistry.SpawnSparkParticle(pos, vel, Main.rand.Next(12, 18), Main.rand.NextFloat(.35f, .5f), Color.Chocolate);
+                Vector2 vel = Projectile.Center.DirectionTo(Owner.Center).RotatedByRandom(0.35f) *
+                              Main.rand.NextFloat(5f, 12f);
+                ParticleRegistry.SpawnSparkParticle(pos, vel, Main.rand.Next(12, 18), Main.rand.NextFloat(.35f, .5f),
+                    Color.Chocolate);
             }
         }
 
@@ -219,7 +229,8 @@ public class ForkStab : ModProjectile
             AfterimageData afterImage = afterImages[i];
 
             float opacity = MathHelper.Lerp(0.5f, 0f, 1f - afterImage.time / 15f);
-            Main.spriteBatch.Draw(tex, afterImage.pos - Main.screenPosition + off, null, Color.Red * 0.5f * opacity, afterImage.rot, tex.Size() / 2, scale, 0f, 0f);
+            Main.spriteBatch.Draw(tex, afterImage.pos - Main.screenPosition + off, null, Color.Red * 0.5f * opacity,
+                afterImage.rot, tex.Size() / 2, scale, 0f, 0f);
         }
 
         sb.Draw(tex, pos + off, null, Color.White * fade, rot, tex.Size() / 2, scale, 0, 0);

@@ -19,7 +19,7 @@ public class AnvilAndPropane : ModItem
         Item.width = 100;
         Item.height = 56;
         Item.useTime =
-        Item.useAnimation = 50;
+            Item.useAnimation = 50;
         Item.useStyle = ItemUseStyleID.Swing;
         Item.noMelee = true;
         Item.knockBack = .6f;
@@ -41,9 +41,11 @@ public class AnvilAndPropane : ModItem
         tooltips.ColorLocalization(new Color(189, 185, 175));
     }
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback)
     {
-        Projectile.NewProjectile(source, position, velocity * .5f, ModContent.ProjectileType<TheAnvil>(), damage, knockback, player.whoAmI, 0f);
+        Projectile.NewProjectile(source, position, velocity * .5f, ModContent.ProjectileType<TheAnvil>(), damage,
+            knockback, player.whoAmI, 0f);
         return true;
     }
 }

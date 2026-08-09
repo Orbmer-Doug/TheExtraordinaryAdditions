@@ -33,12 +33,12 @@ public class AdditionsNPCInfo : GlobalNPC
     public override void SendExtraAI(NPC npc, BitWriter bitWriter, BinaryWriter binaryWriter)
     {
         for (int i = 0; i < TotalExtraAISlots; i++)
-            binaryWriter.Write((float)ExtraAI[i]);
+            binaryWriter.Write((float) ExtraAI[i]);
     }
 
     public override void ReceiveExtraAI(NPC npc, BitReader bitReader, BinaryReader binaryReader)
     {
         for (int i = 0; i < TotalExtraAISlots; i++)
-            ExtraAI[i] = (float)binaryReader.ReadSingle();
+            ExtraAI[i] = (float) binaryReader.ReadSingle();
     }
 }

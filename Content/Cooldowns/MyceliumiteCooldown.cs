@@ -1,4 +1,4 @@
-﻿using CalamityMod.Cooldowns;
+﻿/*
 using Terraria.Localization;
 
 namespace TheExtraordinaryAdditions.Content.Cooldowns;
@@ -13,3 +13,6 @@ public class MyceliumiteCooldown : CooldownHandler
     public override Color CooldownStartColor => new(30, 100, 172);
     public override Color CooldownEndColor => new(95, 110, 255);
 }
+*/
+
+

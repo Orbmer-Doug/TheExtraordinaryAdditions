@@ -37,7 +37,7 @@ public class AbsoluteLeggingsDrawer : ModSystem
             AfterimageTarget = new(true, CreateScreenSizedTarget);
             AfterimageTargetPrevious = new(true, CreateScreenSizedTarget);
         });
-        
+
         RenderTargetManager.RenderTargetUpdateLoopEvent += PrepareAfterimageTarget;
         On_LegacyPlayerRenderer.DrawPlayers += DrawLegsTarget;
         On_PlayerDrawLayers.DrawPlayer_13_Leggings += DisallowLeggingDrawingIfNecessary;
@@ -58,23 +58,27 @@ public class AbsoluteLeggingsDrawer : ModSystem
         On_PlayerDrawLayers.DrawPlayer_13_Leggings -= DisallowLeggingDrawingIfNecessary;
     }
 
-    private void DrawLegsTarget(On_LegacyPlayerRenderer.orig_DrawPlayers orig, LegacyPlayerRenderer self, Camera camera, IEnumerable<Player> players)
+    private void DrawLegsTarget(On_LegacyPlayerRenderer.orig_DrawPlayers orig, LegacyPlayerRenderer self, Camera camera,
+        IEnumerable<Player> players)
     {
         if (anyoneIsUsingLeggings)
         {
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.AnisotropicWrap, DepthStencilState.None, camera.Rasterizer, null, camera.GameViewMatrix.TransformationMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.AnisotropicWrap,
+                DepthStencilState.None, camera.Rasterizer, null, camera.GameViewMatrix.TransformationMatrix);
 
             if (Main.LocalPlayer.cLegs != 0)
                 GameShaders.Armor.Apply(Main.LocalPlayer.cLegs, Main.LocalPlayer);
 
-            Main.spriteBatch.Draw(AfterimageTargetPrevious, Main.screenLastPosition - Main.screenPosition, LocalPlayerDrawManager.ShaderDrawAction is not null ? Color.Transparent : Color.White);
+            Main.spriteBatch.Draw(AfterimageTargetPrevious, Main.screenLastPosition - Main.screenPosition,
+                LocalPlayerDrawManager.ShaderDrawAction is not null ? Color.Transparent : Color.White);
             Main.spriteBatch.End();
         }
 
         orig(self, camera, players);
     }
 
-    private void DisallowLeggingDrawingIfNecessary(On_PlayerDrawLayers.orig_DrawPlayer_13_Leggings orig, ref PlayerDrawSet drawinfo)
+    private void DisallowLeggingDrawingIfNecessary(On_PlayerDrawLayers.orig_DrawPlayer_13_Leggings orig,
+        ref PlayerDrawSet drawinfo)
     {
         if (drawinfo.hideEntirePlayer || drawinfo.drawPlayer.dead)
             return;
@@ -86,13 +90,16 @@ public class AbsoluteLeggingsDrawer : ModSystem
         {
             // Use the same position calculation as DrawPlayerLeggings for consistency
             Vector2 playerPosition = new Vector2(
-                (int)(drawinfo.Position.X - Main.screenPosition.X - drawinfo.drawPlayer.bodyFrame.Width / 2 + drawinfo.drawPlayer.width / 2),
-                (int)(drawinfo.Position.Y - Main.screenPosition.Y + drawinfo.drawPlayer.height - drawinfo.drawPlayer.bodyFrame.Height + 4f)
+                (int) (drawinfo.Position.X - Main.screenPosition.X - drawinfo.drawPlayer.bodyFrame.Width / 2 +
+                       drawinfo.drawPlayer.width / 2),
+                (int) (drawinfo.Position.Y - Main.screenPosition.Y + drawinfo.drawPlayer.height -
+                    drawinfo.drawPlayer.bodyFrame.Height + 4f)
             ) + drawinfo.drawPlayer.legPosition + drawinfo.legVect;
 
             Rectangle outlineFrame = drawinfo.drawPlayer.legFrame;
 
-            DrawData outline = new(ArmorOutlineTexture, playerPosition, outlineFrame, Color.White, drawinfo.drawPlayer.legRotation, drawinfo.legVect, 1f, drawinfo.playerEffect)
+            DrawData outline = new(ArmorOutlineTexture, playerPosition, outlineFrame, Color.White,
+                drawinfo.drawPlayer.legRotation, drawinfo.legVect, 1f, drawinfo.playerEffect)
             {
                 shader = drawinfo.cLegs
             };
@@ -122,12 +129,17 @@ public class AbsoluteLeggingsDrawer : ModSystem
 
         var gd = Main.instance.GraphicsDevice;
 
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.AnisotropicClamp, DepthStencilState.Default, Main.Rasterizer, null, Matrix.Identity);
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.AnisotropicClamp,
+            DepthStencilState.Default, Main.Rasterizer, null, Matrix.Identity);
         gd.SetRenderTarget(AfterimageTarget);
         gd.Clear(Color.Transparent);
 
-        bool probablyUsingSniperEffects = Main.LocalPlayer.scope || Main.LocalPlayer.HeldMouseItem().type == ItemID.SniperRifle || Main.LocalPlayer.HeldMouseItem().type == ItemID.Binoculars;
-        if (!probablyUsingSniperEffects || CameraSystem.UnmodifiedCameraPosition.WithinRange(Main.screenPosition, Main.LocalPlayer.velocity.Length() + 60f))
+        bool probablyUsingSniperEffects = Main.LocalPlayer.scope ||
+                                          Main.LocalPlayer.HeldMouseItem().type == ItemID.SniperRifle ||
+                                          Main.LocalPlayer.HeldMouseItem().type == ItemID.Binoculars;
+        if (!probablyUsingSniperEffects ||
+            CameraSystem.UnmodifiedCameraPosition.WithinRange(Main.screenPosition,
+                Main.LocalPlayer.velocity.Length() + 60f))
             Main.spriteBatch.Draw(AfterimageTargetPrevious, Vector2.Zero, Color.White);
 
         DrawPlayerArmorToTarget();
@@ -168,8 +180,10 @@ public class AbsoluteLeggingsDrawer : ModSystem
 
             // Calculate position
             Vector2 position = new Vector2(
-                (int)(drawinfo.Position.X - Main.screenPosition.X - drawPlayer.bodyFrame.Width / 2 + drawPlayer.width / 2),
-                (int)(drawinfo.Position.Y - Main.screenPosition.Y + drawPlayer.height - drawPlayer.bodyFrame.Height + 4f)
+                (int) (drawinfo.Position.X - Main.screenPosition.X - drawPlayer.bodyFrame.Width / 2 +
+                       drawPlayer.width / 2),
+                (int) (drawinfo.Position.Y - Main.screenPosition.Y + drawPlayer.height - drawPlayer.bodyFrame.Height +
+                       4f)
             ) + drawPlayer.legPosition + drawinfo.legVect;
 
             // Determine texture and frame

@@ -43,11 +43,12 @@ public class SolemnLament : ModItem
 
     public override bool AltFunctionUse(Player player) => !player.HasBuff(ModContent.BuffType<EternalRestCooldown>());
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback)
     {
         if (player.altFunctionUse == 2)
         {
-            player.AddBuff(ModContent.BuffType<EternalRest>(), CalUtils.SecondsToFrames(10));
+            player.AddBuff(ModContent.BuffType<EternalRest>(), SecondsToFrames(10));
         }
         else
         {

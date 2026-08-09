@@ -6,6 +6,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 public class IchorStreamBlast : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.width = 72;

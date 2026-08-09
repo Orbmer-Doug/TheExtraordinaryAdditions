@@ -25,10 +25,10 @@ public class MonsterBanner : ModTile
         TileObjectData.newTile.Height = 3;
         TileObjectData.newTile.CoordinateHeights = [16, 16, 16];
         TileObjectData.newTile.StyleHorizontal = true;
-        TileObjectData.newTile.AnchorTop = new AnchorData((AnchorType)649, TileObjectData.newTile.Width, 0);
+        TileObjectData.newTile.AnchorTop = new AnchorData((AnchorType) 649, TileObjectData.newTile.Width, 0);
         TileObjectData.newTile.DrawYOffset = -2;
         TileObjectData.newAlternate.CopyFrom(TileObjectData.newTile);
-        TileObjectData.newAlternate.AnchorTop = new AnchorData((AnchorType)256, TileObjectData.newTile.Width, 0);
+        TileObjectData.newAlternate.AnchorTop = new AnchorData((AnchorType) 256, TileObjectData.newTile.Width, 0);
         TileObjectData.newAlternate.DrawYOffset = -10;
         TileObjectData.addAlternate(0);
         TileObjectData.addTile(Type);

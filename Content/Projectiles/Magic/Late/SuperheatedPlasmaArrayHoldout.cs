@@ -12,6 +12,7 @@ public class SuperheatedPlasmaArrayHoldout : ModProjectile, ILocalizedModType, I
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SuperheatedPlasmaArray);
     public Player Owner => Main.player[Projectile.owner];
     public ref float Time => ref Projectile.ai[0];
+
     public override void SetDefaults()
     {
         Projectile.width = 198;
@@ -26,6 +27,7 @@ public class SuperheatedPlasmaArrayHoldout : ModProjectile, ILocalizedModType, I
     }
 
     private const int ChargeUpTime = 120;
+
     public override void AI()
     {
         bool allowContinuedUse = Time % 12f != 11f || Owner.HeldItem.CheckManaBetter(Owner, Owner.HeldItem.mana, true);
@@ -43,7 +45,9 @@ public class SuperheatedPlasmaArrayHoldout : ModProjectile, ILocalizedModType, I
 
         if (this.RunLocal())
         {
-            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, (Owner.Additions().MouseWorld - Owner.MountedCenter).SafeNormalize(Vector2.Zero) * Projectile.Size.Length() * .3f, 0.3f);
+            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity,
+                (Owner.Additions().MouseWorld - Owner.MountedCenter).SafeNormalize(Vector2.Zero) *
+                Projectile.Size.Length() * .3f, 0.3f);
             if (Projectile.velocity != Projectile.oldVelocity)
                 Projectile.netUpdate = true;
         }
@@ -62,23 +66,31 @@ public class SuperheatedPlasmaArrayHoldout : ModProjectile, ILocalizedModType, I
         Vector2 tipOfGun = Owner.direction == 1 ? Projectile.RotHitbox().Right : Projectile.RotHitbox().Left;
         if (Time < ChargeUpTime)
         {
-            Vector2 pos = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.45f) * Main.rand.NextFloat(200f, 260f);
+            Vector2 pos = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.45f) *
+                Main.rand.NextFloat(200f, 260f);
             Vector2 vel = RandomVelocity(3f, 8f, 12f);
             int life = Main.rand.Next(14, 20);
-            ParticleRegistry.SpawnBloomPixelParticle(pos, vel, life, Main.rand.NextFloat(.4f, .8f), Color.Orange, Color.OrangeRed, tipOfGun, 1.5f, 9);
+            ParticleRegistry.SpawnBloomPixelParticle(pos, vel, life, Main.rand.NextFloat(.4f, .8f), Color.Orange,
+                Color.OrangeRed, tipOfGun, 1.5f, 9);
         }
+
         if (Time == ChargeUpTime)
         {
             AdditionsSound.etherealBlazeStart.Play(tipOfGun, 1.2f, .2f);
             for (float i = 1f; i < 1.5f; i += .1f)
-                ParticleRegistry.SpawnDetailedBlastParticle(tipOfGun, Vector2.Zero, Vector2.One * 110f * i, Vector2.Zero, (int)(17 * i), Color.Orange.Lerp(Color.OrangeRed, (i * 1.2f) - 1f), 0f, Color.OrangeRed, true);
+                ParticleRegistry.SpawnDetailedBlastParticle(tipOfGun, Vector2.Zero, Vector2.One * 110f * i,
+                    Vector2.Zero, (int) (17 * i), Color.Orange.Lerp(Color.OrangeRed, (i * 1.2f) - 1f), 0f,
+                    Color.OrangeRed, true);
 
             if (this.RunLocal())
-                Projectile.NewProj(tipOfGun, Vector2.Zero, ModContent.ProjectileType<SuperheatedPlasmaBeam>(), Projectile.damage, Projectile.knockBack, Projectile.owner, Projectile.whoAmI);
+                Projectile.NewProj(tipOfGun, Vector2.Zero, ModContent.ProjectileType<SuperheatedPlasmaBeam>(),
+                    Projectile.damage, Projectile.knockBack, Projectile.owner, Projectile.whoAmI);
         }
+
         if (Time > ChargeUpTime)
         {
-            slot ??= LoopedSoundManager.CreateNew(new(AdditionsSound.FireBeamLoop, () => 1.2f), () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
+            slot ??= LoopedSoundManager.CreateNew(new(AdditionsSound.FireBeamLoop, () => 1.2f),
+                () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
             slot.Update(Projectile.Center);
             Lighting.AddLight(tipOfGun, Color.OrangeRed.ToVector3() * 2f);
         }
@@ -87,6 +99,7 @@ public class SuperheatedPlasmaArrayHoldout : ModProjectile, ILocalizedModType, I
     }
 
     public LoopedSoundInstance slot;
+
     public override void OnKill(int timeLeft)
     {
         if (Time > ChargeUpTime)

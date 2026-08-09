@@ -40,9 +40,13 @@ public class EclipsedDuo : ModItem
     }
 
     public int Switch;
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback)
     {
-        EclipseWhip whip = Main.projectile[player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI)].As<EclipseWhip>();
+        EclipseWhip whip = Main
+            .projectile[player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI)]
+            .As<EclipseWhip>();
         whip.Moon = Switch == 1;
         Switch = (Switch + 1) % 2;
         NetMessage.SendData(MessageID.PlayerControls, -1, -1, null, player.whoAmI);

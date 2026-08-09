@@ -1,6 +1,4 @@
-﻿using CalamityMod;
-using CalamityMod.Buffs.StatBuffs;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
@@ -62,6 +60,109 @@ public static class CoreUtils
         mod.NPC.netSpam = 0;
     }
 
+    public static Rectangle GetCurrentFrame(this Item item, ref int frame, ref int frameCounter, int frameDelay,
+        int frameAmt, bool frameCounterUp = true)
+    {
+        if (frameCounter >= frameDelay)
+        {
+            frameCounter = -1;
+            frame = frame == frameAmt - 1 ? 0 : frame + 1;
+        }
+
+        if (frameCounterUp)
+            frameCounter++;
+        return new Rectangle(0, item.height * frame, item.width, item.height);
+    }
+
+    public static DamageClass GetBestClass(this Player player)
+    {
+        float bestDamage = 1f;
+        DamageClass bestClass = DamageClass.Generic;
+
+        float melee = player.GetTotalDamage<MeleeDamageClass>().Additive;
+        if (melee > bestDamage)
+        {
+            bestDamage = melee;
+            bestClass = DamageClass.Melee;
+        }
+
+        float ranged = player.GetTotalDamage<RangedDamageClass>().Additive;
+        if (ranged > bestDamage)
+        {
+            bestDamage = ranged;
+            bestClass = DamageClass.Ranged;
+        }
+
+        float magic = player.GetTotalDamage<MagicDamageClass>().Additive;
+        if (magic > bestDamage)
+        {
+            bestDamage = magic;
+            bestClass = DamageClass.Magic;
+        }
+
+        float summon = player.GetTotalDamage<SummonDamageClass>().Additive * .75f;
+        if (summon > bestDamage)
+        {
+            bestDamage = summon;
+            bestClass = DamageClass.Summon;
+        }
+
+        return bestClass;
+    }
+
+    public static Vector2 ClampMagnitude(this Vector2 v, float min, float max) =>
+        v.SafeNormalize(Vector2.UnitY) * MathHelper.Clamp(v.Length(), min, max);
+
+    public static bool IsAnEnemy(this NPC npc, bool allowStatues = true, bool checkDead = true, bool checkDamage = true)
+    {
+        if (npc is null || (!npc.active && (!checkDead || npc.life > 0)) || npc.townNPC || npc.friendly)
+            return false;
+        if (!allowStatues && npc.SpawnedFromStatue)
+            return false;
+        if (npc.lifeMax <= 5 || ((npc.defDamage <= 5 && checkDamage) && npc.lifeMax <= 5))
+            return false;
+        return true;
+    }
+
+    public static void TreasureBagLightAndDust(this Item item)
+    {
+        Lighting.AddLight(item.Center, Color.White.ToVector3() * 0.4f);
+
+        if (item.timeSinceItemSpawned % 12 == 0)
+        {
+            Vector2 center = item.Center + new Vector2(0f, item.height * -0.1f);
+            Vector2 direction = Main.rand.NextVector2CircularEdge(item.width * 0.6f, item.height * 0.6f);
+            float distance = 0.3f + Main.rand.NextFloat() * 0.5f;
+            Vector2 velocity = new Vector2(0f, -Main.rand.NextFloat() * 0.3f - 1.5f);
+
+            Dust dust = Dust.NewDustPerfect(center + direction * distance, DustID.SilverFlame, velocity);
+            dust.scale = 0.5f;
+            dust.fadeIn = 1.1f;
+            dust.noGravity = true;
+            dust.noLight = true;
+            dust.alpha = 0;
+        }
+    }
+
+    public static bool FinalExtraUpdate(this Projectile proj) => proj.numUpdates == -1;
+
+    public static void ExpandHitboxBy(this Projectile projectile, int width, int height)
+    {
+        projectile.position = projectile.Center;
+        projectile.width = width;
+        projectile.height = height;
+        projectile.position -= projectile.Size * 0.5f;
+    }
+
+    public static void ExpandHitboxBy(this Projectile projectile, int newSize) =>
+        projectile.ExpandHitboxBy(newSize, newSize);
+
+    public static void ExpandHitboxBy(this Projectile projectile, Vector2 newSize) =>
+        projectile.ExpandHitboxBy((int) newSize.X, (int) newSize.Y);
+
+    public static void ExpandHitboxBy(this Projectile projectile, float expandRatio) =>
+        projectile.ExpandHitboxBy((int) (projectile.width * expandRatio), (int) (projectile.height * expandRatio));
+
     public static int EstimateLightRadius(Vector3 lightColor, LightMaskMode medium = LightMaskMode.None,
         float minIntensityThreshold = 0.0185f, int maxRadius = 15)
     {
@@ -78,7 +179,7 @@ public static class CoreUtils
         };
 
         // Calculate steps for two-pass blur: intensity * decay^(2r) = threshold
-        int steps = (int)Math.Ceiling(Math.Log(minIntensityThreshold / maxIntensity) / Math.Log(decayRate));
+        int steps = (int) Math.Ceiling(Math.Log(minIntensityThreshold / maxIntensity) / Math.Log(decayRate));
         int radius = steps / 2; // Two passes, so radius is half the total steps
 
         return Math.Min(Math.Max(0, radius), maxRadius);
@@ -96,7 +197,7 @@ public static class CoreUtils
             _ => 0.91f
         };
 
-        return edgeIntensity / (float)Math.Pow(decayRate, desiredRadius);
+        return edgeIntensity / (float) Math.Pow(decayRate, desiredRadius);
     }
 
     public static string GetTerrariaItem(this int id) => "Terraria/Images/Item_" + id;
@@ -109,13 +210,13 @@ public static class CoreUtils
     public static T GetEnumValue<T>(int index) where T : Enum
     {
         Array values = Enum.GetValues(typeof(T));
-        return (T)values.GetValue(index - 1);
+        return (T) values.GetValue(index - 1);
     }
 
     public static T GetLastEnumValue<T>() where T : Enum
     {
         Array values = Enum.GetValues(typeof(T));
-        return (T)values.GetValue(values.Length - 1);
+        return (T) values.GetValue(values.Length - 1);
     }
 
     public static SlotId Play(this AdditionsSound sound, Vector2 position, float volume = 1f, float pitch = 0f,
@@ -265,12 +366,12 @@ public static class CoreUtils
 
             if (ToSize.HasValue && ToSize != null)
             {
-                Projectile.Resize((int)MathHelper.Lerp(Size.X, ToSize.Value.X, completion),
-                    (int)MathHelper.Lerp(Size.Y, ToSize.Value.Y, completion));
+                Projectile.Resize((int) MathHelper.Lerp(Size.X, ToSize.Value.X, completion),
+                    (int) MathHelper.Lerp(Size.Y, ToSize.Value.Y, completion));
             }
             else
             {
-                Projectile.Resize((int)Size.X, (int)Size.Y);
+                Projectile.Resize((int) Size.X, (int) Size.Y);
             }
 
             Lighting.AddLight(Projectile.Center,
@@ -389,7 +490,7 @@ public static class CoreUtils
             {
                 CombinedHooks.OnConsumeMana(player, item, amount);
                 player.statMana -= amount;
-                player.manaRegenDelay = (int)player.maxRegenDelay;
+                player.manaRegenDelay = (int) player.maxRegenDelay;
             }
 
             return true;
@@ -408,7 +509,7 @@ public static class CoreUtils
             {
                 CombinedHooks.OnConsumeMana(player, item, amount);
                 player.statMana -= amount;
-                player.manaRegenDelay = (int)player.maxRegenDelay;
+                player.manaRegenDelay = (int) player.maxRegenDelay;
             }
 
             return true;
@@ -437,7 +538,7 @@ public static class CoreUtils
         var tooltiped = tooltips.Where(x => x.Name.Contains("Tooltip") && x.Mod == "Terraria");
         foreach (var tooltip in tooltiped)
         {
-            int tooltipLineIndex = (int)char.GetNumericValue(tooltip.Name.Last());
+            int tooltipLineIndex = (int) char.GetNumericValue(tooltip.Name.Last());
             if (tooltipLineIndex >= lineToStart)
                 tooltip.OverrideColor = col;
         }
@@ -585,19 +686,6 @@ public static class CoreUtils
         NPCID.Sets.NPCBestiaryDrawOffset.Add(npc.Type, value);
     }
 
-    /// <summary>
-    /// Must be used every frame to sustain the close
-    /// </summary>
-    public static void MakeCalamityBossBarClose(this NPC npc)
-    {
-        if (Main.gameMenu)
-            return;
-        npc.Calamity().ShouldCloseHPBar = true;
-    }
-
-    public static void GrantBossEffectsBuff(this Player p) => p.AddBuff(ModContent.BuffType<BossEffects>(), 2);
-    public static void GrantInfiniteFlight(this Player p) => p.Calamity().infiniteFlight = true;
-
     #region Spawning
 
     /// <summary>
@@ -694,7 +782,8 @@ public static class CoreUtils
     public static int NewNPCBetter(this NPC npc, Vector2 pos, Vector2 vel, int type, int start = 0, float ai0 = 0f,
         float ai1 = 0f, float ai2 = 0f, float ai3 = 0f, int target = -1)
     {
-        int index = NPC.NewNPC(npc.GetSpawnSourceForNPCFromNPCAI(), (int)pos.X, (int)pos.Y, type, start, ai0, ai1, ai2,
+        int index = NPC.NewNPC(npc.GetSpawnSourceForNPCFromNPCAI(), (int) pos.X, (int) pos.Y, type, start, ai0, ai1,
+            ai2,
             ai3, target);
 
         if (index >= 0 && index < Main.maxNPCs)
@@ -861,7 +950,7 @@ public static class CoreUtils
         if (Main.rand.NextBool(5))
             mult += 0.2f;
 
-        Main.rainTime = (int)(Main.rainTime * mult);
+        Main.rainTime = (int) (Main.rainTime * mult);
         Main.raining = true;
         AdditionsNetcode.SyncWorld();
     }
@@ -944,7 +1033,7 @@ public static class CoreUtils
         increment = MathHelper.Clamp(increment, 0f, 1f);
 
         float segmentLength = 1f / (colors.Length - 1);
-        int segmentIndex = (int)(increment / segmentLength);
+        int segmentIndex = (int) (increment / segmentLength);
 
         if (segmentIndex >= colors.Length - 1)
             return colors[^1];
@@ -957,10 +1046,10 @@ public static class CoreUtils
         Color end = colors[segmentIndex + 1];
 
         // Perform the interpolation for each color channel
-        byte r = (byte)(start.R + (end.R - start.R) * segmentT);
-        byte g = (byte)(start.G + (end.G - start.G) * segmentT);
-        byte b = (byte)(start.B + (end.B - start.B) * segmentT);
-        byte a = (byte)(start.A + (end.A - start.A) * segmentT);
+        byte r = (byte) (start.R + (end.R - start.R) * segmentT);
+        byte g = (byte) (start.G + (end.G - start.G) * segmentT);
+        byte b = (byte) (start.B + (end.B - start.B) * segmentT);
+        byte a = (byte) (start.A + (end.A - start.A) * segmentT);
 
         return new Color(r, g, b, a);
     }
@@ -970,7 +1059,7 @@ public static class CoreUtils
     public static Color ColorSwap(Color firstColor, Color secondColor, float seconds)
     {
         float colorMe =
-            (float)((Math.Sin((double)(MathHelper.Pi * 2f / seconds) * Main.GlobalTimeWrappedHourly) + 1.0) * 0.5);
+            (float) ((Math.Sin((double) (MathHelper.Pi * 2f / seconds) * Main.GlobalTimeWrappedHourly) + 1.0) * 0.5);
         return Color.Lerp(firstColor, secondColor, colorMe);
     }
 
@@ -1045,8 +1134,9 @@ public static class CoreUtils
     {
         // Check whether the projectile's hitbox intersects the screen, accounting for the screen fluff setting
         int fluff = ProjectileID.Sets.DrawScreenCheckFluff[p.type];
-        Rectangle screenArea = new((int)Main.Camera.ScaledPosition.X - fluff, (int)Main.Camera.ScaledPosition.Y - fluff,
-            (int)Main.Camera.ScaledSize.X + fluff * 2, (int)Main.Camera.ScaledSize.Y + fluff * 2);
+        Rectangle screenArea = new((int) Main.Camera.ScaledPosition.X - fluff,
+            (int) Main.Camera.ScaledPosition.Y - fluff,
+            (int) Main.Camera.ScaledSize.X + fluff * 2, (int) Main.Camera.ScaledSize.Y + fluff * 2);
         return !screenArea.Intersects(p.Hitbox);
     }
 
@@ -1088,7 +1178,7 @@ public static class CoreUtils
     {
         float x = Main.maxTilesX / 4200f;
         x *= x;
-        return (float)((player.position.Y / 16f - (60f + 10f * x)) / (Main.worldSurface / 6.0)) < 1f;
+        return (float) ((player.position.Y / 16f - (60f + 10f * x)) / (Main.worldSurface / 6.0)) < 1f;
     }
 
     public static bool GiveIFrames(this Player player, int frames, bool blink = false)
@@ -1153,7 +1243,7 @@ public static class CoreUtils
 
     public static void StickyProjAI(this Projectile projectile, int timeLeft, bool findNewNPC = false)
     {
-        if ((int)projectile.ai[0] == 1)
+        if ((int) projectile.ai[0] == 1)
         {
             bool killProj = false;
             bool spawnDust = false;
@@ -1169,7 +1259,7 @@ public static class CoreUtils
             }
 
             //So AI knows what NPC it is sticking to
-            int npcIndex = (int)projectile.ai[1];
+            int npcIndex = (int) projectile.ai[1];
             NPC npc = Main.npc[npcIndex];
 
             //Kill projectile after so many seconds or if the NPC it is stuck to no longer exists

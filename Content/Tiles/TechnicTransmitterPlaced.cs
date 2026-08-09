@@ -119,7 +119,7 @@ public class TransmitterLightspeed : ModProjectile, IHasScreenShader
 
     public bool Reverse
     {
-        get => (int)Projectile.ai[1] == 1;
+        get => (int) Projectile.ai[1] == 1;
         set => Projectile.ai[1] = value.ToInt();
     }
 
@@ -181,9 +181,9 @@ public class TransmitterLightspeed : ModProjectile, IHasScreenShader
 
     public void ReleaseShader()
     {
-        if (!HasShader) 
+        if (!HasShader)
             return;
-        
+
         Shader.Deactivate();
         ScreenShaderPool.ReturnShader("AsterlinSpaceTravel", Shader);
         HasShader = false;
@@ -205,7 +205,7 @@ public class TransmitterLightspeed : ModProjectile, IHasScreenShader
         }
 
         float term = (c - 1f + percentageFromEnd) / percentageFromEnd;
-        return thickness * (float)Math.Sqrt(1f - term * term);
+        return thickness * (float) Math.Sqrt(1f - term * term);
     }
 
     public Color ColorFunct(SystemVector2 c, Vector2 pos) => Color.Cyan * InverseLerp(0f, 1.4f, Time);

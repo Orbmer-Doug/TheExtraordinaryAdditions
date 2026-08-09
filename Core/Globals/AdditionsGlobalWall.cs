@@ -24,7 +24,7 @@ public class AdditionsGlobalWall : GlobalWall
         int wallID = ParanoidTileRetrieval(x, y).WallType;
         bool result = false;
         foreach (Delegate d in IsWallUnbreakableEvent.GetInvocationList())
-            result |= ((WallConditionDelegate)d).Invoke(x, y, wallID);
+            result |= ((WallConditionDelegate) d).Invoke(x, y, wallID);
 
         return result;
     }

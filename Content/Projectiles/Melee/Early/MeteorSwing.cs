@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
@@ -19,7 +18,7 @@ public class MeteorSwing : BaseSwordSwing
 
     public int HitCounter
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[7];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[7];
         set => Projectile.AdditionsInfo().ExtraAI[7] = value;
     }
 
@@ -37,7 +36,7 @@ public class MeteorSwing : BaseSwordSwing
     {
         // Check for tiles
         Projectile.ownerHitCheck = true;
-        Projectile.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
+        Projectile.DamageType = ModContent.GetInstance<MeleeNoSpeedDamageClass>();
     }
 
     public override void SafeInitialize()
@@ -71,7 +70,8 @@ public class MeteorSwing : BaseSwordSwing
         {
             if (Time % 2 == 1)
             {
-                after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.scale, Projectile.Opacity, Projectile.rotation, Effects, 70, 2, 0f));
+                after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.scale, Projectile.Opacity,
+                    Projectile.rotation, Effects, 70, 2, 0f));
             }
         }
 
@@ -115,14 +115,17 @@ public class MeteorSwing : BaseSwordSwing
 
         for (int i = 0; i < 2; i++)
         {
-            Vector2 pos = Vector2.Lerp(Rect().Bottom + PolarVector(22f, Projectile.rotation - SwordRotation), Rect().Top, Main.rand.NextFloat());
+            Vector2 pos = Vector2.Lerp(Rect().Bottom + PolarVector(22f, Projectile.rotation - SwordRotation),
+                Rect().Top, Main.rand.NextFloat());
             Vector2 vel = -SwordDir * Main.rand.NextFloat(4f, 8f);
             int life = Main.rand.Next(19, 25);
             float scale = Main.rand.NextFloat(.4f, .8f);
             Color color = Color.Lerp(Color.OrangeRed, Color.Red, Main.rand.NextFloat(.2f, .6f));
 
             ParticleRegistry.SpawnSquishyPixelParticle(pos, vel, life * 3, scale * 2f, color, Color.White, 4);
-            ParticleRegistry.SpawnGlowParticle(Vector2.Lerp(Rect().Bottom + PolarVector(22f, Projectile.rotation - SwordRotation), Rect().Top, Main.rand.NextFloat()), vel, life, scale * 60f, color, .8f);
+            ParticleRegistry.SpawnGlowParticle(
+                Vector2.Lerp(Rect().Bottom + PolarVector(22f, Projectile.rotation - SwordRotation), Rect().Top,
+                    Main.rand.NextFloat()), vel, life, scale * 60f, color, .8f);
         }
 
         // Account for flask
@@ -138,9 +141,11 @@ public class MeteorSwing : BaseSwordSwing
             int life = Main.rand.Next(100, 125);
             float scale = Main.rand.NextFloat(1.2f, 1.9f);
             Color color = Color.OrangeRed.Lerp(Color.Orange, Main.rand.NextFloat(.2f, .5f));
-            ParticleRegistry.SpawnSquishyPixelParticle(start + Main.rand.NextVector2Circular(14f, 14f), vel * 2f, life / 2, scale * 1.5f, color, Color.White, 5);
-            ParticleRegistry.SpawnHeavySmokeParticle(start, vel, (int)(life * .5f), scale * .3f, color, .8f);
+            ParticleRegistry.SpawnSquishyPixelParticle(start + Main.rand.NextVector2Circular(14f, 14f), vel * 2f,
+                life / 2, scale * 1.5f, color, Color.White, 5);
+            ParticleRegistry.SpawnHeavySmokeParticle(start, vel, (int) (life * .5f), scale * .3f, color, .8f);
         }
+
         npc.velocity += SwordDir * Item.knockBack * npc.knockBackResist;
 
         int type = ModContent.ProjectileType<MeteorSpawn>();
@@ -148,7 +153,8 @@ public class MeteorSwing : BaseSwordSwing
         {
             HitCounter++;
             if (HitCounter % 3 == 0)
-                Projectile.NewProj(start, Vector2.Zero, type, Projectile.damage, Projectile.knockBack / 3, Projectile.owner);
+                Projectile.NewProj(start, Vector2.Zero, type, Projectile.damage, Projectile.knockBack / 3,
+                    Projectile.owner);
         }
 
         ScreenShakeSystem.New(new(.1f, .1f), start);
@@ -165,7 +171,8 @@ public class MeteorSwing : BaseSwordSwing
             int life = Main.rand.Next(100, 125);
             float scale = Main.rand.NextFloat(.9f, 1.5f);
             Color color = Color.BlueViolet;
-            ParticleRegistry.SpawnSquishyPixelParticle(start + Main.rand.NextVector2Circular(10f, 10f), vel, life, scale, color, Color.Violet);
+            ParticleRegistry.SpawnSquishyPixelParticle(start + Main.rand.NextVector2Circular(10f, 10f), vel, life,
+                scale, color, Color.Violet);
         }
 
         ScreenShakeSystem.New(new(.1f, .1f), start);
@@ -177,13 +184,14 @@ public class MeteorSwing : BaseSwordSwing
     {
         // Make it a crit if the strike was with the very tip
         if (new RotatedRectangle(30f, Rect().Top - PolarVector(10f, Projectile.rotation - SwordRotation),
-            Rect().Top + PolarVector(10f, Projectile.rotation - SwordRotation)).Intersects(target.Hitbox))
+                Rect().Top + PolarVector(10f, Projectile.rotation - SwordRotation)).Intersects(target.Hitbox))
         {
             modifiers.SetCrit();
         }
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         // Determine the effects for drawing. These must be done here otherwise silly things WILL happen.
@@ -208,7 +216,8 @@ public class MeteorSwing : BaseSwordSwing
         }
 
         // Not manually setting the rotation offset and sprite effects here caused a latency between frames where rarely a artifact would occur
-        after?.DrawFancySwordAfterimages(Tex, Projectile.Center, [Color.OrangeRed * 1.8f], origin, Effects, RotationOffset, Projectile.Opacity, Projectile.scale);
+        after?.DrawFancySwordAfterimages(Tex, Projectile.Center, [Color.OrangeRed * 1.8f], origin, Effects,
+            RotationOffset, Projectile.Opacity, Projectile.scale);
 
         Main.spriteBatch.Draw(Tex, Projectile.Center - Main.screenPosition, null, lightColor,
             Projectile.rotation + RotationOffset, origin, Projectile.scale, Effects, 0f);

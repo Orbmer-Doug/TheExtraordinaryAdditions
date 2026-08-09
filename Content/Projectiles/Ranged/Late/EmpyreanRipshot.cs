@@ -14,6 +14,7 @@ public class EmpyreanRipshot : ModProjectile
     public override string Texture => AssetRegistry.Invis;
     public ref float Time => ref Projectile.ai[0];
     public ref float Fade => ref Projectile.ai[1];
+
     public bool Hit
     {
         get => Projectile.ai[2] == 1f;
@@ -40,6 +41,7 @@ public class EmpyreanRipshot : ModProjectile
     }
 
     public Player Owner => Main.player[Projectile.owner];
+
     public override void AI()
     {
         if (trail == null || trail.Disposed)
@@ -69,12 +71,14 @@ public class EmpyreanRipshot : ModProjectile
         AdditionsSound.etherealHitBoom2.Play(Projectile.Center, 1.6f, 0f, .1f, 10);
         if (this.RunLocal())
         {
-            CosmicBlast blast = Main.projectile[Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<CosmicBlast>(),
-                (int)(Projectile.damage * 1.25f), Projectile.knockBack, Owner.whoAmI)].As<CosmicBlast>();
+            CosmicBlast blast = Main.projectile[Projectile.NewProj(Projectile.Center, Vector2.Zero,
+                ModContent.ProjectileType<CosmicBlast>(),
+                (int) (Projectile.damage * 1.25f), Projectile.knockBack, Owner.whoAmI)].As<CosmicBlast>();
             blast.Target = target;
             blast.Offset = Projectile.position - target.position;
             blast.Offset -= Projectile.velocity;
         }
+
         Hit = true;
     }
 
@@ -88,15 +92,17 @@ public class EmpyreanRipshot : ModProjectile
         Color color = MulticolorLerp(c.X, startingColor, middleColor, endColor);
 
         color *= trailOpacity;
-        color.A = (byte)(trailOpacity * 255);
+        color.A = (byte) (trailOpacity * 255);
         return color * Projectile.Opacity;
     }
 
     private float WidthFunction(float completionRatio) =>
-         Projectile.width * 0.6f * MathHelper.SmoothStep(0.6f, 1f, Utils.GetLerpValue(0f, 0.3f, completionRatio, true)) * Projectile.Opacity;
+        Projectile.width * 0.6f * MathHelper.SmoothStep(0.6f, 1f, Utils.GetLerpValue(0f, 0.3f, completionRatio, true)) *
+        Projectile.Opacity;
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints points = new(20);
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -110,6 +116,7 @@ public class EmpyreanRipshot : ModProjectile
 
             trail.DrawTrail(glow, points.Points);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.OverProjectiles);
         return false;
     }

@@ -1,8 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.IO;
-using CalamityMod;
-using CalamityMod.Items.Weapons.Melee;
 using Terraria;
 using Terraria.Graphics.Renderers;
 using Terraria.ID;
@@ -45,7 +43,7 @@ public class JudgeSwing : BaseSwordSwing
     {
         // Check for tiles
         Projectile.ownerHitCheck = true;
-        Projectile.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
+        Projectile.DamageType = ModContent.GetInstance<MeleeNoSpeedDamageClass>();
     }
 
     public override void SafeInitialize()
@@ -131,8 +129,10 @@ public class JudgeSwing : BaseSwordSwing
             int life = Main.rand.Next(20, 28);
             float scale = Main.rand.NextFloat(.2f, .9f);
             Color color = ColorFunct(SystemVector2.Zero, Vector2.Zero);
-            ParticleRegistry.SpawnBloomLineParticle(start + Main.rand.NextVector2Circular(10f, 10f), vel, life, scale, color);
+            ParticleRegistry.SpawnBloomLineParticle(start + Main.rand.NextVector2Circular(10f, 10f), vel, life, scale,
+                color);
         }
+
         npc.velocity += SwordDir * Item.knockBack * npc.knockBackResist;
 
         AdditionsSound.RoySpecial2.Play(start, .6f, 0f, .3f);
@@ -146,13 +146,15 @@ public class JudgeSwing : BaseSwordSwing
             int life = Main.rand.Next(20, 28);
             float scale = Main.rand.NextFloat(.2f, .9f);
             Color color = ColorFunct(SystemVector2.Zero, Vector2.Zero);
-            ParticleRegistry.SpawnBloomLineParticle(start + Main.rand.NextVector2Circular(10f, 10f), vel, life, scale, color);
+            ParticleRegistry.SpawnBloomLineParticle(start + Main.rand.NextVector2Circular(10f, 10f), vel, life, scale,
+                color);
         }
 
         AdditionsSound.RoySpecial2.Play(start, .6f, 0f, .3f);
     }
 
     public float WidthFunct(float c) => 66f * Projectile.scale;
+
     public Color ColorFunct(SystemVector2 c, Vector2 pos)
     {
         float opacity = InverseLerp(0.016f, 0.07f, AngularVelocity);
@@ -161,6 +163,7 @@ public class JudgeSwing : BaseSwordSwing
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints points = new(20);
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -194,11 +197,13 @@ public class JudgeSwing : BaseSwordSwing
         Texture2D tex = Splendor ? AssetRegistry.GetTexture(AdditionsTexture.SplendorIsJusticeW) : Tex;
         float rot = RotationOffset;
         SpriteEffects fx = Effects;
+
         void sword()
         {
             Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, null, Color.White * Projectile.Opacity,
                 Projectile.rotation + rot, origin, Projectile.scale, fx, 0f);
         }
+
         PixelationLayer layer = Splendor ? PixelationLayer.UnderPlayers : PixelationLayer.OverPlayers;
         LayeredDrawSystem.QueueDrawAction(sword, layer);
         PixelationSystem.QueuePrimitiveRenderAction(draw, layer);
@@ -214,6 +219,7 @@ public class JudgeSpear : ModProjectile
     public Vector2 Size = new Vector2(30, 126);
     public Vector2 Top => Projectile.Center + PolarVector(Size.Y / 2, Projectile.rotation - PiOver2);
     public Vector2 Bottom => Projectile.Center - PolarVector(Size.Y / 2, Projectile.rotation - PiOver2);
+
     public override void SetDefaults()
     {
         Projectile.Size = new(10);
@@ -226,32 +232,37 @@ public class JudgeSpear : ModProjectile
         Projectile.stopsDealingDamageAfterPenetrateHits = true;
         Projectile.DamageType = DamageClass.MeleeNoSpeed;
     }
+
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
+
     public ref float OldArmRot => ref Projectile.ai[1];
+
     public bool Thrown
     {
-        get => (int)Projectile.ai[2] == 1;
+        get => (int) Projectile.ai[2] == 1;
         set => Projectile.ai[2] = value.ToInt();
     }
+
     public int FadeTime
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[0];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[0];
         set => Projectile.AdditionsInfo().ExtraAI[0] = value;
     }
+
     public bool Hit
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[1] == 1;
+        get => (int) Projectile.AdditionsInfo().ExtraAI[1] == 1;
         set => Projectile.AdditionsInfo().ExtraAI[1] = value.ToInt();
     }
-    
+
     public float MeleeSpeed => Owner.GetTotalAttackSpeed(DamageClass.MeleeNoSpeed);
-    public int ReelTime => (int)(20 / MeleeSpeed);
-    public static readonly int ThrowTime = CalUtils.SecondsToFrames(4);
-    
+    public int ReelTime => (int) (20 / MeleeSpeed);
+    public static readonly int ThrowTime = SecondsToFrames(4);
+
     public Player Owner => Main.player[Projectile.owner];
     public GlobalPlayer Modded => Owner.Additions();
     public Vector2 Center => Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
@@ -270,7 +281,7 @@ public class JudgeSpear : ModProjectile
 
         Time++;
     }
-    
+
     public void DoReel()
     {
         float completion = InverseLerp(0f, ReelTime, Time);
@@ -279,21 +290,25 @@ public class JudgeSpear : ModProjectile
             Projectile.Kill();
             return;
         }
+
         if (this.RunLocal())
         {
-            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Center.SafeDirectionTo(Modded.MouseWorld), .9f);
+            Projectile.velocity =
+                Vector2.SmoothStep(Projectile.velocity, Center.SafeDirectionTo(Modded.MouseWorld), .9f);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
+
         Projectile.rotation = Projectile.velocity.ToRotation() + PiOver2;
-        
+
         Projectile.timeLeft = 22;
         Owner.SetDummyItemTime(2);
         Owner.heldProj = Projectile.whoAmI;
         Owner.ChangeDir(Projectile.direction);
 
         float vel = Projectile.velocity.ToRotation();
-        float reelAnim = MakePoly(3f).InOutFunction.Evaluate(vel, vel - (1.3f * Projectile.direction * Owner.gravDir), completion);
+        float reelAnim = MakePoly(3f).InOutFunction
+            .Evaluate(vel, vel - (1.3f * Projectile.direction * Owner.gravDir), completion);
         Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, reelAnim);
         OldArmRot = reelAnim;
         Projectile.Center = Owner.GetFrontHandPositionImproved() + Vector2.UnitY * Owner.gfxOffY;
@@ -334,6 +349,7 @@ public class JudgeSpear : ModProjectile
             HitEffects();
             fadeAway();
         }
+
         if (FadeTime >= 30)
             Projectile.Kill();
         return;
@@ -353,12 +369,12 @@ public class JudgeSpear : ModProjectile
 
     private void HitEffects()
     {
-        if (Hit) 
+        if (Hit)
             return;
-        
+
         if (this.RunLocal())
             Projectile.NewProj(Projectile.RotHitbox().Top, Vector2.Zero, ModContent.ProjectileType<JudgeKaboom>(),
-                (int)(Projectile.damage * .5f), 1f, Projectile.owner);
+                (int) (Projectile.damage * .5f), 1f, Projectile.owner);
         AdditionsSound.GenericExplo.Play(Top, .6f, 0f, .2f, 20);
         Hit = true;
         this.Sync();
@@ -370,13 +386,15 @@ public class JudgeSpear : ModProjectile
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D texture = Projectile.ThisProjectileTexture();
         Vector2 drawPosition = Projectile.Center - Main.screenPosition;
         Vector2 size = texture.Size();
-        Color col = Color.Lerp(Color.Yellow with { A = 0 } * Projectile.Opacity, Projectile.GetAlpha(lightColor), Projectile.Opacity);
-        
+        Color col = Color.Lerp(Color.Yellow with { A = 0 } * Projectile.Opacity, Projectile.GetAlpha(lightColor),
+            Projectile.Opacity);
+
         float fade = InverseLerp(30f, 0f, FadeTime);
         after?.DrawFancyAfterimages(texture, [Color.DarkOrange, Color.Orange, Color.Gold], fade);
         Main.EntitySpriteDraw(texture, drawPosition, null,
@@ -391,6 +409,7 @@ public class JudgeKaboom : ModProjectile
     public override string Texture => AssetRegistry.Invis;
 
     private const int Lifetime = 55;
+
     public override void SetDefaults()
     {
         Projectile.scale = 0f;
@@ -406,21 +425,22 @@ public class JudgeKaboom : ModProjectile
 
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
+
     public int TimeOffset
     {
-        get => (int)Projectile.ai[1];
+        get => (int) Projectile.ai[1];
         set => Projectile.ai[1] = value;
-    } 
+    }
 
     public override void AI()
     {
         if (Time == 0)
         {
             TimeOffset = Main.rand.Next(0, 360);
-            
+
             ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero,
                 40, 0f, Vector2.One, 0f, 280f, Color.White * .68f);
             for (int i = 0; i < 30; i++)
@@ -433,13 +453,14 @@ public class JudgeKaboom : ModProjectile
 
         Projectile.scale = MakePoly(5f).OutFunction.Evaluate(Time, 0,
             90, 0f, 190f);
-        Lighting.AddLight(Projectile.Center, Color.Yellow.ToVector3() * InverseLerp(0, Lifetime, Projectile.timeLeft) * 2f);
+        Lighting.AddLight(Projectile.Center,
+            Color.Yellow.ToVector3() * InverseLerp(0, Lifetime, Projectile.timeLeft) * 2f);
         Time++;
     }
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return CalUtils.CircularHitboxCollision(Projectile.Center, Projectile.scale, targetHitbox);
+        return CircularHitboxCollision(Projectile.Center, Projectile.scale, targetHitbox);
     }
 
     public override bool PreDraw(ref Color lightColor)
@@ -460,7 +481,9 @@ public class JudgeKaboom : ModProjectile
             Main.spriteBatch.DrawBetter(tex,
                 Projectile.Center, null, Color.White, 0f, Vector2.One / 2, Projectile.scale);
         }
-        PixelationSystem.QueueTextureRenderAction(render, PixelationLayer.UnderProjectiles, BlendState.AlphaBlend, AssetRegistry.GetShader("GabrielExplosion"));
+
+        PixelationSystem.QueueTextureRenderAction(render, PixelationLayer.UnderProjectiles, BlendState.AlphaBlend,
+            AssetRegistry.GetShader("GabrielExplosion"));
         return false;
     }
 }

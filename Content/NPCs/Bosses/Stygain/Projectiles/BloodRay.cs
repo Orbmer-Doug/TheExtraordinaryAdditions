@@ -37,6 +37,7 @@ public class BloodRay : ProjOwnedByNPC<StygainHeart>
     public ref float Time => ref Projectile.AdditionsInfo().ExtraAI[0];
 
     private const int Lifetime = 400;
+
     public override void OnHitPlayer(Player target, Player.HurtInfo info)
     {
         StygainHeart.ApplyLifesteal(this, target, info.Damage);
@@ -63,6 +64,7 @@ public class BloodRay : ProjOwnedByNPC<StygainHeart>
                     barrier.ai[0] += .1f;
                     barrier.ai[2] = 1;
                 }
+
                 Projectile.Kill();
             }
         }
@@ -84,7 +86,8 @@ public class BloodRay : ProjOwnedByNPC<StygainHeart>
         {
             if (i % 4 == 3)
             {
-                ParticleRegistry.SpawnBloodStreakParticle(Projectile.Center, Projectile.velocity.SafeNormalize(Vector2.Zero),
+                ParticleRegistry.SpawnBloodStreakParticle(Projectile.Center,
+                    Projectile.velocity.SafeNormalize(Vector2.Zero),
                     Main.rand.Next(16, 30), Main.rand.NextFloat(.2f, .5f), Color.DarkRed);
             }
 
@@ -94,13 +97,14 @@ public class BloodRay : ProjOwnedByNPC<StygainHeart>
             float scale = Main.rand.NextFloat(.2f, .5f);
             Color col = Color.Crimson;
             ParticleRegistry.SpawnGlowParticle(pos, vel, time, scale * 1.25f, col);
-            ParticleRegistry.SpawnCloudParticle(pos, vel, col, Color.DarkRed, time, Projectile.width * scale * 2f, Main.rand.NextFloat(.5f, 1f));
+            ParticleRegistry.SpawnCloudParticle(pos, vel, col, Color.DarkRed, time, Projectile.width * scale * 2f,
+                Main.rand.NextFloat(.5f, 1f));
         }
     }
 
     internal Color ColorFunction(SystemVector2 completionRatio, Vector2 position)
     {
-        float fadeOpacity = (float)Math.Sqrt(Projectile.timeLeft / 100f);
+        float fadeOpacity = (float) Math.Sqrt(Projectile.timeLeft / 100f);
         return Color.Red * fadeOpacity;
     }
 
@@ -111,6 +115,7 @@ public class BloodRay : ProjOwnedByNPC<StygainHeart>
 
     public TrailPoints cache;
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -121,6 +126,7 @@ public class BloodRay : ProjOwnedByNPC<StygainHeart>
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.StreakMagma), 1);
             trail.DrawTrail(shader, cache.Points, 30);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 
         SpriteEffects direction = Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;

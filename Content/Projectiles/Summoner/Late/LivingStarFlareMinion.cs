@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -32,7 +31,7 @@ public class LivingStarFlareMinion : ModProjectile
         Projectile.minionSlots = 1f;
         Projectile.penetrate = -1;
         Projectile.width =
-        Projectile.height = 32;
+            Projectile.height = 32;
         Projectile.scale = 0;
         Projectile.DamageType = DamageClass.Summon;
         Projectile.netImportant = true;
@@ -44,9 +43,10 @@ public class LivingStarFlareMinion : ModProjectile
     public ref float OrbitOffsetAngle => ref Projectile.ai[0];
     public ref float OrbitSquish => ref Projectile.ai[1];
     public ref float OrbitRadius => ref Projectile.ai[2];
+
     public int Time
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[0];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[0];
         set => Projectile.AdditionsInfo().ExtraAI[0] = value;
     }
 
@@ -57,6 +57,7 @@ public class LivingStarFlareMinion : ModProjectile
             Modded.Flare = false;
             return;
         }
+
         Owner.AddBuff(ModContent.BuffType<LittleStar>(), 3600);
         if (Modded.Flare)
             Projectile.timeLeft = 2;
@@ -72,7 +73,8 @@ public class LivingStarFlareMinion : ModProjectile
             this.Sync();
         }
 
-        Vector2 orbitDestination = Owner.Center + OrbitOffsetAngle.ToRotationVector2() * OrbitRadius * new Vector2(1f, OrbitSquish);
+        Vector2 orbitDestination =
+            Owner.Center + OrbitOffsetAngle.ToRotationVector2() * OrbitRadius * new Vector2(1f, OrbitSquish);
         Projectile.SmoothFlyNear(orbitDestination, Projectile.Opacity * 0.04f, 1f - Projectile.Opacity * 0.13f);
         OrbitOffsetAngle += MathHelper.TwoPi / OrbitRadius * InverseLerp(0f, 90f, Time);
 
@@ -87,7 +89,8 @@ public class LivingStarFlareMinion : ModProjectile
                 AdditionsSound.HeavyLaserBlast.Play(Projectile.Center, .6f, -.1f, 0f, 20);
                 if (this.RunLocal())
                     Projectile.NewProj(Projectile.Center, Projectile.SafeDirectionTo(Target.Center),
-                        ModContent.ProjectileType<LivingStarBeam>(), Projectile.damage, Projectile.knockBack, Owner.whoAmI, Projectile.whoAmI, Target.whoAmI);
+                        ModContent.ProjectileType<LivingStarBeam>(), Projectile.damage, Projectile.knockBack,
+                        Owner.whoAmI, Projectile.whoAmI, Target.whoAmI);
             }
         }
 
@@ -104,12 +107,13 @@ public class LivingStarFlareMinion : ModProjectile
         fireball.TrySetParameter("time", Main.GlobalTimeWrappedHourly * (0.04f + 0.32f));
         fireball.TrySetParameter("opacity", Projectile.Opacity);
 
-        Main.spriteBatch.EnterShaderRegion(BlendState.AlphaBlend, fireball.Effect);
+        Main.spriteBatch.EnterShaderRegion(fireball.Effect);
         Vector2 drawPos = Projectile.Center - Main.screenPosition;
         Texture2D invis = AssetRegistry.GetTexture(AdditionsTexture.Invisible);
         fireball.Render();
-        Main.spriteBatch.Draw(invis, drawPos, null, Color.White * Projectile.Opacity, 0f, invis.Size() * 0.5f, Projectile.scale * 100f, SpriteEffects.None, 0f);
-        Main.spriteBatch.ExitShaderRegion();
+        Main.spriteBatch.Draw(invis, drawPos, null, Color.White * Projectile.Opacity, 0f, invis.Size() * 0.5f,
+            Projectile.scale * 100f, SpriteEffects.None, 0f);
+        Main.spriteBatch.ResetToDefault();
         return false;
     }
 }
@@ -117,6 +121,7 @@ public class LivingStarFlareMinion : ModProjectile
 public class LivingStarBeam : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 30;
@@ -141,24 +146,28 @@ public class LivingStarBeam : ModProjectile
 
     public int OwnerIndex
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
+
     public int TargetIndex
     {
-        get => (int)Projectile.ai[1];
+        get => (int) Projectile.ai[1];
         set => Projectile.ai[1] = value;
     }
+
     public int Time
     {
-        get => (int)Projectile.ai[2];
+        get => (int) Projectile.ai[2];
         set => Projectile.ai[2] = value;
     }
+
     public BeamState CurrentState
     {
-        get => (BeamState)Projectile.AdditionsInfo().ExtraAI[0];
-        set => Projectile.AdditionsInfo().ExtraAI[0] = (int)value;
+        get => (BeamState) Projectile.AdditionsInfo().ExtraAI[0];
+        set => Projectile.AdditionsInfo().ExtraAI[0] = (int) value;
     }
+
     public Vector2 TargetOffset
     {
         get => new Vector2(Projectile.AdditionsInfo().ExtraAI[1], Projectile.AdditionsInfo().ExtraAI[2]);
@@ -168,6 +177,7 @@ public class LivingStarBeam : ModProjectile
             Projectile.AdditionsInfo().ExtraAI[2] = value.Y;
         }
     }
+
     public bool Init
     {
         get => Projectile.AdditionsInfo().ExtraAI[3] == 1;
@@ -175,6 +185,7 @@ public class LivingStarBeam : ModProjectile
     }
 
     public override bool ShouldUpdatePosition() => false;
+
     public override void AI()
     {
         if (trail == null || trail.Disposed)
@@ -188,6 +199,7 @@ public class LivingStarBeam : ModProjectile
             Projectile.Kill();
             return;
         }
+
         NPC target = Main.npc?[TargetIndex] ?? null;
 
         if (!Init)
@@ -199,7 +211,8 @@ public class LivingStarBeam : ModProjectile
         if (target != null && target.active)
         {
             float comp = InverseLerp(0f, 40f, Time);
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(target.position + TargetOffset), comp);
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity,
+                Projectile.SafeDirectionTo(target.position + TargetOffset), comp);
             Projectile.rotation = Projectile.velocity.ToRotation();
         }
 
@@ -216,6 +229,7 @@ public class LivingStarBeam : ModProjectile
                     CurrentState = BeamState.Fading;
                     this.Sync();
                 }
+
                 break;
             case BeamState.Fading:
                 float fadeComp = InverseLerp(0f, FadeTime, Time);
@@ -226,9 +240,12 @@ public class LivingStarBeam : ModProjectile
                     Projectile.Kill();
                     return;
                 }
+
                 break;
         }
-        points.SetPoints(Projectile.Center.GetLaserControlPoints(Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero) * MaxLength, 80));
+
+        points.SetPoints(Projectile.Center.GetLaserControlPoints(
+            Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero) * MaxLength, 80));
 
         Time++;
     }
@@ -252,6 +269,7 @@ public class LivingStarBeam : ModProjectile
 
     public TrailPoints points = new(80);
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -261,9 +279,11 @@ public class LivingStarBeam : ModProjectile
 
             ManagedShader shader = AssetRegistry.GetShader("DisintegrationBeamShader");
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.StreakMagma), 1, SamplerState.AnisotropicWrap);
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.VoronoiShapes), 2, SamplerState.AnisotropicWrap);
+            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.VoronoiShapes), 2,
+                SamplerState.AnisotropicWrap);
             trail.DrawTrail(shader, points.Points);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;
     }

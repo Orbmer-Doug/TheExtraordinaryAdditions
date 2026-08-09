@@ -7,6 +7,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 public class HellFlame : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.height = Projectile.width = 24;
@@ -46,6 +47,8 @@ public class HellFlame : ModProjectile
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         for (int i = 0; i < 7; i++)
-            ParticleRegistry.SpawnSparkParticle(Projectile.Center, Projectile.velocity.RotatedByRandom(.4f) * Main.rand.NextFloat(-1f, -2f), 40, Main.rand.NextFloat(.9f, 1.5f), Color.OrangeRed);
+            ParticleRegistry.SpawnSparkParticle(Projectile.Center,
+                Projectile.velocity.RotatedByRandom(.4f) * Main.rand.NextFloat(-1f, -2f), 40,
+                Main.rand.NextFloat(.9f, 1.5f), Color.OrangeRed);
     }
 }

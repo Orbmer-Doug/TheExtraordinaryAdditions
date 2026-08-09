@@ -14,6 +14,7 @@ public class LightripBullet : ModProjectile, ILocalizedModType, IModType
     public override string Texture => AssetRegistry.Invis;
 
     public const int Lifetime = 50;
+
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.DrawScreenCheckFluff[Type] = 2000;
@@ -34,7 +35,7 @@ public class LightripBullet : ModProjectile, ILocalizedModType, IModType
 
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
 
@@ -84,18 +85,24 @@ public class LightripBullet : ModProjectile, ILocalizedModType, IModType
         if (!Main.dedServ)
             AdditionsSound.FireImpact.Play(Projectile.Center, .8f, 0f, .1f, 40, Name);
         if (this.RunLocal())
-            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<LightripBlast>(), Projectile.damage / 2, 0f, Main.myPlayer);
+            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<LightripBlast>(),
+                Projectile.damage / 2, 0f, Main.myPlayer);
         Time = 0;
         Wait = true;
         Projectile.velocity *= 0f;
     }
 
     public float Completion => InverseLerp(0f, Lifetime * Projectile.MaxUpdates, Time);
-    public float WidthFunct(float c) => Animators.MakePoly(3.6f).OutFunction.Evaluate(10f, 0f, Completion) * Animators.MakePoly(5f).OutFunction(c);
-    public Color ColorFunct(SystemVector2 c, Vector2 pos) => Color.Cyan * Animators.MakePoly(2.3f).InOutFunction.Evaluate(1f, 0f, Completion);
+
+    public float WidthFunct(float c) => Animators.MakePoly(3.6f).OutFunction.Evaluate(10f, 0f, Completion) *
+                                        Animators.MakePoly(5f).OutFunction(c);
+
+    public Color ColorFunct(SystemVector2 c, Vector2 pos) =>
+        Color.Cyan * Animators.MakePoly(2.3f).InOutFunction.Evaluate(1f, 0f, Completion);
 
     public TrailPoints points = new(60);
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -107,6 +114,7 @@ public class LightripBullet : ModProjectile, ILocalizedModType, IModType
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WavyBlotchNoise), 1, SamplerState.LinearWrap);
             trail.DrawTrail(shader, points.Points);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;
     }

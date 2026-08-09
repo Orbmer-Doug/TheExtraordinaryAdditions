@@ -8,6 +8,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle.AZ;
 public class Slug : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Slug);
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 16;
@@ -15,7 +16,7 @@ public class Slug : ModProjectile
         Projectile.hostile = false;
         Projectile.ignoreWater = true;
         Projectile.tileCollide = true;
-        Projectile.timeLeft = CalUtils.SecondsToFrames(10);
+        Projectile.timeLeft = SecondsToFrames(10);
     }
 
     public override bool OnTileCollide(Vector2 oldVelocity)
@@ -30,6 +31,7 @@ public class Slug : ModProjectile
     public override void OnKill(int timeLeft)
     {
         for (int i = 0; i < 20; i++)
-            ParticleRegistry.SpawnMistParticle(Projectile.Center, Main.rand.NextVector2Circular(3f, 3f), Main.rand.NextFloat(.5f, 1f), Color.DarkGray, Color.DarkSlateGray, 170);
+            ParticleRegistry.SpawnMistParticle(Projectile.Center, Main.rand.NextVector2Circular(3f, 3f),
+                Main.rand.NextFloat(.5f, 1f), Color.DarkGray, Color.DarkSlateGray, 170);
     }
 }

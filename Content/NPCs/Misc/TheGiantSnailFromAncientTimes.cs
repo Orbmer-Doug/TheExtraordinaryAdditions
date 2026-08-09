@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using CalamityMod;
 using Terraria;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
@@ -96,7 +95,7 @@ public sealed class TheGiantSnailFromAncientTimes : ModNPC
 
     public int Timer
     {
-        get => (int)NPC.ai[0];
+        get => (int) NPC.ai[0];
         set => NPC.ai[0] = value;
     }
 
@@ -119,7 +118,7 @@ public sealed class TheGiantSnailFromAncientTimes : ModNPC
 
         float interpolant = InverseLerp(NPC.lifeMax, 0f, NPC.life);
         Vector2 dest = target.Center - Vector2.UnitY *
-            (400f + (float)Math.Sin(Timer * MathHelper.Lerp(.06f, .3f, interpolant / 2)) * 30f);
+            (400f + (float) Math.Sin(Timer * MathHelper.Lerp(.06f, .3f, interpolant / 2)) * 30f);
         if (interpolant >= .5f)
             dest = target.Center +
                    PolarVector(MathF.Sin(Timer * MathHelper.Lerp(.002f, .05f, interpolant / 2 + .5f)) * 600f,

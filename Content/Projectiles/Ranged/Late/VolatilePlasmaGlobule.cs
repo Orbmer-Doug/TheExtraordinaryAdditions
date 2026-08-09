@@ -10,6 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 public class VolatilePlasmaGlobule : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.penetrate = 5;
@@ -28,7 +29,7 @@ public class VolatilePlasmaGlobule : ModProjectile
     public Vector2 Offset;
     public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(Offset);
     public override void ReceiveExtraAI(BinaryReader reader) => Offset = reader.ReadVector2();
-    
+
     public enum CurrentState
     {
         Free,
@@ -38,8 +39,8 @@ public class VolatilePlasmaGlobule : ModProjectile
 
     public CurrentState State
     {
-        get => (CurrentState)Projectile.AdditionsInfo().ExtraAI[0];
-        set => Projectile.AdditionsInfo().ExtraAI[0] = (float)value;
+        get => (CurrentState) Projectile.AdditionsInfo().ExtraAI[0];
+        set => Projectile.AdditionsInfo().ExtraAI[0] = (float) value;
     }
 
     public override void AI()
@@ -57,10 +58,14 @@ public class VolatilePlasmaGlobule : ModProjectile
         int arms = 3;
         for (int i = 0; i < arms; i++)
         {
-            Vector2 vel = (MathHelper.TwoPi * i / arms + offset).ToRotationVector2().RotatedBy(4) * Main.rand.NextFloat(2.1f, 4.1f);
+            Vector2 vel = (MathHelper.TwoPi * i / arms + offset).ToRotationVector2().RotatedBy(4) *
+                          Main.rand.NextFloat(2.1f, 4.1f);
             ParticleRegistry.SpawnGlowParticle(Projectile.Center, vel, 20, 40f, randomColor, 1f, true);
         }
-        ParticleRegistry.SpawnBloomPixelParticle(Projectile.Center, Main.rand.NextVector2CircularEdge(4f, 4f) * Main.rand.NextFloat(.6f, 1.8f), Main.rand.Next(24, 34), Main.rand.NextFloat(.3f, .9f), randomColor, randomColor * 2);
+
+        ParticleRegistry.SpawnBloomPixelParticle(Projectile.Center,
+            Main.rand.NextVector2CircularEdge(4f, 4f) * Main.rand.NextFloat(.6f, 1.8f), Main.rand.Next(24, 34),
+            Main.rand.NextFloat(.3f, .9f), randomColor, randomColor * 2);
 
         switch (State)
         {
@@ -68,7 +73,7 @@ public class VolatilePlasmaGlobule : ModProjectile
                 Projectile.velocity.Y = MathHelper.Clamp(Projectile.velocity.Y + .3f, -20f, 30f);
                 break;
             case CurrentState.HitEnemy:
-                NPC target = Main.npc[(int)NPCID];
+                NPC target = Main.npc[(int) NPCID];
 
                 if (!target.active)
                 {
@@ -94,6 +99,7 @@ public class VolatilePlasmaGlobule : ModProjectile
     }
 
     public ref float NPCID => ref Projectile.AdditionsInfo().ExtraAI[2];
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         Projectile.tileCollide = false;
@@ -108,6 +114,7 @@ public class VolatilePlasmaGlobule : ModProjectile
 
     public override void OnKill(int timeLeft)
     {
-        ParticleRegistry.SpawnSparkleParticle(Projectile.Center, Vector2.Zero, 18, Main.rand.NextFloat(1f, 1.5f), Color.Yellow * 1.8f, Color.AntiqueWhite, 2f, .1f);
+        ParticleRegistry.SpawnSparkleParticle(Projectile.Center, Vector2.Zero, 18, Main.rand.NextFloat(1f, 1.5f),
+            Color.Yellow * 1.8f, Color.AntiqueWhite, 2f, .1f);
     }
 }

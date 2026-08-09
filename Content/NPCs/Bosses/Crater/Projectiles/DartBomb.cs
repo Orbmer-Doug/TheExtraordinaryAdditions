@@ -32,9 +32,10 @@ public class DartBomb : ProjOwnedByNPC<Asterlin>
 
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
+
     public ref float InitialRotation => ref Projectile.ai[1];
 
     public List<VisualDart> DartList = [];
@@ -59,21 +60,25 @@ public class DartBomb : ProjOwnedByNPC<Asterlin>
         if (Progress >= 1f)
         {
             AdditionsSound.banditShot2A.Play(Projectile.Center, .9f, 0f, .1f, 40, Name);
-            ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 30, 0f, Vector2.One, 0f, 212f, Color.Cyan);
-            ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 35, 0f, Vector2.One, 0f, 262f, Color.Cyan * .3f);
+            ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 30, 0f, Vector2.One, 0f, 212f,
+                Color.Cyan);
+            ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 35, 0f, Vector2.One, 0f, 262f,
+                Color.Cyan * .3f);
             if (this.RunServer())
             {
                 for (int i = 0; i < DartList.Count; i++)
                 {
                     VisualDart dart = DartList[i];
                     Main.projectile[SpawnProjectile(dart.Center, dart.Rotation.ToRotationVector2() * 2.5f,
-                        ModContent.ProjectileType<GodPiercingDart>(), Asterlin.LightAttackDamage, 0f)].As<GodPiercingDart>().ExtendedTelegraph = true;
+                            ModContent.ProjectileType<GodPiercingDart>(), Asterlin.LightAttackDamage, 0f)]
+                        .As<GodPiercingDart>().ExtendedTelegraph = true;
                 }
             }
 
             Projectile.Kill();
             return;
         }
+
         Projectile.velocity *= .95f;
 
         // Add new ones if necessary
@@ -107,18 +112,24 @@ public class DartBomb : ProjOwnedByNPC<Asterlin>
         for (int i = 0; i < DartList.Count; i++)
         {
             VisualDart visual = DartList[i];
-            Main.spriteBatch.DrawBetter(dart, visual.Center, null, Color.White * visual.Opacity, visual.Rotation + MathHelper.PiOver2, dart.Size() / 2, 1f * visual.Opacity);
+            Main.spriteBatch.DrawBetter(dart, visual.Center, null, Color.White * visual.Opacity,
+                visual.Rotation + MathHelper.PiOver2, dart.Size() / 2, 1f * visual.Opacity);
         }
 
         // Draw main bomb core
         void draw()
         {
             float opac = Animators.BezierEase(InverseLerp(0f, 18f, Time));
-            Main.spriteBatch.DrawBetterRect(glow, ToTarget(Projectile.Center, new(30f * opac)), null, Color.LightCyan * opac, 0f, glow.Size() / 2);
-            Main.spriteBatch.DrawBetterRect(glow, ToTarget(Projectile.Center, new(60f)), null, Color.Cyan * .75f * opac, 0f, glow.Size() / 2);
-            Main.spriteBatch.DrawBetterRect(glow, ToTarget(Projectile.Center, new(90f)), null, Color.DarkCyan * .4f * opac, 0f, glow.Size() / 2);
-            Main.spriteBatch.DrawBetterRect(glow, ToTarget(Projectile.Center, new(120f)), null, Color.DarkCyan * .2f * opac, 0f, glow.Size() / 2);
+            Main.spriteBatch.DrawBetterRect(glow, ToTarget(Projectile.Center, new(30f * opac)), null,
+                Color.LightCyan * opac, 0f, glow.Size() / 2);
+            Main.spriteBatch.DrawBetterRect(glow, ToTarget(Projectile.Center, new(60f)), null, Color.Cyan * .75f * opac,
+                0f, glow.Size() / 2);
+            Main.spriteBatch.DrawBetterRect(glow, ToTarget(Projectile.Center, new(90f)), null,
+                Color.DarkCyan * .4f * opac, 0f, glow.Size() / 2);
+            Main.spriteBatch.DrawBetterRect(glow, ToTarget(Projectile.Center, new(120f)), null,
+                Color.DarkCyan * .2f * opac, 0f, glow.Size() / 2);
         }
+
         PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.UnderProjectiles, BlendState.Additive);
 
         return false;

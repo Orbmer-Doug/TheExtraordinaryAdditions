@@ -1,5 +1,4 @@
-﻿using CalamityMod.Items.Materials;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
@@ -42,7 +41,6 @@ public class GaussBallisticWarheadLauncher : ModItem
         Item.rare = ModContent.RarityType<LaserClassRarity>();
         Item.value = AdditionsGlobalItem.LaserRarityPrice;
         Item.useStyle = ItemUseStyleID.Shoot;
-
     }
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
@@ -52,19 +50,19 @@ public class GaussBallisticWarheadLauncher : ModItem
 
     public override bool CanShoot(Player player) => false;
 
-    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor,
+        Color itemColor, Vector2 origin, float scale)
     {
-        DrawInventoryCustomScale(spriteBatch, TextureAssets.Item[Type].Value, position, frame, drawColor, itemColor, origin, scale, .29f, new Vector2(0f, 0f));
+        DrawInventoryCustomScale(spriteBatch, TextureAssets.Item[Type].Value, position, frame, drawColor,
+            origin, scale, .29f, new Vector2(0f, 0f));
         return false;
     }
 
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        recipe.AddIngredient(ModContent.ItemType<ExoPrism>(), 14);
+        //TODO
         recipe.AddIngredient(ModContent.ItemType<PlasmaCore>(), 1);
-        recipe.AddIngredient(ModContent.ItemType<DubiousPlating>(), 25);
-        recipe.AddIngredient(ModContent.ItemType<MysteriousCircuitry>(), 30);
         recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();
     }

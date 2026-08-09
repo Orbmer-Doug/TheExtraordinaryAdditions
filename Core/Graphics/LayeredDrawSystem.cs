@@ -105,13 +105,17 @@ public class LayeredDrawSystem : ModSystem
                         if (endSB)
                             sb.End();
 
-                        sb.Begin(SpriteSortMode.Deferred, action.Blend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, action.Shader?.Effect, Main.GameViewMatrix.TransformationMatrix);
+                        sb.Begin(SpriteSortMode.Deferred, action.Blend, Main.DefaultSamplerState,
+                            DepthStencilState.None, RasterizerState.CullNone, action.Shader?.Effect,
+                            Main.GameViewMatrix.TransformationMatrix);
                         action.Shader?.Render();
                         action.RenderAction();
                         sb.End();
 
                         if (endSB)
-                            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+                            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState,
+                                DepthStencilState.None, RasterizerState.CullNone, null,
+                                Main.GameViewMatrix.TransformationMatrix);
                     }
                 }
                 else if (groupActions.Count == 1)
@@ -124,13 +128,16 @@ public class LayeredDrawSystem : ModSystem
                     if (endSB)
                         sb.End();
 
-                    sb.Begin(SpriteSortMode.Deferred, action.Blend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, action.Shader?.Effect, Main.GameViewMatrix.TransformationMatrix);
+                    sb.Begin(SpriteSortMode.Deferred, action.Blend, Main.DefaultSamplerState, DepthStencilState.None,
+                        RasterizerState.CullNone, action.Shader?.Effect, Main.GameViewMatrix.TransformationMatrix);
                     action.Shader?.Render();
                     action.RenderAction();
                     sb.End();
 
                     if (endSB)
-                        sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+                        sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState,
+                            DepthStencilState.None, RasterizerState.CullNone, null,
+                            Main.GameViewMatrix.TransformationMatrix);
                 }
                 else
                 {
@@ -139,7 +146,8 @@ public class LayeredDrawSystem : ModSystem
                         sb.End();
 
                     ManagedShader sharedShader = groupActions[0].Shader;
-                    sb.Begin(SpriteSortMode.Deferred, blend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, sharedShader?.Effect, Main.GameViewMatrix.TransformationMatrix);
+                    sb.Begin(SpriteSortMode.Deferred, blend, Main.DefaultSamplerState, DepthStencilState.None,
+                        RasterizerState.CullNone, sharedShader?.Effect, Main.GameViewMatrix.TransformationMatrix);
                     foreach (DrawAction action in groupActions)
                     {
                         if (action.RenderAction == null)
@@ -150,10 +158,13 @@ public class LayeredDrawSystem : ModSystem
                             action.Shader?.Render();
                         action.RenderAction();
                     }
+
                     sb.End();
 
                     if (endSB)
-                        sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
+                        sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState,
+                            DepthStencilState.None, RasterizerState.CullNone, null,
+                            Main.GameViewMatrix.TransformationMatrix);
                 }
             }
         });
@@ -162,7 +173,8 @@ public class LayeredDrawSystem : ModSystem
         actions.Clear();
     }
 
-    public static void QueueDrawAction(Action renderAction, PixelationLayer layer, BlendState blendState = null, ManagedShader effect = null, string groupID = null)
+    public static void QueueDrawAction(Action renderAction, PixelationLayer layer, BlendState blendState = null,
+        ManagedShader effect = null, string groupID = null)
     {
         ArgumentNullException.ThrowIfNull(renderAction);
         BlendState blend = blendState ?? BlendState.AlphaBlend;
@@ -171,7 +183,8 @@ public class LayeredDrawSystem : ModSystem
         if (groupID == null && effect == null)
             groupID = $"__Sentinel_{layer}_{blend}";
 
-        DrawAction action = new(renderAction, blend, isTexture: true, effect, groupID); // Treat as texture for consistency
+        DrawAction action = new(renderAction, blend, isTexture: true, effect,
+            groupID); // Treat as texture for consistency
         DrawActionsByLayer[layer].Add(action);
     }
 }

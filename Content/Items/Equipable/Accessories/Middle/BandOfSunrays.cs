@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using CalamityMod;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -15,6 +14,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
 public class BandOfSunrays : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BandOfSunrays);
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(new Color(255, 248, 173));
@@ -39,10 +39,11 @@ public class BandOfSunrays : ModItem
             if (player.ownedProjectileCounts[ModContent.ProjectileType<LightSpirit>()] == 0)
             {
                 StatModifier totalDamage = player.GetTotalDamage(player.GetBestClass());
-                int damage = (int)totalDamage.ApplyTo(150f);
+                int damage = (int) totalDamage.ApplyTo(150f);
                 for (int i = 0; i < 3; i++)
                 {
-                    Projectile star = Main.projectile[player.NewPlayerProj(player.Center, Vector2.Zero, ModContent.ProjectileType<LightSpirit>(), damage,
+                    Projectile star = Main.projectile[player.NewPlayerProj(player.Center, Vector2.Zero,
+                        ModContent.ProjectileType<LightSpirit>(), damage,
                         0f, player.whoAmI, MathHelper.TwoPi * i / 3f)];
                     star.rotation = star.ai[0];
                     star.originalDamage = damage / 2;

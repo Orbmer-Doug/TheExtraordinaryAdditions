@@ -90,7 +90,8 @@ public static class RelicAutoloader
             TileObjectData.newTile.LavaDeath = false; // Does not break when lava touches it
             TileObjectData.newTile.DrawYOffset = 2; // So the tile sinks into the ground
             TileObjectData.newTile.Direction = TileObjectDirection.PlaceLeft; // Player faces to the left
-            TileObjectData.newTile.StyleHorizontal = false; // Based on how the alternate sprites are positioned on the sprite (by default, true)
+            TileObjectData.newTile.StyleHorizontal =
+                false; // Based on how the alternate sprites are positioned on the sprite (by default, true)
 
             TileObjectData.newTile.StyleWrapLimitVisualOverride = 2;
             TileObjectData.newTile.StyleMultiplier = 2;
@@ -112,7 +113,8 @@ public static class RelicAutoloader
 
         public override bool CreateDust(int i, int j, ref int type) => false;
 
-        public override void SetDrawPositions(int i, int j, ref int width, ref int offsetY, ref int height, ref short tileFrameX, ref short tileFrameY)
+        public override void SetDrawPositions(int i, int j, ref int width, ref int offsetY, ref int height,
+            ref short tileFrameX, ref short tileFrameY)
         {
             tileFrameX %= FrameWidth;
             tileFrameY %= FrameHeight * 2;
@@ -141,7 +143,8 @@ public static class RelicAutoloader
             // Get the initial draw parameters
             Texture2D texture = RelicTexture.Value;
 
-            int frameY = tile.TileFrameX / FrameWidth; // Picks the frame on the sheet based on the placeStyle of the item.
+            int frameY =
+                tile.TileFrameX / FrameWidth; // Picks the frame on the sheet based on the placeStyle of the item.
             Rectangle frame = texture.Frame(1, 1, 0, frameY);
 
             Vector2 origin = frame.Size() / 2f;
@@ -149,12 +152,14 @@ public static class RelicAutoloader
 
             Color color = Lighting.GetColor(p.X, p.Y);
 
-            bool direction = tile.TileFrameY / FrameHeight != 0; // This is related to the alternate tile data we registered before
+            bool direction =
+                tile.TileFrameY / FrameHeight != 0; // This is related to the alternate tile data we registered before
             SpriteEffects effects = direction ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
 
             // Smoothly move up and down over time
             float offset = Sin01(Main.GlobalTimeWrappedHourly * MathHelper.TwoPi / 5f);
-            Vector2 drawPos = worldPos + offScreen - Main.screenPosition + new Vector2(0f, -44f) - Vector2.UnitY * offset * 4f;
+            Vector2 drawPos = worldPos + offScreen - Main.screenPosition + new Vector2(0f, -44f) -
+                              Vector2.UnitY * offset * 4f;
 
             // Draw the main texture
             spriteBatch.Draw(texture, drawPos, frame, color, 0f, origin, 1f, effects, 0f);
@@ -165,7 +170,9 @@ public static class RelicAutoloader
             effectColor.A = 0;
             effectColor = effectColor * 0.1f * scale;
             for (float offsetAngle = 0f; offsetAngle < 1f; offsetAngle += 0.1666f)
-                spriteBatch.Draw(texture, drawPos + (MathHelper.TwoPi * offsetAngle).ToRotationVector2() * (3f + offset * 2f), frame, effectColor, 0f, origin, 1f, effects, 0f);
+                spriteBatch.Draw(texture,
+                    drawPos + (MathHelper.TwoPi * offsetAngle).ToRotationVector2() * (3f + offset * 2f), frame,
+                    effectColor, 0f, origin, 1f, effects, 0f);
         }
     }
 

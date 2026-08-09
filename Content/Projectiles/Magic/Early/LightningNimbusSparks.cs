@@ -13,6 +13,7 @@ public class LightningNimbusSparks : ModProjectile
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.LightningNimbusSparks);
     public Player Owner => Main.player[Projectile.owner];
     public GlobalPlayer ModdedOwner => Owner.Additions();
+
     public override void SetStaticDefaults()
     {
         Main.projFrames[Projectile.type] = 3;
@@ -40,6 +41,7 @@ public class LightningNimbusSparks : ModProjectile
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D tex = Projectile.ThisProjectileTexture();
@@ -48,16 +50,19 @@ public class LightningNimbusSparks : ModProjectile
         Vector2 pos = Projectile.Center - Main.screenPosition;
         Color color = Color.White;
 
-        after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [Color.Pink, Color.Violet, Color.DarkViolet], Projectile.Opacity);
+        after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [Color.Pink, Color.Violet, Color.DarkViolet],
+            Projectile.Opacity);
         Main.spriteBatch.Draw(tex, pos, frame, color, Projectile.rotation, orig, Projectile.scale, 0, 0f);
         return false;
     }
 
     private ref float Time => ref Projectile.ai[0];
+
     public override void AI()
     {
         after ??= new(5, () => Projectile.Center);
-        after?.UpdateFancyAfterimages(new(Projectile.Center, new(1f, .75f), Projectile.Opacity, Projectile.rotation, 0, 90, 0, 0f, Projectile.ThisProjectileTexture().Frame(1, 3, 0, Projectile.frame), false, -.1f));
+        after?.UpdateFancyAfterimages(new(Projectile.Center, new(1f, .75f), Projectile.Opacity, Projectile.rotation, 0,
+            90, 0, 0f, Projectile.ThisProjectileTexture().Frame(1, 3, 0, Projectile.frame), false, -.1f));
 
         Projectile.Opacity = InverseLerp(0f, 9f, Time);
         Projectile.SetAnimation(3, 6);
@@ -69,8 +74,9 @@ public class LightningNimbusSparks : ModProjectile
         {
             float scaleDown = (1f - InverseLerp(0f, 15f, Projectile.ai[1]++)) / 2 + .2f;
             Projectile.scale = scaleDown;
-            Projectile.Resize((int)(28 * scaleDown), (int)(14 * scaleDown));
+            Projectile.Resize((int) (28 * scaleDown), (int) (14 * scaleDown));
         }
+
         Time++;
     }
 
@@ -83,7 +89,8 @@ public class LightningNimbusSparks : ModProjectile
     public override void OnKill(int timeLeft)
     {
         for (int i = 0; i < 8; i++)
-            Dust.NewDustPerfect(Projectile.Center, DustID.WitherLightning, Main.rand.NextVector2Circular(4f, 4f), 0, default, Main.rand.NextFloat(.7f, 1.2f)).noGravity = true;
+            Dust.NewDustPerfect(Projectile.Center, DustID.WitherLightning, Main.rand.NextVector2Circular(4f, 4f), 0,
+                default, Main.rand.NextFloat(.7f, 1.2f)).noGravity = true;
 
         SoundID.NPCHit53.Play(Projectile.Center, .6f);
     }

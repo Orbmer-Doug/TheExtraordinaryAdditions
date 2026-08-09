@@ -1,5 +1,4 @@
-﻿using CalamityMod.Cooldowns;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -45,19 +44,23 @@ public class JudgeOfHellsArmaments : ModItem
         list.ColorLocalization(new Color(255, 217, 0));
     }
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback)
     {
         if (player.altFunctionUse == ItemAlternativeFunctionID.ActivatedAndUsed)
         {
-            player.NewPlayerProj(position, velocity, ModContent.ProjectileType<JudgeSpear>(), damage, knockback, player.whoAmI);
+            player.NewPlayerProj(position, velocity, ModContent.ProjectileType<JudgeSpear>(), damage, knockback,
+                player.whoAmI);
             return false;
         }
         else if (player.altFunctionUse == ItemAlternativeFunctionID.None)
         {
             player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI);
-            Main.projectile[player.NewPlayerProj(position, velocity, type, damage / 2, knockback, player.whoAmI)].As<JudgeSwing>().Splendor = true;
+            Main.projectile[player.NewPlayerProj(position, velocity, type, damage / 2, knockback, player.whoAmI)]
+                .As<JudgeSwing>().Splendor = true;
             return false;
         }
+
         return false;
     }
 

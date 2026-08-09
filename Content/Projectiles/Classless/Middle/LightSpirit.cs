@@ -5,7 +5,6 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
-using static CalamityMod.CalamityUtils;
 using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
@@ -16,14 +15,16 @@ public class LightSpirit : ModProjectile
 
     public override void SetStaticDefaults()
     {
-        ProjectileID.Sets.MinionSacrificable[Projectile.type] = ProjectileID.Sets.MinionTargettingFeature[Projectile.type] = true;
+        ProjectileID.Sets.MinionSacrificable[Projectile.type] =
+            ProjectileID.Sets.MinionTargettingFeature[Projectile.type] = true;
     }
 
     public override void SetDefaults()
     {
         Projectile.width = 59;
         Projectile.height = 50;
-        Projectile.netImportant = Projectile.friendly = Projectile.ignoreWater = Projectile.usesLocalNPCImmunity = Projectile.minion = true;
+        Projectile.netImportant = Projectile.friendly =
+            Projectile.ignoreWater = Projectile.usesLocalNPCImmunity = Projectile.minion = true;
         Projectile.localNPCHitCooldown = 20;
         Projectile.minionSlots = 0f;
         Projectile.timeLeft = 18000;
@@ -53,12 +54,16 @@ public class LightSpirit : ModProjectile
         if (Time % 50f == 49f && this.RunLocal() && potentialTarget != null)
         {
             Vector2 vel = Projectile.SafeDirectionTo(potentialTarget.Center) * 10f;
-            Projectile p = Main.projectile[Projectile.NewProj(Projectile.Center, vel, ModContent.ProjectileType<LightSpiritStar>(), Projectile.damage, Projectile.knockBack, Projectile.owner, 0f, 0f, 0f)];
+            Projectile p =
+                Main.projectile[
+                    Projectile.NewProj(Projectile.Center, vel, ModContent.ProjectileType<LightSpiritStar>(),
+                        Projectile.damage, Projectile.knockBack, Projectile.owner, 0f, 0f, 0f)];
             p.originalDamage = Projectile.originalDamage;
 
             for (int i = 0; i < 12; i++)
             {
-                ParticleRegistry.SpawnGlowParticle(Projectile.RandAreaInEntity(), vel.RotatedByRandom(.25f) * Main.rand.NextFloat(.6f, 1f),
+                ParticleRegistry.SpawnGlowParticle(Projectile.RandAreaInEntity(),
+                    vel.RotatedByRandom(.25f) * Main.rand.NextFloat(.6f, 1f),
                     Main.rand.Next(20, 30), Main.rand.NextFloat(20f, 50f), Color.Gold);
             }
         }
@@ -71,6 +76,7 @@ public class LightSpirit : ModProjectile
     }
 
     public override bool? CanDamage() => false;
+
     public override bool PreDraw(ref Color lightColor)
     {
         SpriteBatch sb = Main.spriteBatch;
@@ -83,12 +89,13 @@ public class LightSpirit : ModProjectile
         shine.TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly * 1f);
         shine.TrySetParameter("resolution", res);
 
-        sb.EnterShaderRegionAlt();
+        sb.EnterShaderRegion();
         shine.Render("AutoloadPass", true, false);
 
-        sb.Draw(tex, ToTarget(Projectile.Center, res), null, Color.Gold * Projectile.Opacity, Projectile.rotation, tex.Size() * 0.5f, 0, 0f);
+        sb.Draw(tex, ToTarget(Projectile.Center, res), null, Color.Gold * Projectile.Opacity, Projectile.rotation,
+            tex.Size() * 0.5f, 0, 0f);
 
-        sb.ExitShaderRegion();
+        sb.ResetToDefault();
         return false;
     }
 }

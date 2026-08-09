@@ -17,6 +17,7 @@ public abstract class BaseIdleHoldoutProjectile : BaseHoldoutProjectile
     private static Dictionary<int, int> itemProjectileRelationship = [];
     public abstract int AssociatedItemID { get; }
     public abstract int IntendedProjectileType { get; }
+
     public static Dictionary<int, int> ItemProjectileRelationship
     {
         get => itemProjectileRelationship;
@@ -86,7 +87,8 @@ public class GlobalIdleHoldoutPlayer : ModPlayer
             {
                 int damage = Player.GetWeaponDamage(heldItem, false);
                 float kb = Player.GetWeaponKnockback(heldItem, heldItem.knockBack);
-                Projectile p = Main.projectile[Projectile.NewProjectile(Player.GetSource_ItemUse(heldItem, null), Player.Center,
+                Projectile p = Main.projectile[Projectile.NewProjectile(Player.GetSource_ItemUse(heldItem, null),
+                    Player.Center,
                     Vector2.Zero, holdoutType, damage, kb, Player.whoAmI, 0f, 0f, 0f)];
             }
         }

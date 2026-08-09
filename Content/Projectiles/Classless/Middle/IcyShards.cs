@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -32,6 +31,7 @@ public class IcyShards : ModProjectile
     public Player Owner => Main.player[Projectile.owner];
     public GlobalPlayer Modded => Owner.Additions();
     public const int WaitTime = 50;
+
     public override void AI()
     {
         if (Time == 0f)
@@ -43,8 +43,10 @@ public class IcyShards : ModProjectile
         after ??= new(5, () => Projectile.Center);
         Projectile.Opacity = InverseLerp(0f, 12f, Time) * InverseLerp(0f, 10f, Projectile.timeLeft);
         Projectile.scale = InverseLerp(0f, 20f, Projectile.timeLeft);
-        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.scale, Projectile.Opacity, Projectile.rotation, 0, 90, 1,
-            0f, Projectile.ThisProjectileTexture().Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame), true, -.3f));
+        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.scale, Projectile.Opacity,
+            Projectile.rotation, 0, 90, 1,
+            0f, Projectile.ThisProjectileTexture().Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame),
+            true, -.3f));
 
         if (Time < WaitTime)
         {
@@ -54,11 +56,14 @@ public class IcyShards : ModProjectile
             if (Time < (WaitTime - 10))
                 Projectile.rotation += dir * InverseLerp(WaitTime, 0f, Time) * .5f;
             else
-                Projectile.rotation = Projectile.rotation.SmoothAngleLerp(Projectile.AngleTo(Modded.MouseWorld) + MathHelper.PiOver2, .2f, .4f);
+                Projectile.rotation =
+                    Projectile.rotation.SmoothAngleLerp(Projectile.AngleTo(Modded.MouseWorld) + MathHelper.PiOver2, .2f,
+                        .4f);
         }
         else if (Time == WaitTime)
         {
-            ParticleRegistry.SpawnPulseRingParticle(Projectile.RotHitbox().Bottom, Vector2.Zero, 10, Projectile.rotation - MathHelper.PiOver2, new(.3f, 1f), 0f, 40f, Color.SlateBlue);
+            ParticleRegistry.SpawnPulseRingParticle(Projectile.RotHitbox().Bottom, Vector2.Zero, 10,
+                Projectile.rotation - MathHelper.PiOver2, new(.3f, 1f), 0f, 40f, Color.SlateBlue);
             if (this.RunLocal())
             {
                 Projectile.velocity = Projectile.SafeDirectionTo(Modded.MouseWorld) * 15f;
@@ -79,7 +84,8 @@ public class IcyShards : ModProjectile
     public override void OnKill(int timeLeft)
     {
         for (int i = 0; i < 20; i++)
-            ParticleRegistry.SpawnDustParticle(Projectile.RotHitbox().RandomPoint(), Projectile.velocity * Main.rand.NextFloat(.1f, .2f),
+            ParticleRegistry.SpawnDustParticle(Projectile.RotHitbox().RandomPoint(),
+                Projectile.velocity * Main.rand.NextFloat(.1f, .2f),
                 Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .6f), Color.LightCyan);
         SoundID.Item49.Play(Projectile.Center, .7f, 0f, .1f, null, 20);
     }
@@ -87,12 +93,14 @@ public class IcyShards : ModProjectile
     public override bool? CanDamage() => Time > WaitTime ? null : false;
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D tex = Projectile.ThisProjectileTexture();
         Rectangle frame = tex.Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame);
         after?.DrawFancyAfterimages(tex, [Color.DarkSlateBlue], .5f);
-        Main.spriteBatch.DrawBetter(tex, Projectile.Center, frame, lightColor * Projectile.Opacity, Projectile.rotation, frame.Size() / 2, Projectile.scale);
+        Main.spriteBatch.DrawBetter(tex, Projectile.Center, frame, lightColor * Projectile.Opacity, Projectile.rotation,
+            frame.Size() / 2, Projectile.scale);
         return false;
     }
 }

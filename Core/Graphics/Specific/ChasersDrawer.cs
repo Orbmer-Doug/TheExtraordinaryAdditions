@@ -10,23 +10,11 @@ namespace TheExtraordinaryAdditions.Core.Graphics.Specific;
 // Inspired from: https://github.com/LucilleKarma/WrathOfTheGodsPublic/blob/main/Content/NPCs/Bosses/NamelessDeity/SpecificEffectManagers/LightSlashDrawer.cs
 public class ChasersDrawer : ModSystem
 {
-    public static int ContinueRenderingCountdown
-    {
-        get;
-        private set;
-    }
+    public static int ContinueRenderingCountdown { get; private set; }
 
-    public static ManagedRenderTarget ChaserTarget
-    {
-        get;
-        private set;
-    }
+    public static ManagedRenderTarget ChaserTarget { get; private set; }
 
-    public static ManagedRenderTarget ChaserTargetPrevious
-    {
-        get;
-        private set;
-    }
+    public static ManagedRenderTarget ChaserTargetPrevious { get; private set; }
 
     public override void OnModLoad()
     {
@@ -54,7 +42,8 @@ public class ChasersDrawer : ModSystem
         GraphicsDevice gd = Main.instance.GraphicsDevice;
 
         // Prepare the render target for drawing.
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.AnisotropicClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Matrix.Identity);
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.AnisotropicClamp,
+            DepthStencilState.Default, RasterizerState.CullNone, null, Matrix.Identity);
         gd.SetRenderTarget(ChaserTargetPrevious);
         gd.Clear(Color.Transparent);
 
@@ -98,7 +87,8 @@ public class ChasersDrawer : ModSystem
         ManagedScreenShader shader = AssetRegistry.GetFilter("ChasersOverlay");
         shader.TrySetParameter("splitBrightnessFactor", 3.2f);
         shader.TrySetParameter("splitTextureZoomFactor", 0.75f);
-        shader.TrySetParameter("backgroundOffset", (Main.screenPosition - Main.screenLastPosition) / Main.ScreenSize.ToVector2());
+        shader.TrySetParameter("backgroundOffset",
+            (Main.screenPosition - Main.screenLastPosition) / Main.ScreenSize.ToVector2());
         shader.TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly);
         shader.SetTexture(ChaserTarget, 1, SamplerState.AnisotropicClamp);
         shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Cosmos2), 2, SamplerState.AnisotropicWrap);

@@ -14,6 +14,7 @@ public class GoldenShowerHoldout : BaseIdleHoldoutProjectile
     public override string Texture => "Terraria/Images/Item_" + ItemID.GoldenShower;
     public override int AssociatedItemID => ItemID.GoldenShower;
     public override int IntendedProjectileType => ModContent.ProjectileType<GoldenShowerHoldout>();
+
     public override void Defaults()
     {
         Projectile.width = 24;
@@ -27,6 +28,7 @@ public class GoldenShowerHoldout : BaseIdleHoldoutProjectile
 
     public ref float Time => ref Projectile.ai[0];
     public ref float Delay => ref Projectile.ai[1];
+
     public override void SafeAI()
     {
         Item item = Owner.HeldItem;
@@ -36,6 +38,7 @@ public class GoldenShowerHoldout : BaseIdleHoldoutProjectile
             SoundEngine.PlaySound(SoundID.Item13, Projectile.Center);
             Delay = item.useAnimation;
         }
+
         if (Delay > 0)
             Delay--;
 
@@ -46,11 +49,13 @@ public class GoldenShowerHoldout : BaseIdleHoldoutProjectile
 
             vel *= item.shootSpeed;
 
-            Projectile.NewProj(pos, vel, ModContent.ProjectileType<IchorStream>(), item.damage, item.knockBack, Owner.whoAmI);
+            Projectile.NewProj(pos, vel, ModContent.ProjectileType<IchorStream>(), item.damage, item.knockBack,
+                Owner.whoAmI);
         }
 
         int wait = item.useAnimation * 2;
-        if (Time % wait == wait - 1 && Modded.SafeMouseRight.Current && TryUseMana() && !Modded.MouseLeft.Current && this.RunLocal())
+        if (Time % wait == wait - 1 && Modded.SafeMouseRight.Current && TryUseMana() && !Modded.MouseLeft.Current &&
+            this.RunLocal())
         {
             SoundEngine.PlaySound(SoundID.Item13, Projectile.Center);
 
@@ -58,7 +63,8 @@ public class GoldenShowerHoldout : BaseIdleHoldoutProjectile
             {
                 Vector2 vel = -Vector2.UnitY.RotatedByRandom(.36f) * item.shootSpeed * Main.rand.NextFloat(.66f, 1f);
                 SoundEngine.PlaySound(SoundID.Item13, Projectile.Center);
-                Projectile.NewProj(pos, vel, ModContent.ProjectileType<IchorSwirl>(), item.damage, item.knockBack * 2, Owner.whoAmI, 0f, 1f);
+                Projectile.NewProj(pos, vel, ModContent.ProjectileType<IchorSwirl>(), item.damage, item.knockBack * 2,
+                    Owner.whoAmI, 0f, 1f);
             }
         }
 
@@ -82,7 +88,8 @@ public class GoldenShowerHoldout : BaseIdleHoldoutProjectile
         Texture2D tex = Projectile.ThisProjectileTexture();
         Rectangle frame = tex.Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame);
         Vector2 orig = new(0, tex.Height / 2);
-        Main.spriteBatch.DrawBetter(tex, Projectile.Center, frame, Projectile.GetAlpha(lightColor), Projectile.rotation, orig, 1, FixedDirection());
+        Main.spriteBatch.DrawBetter(tex, Projectile.Center, frame, Projectile.GetAlpha(lightColor), Projectile.rotation,
+            orig, 1, FixedDirection());
         return false;
     }
 }

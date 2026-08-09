@@ -21,7 +21,7 @@ public class KunaiTag : ModBuff
     {
         if (npc.GetGlobalNPC<AdditionsGlobalNPC>().StarKunai < npc.buffTime[buffIndex])
             npc.GetGlobalNPC<AdditionsGlobalNPC>().StarKunai = npc.buffTime[buffIndex];
-        
+
         npc.DelBuff(buffIndex);
         buffIndex--;
     }

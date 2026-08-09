@@ -17,6 +17,7 @@ public class LightningChain : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
     private const int Life = 30;
+
     public override void SetDefaults()
     {
         Projectile.DamageType = DamageClass.Magic;
@@ -33,35 +34,45 @@ public class LightningChain : ModProjectile
 
     public ref float Time => ref Projectile.ai[0];
     public ref float Power => ref Projectile.ai[1];
+
     public bool NotPrimary
     {
         get => Projectile.ai[2] == 1f;
         set => Projectile.ai[2] = value.ToInt();
     }
+
     public int Current
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[0];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[0];
         set => Projectile.AdditionsInfo().ExtraAI[0] = value;
     }
 
-    public int MaxChains => (int)MathF.Ceiling(Utils.Remap(Power, CondereFulminaHoldout.TotalReelTime / 2, CondereFulminaHoldout.TotalReelTime, 2, 8));
-    public float Width => Utils.Remap(Power, CondereFulminaHoldout.TotalReelTime / 2, CondereFulminaHoldout.TotalReelTime, 8f, 50f);
+    public int MaxChains => (int) MathF.Ceiling(Utils.Remap(Power, CondereFulminaHoldout.TotalReelTime / 2,
+        CondereFulminaHoldout.TotalReelTime, 2, 8));
+
+    public float Width => Utils.Remap(Power, CondereFulminaHoldout.TotalReelTime / 2,
+        CondereFulminaHoldout.TotalReelTime, 8f, 50f);
+
     public Vector2 Start { get; set; }
     public Vector2 End { get; set; }
+
     public override void SendExtraAI(BinaryWriter writer)
     {
         writer.WriteVector2(Start);
         writer.WriteVector2(End);
     }
+
     public override void ReceiveExtraAI(BinaryReader reader)
     {
         Start = reader.ReadVector2();
         End = reader.ReadVector2();
     }
+
     public float Completion => Animators.MakePoly(6f).OutFunction(InverseLerp(0f, Life, Time));
     public override bool ShouldUpdatePosition() => false;
 
     public HashSet<NPC> PreviousNPCs = [null];
+
     public override void AI()
     {
         if (trail == null || trail.Disposed)
@@ -78,9 +89,11 @@ public class LightningChain : ModProjectile
                     Projectile.Kill();
                     return;
                 }
+
                 End = close.RandAreaInEntity();
                 for (float i = .2f; i < 1f; i += .1f)
-                    ParticleRegistry.SpawnGlowParticle(End, Vector2.Zero, 30, Width * i, ColorFunct(SystemVector2.Zero, Vector2.Zero));
+                    ParticleRegistry.SpawnGlowParticle(End, Vector2.Zero, 30, Width * i,
+                        ColorFunct(SystemVector2.Zero, Vector2.Zero));
             }
 
             points = new(100);
@@ -95,6 +108,7 @@ public class LightningChain : ModProjectile
     }
 
     public override bool? CanDamage() => Projectile.numHits <= 0;
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         Projectile.friendly = false;
@@ -107,7 +121,10 @@ public class LightningChain : ModProjectile
             if (close.CanHomeInto())
             {
                 Vector2 end = close.RandAreaInEntity();
-                LightningChain chain = Main.projectile[Projectile.NewProj(end, Vector2.Zero, ModContent.ProjectileType<LightningChain>(), Projectile.damage, Projectile.knockBack, Projectile.owner)].As<LightningChain>();
+                LightningChain chain = Main
+                    .projectile[
+                        Projectile.NewProj(end, Vector2.Zero, ModContent.ProjectileType<LightningChain>(),
+                            Projectile.damage, Projectile.knockBack, Projectile.owner)].As<LightningChain>();
                 chain.NotPrimary = true;
                 chain.Start = End;
                 chain.End = end;
@@ -116,7 +133,8 @@ public class LightningChain : ModProjectile
                 chain.PreviousNPCs = new HashSet<NPC>(PreviousNPCs) { close };
                 chain.Sync();
                 for (float i = .2f; i < 1f; i += .1f)
-                    ParticleRegistry.SpawnGlowParticle(end, Vector2.Zero, 30, Width * i, ColorFunct(SystemVector2.Zero, Vector2.Zero));
+                    ParticleRegistry.SpawnGlowParticle(end, Vector2.Zero, 30, Width * i,
+                        ColorFunct(SystemVector2.Zero, Vector2.Zero));
             }
         }
     }
@@ -127,9 +145,13 @@ public class LightningChain : ModProjectile
     }
 
     public float WidthFunct(float c) => Width * Projectile.Opacity;
-    public Color ColorFunct(SystemVector2 c, Vector2 pos) => MulticolorLerp(Completion, Color.White, Color.LightCyan, Color.Cyan, Color.DarkCyan) * Projectile.Opacity;
+
+    public Color ColorFunct(SystemVector2 c, Vector2 pos) =>
+        MulticolorLerp(Completion, Color.White, Color.LightCyan, Color.Cyan, Color.DarkCyan) * Projectile.Opacity;
+
     public TrailPoints points;
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -141,6 +163,7 @@ public class LightningChain : ModProjectile
                 trail.DrawTrail(shader, points.Points);
             }
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 
         return false;

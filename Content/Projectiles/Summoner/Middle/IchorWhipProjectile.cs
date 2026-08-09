@@ -22,9 +22,11 @@ public class IchorWhipProjectile : BaseWhip
             float scale = Main.rand.NextFloat(.9f, 1.3f);
             Dust.NewDustPerfect(Tip, DustID.Ichor, vel, 0, default, scale).noGravity = true;
         }
+
         Lighting.AddLight(Tip, Color.Gold.ToVector3() * Convert01To010(GetCompletion()));
 
-        Projectile.scale = MathHelper.Lerp(0.5f, 1.5f, GetLerpBump(0f, .4f, 1f, .6f, Completion)) * GetThin(GetCompletion());
+        Projectile.scale = MathHelper.Lerp(0.5f, 1.5f, GetLerpBump(0f, .4f, 1f, .6f, Completion)) *
+                           GetThin(GetCompletion());
     }
 
     public override void NPCHitEffects(NPC target, NPC.HitInfo hit, in Vector2 pos, in Vector2 vel, in int index)
@@ -36,8 +38,8 @@ public class IchorWhipProjectile : BaseWhip
                 Main.rand.Next(70, 90), Main.rand.NextFloat(.8f, 1.5f), Color.Gold, Color.Yellow, 3, true, true);
         }
 
-        target.AddBuff(BuffID.Ichor, (int)(CalUtils.SecondsToFrames(5) * Convert01To010(GetCompletion())));
-        Projectile.damage = (int)(Projectile.damage * .75f);
+        target.AddBuff(BuffID.Ichor, (int) (SecondsToFrames(5) * Convert01To010(GetCompletion())));
+        Projectile.damage = (int) (Projectile.damage * .75f);
     }
 
     public override Color LineColor(SystemVector2 completion, Vector2 position)
@@ -87,7 +89,8 @@ public class IchorWhipProjectile : BaseWhip
                 Vector2 orig = frame.Size() / 2;
                 SpriteEffects flip = Owner.direction < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
 
-                Main.spriteBatch.DrawBetter(texture, pos, frame, color, rotation, orig, tip ? Projectile.scale : 1f, flip);
+                Main.spriteBatch.DrawBetter(texture, pos, frame, color, rotation, orig, tip ? Projectile.scale : 1f,
+                    flip);
             }
         }
 
@@ -102,6 +105,7 @@ public class IchorWhipProjectile : BaseWhip
                 Main.spriteBatch.DrawBetterRect(tex, targ, null, Color.Gold * completion, 0f, orig);
             }
         }
+
         PixelationSystem.QueueTextureRenderAction(glow, PixelationLayer.OverProjectiles, BlendState.Additive);
     }
 }

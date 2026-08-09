@@ -15,6 +15,7 @@ public class LuminiteRocket : ModProjectile
     public ref float Time => ref Projectile.ai[0];
 
     public Player Owner => Main.player[Projectile.owner];
+
     public override void SetDefaults()
     {
         Projectile.width = 20;
@@ -28,7 +29,9 @@ public class LuminiteRocket : ModProjectile
         Projectile.MaxUpdates = 3;
     }
 
-    public Vector2 Back => Projectile.Center + PolarVector(Projectile.width / 2, Projectile.rotation - MathHelper.PiOver2);
+    public Vector2 Back =>
+        Projectile.Center + PolarVector(Projectile.width / 2, Projectile.rotation - MathHelper.PiOver2);
+
     public override void AI()
     {
         if (trail == null || trail.Disposed)
@@ -69,24 +72,30 @@ public class LuminiteRocket : ModProjectile
         for (int a = 0; a <= count; a++)
         {
             if (a < 20)
-                ParticleRegistry.SpawnGlowParticle(Projectile.Center, Vector2.Zero, 22, Main.rand.NextFloat(90f, 100f), Color.LightCyan);
+                ParticleRegistry.SpawnGlowParticle(Projectile.Center, Vector2.Zero, 22, Main.rand.NextFloat(90f, 100f),
+                    Color.LightCyan);
 
             float scale = Main.rand.NextFloat(.3f, 1f);
-            Vector2 vel = (MathHelper.TwoPi * a / count + Main.rand.NextFloat(MathHelper.TwoPi)).ToRotationVector2() * Main.rand.NextFloat(2f, 12f);
-            ParticleRegistry.SpawnMistParticle(Projectile.Center, vel, scale, Color.Cyan, Color.Transparent, Main.rand.NextByte(100, 255));
+            Vector2 vel = (MathHelper.TwoPi * a / count + Main.rand.NextFloat(MathHelper.TwoPi)).ToRotationVector2() *
+                          Main.rand.NextFloat(2f, 12f);
+            ParticleRegistry.SpawnMistParticle(Projectile.Center, vel, scale, Color.Cyan, Color.Transparent,
+                Main.rand.NextByte(100, 255));
 
             for (int i = 0; i <= count; i++)
             {
-                ParticleRegistry.SpawnHeavySmokeParticle(Projectile.Center, vel * .4f, 50, scale * .5f, Color.DarkCyan, .3f, true);
+                ParticleRegistry.SpawnHeavySmokeParticle(Projectile.Center, vel * .4f, 50, scale * .5f, Color.DarkCyan,
+                    .3f, true);
             }
         }
 
         if (this.RunLocal())
-            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<LuminiteBlast>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
+            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<LuminiteBlast>(),
+                Projectile.damage, Projectile.knockBack, Projectile.owner);
     }
-    
+
     public OptimizedPrimitiveTrail trail;
     public TrailPoints points = new(30);
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -108,6 +117,7 @@ public class LuminiteRocket : ModProjectile
 public class LuminiteBlast : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.Size = new(180f);

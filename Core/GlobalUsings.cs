@@ -8,6 +8,5 @@ global using static TheExtraordinaryAdditions.Core.Utilities.PrimitiveUtils;
 global using static TheExtraordinaryAdditions.Core.Utilities.TileUtils;
 global using static TheExtraordinaryAdditions.Core.Utilities.SpriteBatchUtils;
 global using static TheExtraordinaryAdditions.Core.Utilities.SeekingUtils;
-global using CalUtils = CalamityMod.CalamityUtils;
 global using RotatedRectangle = TheExtraordinaryAdditions.Core.DataStructures.RotatedRectangle;
 global using SystemVector2 = System.Numerics.Vector2;

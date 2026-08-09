@@ -37,38 +37,38 @@ public partial class Asterlin
             StateMachine.RegisterState(new EntityAIState<AsterlinAIType>(type));
 
         StateMachine.AddTransitionStateHijack(
-        originalState =>
-        {
-            if (NPC.life <= 1 && !DoneDesperationTransition)
-                return AsterlinAIType.DesperationDrama;
-            if (DoneDesperationTransition)
-                return originalState;
-
-            if (LifeRatio <= Phase3LifeRatio && !DonePhase3Transition)
-                return AsterlinAIType.EnterPhase3;
-            if (DonePhase3Transition)
-                return originalState;
-
-            if (LifeRatio <= Phase2LifeRatio && !DonePhase2Transition)
-                return AsterlinAIType.EnterPhase2;
-            
-            return originalState;
-        },
-        finalState =>
-        {
-            switch (finalState)
+            originalState =>
             {
-                case AsterlinAIType.EnterPhase2:
-                    DonePhase2Transition = true;
-                    break;
-                case AsterlinAIType.EnterPhase3:
-                    DonePhase3Transition = true;
-                    break;
-                case AsterlinAIType.DesperationDrama:
-                    DoneDesperationTransition = true;
-                    break;
-            }
-        });
+                if (NPC.life <= 1 && !DoneDesperationTransition)
+                    return AsterlinAIType.DesperationDrama;
+                if (DoneDesperationTransition)
+                    return originalState;
+
+                if (LifeRatio <= Phase3LifeRatio && !DonePhase3Transition)
+                    return AsterlinAIType.EnterPhase3;
+                if (DonePhase3Transition)
+                    return originalState;
+
+                if (LifeRatio <= Phase2LifeRatio && !DonePhase2Transition)
+                    return AsterlinAIType.EnterPhase2;
+
+                return originalState;
+            },
+            finalState =>
+            {
+                switch (finalState)
+                {
+                    case AsterlinAIType.EnterPhase2:
+                        DonePhase2Transition = true;
+                        break;
+                    case AsterlinAIType.EnterPhase3:
+                        DonePhase3Transition = true;
+                        break;
+                    case AsterlinAIType.DesperationDrama:
+                        DoneDesperationTransition = true;
+                        break;
+                }
+            });
 
         // Load state transitions
         AutomatedMethodInvokeAttribute.InvokeWithAttribute(this);

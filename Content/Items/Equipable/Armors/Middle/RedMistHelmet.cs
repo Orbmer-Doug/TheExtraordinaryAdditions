@@ -2,7 +2,6 @@
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
@@ -19,8 +18,10 @@ public class RedMistHelmet : ModItem
     public override void SetStaticDefaults()
     {
         ArmorIDs.Head.Sets.DrawHead[Item.headSlot] = false; // Don't draw the head at all. Used by Space Creature Mask
-        ArmorIDs.Head.Sets.DrawHatHair[Item.headSlot] = false; // Draw hair as if a hat was covering the top. Used by Wizards Hat
-        ArmorIDs.Head.Sets.DrawFullHair[Item.headSlot] = false; // Draw all hair as normal. Used by Mime Mask, Sunglasses
+        ArmorIDs.Head.Sets.DrawHatHair[Item.headSlot] =
+            false; // Draw hair as if a hat was covering the top. Used by Wizards Hat
+        ArmorIDs.Head.Sets.DrawFullHair[Item.headSlot] =
+            false; // Draw all hair as normal. Used by Mime Mask, Sunglasses
         ArmorIDs.Head.Sets.DrawsBackHairWithoutHeadgear[Item.headSlot] = false;
     }
 
@@ -39,18 +40,22 @@ public class RedMistHelmet : ModItem
     }
 
     public const int AuraDamage = 300;
+
     public override void UpdateArmorSet(Player player)
     {
         string hotkey = AdditionsKeybinds.SetBonusHotKey.TooltipHotkeyString();
         player.setBonus = this.GetLocalization("SetBonus").Format(hotkey);
 
         int type = ModContent.ProjectileType<StygainAura>();
-        if (AdditionsKeybinds.SetBonusHotKey.JustPressed && player.ownedProjectileCounts[type] <= 0 && !CalUtils.HasCooldown(player, RedMistCooldown.ID) && player.whoAmI == Main.myPlayer)
+        /* TODO
+        if (AdditionsKeybinds.SetBonusHotKey.JustPressed && player.ownedProjectileCounts[type] <= 0 && !.HasCooldown(
+            player, RedMistCooldown.ID) && player.whoAmI == Main.myPlayer)
         {
             AdditionsSound.etherealThrow.Play(player.Center, 1f, 0f, .1f);
             player.NewPlayerProj(player.Center, Vector2.Zero, type, AuraDamage, 1f, player.whoAmI);
-            CalUtils.AddCooldown(player, RedMistCooldown.ID, StygainAura.CooldownTime);
+                .AddCooldown(player, RedMistCooldown.ID, StygainAura.CooldownTime);
         }
+        */
 
         player.GetModPlayer<RedMistPlayer>().Equipped = true;
     }
@@ -61,6 +66,7 @@ public class RedMistHelmet : ModItem
         {
             return legs.type == ModContent.ItemType<MimicryLeggings>();
         }
+
         return false;
     }
 

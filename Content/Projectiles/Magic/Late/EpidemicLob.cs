@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using CalamityMod;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Common.Particles.Shader;
@@ -12,22 +11,25 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
 public class EpidemicLob : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     private bool HitTarget
     {
-        get => (int)Projectile.ai[0] == 1;
+        get => (int) Projectile.ai[0] == 1;
         set => Projectile.ai[0] = value.ToInt();
     }
+
     private bool HitGround
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[0] == 1;
+        get => (int) Projectile.AdditionsInfo().ExtraAI[0] == 1;
         set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
 
     private int Timer
     {
-        get => (int)Projectile.ai[1];
+        get => (int) Projectile.ai[1];
         set => Projectile.ai[1] = value;
     }
+
     private ref float Counter => ref Projectile.AdditionsInfo().ExtraAI[1];
     public ref float EnemyID => ref Projectile.ai[2];
 
@@ -39,7 +41,7 @@ public class EpidemicLob : ModProjectile
         Projectile.ignoreWater = true;
         Projectile.DamageType = DamageClass.Magic;
         Projectile.penetrate = -1;
-        Projectile.timeLeft = CalUtils.SecondsToFrames(4);
+        Projectile.timeLeft = SecondsToFrames(4);
 
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = 8;
@@ -50,7 +52,8 @@ public class EpidemicLob : ModProjectile
     public override void ReceiveExtraAI(BinaryReader reader) => offset = reader.ReadVector2();
     private const int FadeIn = 15;
 
-    public static readonly int Charge = CalUtils.SecondsToFrames(2);
+    public static readonly int Charge = SecondsToFrames(2);
+
     public override void AI()
     {
         Lighting.AddLight(Projectile.Center, Color.Olive.ToVector3() * Projectile.scale);
@@ -59,14 +62,16 @@ public class EpidemicLob : ModProjectile
         float inter = InverseLerp(0f, Charge, Counter, true);
         Projectile.scale = fadeInter * (1f - inter);
 
-        ShaderParticleRegistry.SpawnEpidemicParticle(Projectile.Center, Main.rand.NextVector2Circular(1f, 1f) * Projectile.scale, Projectile.scale * 50f);
+        ShaderParticleRegistry.SpawnEpidemicParticle(Projectile.Center,
+            Main.rand.NextVector2Circular(1f, 1f) * Projectile.scale, Projectile.scale * 50f);
 
         if (Timer % FadeIn == FadeIn - 1)
         {
             const int amt = 20;
             for (int i = 0; i < amt; i++)
             {
-                Vector2 vel = GetPointOnRotatedEllipse(3f, 8f, Projectile.velocity.ToRotation(), Terraria.Utils.Remap(i, 0, amt, 0f, MathHelper.TwoPi));
+                Vector2 vel = GetPointOnRotatedEllipse(3f, 8f, Projectile.velocity.ToRotation(),
+                    Terraria.Utils.Remap(i, 0, amt, 0f, MathHelper.TwoPi));
                 Vector2 pos = Projectile.Center + vel;
                 ShaderParticleRegistry.SpawnEpidemicParticle(pos, vel * Projectile.scale, Projectile.scale * 40f);
             }
@@ -83,7 +88,7 @@ public class EpidemicLob : ModProjectile
 
         if (HitTarget)
         {
-            NPC target = Main.npc[(int)EnemyID];
+            NPC target = Main.npc[(int) EnemyID];
 
             if (target == null || target.active == false)
                 return;
@@ -112,7 +117,8 @@ public class EpidemicLob : ModProjectile
             {
                 float scale = (1f - inter) * 100f;
                 Vector2 pos = Projectile.Center + Main.rand.NextVector2Circular(scale, scale);
-                ParticleRegistry.SpawnCloudParticle(Projectile.Center, RandomVelocity(2f, 1f, 4f), Color.LimeGreen, Color.DarkOliveGreen, 20, 1f - inter, .8f);
+                ParticleRegistry.SpawnCloudParticle(Projectile.Center, RandomVelocity(2f, 1f, 4f), Color.LimeGreen,
+                    Color.DarkOliveGreen, 20, 1f - inter, .8f);
             }
 
             Counter++;
@@ -152,7 +158,8 @@ public class EpidemicLob : ModProjectile
 
     public override void OnKill(int timeLeft)
     {
-        ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 12, 0f, Vector2.One, 0f, 500f, Color.DarkOliveGreen, true);
+        ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 12, 0f, Vector2.One, 0f, 500f,
+            Color.DarkOliveGreen, true);
 
         float dustCount = MathHelper.TwoPi * 200 / 8f;
 
@@ -168,7 +175,8 @@ public class EpidemicLob : ModProjectile
         // Create spikes
         for (int x = 0; x < 10; x++)
         {
-            Vector2 vel = Projectile.Center.SafeDirectionTo(Projectile.Center + Main.rand.NextVector2CircularEdge(200f, 200f));
+            Vector2 vel =
+                Projectile.Center.SafeDirectionTo(Projectile.Center + Main.rand.NextVector2CircularEdge(200f, 200f));
 
             const int amt = 80;
             for (int i = 0; i < amt; i++)

@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.IO;
-using CalamityMod;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -27,7 +26,7 @@ public class StellarKunaiProj : ModProjectile, ILocalizedModType, IModType
     private Vector2 offset;
     public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(offset);
     public override void ReceiveExtraAI(BinaryReader reader) => offset = reader.ReadVector2();
-    
+
     public const int ChargeupTime = 30;
     public const int Lifetime = 200;
     public float ChargeProgress => InverseLerp(0f, ChargeupTime, Timer);
@@ -37,7 +36,9 @@ public class StellarKunaiProj : ModProjectile, ILocalizedModType, IModType
         get => Projectile.ai[0] == 1f;
         set => Projectile.ai[0] = value.ToInt();
     }
+
     public ref float EnemyID => ref Projectile.ai[1];
+
     public bool Stuck
     {
         get => Projectile.ai[2] == 1f;
@@ -54,6 +55,7 @@ public class StellarKunaiProj : ModProjectile, ILocalizedModType, IModType
     }
 
     private const int RealWidth = 48;
+
     public override void SetDefaults()
     {
         Projectile.width = 18;
@@ -100,10 +102,12 @@ public class StellarKunaiProj : ModProjectile, ILocalizedModType, IModType
         {
             if (this.RunLocal())
             {
-                Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, center.SafeDirectionTo(Owner.Additions().MouseWorld), (1f - ChargeProgress) * .5f);
+                Projectile.velocity = Vector2.SmoothStep(Projectile.velocity,
+                    center.SafeDirectionTo(Owner.Additions().MouseWorld), (1f - ChargeProgress) * .5f);
                 if (Projectile.velocity != Projectile.oldVelocity)
                     this.Sync();
             }
+
             Owner.ChangeDir(Projectile.velocity.X.NonZeroSign());
             float rotation = ArmAnticipationMovement();
             Projectile.Center = center + PolarVector(40f, rotation);
@@ -111,6 +115,7 @@ public class StellarKunaiProj : ModProjectile, ILocalizedModType, IModType
             Owner.SetCompositeArmFront(true, 0, rotation - MathHelper.PiOver2);
             return;
         }
+
         if (Timer == ChargeupTime)
         {
             SoundID.Item1.Play(Projectile.Center, Main.rand.NextFloat(.9f, 1.2f), 0f, .1f, null, 1, Name);
@@ -125,11 +130,13 @@ public class StellarKunaiProj : ModProjectile, ILocalizedModType, IModType
             Returning = true;
             this.Sync();
         }
+
         if (Returning)
         {
             Vector2 handPos = Owner.GetFrontHandPositionImproved();
             float jitter = 10f * (1f - ReelInterpolant);
-            Vector2 backPos = Projectile.Center - Projectile.velocity.SafeNormalize(Vector2.Zero) * (RealWidth * .3f) + Main.rand.NextVector2Circular(jitter, jitter);
+            Vector2 backPos = Projectile.Center - Projectile.velocity.SafeNormalize(Vector2.Zero) * (RealWidth * .3f) +
+                              Main.rand.NextVector2Circular(jitter, jitter);
 
             line.SetPoints(handPos.GetLaserControlPoints(backPos, 30));
 
@@ -147,24 +154,28 @@ public class StellarKunaiProj : ModProjectile, ILocalizedModType, IModType
                 Projectile.friendly = true;
                 SoundEngine.PlaySound(SoundID.Item9 with { Volume = .8f, PitchVariance = .1f }, Projectile.Center);
             }
+
             if (ReturningTimer > ChargeupTime)
             {
                 Stuck = false;
-                Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Owner.Center) * 20f, .8f);
+                Projectile.velocity =
+                    Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Owner.Center) * 20f, .8f);
                 Projectile.extraUpdates = 5;
                 if (Projectile.Hitbox.Intersects(Owner.Hitbox))
                 {
                     Projectile.Kill();
                 }
+
                 this.Sync();
             }
+
             ReturningTimer++;
         }
 
         if (Stuck)
         {
             // Stick to the target
-            NPC target = Main.npc[(int)MathHelper.Clamp((int)EnemyID, 0, Main.maxNPCs)];
+            NPC target = Main.npc[(int) MathHelper.Clamp((int) EnemyID, 0, Main.maxNPCs)];
 
             if (!target.active)
             {
@@ -194,13 +205,14 @@ public class StellarKunaiProj : ModProjectile, ILocalizedModType, IModType
                 Vector2 vel = -Projectile.velocity.RotatedBy(.45f * i) * Main.rand.NextFloat(.4f, .7f);
 
                 ParticleRegistry.SpawnSparkParticle(pos, vel, 12, Main.rand.NextFloat(.1f, .3f), Color.BlueViolet);
-                ParticleRegistry.SpawnSparkleParticle(pos, vel, 20, Main.rand.NextFloat(.4f, .6f), Color.Blue, Color.Cyan, 1.1f);
+                ParticleRegistry.SpawnSparkleParticle(pos, vel, 20, Main.rand.NextFloat(.4f, .6f), Color.Blue,
+                    Color.Cyan, 1.1f);
             }
 
             // Play some flying sounds
             if (Projectile.soundDelay <= 0)
             {
-                SoundEngine.PlaySound(SoundID.Item7, (Vector2?)Projectile.Center, null);
+                SoundEngine.PlaySound(SoundID.Item7, (Vector2?) Projectile.Center, null);
                 Projectile.soundDelay = 8;
             }
 
@@ -225,11 +237,13 @@ public class StellarKunaiProj : ModProjectile, ILocalizedModType, IModType
         target.AddBuff(ModContent.BuffType<KunaiTag>(), 120);
 
         Vector2 pos = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero) * RealWidth * .5f;
-        ParticleRegistry.SpawnSparkleParticle(pos, Vector2.Zero, Main.rand.Next(15, 17), Main.rand.NextFloat(2.2f, 2.5f), Color.White, Color.FloralWhite, 1f, .1f);
+        ParticleRegistry.SpawnSparkleParticle(pos, Vector2.Zero, Main.rand.Next(15, 17),
+            Main.rand.NextFloat(2.2f, 2.5f), Color.White, Color.FloralWhite, 1f, .1f);
         for (int i = 0; i < Main.rand.Next(6, 12); i++)
         {
             Vector2 vel = Projectile.velocity.RotatedByRandom(.35f) * Main.rand.NextFloat(.8f, 1.4f) * (Stuck ? -1 : 1);
-            ParticleRegistry.SpawnSparkParticle(pos, vel, Main.rand.Next(45, 60), Main.rand.NextFloat(.4f, .6f), Color.AntiqueWhite);
+            ParticleRegistry.SpawnSparkParticle(pos, vel, Main.rand.Next(45, 60), Main.rand.NextFloat(.4f, .6f),
+                Color.AntiqueWhite);
         }
 
         // Set the sticking variables
@@ -247,12 +261,13 @@ public class StellarKunaiProj : ModProjectile, ILocalizedModType, IModType
         }
 
         // Small penalty
-        Projectile.damage = (int)(Projectile.damage * .9f);
+        Projectile.damage = (int) (Projectile.damage * .9f);
     }
 
     public override bool OnTileCollide(Vector2 oldVelocity)
     {
-        Projectile.velocity = Projectile.oldVelocity.Length() * 0.3f * Utils.SafeNormalize(Owner.MountedCenter - Projectile.Center, Vector2.One);
+        Projectile.velocity = Projectile.oldVelocity.Length() * 0.3f *
+                              Utils.SafeNormalize(Owner.MountedCenter - Projectile.Center, Vector2.One);
         Returning = true;
         Projectile.tileCollide = false;
         return false;
@@ -269,12 +284,13 @@ public class StellarKunaiProj : ModProjectile, ILocalizedModType, IModType
 
     private Color ColorFunction(SystemVector2 c, Vector2 position)
     {
-        Color col = new Color(8, 10 + (int)(95 * c.X), 145) * c.X;
+        Color col = new Color(8, 10 + (int) (95 * c.X), 145) * c.X;
         return col * ReelInterpolant;
     }
 
     public TrailPoints line = new(30);
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -286,16 +302,19 @@ public class StellarKunaiProj : ModProjectile, ILocalizedModType, IModType
             {
                 ManagedShader prim = ShaderRegistry.EnlightenedBeam;
                 prim.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Streak), 1, SamplerState.LinearWrap);
-                prim.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.BigWavyBlobNoise), 2, SamplerState.LinearWrap);
+                prim.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.BigWavyBlobNoise), 2,
+                    SamplerState.LinearWrap);
                 trail.DrawTrail(prim, line.Points, 100);
             }
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 
         Texture2D texture = Projectile.ThisProjectileTexture();
         Rectangle frame = texture.Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame);
         Vector2 drawPosition = Projectile.Center - Main.screenPosition;
-        Main.EntitySpriteDraw(texture, drawPosition, frame, Projectile.GetAlpha(Color.White), Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, 0, 0);
+        Main.EntitySpriteDraw(texture, drawPosition, frame, Projectile.GetAlpha(Color.White), Projectile.rotation,
+            frame.Size() * 0.5f, Projectile.scale, 0, 0);
 
         return false;
     }

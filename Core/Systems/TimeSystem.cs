@@ -74,8 +74,8 @@ public sealed class TimeSystem : ModSystem
         RenderOnlyFrame = updateCount == lastRenderUpdateCount;
         lastRenderUpdateCount = updateCount;
 
-        RenderTime = (float)gameTime.TotalGameTime.TotalSeconds;
-        RenderDeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+        RenderTime = (float) gameTime.TotalGameTime.TotalSeconds;
+        RenderDeltaTime = (float) gameTime.ElapsedGameTime.TotalSeconds;
 
         orig(main, gameTime);
 
@@ -84,7 +84,7 @@ public sealed class TimeSystem : ModSystem
 
     private static void OnDoUpdate(On_Main.orig_DoUpdate orig, Main main, ref GameTime gameTime)
     {
-        LogicTime = (float)gameTime.TotalGameTime.TotalSeconds;
+        LogicTime = (float) gameTime.TotalGameTime.TotalSeconds;
 
         orig(main, ref gameTime);
     }

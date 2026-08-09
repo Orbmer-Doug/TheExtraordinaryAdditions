@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using CalamityMod;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
@@ -25,6 +24,7 @@ public class HolySwordSwing : BaseSwordSwing
         get => Projectile.AdditionsInfo().ExtraAI[7] == 1f;
         set => Projectile.AdditionsInfo().ExtraAI[7] = value.ToInt();
     }
+
     public ref float Shots => ref Projectile.AdditionsInfo().ExtraAI[8];
 
     public float MaxScale => 2f * MeleeScale;
@@ -36,14 +36,15 @@ public class HolySwordSwing : BaseSwordSwing
 
     public const float ThrustReel = .3f;
     public const float ThrustOut = 1f;
+
     public override float Animation()
     {
         if (Mark)
         {
             return new PiecewiseCurve()
-            .Add(15f, -20f, ThrustReel, MakePoly(2.4f).OutFunction)
-            .Add(-20f, 30f, ThrustOut, Circ.OutFunction)
-            .Evaluate(SwingCompletion) * Clamp(Projectile.scale, 0f, 1f);
+                .Add(15f, -20f, ThrustReel, MakePoly(2.4f).OutFunction)
+                .Add(-20f, 30f, ThrustOut, Circ.OutFunction)
+                .Evaluate(SwingCompletion) * Clamp(Projectile.scale, 0f, 1f);
         }
 
         return new PiecewiseCurve()
@@ -52,12 +53,17 @@ public class HolySwordSwing : BaseSwordSwing
             .Add(.9f, 1f, EndPercent, MakePoly(2).OutFunction)
             .Evaluate(SwingCompletion);
     }
+
     public Vector2 LightPos => Owner.Center - Vector2.UnitY * Main.screenHeight / 2;
     public const float LightWidth = .3f;
 
     public override bool CanHitPvp(Player target) => SwingCompletion.BetweenNum(ReelPercent, SwingPercent) && !Mark;
-    public override bool? CanHitNPC(NPC target) => SwingCompletion.BetweenNum(ReelPercent, SwingPercent) && !Mark ? null : false;
-    public override bool? CanCutTiles() => SwingCompletion.BetweenNum(ReelPercent, SwingPercent) && !Mark ? null : false;
+
+    public override bool? CanHitNPC(NPC target) =>
+        SwingCompletion.BetweenNum(ReelPercent, SwingPercent) && !Mark ? null : false;
+
+    public override bool? CanCutTiles() =>
+        SwingCompletion.BetweenNum(ReelPercent, SwingPercent) && !Mark ? null : false;
 
     public override void SafeInitialize()
     {
@@ -74,7 +80,8 @@ public class HolySwordSwing : BaseSwordSwing
         if (!Mark)
             Projectile.Center = Owner.GetFrontHandPositionImproved();
         else
-            Projectile.Center = Owner.GetFrontHandPositionImproved() + PolarVector(Animation(), Projectile.rotation - SwordRotation);
+            Projectile.Center = Owner.GetFrontHandPositionImproved() +
+                                PolarVector(Animation(), Projectile.rotation - SwordRotation);
 
         Owner.heldProj = Projectile.whoAmI;
         Owner.SetDummyItemTime(2);
@@ -101,7 +108,9 @@ public class HolySwordSwing : BaseSwordSwing
                 {
                     foreach (NPC npc in Main.ActiveNPCs)
                     {
-                        if (npc.CanHomeInto() && LightPos.IsInFieldOfView(PiOver2, npc.Center, LightWidth * 2f, 1000f) && npc.GetGlobalNPC<HolyGlobalNPC>().MarkedTime <= 0)
+                        if (npc.CanHomeInto() &&
+                            LightPos.IsInFieldOfView(PiOver2, npc.Center, LightWidth * 2f, 1000f) &&
+                            npc.GetGlobalNPC<HolyGlobalNPC>().MarkedTime <= 0)
                             npc.GetGlobalNPC<HolyGlobalNPC>().MarkedTime = HolyGlobalNPC.TimeMarked;
                     }
 
@@ -111,6 +120,7 @@ public class HolySwordSwing : BaseSwordSwing
                         PlayedSound = true;
                     }
                 }
+
                 Time++;
 
                 Projectile.scale = MakePoly(3f).InOutFunction.Evaluate(Time, 0f, 20f * MaxUpdates, 0f, MaxScale);
@@ -137,7 +147,8 @@ public class HolySwordSwing : BaseSwordSwing
                                 Vector2 pos = Rect().Top;
                                 if (this.RunLocal())
                                     Projectile.NewProj(pos, Center.SafeDirectionTo(pos) * Main.rand.NextFloat(5f, 9f),
-                                        ModContent.ProjectileType<HolyDart>(), Projectile.damage, Projectile.knockBack, Projectile.owner);
+                                        ModContent.ProjectileType<HolyDart>(), Projectile.damage, Projectile.knockBack,
+                                        Projectile.owner);
                                 Shots++;
                                 break;
                             }
@@ -189,11 +200,15 @@ public class HolySwordSwing : BaseSwordSwing
 
         for (int i = 0; i < 2; i++)
         {
-            Vector2 pos = (Rect().Bottom + PolarVector(28f * Projectile.scale, Projectile.rotation + SwordRotation)).Lerp(Rect().Top, Main.rand.NextFloat());
+            Vector2 pos =
+                (Rect().Bottom + PolarVector(28f * Projectile.scale, Projectile.rotation + SwordRotation)).Lerp(
+                    Rect().Top, Main.rand.NextFloat());
             int life = Main.rand.Next(20, 30);
             float scale = Main.rand.NextFloat(.2f, .5f);
-            Color color = ColorFunct(SystemVector2.One * Main.rand.NextFloat(.1f, .6f), Vector2.Zero).Lerp(Color.OrangeRed, Main.rand.NextFloat(0f, .4f));
-            ParticleRegistry.SpawnBloomPixelParticle(pos, SwordDir * Main.rand.NextFloat(7f, 12f), life, scale, color, color * 1.5f, null, 1.4f);
+            Color color = ColorFunct(SystemVector2.One * Main.rand.NextFloat(.1f, .6f), Vector2.Zero)
+                .Lerp(Color.OrangeRed, Main.rand.NextFloat(0f, .4f));
+            ParticleRegistry.SpawnBloomPixelParticle(pos, SwordDir * Main.rand.NextFloat(7f, 12f), life, scale, color,
+                color * 1.5f, null, 1.4f);
         }
     }
 
@@ -205,7 +220,8 @@ public class HolySwordSwing : BaseSwordSwing
             int life = Main.rand.Next(30, 40);
             float scale = Main.rand.NextFloat(.9f, 1.6f);
             Color color = Color.Gold.Lerp(Color.Goldenrod, Main.rand.NextFloat(.3f, .7f));
-            ParticleRegistry.SpawnSparkParticle(start + Main.rand.NextVector2Circular(9f, 9f), SwordDir.RotatedByRandom(.2f) * Main.rand.NextFloat(9f, 15f), life, scale, color);
+            ParticleRegistry.SpawnSparkParticle(start + Main.rand.NextVector2Circular(9f, 9f),
+                SwordDir.RotatedByRandom(.2f) * Main.rand.NextFloat(9f, 15f), life, scale, color);
         }
 
         for (int i = 0; i < Main.rand.Next(5, 9); i++)
@@ -213,7 +229,8 @@ public class HolySwordSwing : BaseSwordSwing
             int life = Main.rand.Next(30, 50);
             float scale = Main.rand.NextFloat(60.9f, 90.1f);
             Color color = Color.Gold.Lerp(Color.OrangeRed, Main.rand.NextFloat(.3f, .7f));
-            ParticleRegistry.SpawnGlowParticle(start, SwordDir.RotatedByRandom(.21f) * Main.rand.NextFloat(2f, 10f), life, scale, color);
+            ParticleRegistry.SpawnGlowParticle(start, SwordDir.RotatedByRandom(.21f) * Main.rand.NextFloat(2f, 10f),
+                life, scale, color);
         }
 
         npc.velocity += SwordDir * Item.knockBack * npc.knockBackResist;
@@ -231,7 +248,8 @@ public class HolySwordSwing : BaseSwordSwing
             int life = Main.rand.Next(30, 40);
             float scale = Main.rand.NextFloat(.9f, 1.6f);
             Color color = Color.Gold.Lerp(Color.Goldenrod, Main.rand.NextFloat(.3f, .7f));
-            ParticleRegistry.SpawnSparkParticle(start + Main.rand.NextVector2Circular(9f, 9f), SwordDir.RotatedByRandom(.2f) * Main.rand.NextFloat(9f, 15f), life, scale, color);
+            ParticleRegistry.SpawnSparkParticle(start + Main.rand.NextVector2Circular(9f, 9f),
+                SwordDir.RotatedByRandom(.2f) * Main.rand.NextFloat(9f, 15f), life, scale, color);
         }
 
         for (int i = 0; i < Main.rand.Next(3, 5); i++)
@@ -239,7 +257,8 @@ public class HolySwordSwing : BaseSwordSwing
             int life = Main.rand.Next(20, 30);
             float scale = Main.rand.NextFloat(.9f, 1.1f);
             Color color = Color.Chocolate.Lerp(Color.OrangeRed, Main.rand.NextFloat(.3f, .7f));
-            ParticleRegistry.SpawnGlowParticle(start, SwordDir.RotatedByRandom(.21f) * Main.rand.NextFloat(2f, 10f), life, scale, color);
+            ParticleRegistry.SpawnGlowParticle(start, SwordDir.RotatedByRandom(.21f) * Main.rand.NextFloat(2f, 10f),
+                life, scale, color);
         }
 
         ScreenShakeSystem.New(new(.1f, .1f), start);
@@ -249,6 +268,7 @@ public class HolySwordSwing : BaseSwordSwing
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints points = new(20);
+
     public static float WidthFunct(float c)
     {
         return OptimizedPrimitiveTrail.HemisphereWidthFunct(c, SmoothStep(1f, 0f, c) * 30f);
@@ -276,10 +296,11 @@ public class HolySwordSwing : BaseSwordSwing
             effect.TrySetParameter("edgeBlendLength", 0.14f);
             effect.TrySetParameter("edgeBlendStrength", 13f);
 
-            Main.spriteBatch.EnterShaderRegion(BlendState.Additive, effect.Effect);
+            Main.spriteBatch.EnterShaderRegion(effect.Effect, BlendState.Additive);
             Texture2D invis = AssetRegistry.InvisTex;
-            Main.EntitySpriteDraw(invis, LightPos - Main.screenPosition, null, Color.White, PiOver2, invis.Size() / 2, 2400f, 0, 0f);
-            Main.spriteBatch.ExitShaderRegion();
+            Main.EntitySpriteDraw(invis, LightPos - Main.screenPosition, null, Color.White, PiOver2, invis.Size() / 2,
+                2400f, 0, 0f);
+            Main.spriteBatch.ResetToDefault();
         }
 
         Vector2 origin;
@@ -328,19 +349,23 @@ public class HolyGlobalNPC : GlobalNPC
     public override bool InstancePerEntity => true;
     public int MarkedTime;
     public Vector2 CrossPos;
-    public static readonly int TimeMarked = CalUtils.SecondsToFrames(10);
+    public static readonly int TimeMarked = SecondsToFrames(10);
+
     public override bool AppliesToEntity(NPC entity, bool lateInstantiation)
     {
         return lateInstantiation && entity.realLife <= 0;
     }
+
     public override void PostAI(NPC npc)
     {
         if (MarkedTime > 0)
         {
-            CrossPos = Vector2.SmoothStep(CrossPos, npc.Center + Vector2.UnitY * -(npc.height + (Sin01(MarkedTime * .01f) * 40f)), .5f);
+            CrossPos = Vector2.SmoothStep(CrossPos,
+                npc.Center + Vector2.UnitY * -(npc.height + (Sin01(MarkedTime * .01f) * 40f)), .5f);
             MarkedTime--;
         }
     }
+
     public override void PostDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
         if (MarkedTime > 0)
@@ -354,11 +379,13 @@ public class HolyGlobalNPC : GlobalNPC
 
             for (int i = 0; i < 6; i++)
             {
-                Vector2 spinStart = drawPosition + Terraria.Utils.RotatedBy(spinPoint, (double)(rotation - (float)Math.PI * i / 3f), default);
+                Vector2 spinStart = drawPosition + Terraria.Utils.RotatedBy(spinPoint,
+                    (double) (rotation - (float) Math.PI * i / 3f), default);
                 Color glowAlpha = backglow;
                 glowAlpha.A = 25;
                 Main.spriteBatch.Draw(tex, spinStart, null, glowAlpha * .85f, 0f, tex.Size() / 2, scale, 0, 0f);
             }
+
             spriteBatch.Draw(tex, drawPosition, null, Color.White, 0f, tex.Size() / 2, scale, 0, 0f);
         }
     }

@@ -33,11 +33,13 @@ public class Seams : ModProjectile, ILocalizedModType, IModType
     public const int MaxWidth = 1400;
     public float Interpolant => InverseLerp(0f, MaxTime, Time);
     public Point Size;
+
     public override void SendExtraAI(BinaryWriter writer)
     {
         writer.Write(Size.X);
         writer.Write(Size.Y);
     }
+
     public override void ReceiveExtraAI(BinaryReader reader)
     {
         Size.X = reader.ReadInt32();
@@ -48,10 +50,11 @@ public class Seams : ModProjectile, ILocalizedModType, IModType
     {
         Projectile.rotation = Projectile.velocity.ToRotation();
 
-        int width = (int)Animators.MakePoly(3f).InOutFunction.Evaluate(70f, MaxWidth, Interpolant);
-        int height = (int)Animators.MakePoly(3f).OutFunction.Evaluate(100f, 10f, Interpolant);
+        int width = (int) Animators.MakePoly(3f).InOutFunction.Evaluate(70f, MaxWidth, Interpolant);
+        int height = (int) Animators.MakePoly(3f).OutFunction.Evaluate(100f, 10f, Interpolant);
         Size = new(width, height);
-        Projectile.Opacity = Animators.MakePoly(2f).InFunction(InverseLerp(0f, 5f * Projectile.MaxUpdates, Projectile.timeLeft));
+        Projectile.Opacity = Animators.MakePoly(2f)
+            .InFunction(InverseLerp(0f, 5f * Projectile.MaxUpdates, Projectile.timeLeft));
 
         Time++;
     }
@@ -76,11 +79,16 @@ public class Seams : ModProjectile, ILocalizedModType, IModType
 
             for (float i = .5f; i < 1f; i += .1f)
             {
-                Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Size.ToVector2() * i * .4f * Projectile.Opacity), null, Color.White * Projectile.Opacity, Projectile.rotation, origin);
-                Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Size.ToVector2() * i), null, col, Projectile.rotation, origin);
-                Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Size.ToVector2() * i * 1.3f), null, new Color(77, 0, 110) * Projectile.Opacity * .4f, Projectile.rotation, origin);
+                Main.spriteBatch.DrawBetterRect(tex,
+                    ToTarget(Projectile.Center, Size.ToVector2() * i * .4f * Projectile.Opacity), null,
+                    Color.White * Projectile.Opacity, Projectile.rotation, origin);
+                Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Size.ToVector2() * i), null, col,
+                    Projectile.rotation, origin);
+                Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Size.ToVector2() * i * 1.3f), null,
+                    new Color(77, 0, 110) * Projectile.Opacity * .4f, Projectile.rotation, origin);
             }
         }
+
         PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.Dusts, BlendState.Additive);
 
         return false;

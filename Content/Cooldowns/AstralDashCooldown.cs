@@ -1,4 +1,4 @@
-﻿using CalamityMod.Cooldowns;
+﻿/*
 using Terraria;
 using Terraria.Localization;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
@@ -15,6 +15,7 @@ public class AstralDashCooldown : CooldownHandler
     public override Color OutlineColor => Color.White;
     public override Color CooldownStartColor => new(66, 189, 181);
     public override Color CooldownEndColor => new(109, 242, 196);
+
     public override void Tick()
     {
         if (Main.rand.NextBool(4))
@@ -25,9 +26,13 @@ public class AstralDashCooldown : CooldownHandler
             int life = Main.rand.Next(40, 100);
             float scale = Main.rand.NextFloat(.3f, .5f);
             Color col = MulticolorLerp(Sin01(Main.GlobalTimeWrappedHourly * 1.4f), AstralKatanaSweep.AstralBluePalette);
-            Color col2 = MulticolorLerp(Cos01(Main.GlobalTimeWrappedHourly * 1.4f), AstralKatanaSweep.AstralOrangePalette);
+            Color col2 = MulticolorLerp(Cos01(Main.GlobalTimeWrappedHourly * 1.4f),
+                AstralKatanaSweep.AstralOrangePalette);
             Color color = Main.rand.NextBool() ? col : col2;
             ParticleRegistry.SpawnBloomPixelParticle(pos, vel, life, scale, color, color, center, 1.1f);
         }
     }
 }
+*/
+
+

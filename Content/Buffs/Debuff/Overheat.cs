@@ -30,7 +30,10 @@ public class Overheat : ModBuff
         if (player.statLife <= 0)
         {
             player.statLife = 0;
-            player.KillMe(PlayerDeathReason.ByCustomReason(NetworkText.FromKey("Mods.TheExtraordinaryAdditions.Status.Death.Overheat", player.name)), 10, 1, false);
+            player.KillMe(
+                PlayerDeathReason.ByCustomReason(
+                    NetworkText.FromKey("Mods.TheExtraordinaryAdditions.Status.Death.Overheat", player.name)), 10, 1,
+                false);
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.IO;
-using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -52,7 +51,7 @@ public class EncasingGlacier : ModNPC
 
     public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)
     {
-        NPC.lifeMax = (int)(NPC.lifeMax * 0.8f * balance);
+        NPC.lifeMax = (int) (NPC.lifeMax * 0.8f * balance);
     }
 
     public override void SendExtraAI(BinaryWriter writer)
@@ -67,7 +66,7 @@ public class EncasingGlacier : ModNPC
 
     public int AuroraIndex
     {
-        get => (int)NPC.ai[0];
+        get => (int) NPC.ai[0];
         set => NPC.ai[0] = value;
     }
 
@@ -76,7 +75,7 @@ public class EncasingGlacier : ModNPC
 
     public bool Breaking
     {
-        get => (int)NPC.ai[3] == 1;
+        get => (int) NPC.ai[3] == 1;
         set => NPC.ai[3] = value.ToInt();
     }
 
@@ -150,14 +149,14 @@ public class EncasingGlacier : ModNPC
             ManagedShader shader = AssetRegistry.GetShader("RadialCrackingShader");
             shader.TrySetParameter("Completion", BreakCompletion);
 
-            Main.spriteBatch.EnterShaderRegion(BlendState.NonPremultiplied, shader.Effect);
+            Main.spriteBatch.EnterShaderRegion(shader.Effect, BlendState.NonPremultiplied);
             Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.Glacier);
 
             shader.Render();
             Main.spriteBatch.DrawBetter(tex, NPC.Center, null, Lighting.GetColor(NPC.Center.ToTileCoordinates()), 0f,
                 tex.Size() / 2, 3f);
 
-            Main.spriteBatch.ExitShaderRegion();
+            Main.spriteBatch.ResetToDefault();
         }
 
         LayeredDrawSystem.QueueDrawAction(draw, PixelationLayer.OverNPCs);

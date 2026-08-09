@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using CalamityMod;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
@@ -68,7 +67,7 @@ public class AdditionsGlobalNPC : GlobalNPC
 
     public override GlobalNPC Clone(NPC npc, NPC npcClone)
     {
-        AdditionsGlobalNPC myClone = (AdditionsGlobalNPC)Clone(npc, npcClone);
+        AdditionsGlobalNPC myClone = (AdditionsGlobalNPC) Clone(npc, npcClone);
         myClone.PlasmaIncineration = PlasmaIncineration;
         myClone.VoidEnergy = VoidEnergy;
         myClone.Wavebreaked = Wavebreaked;
@@ -96,13 +95,13 @@ public class AdditionsGlobalNPC : GlobalNPC
 
         if (PlasmaIncineration > 0)
         {
-            const int plasmaIncineration = (int)250.0;
+            const int plasmaIncineration = (int) 250.0;
             ApplyDPSDebuff(plasmaIncineration, plasmaIncineration, ref damage);
         }
 
         if (Wavebreaked > 0)
         {
-            const int torrential = (int)180.0;
+            const int torrential = (int) 180.0;
             ApplyDPSDebuff(torrential, torrential, ref damage);
         }
     }
@@ -245,12 +244,12 @@ public class AdditionsGlobalNPC : GlobalNPC
         {
             spriteBatch.SetBlendState(BlendState.Additive);
             Texture2D bloomTexture = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
-            float properBloomSize = bloomTexture.Height / (float)bloomTexture.Height;
-            Color color = Color.Lerp(Color.OrangeRed, Color.Gray, (float)MathF.Sin(Main.GlobalTimeWrappedHourly * 2f));
+            float properBloomSize = bloomTexture.Height / (float) bloomTexture.Height;
+            Color color = Color.Lerp(Color.OrangeRed, Color.Gray, (float) MathF.Sin(Main.GlobalTimeWrappedHourly * 2f));
             Vector2 sparkCenter = npc.Center - Main.screenPosition;
             Main.EntitySpriteDraw(bloomTexture, sparkCenter, null, color * 0.6f, 0f, bloomTexture.Size() / 2f,
                 2f * properBloomSize / 2, 0, 0f);
-            spriteBatch.ResetBlendState();
+            spriteBatch.ResetToDefault();
         }
 
         return base.PreDraw(npc, spriteBatch, screenPos, drawColor);

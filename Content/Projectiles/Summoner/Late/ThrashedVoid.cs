@@ -24,7 +24,7 @@ public class ThrashedVoid : BaseWhip
 
     public int SwingDir
     {
-        get => (int)Projectile.ai[2];
+        get => (int) Projectile.ai[2];
         set => Projectile.ai[2] = value;
     }
 
@@ -45,27 +45,30 @@ public class ThrashedVoid : BaseWhip
         {
             Vector2 pos = WhipPoints.Points[Main.rand.Next(0, WhipPoints.Count - 1)];
             Vector2 vel = OutwardVel * Main.rand.NextFloat(100f, 400f);
-            ParticleRegistry.SpawnLightningArcParticle(pos, vel, Main.rand.Next(4, 10), Main.rand.NextFloat(.4f, .8f), Color.DarkViolet.Lerp(Color.Purple, Main.rand.NextFloat(.4f, .6f)));
+            ParticleRegistry.SpawnLightningArcParticle(pos, vel, Main.rand.Next(4, 10), Main.rand.NextFloat(.4f, .8f),
+                Color.DarkViolet.Lerp(Color.Purple, Main.rand.NextFloat(.4f, .6f)));
         }
     }
 
     public override void CrackEffects()
     {
         if (this.RunLocal())
-            Projectile.NewProj(Tip, Vector2.Zero, ModContent.ProjectileType<VoidBlast>(), Projectile.damage / 4, Projectile.knockBack, Owner.whoAmI);
+            Projectile.NewProj(Tip, Vector2.Zero, ModContent.ProjectileType<VoidBlast>(), Projectile.damage / 4,
+                Projectile.knockBack, Owner.whoAmI);
         AdditionsSound.commandoBlast2.Play(Tip, 1.1f, -.1f, .1f);
     }
 
     public override void NPCHitEffects(NPC target, NPC.HitInfo hit, in Vector2 pos, in Vector2 vel, in int index)
     {
-        Projectile.damage = (int)(Projectile.damage * .85f);
-        target.AddBuff(ModContent.BuffType<VoidDebuff>(), CalUtils.SecondsToFrames(4));
+        Projectile.damage = (int) (Projectile.damage * .85f);
+        target.AddBuff(ModContent.BuffType<VoidDebuff>(), SecondsToFrames(4));
     }
 
     public override Color LineColor(SystemVector2 completion, Vector2 position)
     {
         return Color.BlueViolet;
     }
+
     public override float LineWidth(float completion)
     {
         return 8f * MathHelper.SmoothStep(1f, .5f, completion);
@@ -73,7 +76,7 @@ public class ThrashedVoid : BaseWhip
 
     public static Color TrailColor(SystemVector2 completion, Vector2 position)
     {
-        return new Color(21 + (int)(10 * completion.X), 3, 51 + (int)(10 * completion.X)) * completion.X;
+        return new Color(21 + (int) (10 * completion.X), 3, 51 + (int) (10 * completion.X)) * completion.X;
     }
 
     public static float TrailWidth(float completion)
@@ -83,6 +86,7 @@ public class ThrashedVoid : BaseWhip
 
     public OptimizedPrimitiveTrail Trail;
     public TrailPoints points = new(10);
+
     public override void DrawLine()
     {
         if (Trail != null)
@@ -119,9 +123,12 @@ public class ThrashedVoid : BaseWhip
             for (int i = 0; i < WhipPoints.Count; i++)
             {
                 Vector2 pos = WhipPoints.Points[i];
-                Main.spriteBatch.DrawBetterRect(tex, ToTarget(pos, new Vector2(150f) * InverseLerp(0f, WhipPoints.Count, i)), null, Color.Purple, 0f, tex.Size() / 2);
+                Main.spriteBatch.DrawBetterRect(tex,
+                    ToTarget(pos, new Vector2(150f) * InverseLerp(0f, WhipPoints.Count, i)), null, Color.Purple, 0f,
+                    tex.Size() / 2);
             }
         }
+
         PixelationSystem.QueueTextureRenderAction(bloom, PixelationLayer.OverProjectiles, BlendState.Additive);
 
         Texture2D texture = Projectile.ThisProjectileTexture();
@@ -164,7 +171,8 @@ public class ThrashedVoid : BaseWhip
                 Vector2 orig = frame.Size() / 2;
                 SpriteEffects flip = Owner.direction < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
 
-                Main.spriteBatch.DrawBetter(texture, pos, frame, color, rotation, orig, tip ? Projectile.scale : 1f, flip);
+                Main.spriteBatch.DrawBetter(texture, pos, frame, color, rotation, orig, tip ? Projectile.scale : 1f,
+                    flip);
             }
         }
     }

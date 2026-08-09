@@ -1,7 +1,4 @@
-﻿using CalamityMod.Items.Materials;
-using CalamityMod.Items.Placeables;
-using System.Collections.Generic;
-using CalamityMod.Items.Placeables.FurnitureVoid;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -49,8 +46,7 @@ public class TidalDeluge : ModItem
     {
         Recipe recipe = CreateRecipe();
         recipe.AddIngredient(ItemID.RainbowWhip, 1);
-        recipe.AddIngredient(ModContent.ItemType<Lumenyl>(), 18);
-        recipe.AddIngredient(ModContent.ItemType<SmoothVoidstone>(), 250);
+        //TODO
         recipe.AddIngredient(ItemID.LunarBar, 8);
         recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();

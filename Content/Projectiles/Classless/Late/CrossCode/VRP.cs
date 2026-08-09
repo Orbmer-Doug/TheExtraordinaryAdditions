@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -41,15 +40,15 @@ public class VRP : ModProjectile
 
     private Element State
     {
-        get => (Element)Projectile.ai[0];
-        set => Projectile.ai[0] = (float)value;
+        get => (Element) Projectile.ai[0];
+        set => Projectile.ai[0] = (float) value;
     }
 
     public ref float Completion => ref Projectile.ai[1];
 
     public int Bounces
     {
-        get => (int)Projectile.ai[2];
+        get => (int) Projectile.ai[2];
         set => Projectile.ai[2] = value;
     }
 
@@ -57,13 +56,13 @@ public class VRP : ModProjectile
 
     public bool TileDeath
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[1] == 1;
+        get => (int) Projectile.AdditionsInfo().ExtraAI[1] == 1;
         set => Projectile.AdditionsInfo().ExtraAI[1] = value.ToInt();
     }
 
     public bool Charged
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[2] == 1;
+        get => (int) Projectile.AdditionsInfo().ExtraAI[2] == 1;
         set => Projectile.AdditionsInfo().ExtraAI[2] = value.ToInt();
     }
 
@@ -127,8 +126,8 @@ public class VRP : ModProjectile
         if (Math.Abs(Projectile.velocity.Y - oldVelocity.Y) > float.Epsilon)
             Projectile.velocity.Y = -oldVelocity.Y;
 
-        Projectile.damage += (int)(Projectile.damage * .25);
-        Projectile.CritChance = (int)(InverseLerp(0f, Bounces, MaxBounces) * 100);
+        Projectile.damage += (int) (Projectile.damage * .25);
+        Projectile.CritChance = (int) (InverseLerp(0f, Bounces, MaxBounces) * 100);
 
         switch (State)
         {
@@ -231,12 +230,12 @@ public class VRP : ModProjectile
             case Element.Neutral:
                 break;
             case Element.Cold:
-                target.AddBuff(BuffID.Frostburn, CalUtils.SecondsToFrames(3));
-                target.AddBuff(BuffID.Frostburn2, CalUtils.SecondsToFrames(3));
+                target.AddBuff(BuffID.Frostburn, SecondsToFrames(3));
+                target.AddBuff(BuffID.Frostburn2, SecondsToFrames(3));
                 break;
             case Element.Heat:
-                target.AddBuff(BuffID.OnFire, CalUtils.SecondsToFrames(3));
-                target.AddBuff(BuffID.OnFire3, CalUtils.SecondsToFrames(3));
+                target.AddBuff(BuffID.OnFire, SecondsToFrames(3));
+                target.AddBuff(BuffID.OnFire3, SecondsToFrames(3));
                 break;
             case Element.Shock:
             case Element.Wave:
@@ -282,7 +281,7 @@ public class VRP : ModProjectile
         Main.spriteBatch.SetBlendState(BlendState.Additive);
         Main.EntitySpriteDraw(Bloom, Projectile.Center - Main.screenPosition, null, Color.White * .5f, 0f,
             Bloom.Size() * .5f, .3f, 0);
-        Main.spriteBatch.ResetBlendState();
+        Main.spriteBatch.ResetToDefault();
 
         if (!Charged)
         {

@@ -4,11 +4,13 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 
 namespace TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
+
 public class PrimordialRarity : ModRarity
 {
     public override Color RarityColor => new Color(64, 0, 138);
 
     internal static List<RarityParticleInfo> PrimordialSparkleList = [];
+
     public static void DrawCustomTooltipLine(DrawableTooltipLine tooltipLine)
     {
         ManagedShader displace = ShaderRegistry.GlitchDisplacement;

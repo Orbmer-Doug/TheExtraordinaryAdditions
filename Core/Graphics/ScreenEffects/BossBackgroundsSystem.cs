@@ -43,14 +43,12 @@ public class BossBackgroundsSystem : ModSystem
         fog.TrySetParameter("opacity", fogInterpolant);
         fog.TrySetParameter("time", Main.GlobalTimeWrappedHourly * .2f);
 
-        sb.End();
-        sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearWrap, DepthStencilState.None,
-            Main.Rasterizer, fog.Effect, Main.GameViewMatrix.TransformationMatrix);
+        sb.EnterShaderRegion(fog.Effect);
         fog.Render();
         Point size = new(Main.graphics.GraphicsDevice.Viewport.Width,
             Main.graphics.GraphicsDevice.Viewport.Height);
         sb.Draw(noise, new Rectangle(0, 0, size.X, size.Y), null, Color.White * fogInterpolant, 0f, Vector2.Zero, 0,
             0f);
-        sb.ExitShaderRegion();
+        sb.ResetToDefault();
     }
 }

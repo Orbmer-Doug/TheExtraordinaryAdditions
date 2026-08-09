@@ -23,6 +23,7 @@ public class SuperBloodMoonSystem : ModSystem
 {
     public static bool SuperBloodMoon = false;
     public static bool IsSuperBloodMoon => SuperBloodMoon == true && bloodMoon == true;
+
     public override void ClearWorld()
     {
         SuperBloodMoon = false;
@@ -70,7 +71,8 @@ public class IncreaseBloodMoonSpawnRate : ModSystem
         if (SuperBloodMoonSystem.SuperBloodMoon && !bloodMoon)
         {
             // Literally just run the check again
-            if (!WorldGen.spawnEye && moonPhase != (int)MoonPhase.Empty && rand.NextBool(4) && netMode != NetmodeID.MultiplayerClient)
+            if (!WorldGen.spawnEye && moonPhase != (int) MoonPhase.Empty && rand.NextBool(4) &&
+                netMode != NetmodeID.MultiplayerClient)
             {
                 foreach (Player p in ActivePlayers)
                 {
@@ -92,7 +94,8 @@ public class IncreaseBloodMoonSpawnRate : ModSystem
         }
     }
 
-    public static void ModifyMoon(On_Main.orig_DrawSunAndMoon orig, Main self, SceneArea sceneArea, Color moonColor, Color sunColor, float tempMushroomInfluence)
+    public static void ModifyMoon(On_Main.orig_DrawSunAndMoon orig, Main self, SceneArea sceneArea, Color moonColor,
+        Color sunColor, float tempMushroomInfluence)
     {
         if (SuperBloodMoonSystem.IsSuperBloodMoon && !gameMenu)
         {
@@ -102,23 +105,27 @@ public class IncreaseBloodMoonSpawnRate : ModSystem
                 moonType = Utils.Clamp(moonType, 0, 8);
 
             Asset<Texture2D> moon = TextureAssets.Moon[moonType];
-            float nightCompletion = (float)(time / nightLength);
+            float nightCompletion = (float) (time / nightLength);
 
             Rectangle frame = new(0, moon.Width() * moonPhase, moon.Width(), moon.Width());
             float moonRotation = nightCompletion * 2f - 7.3f;
 
-            int moonX = (int)(nightCompletion * (double)(sceneArea.totalWidth + moon.Value.Width * 2)) - moon.Value.Width;
+            int moonX = (int) (nightCompletion * (double) (sceneArea.totalWidth + moon.Value.Width * 2)) -
+                        moon.Value.Width;
             double verticalOffset;
-            verticalOffset = nightCompletion < .5f ? Math.Pow(1.0 - nightCompletion * 2.0, 2.0) : Math.Pow((nightCompletion - 0.5) * 2.0, 2.0);
+            verticalOffset = nightCompletion < .5f
+                ? Math.Pow(1.0 - nightCompletion * 2.0, 2.0)
+                : Math.Pow((nightCompletion - 0.5) * 2.0, 2.0);
 
-            int moonY = (int)(sceneArea.bgTopY + verticalOffset * 250.0 + 180.0);
-            float moonScale = (float)(1.2 - verticalOffset * 0.4) * ForcedMinimumZoom;
+            int moonY = (int) (sceneArea.bgTopY + verticalOffset * 250.0 + 180.0);
+            float moonScale = (float) (1.2 - verticalOffset * 0.4) * ForcedMinimumZoom;
 
             Vector2 moonPos = new Vector2(moonX, moonY + moonModY) + sceneArea.SceneLocalScreenPositionOffset;
 
             // Draw a strong glow behind the moon
             spriteBatch.End();
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, DefaultSamplerState, DepthStencilState.None, Rasterizer, null, Matrix.Identity);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, DefaultSamplerState, DepthStencilState.None,
+                Rasterizer, null, Matrix.Identity);
             Texture2D bloom = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
 
             float intensity = Convert01To010(nightCompletion);
@@ -135,11 +142,10 @@ public class IncreaseBloodMoonSpawnRate : ModSystem
             distort.TrySetParameter("screenZoom", GameViewMatrix.Zoom);
             distort.TrySetParameter("mainColor", moonColor.Lerp(Color.Crimson, .3f).ToVector4());
 
-            spriteBatch.End();
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, DefaultSamplerState, DepthStencilState.None, Rasterizer, distort.Effect, Matrix.Identity);
+            spriteBatch.EnterShaderRegion(distort.Effect);
             distort.Render();
             spriteBatch.Draw(moon.Value, moonPos, frame, Color.White, moonRotation, frame.Size() / 2, moonScale, 0, 0f);
-            spriteBatch.ExitShaderRegion();
+            spriteBatch.ResetToDefault();
         }
         else
             orig(self, sceneArea, moonColor, sunColor, tempMushroomInfluence);
@@ -152,12 +158,13 @@ public class SuperBloodMoonGlobalNPC : GlobalNPC
     {
         if (SuperBloodMoonSystem.IsSuperBloodMoon)
         {
-            spawnRate = (int)((double)spawnRate * 0.13f);
-            maxSpawns = (int)(maxSpawns * 3f);
+            spawnRate = (int) ((double) spawnRate * 0.13f);
+            maxSpawns = (int) (maxSpawns * 3f);
         }
     }
 
     public override bool InstancePerEntity => true;
+
     public override void SetDefaults(NPC npc)
     {
         if (SuperBloodMoonSystem.IsSuperBloodMoon)
@@ -178,8 +185,13 @@ public class SuperBloodMoonGlobalNPC : GlobalNPC
         }
     }
 
-    public static readonly HashSet<int> EyeList = [NPCID.CataractEye, NPCID.CataractEye2, NPCID.DemonEye, NPCID.DemonEye2, NPCID.DialatedEye,
-    NPCID.DialatedEye2, NPCID.GreenEye, NPCID.GreenEye2, NPCID.PurpleEye, NPCID.PurpleEye2, NPCID.SleepyEye, NPCID.SleepyEye2];
+    public static readonly HashSet<int> EyeList =
+    [
+        NPCID.CataractEye, NPCID.CataractEye2, NPCID.DemonEye, NPCID.DemonEye2, NPCID.DialatedEye,
+        NPCID.DialatedEye2, NPCID.GreenEye, NPCID.GreenEye2, NPCID.PurpleEye, NPCID.PurpleEye2, NPCID.SleepyEye,
+        NPCID.SleepyEye2
+    ];
+
     public static int EyeShootWait => DifficultyBasedValue(40, 35, 30, 25, 23, 20);
     public const int Eyesight = 700;
 
@@ -265,7 +277,7 @@ public class SuperBloodMoonGlobalNPC : GlobalNPC
                                 posY *= 1f + rand.NextFloat(-.1f, .11f);
                             }
 
-                            float circle = (float)Math.Sqrt(posX * posX + posY * posY);
+                            float circle = (float) Math.Sqrt(posX * posX + posY * posY);
                             float prevCircle = circle;
                             circle = speed / circle;
                             npc.velocity.X = posX * circle;
@@ -326,6 +338,7 @@ public class SuperBloodMoonGlobalNPC : GlobalNPC
                             if (npc.netSpam > 10)
                                 npc.netSpam = 10;
                         }
+
                         break;
 
                     // Slow down
@@ -334,8 +347,10 @@ public class SuperBloodMoonGlobalNPC : GlobalNPC
                         {
                             for (int i = 0; i < 20; i++)
                             {
-                                ParticleRegistry.SpawnGlowParticle(npc.RotHitbox().RandomPoint(), npc.velocity * rand.NextFloat(.2f, .8f),
-                                    rand.Next(20, 30), rand.NextFloat(10f, 20f), Color.Crimson.Lerp(Color.Red, rand.NextFloat(.2f, .5f)), 1f);
+                                ParticleRegistry.SpawnGlowParticle(npc.RotHitbox().RandomPoint(),
+                                    npc.velocity * rand.NextFloat(.2f, .8f),
+                                    rand.Next(20, 30), rand.NextFloat(10f, 20f),
+                                    Color.Crimson.Lerp(Color.Red, rand.NextFloat(.2f, .5f)), 1f);
                             }
 
                             SoundID.DD2_WyvernDiveDown.Play(npc.position, .7f, .2f, .1f, null, 20);
@@ -358,7 +373,9 @@ public class SuperBloodMoonGlobalNPC : GlobalNPC
                         else
                         {
                             if (rand.NextBool(3))
-                                ParticleRegistry.SpawnSparkParticle(npc.RotHitbox().RandomPoint(), -npc.velocity * rand.NextFloat(.2f, .4f), rand.Next(12, 20), rand.NextFloat(.3f, .5f), Color.Red);
+                                ParticleRegistry.SpawnSparkParticle(npc.RotHitbox().RandomPoint(),
+                                    -npc.velocity * rand.NextFloat(.2f, .4f), rand.Next(12, 20),
+                                    rand.NextFloat(.3f, .5f), Color.Red);
                             npc.rotation = npc.velocity.ToRotation() - MathHelper.PiOver2;
                         }
 
@@ -372,6 +389,7 @@ public class SuperBloodMoonGlobalNPC : GlobalNPC
                             state = 0f;
                             timer = 0f;
                         }
+
                         break;
                 }
             }
@@ -385,7 +403,8 @@ public class SuperBloodMoonGlobalNPC : GlobalNPC
             switch (npc.type)
             {
                 case NPCID.Drippler:
-                    ParticleRegistry.SpawnDetailedBlastParticle(npc.Center, Vector2.Zero, npc.Size * 1.2f, Vector2.Zero, 30, Color.Crimson);
+                    ParticleRegistry.SpawnDetailedBlastParticle(npc.Center, Vector2.Zero, npc.Size * 1.2f, Vector2.Zero,
+                        30, Color.Crimson);
                     for (int i = 0; i < rand.Next(2, 3); i++)
                     {
                         Vector2 pos = npc.RotHitbox().RandomPoint();
@@ -395,7 +414,8 @@ public class SuperBloodMoonGlobalNPC : GlobalNPC
                             type = rand.NextFromList(NPCID.DemonEyeSpaceship, NPCID.DemonTaxCollector);
 
                         npc.NewNPCBetter(pos, vel, type, 0, 0f, 0f, 0f, 0f, npc.target);
-                        ParticleRegistry.SpawnBloodStreakParticle(pos, vel.SafeNormalize(Vector2.Zero), 30, rand.NextFloat(.5f, .6f), Color.DarkRed);
+                        ParticleRegistry.SpawnBloodStreakParticle(pos, vel.SafeNormalize(Vector2.Zero), 30,
+                            rand.NextFloat(.5f, .6f), Color.DarkRed);
                     }
 
                     break;
@@ -441,7 +461,8 @@ public class JumpingFighterAI : GlobalNPC
             npc.velocity.Y = -4.2f;
             for (int i = 0; i < 20; i++)
             {
-                ParticleRegistry.SpawnGlowParticle(npc.RotHitbox().RandomPoint(), npc.velocity * rand.NextFloat(.4f, 1f),
+                ParticleRegistry.SpawnGlowParticle(npc.RotHitbox().RandomPoint(),
+                    npc.velocity * rand.NextFloat(.4f, 1f),
                     rand.Next(20, 40), rand.NextFloat(12f, 30f), Color.DarkRed);
             }
 
@@ -456,6 +477,7 @@ public class JumpingFighterAI : GlobalNPC
 public class VermillionTear : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 16;
@@ -468,24 +490,32 @@ public class VermillionTear : ModProjectile
     }
 
     public ref float Time => ref Projectile.ai[0];
+
     public override void AI()
     {
         if (Time == 0f)
         {
-            ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Projectile.velocity.SafeNormalize(Vector2.Zero) * 3f, 30, Projectile.velocity.ToRotation(), new(.3f, 1.1f), 0f, 50f, Color.Crimson);
+            ParticleRegistry.SpawnPulseRingParticle(Projectile.Center,
+                Projectile.velocity.SafeNormalize(Vector2.Zero) * 3f, 30, Projectile.velocity.ToRotation(),
+                new(.3f, 1.1f), 0f, 50f, Color.Crimson);
             for (int i = 0; i < 8; i++)
             {
-                ParticleRegistry.SpawnSparkleParticle(Projectile.Center, Projectile.velocity * rand.NextFloat(.1f, .3f), rand.Next(20, 30), rand.NextFloat(.4f, .8f),
+                ParticleRegistry.SpawnSparkleParticle(Projectile.Center, Projectile.velocity * rand.NextFloat(.1f, .3f),
+                    rand.Next(20, 30), rand.NextFloat(.4f, .8f),
                     Color.Crimson, Color.DarkRed, .7f, rand.NextFloat(-.1f, .1f));
             }
         }
+
         after ??= new(30, () => Projectile.Center);
 
         float squish = MathHelper.Clamp(Projectile.velocity.Length() / 5f, 1f, 2f);
-        after.UpdateFancyAfterimages(new(Projectile.Center, new Vector2(1f, .4f * squish) * Projectile.Opacity * 60f, Projectile.Opacity, Projectile.rotation, 0, 90, 0, 0f, null, true, -.1f));
+        after.UpdateFancyAfterimages(new(Projectile.Center, new Vector2(1f, .4f * squish) * Projectile.Opacity * 60f,
+            Projectile.Opacity, Projectile.rotation, 0, 90, 0, 0f, null, true, -.1f));
 
         if (rand.NextBool(9))
-            ParticleRegistry.SpawnBloomPixelParticle(Projectile.RotHitbox().RandomPoint(), -Projectile.velocity * rand.NextFloat(.2f, .5f), rand.Next(20, 30), rand.NextFloat(.2f, .5f), Color.Red, Color.Crimson, null, 1.2f, 3);
+            ParticleRegistry.SpawnBloomPixelParticle(Projectile.RotHitbox().RandomPoint(),
+                -Projectile.velocity * rand.NextFloat(.2f, .5f), rand.Next(20, 30), rand.NextFloat(.2f, .5f), Color.Red,
+                Color.Crimson, null, 1.2f, 3);
 
         Projectile.velocity *= .98f;
         Projectile.Opacity = InverseLerp(0f, 12f, Time) * InverseLerp(0f, 1f, Projectile.velocity.Length());
@@ -497,16 +527,20 @@ public class VermillionTear : ModProjectile
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void glow()
         {
             Texture2D soft = AssetRegistry.GetTexture(AdditionsTexture.GlowSoft);
-            spriteBatch.DrawBetterRect(soft, ToTarget(Projectile.Center, Projectile.Size * 2.5f), null, Color.Crimson * Projectile.Opacity, 0f, soft.Size() / 2);
+            spriteBatch.DrawBetterRect(soft, ToTarget(Projectile.Center, Projectile.Size * 2.5f), null,
+                Color.Crimson * Projectile.Opacity, 0f, soft.Size() / 2);
 
             Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.LensStar);
-            after?.DrawFancyAfterimages(tex, [Color.Crimson, Color.Red, Color.DarkRed], Projectile.Opacity, 1f, 0f, true);
+            after?.DrawFancyAfterimages(tex, [Color.Crimson, Color.Red, Color.DarkRed], Projectile.Opacity, 1f, 0f,
+                true);
         }
+
         PixelationSystem.QueueTextureRenderAction(glow, PixelationLayer.UnderProjectiles, BlendState.Additive);
         return false;
     }

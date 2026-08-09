@@ -32,7 +32,8 @@ public class Atorcoppe : ModItem
         return player.ownedProjectileCounts[Item.shoot] <= 0;
     }
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback)
     {
         player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI);
         player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI, 0f, 0f, 1f);

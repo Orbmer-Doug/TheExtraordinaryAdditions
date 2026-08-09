@@ -18,7 +18,8 @@ public class LaserClassRarity : ModRarity
 
         if (Main.rand.NextBool())
         {
-            CustomRaritySystem.Spawn(ref SmokeList, new RaritySmoke(rect.RandomRectangle(), Main.rand.NextVector2CircularEdge(1f, 1f),
+            CustomRaritySystem.Spawn(ref SmokeList, new RaritySmoke(rect.RandomRectangle(),
+                Main.rand.NextVector2CircularEdge(1f, 1f),
                 Main.rand.Next(80, 120), Main.rand.NextFloat(.4f, .68f), Color.OrangeRed));
         }
 

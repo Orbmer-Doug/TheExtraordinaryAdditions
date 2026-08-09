@@ -14,6 +14,7 @@ public class LaserBlast : ModProjectile, ILocalizedModType, IModType
     public override string Texture => AssetRegistry.Invis;
 
     public const int Lifetime = 30;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 7;
@@ -30,6 +31,7 @@ public class LaserBlast : ModProjectile, ILocalizedModType, IModType
     }
 
     public ref float Time => ref Projectile.ai[0];
+
     public bool Hit
     {
         get => Projectile.ai[1] == 1f;
@@ -40,13 +42,16 @@ public class LaserBlast : ModProjectile, ILocalizedModType, IModType
     public Vector2 End;
     public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(End);
     public override void ReceiveExtraAI(BinaryReader reader) => End = reader.ReadVector2();
+
     public override void AI()
     {
         if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, null, 50);
 
-        Vector2 expected = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero) * Animators.MakePoly(3f).OutFunction.Evaluate(Time, 0f, Lifetime, 0f, 1000f);
-        End = LaserCollision(Projectile.Center, expected, CollisionTarget.Tiles | CollisionTarget.NPCs, out CollisionTarget hit, WidthFunct(.5f));
+        Vector2 expected = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero) *
+            Animators.MakePoly(3f).OutFunction.Evaluate(Time, 0f, Lifetime, 0f, 1000f);
+        End = LaserCollision(Projectile.Center, expected, CollisionTarget.Tiles | CollisionTarget.NPCs,
+            out CollisionTarget hit, WidthFunct(.5f));
         if (End != expected && !Hit)
         {
             Hit = true;
@@ -59,7 +64,9 @@ public class LaserBlast : ModProjectile, ILocalizedModType, IModType
         if (!Hit)
         {
             Color color = Main.rand.NextBool(4) ? new Color(106, 93, 255) * 1.6f : new Color(106, 93, 255);
-            ParticleRegistry.SpawnSparkParticle(End + Main.rand.NextVector2Circular(Projectile.height, Projectile.height) * 2, Projectile.velocity, 30, .6f, color);
+            ParticleRegistry.SpawnSparkParticle(
+                End + Main.rand.NextVector2Circular(Projectile.height, Projectile.height) * 2, Projectile.velocity, 30,
+                .6f, color);
             Time++;
         }
     }
@@ -67,14 +74,15 @@ public class LaserBlast : ModProjectile, ILocalizedModType, IModType
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         Projectile.knockBack *= .6f;
-        Projectile.damage = (int)(Projectile.damage * .4f);
+        Projectile.damage = (int) (Projectile.damage * .4f);
     }
 
     public override bool ShouldUpdatePosition() => false;
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return targetHitbox.LineCollision(Projectile.Center, End + Projectile.velocity.SafeNormalize(Vector2.Zero) * 10f, WidthFunct(.5f));
+        return targetHitbox.LineCollision(Projectile.Center,
+            End + Projectile.velocity.SafeNormalize(Vector2.Zero) * 10f, WidthFunct(.5f));
     }
 
     public float WidthFunct(float c)
@@ -89,6 +97,7 @@ public class LaserBlast : ModProjectile, ILocalizedModType, IModType
 
     public TrailPoints points = new(50);
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -100,6 +109,7 @@ public class LaserBlast : ModProjectile, ILocalizedModType, IModType
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FireNoise), 1, SamplerState.LinearWrap);
             trail.DrawTrail(shader, points.Points);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;
     }

@@ -1,6 +1,4 @@
-﻿using CalamityMod.Projectiles.Melee;
-using CalamityMod.Projectiles.Ranged;
-using SubworldLibrary;
+﻿using SubworldLibrary;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Events;
@@ -48,9 +46,12 @@ public class CloudedCraterUpdateSystem : ModSystem
 
         // Disable liquid placing/removing items
         int itemID = item.type;
-        bool isSponge = itemID is ItemID.SuperAbsorbantSponge or ItemID.LavaAbsorbantSponge or ItemID.HoneyAbsorbantSponge or ItemID.UltraAbsorbantSponge;
-        bool isRegularBucket = itemID is ItemID.EmptyBucket or ItemID.WaterBucket or ItemID.LavaBucket or ItemID.HoneyBucket;
-        bool isSpecialBucket = itemID is ItemID.BottomlessBucket or ItemID.BottomlessLavaBucket or ItemID.BottomlessHoneyBucket or ItemID.BottomlessShimmerBucket;
+        bool isSponge = itemID is ItemID.SuperAbsorbantSponge or ItemID.LavaAbsorbantSponge
+            or ItemID.HoneyAbsorbantSponge or ItemID.UltraAbsorbantSponge;
+        bool isRegularBucket =
+            itemID is ItemID.EmptyBucket or ItemID.WaterBucket or ItemID.LavaBucket or ItemID.HoneyBucket;
+        bool isSpecialBucket = itemID is ItemID.BottomlessBucket or ItemID.BottomlessLavaBucket
+            or ItemID.BottomlessHoneyBucket or ItemID.BottomlessShimmerBucket;
         return !isSponge && !isRegularBucket && !isSpecialBucket ||
                itemID == ModContent.ItemType<MatterDisintegrationDrill>();
     }
@@ -79,8 +80,6 @@ public class CloudedCraterUpdateSystem : ModSystem
         // Prevent tile-manipulating items from working messing up tiles
         if (projectile.type == ModContent.ProjectileType<CannonHoldout>())
             projectile.active = false;
-        if (projectile.type == ModContent.ProjectileType<CrystylCrusherRay>())
-            projectile.active = false;
         switch (projectile.type)
         {
             case ProjectileID.DirtBomb or ProjectileID.DirtStickyBomb:
@@ -101,9 +100,7 @@ public class CloudedCraterUpdateSystem : ModSystem
         bool wetRocket = projectile.type is ProjectileID.WetRocket or ProjectileID.WetSnowmanRocket;
         bool honeyRocket = projectile.type is ProjectileID.HoneyRocket or ProjectileID.HoneySnowmanRocket;
         bool lavaRocket = projectile.type is ProjectileID.LavaRocket or ProjectileID.LavaSnowmanRocket;
-        bool rocket = dryRocket || wetRocket || honeyRocket || lavaRocket ||
-                      projectile.type == ModContent.ProjectileType<MortarRoundProj>() ||
-                      projectile.type == ModContent.ProjectileType<RubberMortarRoundProj>();
+        bool rocket = dryRocket || wetRocket || honeyRocket || lavaRocket;
 
         bool dryMisc = projectile.type is ProjectileID.DryGrenade or ProjectileID.DryMine;
         bool wetMisc = projectile.type is ProjectileID.WetGrenade or ProjectileID.WetMine;
@@ -126,10 +123,10 @@ public class CloudedCraterUpdateSystem : ModSystem
         if (type == TileID.Tombstones)
             Main.tile[x, y].Get<TileWallWireStateData>().HasTile = false;
     }
-    
+
     private bool DisallowTileBreakage(int x, int y, int type) => WasInSubworldLastUpdateFrame;
     private bool DisallowWallBreakage(int x, int y, int type) => WasInSubworldLastUpdateFrame;
-    
+
 
     public override void PreUpdateEntities()
     {

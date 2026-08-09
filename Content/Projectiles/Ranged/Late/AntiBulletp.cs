@@ -31,7 +31,8 @@ public class AntiBulletp : ModProjectile
     public override void AI()
     {
         after ??= new(15, () => Projectile.Center);
-        after.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 0, 3, 3f));
+        after.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 0,
+            3, 3f));
 
         Projectile.FacingRight();
         Lighting.AddLight(Projectile.Center, Color.OrangeRed.ToVector3() * 2f * Projectile.Opacity);
@@ -55,7 +56,8 @@ public class AntiBulletp : ModProjectile
             int life = Main.rand.Next(55, 70);
             float scale = Main.rand.NextFloat(0.7f, Main.rand.NextFloat(3.3f, 5.5f));
             Color col = Color.Lerp(Color.Chocolate, Color.OrangeRed * 1.2f, Main.rand.NextFloat(0.8f));
-            Vector2 vel = splatterDirection.RotatedByRandom(Main.rand.NextFloat(.48f, .57f)) * Main.rand.NextFloat(1f, 1.2f);
+            Vector2 vel = splatterDirection.RotatedByRandom(Main.rand.NextFloat(.48f, .57f)) *
+                          Main.rand.NextFloat(1f, 1.2f);
 
             Vector2 pos = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero) * Projectile.width * .5f;
             ParticleRegistry.SpawnSparkParticle(pos, vel, life, scale, col);
@@ -63,7 +65,8 @@ public class AntiBulletp : ModProjectile
             // Fly off shrapnel
             if (Main.rand.NextBool(2) && this.RunLocal())
             {
-                Projectile.NewProj(pos, vel, ModContent.ProjectileType<AntiBulletShrapnel>(), (int)(Projectile.damage * .33f), 0f, Projectile.owner);
+                Projectile.NewProj(pos, vel, ModContent.ProjectileType<AntiBulletShrapnel>(),
+                    (int) (Projectile.damage * .33f), 0f, Projectile.owner);
             }
         }
 
@@ -71,13 +74,15 @@ public class AntiBulletp : ModProjectile
 
         // be balanced
         if (Projectile.damage > 500)
-            Projectile.damage = (int)(Projectile.damage * 0.8f);
+            Projectile.damage = (int) (Projectile.damage * 0.8f);
     }
-    
+
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
-        after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [Color.White, Color.OrangeRed, Color.Chocolate], Projectile.Opacity);
+        after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [Color.White, Color.OrangeRed, Color.Chocolate],
+            Projectile.Opacity);
         Projectile.DrawBaseProjectile(Color.White);
         return false;
     }

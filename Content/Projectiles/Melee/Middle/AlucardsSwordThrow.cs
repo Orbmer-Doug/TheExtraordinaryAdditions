@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -18,6 +17,7 @@ public class AlucardsSwordThrow : ModProjectile, ILocalizedModType, IModType
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AlucardsSwordThrow);
     public Player Owner => Main.player[Projectile.owner];
     public ref float Time => ref Projectile.ai[0];
+
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
@@ -42,7 +42,8 @@ public class AlucardsSwordThrow : ModProjectile, ILocalizedModType, IModType
     public override void AI()
     {
         if (trail == null || trail.Disposed)
-            trail = new(c => 18f * MathHelper.SmoothStep(1f, 0f, c), (c, pos) => Color.DarkRed.Lerp(Color.Black, c.X) * MathHelper.SmoothStep(1f, 0f, c.X), null, 15);
+            trail = new(c => 18f * MathHelper.SmoothStep(1f, 0f, c),
+                (c, pos) => Color.DarkRed.Lerp(Color.Black, c.X) * MathHelper.SmoothStep(1f, 0f, c.X), null, 15);
         cache ??= new(15);
         cache.Update(Projectile.RotHitbox().Right);
 
@@ -52,15 +53,19 @@ public class AlucardsSwordThrow : ModProjectile, ILocalizedModType, IModType
         {
             for (int i = 0; i < 3; i++)
             {
-                Vector2 pos = Projectile.Center + Main.rand.NextVector2Unit() * Projectile.width * .8f * Main.rand.NextFloat(0.75f, 0.96f);
-                Vector2 vel = (pos - Projectile.Center).SafeNormalize(Vector2.UnitY).RotatedBy(MathHelper.PiOver2) * Main.rand.NextFloat(1f, 3f);
+                Vector2 pos = Projectile.Center + Main.rand.NextVector2Unit() * Projectile.width * .8f *
+                    Main.rand.NextFloat(0.75f, 0.96f);
+                Vector2 vel = (pos - Projectile.Center).SafeNormalize(Vector2.UnitY).RotatedBy(MathHelper.PiOver2) *
+                              Main.rand.NextFloat(1f, 3f);
                 float size = Main.rand.NextFloat(.5f, .8f);
                 int lifetime = Main.rand.Next(21, 34);
-                ParticleRegistry.SpawnDustParticle(pos, vel, lifetime, size, Color.DarkRed, .1f, false, true, true, false);
+                ParticleRegistry.SpawnDustParticle(pos, vel, lifetime, size, Color.DarkRed, .1f, false, true, true,
+                    false);
             }
         }
 
-        float direction = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true).SafeDirectionTo(Projectile.Center).ToRotation();
+        float direction = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true)
+            .SafeDirectionTo(Projectile.Center).ToRotation();
         Owner.SetFrontHandBetter(0, direction);
         Owner.SetBackHandBetter(0, direction);
 
@@ -73,8 +78,10 @@ public class AlucardsSwordThrow : ModProjectile, ILocalizedModType, IModType
                 Vector2 mouse = Owner.Additions().MouseWorld;
                 float dist = Projectile.Distance(mouse);
                 float ratio = (1.45f - InverseLerp(0f, 1000f, dist)) * .25f;
-                Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.SafeDirectionTo(mouse) * MathHelper.Clamp(dist, MathHelper.Min(dist, 5f), 40f), ratio);
+                Projectile.velocity = Vector2.SmoothStep(Projectile.velocity,
+                    Projectile.SafeDirectionTo(mouse) * MathHelper.Clamp(dist, MathHelper.Min(dist, 5f), 40f), ratio);
             }
+
             Projectile.rotation += 0.25f / Projectile.MaxUpdates;
         }
         else
@@ -86,15 +93,19 @@ public class AlucardsSwordThrow : ModProjectile, ILocalizedModType, IModType
             {
                 for (int i = 0; i < 20; i++)
                 {
-                    ParticleRegistry.SpawnGlowParticle(Projectile.RotHitbox().RandomPoint(), Projectile.velocity * Main.rand.NextFloat(.1f, .2f),
+                    ParticleRegistry.SpawnGlowParticle(Projectile.RotHitbox().RandomPoint(),
+                        Projectile.velocity * Main.rand.NextFloat(.1f, .2f),
                         Main.rand.Next(10, 20), Main.rand.NextFloat(.4f, .5f), Color.DarkRed);
                 }
+
                 Projectile.Kill();
             }
+
             float idealAngle = Projectile.AngleTo(Owner.Center) - MathHelper.PiOver4;
             Projectile.rotation = Projectile.rotation.AngleLerp(idealAngle, 0.1f);
             Projectile.rotation = Projectile.rotation.AngleTowards(idealAngle, 0.25f);
         }
+
         if (Projectile.velocity != Projectile.oldVelocity)
             this.Sync();
 
@@ -106,14 +117,16 @@ public class AlucardsSwordThrow : ModProjectile, ILocalizedModType, IModType
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.RotHitbox().Left, Projectile.RotHitbox().Right);
+        return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(),
+            Projectile.RotHitbox().Left, Projectile.RotHitbox().Right);
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         Vector2 pos;
 
-        if (CheckLinearCollision(Projectile.RotHitbox().Right, Projectile.RotHitbox().Left, target.Hitbox, out Vector2 start, out Vector2 end))
+        if (CheckLinearCollision(Projectile.RotHitbox().Right, Projectile.RotHitbox().Left, target.Hitbox,
+                out Vector2 start, out Vector2 end))
             pos = start;
         else
             pos = Projectile.Center;
@@ -121,7 +134,8 @@ public class AlucardsSwordThrow : ModProjectile, ILocalizedModType, IModType
         int life = Main.rand.Next(15, 20);
         float scale = Main.rand.NextFloat(1.1f, 1.7f);
         Vector2 vel = Projectile.velocity.RotatedByRandom(.3f) * Main.rand.NextFloat(.4f, .6f);
-        ParticleRegistry.SpawnSparkleParticle(pos, Vector2.Zero, life, scale, Color.White, Color.Red, Main.rand.NextFloat(1.4f, 1.6f));
+        ParticleRegistry.SpawnSparkleParticle(pos, Vector2.Zero, life, scale, Color.White, Color.Red,
+            Main.rand.NextFloat(1.4f, 1.6f));
 
         // fun fact these are the sounds of me hitting a tungsten cube with solid glass
         AdditionsSound.MetalHit3.Play(Projectile.Center, 1f, .1f, .1f, 5);
@@ -129,6 +143,7 @@ public class AlucardsSwordThrow : ModProjectile, ILocalizedModType, IModType
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints cache;
+
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D texture = Projectile.ThisProjectileTexture();
@@ -146,11 +161,14 @@ public class AlucardsSwordThrow : ModProjectile, ILocalizedModType, IModType
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Streak), 1);
             trail.DrawTrail(shader, cache.Points, 120);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 
         // Draw the base sprite and glowmask
-        Main.EntitySpriteDraw(texture, drawPosition, frame, Projectile.GetAlpha(lightColor), Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, direction, 0);
-        Main.EntitySpriteDraw(glowmask, drawPosition, frame, Projectile.GetAlpha(Color.White), Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, direction, 0);
+        Main.EntitySpriteDraw(texture, drawPosition, frame, Projectile.GetAlpha(lightColor), Projectile.rotation,
+            frame.Size() * 0.5f, Projectile.scale, direction, 0);
+        Main.EntitySpriteDraw(glowmask, drawPosition, frame, Projectile.GetAlpha(Color.White), Projectile.rotation,
+            frame.Size() * 0.5f, Projectile.scale, direction, 0);
         return false;
     }
 }

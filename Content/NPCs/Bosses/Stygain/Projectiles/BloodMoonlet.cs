@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using CalamityMod;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
@@ -58,13 +57,13 @@ public class BloodMoonlet : ProjOwnedByNPC<StygainHeart>
         circle.TrySetParameter("opacity", InverseLerp(0f, 60f, Time) * .78f);
         circle.TrySetParameter("color",
             Color.Lerp(Color.MediumVioletRed, Color.PaleVioletRed,
-                0.7f * (float)Math.Pow(Sin01(Main.GlobalTimeWrappedHourly), 3.0)));
+                0.7f * (float) Math.Pow(Sin01(Main.GlobalTimeWrappedHourly), 3.0)));
         circle.TrySetParameter("secondColor", Color.Lerp(Color.MediumVioletRed, Color.White, 0.4f));
         circle.Render();
 
         Main.EntitySpriteDraw(telegraphBase, drawPosition, null, Color.White, 0f, telegraphBase.Size() / 2f, 1000f, 0);
 
-        sb.ExitShaderRegion();
+        sb.ResetToDefault();
 
         if (trail != null && !trail.Disposed && cache != null)
             trail.DrawTrail(ShaderRegistry.StandardPrimitiveShader, cache.Points, 40, false, false);

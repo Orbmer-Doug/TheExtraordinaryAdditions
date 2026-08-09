@@ -29,6 +29,7 @@ public class FulgurSwing : BaseSwordSwing
     }
 
     public override float SwingAngle => SwingDir == SwingDirection.Up ? PiOver2 : TwoPi + PiOver2;
+
     public override float Animation()
     {
         if (SwingDir == SwingDirection.Up)
@@ -41,6 +42,7 @@ public class FulgurSwing : BaseSwordSwing
     }
 
     public override int SwingTime => SwingDir == SwingDirection.Up ? 40 : 90;
+
     public bool Stabbing
     {
         get => Projectile.AdditionsInfo().ExtraAI[7] == 1f;
@@ -70,7 +72,8 @@ public class FulgurSwing : BaseSwordSwing
     {
         // Owner values
         Projectile.rotation = SwingOffset();
-        Projectile.Center = Owner.GetFrontHandPositionImproved() - PolarVector(62f * Projectile.scale, Projectile.rotation - SwordRotation);
+        Projectile.Center = Owner.GetFrontHandPositionImproved() -
+                            PolarVector(62f * Projectile.scale, Projectile.rotation - SwordRotation);
         Owner.heldProj = Projectile.whoAmI;
         Owner.SetDummyItemTime(2);
         Owner.ChangeDir(Direction);
@@ -78,7 +81,8 @@ public class FulgurSwing : BaseSwordSwing
         Owner.itemRotation = WrapAngle(Projectile.rotation);
 
         // swoosh
-        if (((Animation() >= .26f && SwingDir == SwingDirection.Up) || (Animation() >= .04f && SwingDir == SwingDirection.Down)) && !PlayedSound)
+        if (((Animation() >= .26f && SwingDir == SwingDirection.Up) ||
+             (Animation() >= .04f && SwingDir == SwingDirection.Down)) && !PlayedSound)
         {
             SoundID.DD2_GhastlyGlaivePierce.Play(Projectile.Center, 1f, 0f, .1f, null, 20, Name);
             PlayedSound = true;
@@ -93,9 +97,11 @@ public class FulgurSwing : BaseSwordSwing
         // Update trails
         if (TimeStop <= 0f)
         {
-            points.Update(Projectile.Center + PolarVector(148f * Projectile.scale, Projectile.rotation - SwordRotation) - Center);
+            points.Update(Projectile.Center +
+                PolarVector(148f * Projectile.scale, Projectile.rotation - SwordRotation) - Center);
 
-            if (Time % 20 == 0 && SwingCompletion.BetweenNum(.2f, .8f) && NPCTargeting.TryGetClosestNPC(new(Rect().Top, 400, true), out NPC target))
+            if (Time % 20 == 0 && SwingCompletion.BetweenNum(.2f, .8f) &&
+                NPCTargeting.TryGetClosestNPC(new(Rect().Top, 400, true), out NPC target))
             {
                 if (Item.CheckManaBetter(Owner, 2, true))
                 {
@@ -103,10 +109,13 @@ public class FulgurSwing : BaseSwordSwing
                     if (this.RunLocal())
                     {
                         Vector2 rand = target.RandAreaInEntity();
-                        FulgurZap chain = Main.projectile[Projectile.NewProj(pos, Vector2.Zero, ModContent.ProjectileType<FulgurZap>(),
-                            (int)(Projectile.damage * .28f), Projectile.knockBack / 4, Owner.whoAmI, ai1: rand.X, ai2: rand.Y)].As<FulgurZap>();
+                        FulgurZap chain = Main.projectile[Projectile.NewProj(pos, Vector2.Zero,
+                            ModContent.ProjectileType<FulgurZap>(),
+                            (int) (Projectile.damage * .28f), Projectile.knockBack / 4, Owner.whoAmI, ai1: rand.X,
+                            ai2: rand.Y)].As<FulgurZap>();
                         chain.Sync();
                     }
+
                     SoundID.DD2_LightningBugZap.Play(pos, 1f, -.1f, .1f);
                 }
             }
@@ -152,7 +161,9 @@ public class FulgurSwing : BaseSwordSwing
 
         for (int i = 0; i < 1; i++)
         {
-            Vector2 pos = Vector2.Lerp(Rect().Bottom + PolarVector(115f * Projectile.scale, Projectile.rotation - SwordRotation), Rect().Top, Main.rand.NextFloat());
+            Vector2 pos =
+                Vector2.Lerp(Rect().Bottom + PolarVector(115f * Projectile.scale, Projectile.rotation - SwordRotation),
+                    Rect().Top, Main.rand.NextFloat());
             Vector2 vel = -SwordDir * Main.rand.NextFloat(4f, 8f);
             int life = Main.rand.Next(19, 25);
             float scale = Main.rand.NextFloat(.1f, .2f);
@@ -174,8 +185,10 @@ public class FulgurSwing : BaseSwordSwing
             int life = Main.rand.Next(20, 35);
             float scale = Main.rand.NextFloat(1.2f, 1.9f);
             Color color = Color.DeepSkyBlue.Lerp(Color.Cyan, Main.rand.NextFloat(.2f, .5f));
-            ParticleRegistry.SpawnSparkParticle(start + Main.rand.NextVector2Circular(20f, 20f), vel, life, scale, color);
+            ParticleRegistry.SpawnSparkParticle(start + Main.rand.NextVector2Circular(20f, 20f), vel, life, scale,
+                color);
         }
+
         npc.velocity += SwordDir * Item.knockBack * npc.knockBackResist;
 
         ScreenShakeSystem.New(new(.1f, .1f), start);
@@ -192,7 +205,8 @@ public class FulgurSwing : BaseSwordSwing
             int life = Main.rand.Next(100, 125);
             float scale = Main.rand.NextFloat(.9f, 1.5f);
             Color color = Color.BlueViolet;
-            ParticleRegistry.SpawnSquishyPixelParticle(start + Main.rand.NextVector2Circular(10f, 10f), vel, life, scale, color, Color.Violet);
+            ParticleRegistry.SpawnSquishyPixelParticle(start + Main.rand.NextVector2Circular(10f, 10f), vel, life,
+                scale, color, Color.Violet);
         }
 
         ScreenShakeSystem.New(new(.1f, .1f), start);
@@ -202,9 +216,11 @@ public class FulgurSwing : BaseSwordSwing
 
     public TrailPoints points = new(20);
     public OptimizedPrimitiveTrail trail;
+
     private float WidthFunct(float c)
     {
-        return 57f * Projectile.scale * MathF.Pow(SmoothStep(0f, 1f, SmoothStep(1f, 0f, c)), 2) * InverseLerp(0.016f, 0.07f, AngularVelocity);
+        return 57f * Projectile.scale * MathF.Pow(SmoothStep(0f, 1f, SmoothStep(1f, 0f, c)), 2) *
+               InverseLerp(0.016f, 0.07f, AngularVelocity);
     }
 
     private Color ColorFunct(SystemVector2 c, Vector2 pos)
@@ -251,7 +267,8 @@ public class FulgurSwing : BaseSwordSwing
 
         Main.spriteBatch.Draw(Tex, Projectile.Center - Main.screenPosition, null, lightColor,
             Projectile.rotation + RotationOffset, origin, Projectile.scale, Effects, 0f);
-        Main.spriteBatch.Draw(AssetRegistry.GetTexture(AdditionsTexture.FulgurSpear_Glow), Projectile.Center - Main.screenPosition, null, Color.White,
+        Main.spriteBatch.Draw(AssetRegistry.GetTexture(AdditionsTexture.FulgurSpear_Glow),
+            Projectile.Center - Main.screenPosition, null, Color.White,
             Projectile.rotation + RotationOffset, origin, Projectile.scale, Effects, 0f);
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 

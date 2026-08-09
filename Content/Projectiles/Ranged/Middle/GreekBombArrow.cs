@@ -10,6 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 public class GreekBombArrow : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GreekBombArrow);
+
     public override void SetDefaults()
     {
         Projectile.width = 14;
@@ -26,10 +27,11 @@ public class GreekBombArrow : ModProjectile
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        target.AddBuff(BuffID.CursedInferno, CalUtils.SecondsToFrames(4));
+        target.AddBuff(BuffID.CursedInferno, SecondsToFrames(4));
     }
 
     public ref float Time => ref Projectile.ai[0];
+
     public override void AI()
     {
         Projectile.FacingDown();
@@ -40,31 +42,43 @@ public class GreekBombArrow : ModProjectile
         Projectile.velocity *= .99f;
 
         Lighting.AddLight(Projectile.RotHitbox().Bottom, Color.LawnGreen.ToVector3() * .7f);
-        ParticleRegistry.SpawnSparkParticle(Projectile.RotHitbox().Bottom, Projectile.velocity * .5f, 40, 1f, Color.Lime);
+        ParticleRegistry.SpawnSparkParticle(Projectile.RotHitbox().Bottom, Projectile.velocity * .5f, 40, 1f,
+            Color.Lime);
         Time++;
     }
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return targetHitbox.LineCollision(Projectile.BaseRotHitbox().Top, Projectile.BaseRotHitbox().Bottom, Projectile.width);
+        return targetHitbox.LineCollision(Projectile.BaseRotHitbox().Top, Projectile.BaseRotHitbox().Bottom,
+            Projectile.width);
     }
 
     public override void OnKill(int timeLeft)
     {
-        SoundEngine.PlaySound(SoundID.Item14 with { Pitch = .2f, PitchVariance = .1f, Volume = Main.rand.NextFloat(.8f, 1.1f), Identifier = Name }, Projectile.Center);
+        SoundEngine.PlaySound(
+            SoundID.Item14 with
+            {
+                Pitch = .2f, PitchVariance = .1f, Volume = Main.rand.NextFloat(.8f, 1.1f), Identifier = Name
+            }, Projectile.Center);
 
         if (this.RunLocal())
         {
             for (int i = 0; i < Main.rand.Next(3, 5); i++)
-                Projectile.NewProj(Projectile.Center, -Projectile.oldVelocity.RotatedByRandom(1.8f) * Main.rand.NextFloat(.2f, .4f), ModContent.ProjectileType<GreekNapalm>(), Projectile.damage / 2, 0f, Projectile.owner);
+                Projectile.NewProj(Projectile.Center,
+                    -Projectile.oldVelocity.RotatedByRandom(1.8f) * Main.rand.NextFloat(.2f, .4f),
+                    ModContent.ProjectileType<GreekNapalm>(), Projectile.damage / 2, 0f, Projectile.owner);
         }
 
         for (int i = 0; i < 30; i++)
         {
-            Vector2 shootVelocity = (MathHelper.TwoPi * Main.rand.Next(0, 11) / 10f + RandomRotation()).ToRotationVector2() * Main.rand.NextFloat(4f, 9f);
+            Vector2 shootVelocity =
+                (MathHelper.TwoPi * Main.rand.Next(0, 11) / 10f + RandomRotation()).ToRotationVector2() *
+                Main.rand.NextFloat(4f, 9f);
 
-            ParticleRegistry.SpawnGlowParticle(Projectile.Center, shootVelocity, Main.rand.Next(18, 25), Main.rand.NextFloat(24f, 34f), Color.LawnGreen, 1f);
-            ParticleRegistry.SpawnSparkParticle(Projectile.Center, shootVelocity, Main.rand.Next(28, 34), .6f, Color.Lime);
+            ParticleRegistry.SpawnGlowParticle(Projectile.Center, shootVelocity, Main.rand.Next(18, 25),
+                Main.rand.NextFloat(24f, 34f), Color.LawnGreen, 1f);
+            ParticleRegistry.SpawnSparkParticle(Projectile.Center, shootVelocity, Main.rand.Next(28, 34), .6f,
+                Color.Lime);
         }
     }
 }

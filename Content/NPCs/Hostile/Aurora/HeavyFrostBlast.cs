@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -32,12 +31,12 @@ public class HeavyFrostBlast : ProjOwnedByNPC<AuroraGuard>
     {
         float interpolant = InverseLerp(0f, Lifetime, Time);
         float size = Animators.MakePoly(2.4f).InFunction.Evaluate(Time, 0f, Lifetime, .2f, 1.5f);
-        Projectile.ExpandHitboxBy((int)(size * 170));
+        Projectile.ExpandHitboxBy((int) (size * 170));
 
         Color col = MulticolorLerp(interpolant, Icey, LightCornflower, MauveBright, Lavender, BrightViolet);
         for (int i = 0; i < 5; i++)
         {
-            int life = (int)(30 + (size * 10));
+            int life = (int) (30 + (size * 10));
             ParticleRegistry.SpawnHeavySmokeParticle(Projectile.RandAreaInEntity(), Vector2.Zero, life, size * 3f, col);
             ParticleRegistry.SpawnCloudParticle(Projectile.RandAreaInEntity(), Vector2.Zero, col, Color.DarkViolet,
                 life - 9, size * .1f, Main.rand.NextFloat(.5f, .8f), Main.rand.NextByte(0, 2));

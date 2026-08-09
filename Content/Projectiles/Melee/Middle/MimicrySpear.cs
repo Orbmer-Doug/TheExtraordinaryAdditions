@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -16,6 +15,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 public class MimicrySpear : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Mimicry);
+
     public override void SetDefaults()
     {
         Projectile.width = 66;
@@ -30,14 +30,17 @@ public class MimicrySpear : ModProjectile
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = -1;
     }
+
     public Player Owner => Main.player[Projectile.owner];
     public GlobalPlayer Modded => Owner.Additions();
     public ref float Time => ref Projectile.ai[0];
+
     public bool Start
     {
         get => Projectile.ai[1] == 1f;
         set => Projectile.ai[1] = value.ToInt();
     }
+
     public ref float Offset => ref Projectile.ai[2];
     public ref float CurrentStab => ref Projectile.AdditionsInfo().ExtraAI[0];
 
@@ -45,9 +48,12 @@ public class MimicrySpear : ModProjectile
     public const float timeOut = 10f;
     public const float timeStab = timeReeling + timeOut;
     public const float totalTime = timeStab + 10f;
+
     public override void AI()
     {
-        if (this.RunLocal() && (Owner.dead || !Owner.active || (!Modded.MouseRight.Current && Time < timeReeling && !Start) || Projectile.Opacity <= 0f))
+        if (this.RunLocal() && (Owner.dead || !Owner.active ||
+                                (!Modded.MouseRight.Current && Time < timeReeling && !Start) ||
+                                Projectile.Opacity <= 0f))
         {
             Projectile.Kill();
             return;
@@ -60,11 +66,13 @@ public class MimicrySpear : ModProjectile
         if (Modded.MouseRight.Current && !Start)
         {
             if (this.RunLocal())
-                Projectile.velocity = Vector2.Lerp(Projectile.velocity, Owner.SafeDirectionTo(Owner.Additions().MouseWorld), .5f);
+                Projectile.velocity = Vector2.Lerp(Projectile.velocity,
+                    Owner.SafeDirectionTo(Owner.Additions().MouseWorld), .5f);
 
             Offset = MakePoly(3).InOutFunction.Evaluate(55f, 31f, InverseLerp(0f, timeReeling, Time));
             Projectile.friendly = false;
         }
+
         if (this.RunLocal() && !Modded.MouseRight.Current && !Start && Time >= timeReeling)
         {
             StabEffects();
@@ -74,6 +82,7 @@ public class MimicrySpear : ModProjectile
             Projectile.netUpdate = true;
             Projectile.netSpam = 0;
         }
+
         if (Start)
         {
             if (CurrentStab >= 3 && Time >= (timeOut * 2))
@@ -96,7 +105,8 @@ public class MimicrySpear : ModProjectile
 
                     // Update the hitbox for visuals
                     Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver4;
-                    Projectile.Center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true) + PolarVector(Offset * Projectile.Opacity, Projectile.velocity.ToRotation());
+                    Projectile.Center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true) +
+                                        PolarVector(Offset * Projectile.Opacity, Projectile.velocity.ToRotation());
 
                     StabEffects();
                     Time = 0f;
@@ -108,13 +118,15 @@ public class MimicrySpear : ModProjectile
                 }
             }
         }
+
         Time++;
 
         Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver4;
         Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, Projectile.velocity.ToRotation());
 
         // Glue to player
-        Projectile.Center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true) + PolarVector(Offset * Projectile.Opacity, Projectile.velocity.ToRotation());
+        Projectile.Center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true) +
+                            PolarVector(Offset * Projectile.Opacity, Projectile.velocity.ToRotation());
     }
 
     public void StabEffects()
@@ -127,7 +139,8 @@ public class MimicrySpear : ModProjectile
 
         for (int i = 0; i < 20; i++)
         {
-            Vector2 pos = new RotatedRectangle(35f, Projectile.RotHitbox().BottomLeft, Projectile.RotHitbox().TopRight).RandomPoint();
+            Vector2 pos = new RotatedRectangle(35f, Projectile.RotHitbox().BottomLeft, Projectile.RotHitbox().TopRight)
+                .RandomPoint();
             Vector2 vel = Projectile.velocity.SafeNormalize(Vector2.Zero) * Main.rand.NextFloat(6f, 11f);
             int life = Main.rand.Next(20, 30);
             float scale = Main.rand.NextFloat(.4f, .7f);
@@ -141,6 +154,7 @@ public class MimicrySpear : ModProjectile
     }
 
     public override bool ShouldUpdatePosition() => false;
+
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
         return targetHitbox.LineCollision(Projectile.RotHitbox().BottomLeft, Projectile.RotHitbox().TopRight, 16f);
@@ -160,16 +174,24 @@ public class MimicrySpear : ModProjectile
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        if (CheckLinearCollision(Projectile.RotHitbox().BottomLeft, Projectile.RotHitbox().TopRight, target.Hitbox, out Vector2 start, out Vector2 end))
+        if (CheckLinearCollision(Projectile.RotHitbox().BottomLeft, Projectile.RotHitbox().TopRight, target.Hitbox,
+                out Vector2 start, out Vector2 end))
         {
             for (int i = 0; i < 25; i++)
             {
-                ParticleRegistry.SpawnGlowParticle(start, Projectile.velocity.RotatedByRandom(.12f) * Main.rand.NextFloat(6f, 12f), 40, .5f, Color.DarkRed);
-                ParticleRegistry.SpawnBloomLineParticle(start, Projectile.velocity.RotatedByRandom(.2f) * Main.rand.NextFloat(10f, 18f), Main.rand.Next(20, 30), Main.rand.NextFloat(.3f, .5f), Color.Crimson);
+                ParticleRegistry.SpawnGlowParticle(start,
+                    Projectile.velocity.RotatedByRandom(.12f) * Main.rand.NextFloat(6f, 12f), 40, .5f, Color.DarkRed);
+                ParticleRegistry.SpawnBloomLineParticle(start,
+                    Projectile.velocity.RotatedByRandom(.2f) * Main.rand.NextFloat(10f, 18f), Main.rand.Next(20, 30),
+                    Main.rand.NextFloat(.3f, .5f), Color.Crimson);
 
-                Dust.NewDustPerfect(start + Main.rand.NextVector2Circular(5f, 5f), DustID.Blood, Projectile.velocity.RotatedByRandom(.3f) * Main.rand.NextFloat(4f, 10f), 0, default, Main.rand.NextFloat(.5f, 1f));
+                Dust.NewDustPerfect(start + Main.rand.NextVector2Circular(5f, 5f), DustID.Blood,
+                    Projectile.velocity.RotatedByRandom(.3f) * Main.rand.NextFloat(4f, 10f), 0, default,
+                    Main.rand.NextFloat(.5f, 1f));
             }
-            ParticleRegistry.SpawnBloodStreakParticle(start, Projectile.velocity, Main.rand.Next(24, 34), Main.rand.NextFloat(.3f, .5f), Color.Crimson);
+
+            ParticleRegistry.SpawnBloodStreakParticle(start, Projectile.velocity, Main.rand.Next(24, 34),
+                Main.rand.NextFloat(.3f, .5f), Color.Crimson);
 
             if (Projectile.numHits <= 0)
                 Owner.Heal(10);
@@ -205,13 +227,17 @@ public class MimicrySpear : ModProjectile
         const int amt = 8;
         for (int i = 0; i < amt; i++)
         {
-            Vector2 spinStart = drawStartOuter + Utils.RotatedBy(spinPoint, (double)(rotation - (float)Math.PI * i / (amt / 2)), default);
+            Vector2 spinStart = drawStartOuter +
+                                Utils.RotatedBy(spinPoint, (double) (rotation - (float) Math.PI * i / (amt / 2)),
+                                    default);
             Color glowAlpha = Projectile.GetAlpha(Color.Crimson * Projectile.Opacity);
-            glowAlpha.A = (byte)Projectile.alpha;
-            Main.spriteBatch.Draw(tex, spinStart, null, glowAlpha * opacity * Projectile.Opacity, Projectile.rotation + rotOff, tex.Size() / 2, Projectile.scale * 1.25f, fx, 0f);
+            glowAlpha.A = (byte) Projectile.alpha;
+            Main.spriteBatch.Draw(tex, spinStart, null, glowAlpha * opacity * Projectile.Opacity,
+                Projectile.rotation + rotOff, tex.Size() / 2, Projectile.scale * 1.25f, fx, 0f);
         }
 
-        Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, null, lightColor * Projectile.Opacity, Projectile.rotation + rotOff, tex.Size() / 2, Projectile.scale, fx, 0f);
+        Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, null, lightColor * Projectile.Opacity,
+            Projectile.rotation + rotOff, tex.Size() / 2, Projectile.scale, fx, 0f);
         return false;
     }
 }

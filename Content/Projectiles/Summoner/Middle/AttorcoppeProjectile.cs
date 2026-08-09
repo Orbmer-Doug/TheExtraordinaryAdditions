@@ -27,12 +27,14 @@ public class AttorcoppeProjectile : BaseWhip
     {
         if (Completion.BetweenNum(.2f, .8f) && Projectile.numUpdates < 3)
         {
-            Dust.NewDustPerfect(Tip, DustID.Venom, Main.rand.NextVector2Circular(5f, 5f), 0, default, Main.rand.NextFloat(.5f, .9f)).noGravity = true;
+            Dust.NewDustPerfect(Tip, DustID.Venom, Main.rand.NextVector2Circular(5f, 5f), 0, default,
+                Main.rand.NextFloat(.5f, .9f)).noGravity = true;
 
             if (Main.rand.NextBool(3))
             {
                 Vector2 pos = WhipPoints.Points[Main.rand.Next(0, WhipPoints.Count - 2)];
-                Dust.NewDustPerfect(pos, DustID.Web, OutwardVel, 0, default, Main.rand.NextFloat(.4f, .8f)).noGravity = true;
+                Dust.NewDustPerfect(pos, DustID.Web, OutwardVel, 0, default, Main.rand.NextFloat(.4f, .8f)).noGravity =
+                    true;
             }
         }
     }
@@ -43,7 +45,8 @@ public class AttorcoppeProjectile : BaseWhip
         {
             float rot = RandomRotation();
             for (int i = 0; i < 8; i++)
-                ParticleRegistry.SpawnSparkParticle(Tip, (MathHelper.TwoPi * i / 8 + rot).ToRotationVector2() * 7f, 18, .58f, Color.Violet);
+                ParticleRegistry.SpawnSparkParticle(Tip, (MathHelper.TwoPi * i / 8 + rot).ToRotationVector2() * 7f, 18,
+                    .58f, Color.Violet);
         }
     }
 
@@ -51,7 +54,7 @@ public class AttorcoppeProjectile : BaseWhip
     {
         if (index == (WhipPoints.Count - 1))
             target.AddBuff(BuffID.Venom, 180);
-        Projectile.damage = (int)(Projectile.damage * 0.8f);
+        Projectile.damage = (int) (Projectile.damage * 0.8f);
     }
 
     public override void ModifyNPCEffects(NPC target, ref NPC.HitModifiers modifiers, in Vector2 pos, in int index)
@@ -110,7 +113,8 @@ public class AttorcoppeProjectile : BaseWhip
                 Vector2 orig = frame.Size() / 2;
                 SpriteEffects flip = Owner.direction < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
 
-                Main.spriteBatch.DrawBetter(texture, pos, frame, color, rotation, orig, tip ? Projectile.scale : 1f, flip);
+                Main.spriteBatch.DrawBetter(texture, pos, frame, color, rotation, orig, tip ? Projectile.scale : 1f,
+                    flip);
             }
         }
     }

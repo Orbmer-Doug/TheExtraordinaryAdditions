@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Terraria;
+﻿using Terraria;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Utilities;
 using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
@@ -41,7 +40,7 @@ public class BloodletRelay : ProjOwnedByNPC<StygainHeart>
         Projectile.velocity = Projectile.SafeDirectionTo(Owner.Center) * 12f;
         if (Projectile.Hitbox.Intersects(Owner.Hitbox))
         {
-            int healAmount = (int)Projectile.ai[0];
+            int healAmount = (int) Projectile.ai[0];
             if (Owner.life < Owner.lifeMax)
                 Owner.life += healAmount;
             if (Owner.life > Owner.lifeMax)

@@ -24,7 +24,7 @@ public class HeavenForgedSwing : BaseSwordSwing
 
     public int SwingCounter
     {
-        get => (int)ProjInfo.ExtraAI[9];
+        get => (int) ProjInfo.ExtraAI[9];
         set => ProjInfo.ExtraAI[9] = value;
     }
 
@@ -42,11 +42,7 @@ public class HeavenForgedSwing : BaseSwordSwing
         _ => 222
     };
 
-    public Quaternion Rotation
-    {
-        get;
-        set;
-    }
+    public Quaternion Rotation { get; set; }
 
     public override void WriteExtraAI(BinaryWriter writer)
     {
@@ -55,6 +51,7 @@ public class HeavenForgedSwing : BaseSwordSwing
         writer.Write(Rotation.Z);
         writer.Write(Rotation.W);
     }
+
     public override void GetExtraAI(BinaryReader reader)
     {
         float x = reader.ReadSingle();
@@ -85,15 +82,14 @@ public class HeavenForgedSwing : BaseSwordSwing
         Quaternion anticipation = EulerAnglesConversion(Direction, -1.96f, -.8f);
         Quaternion slash = EulerAnglesConversion(Direction, 2.65f, -1.2f);
         Quaternion end = EulerAnglesConversion(Direction, 3.95f, -1.4f);
-        PiecewiseRotation sweep = new PiecewiseRotation().
-                    Add(Sine.InOutFunction, anticipation, 0.3f, start).
-                    Add(MakePoly(4).InFunction, slash, 0.7f).
-                    Add(MakePoly(2).OutFunction, end, 1f);
+        PiecewiseRotation sweep = new PiecewiseRotation().Add(Sine.InOutFunction, anticipation, 0.3f, start)
+            .Add(MakePoly(4).InFunction, slash, 0.7f).Add(MakePoly(2).OutFunction, end, 1f);
 
         float forwardAngle = Utils.MultiLerp(SwingCompletion.Squared(), -1.4f, -PiOver2 + .1f, 0f);
         float spinAngle = Pi * MakePoly(3.5f).InOutFunction(1f - SwingCompletion) * -4f;
         Quaternion spin = EulerAnglesConversion(Direction, spinAngle + 3.95f, forwardAngle);
-        Quaternion spinFinal = EulerAnglesConversion(Direction, (Pi * MakePoly(3.5f).InOutFunction(0f) * 4f) + 3.95f, 0f);
+        Quaternion spinFinal =
+            EulerAnglesConversion(Direction, (Pi * MakePoly(3.5f).InOutFunction(0f) * 4f) + 3.95f, 0f);
 
         Quaternion slam = EulerAnglesConversion(Direction, -.06f, .2f);
 
@@ -104,40 +100,42 @@ public class HeavenForgedSwing : BaseSwordSwing
                 Rotation = sweep.Evaluate(SwingCompletion, Direction == -1f && SwingCompletion >= 0.7f, 1);
                 DontChangeDir = true;
 
-                if (Time == (int)(SwingTime * 0.84f))
+                if (Time == (int) (SwingTime * 0.84f))
                 {
                     CreateBolts();
                     AdditionsSound.MediumSwing2.Play(Projectile.Center, 1.2f, 0f, .2f);
                 }
+
                 break;
             case 1:
                 SwingDir = SwingDirection.Down;
                 Rotation = spin;
 
-                int wait = (int)(SwingTime * 0.6f);
+                int wait = (int) (SwingTime * 0.6f);
                 if (Time % wait == wait - 1 && SwingCompletion < .5f)
                 {
                     CreateBolts();
                     AdditionsSound.MediumSwing.Play(Projectile.Center, 1.4f, 0f, .2f, 10);
                 }
+
                 if (Time % wait == wait - 1)
                     Projectile.ResetLocalNPCHitImmunity();
 
                 break;
             case 2:
                 SwingDir = SwingDirection.Up;
-                PiecewiseRotation up = new PiecewiseRotation().
-                    Add(MakePoly(8f).InOutFunction, slam, 1f, spinFinal);
+                PiecewiseRotation up = new PiecewiseRotation().Add(MakePoly(8f).InOutFunction, slam, 1f, spinFinal);
                 Rotation = up.Evaluate(SwingCompletion, SwingCompletion < .85f, -1);
                 Owner.ChangeDir(Projectile.velocity.X.NonZeroSign());
                 DontChangeDir = true;
 
-                if (Time == (int)(SwingTime * 0.3f))
+                if (Time == (int) (SwingTime * 0.3f))
                 {
                     CreateBolts();
                     Projectile.ResetLocalNPCHitImmunity();
                     AdditionsSound.MediumSwing2.Play(Projectile.Center, 1.4f, 0f, .14f);
                 }
+
                 break;
         }
 
@@ -148,7 +146,8 @@ public class HeavenForgedSwing : BaseSwordSwing
         Owner.heldProj = Projectile.whoAmI;
         Owner.SetDummyItemTime(2);
         Owner.ChangeDir(Direction);
-        Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, Rect().Left.SafeDirectionTo(Rect().Top).ToRotation());
+        Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full,
+            Rect().Left.SafeDirectionTo(Rect().Top).ToRotation());
         Owner.itemRotation = WrapAngle(Projectile.rotation);
 
         float scaleUp = MeleeScale;
@@ -199,14 +198,15 @@ public class HeavenForgedSwing : BaseSwordSwing
                 for (int a = -1; a <= 1; a += 2)
                 {
                     Vector2 target = Modded.MouseWorld;
-                    position = Owner.Center - new Vector2(rand.NextFloat(100f, screenWidth / 2) * Owner.direction, 600f * a);
+                    position = Owner.Center -
+                               new Vector2(rand.NextFloat(100f, screenWidth / 2) * Owner.direction, 600f * a);
                     position.Y -= 40 * i;
 
                     Vector2 vel = position.SafeDirectionTo(target) * rand.NextFloat(10f, 20f);
                     vel.Y += rand.NextFloat(-2f, 2f);
 
                     int proj = ModContent.ProjectileType<HeavenForgedSpear>();
-                    int dmg = (int)(Projectile.damage * .55f);
+                    int dmg = (int) (Projectile.damage * .55f);
                     Projectile.NewProj(position, vel, proj, dmg, Projectile.knockBack / 2, Owner.whoAmI);
                 }
             }
@@ -215,7 +215,8 @@ public class HeavenForgedSwing : BaseSwordSwing
 
     public override float SwingOffset()
     {
-        return SwordRotation + SwingAngle * Animation() * (SwingDir != SwingDirection.Up).ToDirectionInt() * Direction * Owner.gravDir;
+        return SwordRotation + SwingAngle * Animation() * (SwingDir != SwingDirection.Up).ToDirectionInt() * Direction *
+            Owner.gravDir;
     }
 
     public override RotatedRectangle Rect()
@@ -228,7 +229,9 @@ public class HeavenForgedSwing : BaseSwordSwing
         Quaternion angleFix = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, -ThreePIOver4);
         Quaternion final = Quaternion.Multiply(Rotation, angleFix);
 
-        tip = Vector3.Transform(size3D, Quaternion.CreateFromRotationMatrix(Matrix.CreateFromQuaternion(final) * Matrix.CreateRotationZ(InitialMouseAngle)));
+        tip = Vector3.Transform(size3D,
+            Quaternion.CreateFromRotationMatrix(Matrix.CreateFromQuaternion(final) *
+                                                Matrix.CreateRotationZ(InitialMouseAngle)));
         begin = Projectile.Center;
         end = begin + new Vector2(tip.X, tip.Y);
         GetPrincipalAxes(final, out float roll, out float _, out float _);
@@ -242,7 +245,8 @@ public class HeavenForgedSwing : BaseSwordSwing
         for (int i = 0; i < 24; i++)
         {
             Vector2 vel = (Rect().Bottom.SafeDirectionTo(Rect().Top)).RotatedByRandom(.3f) * rand.NextFloat(7f, 15f);
-            ParticleRegistry.SpawnSparkParticle(start + rand.NextVector2Circular(9f, 9f), vel, rand.Next(30, 40), rand.NextFloat(.7f, 1f), Color.DeepSkyBlue);
+            ParticleRegistry.SpawnSparkParticle(start + rand.NextVector2Circular(9f, 9f), vel, rand.Next(30, 40),
+                rand.NextFloat(.7f, 1f), Color.DeepSkyBlue);
         }
 
         AdditionsSound.etherealHit4.Play(start, 1f, 0f, .2f, 10, Name);
@@ -254,7 +258,8 @@ public class HeavenForgedSwing : BaseSwordSwing
         for (int i = 0; i < 24; i++)
         {
             Vector2 vel = (Rect().Bottom.SafeDirectionTo(Rect().Top)).RotatedByRandom(.3f) * rand.NextFloat(7f, 15f);
-            ParticleRegistry.SpawnSparkParticle(start + rand.NextVector2Circular(9f, 9f), vel, rand.Next(30, 40), rand.NextFloat(.7f, 1f), Color.DeepSkyBlue);
+            ParticleRegistry.SpawnSparkParticle(start + rand.NextVector2Circular(9f, 9f), vel, rand.Next(30, 40),
+                rand.NextFloat(.7f, 1f), Color.DeepSkyBlue);
         }
 
         AdditionsSound.etherealHit4.Play(start, 1f, 0f, .2f, 10, Name);
@@ -314,11 +319,13 @@ public class HeavenForgedSwing : BaseSwordSwing
             trailShader.TrySetParameter("flip", flip);
 
             trailShader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Cosmos), 0, SamplerState.LinearWrap);
-            trail.DrawTrail(trailShader, points.Points, 40, false, true, Get3DOrthoPrimitiveMatrix(Projectile.Center, Rotation, Projectile.scale, InitialMouseAngle));
+            trail.DrawTrail(trailShader, points.Points, 40, false, true,
+                Get3DOrthoPrimitiveMatrix(Projectile.Center, Rotation, Projectile.scale, InitialMouseAngle));
         }
 
         // Draw the main sword
-        DrawTextureIn3D(Tex, Projectile.Center, Rotation, Projectile.scale, InitialMouseAngle, Color.White, false, (Direction < 0 ? -(int)SwingDir : (int)SwingDir) * (int)Owner.gravDir);
+        DrawTextureIn3D(Tex, Projectile.Center, Rotation, Projectile.scale, InitialMouseAngle, Color.White, false,
+            (Direction < 0 ? -(int) SwingDir : (int) SwingDir) * (int) Owner.gravDir);
 
         if (SwingCompletion > .3f)
         {
@@ -333,7 +340,7 @@ public class HeavenForgedSwing : BaseSwordSwing
                 float endingRotation = Projectile.oldRot[i + 1] - Projectile.rotation - SwordRotation;
                 for (int j = 0; j < subdivisions; j++)
                 {
-                    float rotation = startingRotation.AngleLerp(endingRotation, j / (float)subdivisions);
+                    float rotation = startingRotation.AngleLerp(endingRotation, j / (float) subdivisions);
                     Vector2 trailVector = rotation.ToRotationVector2() * afterimageOffset;
                     trailPositions.Add(Projectile.Center + trailVector);
                 }
@@ -342,6 +349,7 @@ public class HeavenForgedSwing : BaseSwordSwing
             points.SetPoints(trailPositions);
             PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.OverPlayers);
         }
+
         return false;
     }
 }

@@ -12,6 +12,7 @@ public class SolemButterflyLament : ModProjectile, ILocalizedModType, IModType
     {
         Main.projFrames[Projectile.type] = 4;
     }
+
     public Player Owner => Main.player[Projectile.owner];
 
     public override void SetDefaults()
@@ -50,7 +51,8 @@ public class SolemButterflyLament : ModProjectile, ILocalizedModType, IModType
         Rectangle frame = texture.Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame);
         Vector2 drawPosition = Projectile.Center - Main.screenPosition;
         SpriteEffects direction = Projectile.direction == 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
-        Main.EntitySpriteDraw(texture, drawPosition, frame, Projectile.GetAlpha(lightColor), Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, direction, 0);
+        Main.EntitySpriteDraw(texture, drawPosition, frame, Projectile.GetAlpha(lightColor), Projectile.rotation,
+            frame.Size() * 0.5f, Projectile.scale, direction, 0);
         return false;
     }
 }

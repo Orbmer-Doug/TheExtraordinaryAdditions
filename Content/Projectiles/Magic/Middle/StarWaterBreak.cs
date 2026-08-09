@@ -30,18 +30,22 @@ public class StarWaterBreak : ModProjectile, ILocalizedModType, IModType
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
-        after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [Color.DarkSlateBlue, Color.SlateBlue, Color.Blue]);
+        after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(),
+            [Color.DarkSlateBlue, Color.SlateBlue, Color.Blue]);
         Projectile.DrawBaseProjectile(Color.White);
         return false;
     }
 
     public ref float Time => ref Projectile.ai[0];
+
     public override void AI()
     {
         after ??= new(10, () => Projectile.Center);
-        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 0, 1, 1f));
+        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 0,
+            1, 1f));
 
         Time++;
         if (Time <= 60f)
@@ -50,6 +54,7 @@ public class StarWaterBreak : ModProjectile, ILocalizedModType, IModType
             Projectile.velocity *= 0.985f;
             return;
         }
+
         Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.ToRadians(45f);
 
         if (Projectile.timeLeft > 60)
@@ -62,6 +67,7 @@ public class StarWaterBreak : ModProjectile, ILocalizedModType, IModType
 
     public override void OnKill(int timeLeft)
     {
-        ParticleRegistry.SpawnSparkleParticle(Projectile.Center, Vector2.Zero, 20, Main.rand.NextFloat(1f, 2.4f), Color.BlueViolet, Color.DarkSlateBlue, .8f, .02f);
+        ParticleRegistry.SpawnSparkleParticle(Projectile.Center, Vector2.Zero, 20, Main.rand.NextFloat(1f, 2.4f),
+            Color.BlueViolet, Color.DarkSlateBlue, .8f, .02f);
     }
 }

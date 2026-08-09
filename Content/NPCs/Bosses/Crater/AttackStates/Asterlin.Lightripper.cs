@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using CalamityMod;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
@@ -43,8 +42,8 @@ public partial class Asterlin
 
     public LightripperState Lightripper_State
     {
-        get => (LightripperState)ExtraAI[1];
-        set => ExtraAI[1] = (int)value;
+        get => (LightripperState) ExtraAI[1];
+        set => ExtraAI[1] = (int) value;
     }
 
     public ref float Lightripper_InitialDirection => ref ExtraAI[2];
@@ -54,10 +53,10 @@ public partial class Asterlin
     public static int Lightripper_ReleaseRate => 2;
     public static int Lightripper_TotalBeams => DifficultyBasedValue(7, 8, 10, 11, 12, 14);
 
-    public static int Lightripper_HoverTime => CalUtils.SecondsToFrames(1.1f);
-    public static int Lightripper_ReelbackTime => CalUtils.SecondsToFrames(.6f);
-    public static int Lightripper_DashTime => CalUtils.SecondsToFrames(.35f);
-    public static int Lightripper_SlowdownTime => CalUtils.SecondsToFrames(.67f);
+    public static int Lightripper_HoverTime => SecondsToFrames(1.1f);
+    public static int Lightripper_ReelbackTime => SecondsToFrames(.6f);
+    public static int Lightripper_DashTime => SecondsToFrames(.35f);
+    public static int Lightripper_SlowdownTime => SecondsToFrames(.67f);
 
     public void DoBehavior_Lightripper()
     {
@@ -69,7 +68,7 @@ public partial class Asterlin
                     comp = 0f;
                 return Color.Cyan * comp * Animators.MakePoly(4f).OutFunction(1f - uv.X);
             }, null, 50);
-        
+
         switch (Lightripper_State)
         {
             case LightripperState.BeamRelease:
@@ -134,7 +133,7 @@ public partial class Asterlin
                     Main.rand.Next(20, 50), Main.rand.NextFloat(.5f, 1.5f), Color.DeepSkyBlue, 1f, 2f, 5f);
 
                 Lightripper_Points.SetPoints(NPC.Center.GetLaserControlPoints(Target.Center, 50));
-                
+
                 if (AITimer >= Lightripper_ReelbackTime)
                 {
                     Lightripper_State = LightripperState.Dash;
@@ -188,9 +187,10 @@ public partial class Asterlin
         {
             if (Lightripper_Tele == null || Lightripper_Tele.Disposed || Lightripper_Points == null)
                 return;
-            
+
             Lightripper_Tele.DrawTrail(ShaderRegistry.StandardPrimitiveShader, Lightripper_Points.Points);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderNPCs);
     }
 }

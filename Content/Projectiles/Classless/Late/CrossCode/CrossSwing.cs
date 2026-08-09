@@ -19,13 +19,13 @@ public class CrossSwing : BaseSwordSwing
 
     public Element State
     {
-        get => (Element)Projectile.AdditionsInfo().ExtraAI[7];
-        set => Projectile.AdditionsInfo().ExtraAI[7] = (float)value;
+        get => (Element) Projectile.AdditionsInfo().ExtraAI[7];
+        set => Projectile.AdditionsInfo().ExtraAI[7] = (float) value;
     }
 
     public int SwingCounter
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[8];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[8];
         set => Projectile.AdditionsInfo().ExtraAI[8] = value;
     }
 

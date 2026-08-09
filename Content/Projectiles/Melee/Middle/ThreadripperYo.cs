@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -22,7 +21,7 @@ public class ThreadripperYo : ModProjectile
     public ref float Wait => ref Projectile.AdditionsInfo().ExtraAI[6];
     public ref int Counter => ref Owner.GetModPlayer<ThreadripperPlayer>().Counter;
     public const int Max = 25;
-    public static readonly int ShredTime = CalUtils.SecondsToFrames(6.5f);
+    public static readonly int ShredTime = SecondsToFrames(6.5f);
     public float Interpol => Shred > 0 ? InverseLerp(0f, ShredTime, Shred) : InverseLerp(0f, Max, Counter);
 
     public override void SetStaticDefaults()
@@ -47,7 +46,8 @@ public class ThreadripperYo : ModProjectile
     public override void AI()
     {
         after ??= new(5, () => Projectile.Center);
-        after.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.scale, Projectile.Opacity, Projectile.rotation, 0, 245));
+        after.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.scale, Projectile.Opacity,
+            Projectile.rotation, 0, 245));
 
         if (Projectile.FinalExtraUpdate())
         {
@@ -70,7 +70,8 @@ public class ThreadripperYo : ModProjectile
                         float speedReduce = Main.rand.NextFloat(.5f, .7f);
                         float scale = Main.rand.NextFloat(.5f, 1.2f);
                         Color color = Color.Lerp(Color.DarkRed, Color.Crimson, Main.rand.NextFloat(.4f, .6f)) * 0.75f;
-                        ParticleRegistry.SpawnBloodParticle(pos, vel * speedReduce * MathHelper.Clamp(Interpol, .2f, 1f), life, scale * Interpol, color);
+                        ParticleRegistry.SpawnBloodParticle(pos,
+                            vel * speedReduce * MathHelper.Clamp(Interpol, .2f, 1f), life, scale * Interpol, color);
                     }
                 }
 
@@ -81,11 +82,14 @@ public class ThreadripperYo : ModProjectile
             {
                 if (Main.rand.NextBool(Max - Counter) || Shred > 0)
                 {
-                    Vector2 pos = Projectile.Center + Main.rand.NextVector2CircularEdge(Projectile.height, Projectile.height);
-                    Vector2 vel = (Projectile.rotation + MathHelper.PiOver2).ToRotationVector2() * (4f + Projectile.velocity.Length() * Main.rand.NextFloat(.2f, .5f));
+                    Vector2 pos = Projectile.Center +
+                                  Main.rand.NextVector2CircularEdge(Projectile.height, Projectile.height);
+                    Vector2 vel = (Projectile.rotation + MathHelper.PiOver2).ToRotationVector2() *
+                                  (4f + Projectile.velocity.Length() * Main.rand.NextFloat(.2f, .5f));
                     int life = Main.rand.Next(23, 38);
                     float scale = Main.rand.NextFloat(12f, 30f) * Interpol;
-                    ParticleRegistry.SpawnGlowParticle(pos, vel, life, scale, Color.Red, Main.rand.NextFloat(.7f, 1.3f));
+                    ParticleRegistry.SpawnGlowParticle(pos, vel, life, scale, Color.Red,
+                        Main.rand.NextFloat(.7f, 1.3f));
                 }
             }
 
@@ -109,7 +113,8 @@ public class ThreadripperYo : ModProjectile
         // sawblade vs. ground = friction
         if (Timer % 4f == 3f)
         {
-            Collision.HitTiles(Projectile.position + Projectile.velocity, Projectile.velocity * 2, Projectile.width, Projectile.height);
+            Collision.HitTiles(Projectile.position + Projectile.velocity, Projectile.velocity * 2, Projectile.width,
+                Projectile.height);
 
             Vector2 splatterDirection = Projectile.SafeDirectionTo(Owner.Center) * 8f + Projectile.velocity * 1.2f;
 
@@ -120,8 +125,10 @@ public class ThreadripperYo : ModProjectile
             Vector2 vel = Utils.RotatedByRandom(splatterDirection, 0.9) * Utils.NextFloat(Main.rand, .5f, 1.2f);
 
             ParticleRegistry.SpawnSparkParticle(Projectile.Center, vel, life, scale, col, true, true);
-            ParticleRegistry.SpawnSquishyPixelParticle(Projectile.Center, vel * 1.4f, life, scale * 1.4f, col * 1.6f, col * 2.4f, 4, true, true);
+            ParticleRegistry.SpawnSquishyPixelParticle(Projectile.Center, vel * 1.4f, life, scale * 1.4f, col * 1.6f,
+                col * 2.4f, 4, true, true);
         }
+
         Projectile.velocity *= .34f;
         return false;
     }
@@ -133,6 +140,7 @@ public class ThreadripperYo : ModProjectile
             Counter += 1;
             Wait = 30;
         }
+
         if (Counter >= Max)
         {
             Shred = ShredTime;
@@ -149,17 +157,21 @@ public class ThreadripperYo : ModProjectile
             ParticleRegistry.SpawnBloodParticle(target.Center, vel, life, scale, color);
         }
     }
-    
+
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void glow()
         {
             Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
             Vector2 orig = tex.Size() / 2f;
-            Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Vector2.One * Projectile.height * 4f), null, Color.DarkRed * .6f * Interpol, 0f, orig);
-            Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Vector2.One * Projectile.height * 3.5f), null, Color.Red * .85f * Interpol, 0f, orig);
-            Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Vector2.One * Projectile.height * 3f), null, Color.Crimson * Interpol, 0f, orig);
+            Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Vector2.One * Projectile.height * 4f),
+                null, Color.DarkRed * .6f * Interpol, 0f, orig);
+            Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Vector2.One * Projectile.height * 3.5f),
+                null, Color.Red * .85f * Interpol, 0f, orig);
+            Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Vector2.One * Projectile.height * 3f),
+                null, Color.Crimson * Interpol, 0f, orig);
         }
 
         Texture2D tex = Projectile.ThisProjectileTexture();

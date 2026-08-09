@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using CalamityMod;
 using Terraria;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
@@ -22,6 +21,7 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Arid;
 public class GlassPiercer : ModNPC
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.DuneProwlerSniper);
+
     public override void SetStaticDefaults()
     {
         Main.npcFrameCount[NPC.type] = 52;
@@ -47,10 +47,9 @@ public class GlassPiercer : ModNPC
     public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
     {
         bestiaryEntry.Info.AddRange([
-                BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Desert,
-                new FlavorTextBestiaryInfoElement(this.GetLocalizedValue("Bestiary"))
-            ]);
-
+            BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Desert,
+            new FlavorTextBestiaryInfoElement(this.GetLocalizedValue("Bestiary"))
+        ]);
     }
 
     public override void FindFrame(int frameHeight)
@@ -63,38 +62,46 @@ public class GlassPiercer : ModNPC
                 NPC.frame.Y = NPC.frame.Y + frameHeight;
                 NPC.frameCounter = 0.0;
             }
+
             if (NPC.frame.Y >= frameHeight * 13)
             {
                 NPC.frame.Y = frameHeight;
             }
+
             return;
         }
+
         NPC.frameCounter += Math.Abs(NPC.velocity.X);
         if (NPC.frameCounter > 6.0)
         {
             NPC.frameCounter = 0.0;
             NPC.frame.Y = NPC.frame.Y + frameHeight;
         }
+
         if (NPC.velocity.Y == 0f)
         {
             if (NPC.direction == 1)
             {
                 NPC.spriteDirection = 1;
             }
+
             if (NPC.direction == -1)
             {
                 NPC.spriteDirection = -1;
             }
+
             if (NPC.velocity.X == 0f)
             {
                 NPC.frameCounter = 0.0;
                 NPC.frame.Y = 0;
                 return;
             }
+
             if (NPC.frame.Y < frameHeight)
             {
                 NPC.frame.Y = frameHeight;
             }
+
             if (NPC.frame.Y > frameHeight * 13)
             {
                 NPC.frame.Y = frameHeight;
@@ -108,16 +115,18 @@ public class GlassPiercer : ModNPC
     }
 
     public static readonly float StuckJumpPower = -5f;
-    public static readonly int RunTime = CalUtils.SecondsToFrames(2.5f);
+    public static readonly int RunTime = SecondsToFrames(2.5f);
     public ref float IdleTimer => ref NPC.ai[0];
     public ref float DoorInteractionTimer => ref NPC.ai[1];
     public ref float DoorAttemptTimer => ref NPC.ai[2];
     public ref float StuckTimer => ref NPC.ai[3];
+
     public bool Running
     {
         get => NPC.AdditionsInfo().ExtraAI[0] == 1;
         set => NPC.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
+
     public ref float RunningTimer => ref NPC.AdditionsInfo().ExtraAI[1];
 
     public override void AI()
@@ -125,7 +134,8 @@ public class GlassPiercer : ModNPC
         if (NPC.localAI[0] == 0)
         {
             if (this.RunServer())
-                NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<GlassFocusedSniper>(), NPC.damage, 2f, NPC.whoAmI);
+                NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<GlassFocusedSniper>(), NPC.damage,
+                    2f, NPC.whoAmI);
             Running = false;
             NPC.localAI[0] = 1;
             NPC.netUpdate = true;
@@ -139,6 +149,7 @@ public class GlassPiercer : ModNPC
             Running = true;
             NPC.netUpdate = true;
         }
+
         if (Running)
         {
             if (NPC.alpha > 0)
@@ -158,14 +169,16 @@ public class GlassPiercer : ModNPC
             int maxAlpha = 150;
             if (NPC.alpha < maxAlpha)
             {
-                ParticleRegistry.SpawnMistParticle(NPC.RotHitbox().RandomPoint(), -Vector2.UnitY * Main.rand.NextFloat(1f, 2f),
-                    Main.rand.NextFloat(.3f, .7f), Color.SaddleBrown, Color.Transparent, Main.rand.NextFloat(110f, 160f));
+                ParticleRegistry.SpawnMistParticle(NPC.RotHitbox().RandomPoint(),
+                    -Vector2.UnitY * Main.rand.NextFloat(1f, 2f),
+                    Main.rand.NextFloat(.3f, .7f), Color.SaddleBrown, Color.Transparent,
+                    Main.rand.NextFloat(110f, 160f));
                 NPC.alpha += 2;
             }
         }
 
         // Initial directionY adjustment if NPC is exactly at player's feet level
-        if (target.position.Y + (float)target.height == NPC.position.Y + (float)NPC.height)
+        if (target.position.Y + (float) target.height == NPC.position.Y + (float) NPC.height)
         {
             NPC.directionY = -1;
         }
@@ -178,6 +191,7 @@ public class GlassPiercer : ModNPC
         {
             wasVelocityXZero = true;
         }
+
         if (NPC.justHit)
         {
             wasVelocityXZero = false;
@@ -193,30 +207,36 @@ public class GlassPiercer : ModNPC
 
         if (!isSpecialTypeForStuckLogic && useStuckDetection)
         {
-            if (NPC.velocity.Y == 0f && ((NPC.velocity.X > 0f && NPC.direction < 0) || (NPC.velocity.X < 0f && NPC.direction > 0)))
+            if (NPC.velocity.Y == 0f &&
+                ((NPC.velocity.X > 0f && NPC.direction < 0) || (NPC.velocity.X < 0f && NPC.direction > 0)))
             {
                 shouldTurnAround = true;
             }
-            if (NPC.position.X == NPC.oldPosition.X || StuckTimer >= (float)stuckTimerMax || shouldTurnAround)
+
+            if (NPC.position.X == NPC.oldPosition.X || StuckTimer >= (float) stuckTimerMax || shouldTurnAround)
             {
                 StuckTimer += 1f;
             }
-            else if ((double)Math.Abs(NPC.velocity.X) > 0.9 && StuckTimer > 0f)
+            else if ((double) Math.Abs(NPC.velocity.X) > 0.9 && StuckTimer > 0f)
             {
                 StuckTimer -= 1f;
             }
-            if (StuckTimer > (float)(stuckTimerMax * 10))
+
+            if (StuckTimer > (float) (stuckTimerMax * 10))
             {
                 StuckTimer = 0f;
             }
+
             if (NPC.justHit)
             {
                 StuckTimer = 0f;
             }
-            if (StuckTimer == (float)stuckTimerMax)
+
+            if (StuckTimer == (float) stuckTimerMax)
             {
                 NPC.netUpdate = true;
             }
+
             playerHitbox = target.Hitbox;
             if (playerHitbox.Intersects(NPC.Hitbox))
             {
@@ -225,7 +245,8 @@ public class GlassPiercer : ModNPC
         }
 
         // Check if not stuck and not discouraged to pursue
-        if (StuckTimer < (float)stuckTimerMax && NPC.DespawnEncouragement_AIStyle3_Fighters_NotDiscouraged(NPC.type, NPC.position, NPC))
+        if (StuckTimer < (float) stuckTimerMax &&
+            NPC.DespawnEncouragement_AIStyle3_Fighters_NotDiscouraged(NPC.type, NPC.position, NPC))
         {
             NPC.TargetClosest();
             if (NPC.directionY > 0 && target.Center.Y <= NPC.Bottom.Y)
@@ -253,6 +274,7 @@ public class GlassPiercer : ModNPC
             {
                 IdleTimer = 0f;
             }
+
             if (NPC.direction == 0)
             {
                 NPC.direction = 1;
@@ -272,6 +294,7 @@ public class GlassPiercer : ModNPC
             {
                 NPC.velocity.X *= 0.8f;
             }
+
             NPC.velocity.X += 0.1f;
             if (NPC.velocity.X > maxSpeed)
             {
@@ -284,6 +307,7 @@ public class GlassPiercer : ModNPC
             {
                 NPC.velocity.X *= 0.8f;
             }
+
             NPC.velocity.X -= 0.1f;
             if (NPC.velocity.X < -maxSpeed)
             {
@@ -293,12 +317,12 @@ public class GlassPiercer : ModNPC
 
         if (NPC.velocity.Y == 0f || forceJump)
         {
-            int tileYBelow = (int)(NPC.position.Y + (float)NPC.height + 7f) / 16;
-            int tileYAbove = (int)(NPC.position.Y - 9f) / 16;
-            int tileXLeft = (int)NPC.position.X / 16;
-            int tileXRight = (int)(NPC.position.X + (float)NPC.width) / 16;
-            int tileXCenterLeft = (int)(NPC.position.X + 8f) / 16;
-            int tileXCenterRight = (int)(NPC.position.X + (float)NPC.width - 8f) / 16;
+            int tileYBelow = (int) (NPC.position.Y + (float) NPC.height + 7f) / 16;
+            int tileYAbove = (int) (NPC.position.Y - 9f) / 16;
+            int tileXLeft = (int) NPC.position.X / 16;
+            int tileXRight = (int) (NPC.position.X + (float) NPC.width) / 16;
+            int tileXCenterLeft = (int) (NPC.position.X + 8f) / 16;
+            int tileXCenterRight = (int) (NPC.position.X + (float) NPC.width - 8f) / 16;
             bool missingTilesBelow = false;
             for (int tileX = tileXCenterLeft; tileX <= tileXCenterRight; tileX++)
             {
@@ -307,20 +331,26 @@ public class GlassPiercer : ModNPC
                     missingTilesBelow = true;
                     continue;
                 }
-                if (Main.tile[tileX, tileYAbove] != null && Main.tile[tileX, tileYAbove].HasUnactuatedTile && Main.tileSolid[Main.tile[tileX, tileYAbove].type])
+
+                if (Main.tile[tileX, tileYAbove] != null && Main.tile[tileX, tileYAbove].HasUnactuatedTile &&
+                    Main.tileSolid[Main.tile[tileX, tileYAbove].type])
                 {
                     onGround = false;
                     break;
                 }
-                if (!missingTilesBelow && tileX >= tileXLeft && tileX <= tileXRight && Main.tile[tileX, tileYBelow].HasUnactuatedTile && Main.tileSolid[Main.tile[tileX, tileYBelow].type])
+
+                if (!missingTilesBelow && tileX >= tileXLeft && tileX <= tileXRight &&
+                    Main.tile[tileX, tileYBelow].HasUnactuatedTile && Main.tileSolid[Main.tile[tileX, tileYBelow].type])
                 {
                     onGround = true;
                 }
             }
+
             if (!onGround && NPC.velocity.Y < 0f)
             {
                 NPC.velocity.Y = 0f;
             }
+
             if (missingTilesBelow)
             {
                 return;
@@ -334,47 +364,68 @@ public class GlassPiercer : ModNPC
             {
                 directionOffset = -1;
             }
+
             if (NPC.velocity.X > 0f)
             {
                 directionOffset = 1;
             }
+
             Vector2 projectedPosition = NPC.position;
             projectedPosition.X += NPC.velocity.X;
-            int tileXCheck = (int)((projectedPosition.X + (float)(NPC.width / 2) + (float)((NPC.width / 2 + 1) * directionOffset)) / 16f);
-            int tileYCheck = (int)((projectedPosition.Y + (float)NPC.height - 1f) / 16f);
+            int tileXCheck = (int) ((projectedPosition.X + (float) (NPC.width / 2) +
+                                     (float) ((NPC.width / 2 + 1) * directionOffset)) / 16f);
+            int tileYCheck = (int) ((projectedPosition.Y + (float) NPC.height - 1f) / 16f);
             if (WorldGen.InWorld(tileXCheck, tileYCheck, 4))
             {
                 // absolutely hideous but it works
-                if ((float)(tileXCheck * 16) < projectedPosition.X + (float)NPC.width && (float)(tileXCheck * 16 + 16) > projectedPosition.X
-                    && ((Main.tile[tileXCheck, tileYCheck].HasUnactuatedTile && !Main.tile[tileXCheck, tileYCheck].TopSlope
-                    && !Main.tile[tileXCheck, tileYCheck - 1].TopSlope && Main.tileSolid[Main.tile[tileXCheck, tileYCheck].type]
-                    && !Main.tileSolidTop[Main.tile[tileXCheck, tileYCheck].type]) || (Main.tile[tileXCheck, tileYCheck - 1].IsHalfBlock
-                    && Main.tile[tileXCheck, tileYCheck - 1].HasUnactuatedTile)) && (!Main.tile[tileXCheck, tileYCheck - 1].HasUnactuatedTile
-                    || !Main.tileSolid[Main.tile[tileXCheck, tileYCheck - 1].type] || Main.tileSolidTop[Main.tile[tileXCheck, tileYCheck - 1].type]
-                    || (Main.tile[tileXCheck, tileYCheck - 1].IsHalfBlock && (!Main.tile[tileXCheck, tileYCheck - 4].HasUnactuatedTile
-                    || !Main.tileSolid[Main.tile[tileXCheck, tileYCheck - 4].type] || Main.tileSolidTop[Main.tile[tileXCheck, tileYCheck - 4].type])))
-                    && (!Main.tile[tileXCheck, tileYCheck - 2].HasUnactuatedTile || !Main.tileSolid[Main.tile[tileXCheck, tileYCheck - 2].type]
-                    || Main.tileSolidTop[Main.tile[tileXCheck, tileYCheck - 2].type]) && (!Main.tile[tileXCheck, tileYCheck - 3].HasUnactuatedTile
-                    || !Main.tileSolid[Main.tile[tileXCheck, tileYCheck - 3].type] || Main.tileSolidTop[Main.tile[tileXCheck, tileYCheck - 3].type])
-                    && (!Main.tile[tileXCheck - directionOffset, tileYCheck - 3].HasUnactuatedTile || !Main.tileSolid[Main.tile[tileXCheck - directionOffset, tileYCheck - 3].type]))
+                if ((float) (tileXCheck * 16) < projectedPosition.X + (float) NPC.width &&
+                    (float) (tileXCheck * 16 + 16) > projectedPosition.X
+                    && ((Main.tile[tileXCheck, tileYCheck].HasUnactuatedTile && !Main.tile[tileXCheck, tileYCheck]
+                                                                                 .TopSlope
+                                                                             && !Main.tile[tileXCheck, tileYCheck - 1]
+                                                                                 .TopSlope &&
+                                                                             Main.tileSolid[
+                                                                                 Main.tile[tileXCheck, tileYCheck].type]
+                                                                             && !Main.tileSolidTop[
+                                                                                 Main.tile[tileXCheck,
+                                                                                     tileYCheck].type]) ||
+                        (Main.tile[tileXCheck, tileYCheck - 1].IsHalfBlock
+                         && Main.tile[tileXCheck, tileYCheck - 1].HasUnactuatedTile)) &&
+                    (!Main.tile[tileXCheck, tileYCheck - 1].HasUnactuatedTile
+                     || !Main.tileSolid[Main.tile[tileXCheck, tileYCheck - 1].type] ||
+                     Main.tileSolidTop[Main.tile[tileXCheck, tileYCheck - 1].type]
+                     || (Main.tile[tileXCheck, tileYCheck - 1].IsHalfBlock &&
+                         (!Main.tile[tileXCheck, tileYCheck - 4].HasUnactuatedTile
+                          || !Main.tileSolid[Main.tile[tileXCheck, tileYCheck - 4].type] ||
+                          Main.tileSolidTop[Main.tile[tileXCheck, tileYCheck - 4].type])))
+                    && (!Main.tile[tileXCheck, tileYCheck - 2].HasUnactuatedTile ||
+                        !Main.tileSolid[Main.tile[tileXCheck, tileYCheck - 2].type]
+                        || Main.tileSolidTop[Main.tile[tileXCheck, tileYCheck - 2].type]) &&
+                    (!Main.tile[tileXCheck, tileYCheck - 3].HasUnactuatedTile
+                     || !Main.tileSolid[Main.tile[tileXCheck, tileYCheck - 3].type] ||
+                     Main.tileSolidTop[Main.tile[tileXCheck, tileYCheck - 3].type])
+                    && (!Main.tile[tileXCheck - directionOffset, tileYCheck - 3].HasUnactuatedTile ||
+                        !Main.tileSolid[Main.tile[tileXCheck - directionOffset, tileYCheck - 3].type]))
                 {
                     float groundY = tileYCheck * 16;
                     if (Main.tile[tileXCheck, tileYCheck].IsHalfBlock)
                     {
                         groundY += 8f;
                     }
+
                     if (Main.tile[tileXCheck, tileYCheck - 1].IsHalfBlock)
                     {
                         groundY -= 8f;
                     }
-                    if (groundY < projectedPosition.Y + (float)NPC.height)
+
+                    if (groundY < projectedPosition.Y + (float) NPC.height)
                     {
-                        float heightDifference = projectedPosition.Y + (float)NPC.height - groundY;
+                        float heightDifference = projectedPosition.Y + (float) NPC.height - groundY;
                         float maxStepHeight = 16.1f;
                         if (heightDifference <= maxStepHeight)
                         {
-                            NPC.gfxOffY += NPC.position.Y + (float)NPC.height - groundY;
-                            NPC.position.Y = groundY - (float)NPC.height;
+                            NPC.gfxOffY += NPC.position.Y + (float) NPC.height - groundY;
+                            NPC.position.Y = groundY - (float) NPC.height;
                             if (heightDifference < 9f)
                             {
                                 NPC.stepSpeed = 1f;
@@ -391,11 +442,12 @@ public class GlassPiercer : ModNPC
 
         if (onGround)
         {
-            int tileXObstacle = (int)((NPC.position.X + (float)(NPC.width / 2) + (float)(15 * NPC.direction)) / 16f);
-            int tileYObstacle = (int)((NPC.position.Y + (float)NPC.height - 15f) / 16f);
+            int tileXObstacle = (int) ((NPC.position.X + (float) (NPC.width / 2) + (float) (15 * NPC.direction)) / 16f);
+            int tileYObstacle = (int) ((NPC.position.Y + (float) NPC.height - 15f) / 16f);
 
-            if (Main.tile[tileXObstacle, tileYObstacle - 1].HasUnactuatedTile && (TileLoader.IsClosedDoor(Main.tile[tileXObstacle, tileYObstacle - 1])
-                || Main.tile[tileXObstacle, tileYObstacle - 1].type == 388) && canOpenDoors)
+            if (Main.tile[tileXObstacle, tileYObstacle - 1].HasUnactuatedTile &&
+                (TileLoader.IsClosedDoor(Main.tile[tileXObstacle, tileYObstacle - 1])
+                 || Main.tile[tileXObstacle, tileYObstacle - 1].type == 388) && canOpenDoors)
             {
                 DoorAttemptTimer += 1f;
                 StuckTimer = 0f;
@@ -407,12 +459,14 @@ public class GlassPiercer : ModNPC
                     {
                         DoorInteractionTimer = 0f;
                     }
-                    NPC.velocity.X = 0.5f * (float)(-NPC.direction);
+
+                    NPC.velocity.X = 0.5f * (float) (-NPC.direction);
                     int doorOpenIncrement = 5;
                     if (Main.tile[tileXObstacle, tileYObstacle - 1].type == 388)
                     {
                         doorOpenIncrement = 2;
                     }
+
                     DoorInteractionTimer += doorOpenIncrement;
 
                     DoorAttemptTimer = 0f;
@@ -434,11 +488,14 @@ public class GlassPiercer : ModNPC
                                 StuckTimer = stuckTimerMax;
                                 NPC.netUpdate = true;
                             }
+
                             if (this.RunClient() && opened)
                             {
-                                NetMessage.SendData(MessageID.ToggleDoorState, -1, -1, null, 0, tileXObstacle, tileYObstacle - 1, NPC.direction);
+                                NetMessage.SendData(MessageID.ToggleDoorState, -1, -1, null, 0, tileXObstacle,
+                                    tileYObstacle - 1, NPC.direction);
                             }
                         }
+
                         if (Main.tile[tileXObstacle, tileYObstacle - 1].type == 388)
                         {
                             bool opened = WorldGen.ShiftTallGate(tileXObstacle, tileYObstacle - 1, closing: false);
@@ -447,9 +504,11 @@ public class GlassPiercer : ModNPC
                                 StuckTimer = stuckTimerMax;
                                 NPC.netUpdate = true;
                             }
+
                             if (this.RunClient() && opened)
                             {
-                                NetMessage.SendData(MessageID.ToggleDoorState, -1, -1, null, 4, tileXObstacle, tileYObstacle - 1);
+                                NetMessage.SendData(MessageID.ToggleDoorState, -1, -1, null, 4, tileXObstacle,
+                                    tileYObstacle - 1);
                             }
                         }
                     }
@@ -458,11 +517,14 @@ public class GlassPiercer : ModNPC
             else
             {
                 int spriteDirectionAdjusted = NPC.spriteDirection;
-                if ((NPC.velocity.X < 0f && spriteDirectionAdjusted == -1) || (NPC.velocity.X > 0f && spriteDirectionAdjusted == 1))
+                if ((NPC.velocity.X < 0f && spriteDirectionAdjusted == -1) ||
+                    (NPC.velocity.X > 0f && spriteDirectionAdjusted == 1))
                 {
-                    if (NPC.height >= 32 && Main.tile[tileXObstacle, tileYObstacle - 2].HasUnactuatedTile && Main.tileSolid[Main.tile[tileXObstacle, tileYObstacle - 2].type])
+                    if (NPC.height >= 32 && Main.tile[tileXObstacle, tileYObstacle - 2].HasUnactuatedTile &&
+                        Main.tileSolid[Main.tile[tileXObstacle, tileYObstacle - 2].type])
                     {
-                        if (Main.tile[tileXObstacle, tileYObstacle - 3].HasUnactuatedTile && Main.tileSolid[Main.tile[tileXObstacle, tileYObstacle - 3].type])
+                        if (Main.tile[tileXObstacle, tileYObstacle - 3].HasUnactuatedTile &&
+                            Main.tileSolid[Main.tile[tileXObstacle, tileYObstacle - 3].type])
                         {
                             NPC.velocity.Y = -8f;
                             NPC.netUpdate = true;
@@ -473,20 +535,25 @@ public class GlassPiercer : ModNPC
                             NPC.netUpdate = true;
                         }
                     }
-                    else if (Main.tile[tileXObstacle, tileYObstacle - 1].HasUnactuatedTile && Main.tileSolid[Main.tile[tileXObstacle, tileYObstacle - 1].type])
+                    else if (Main.tile[tileXObstacle, tileYObstacle - 1].HasUnactuatedTile &&
+                             Main.tileSolid[Main.tile[tileXObstacle, tileYObstacle - 1].type])
                     {
                         NPC.velocity.Y = -6f;
                         NPC.netUpdate = true;
                     }
-                    else if (NPC.position.Y + (float)NPC.height - (float)(tileYObstacle * 16) > 20f && Main.tile[tileXObstacle, tileYObstacle].HasUnactuatedTile
-                        && !Main.tile[tileXObstacle, tileYObstacle].TopSlope && Main.tileSolid[Main.tile[tileXObstacle, tileYObstacle].type])
+                    else if (NPC.position.Y + (float) NPC.height - (float) (tileYObstacle * 16) > 20f &&
+                             Main.tile[tileXObstacle, tileYObstacle].HasUnactuatedTile
+                             && !Main.tile[tileXObstacle, tileYObstacle].TopSlope &&
+                             Main.tileSolid[Main.tile[tileXObstacle, tileYObstacle].type])
                     {
                         NPC.velocity.Y = -5f;
                         NPC.netUpdate = true;
                     }
-                    else if (NPC.directionY < 0 && NPC.type != 67 && (!Main.tile[tileXObstacle, tileYObstacle + 1].HasUnactuatedTile
-                        || !Main.tileSolid[Main.tile[tileXObstacle, tileYObstacle + 1].type]) && (!Main.tile[tileXObstacle + NPC.direction, tileYObstacle + 1].HasUnactuatedTile
-                        || !Main.tileSolid[Main.tile[tileXObstacle + NPC.direction, tileYObstacle + 1].type]))
+                    else if (NPC.directionY < 0 && NPC.type != 67 &&
+                             (!Main.tile[tileXObstacle, tileYObstacle + 1].HasUnactuatedTile
+                              || !Main.tileSolid[Main.tile[tileXObstacle, tileYObstacle + 1].type]) &&
+                             (!Main.tile[tileXObstacle + NPC.direction, tileYObstacle + 1].HasUnactuatedTile
+                              || !Main.tileSolid[Main.tile[tileXObstacle + NPC.direction, tileYObstacle + 1].type]))
                     {
                         NPC.velocity.Y = -8f;
                         NPC.velocity.X *= 1.5f;
@@ -504,22 +571,24 @@ public class GlassPiercer : ModNPC
                     }
 
                     if (NPC.velocity.Y == 0f && (Main.expertMode || NPC.type == 586) && target.Bottom.Y < NPC.Top.Y
-                        && Math.Abs(NPC.Center.X - target.Center.X) < (float)(target.width * 3) && Collision.CanHit(NPC, target))
+                        && Math.Abs(NPC.Center.X - target.Center.X) < (float) (target.width * 3) &&
+                        Collision.CanHit(NPC, target))
                     {
                         if (NPC.velocity.Y == 0f)
                         {
                             int maxJumpHeightTiles = 6;
-                            if (target.Bottom.Y > NPC.Top.Y - (float)(maxJumpHeightTiles * 16))
+                            if (target.Bottom.Y > NPC.Top.Y - (float) (maxJumpHeightTiles * 16))
                             {
                                 NPC.velocity.Y = -7.9f;
                             }
                             else
                             {
-                                int tileXCenter = (int)(NPC.Center.X / 16f);
-                                int tileYBottom = (int)(NPC.Bottom.Y / 16f) - 1;
+                                int tileXCenter = (int) (NPC.Center.X / 16f);
+                                int tileYBottom = (int) (NPC.Bottom.Y / 16f) - 1;
                                 for (int tileY = tileYBottom; tileY > tileYBottom - maxJumpHeightTiles; tileY--)
                                 {
-                                    if (Main.tile[tileXCenter, tileY].HasUnactuatedTile && TileID.Sets.Platforms[Main.tile[tileXCenter, tileY].type])
+                                    if (Main.tile[tileXCenter, tileY].HasUnactuatedTile &&
+                                        TileID.Sets.Platforms[Main.tile[tileXCenter, tileY].type])
                                     {
                                         NPC.velocity.Y = -7.9f;
                                         break;
@@ -549,13 +618,16 @@ public class GlassPiercer : ModNPC
     {
         for (int i = 0; i < 3; i++)
         {
-            Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Bone, hit.HitDirection, -1f, 0, default(Color), 1f);
+            Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Bone, hit.HitDirection, -1f, 0, default(Color),
+                1f);
         }
+
         if (NPC.life <= 0)
         {
             for (int j = 0; j < 15; j++)
             {
-                Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Bone, hit.HitDirection, -2f, 0, default(Color), 1f);
+                Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Bone, hit.HitDirection, -2f, 0, default(Color),
+                    1f);
             }
         }
     }
@@ -569,6 +641,7 @@ public class GlassPiercer : ModNPC
 public class GlassFocusedSniper : ProjOwnedByNPC<GlassPiercer>
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GlassFocusedSniper);
+
     public override void SetDefaults()
     {
         Projectile.Size = new(72, 24);
@@ -580,14 +653,16 @@ public class GlassFocusedSniper : ProjOwnedByNPC<GlassPiercer>
 
     public int Time
     {
-        get => (int)Projectile.ai[1];
+        get => (int) Projectile.ai[1];
         set => Projectile.ai[1] = value;
     }
+
     public static int ShotDamage => FixDamageFromDifficulty(DifficultyBasedValue(120, 200, 280));
 
     public override bool? CanDamage() => false;
     public override bool? CanCutTiles() => false;
     public override bool ShouldUpdatePosition() => false;
+
     public override void SafeAI()
     {
         Projectile.timeLeft = 3;
@@ -599,7 +674,8 @@ public class GlassFocusedSniper : ProjOwnedByNPC<GlassPiercer>
                 turnAmt = .12f;
             if (Main.masterMode)
                 turnAmt = .14f;
-            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.SafeDirectionTo(target.Center + target.velocity.ClampLength(0f, 50f) * 10f), turnAmt);
+            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity,
+                Projectile.SafeDirectionTo(target.Center + target.velocity.ClampLength(0f, 50f) * 10f), turnAmt);
             Time = (Time + 1) % 60;
         }
         else
@@ -609,21 +685,29 @@ public class GlassFocusedSniper : ProjOwnedByNPC<GlassPiercer>
         }
 
         Projectile.rotation = Projectile.velocity.ToRotation();
-        Projectile.Center = Owner.RotHitbox().Center + PolarVector(25f, Projectile.rotation) + PolarVector(3f, Projectile.rotation + MathHelper.PiOver2);
+        Projectile.Center = Owner.RotHitbox().Center + PolarVector(25f, Projectile.rotation) +
+                            PolarVector(3f, Projectile.rotation + MathHelper.PiOver2);
         if (target != null && Time % 60 == 59 && Collision.CanHit(Projectile, target))
         {
             Vector2 tip = Projectile.RotHitbox().Right;
 
             if (this.RunServer())
             {
-                SpawnProjectile(tip, Projectile.velocity * 10f, ModContent.ProjectileType<GlassFocusedShot>(), ShotDamage, 2f);
-                SpawnProjectile(Projectile.Center, -Projectile.velocity.RotatedBy(.4f * Projectile.direction) * Main.rand.NextFloat(2f, 5f), ModContent.ProjectileType<GlassShell>(), 0, 0);
+                SpawnProjectile(tip, Projectile.velocity * 10f, ModContent.ProjectileType<GlassFocusedShot>(),
+                    ShotDamage, 2f);
+                SpawnProjectile(Projectile.Center,
+                    -Projectile.velocity.RotatedBy(.4f * Projectile.direction) * Main.rand.NextFloat(2f, 5f),
+                    ModContent.ProjectileType<GlassShell>(), 0, 0);
             }
+
             for (int i = 0; i < 12; i++)
             {
-                ParticleRegistry.SpawnSparkParticle(tip, Projectile.velocity.RotatedByRandom(.2f) * Main.rand.NextFloat(2f, 8f), 40, Main.rand.NextFloat(.3f, .5f), Color.OrangeRed);
+                ParticleRegistry.SpawnSparkParticle(tip,
+                    Projectile.velocity.RotatedByRandom(.2f) * Main.rand.NextFloat(2f, 8f), 40,
+                    Main.rand.NextFloat(.3f, .5f), Color.OrangeRed);
                 ParticleRegistry.SpawnGlowParticle(tip, Vector2.Zero, 12, 30f, Color.OrangeRed, 1.1f);
             }
+
             this.Sync();
         }
     }
@@ -642,6 +726,7 @@ public class GlassShell : ProjOwnedByNPC<GlassPiercer>
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.EmptyRound);
     public override bool IgnoreOwnerActivity => true;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 10;
@@ -653,6 +738,7 @@ public class GlassShell : ProjOwnedByNPC<GlassPiercer>
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = -1;
     }
+
     public bool TouchedGrass
     {
         get => Projectile.ai[2] == 1;
@@ -665,6 +751,7 @@ public class GlassShell : ProjOwnedByNPC<GlassPiercer>
         {
             Projectile.rotation += 0.5f * Projectile.direction;
         }
+
         Projectile.velocity.Y -= 0.055f;
         Projectile.velocity.X *= 0.992f;
     }
@@ -676,6 +763,7 @@ public class GlassShell : ProjOwnedByNPC<GlassPiercer>
             TouchedGrass = true;
             this.Sync();
         }
+
         Projectile.velocity *= 0.98f;
         return false;
     }
@@ -716,6 +804,7 @@ public class GlassFocusedShot : ProjOwnedByNPC<GlassPiercer>
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints points = new(20);
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -727,6 +816,7 @@ public class GlassFocusedShot : ProjOwnedByNPC<GlassPiercer>
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Pixel), 1);
             trail.DrawTrail(shader, points.Points);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;
     }

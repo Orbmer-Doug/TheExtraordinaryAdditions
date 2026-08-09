@@ -9,7 +9,6 @@ using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using static CalamityMod.CalamityUtils;
 using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
@@ -20,13 +19,13 @@ public class ConvergentFireball : ProjOwnedByNPC<Asterlin>
 
     public float Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
 
     public float Cooldown
     {
-        get => (int)Projectile.ai[1];
+        get => (int) Projectile.ai[1];
         set => Projectile.ai[1] = value;
     }
 
@@ -36,7 +35,7 @@ public class ConvergentFireball : ProjOwnedByNPC<Asterlin>
         set => Projectile.ai[2] = value.ToInt();
     }
 
-    public static readonly int ScaleUpTime = CalUtils.SecondsToFrames(1f);
+    public static readonly int ScaleUpTime = SecondsToFrames(1f);
     public const int MaxScale = 200;
     public LoopedSoundInstance flame;
 
@@ -68,16 +67,21 @@ public class ConvergentFireball : ProjOwnedByNPC<Asterlin>
             Projectile.scale = Animators.MakePoly(3f).OutFunction.Evaluate(Time, 0f, ScaleUpTime, 0f, MaxScale);
         }
 
-        float fade = InverseLerp(Asterlin.UnveilingZenith_TotalTime, Asterlin.UnveilingZenith_TotalTime - 80f, ModOwner.AITimer);
+        float fade = InverseLerp(Asterlin.UnveilingZenith_TotalTime, Asterlin.UnveilingZenith_TotalTime - 80f,
+            ModOwner.AITimer);
         Vector2 target = Vector2.Lerp(ModOwner.LeftVentPosition, ModOwner.RightVentPosition, .5f);
         if (!Stolen)
         {
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.DirectionTo(target).SafeNormalize(Vector2.Zero) * 2f, 0.03f * fade);
-            Projectile.velocity += Projectile.DirectionTo(target).SafeNormalize(Vector2.Zero) * (0.1f + InverseLerp(900f, 1600f, Projectile.Distance(target)) * fade);
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity,
+                Projectile.DirectionTo(target).SafeNormalize(Vector2.Zero) * 2f, 0.03f * fade);
+            Projectile.velocity += Projectile.DirectionTo(target).SafeNormalize(Vector2.Zero) *
+                                   (0.1f + InverseLerp(900f, 1600f, Projectile.Distance(target)) * fade);
         }
         else
         {
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.DirectionTo(target).SafeNormalize(Vector2.Zero) * MathHelper.Min(Projectile.Distance(target), 10f), 0.7f);
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity,
+                Projectile.DirectionTo(target).SafeNormalize(Vector2.Zero) *
+                MathHelper.Min(Projectile.Distance(target), 10f), 0.7f);
         }
 
         Projectile.ProjAntiClump(.1f, false);
@@ -97,7 +101,8 @@ public class ConvergentFireball : ProjOwnedByNPC<Asterlin>
                 if (player.DeadOrGhost || player.Distance(Projectile.Center) > 64f)
                     continue;
 
-                Projectile.velocity = Projectile.DirectionFrom(player.Center).SafeNormalize(Vector2.Zero) * (14f + Projectile.velocity.Length() + player.velocity.Length());
+                Projectile.velocity = Projectile.DirectionFrom(player.Center).SafeNormalize(Vector2.Zero) *
+                                      (14f + Projectile.velocity.Length() + player.velocity.Length());
                 Cooldown += 15f;
                 if (Time > 40f)
                     SoundID.Item56.Play(Projectile.Center, 5f, -.4f, .2f);
@@ -105,11 +110,15 @@ public class ConvergentFireball : ProjOwnedByNPC<Asterlin>
                 for (int i = 0; i < 40; i++)
                 {
                     Vector2 pos = Projectile.Center + Main.rand.NextVector2Circular(36f, 36f);
-                    Vector2 vel = Main.rand.NextVector2Circular(7f, 7f) + Projectile.velocity * Main.rand.NextFloat(.5f, .8f);
+                    Vector2 vel = Main.rand.NextVector2Circular(7f, 7f) +
+                                  Projectile.velocity * Main.rand.NextFloat(.5f, .8f);
                     int life = Main.rand.Next(30, 45);
-                    ParticleRegistry.SpawnGlowParticle(pos, vel * .1f, life / 2, Main.rand.NextFloat(40f, 140f), Color.Orange, .9f);
-                    ParticleRegistry.SpawnSquishyPixelParticle(pos, vel, life * 2, Main.rand.NextFloat(.8f, 2.4f), Color.OrangeRed, Color.Goldenrod, 4);
-                    ParticleRegistry.SpawnHeavySmokeParticle(pos, vel, life, Main.rand.NextFloat(.6f, 1.1f), Color.OrangeRed);
+                    ParticleRegistry.SpawnGlowParticle(pos, vel * .1f, life / 2, Main.rand.NextFloat(40f, 140f),
+                        Color.Orange, .9f);
+                    ParticleRegistry.SpawnSquishyPixelParticle(pos, vel, life * 2, Main.rand.NextFloat(.8f, 2.4f),
+                        Color.OrangeRed, Color.Goldenrod, 4);
+                    ParticleRegistry.SpawnHeavySmokeParticle(pos, vel, life, Main.rand.NextFloat(.6f, 1.1f),
+                        Color.OrangeRed);
                 }
 
                 this.Sync();
@@ -119,8 +128,10 @@ public class ConvergentFireball : ProjOwnedByNPC<Asterlin>
         if (Cooldown > 0f)
             Cooldown--;
 
-        Projectile.scale = MathHelper.Lerp(0f, MaxScale, 1f - InverseLerp(0f, Asterlin.UnveilingZenith_StarCollapseTime, ModOwner.UnveilingZenith_CollapseTimer));
-        Projectile.Opacity = Animators.BezierEase(InverseLerp(0f, ScaleUpTime, Time)) * Animators.MakePoly(2f).InFunction(fade);
+        Projectile.scale = MathHelper.Lerp(0f, MaxScale,
+            1f - InverseLerp(0f, Asterlin.UnveilingZenith_StarCollapseTime, ModOwner.UnveilingZenith_CollapseTimer));
+        Projectile.Opacity = Animators.BezierEase(InverseLerp(0f, ScaleUpTime, Time)) *
+                             Animators.MakePoly(2f).InFunction(fade);
         if (fade != 1)
         {
             for (int i = 0; i < 7; i++)
@@ -131,9 +142,11 @@ public class ConvergentFireball : ProjOwnedByNPC<Asterlin>
                     Color.OrangeRed.Lerp(Color.Gold, Main.rand.NextFloat(0f, .4f)), Projectile.Opacity + .2f);
                 ParticleRegistry.SpawnSquishyPixelParticle(Projectile.Center + Main.rand.NextVector2Circular(10f, 10f),
                     Main.rand.NextVector2Circular(14f, 14f) + Main.rand.NextVector2Circular(4f, 4f),
-                    Main.rand.Next(40, 60), Main.rand.NextFloat(2.5f, 3.5f) * Projectile.Opacity, Color.OrangeRed, Color.Gold, 4, false, false, Main.rand.NextFloat(-.2f, .2f));
+                    Main.rand.Next(40, 60), Main.rand.NextFloat(2.5f, 3.5f) * Projectile.Opacity, Color.OrangeRed,
+                    Color.Gold, 4, false, false, Main.rand.NextFloat(-.2f, .2f));
             }
         }
+
         if (fade <= 0)
             Projectile.Kill();
 
@@ -153,10 +166,12 @@ public class ConvergentFireball : ProjOwnedByNPC<Asterlin>
     public override bool PreDraw(ref Color lightColor)
     {
         float rad = Projectile.scale;
+
         void draw()
         {
             Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.OrganicNoise);
-            Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, new(rad)), null, Color.White, 0f, tex.Size() / 2, 0);
+            Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, new(rad)), null, Color.White, 0f,
+                tex.Size() / 2, 0);
         }
 
         ManagedShader shader = AssetRegistry.GetShader("IntenseFireball");
@@ -173,11 +188,12 @@ public class DisintegrationNova : ProjOwnedByNPC<Asterlin>
 {
     public override string Texture => AssetRegistry.Invis;
     public override bool IgnoreOwnerActivity => true;
-    public static int Lifetime = CalUtils.SecondsToFrames(1.4f);
+    public static int Lifetime = SecondsToFrames(1.4f);
     public static int MaxRadius = 11000;
+
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
 
@@ -205,9 +221,12 @@ public class DisintegrationNova : ProjOwnedByNPC<Asterlin>
             if (player.creativeGodMode)
                 continue;
 
-            player.KillMe(PlayerDeathReason.ByCustomReason(GetNetworkText($"Status.Death." + (Main.rand.NextBool() ? "AsterlinDeath2" : "AsterlinDeath1"), player.name)),
+            player.KillMe(
+                PlayerDeathReason.ByCustomReason(GetNetworkText(
+                    $"Status.Death." + (Main.rand.NextBool() ? "AsterlinDeath2" : "AsterlinDeath1"), player.name)),
                 Projectile.damage, (Projectile.Center.X > player.Center.X).ToDirectionInt(), false);
-            player.RemoveAllIFrames();
+            //TODO: yucky???
+            //player.RemoveAllIFrames();
         }
 
         if (Time == 0)
@@ -218,13 +237,14 @@ public class DisintegrationNova : ProjOwnedByNPC<Asterlin>
             ParticleRegistry.SpawnFlash(Projectile.Center, 20, .2f, MaxRadius * 2);
             AdditionsSound.MomentOfCreation.Play(Projectile.Center, 1.5f, -1f);
         }
+
         Projectile.scale = InverseLerp(0f, Lifetime, Time);
         Time++;
     }
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return CalUtils.CircularHitboxCollision(Projectile.Center, MaxRadius * Projectile.scale, targetHitbox);
+        return CircularHitboxCollision(Projectile.Center, MaxRadius * Projectile.scale, targetHitbox);
     }
 
     public override bool PreDraw(ref Color lightColor)
@@ -234,12 +254,14 @@ public class DisintegrationNova : ProjOwnedByNPC<Asterlin>
             ManagedShader fireball = AssetRegistry.GetShader("FireballExplosion");
             fireball.TrySetParameter("scale", Projectile.scale);
 
-            Main.spriteBatch.EnterShaderRegion(null, fireball.Effect);
+            Main.spriteBatch.EnterShaderRegion(fireball.Effect);
             Texture2D noise = AssetRegistry.GetTexture(AdditionsTexture.TurbulentNoise);
             fireball.Render();
-            Main.spriteBatch.DrawBetterRect(noise, ToTarget(Projectile.Center, new Vector2(MaxRadius)), null, Color.Goldenrod, 0f, noise.Size() / 2f);
-            Main.spriteBatch.ExitShaderRegion();
+            Main.spriteBatch.DrawBetterRect(noise, ToTarget(Projectile.Center, new Vector2(MaxRadius)), null,
+                Color.Goldenrod, 0f, noise.Size() / 2f);
+            Main.spriteBatch.ResetToDefault();
         }
+
         LayeredDrawSystem.QueueDrawAction(draw, PixelationLayer.Dusts);
         return false;
     }

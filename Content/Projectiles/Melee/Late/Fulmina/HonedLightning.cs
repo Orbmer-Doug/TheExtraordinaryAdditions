@@ -12,10 +12,12 @@ internal class HonedLightning : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
     private const int Life = 30;
+
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.DrawScreenCheckFluff[Type] = 2000;
     }
+
     public override void SetDefaults()
     {
         Projectile.DamageType = DamageClass.Magic;
@@ -38,6 +40,7 @@ internal class HonedLightning : ModProjectile
     public override void ReceiveExtraAI(BinaryReader reader) => End = reader.ReadVector2();
     public float Completion => Animators.MakePoly(6f).OutFunction(InverseLerp(0f, Life, Time));
     public override bool ShouldUpdatePosition() => false;
+
     public override void AI()
     {
         if (trail == null || trail.Disposed)
@@ -64,9 +67,13 @@ internal class HonedLightning : ModProjectile
     }
 
     public float WidthFunct(float c) => Width * Projectile.Opacity;
-    public Color ColorFunct(SystemVector2 c, Vector2 pos) => MulticolorLerp(Completion, Color.White, Color.LightCyan, Color.Cyan, Color.DarkCyan) * Projectile.Opacity;
+
+    public Color ColorFunct(SystemVector2 c, Vector2 pos) =>
+        MulticolorLerp(Completion, Color.White, Color.LightCyan, Color.Cyan, Color.DarkCyan) * Projectile.Opacity;
+
     public TrailPoints points;
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()

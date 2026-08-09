@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -20,6 +19,7 @@ public class WitheredShredderShield : ModProjectile
     public NPC Target => NPCTargeting.MinionHoming(new(Projectile.Center, 1000, false, true), Owner);
 
     public const float ReelBackTime = 50f;
+
     public override void SetStaticDefaults()
     {
         Main.projFrames[Type] = 1;
@@ -70,14 +70,14 @@ public class WitheredShredderShield : ModProjectile
 
     public SubState subState
     {
-        get => (SubState)Projectile.ai[1];
-        set => Projectile.ai[1] = (float)value;
+        get => (SubState) Projectile.ai[1];
+        set => Projectile.ai[1] = (float) value;
     }
 
     public CurrentState State
     {
-        get => (CurrentState)Projectile.ai[2];
-        set => Projectile.ai[2] = (float)value;
+        get => (CurrentState) Projectile.ai[2];
+        set => Projectile.ai[2] = (float) value;
     }
 
     public bool HasHitTarget
@@ -118,6 +118,7 @@ public class WitheredShredderShield : ModProjectile
     }
 
     public LoopedSoundInstance SawSlot;
+
     public override void AI()
     {
         after ??= new(8, () => Projectile.Center);
@@ -149,13 +150,16 @@ public class WitheredShredderShield : ModProjectile
             Hover();
         }
 
-        SawSlot ??= LoopedSoundManager.CreateNew(new(AdditionsSound.chainsawThrown, () => Terraria.Utils.Remap(ShredTimer, CalUtils.SecondsToFrames(4.3f), CalUtils.SecondsToFrames(5), .3f, 0f)),
-            () => AdditionsLoopedSound.ProjectileNotActive(Projectile), () => State == CurrentState.Charge && subState == SubState.Shred);
+        SawSlot ??= LoopedSoundManager.CreateNew(
+            new(AdditionsSound.chainsawThrown, () => Terraria.Utils.Remap(ShredTimer, SecondsToFrames(4.3f),
+                SecondsToFrames(5), .3f, 0f)),
+            () => AdditionsLoopedSound.ProjectileNotActive(Projectile), () =>
+                State == CurrentState.Charge && subState == SubState.Shred);
         SawSlot?.Update(Projectile.Center);
 
         bool ramming = subState == SubState.Ram && !HasHitTarget;
         after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0,
-            (byte)(ramming ? 255 : 40), ramming ? 0 : 2, ramming ? 0f : 4f));
+            (byte) (ramming ? 255 : 40), ramming ? 0 : 2, ramming ? 0f : 4f));
 
         Projectile.VelocityBasedRotation();
         Projectile.ProjAntiClump(.19f);
@@ -180,6 +184,7 @@ public class WitheredShredderShield : ModProjectile
         {
             Projectile.velocity = (Projectile.velocity * 37f + Projectile.SafeDirectionTo(origin) * 17f) / 40f;
         }
+
         if (!Projectile.WithinRange(origin, 1200f))
         {
             Projectile.position = origin;
@@ -198,7 +203,8 @@ public class WitheredShredderShield : ModProjectile
         const float speed = 40f;
         const float distance = 300f;
         const float rot = MathHelper.Pi;
-        Vector2 spawnOffset = Vector2.UnitY.RotatedBy(MathHelper.Lerp(-rot, rot, Projectile.whoAmI % 16f / 16f)) * distance;
+        Vector2 spawnOffset = Vector2.UnitY.RotatedBy(MathHelper.Lerp(-rot, rot, Projectile.whoAmI % 16f / 16f)) *
+                              distance;
         if (Projectile.whoAmI * 113 % 2 == 1)
             spawnOffset *= -1f;
 
@@ -209,7 +215,8 @@ public class WitheredShredderShield : ModProjectile
         {
             case SubState.Position:
                 // Hover to the target
-                Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(destination) * speed, 0.2f).RotatedBy(.05f);
+                Projectile.velocity = Vector2
+                    .Lerp(Projectile.velocity, Projectile.SafeDirectionTo(destination) * speed, 0.2f).RotatedBy(.05f);
                 if (Projectile.WithinRange(destination, Projectile.velocity.Length() * 1.35f))
                 {
                     // Reel back
@@ -217,6 +224,7 @@ public class WitheredShredderShield : ModProjectile
                     subState = SubState.Reelback;
                     this.Sync();
                 }
+
                 break;
             case SubState.Reelback:
                 // Slow down
@@ -231,6 +239,7 @@ public class WitheredShredderShield : ModProjectile
                     Timer = 0f;
                     this.Sync();
                 }
+
                 break;
             case SubState.Ram:
 
@@ -239,10 +248,14 @@ public class WitheredShredderShield : ModProjectile
                 {
                     for (int i = 0; i < 4; i++)
                     {
-                        Vector2 pos = Projectile.Center + Terraria.Utils.ToRotationVector2(i * MathHelper.PiOver2 + Projectile.rotation) * 10f;
-                        ParticleRegistry.SpawnSparkParticle(pos, -Projectile.velocity * Main.rand.NextFloat(.1f, .4f), 20, .3f, Color.AntiqueWhite);
+                        Vector2 pos = Projectile.Center +
+                                      Terraria.Utils.ToRotationVector2(i * MathHelper.PiOver2 + Projectile.rotation) *
+                                      10f;
+                        ParticleRegistry.SpawnSparkParticle(pos, -Projectile.velocity * Main.rand.NextFloat(.1f, .4f),
+                            20, .3f, Color.AntiqueWhite);
                     }
                 }
+
                 if (HasHitTarget)
                     AltCounter++;
 
@@ -275,11 +288,12 @@ public class WitheredShredderShield : ModProjectile
                     SoundID.DD2_WyvernDiveDown.Play(Projectile.Center, 1.2f, -.1f);
                     PlayedSound = true;
                 }
+
                 break;
             case SubState.Shred:
-                {
-                    Shred();
-                }
+            {
+                Shred();
+            }
                 break;
         }
     }
@@ -288,7 +302,7 @@ public class WitheredShredderShield : ModProjectile
     {
         ShredTimer++;
 
-        if (ShredTimer >= CalUtils.SecondsToFrames(5))
+        if (ShredTimer >= SecondsToFrames(5))
         {
             Timer = 0f;
             HasHitTarget = false;
@@ -303,7 +317,8 @@ public class WitheredShredderShield : ModProjectile
         {
             for (int i = 0; i < 3; i++)
             {
-                Vector2 pos = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero) * Projectile.width * .5f;
+                Vector2 pos = Projectile.Center +
+                              Projectile.velocity.SafeNormalize(Vector2.Zero) * Projectile.width * .5f;
                 Vector2 vel = Main.rand.NextVector2CircularEdge(10, 10);
                 int life = Main.rand.Next(30, 80);
                 float reduction = Main.rand.NextFloat(.5f, .7f);
@@ -314,7 +329,8 @@ public class WitheredShredderShield : ModProjectile
         }
 
         float comp = InverseLerp(0f, 50f, ShredTimer % 50);
-        Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.SafeDirectionTo(Target.Center + GetPointOnLemniscate(comp, -AltRotation, 300f)) * 24f, .6f);
+        Projectile.velocity = Vector2.SmoothStep(Projectile.velocity,
+            Projectile.SafeDirectionTo(Target.Center + GetPointOnLemniscate(comp, -AltRotation, 300f)) * 24f, .6f);
         AltRotation = (AltRotation + .05f) % MathHelper.TwoPi;
     }
 
@@ -339,13 +355,17 @@ public class WitheredShredderShield : ModProjectile
             Vector2 pos = Projectile.Center + Main.rand.NextVector2Circular(10f, 10f);
             Vector2 vel = -Projectile.velocity.RotatedByRandom(.3f) * Main.rand.NextFloat(.33f, .66f);
 
-            ParticleRegistry.SpawnSparkleParticle(pos, vel, 30, Main.rand.NextFloat(.2f, .4f), Color.OrangeRed, Color.DarkRed);
-            ParticleRegistry.SpawnSparkParticle(pos, vel, Main.rand.Next(20, 40), Main.rand.NextFloat(.4f, 1.2f), Color.Chocolate);
+            ParticleRegistry.SpawnSparkleParticle(pos, vel, 30, Main.rand.NextFloat(.2f, .4f), Color.OrangeRed,
+                Color.DarkRed);
+            ParticleRegistry.SpawnSparkParticle(pos, vel, Main.rand.Next(20, 40), Main.rand.NextFloat(.4f, 1.2f),
+                Color.Chocolate);
         }
+
         AdditionsSound.PlasticHit.Play(Projectile.Center, .6f, -.1f, .2f, 10, Name);
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D texture = Projectile.ThisProjectileTexture();
@@ -369,7 +389,8 @@ public class WitheredShredderShield : ModProjectile
             after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), col, Projectile.Opacity);
         }
 
-        Main.EntitySpriteDraw(texture, drawPosition, frame, Projectile.GetAlpha(mainColor), rotation, frame.Size() * 0.5f, Projectile.scale, 0, 0);
+        Main.EntitySpriteDraw(texture, drawPosition, frame, Projectile.GetAlpha(mainColor), rotation,
+            frame.Size() * 0.5f, Projectile.scale, 0, 0);
         return false;
     }
 }

@@ -14,18 +14,20 @@ public class HealingFungus : ModProjectile
 
     public override void SetDefaults()
     {
-        Projectile.width = 22; Projectile.height = 24;
+        Projectile.width = 22;
+        Projectile.height = 24;
         Projectile.friendly = true;
         Projectile.hostile = false;
         Projectile.tileCollide = true;
         Projectile.ignoreWater = false;
         Projectile.penetrate = -1;
-        Projectile.timeLeft = CalUtils.SecondsToFrames(8);
+        Projectile.timeLeft = SecondsToFrames(8);
     }
 
     public override bool? CanDamage() => false;
     public ref float Time => ref Projectile.ai[0];
     public FancyAfterimages fancy;
+
     public override void AI()
     {
         fancy ??= new(5, () => Projectile.Center);
@@ -34,11 +36,13 @@ public class HealingFungus : ModProjectile
         // Spawn some mushroom-y dust
         if (Projectile.ai[0]++ % 7f == 0f)
         {
-            Dust.NewDustPerfect(Projectile.RandAreaInEntity(), DustID.GlowingMushroom, Main.rand.NextVector2Circular(3f, 3f), 0, default, Main.rand.NextFloat(.8f, 1.1f));
+            Dust.NewDustPerfect(Projectile.RandAreaInEntity(), DustID.GlowingMushroom,
+                Main.rand.NextVector2Circular(3f, 3f), 0, default, Main.rand.NextFloat(.8f, 1.1f));
         }
 
         Projectile.rotation += Projectile.velocity.X * .03f;
-        fancy?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity * .4f, Projectile.rotation, 0, 170, 5, 2f, null, true, -.2f));
+        fancy?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity * .4f, Projectile.rotation,
+            0, 170, 5, 2f, null, true, -.2f));
 
         // Heal effects
         foreach (Player player in Main.ActivePlayers)
@@ -75,7 +79,8 @@ public class HealingFungus : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        fancy?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [Color.Black, Color.DarkBlue, Color.AliceBlue, Color.LightCyan]);
+        fancy?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(),
+            [Color.Black, Color.DarkBlue, Color.AliceBlue, Color.LightCyan]);
         Projectile.DrawBaseProjectile(lightColor);
         return false;
     }

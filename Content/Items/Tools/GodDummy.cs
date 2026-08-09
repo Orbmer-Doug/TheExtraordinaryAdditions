@@ -29,7 +29,7 @@ public class GodDummy : ModItem
         Item.width = 22;
         Item.height = 36;
         Item.useTime =
-        Item.useAnimation = 10;
+            Item.useAnimation = 10;
         Item.useStyle = ItemUseStyleID.Swing;
         Item.useTurn = true;
         Item.value = 0;
@@ -55,7 +55,7 @@ public class GodDummy : ModItem
             else
             {
                 ModPacket netMessage = Mod.GetPacket();
-                netMessage.Write((byte)AdditionsModMessageType.DeleteGodDummy);
+                netMessage.Write((byte) AdditionsModMessageType.DeleteGodDummy);
                 netMessage.Send();
             }
         }

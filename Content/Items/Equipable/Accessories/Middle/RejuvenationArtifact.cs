@@ -12,6 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
 public class RejuvenationArtifact : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.RejuvenationArtifact);
+
     public override void SetStaticDefaults()
     {
         CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1;

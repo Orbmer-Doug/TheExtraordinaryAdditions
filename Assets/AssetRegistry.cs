@@ -89,7 +89,8 @@ public sealed class AssetRegistry : ModSystem
         HasFinishedLoading = false;
         List<string> fileNames = mod.GetFileNames() ?? [];
 
-        List<string> textureFiles = [.. fileNames.Where(f => f.Contains(TexturePath) && f.EndsWith(".rawimg") && !f.Contains("Container"))];
+        List<string> textureFiles =
+            [.. fileNames.Where(f => f.Contains(TexturePath) && f.EndsWith(".rawimg") && !f.Contains("Container"))];
         List<string> soundFiles = [.. fileNames.Where(f => f.Contains(AudioPath))];
 
         foreach (string path in textureFiles)
@@ -121,6 +122,7 @@ public sealed class AssetRegistry : ModSystem
                 mod.Logger.Warn($"Sound '{name}' not found in AdditionsSound enum.");
             }
         }
+
         HasFinishedLoading = true;
     }
 
@@ -137,6 +139,7 @@ public sealed class AssetRegistry : ModSystem
     /// <param name="name">The name of the filter.</param>
     /// <param name="newShaderData">The shader data reference to save.</param>
     public static void SetFilter(string name, Ref<Effect> newShaderData) => Filters[name] = new(newShaderData);
+
     internal static void LoadShaders(Mod mod)
     {
         HasFinishedLoadingShaders = false;
@@ -148,8 +151,10 @@ public sealed class AssetRegistry : ModSystem
             return;
 
         #region Shaders
+
         IEnumerable<string> shaderLoadPaths = fileNames.Where(path => path.Contains(AutoloadDirectoryShaders)
-        && !path.Contains("Compiler/") && (path.Contains(".xnb") || path.Contains(".fxc")));
+                                                                      && !path.Contains("Compiler/") &&
+                                                                      (path.Contains(".xnb") || path.Contains(".fxc")));
 
         foreach (string path in shaderLoadPaths)
         {
@@ -160,11 +165,14 @@ public sealed class AssetRegistry : ModSystem
             Ref<Effect> shader = new(mod.Assets.Request<Effect>(clearedPath, AssetRequestMode.ImmediateLoad).Value);
             SetShader(shaderName, shader);
         }
+
         #endregion
 
         #region Filters
+
         IEnumerable<string> filterLoadPaths = fileNames.Where(path => path.Contains(AutoloadDirectoryFilters)
-        && !path.Contains("Compiler/") && (path.Contains(".xnb") || path.Contains(".fxc")));
+                                                                      && !path.Contains("Compiler/") &&
+                                                                      (path.Contains(".xnb") || path.Contains(".fxc")));
 
         foreach (string path in filterLoadPaths)
         {
@@ -176,7 +184,9 @@ public sealed class AssetRegistry : ModSystem
 
             SetFilter(filterName, filter);
         }
+
         #endregion
+
         HasFinishedLoadingShaders = true;
     }
 
@@ -184,9 +194,9 @@ public sealed class AssetRegistry : ModSystem
     public static T GetAsset<T, TEnum>(TEnum assetEnum) where TEnum : Enum
     {
         if (typeof(T) == typeof(Texture2D) && assetEnum is AdditionsTexture texture)
-            return (T)(object)Textures[texture].Value;
+            return (T) (object) Textures[texture].Value;
         if (typeof(T) == typeof(SoundStyle) && assetEnum is AdditionsSound sound)
-            return (T)(object)Sounds[sound].Value.Asset;
+            return (T) (object) Sounds[sound].Value.Asset;
         throw new ArgumentException($"Unsupported asset type: {typeof(T)}");
     }
 
@@ -214,7 +224,9 @@ public sealed class AssetRegistry : ModSystem
     }
 
     public static SoundStyle GetSound(AdditionsSound sound) => GetAsset<SoundStyle, AdditionsSound>(sound);
+
     public static string GetSoundPath(AdditionsSound sound) => GetAssetPath(sound);
+
     // For whatever reason, having a folder named Music causes tMods autoloaders to try to add a key twice
     public static string GetMusicPath(AdditionsSound sound) => "Assets/Audio/NotMusic/" + sound;
     public static Texture2D GetTexture(AdditionsTexture texture) => GetAsset<Texture2D, AdditionsTexture>(texture);
@@ -234,7 +246,8 @@ public sealed class AssetRegistry : ModSystem
     public static bool TryGetShader(string name, out ManagedShader shader) => Shaders.TryGetValue(name, out shader);
 
     /// <inheritdoc cref="GetShader(string)"/>
-    public static bool TryGetFilter(string name, out ManagedScreenShader filter) => Filters.TryGetValue(name, out filter);
+    public static bool TryGetFilter(string name, out ManagedScreenShader filter) =>
+        Filters.TryGetValue(name, out filter);
 }
 
 #region the wall
@@ -242,15 +255,18 @@ public sealed class AssetRegistry : ModSystem
 public enum AdditionsTexture
 {
     #region Achievements
+
     DefeatedAsterlin,
     DefeatedAuroraGuard,
     DefeatedSnail,
     DefeatedStygain,
     ObtainedCube,
     ObtainedGenedies,
+
     #endregion
 
     #region AsterlinBackgrounds
+
     Background_AstralInfection,
     Background_BEES,
     Background_Blizzard,
@@ -298,9 +314,11 @@ public enum AdditionsTexture
     Background_Undergound,
     Background_Underworld,
     Background_VortexPillar,
+
     #endregion
 
     #region Grayscale
+
     BaseStar,
     BasicCircle,
     BasicCircularCircle,
@@ -358,9 +376,11 @@ public enum AdditionsTexture
     TornadoProj,
     TriTell,
     Vignette,
+
     #endregion
 
     #region Noises
+
     BigWavyBlobNoise,
     BlobbyNoise,
     BlueNebula,
@@ -410,9 +430,11 @@ public enum AdditionsTexture
     WaterNoise,
     WavyBlotchNoise,
     WavyNeurons,
+
     #endregion
 
     #region Trails
+
     DoubleTrail,
     Lightning2,
     LightningGlow,
@@ -428,27 +450,41 @@ public enum AdditionsTexture
     StreakMagma,
     Trail,
     TrailThin,
+
     #endregion
 
     #region Items
+
     #region Consumable
+
     #region BossBags
+
     TreasureBagStygainHeart,
     TreasureBoxAsterlin,
+
     #endregion
+
     FrigidTonic,
     SupremeWaterbreathingPotion,
+
     #endregion
+
     #region Equipable
+
     #region Accessories
+
     #region Early
+
     FulminicEye,
     FulminicEye_Glow,
     FungalSatchel,
     PrimevalToolkit,
     TungstenCube,
+
     #endregion
+
     #region Late
+
     AncientBoon,
     AshersWhiteTie,
     AshersWhiteTie_Neck,
@@ -456,8 +492,11 @@ public enum AdditionsTexture
     GodGauntlet,
     GodGauntlet_Wings,
     TungstenTie,
+
     #endregion
+
     #region Middle
+
     BandOfSunrays,
     EclipsedOnesCloak,
     EclipsedOnesCloak_Front,
@@ -467,10 +506,15 @@ public enum AdditionsTexture
     Rimesplitter,
     WingsOfTwilight,
     WingsOfTwilight_Wings,
+
     #endregion
+
     #endregion
+
     #region Armors
+
     #region Early
+
     PetersUshanka,
     PetersUshanka_Head,
     VoltChestplate,
@@ -479,16 +523,22 @@ public enum AdditionsTexture
     VoltGrieves_Legs,
     VoltHelmet,
     VoltHelmet_Head,
+
     #endregion
+
     #region Late
+
     AbsoluteCoreplate,
     AbsoluteCoreplate_Body,
     AbsoluteGreathelm,
     AbsoluteGreathelm_Head,
     AbsoluteGreaves,
     AbsoluteGreaves_Legs,
+
     #endregion
+
     #region Middle
+
     BlueLeggings,
     BlueLeggings_Legs,
     BlueTopHat,
@@ -515,16 +565,23 @@ public enum AdditionsTexture
     TremorPlating_Body,
     TremorSheathe,
     TremorSheathe_Legs,
+
     #endregion
+
     #endregion
+
     #region Pets
+
     CrimsonCalamari,
     JellyfishSnack,
     Lifeseed,
     PaintCoveredCamera,
     SmallGear,
+
     #endregion
+
     #region Vanity
+
     AsterlinMask,
     AsterlinMask_Head,
     AvatarDress,
@@ -539,17 +596,28 @@ public enum AdditionsTexture
     EclipsedOnesLeggings_Legs,
     StygainHeartMask,
     StygainHeartMask_Head,
+
     #endregion
+
     #endregion
+
     #region Materials
+
     #region Early
+
     ShockCatalyst,
     ShockCatalyst_Glow,
+
     #endregion
+
     #region Late
+
     FerrymansToken,
+
     #endregion
+
     #region Middle
+
     CracklingFragments,
     CrumpledBlueprint,
     EmblazenedEmber,
@@ -560,13 +628,20 @@ public enum AdditionsTexture
     StygianEyeball,
     TremorAlloy,
     WrithingLight,
+
     #endregion
+
     #endregion
+
     #region Novelty
+
     AshyWaterBalloon,
     TortoiseShell,
+
     #endregion
+
     #region Placeable
+
     AngelsRage,
     AsterlinRelic,
     FierceBattle,
@@ -588,13 +663,19 @@ public enum AdditionsTexture
     StygainHeartTrophy,
     TechnicTransmitter,
     WereYouFoolin,
+
     #endregion
+
     #region Summon
+
     CrimsonCarvedBeetle,
     TomeOfArchivalScripts,
     TVRemote,
+
     #endregion
+
     #region Tools
+
     BiomeFinder,
     BriefcaseOfBees,
     GodDummy,
@@ -602,22 +683,36 @@ public enum AdditionsTexture
     MatterDisintegrationCannon,
     MatterDisintegrationCannonBloom,
     PortableDONTTOUCHME,
+
     #endregion
+
     #region Weapons
+
     #region Classless
+
     CrossDisc,
     Eagle500kgBomb,
+
     #endregion
+
     #region Cynosure
+
     DivineSpiritCatalyst,
+
     #endregion
+
     #region Magic
+
     #region Early
+
     BrewingStorms,
     NoxiousSnare,
     TomeOfHellfire,
+
     #endregion
+
     #region Late
+
     CometStorm,
     DeusExMachina,
     Epidemic,
@@ -626,8 +721,11 @@ public enum AdditionsTexture
     SuperheatedPlasmaArray,
     TesselesticMeltdown,
     TesselesticMeltdown_Glowmask,
+
     #endregion
+
     #region Middle
+
     Acheron,
     BloodFracture,
     Fireball,
@@ -635,16 +733,24 @@ public enum AdditionsTexture
     LanceOfSanguineSteels,
     StarlessSea,
     VirulentEntrapment,
+
     #endregion
+
     #endregion
+
     #region Melee
+
     #region Early
+
     BirchStick,
     Fork,
     MeteorKatana,
     ObsidianFlail,
+
     #endregion
+
     #region Late
+
     CallerOfBirds,
     CondereFulmina,
     Cosmireaper,
@@ -659,8 +765,11 @@ public enum AdditionsTexture
     TheSpoon,
     TorrentialTides,
     TripleKatanas,
+
     #endregion
+
     #region Middle
+
     AlucardsSword,
     Bergcrusher,
     BirchTree,
@@ -679,30 +788,48 @@ public enum AdditionsTexture
     SolarBrand_Glow,
     SolemnLament,
     Threadripper,
+
     #endregion
+
     #endregion
+
     #region Multi
+
     #region Early
+
     ChainStrikeJavelin,
     FulgurSpear,
     FulgurSpear_Glow,
+
     #endregion
+
     #region Late
+
     #endregion
+
     #region Middle
+
     BoneGunsword,
+
     #endregion
+
     #endregion
+
     #region Ranged
+
     #region Early
+
     BeanBurrito,
     BoneFlintlock,
     CrystallineSnapcurve,
     Downpour,
     LooseSawblade,
     ObsidianRound,
+
     #endregion
+
     #region Late
+
     AntiMatterCannon,
     CosmicImplosion,
     FlorescenceRounds,
@@ -716,8 +843,11 @@ public enum AdditionsTexture
     TechnicBlitzripper,
     UnparalleledCoalescence,
     UnparalleledCoalescence_Glow,
+
     #endregion
+
     #region Middle
+
     AnvilAndPropane,
     BobmOnAStick,
     BowOfGreekFlames,
@@ -732,21 +862,32 @@ public enum AdditionsTexture
     SmartPistolMK6,
     TorrentialStorms,
     TroubledTank,
+
     #endregion
+
     #endregion
+
     #region Summoner
+
     #region Early
+
     RampantShields,
     StellarKunai,
     TimberLash,
+
     #endregion
+
     #region Late
+
     Avragen,
     DeepestNadir,
     ScriptureOfTheSuperLoki,
     TidalDeluge,
+
     #endregion
+
     #region Middle
+
     Atorcoppe,
     BatLantern,
     EclipsedDuo,
@@ -756,18 +897,28 @@ public enum AdditionsTexture
     LokiShrine,
     TheTongue,
     WitheredShredder,
+
     #endregion
+
     #endregion
+
     #endregion
+
     #endregion
 
     #region NPCs
+
     #region BossBars
+
     AsterlinBossbar,
     StygainBossbar,
+
     #endregion
+
     #region Bosses
+
     #region Crater
+
     Asterlin_BossChecklist,
     Asterlin_Head_Boss,
     Asterlin_Head_BossGlow,
@@ -782,8 +933,11 @@ public enum AdditionsTexture
     LightningNode,
     OverloadedLightDart,
     SeethingRockball,
+
     #endregion
+
     #region Stygain
+
     BloodMoonlet,
     BloodMoonlet_Glow,
     BloodRay,
@@ -794,17 +948,28 @@ public enum AdditionsTexture
     StygainHeart_BossChecklist,
     StygainHeart_Head_Boss,
     WrithingEyeball,
+
     #endregion
+
     #region Tidal
+
     AbyssalCurrent,
+
     #endregion
+
     #endregion
+
     #region Friendly
+
     CreepOldManBubble,
     CreepyOldMan,
+
     #endregion
+
     #region Hostile
+
     #region Arid
+
     DuneProwlerAssault,
     DuneProwlerSniper,
     EmptyRound,
@@ -812,8 +977,11 @@ public enum AdditionsTexture
     GlassShell,
     RaggedRifle,
     RifleBullet,
+
     #endregion
+
     #region Aurora
+
     AuroraGuardBestiary,
     AuroraLimbEnd,
     AuroraLimbStart,
@@ -824,34 +992,53 @@ public enum AdditionsTexture
     GlacialShell,
     GlacialSpike,
     Glacier,
+
     #endregion
+
     #region Fulgur
+
     FulminationSpirit,
     LightningVolt,
     LightningVolt_Glowmask,
+
     #endregion
+
     #region SolarGuardian
+
     SolarGuardian,
+
     #endregion
+
     #endregion
+
     #region Misc
+
     GodDummyNPC,
     ParmaJawn,
     Rebar,
     TheGiantSnailFromAncientTimes,
+
     #endregion
+
     #endregion
 
     #region Projectiles
+
     #region Classless
+
     #region Early
+
     BiomePointer,
     BiomePointerBackground,
     ExplosiveStickyDart,
     ProximityDart,
+
     #endregion
+
     #region Late
+
     #region CrossCode
+
     DiscIceProjectile,
     Overlay,
     Reticle1,
@@ -865,18 +1052,26 @@ public enum AdditionsTexture
     VRPLightning,
     VRPNeutral,
     VRPWave,
+
     #endregion
+
     #region Cynosure
+
     CelestialRendingNeedle,
     OrionsSword,
     UnfathomablePortal,
     UnfathomablePortalGlowmask,
+
     #endregion
+
     _500kg,
     AncientRetaliation,
     SharpTie,
+
     #endregion
+
     #region Middle
+
     AuroricParry,
     AuroricShield,
     BoingMyceliumite,
@@ -887,25 +1082,39 @@ public enum AdditionsTexture
     SandBlast,
     TremorSpikeEnd,
     TremorSpikeMiddle,
+
     #endregion
+
     #endregion
+
     #region Magic
+
     #region Early
+
     LightningNimbusSparks,
+
     #endregion
+
     #region Late
+
     #region Zenith
+
     ConcentratedEnergy,
     SeamstressMagic,
     SeamStrike,
     SewingNeedle,
+
     #endregion
+
     ArmageddonCircle,
     CometStormHoldout,
     EpidemicCircle,
     MoonBlade,
+
     #endregion
+
     #region Middle
+
     FallingHail,
     HellishLance,
     SanguineLance,
@@ -915,26 +1124,39 @@ public enum AdditionsTexture
     VirulentFlower,
     VirulentProjectile,
     VirulentSeed,
+
     #endregion
+
     #endregion
+
     #region Melee
+
     #region Early
+
     MeteorSpawn,
     ObsidianChain,
     ObsidianChainAlt,
     ObsidianMaceProj,
+
     #endregion
+
     #region Late
+
     #region Zenith
+
     #endregion
+
     CyberneticSwing,
     EverbladedSwing,
     HeavenForgedSpear,
     KatanaCleave,
     Pigeon,
     ReaperChain,
+
     #endregion
+
     #region Middle
+
     AlucardsSwordThrow,
     AlucardsSwordThrow_Glow,
     CryingEye,
@@ -947,23 +1169,41 @@ public enum AdditionsTexture
     SolemnLamentProjBlack,
     SolemnLamentProjWhite,
     SplendorIsJusticeW,
+
     #endregion
+
     #endregion
+
     #region Misc
+
     #endregion
+
     #region Multi
+
     #region Early
+
     ShockJavelin,
+
     #endregion
+
     #region Late
+
     #region Zenith
+
     #endregion
+
     #endregion
+
     #region Middle
+
     GunSwordHeld,
+
     #endregion
+
     #endregion
+
     #region Pets
+
     AntFly,
     AntFly_Fly,
     Doohickey,
@@ -971,9 +1211,13 @@ public enum AdditionsTexture
     GearCat_Fly,
     JellyfishBro,
     LilBloodSquid,
+
     #endregion
+
     #region Ranged
+
     #region Early
+
     _9mm,
     BeanFire,
     CalciumBomb,
@@ -985,11 +1229,17 @@ public enum AdditionsTexture
     ObsidianShot,
     RainDrop,
     TheSpores,
+
     #endregion
+
     #region Late
+
     #region Zenith
+
     DivinityArrow,
+
     #endregion
+
     AntiBulletp,
     AntiBulletShell,
     AntiBulletShrapnel,
@@ -1001,16 +1251,22 @@ public enum AdditionsTexture
     GaussReticle,
     LuminiteRocket,
     TechnicBlitzripperHeat,
+
     #endregion
+
     #region Middle
+
     #region AZ
+
     Grub,
     GrubShrapnel,
     Maggot,
     Slug,
     TankHeadHoldout,
     TheSwarm,
+
     #endregion
+
     BowOfGreekFlamesHeld,
     GreekBombArrow,
     HailfireShell,
@@ -1021,25 +1277,39 @@ public enum AdditionsTexture
     TheAnvil,
     ThePropane,
     TorrentialStormsHeld,
+
     #endregion
+
     #endregion
+
     #region Summoner
+
     #region Early
+
     EnchantedShield,
     StellarChain,
     StellarChainExtra,
     TimberWhip,
+
     #endregion
+
     #region Late
+
     #region Zenith
+
     AvragenMinion,
     FleetDaggers,
+
     #endregion
+
     LokiShrinep,
     ThrashedVoid,
     TidalWhip,
+
     #endregion
+
     #region Middle
+
     BatSummon,
     ExsanguinationProj,
     IchorWhipp,
@@ -1049,23 +1319,37 @@ public enum AdditionsTexture
     SpiderWhipProjectile,
     TheTongueWhip,
     TongueSegment,
+
     #endregion
+
     #endregion
+
     #region Vanilla
+
     #region Early
+
     CrimtaneArrow,
+
     #endregion
+
     #region Late
+
     #endregion
+
     #region Middle
+
     DivineArrow,
     KrakenTentacle,
     KrakenTentacleSegment,
+
     #endregion
+
     #endregion
+
     #endregion
 
     #region Tiles
+
     AngelsRagePlaced,
     AsterlinRelicPlaced,
     FierceBattlePlaced,
@@ -1088,9 +1372,11 @@ public enum AdditionsTexture
     StygainHeartTrophyPlaced,
     TechnicTransmitterPlaced,
     WereYouFoolinPlaced,
+
     #endregion
 
     #region UI
+
     Background,
     CursorMelee,
     CursorRanged,
@@ -1110,14 +1396,18 @@ public enum AdditionsTexture
     SmallBar0,
     SmallBar1,
     Wave,
+
     #endregion
 
     #region Biomes
+
     CloudedCraterBackground,
     CloudedCraterIcon,
+
     #endregion
 
     #region Gores
+
     GarciaCartridge,
     GaussBallisticWarheadRocketGore1,
     GaussBallisticWarheadRocketGore2,
@@ -1125,16 +1415,22 @@ public enum AdditionsTexture
     LaserDroneGore1,
     LaserDroneGore2,
     LaserDroneGore3,
+
     #endregion
 
     #region Buffs
+
     #region Buff
+
     DesertsBlessing,
     EternalRest,
     SupremeWaterbreathing,
     WinterHeart,
+
     #endregion
+
     #region Debuff
+
     AshyWater,
     AuroricCooldown,
     CorporealVaporization,
@@ -1149,8 +1445,11 @@ public enum AdditionsTexture
     TheTiesCooldown,
     VoidDebuff,
     Wavebroken,
+
     #endregion
+
     #region Summon
+
     AntBuff,
     AvragenPresence,
     BubbleMan,
@@ -1165,13 +1464,17 @@ public enum AdditionsTexture
     LokiBuff,
     MidnightBats,
     SuperLoki,
+
     #endregion
+
     BuffTemplate,
     DebuffTemplate,
     WhipDebuff,
+
     #endregion
 
     #region Cooldowns
+
     CooldownAbsolute,
     CooldownAbsoluteOutline,
     CooldownAbsoluteOverlay,
@@ -1202,9 +1505,11 @@ public enum AdditionsTexture
     CooldownTremor,
     CooldownTremorOutline,
     CooldownTremorOverlay,
+
     #endregion
 
     #region Particles
+
     BaseRarityGlow,
     BaseRaritySparkleTexture,
     DropletTexture,
@@ -1231,12 +1536,14 @@ public enum AdditionsTexture
     TechyHolosquare,
     ThunderBolt,
     TileGlowmask,
+
     #endregion
 }
 
 public enum AdditionsSound
 {
     #region Ambience
+
     bigwind,
     CosmicEcho,
     CreepyAir,
@@ -1244,9 +1551,11 @@ public enum AdditionsSound
     heartbeat,
     Raining,
     waterfall,
+
     #endregion
 
     #region Base
+
     AuroraKABLOOEY,
     AuroraRise,
     AuroraTink1,
@@ -1298,9 +1607,11 @@ public enum AdditionsSound
     WeaponFail,
     Whoosh,
     WibtorNUKE,
+
     #endregion
 
     #region Blast
+
     Garciaboom,
     GaussBoom,
     GaussBoomLittle,
@@ -1318,9 +1629,11 @@ public enum AdditionsSound
     Rapture,
     SizableExplosion,
     SniperShot,
+
     #endregion
 
     #region Calamity
+
     AdrenalineMajorLoss,
     AstrumDeusLaser,
     BeegBell,
@@ -1329,9 +1642,11 @@ public enum AdditionsSound
     CeaselessVoidDeath,
     ExoPlasmaExplosion2,
     LegStomp,
+
     #endregion
 
     #region CrossCode
+
     AsterlinHit,
     blackHoleSuck,
     ColdBallThrow,
@@ -1394,9 +1709,11 @@ public enum AdditionsSound
     WaveHitSmall,
     WaveSweep,
     WaveSweepMassive,
+
     #endregion
 
     #region Electric
+
     ElectricalPow,
     ElectricalPowBoom,
     ElectricCast,
@@ -1410,9 +1727,11 @@ public enum AdditionsSound
     ThunderImpact,
     ThunderImpactHeavy,
     ThunderLaser,
+
     #endregion
 
     #region Fire
+
     BallCreate,
     BallFire,
     Fireball,
@@ -1431,17 +1750,21 @@ public enum AdditionsSound
     FireWhoosh1,
     FireWhoosh2,
     HeavyFireLoop,
+
     #endregion
 
     #region Misc.
+
     Afraid,
     BlueBerryBUFFINS,
     ClairDeLune,
     PETER,
     thrall,
+
     #endregion
 
     #region Music
+
     clairdelune,
     FrigidGale,
     Infinite,
@@ -1455,9 +1778,11 @@ public enum AdditionsSound
     Spider,
     SRank,
     wereyoufoolin,
+
     #endregion
 
     #region Ori
+
     etherealBlazeStart,
     etherealBounce,
     etherealBounceSmall,
@@ -1496,9 +1821,11 @@ public enum AdditionsSound
     etherealSwordSwingC,
     etherealSwordSwoosh,
     etherealThrow,
+
     #endregion
 
     #region RoR
+
     banditReload,
     banditShot1A,
     banditShot1B,
@@ -1520,9 +1847,11 @@ public enum AdditionsSound
     MediumSwing2,
     SwordSlice,
     SwordSliceShort,
+
     #endregion
 
     #region SSBU
+
     BreakerBeam,
     BreakerCapped,
     BreakerCharge,
@@ -1586,9 +1915,11 @@ public enum AdditionsSound
     SnakeRocket,
     SnakeRocketOut,
     SnakeKablooey,
+
     #endregion
 
     #region Ultrakill
+
     AsterlinChange,
     BlackHoleExplosion,
     BlackHoleLoop,
@@ -1608,6 +1939,7 @@ public enum AdditionsSound
     UIStart,
     VirtueAttack,
     VirtueCharge,
+
     #endregion
 }
 

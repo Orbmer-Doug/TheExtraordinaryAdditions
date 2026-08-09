@@ -1,7 +1,4 @@
-﻿using CalamityMod.Items.Materials;
-using CalamityMod.Items.Placeables;
-using System.Collections.Generic;
-using CalamityMod.Items.Placeables.FurnitureVoid;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -70,9 +67,13 @@ public class AbyssalCurrents : ModItem
 
     public override bool AltFunctionUse(Player player) => true;
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback)
     {
-        AbyssalCurrentsHoldout hold = Main.projectile[Projectile.NewProjectile(source, position, velocity, Item.shoot, damage, knockback, player.whoAmI)].As<AbyssalCurrentsHoldout>();
+        AbyssalCurrentsHoldout hold = Main
+            .projectile[
+                Projectile.NewProjectile(source, position, velocity, Item.shoot, damage, knockback, player.whoAmI)]
+            .As<AbyssalCurrentsHoldout>();
         if (player.altFunctionUse == ItemAlternativeFunctionID.ActivatedAndUsed)
         {
             hold.State = AbyssalCurrentsHoldout.AbyssalState.Spin;
@@ -80,6 +81,7 @@ public class AbyssalCurrents : ModItem
         }
         else
             hold.Projectile.localNPCHitCooldown = -1;
+
         return false;
     }
 
@@ -87,8 +89,7 @@ public class AbyssalCurrents : ModItem
     {
         Recipe recipe = CreateRecipe();
         recipe.AddIngredient(ItemID.RazorbladeTyphoon, 1);
-        recipe.AddIngredient(ModContent.ItemType<Lumenyl>(), 18);
-        recipe.AddIngredient(ModContent.ItemType<SmoothVoidstone>(), 150);
+        //TODO
         recipe.AddIngredient(ItemID.LunarBar, 10);
         recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();

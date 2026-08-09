@@ -39,21 +39,9 @@ public class HyperSlash : ModProjectile
         Projectile.noEnchantmentVisuals = true;
     }
 
-    public Vector2 Start
-    {
-        get;
-        set;
-    }
-    public Vector2 Center
-    {
-        get;
-        set;
-    }
-    public Vector2 End
-    {
-        get;
-        set;
-    }
+    public Vector2 Start { get; set; }
+    public Vector2 Center { get; set; }
+    public Vector2 End { get; set; }
 
     public override void SendExtraAI(BinaryWriter writer)
     {
@@ -70,6 +58,7 @@ public class HyperSlash : ModProjectile
     }
 
     public List<Vector2> Points = [];
+
     public override void AI()
     {
         if (Blood == null || Blood.Disposed)
@@ -84,7 +73,7 @@ public class HyperSlash : ModProjectile
         Points = [];
         for (int i = 0; i < 40; i++)
         {
-            float t = InverseLerp(0f, SliceTime, Time) * i / (float)(40 - 1);
+            float t = InverseLerp(0f, SliceTime, Time) * i / (float) (40 - 1);
             float u = 1 - t;
             float tt = t * t;
             float uu = u * u;
@@ -96,7 +85,8 @@ public class HyperSlash : ModProjectile
 
         Positions.SetPoints(Points);
 
-        Projectile.scale = Animators.MakePoly(2f).InOutFunction.Evaluate(1f, 0f, InverseLerp(SliceTime, Lifetime, Time));
+        Projectile.scale = Animators.MakePoly(2f).InOutFunction
+            .Evaluate(1f, 0f, InverseLerp(SliceTime, Lifetime, Time));
         if (Projectile.scale <= 0f)
             Projectile.Kill();
 
@@ -109,8 +99,14 @@ public class HyperSlash : ModProjectile
     }
 
     private float WidthFunct(float c) => Convert01To010(c) * Projectile.height * .5f * Projectile.scale;
-    private Color ColorFunct(SystemVector2 c, Vector2 position) => Color.DarkRed.Lerp(Color.Crimson, InverseLerp(10f, 0f, Time)).Lerp(Color.Black, .2f) * Projectile.Opacity * Convert01To010(c.X);
-    private float AltWidthFunct(float c) => MathF.Pow(Convert01To010(c), 2) * Projectile.height * .9f * Projectile.scale;
+
+    private Color ColorFunct(SystemVector2 c, Vector2 position) =>
+        Color.DarkRed.Lerp(Color.Crimson, InverseLerp(10f, 0f, Time)).Lerp(Color.Black, .2f) * Projectile.Opacity *
+        Convert01To010(c.X);
+
+    private float AltWidthFunct(float c) =>
+        MathF.Pow(Convert01To010(c), 2) * Projectile.height * .9f * Projectile.scale;
+
     private Color AltColorFunct(SystemVector2 c, Vector2 position) => ColorFunct(c, position) * 1.7f;
 
     public override bool PreDraw(ref Color lightColor)
@@ -136,6 +132,7 @@ public class HyperSlash : ModProjectile
                 Lightning.DrawTrail(slice, Positions.Points, 100, true);
             }
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.OverProjectiles);
 
         return false;

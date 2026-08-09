@@ -8,6 +8,7 @@ namespace TheExtraordinaryAdditions.Content.Buffs.Debuff;
 public class VoidDebuff : ModBuff
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.VoidDebuff);
+
     public override void SetStaticDefaults()
     {
         Main.debuff[Type] = true;
@@ -20,7 +21,7 @@ public class VoidDebuff : ModBuff
     {
         if (npc.GetGlobalNPC<AdditionsGlobalNPC>().VoidEnergy < npc.buffTime[buffIndex])
             npc.GetGlobalNPC<AdditionsGlobalNPC>().VoidEnergy = npc.buffTime[buffIndex];
-        
+
         npc.DelBuff(buffIndex);
         buffIndex--;
     }

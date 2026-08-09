@@ -58,7 +58,7 @@ public sealed partial class GlobalPlayer : ModPlayer
     public float CurrentLimit => InverseLerp(0f, MaxLimit, BreakerLimit);
     public bool AtMaxLimit => CurrentLimit == 1f;
     public bool PlayedLimitSound;
-    public static readonly int MaxTimeWithLimit = CalUtils.SecondsToFrames(15);
+    public static readonly int MaxTimeWithLimit = SecondsToFrames(15);
 
     #endregion Vanilla
 
@@ -119,10 +119,7 @@ public sealed partial class GlobalPlayer : ModPlayer
         return item.CountsAsClass<RangedDamageClass>() || item.CountsAsClass<MeleeDamageClass>()
                                                        || item.CountsAsClass<MagicDamageClass>() ||
                                                        item.CountsAsClass<ThrowingDamageClass>()
-                                                       || item.CountsAsClass<SummonDamageClass>() ||
-                                                       item.CountsAsClass<CalamityMod.RogueDamageClass>()
-                                                       || item.CountsAsClass<CalamityMod.TrueMeleeDamageClass>()
-                                                       || item.CountsAsClass<CalamityMod.TrueMeleeNoSpeedDamageClass>();
+                                                       || item.CountsAsClass<SummonDamageClass>();
     }
 
     public override void PostUpdateMiscEffects()
@@ -144,7 +141,7 @@ public sealed partial class GlobalPlayer : ModPlayer
 
     public override void GetHealLife(Item item, bool quickHeal, ref int healValue)
     {
-        healValue = (int)(healValue * HealingPotBonus);
+        healValue = (int) (healValue * HealingPotBonus);
     }
 
     /// <summary>
@@ -215,7 +212,7 @@ public sealed partial class GlobalPlayer : ModPlayer
             if (AtMaxLimit)
             {
                 Player.moveSpeed += .5f;
-                Player.fallStart = (int)(Player.position.Y / 60f /*16f*/);
+                Player.fallStart = (int) (Player.position.Y / 60f /*16f*/);
                 Player.maxFallSpeed = 20f /*10f*/;
             }
         }
@@ -305,7 +302,7 @@ public sealed partial class GlobalPlayer : ModPlayer
         {
             Vector2 teleportLocation = default;
             teleportLocation.X = Main.mouseX + Main.screenPosition.X;
-            if ((int)Player.gravDir == 1)
+            if ((int) Player.gravDir == 1)
                 teleportLocation.Y = Main.mouseY + Main.screenPosition.Y - Player.height;
             else
                 teleportLocation.Y = Main.screenPosition.Y + Main.screenHeight - Main.mouseY;
@@ -317,7 +314,7 @@ public sealed partial class GlobalPlayer : ModPlayer
                 Player.Teleport(teleportLocation, TeleportationStyleID.Portal, 0);
                 NetMessage.SendData(MessageID.TeleportEntity, -1, -1, null, 0, Player.whoAmI, teleportLocation.X,
                     teleportLocation.Y, 1, 0, 0);
-                Player.AddBuff(BuffID.ChaosState, CalUtils.SecondsToFrames(60));
+                Player.AddBuff(BuffID.ChaosState, SecondsToFrames(60));
             }
         }
     }

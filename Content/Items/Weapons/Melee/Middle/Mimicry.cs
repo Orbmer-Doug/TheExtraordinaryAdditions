@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using CalamityMod;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -28,7 +27,7 @@ public class Mimicry : ModItem
         Item.UseSound = null;
         Item.rare = ModContent.RarityType<BloodWroughtRarity>();
         Item.value = AdditionsGlobalItem.UniqueRarityPrice;
-        Item.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
+        Item.DamageType = ModContent.GetInstance<MeleeNoSpeedDamageClass>();
         Item.shoot = ModContent.ProjectileType<MimicrySlash>();
         Item.noMelee = true;
         Item.noUseGraphic = true;
@@ -44,14 +43,16 @@ public class Mimicry : ModItem
 
     public override bool AltFunctionUse(Player player) => true;
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback)
     {
         if (player.Additions().MouseLeft.Current)
         {
             Projectile.NewProjectile(source, position, velocity, type, damage, knockback, player.whoAmI);
         }
         else if (player.Additions().MouseRight.Current)
-            Projectile.NewProjectile(source, position, velocity, ModContent.ProjectileType<MimicrySpear>(), (int)(damage * 1.25f), knockback * 1.25f, player.whoAmI, 0, 0f, 0f);
+            Projectile.NewProjectile(source, position, velocity, ModContent.ProjectileType<MimicrySpear>(),
+                (int) (damage * 1.25f), knockback * 1.25f, player.whoAmI, 0, 0f, 0f);
 
         return false;
     }

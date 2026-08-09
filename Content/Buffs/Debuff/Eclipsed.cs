@@ -21,7 +21,7 @@ public class Eclipsed : ModBuff
     {
         if (npc.GetGlobalNPC<AdditionsGlobalNPC>().Eclipsed < npc.buffTime[buffIndex])
             npc.GetGlobalNPC<AdditionsGlobalNPC>().Eclipsed = npc.buffTime[buffIndex];
-        
+
         npc.DelBuff(buffIndex);
         buffIndex--;
     }

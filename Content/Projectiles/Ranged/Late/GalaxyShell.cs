@@ -9,6 +9,7 @@ public class GalaxyShell : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GalaxyShell);
     private const int Lifetime = 400;
+
     public override void SetDefaults()
     {
         Projectile.width = 7;
@@ -24,6 +25,7 @@ public class GalaxyShell : ModProjectile
 
     public int Time;
     public bool TouchedGrass;
+
     public override void AI()
     {
         Projectile.extraUpdates = 0;
@@ -33,6 +35,7 @@ public class GalaxyShell : ModProjectile
         {
             Projectile.rotation += 0.5f * Projectile.direction;
         }
+
         Projectile.velocity.Y -= 0.055f;
         Projectile.velocity.X *= 0.992f;
     }
@@ -46,6 +49,7 @@ public class GalaxyShell : ModProjectile
     }
 
     public ref float Timer => ref Projectile.ai[0];
+
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D texture = Projectile.ThisProjectileTexture();
@@ -56,11 +60,16 @@ public class GalaxyShell : ModProjectile
         Vector2 drawOrigin = new(texture.Width * 0.5f, Projectile.height * 0.5f);
         for (int k = 0; k < Projectile.oldPos.Length; k++)
         {
-            Vector2 drawPos = Projectile.oldPos[k] - Main.screenPosition + drawOrigin + new Vector2(0f, Projectile.gfxOffY);
-            Color color = Projectile.GetAlpha(lightColor) * ((Projectile.oldPos.Length - k) / (float)Projectile.oldPos.Length);
-            Main.EntitySpriteDraw(texture, drawPos, null, color, Projectile.rotation, drawOrigin, Projectile.scale, SpriteEffects.None, 0);
+            Vector2 drawPos = Projectile.oldPos[k] - Main.screenPosition + drawOrigin +
+                              new Vector2(0f, Projectile.gfxOffY);
+            Color color = Projectile.GetAlpha(lightColor) *
+                          ((Projectile.oldPos.Length - k) / (float) Projectile.oldPos.Length);
+            Main.EntitySpriteDraw(texture, drawPos, null, color, Projectile.rotation, drawOrigin, Projectile.scale,
+                SpriteEffects.None, 0);
         }
-        Main.EntitySpriteDraw(texture, drawPosition, texture.Frame(), Projectile.GetAlpha(lightColor), Projectile.rotation, texture.Size() * 0.5f, Projectile.scale, direction, 0);
+
+        Main.EntitySpriteDraw(texture, drawPosition, texture.Frame(), Projectile.GetAlpha(lightColor),
+            Projectile.rotation, texture.Size() * 0.5f, Projectile.scale, direction, 0);
         return false;
     }
 }

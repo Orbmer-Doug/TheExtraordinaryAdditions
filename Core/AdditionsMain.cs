@@ -23,10 +23,15 @@ public class AdditionsMain : Mod
     }
 
     public static bool DoneLoading { get; set; }
+
     public static void SetLoadingText(string text)
     {
-        FieldInfo Interface_loadMods = typeof(Mod).Assembly.GetType("Terraria.ModLoader.UI.Interface")!.GetField("loadMods", BindingFlags.NonPublic | BindingFlags.Static)!;
-        MethodInfo UIProgress_set_SubProgressText = typeof(Mod).Assembly.GetType("Terraria.ModLoader.UI.UIProgress")!.GetProperty("SubProgressText", BindingFlags.Public | BindingFlags.Instance)!.GetSetMethod()!;
+        FieldInfo Interface_loadMods =
+            typeof(Mod).Assembly.GetType("Terraria.ModLoader.UI.Interface")!.GetField("loadMods",
+                BindingFlags.NonPublic | BindingFlags.Static)!;
+        MethodInfo UIProgress_set_SubProgressText =
+            typeof(Mod).Assembly.GetType("Terraria.ModLoader.UI.UIProgress")!.GetProperty("SubProgressText",
+                BindingFlags.Public | BindingFlags.Instance)!.GetSetMethod()!;
 
         UIProgress_set_SubProgressText.Invoke(Interface_loadMods.GetValue(null), [text]);
     }
@@ -34,7 +39,7 @@ public class AdditionsMain : Mod
     public override void Load()
     {
         DoneLoading = false;
-        
+
         SetLoadingText("Loading shaders...");
         AssetRegistry.LoadShaders(this);
 

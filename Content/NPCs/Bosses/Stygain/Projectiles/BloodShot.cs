@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using CalamityMod;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
@@ -59,8 +58,8 @@ public class BloodShot : ProjOwnedByNPC<StygainHeart>
     {
         for (int i = 0; i < Projectile.oldPos.Length; i++)
         {
-            int x = (int)Projectile.oldPos[i].X;
-            int y = (int)Projectile.oldPos[i].Y;
+            int x = (int) Projectile.oldPos[i].X;
+            int y = (int) Projectile.oldPos[i].Y;
             if (new Rectangle(x, y, 20, 20).Intersects(targetHitbox))
                 return true;
         }
@@ -112,7 +111,7 @@ public class BloodShot : ProjOwnedByNPC<StygainHeart>
             float afterimageRot = Projectile.oldRot[i];
             Vector2 drawPos = Projectile.oldPos[i] + Projectile.Size * 0.5f - Main.screenPosition +
                               new Vector2(0f, Projectile.gfxOffY);
-            Color afterimageColor = Color.Red * ((Projectile.oldPos.Length - i) / (float)Projectile.oldPos.Length);
+            Color afterimageColor = Color.Red * ((Projectile.oldPos.Length - i) / (float) Projectile.oldPos.Length);
             Main.spriteBatch.Draw(texture, drawPos, null, afterimageColor, afterimageRot, origin,
                 Projectile.scale * 0.5f, 0, 0f);
 

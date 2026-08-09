@@ -37,14 +37,8 @@ public class SunspotSword : BaseIdleHoldoutProjectile, IHasScreenShader
 
     public float AngularDamageFactor
     {
-        get
-        {
-            return Projectile.ai[1];
-        }
-        set
-        {
-            Projectile.ai[1] = value;
-        }
+        get { return Projectile.ai[1]; }
+        set { Projectile.ai[1] = value; }
     }
 
     public ref float FadeTimer => ref Projectile.AdditionsInfo().ExtraAI[1];
@@ -63,6 +57,7 @@ public class SunspotSword : BaseIdleHoldoutProjectile, IHasScreenShader
     {
         writer.Write(Projectile.rotation);
     }
+
     public override void GetExtraAI(BinaryReader reader)
     {
         Projectile.rotation = reader.ReadSingle();
@@ -82,6 +77,7 @@ public class SunspotSword : BaseIdleHoldoutProjectile, IHasScreenShader
     public Vector2 Base => Projectile.Center + PolarVector(-28, Projectile.rotation - PiOver2);
 
     public override bool ShouldDie() => false;
+
     public override void SafeAI()
     {
         if (Time == 0f)
@@ -119,7 +115,7 @@ public class SunspotSword : BaseIdleHoldoutProjectile, IHasScreenShader
         {
             float mouseDistance = Center.Distance(Mouse);
             float distRatio = Utils.GetLerpValue(0f, 360f, mouseDistance, true);
-            float aimResponsiveness = 0.035f + 0.3f * (float)Math.Pow(distRatio, .33f);
+            float aimResponsiveness = 0.035f + 0.3f * (float) Math.Pow(distRatio, .33f);
             float newRotation = Projectile.rotation.AngleLerp(Owner.AngleTo(Mouse) + PiOver2, aimResponsiveness);
             Projectile.rotation = newRotation;
             if (Projectile.rotation != Projectile.oldRot[1])
@@ -138,17 +134,19 @@ public class SunspotSword : BaseIdleHoldoutProjectile, IHasScreenShader
 
         Projectile.Opacity = MakePoly(2.7f).InFunction(FadeInterpolant);
         Projectile.direction = Owner.direction;
-        Projectile.height = (int)Utils.Remap(FadeTimer, 0f, FadeTime, 0f, MaxHeight);
-        Projectile.width = (int)Utils.Remap(FadeTimer, 0f, FadeTime, 0f, 28);
+        Projectile.height = (int) Utils.Remap(FadeTimer, 0f, FadeTime, 0f, MaxHeight);
+        Projectile.width = (int) Utils.Remap(FadeTimer, 0f, FadeTime, 0f, 28);
 
         // Visuals
         HandleDamage();
 
-        if (MathF.Abs(WrapAngle(Projectile.rotation - Projectile.oldRot[1])) > .4f && Projectile.soundDelay == 0 && Time > 6f)
+        if (MathF.Abs(WrapAngle(Projectile.rotation - Projectile.oldRot[1])) > .4f && Projectile.soundDelay == 0 &&
+            Time > 6f)
         {
             AdditionsSound.BraveSwingMedium.Play(Projectile.Center, .6f, 0f, .2f);
             Projectile.soundDelay = 12;
         }
+
         ManageCaches();
 
         Time++;
@@ -162,10 +160,10 @@ public class SunspotSword : BaseIdleHoldoutProjectile, IHasScreenShader
 
         AngularDamageFactor = Lerp(AngularDamageFactor, deltaAngle, 0.08f);
 
-        float speedDamageScalar = 0.166f + (float)Math.Log(AngularDamageFactor / ((float)Math.PI / 30f) + 1.5f, 3.0);
+        float speedDamageScalar = 0.166f + (float) Math.Log(AngularDamageFactor / ((float) Math.PI / 30f) + 1.5f, 3.0);
         int damageWithChargeAndStats = Owner.GetWeaponDamage(Owner.HeldItem, false);
         float sizeDamageScalar = 1f;
-        Projectile.damage = (int)(damageWithChargeAndStats * speedDamageScalar * sizeDamageScalar);
+        Projectile.damage = (int) (damageWithChargeAndStats * speedDamageScalar * sizeDamageScalar);
     }
 
     public override bool PreKill(int timeLeft)
@@ -188,19 +186,21 @@ public class SunspotSword : BaseIdleHoldoutProjectile, IHasScreenShader
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        target.AddBuff(ModContent.BuffType<PlasmaIncineration>(), CalUtils.SecondsToFrames(3));
+        target.AddBuff(ModContent.BuffType<PlasmaIncineration>(), SecondsToFrames(3));
         if (AngularDamageFactor > 0.1f)
         {
             Vector2 start = target.Hitbox.ClosestPointInRect(Tip);
             for (int i = 0; i < 45; i++)
             {
-                Vector2 vel = trailPoints.Points[^4].SafeDirectionTo(trailPoints.Points[^1]).RotatedByRandom(.4f) * Main.rand.NextFloat(2f, 10f);
+                Vector2 vel = trailPoints.Points[^4].SafeDirectionTo(trailPoints.Points[^1]).RotatedByRandom(.4f) *
+                              Main.rand.NextFloat(2f, 10f);
                 int life = Main.rand.Next(30, 60);
                 float scale = Main.rand.NextFloat(.5f, .9f);
                 Color col = Color.OrangeRed.Lerp(Color.Red, Main.rand.NextFloat(.3f, .6f));
                 ParticleRegistry.SpawnHeavySmokeParticle(start, vel, life, scale, col, 2f);
                 ParticleRegistry.SpawnGlowParticle(start, vel * .7f, life, scale * 60f, col, 1.6f);
             }
+
             AdditionsSound.SwordSliceShort.Play(start, .7f, 0f, .1f, 20);
         }
     }
@@ -213,12 +213,14 @@ public class SunspotSword : BaseIdleHoldoutProjectile, IHasScreenShader
 
     public ManagedScreenShader Shader { get; private set; }
     public bool HasShader { get; private set; } = false;
+
     public void InitializeShader()
     {
         Shader = ScreenShaderPool.GetShader("HeatDistortionFilter");
         HasShader = true;
         ScreenShaderUpdates.RegisterEntity(this);
     }
+
     public void UpdateShader()
     {
         Shader.TrySetParameter("intensity", Projectile.Opacity * .25f);
@@ -240,13 +242,15 @@ public class SunspotSword : BaseIdleHoldoutProjectile, IHasScreenShader
             ScreenShaderUpdates.UnregisterEntity(this);
         }
     }
+
     public bool IsEntityActive() => Projectile.active;
 
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D tex = Projectile.ThisProjectileTexture();
         Vector2 orig = tex.Size() * .5f;
-        Main.spriteBatch.DrawBetter(tex, Projectile.Center, null, Color.White * Projectile.Opacity, Projectile.rotation, orig, Projectile.scale);
+        Main.spriteBatch.DrawBetter(tex, Projectile.Center, null, Color.White * Projectile.Opacity, Projectile.rotation,
+            orig, Projectile.scale);
 
         DrawTrail();
         DrawBlade();
@@ -281,6 +285,7 @@ public class SunspotSword : BaseIdleHoldoutProjectile, IHasScreenShader
                 sword.DrawTrail(shader, points.Points);
             }
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.HeldProjectiles);
     }
 
@@ -296,6 +301,7 @@ public class SunspotSword : BaseIdleHoldoutProjectile, IHasScreenShader
                 trail.DrawTrail(shader, trailPoints.Points, 200, true);
             }
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.HeldProjectiles);
     }
 }

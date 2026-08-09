@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Terraria;
+﻿using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Common.Particles.Metaball;
 using TheExtraordinaryAdditions.Content.Buffs.Debuff;
@@ -11,6 +10,7 @@ public class IonizedPlasma : ModProjectile, ILocalizedModType, IModType
     public override string Texture => AssetRegistry.Invis;
 
     public const int Lifetime = 120;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 50;
@@ -26,13 +26,15 @@ public class IonizedPlasma : ModProjectile, ILocalizedModType, IModType
     }
 
     public ref float Timer => ref Projectile.ai[0];
+
     public override void AI()
     {
         Lighting.AddLight(Projectile.Center, Color.OrangeRed.ToVector3() * Projectile.scale * 2);
 
-        int size = (int)Utils.Remap(Timer, 0f, Lifetime, 50f, 190f);
+        int size = (int) Utils.Remap(Timer, 0f, Lifetime, 50f, 190f);
         if (Timer % 2 == 1)
-            MetaballRegistry.SpawnPlasmaMetaball(Projectile.Center + Main.rand.NextVector2Circular(10f, 10f), Main.rand.NextVector2Circular(1f, 1f), 30, size, Projectile.scale);
+            MetaballRegistry.SpawnPlasmaMetaball(Projectile.Center + Main.rand.NextVector2Circular(10f, 10f),
+                Main.rand.NextVector2Circular(1f, 1f), 30, size, Projectile.scale);
         Projectile.ExpandHitboxBy(size);
 
         Projectile.scale = Utils.GetLerpValue(0f, Lifetime, Projectile.timeLeft, true);
@@ -41,7 +43,7 @@ public class IonizedPlasma : ModProjectile, ILocalizedModType, IModType
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        Projectile.damage = (int)(Projectile.damage * .85f);
+        Projectile.damage = (int) (Projectile.damage * .85f);
         target.AddBuff(ModContent.BuffType<PlasmaIncineration>(), 300);
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using CalamityMod;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
@@ -38,7 +37,8 @@ public class RejuvenationHover : ModProjectile
             player.GetModPlayer<RejuvenationPlayer>().HealWait = 0;
     }
 
-    public static readonly int timeForHeal = CalUtils.SecondsToFrames(7);
+    public static readonly int timeForHeal = SecondsToFrames(7);
+
     public override void AI()
     {
         if (!Owner.Available() || Owner.GetModPlayer<RejuvenationArtifactPlayer>().Equipped == false)
@@ -72,19 +72,22 @@ public class RejuvenationHover : ModProjectile
 
                 for (int i = 0; i < 24; i++)
                 {
-                    ParticleRegistry.SpawnSparkleParticle(player.Center, -Vector2.UnitY.RotatedByRandom(.4f) * Main.rand.NextFloat(1f, 7f),
+                    ParticleRegistry.SpawnSparkleParticle(player.Center,
+                        -Vector2.UnitY.RotatedByRandom(.4f) * Main.rand.NextFloat(1f, 7f),
                         Main.rand.Next(40, 60), Main.rand.NextFloat(.5f, .7f), Color.Red, Color.Crimson, 1.4f);
 
-                    ParticleRegistry.SpawnGlowParticle(player.RotHitbox().RandomPoint(), Vector2.UnitY * -Main.rand.NextFloat(2f, 7f),
+                    ParticleRegistry.SpawnGlowParticle(player.RotHitbox().RandomPoint(),
+                        Vector2.UnitY * -Main.rand.NextFloat(2f, 7f),
                         Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .6f), Color.Red, .5f);
                 }
             }
+
             player.GetModPlayer<RejuvenationPlayer>().BeingHealed = true;
         }
 
         Projectile.rotation = Projectile.rotation.AngleLerp(Owner.velocity.X * 0.03f, 0.1f);
         Projectile.Center = Owner.MountedCenter + new Vector2(0f, -100f)
-             + (100f * new Vector2(MathF.Cos(Offset) * 2, MathF.Sin(Offset * 2)));
+                                                + (100f * new Vector2(MathF.Cos(Offset) * 2, MathF.Sin(Offset * 2)));
 
         Offset = (Offset + .015f) % MathHelper.TwoPi;
 
@@ -98,7 +101,8 @@ public class RejuvenationHover : ModProjectile
             int life = Main.rand.Next(40, 90);
             float scale = Main.rand.NextFloat(.4f, .8f);
             Color col = Color.Red.Lerp(Color.Crimson, Main.rand.NextFloat(.4f, .8f));
-            ParticleRegistry.SpawnBloomPixelParticle(pos, vel, life, scale, col, Color.Crimson, Projectile.Center, 1.4f, 5);
+            ParticleRegistry.SpawnBloomPixelParticle(pos, vel, life, scale, col, Color.Crimson, Projectile.Center, 1.4f,
+                5);
         }
 
         Lighting.AddLight(Projectile.Center, Color.IndianRed.ToVector3() * Projectile.Opacity);
@@ -108,12 +112,14 @@ public class RejuvenationHover : ModProjectile
     public override bool? CanCutTiles() => false;
     public override bool ShouldUpdatePosition() => false;
     public override bool? CanDamage() => false;
+
     private float WidthFunct(float c)
     {
         return Projectile.height * .2f * (QuadraticBump(c) + .5f);
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         foreach (Player player in Main.player)
@@ -128,12 +134,16 @@ public class RejuvenationHover : ModProjectile
                 prim.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DendriticNoise), 1);
 
                 TrailPoints points = new(20);
-                points.SetPoints(Projectile.Center.GetLaserControlPoints(Projectile.Center + Projectile.SafeDirectionTo(player.Center) * (Projectile.Center.Distance(player.Center) * completion), 20));
+                points.SetPoints(Projectile.Center.GetLaserControlPoints(
+                    Projectile.Center + Projectile.SafeDirectionTo(player.Center) *
+                    (Projectile.Center.Distance(player.Center) * completion), 20));
 
                 OptimizedPrimitiveTrail line = new(WidthFunct,
-                    (c, pos) => MulticolorLerp(c.X + Sin01(Main.GlobalTimeWrappedHourly), Color.Red, Color.IndianRed, Color.PaleVioletRed, Color.Red * 1.8f) * completion, null, 20);
+                    (c, pos) => MulticolorLerp(c.X + Sin01(Main.GlobalTimeWrappedHourly), Color.Red, Color.IndianRed,
+                        Color.PaleVioletRed, Color.Red * 1.8f) * completion, null, 20);
                 line.DrawTrail(prim, points.Points, 90);
             }
+
             PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         }
 
@@ -153,20 +163,24 @@ public class RejuvenationPlayer : ModPlayer
     public int HealWait;
     public float Completion => InverseLerp(0f, 40f, HealWait);
     public bool BeingHealed;
+
     public override void ResetEffects()
     {
         BeingHealed = false;
     }
+
     public override void UpdateDead()
     {
         HealWait = 0;
         BeingHealed = false;
     }
+
     public override void PostUpdateMiscEffects()
     {
         if (BeingHealed)
             Player.lifeMagnet = true;
     }
+
     public override void UpdateLifeRegen()
     {
         if (BeingHealed)

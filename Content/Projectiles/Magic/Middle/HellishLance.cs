@@ -30,11 +30,13 @@ public class HellishLance : ModProjectile
     public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(Offset);
     public override void ReceiveExtraAI(BinaryReader reader) => Offset = reader.ReadVector2();
     public ref float Time => ref Projectile.ai[0];
+
     public int NPCID
     {
-        get => (int)Projectile.ai[1];
+        get => (int) Projectile.ai[1];
         set => Projectile.ai[1] = value;
     }
+
     public ref float StickTime => ref Projectile.ai[2];
     public ref float AfterOpac => ref Projectile.AdditionsInfo().ExtraAI[0];
 
@@ -58,7 +60,8 @@ public class HellishLance : ModProjectile
         {
             for (int i = 0; i < 20; i++)
             {
-                Vector2 pos = Projectile.RotHitbox().Left + Vector2.UnitX * Main.rand.NextFloat(-Projectile.height / 2, Projectile.height / 2);
+                Vector2 pos = Projectile.RotHitbox().Left +
+                              Vector2.UnitX * Main.rand.NextFloat(-Projectile.height / 2, Projectile.height / 2);
                 Vector2 vel = Vector2.UnitY * -Main.rand.NextFloat(4f, 9f);
                 int life = Main.rand.Next(30, 40);
                 float scal = Main.rand.NextFloat(.4f, .8f);
@@ -69,8 +72,10 @@ public class HellishLance : ModProjectile
         else if (Time > Wait)
         {
             after ??= new(8, () => Projectile.Center);
-            after.UpdateFancyAfterimages(new(Projectile.Center + Projectile.velocity, Vector2.One, AfterOpac, Projectile.rotation, 0, 0, 6));
-            Projectile.velocity = new Vector2(0f, -Animators.MakePoly(5f).OutFunction.Evaluate(Time, Wait, Wait + 12f, 0f, 36f));
+            after.UpdateFancyAfterimages(new(Projectile.Center + Projectile.velocity, Vector2.One, AfterOpac,
+                Projectile.rotation, 0, 0, 6));
+            Projectile.velocity = new Vector2(0f,
+                -Animators.MakePoly(5f).OutFunction.Evaluate(Time, Wait, Wait + 12f, 0f, 36f));
         }
 
         if (Projectile.numHits > 0)
@@ -119,19 +124,24 @@ public class HellishLance : ModProjectile
             AdditionsSound.SwordSliceShort.Play(start, .5f, -.15f, .09f, 10);
             for (int i = 0; i < 20; i++)
             {
-                ParticleRegistry.SpawnSparkParticle(start, Projectile.velocity.RotatedByRandom(.2f) * Main.rand.NextFloat(.3f, .5f), Main.rand.Next(20, 35), Main.rand.NextFloat(.4f, .8f), Color.DarkViolet);
-                ParticleRegistry.SpawnBloomLineParticle(start + Main.rand.NextVector2Circular(8, 8), Projectile.velocity.RotatedByRandom(.4f) * Main.rand.NextFloat(.2f, .3f), Main.rand.Next(15, 25), Main.rand.NextFloat(.5f, .7f), Color.Violet);
+                ParticleRegistry.SpawnSparkParticle(start,
+                    Projectile.velocity.RotatedByRandom(.2f) * Main.rand.NextFloat(.3f, .5f), Main.rand.Next(20, 35),
+                    Main.rand.NextFloat(.4f, .8f), Color.DarkViolet);
+                ParticleRegistry.SpawnBloomLineParticle(start + Main.rand.NextVector2Circular(8, 8),
+                    Projectile.velocity.RotatedByRandom(.4f) * Main.rand.NextFloat(.2f, .3f), Main.rand.Next(15, 25),
+                    Main.rand.NextFloat(.5f, .7f), Color.Violet);
             }
 
             NPCID = target.whoAmI;
             Offset = Projectile.position - target.position;
             Offset -= Projectile.velocity;
-            target.velocity += Projectile.velocity.SafeNormalize(Vector2.Zero) * Projectile.knockBack * target.knockBackResist;
+            target.velocity += Projectile.velocity.SafeNormalize(Vector2.Zero) * Projectile.knockBack *
+                               target.knockBackResist;
 
             this.Sync();
         }
         else
-            Projectile.damage = (int)(Projectile.damage * .675f);
+            Projectile.damage = (int) (Projectile.damage * .675f);
     }
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
@@ -140,6 +150,7 @@ public class HellishLance : ModProjectile
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void proj()
@@ -153,8 +164,10 @@ public class HellishLance : ModProjectile
             after?.DrawFancyAfterimages(tex, [Color.Black, Color.DarkViolet, Color.Violet], Projectile.Opacity, 1f, 0f);
             Main.spriteBatch.DrawBetter(tex, Projectile.Center, null, col, -MathHelper.PiOver2, tex.Size() / 2, scale);
             for (int i = 0; i < 10; i++)
-                Main.spriteBatch.DrawBetter(tex, Projectile.Center, null, color, -MathHelper.PiOver2, tex.Size() / 2, scale);
+                Main.spriteBatch.DrawBetter(tex, Projectile.Center, null, color, -MathHelper.PiOver2, tex.Size() / 2,
+                    scale);
         }
+
         LayeredDrawSystem.QueueDrawAction(proj, PixelationLayer.OverProjectiles);
 
         return false;

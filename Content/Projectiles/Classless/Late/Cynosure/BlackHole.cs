@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.IO;
-using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -54,8 +53,8 @@ public class BlackHole : ModProjectile, IHasScreenShader
         Projectile.scale = reader.ReadSingle();
     }
 
-    public static readonly int WaitTime = CalUtils.SecondsToFrames(.5f);
-    public static readonly int ChaseTime = CalUtils.SecondsToFrames(7) + WaitTime * 2;
+    public static readonly int WaitTime = SecondsToFrames(.5f);
+    public static readonly int ChaseTime = SecondsToFrames(7) + WaitTime * 2;
     public const float StartingScale = 0f;
     public const float IdealScale = 4f;
 
@@ -77,7 +76,7 @@ public class BlackHole : ModProjectile, IHasScreenShader
         }
 
         // beeeg
-        Projectile.ExpandHitboxBy((int)(Projectile.scale * 380f));
+        Projectile.ExpandHitboxBy((int) (Projectile.scale * 380f));
         LoopSounds();
         Succ();
         Projectile.rotation += .15f;
@@ -142,7 +141,7 @@ public class BlackHole : ModProjectile, IHasScreenShader
         float width = Main.instance.GraphicsDevice.Viewport.Width;
         float height = Main.instance.GraphicsDevice.Viewport.Height;
         Vector2 aspectRatioCorrectionFactor = new(width / height, 1f);
-        Vector2 aspectRatioCorrectionFactor2 = new(Main.screenWidth / (float)Main.screenHeight, 1f);
+        Vector2 aspectRatioCorrectionFactor2 = new(Main.screenWidth / (float) Main.screenHeight, 1f);
         Vector2 sourcePosition =
             (WorldSpaceToScreenUV(Projectile.Center) - Vector2.One * 0.5f) * aspectRatioCorrectionFactor2 +
             Vector2.One * 0.5f;

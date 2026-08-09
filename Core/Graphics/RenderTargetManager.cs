@@ -22,7 +22,7 @@ public class RenderTargetManager : ModSystem
     /// <summary>
     /// How long standard render targets can go, in frames, before they are subject to automatic disposal
     /// </summary>
-    public static readonly int TimeUntilUntilUnusedTargetsAreDisposed = CalUtils.SecondsToFrames(10f);
+    public static readonly int TimeUntilUntilUnusedTargetsAreDisposed = SecondsToFrames(10f);
 
     public delegate void RenderTargetUpdateDelegate();
 
@@ -102,10 +102,7 @@ public class RenderTargetManager : ModSystem
             if (target is null || target.WaitingForFirstInitialization)
                 continue;
 
-            Main.QueueMainThreadAction(() =>
-            {
-                target.Recreate(Main.screenWidth, Main.screenHeight);
-            });
+            Main.QueueMainThreadAction(() => { target.Recreate(Main.screenWidth, Main.screenHeight); });
         }
     }
 }

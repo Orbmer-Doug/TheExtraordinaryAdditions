@@ -37,11 +37,11 @@ public partial class Asterlin
 
     private AnimType GetScrewed_Type
     {
-        get => (AnimType)ExtraAI[0];
-        set => ExtraAI[0] = (int)value;
+        get => (AnimType) ExtraAI[0];
+        set => ExtraAI[0] = (int) value;
     }
 
-    public static readonly float GetScrewed_MaxTime = CalUtils.SecondsToFrames(2.5f);
+    public static readonly float GetScrewed_MaxTime = SecondsToFrames(2.5f);
 
     public void DoBehavior_GetScrewed()
     {
@@ -119,9 +119,9 @@ public partial class Asterlin
 
         NPC.Opacity = InverseLerp(GetScrewed_MaxTime, GetScrewed_MaxTime - 40, AITimer);
         SetLegFlamesInterpolant(NPC.Opacity);
-        if (!(AITimer >= GetScrewed_MaxTime)) 
+        if (!(AITimer >= GetScrewed_MaxTime))
             return;
-        
+
         NPC.active = false;
         NPC.netUpdate = true;
         ProjOwnedByNPC<Asterlin>.KillAll();

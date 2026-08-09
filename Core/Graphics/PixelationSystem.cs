@@ -155,7 +155,7 @@ public class PixelationSystem : ModSystem
     internal static readonly BlendState[] SupportedBlendStates =
         [BlendState.AlphaBlend, BlendState.Additive, BlendState.NonPremultiplied];
 
-    public static readonly int InitialCapacity = Main.maxProjectiles + Main.maxNPCs + (int)ParticleSystem.MaxParticles;
+    public static readonly int InitialCapacity = Main.maxProjectiles + Main.maxNPCs + (int) ParticleSystem.MaxParticles;
 
     private static readonly Dictionary<PixelationLayer, Dictionary<BlendState, ManagedRenderTarget>>
         RenderTargetsByLayer = [];
@@ -243,7 +243,7 @@ public class PixelationSystem : ModSystem
         {
             while (layers != 0)
             {
-                PixelationLayer layer = (PixelationLayer)(1 << BitOperations.TrailingZeroCount((int)layers));
+                PixelationLayer layer = (PixelationLayer) (1 << BitOperations.TrailingZeroCount((int) layers));
                 if (PrimitiveDrawActionsByLayer[layer].Count > 0 || TextureDrawActionsByLayer[layer].Count > 0)
                     DrawToRenderTarget(layer, PrimitiveDrawActionsByLayer[layer], TextureDrawActionsByLayer[layer]);
                 layers &= ~layer;
@@ -441,9 +441,9 @@ public class PixelationSystem : ModSystem
 
         foreach (BlendState blend in SupportedBlendStates)
         {
-            if (!targets.TryGetValue(blend, out ManagedRenderTarget target) || target.IsUninitialized) 
+            if (!targets.TryGetValue(blend, out ManagedRenderTarget target) || target.IsUninitialized)
                 continue;
-            
+
             if (endSB)
                 sb.End();
 

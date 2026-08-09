@@ -40,13 +40,13 @@ public class DisintegrationBeam : ProjOwnedByNPC<Asterlin>
 
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
 
     public int ProjOwner
     {
-        get => (int)Projectile.ai[1];
+        get => (int) Projectile.ai[1];
         set => Projectile.ai[1] = value;
     }
 
@@ -54,15 +54,15 @@ public class DisintegrationBeam : ProjOwnedByNPC<Asterlin>
 
     public BeamState CurrentState
     {
-        get => (BeamState)Projectile.AdditionsInfo().ExtraAI[0];
-        set => Projectile.AdditionsInfo().ExtraAI[0] = (int)value;
+        get => (BeamState) Projectile.AdditionsInfo().ExtraAI[0];
+        set => Projectile.AdditionsInfo().ExtraAI[0] = (int) value;
     }
 
     public ref float CurrentLength => ref Projectile.AdditionsInfo().ExtraAI[1];
 
     public bool DontTurn
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[2] == 1;
+        get => (int) Projectile.AdditionsInfo().ExtraAI[2] == 1;
         set => Projectile.AdditionsInfo().ExtraAI[2] = value.ToInt();
     }
 

@@ -11,6 +11,7 @@ public class TechnicPortal : ProjOwnedByNPC<Asterlin>
 {
     public override string Texture => AssetRegistry.Invis;
     public override bool IgnoreOwnerActivity => true;
+
     public override void SetDefaults()
     {
         Projectile.Size = new(250, 700);
@@ -25,14 +26,19 @@ public class TechnicPortal : ProjOwnedByNPC<Asterlin>
 
         if (Projectile.timeLeft < Asterlin.UnrelentingRush_PortalFadeOut)
         {
-            Projectile.Opacity = MakePoly(3f).InOutFunction(InverseLerp(0, Asterlin.UnrelentingRush_PortalFadeOut, Projectile.timeLeft));
-            Projectile.scale = MakePoly(4f).OutFunction(InverseLerp(0, Asterlin.UnrelentingRush_PortalFadeOut, Projectile.timeLeft));
+            Projectile.Opacity = MakePoly(3f)
+                .InOutFunction(InverseLerp(0, Asterlin.UnrelentingRush_PortalFadeOut, Projectile.timeLeft));
+            Projectile.scale = MakePoly(4f)
+                .OutFunction(InverseLerp(0, Asterlin.UnrelentingRush_PortalFadeOut, Projectile.timeLeft));
         }
         else
         {
-            Projectile.Opacity = MakePoly(3f).InOutFunction(InverseLerp(Asterlin.UnrelentingRush_PortalLifetime, Asterlin.UnrelentingRush_PortalLifetime - Asterlin.UnrelentingRush_PortalFadeIn, Projectile.timeLeft));
-            Projectile.scale = MakePoly(2f).OutFunction(InverseLerp(Asterlin.UnrelentingRush_PortalLifetime, Asterlin.UnrelentingRush_PortalLifetime - Asterlin.UnrelentingRush_PortalFadeIn, Projectile.timeLeft));
+            Projectile.Opacity = MakePoly(3f).InOutFunction(InverseLerp(Asterlin.UnrelentingRush_PortalLifetime,
+                Asterlin.UnrelentingRush_PortalLifetime - Asterlin.UnrelentingRush_PortalFadeIn, Projectile.timeLeft));
+            Projectile.scale = MakePoly(2f).OutFunction(InverseLerp(Asterlin.UnrelentingRush_PortalLifetime,
+                Asterlin.UnrelentingRush_PortalLifetime - Asterlin.UnrelentingRush_PortalFadeIn, Projectile.timeLeft));
         }
+
         Projectile.rotation = Projectile.velocity.ToRotation();
     }
 
@@ -42,6 +48,7 @@ public class TechnicPortal : ProjOwnedByNPC<Asterlin>
     public override bool PreDraw(ref Color lightColor)
     {
         ManagedShader shader = AssetRegistry.GetShader("PortalShaderAlt");
+
         void portal()
         {
             Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
@@ -50,9 +57,12 @@ public class TechnicPortal : ProjOwnedByNPC<Asterlin>
             shader.TrySetParameter("mediumColor", Color.Cyan.ToVector3());
             shader.TrySetParameter("hotColor", Color.DeepSkyBlue.ToVector3());
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise), 1, SamplerState.LinearWrap);
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DendriticNoiseZoomedOut), 2, SamplerState.LinearWrap);
-            Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Projectile.Size), null, Color.White, Projectile.rotation, tex.Size() / 2);
+            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DendriticNoiseZoomedOut), 2,
+                SamplerState.LinearWrap);
+            Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Projectile.Size), null, Color.White,
+                Projectile.rotation, tex.Size() / 2);
         }
+
         PixelationSystem.QueueTextureRenderAction(portal, PixelationLayer.OverNPCs, null, shader);
         return false;
     }

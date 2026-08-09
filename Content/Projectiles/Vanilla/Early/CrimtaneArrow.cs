@@ -14,6 +14,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Early;
 public class CrimtaneArrow : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CrimtaneArrow);
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 10;
@@ -35,7 +36,7 @@ public class CrimtaneArrow : ModProjectile
 
     public int NPCID
     {
-        get => (int)Projectile.ai[1];
+        get => (int) Projectile.ai[1];
         set => Projectile.ai[1] = value;
     }
 
@@ -44,6 +45,7 @@ public class CrimtaneArrow : ModProjectile
         get => Projectile.ai[2] == 1f;
         set => Projectile.ai[2] = value.ToInt();
     }
+
     public ref float TrailOpacity => ref Projectile.AdditionsInfo().ExtraAI[0];
 
     public override void AI()
@@ -80,7 +82,8 @@ public class CrimtaneArrow : ModProjectile
         if (TrailOpacity > .01f)
         {
             if (trail == null || trail.Disposed)
-                trail = new(c => Projectile.width, (c, pos) => Color.Crimson * MathHelper.SmoothStep(1f, 0f, c.X) * TrailOpacity, null, 5);
+                trail = new(c => Projectile.width,
+                    (c, pos) => Color.Crimson * MathHelper.SmoothStep(1f, 0f, c.X) * TrailOpacity, null, 5);
             points ??= new(5);
             points.Update(Projectile.Center + Projectile.velocity - PolarVector(12f, Projectile.velocity.ToRotation()));
         }
@@ -94,26 +97,33 @@ public class CrimtaneArrow : ModProjectile
     {
         foreach (Projectile projectile in Main.ActiveProjectiles)
         {
-            if (projectile != null && projectile.type == Type && Projectile.RotHitbox().Intersects(projectile.RotHitbox()) && projectile.identity != Projectile.identity)
+            if (projectile != null && projectile.type == Type &&
+                Projectile.RotHitbox().Intersects(projectile.RotHitbox()) && projectile.identity != Projectile.identity)
             {
                 Vector2 pos = Projectile.RotHitbox().Bottom;
                 for (int i = 0; i < 10; i++)
                 {
-                    ParticleRegistry.SpawnBloomPixelParticle(pos, Main.rand.NextVector2Circular(4f, 4f), Main.rand.Next(30, 40), Main.rand.NextFloat(.3f, .4f), Color.DarkRed, Color.Crimson, null, 1.4f);
-                    ParticleRegistry.SpawnBloomLineParticle(pos, Main.rand.NextVector2Circular(3f, 3f), Main.rand.Next(20, 30), Main.rand.NextFloat(.2f, .4f), Color.Crimson);
+                    ParticleRegistry.SpawnBloomPixelParticle(pos, Main.rand.NextVector2Circular(4f, 4f),
+                        Main.rand.Next(30, 40), Main.rand.NextFloat(.3f, .4f), Color.DarkRed, Color.Crimson, null,
+                        1.4f);
+                    ParticleRegistry.SpawnBloomLineParticle(pos, Main.rand.NextVector2Circular(3f, 3f),
+                        Main.rand.Next(20, 30), Main.rand.NextFloat(.2f, .4f), Color.Crimson);
                 }
+
                 Projectile.Kill();
                 projectile.Kill();
                 return true;
             }
         }
+
         return false;
     }
 
     public override void OnKill(int timeLeft)
     {
         for (int i = 0; i < 15; i++)
-            Dust.NewDustPerfect(Projectile.RotHitbox().RandomPoint(), DustID.Blood, Main.rand.NextVector2Circular(4f, 4f), 90, default, Main.rand.NextFloat(.8f, 1.2f));
+            Dust.NewDustPerfect(Projectile.RotHitbox().RandomPoint(), DustID.Blood,
+                Main.rand.NextVector2Circular(4f, 4f), 90, default, Main.rand.NextFloat(.8f, 1.2f));
     }
 
     public override bool? CanHitNPC(NPC target) => HitEnemy ? false : null;
@@ -143,6 +153,7 @@ public class CrimtaneArrow : ModProjectile
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints points;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void prim()
@@ -152,6 +163,7 @@ public class CrimtaneArrow : ModProjectile
             if (trail != null && !trail.Disposed && TrailOpacity > .01f)
                 trail.DrawTrail(ShaderRegistry.StandardPrimitiveShader, points.Points, 50, true);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(prim, PixelationLayer.UnderProjectiles);
 
         Projectile.DrawBaseProjectile(lightColor);

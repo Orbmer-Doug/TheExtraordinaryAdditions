@@ -11,21 +11,25 @@ public class RagingCursedFire : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
 
-    public override void SetStaticDefaults() { }
+    public override void SetStaticDefaults()
+    {
+    }
+
     public override void SetDefaults()
     {
         Projectile.width =
-        Projectile.height = 16;
+            Projectile.height = 16;
         Projectile.friendly = true;
         Projectile.alpha = 100;
         Projectile.DamageType = DamageClass.Magic;
         Projectile.penetrate = 2;
         Projectile.tileCollide = true;
         Projectile.ignoreWater = false;
-        Projectile.timeLeft = CalUtils.SecondsToFrames(6);
+        Projectile.timeLeft = SecondsToFrames(6);
     }
 
     public ref float Time => ref Projectile.ai[0];
+
     public override void AI()
     {
         // Vanilla AI

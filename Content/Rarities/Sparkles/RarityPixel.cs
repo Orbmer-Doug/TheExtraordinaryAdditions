@@ -14,7 +14,9 @@ public class RarityPixel : Behavior<RarityParticleInfo>
     public Vector2? HomeIn;
     public Vector2[] oldPos = new Vector2[10];
     public byte TrailCount;
-    public RarityPixel(Vector2 pos, Vector2 vel, int life, float scale, Color col, Color bloom, Vector2? home = null, byte trail = 0)
+
+    public RarityPixel(Vector2 pos, Vector2 vel, int life, float scale, Color col, Color bloom, Vector2? home = null,
+        byte trail = 0)
     {
         Info.Position = pos;
         Info.Velocity = InitVel = vel;
@@ -35,9 +37,11 @@ public class RarityPixel : Behavior<RarityParticleInfo>
                 oldPos[i] = Vector2.Zero;
         }
     }
+
     private float Delay;
     private float Timer;
     private Vector2 InitVel;
+
     public override void Update()
     {
         if (Info.TimeRatio > .7f)
@@ -52,6 +56,7 @@ public class RarityPixel : Behavior<RarityParticleInfo>
             {
                 oldPos[j] = oldPos[j - 1];
             }
+
             oldPos[0] = Info.Position;
         }
 
@@ -69,10 +74,13 @@ public class RarityPixel : Behavior<RarityParticleInfo>
 
         Info.Rotation += Info.Velocity.Length() / 5;
     }
+
     public override bool UseAdditive => true;
+
     public override void Draw(SpriteBatch sb, Vector2 position, DrawableTooltipLine line)
     {
-        sb.Draw(Bloom, position, null, BloomColor * Info.Opacity * .3f, Info.Rotation, Bloom.Size() / 2, Info.Scale / 4, 0, 0f);
+        sb.Draw(Bloom, position, null, BloomColor * Info.Opacity * .3f, Info.Rotation, Bloom.Size() / 2, Info.Scale / 4,
+            0, 0f);
 
         if (TrailCount > 0)
         {
@@ -86,6 +94,7 @@ public class RarityPixel : Behavior<RarityParticleInfo>
             }
         }
         else
-            sb.Draw(Info.Texture, position, null, Info.DrawColor * Info.Opacity, Info.Rotation, Info.Texture.Size() / 2, Info.Scale * 6, 0, 0f);
+            sb.Draw(Info.Texture, position, null, Info.DrawColor * Info.Opacity, Info.Rotation, Info.Texture.Size() / 2,
+                Info.Scale * 6, 0, 0f);
     }
 }

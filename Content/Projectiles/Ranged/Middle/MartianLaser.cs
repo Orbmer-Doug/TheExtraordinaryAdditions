@@ -9,6 +9,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 public class MartianLaser : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 10;
@@ -24,6 +25,7 @@ public class MartianLaser : ModProjectile
     public ref float Time => ref Projectile.ai[0];
     public TrailPoints cache;
     public OptimizedPrimitiveTrail trail;
+
     public override void AI()
     {
         cache ??= new(40);
@@ -61,6 +63,7 @@ public class MartianLaser : ModProjectile
             prim.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise), 1);
             trail.DrawTrail(prim, cache.Points, 50);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;
     }

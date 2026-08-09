@@ -35,8 +35,10 @@ public readonly struct BezierCurves(params Vector2[] controls)
             {
                 nextPoints[i] = Vector2.Lerp(points[i], points[i + 1], T);
             }
+
             points = nextPoints;
         }
+
         return points.Length <= 1 ? Vector2.Zero : Vector2.Lerp(points[0], points[1], T);
     }
 

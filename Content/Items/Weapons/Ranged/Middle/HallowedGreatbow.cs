@@ -37,7 +37,7 @@ public class HallowedGreatbow : ModItem
         Item.shootSpeed = 2f;
         Item.crit = 20;
     }
-    
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(new Color(255, 229, 84));

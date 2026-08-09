@@ -63,13 +63,16 @@ public class HellishNapalm : ModProjectile, ILocalizedModType, IModType
         ParticleRegistry.SpawnGlowParticle(pos, vel, 25, scale, Color.OrangeRed * .9f);
         ParticleRegistry.SpawnGlowParticle(pos, vel, 35, scale, Color.Chocolate * .7f);
         if (Main.rand.NextBool(7))
-            ParticleRegistry.SpawnSquishyPixelParticle(pos, vel * Main.rand.NextFloat(1.2f, 2.3f), Main.rand.Next(80, 90), scale / Projectile.height, Color.OrangeRed, Color.Chocolate, 6, true, true);
+            ParticleRegistry.SpawnSquishyPixelParticle(pos, vel * Main.rand.NextFloat(1.2f, 2.3f),
+                Main.rand.Next(80, 90), scale / Projectile.height, Color.OrangeRed, Color.Chocolate, 6, true, true);
         if (Main.rand.NextBool(7))
-            ParticleRegistry.SpawnMistParticle(pos, vel * Main.rand.NextFloat(.7f, 1.2f), scale * .7f / Projectile.height, Color.LightGray, Color.DarkGray, Main.rand.NextFloat(80f, 120f), Main.rand.NextFloat(-.14f, .14f));
+            ParticleRegistry.SpawnMistParticle(pos, vel * Main.rand.NextFloat(.7f, 1.2f),
+                scale * .7f / Projectile.height, Color.LightGray, Color.DarkGray, Main.rand.NextFloat(80f, 120f),
+                Main.rand.NextFloat(-.14f, .14f));
 
         if (HitTarget)
         {
-            NPC target = Main.npc[(int)EnemyID];
+            NPC target = Main.npc[(int) EnemyID];
 
             if (target == null || target.active == false)
                 return;
@@ -109,7 +112,7 @@ public class HellishNapalm : ModProjectile, ILocalizedModType, IModType
             HitTarget = true;
         }
 
-        target.AddBuff(BuffID.OnFire, CalUtils.SecondsToFrames(2), false);
+        target.AddBuff(BuffID.OnFire, SecondsToFrames(2), false);
     }
 
     public override bool OnTileCollide(Vector2 oldVelocity)
@@ -119,11 +122,12 @@ public class HellishNapalm : ModProjectile, ILocalizedModType, IModType
         {
             HitGround = true;
         }
+
         return false;
     }
 
     public override void OnHitPlayer(Player target, Player.HurtInfo info)
     {
-        target.AddBuff(BuffID.OnFire, CalUtils.SecondsToFrames(2), false);
+        target.AddBuff(BuffID.OnFire, SecondsToFrames(2), false);
     }
 }

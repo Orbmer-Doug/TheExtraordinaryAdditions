@@ -77,7 +77,8 @@ public unsafe struct Metaball
     public ref T GetCustomData<T>() where T : unmanaged
     {
         if (sizeof(T) > CustomDataSize)
-            throw new ArgumentException($"Type {typeof(T).Name} exceeds CustomData size ({CustomDataSize} bytes) by {sizeof(T)}.");
+            throw new ArgumentException(
+                $"Type {typeof(T).Name} exceeds CustomData size ({CustomDataSize} bytes) by {sizeof(T)}.");
         return ref MemoryMarshal.AsRef<T>(CustomData);
     }
 
@@ -95,8 +96,11 @@ public readonly record struct MetaballTypeDefinition(
 );
 
 public delegate void UpdateDelegate(ref Metaball m);
+
 public delegate void DrawDelegate(ref Metaball m, SpriteBatch sb);
+
 public delegate void PrepareShaderDelegate(ManagedShader shader, ManagedRenderTarget target);
+
 public delegate void OnCollisionDelegate(ref Metaball m);
 
 [Autoload(Side = ModSide.Client)]
@@ -106,7 +110,9 @@ public class MetaballSystem : ModSystem
     public const uint MaxMetaballs = 16384;
     private static Metaball[] _metaballs = new Metaball[MaxMetaballs];
     private static ulong[] _presenceMask = BitmaskUtils.CreateMask(MaxMetaballs);
-    public static BitmaskUtils.BitmaskEnumerable ActiveMetaballs => new BitmaskUtils.BitmaskEnumerable(_presenceMask.AsSpan(0, _presenceMask.Length), MaxMetaballs);
+
+    public static BitmaskUtils.BitmaskEnumerable ActiveMetaballs =>
+        new BitmaskUtils.BitmaskEnumerable(_presenceMask.AsSpan(0, _presenceMask.Length), MaxMetaballs);
 
     // Metaballs work by having all the particles live on one render target, but this means other types can overpower another one since they both influence each other
     // So we make all types have their own
@@ -159,7 +165,8 @@ public class MetaballSystem : ModSystem
         if (index != -1)
         {
             _metaballs[index] = metaball;
-            _metaballs[index].Init = new(metaball.Velocity, metaball.Scale, metaball.Opacity, metaball.Color, metaball.Size, metaball.Rotation);
+            _metaballs[index].Init = new(metaball.Velocity, metaball.Scale, metaball.Opacity, metaball.Color,
+                metaball.Size, metaball.Rotation);
         }
     }
 
@@ -183,7 +190,7 @@ public class MetaballSystem : ModSystem
                 continue;
             }
 
-            MetaballTypeDefinition def = MetaballRegistry.TypeDefinitions[(byte)m.Type];
+            MetaballTypeDefinition def = MetaballRegistry.TypeDefinitions[(byte) m.Type];
 
             m.OldVelocity = m.Velocity;
             if (m.AllowedCollisions != CollisionTypes.None)
@@ -191,7 +198,8 @@ public class MetaballSystem : ModSystem
                 bool collide = false;
                 if (m.AllowedCollisions.HasFlag(CollisionTypes.Solid))
                 {
-                    m.Velocity = Collision.TileCollision(m.Position, m.Velocity, 1, 1, m.AllowedCollisions.HasFlag(CollisionTypes.NonSolid));
+                    m.Velocity = Collision.TileCollision(m.Position, m.Velocity, 1, 1,
+                        m.AllowedCollisions.HasFlag(CollisionTypes.NonSolid));
                     Vector4 slope = Collision.SlopeCollision(m.Position, m.Velocity, 1, 1, 1f);
                     m.Position.X = slope.X;
                     m.Position.Y = slope.Y;
@@ -201,7 +209,8 @@ public class MetaballSystem : ModSystem
 
                 if (m.AllowedCollisions.HasFlag(CollisionTypes.Liquid))
                 {
-                    m.Velocity = Collision.WaterCollision(m.Position, m.Velocity, 1, 1, m.AllowedCollisions.HasFlag(CollisionTypes.NonSolid));
+                    m.Velocity = Collision.WaterCollision(m.Position, m.Velocity, 1, 1,
+                        m.AllowedCollisions.HasFlag(CollisionTypes.NonSolid));
                 }
 
                 if (m.AllowedCollisions.HasFlag(CollisionTypes.NPC))
@@ -210,7 +219,7 @@ public class MetaballSystem : ModSystem
                     {
                         if (npc == null)
                             continue;
-                        
+
                         Rectangle temp = m.Hitbox;
                         m.Velocity = ResolveCollision(ref temp, npc.RotHitbox(), m.Velocity, out collide);
                     }
@@ -220,9 +229,9 @@ public class MetaballSystem : ModSystem
                 {
                     foreach (Projectile proj in Main.ActiveProjectiles)
                     {
-                        if (proj == null) 
+                        if (proj == null)
                             continue;
-                        
+
                         Rectangle temp = m.Hitbox;
                         m.Velocity = ResolveCollision(ref temp, proj.RotHitbox(), m.Velocity, out collide);
                     }
@@ -232,9 +241,9 @@ public class MetaballSystem : ModSystem
                 {
                     foreach (Player player in Main.ActivePlayers)
                     {
-                        if (player == null) 
+                        if (player == null)
                             continue;
-                        
+
                         Rectangle temp = m.Hitbox;
                         m.Velocity = ResolveCollision(ref temp, player.RotHitbox(), m.Velocity, out collide);
                     }
@@ -247,7 +256,7 @@ public class MetaballSystem : ModSystem
             m.Position += m.Velocity;
 
             def.Update?.Invoke(ref m);
-            m.Hitbox = new((int)(m.Position.X - 2), (int)(m.Position.Y - 2), 4, 4);
+            m.Hitbox = new((int) (m.Position.X - 2), (int) (m.Position.Y - 2), 4, 4);
         }
     }
 
@@ -278,7 +287,7 @@ public class MetaballSystem : ModSystem
                 if (!metaball.Active || metaball.Type != type)
                     continue;
 
-                MetaballTypeDefinition def = MetaballRegistry.TypeDefinitions[(byte)metaball.Type];
+                MetaballTypeDefinition def = MetaballRegistry.TypeDefinitions[(byte) metaball.Type];
 
                 if (def.Draw == null)
                 {
@@ -286,10 +295,10 @@ public class MetaballSystem : ModSystem
                     Vector2 screenDelta = Main.screenLastPosition - Main.screenPosition;
                     Vector2 position = (metaball.Position + screenDelta - Main.screenPosition) / 2f;
                     Rectangle destRect = new(
-                        (int)position.X,
-                        (int)position.Y,
-                        (int)(metaball.Size.X * metaball.Scale / 2f),
-                        (int)(metaball.Size.Y * metaball.Scale / 2f)
+                        (int) position.X,
+                        (int) position.Y,
+                        (int) (metaball.Size.X * metaball.Scale / 2f),
+                        (int) (metaball.Size.Y * metaball.Scale / 2f)
                     );
                     Color color = metaball.Color * metaball.Opacity;
 
@@ -340,12 +349,13 @@ public class MetaballSystem : ModSystem
         foreach (int index in ActiveMetaballs)
         {
             Metaball m = _metaballs[index];
-            if (m.Active && MetaballRegistry.TypeDefinitions[(byte)m.Type].DrawLayer == layer)
+            if (m.Active && MetaballRegistry.TypeDefinitions[(byte) m.Type].DrawLayer == layer)
             {
                 hasMetaballs = true;
                 break;
             }
         }
+
         if (!hasMetaballs)
             return;
 
@@ -363,7 +373,7 @@ public class MetaballSystem : ModSystem
 
         foreach (MetaballTypes type in Enum.GetValues(typeof(MetaballTypes)))
         {
-            MetaballTypeDefinition def = MetaballRegistry.TypeDefinitions[(byte)type];
+            MetaballTypeDefinition def = MetaballRegistry.TypeDefinitions[(byte) type];
             if (def.DrawLayer != layer)
                 continue;
 
@@ -372,9 +382,9 @@ public class MetaballSystem : ModSystem
             foreach (int index in ActiveMetaballs)
             {
                 Metaball m = _metaballs[index];
-                if (!m.Active || m.Type != type) 
+                if (!m.Active || m.Type != type)
                     continue;
-                
+
                 typeHasMetaballs = true;
                 break;
             }
@@ -385,7 +395,8 @@ public class MetaballSystem : ModSystem
             ManagedShader shader = def.Shader == null ? _genericShader : AssetRegistry.GetShader(def.Shader.Name);
             def.PrepareShader?.Invoke(shader, _typeRenderTargets[type]);
             shader.SetTexture(_typeRenderTargets[type], 1, SamplerState.AnisotropicWrap);
-            Main.spriteBatch.Draw(_typeRenderTargets[type], Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 2f, 0, 0f);
+            Main.spriteBatch.Draw(_typeRenderTargets[type], Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 2f, 0,
+                0f);
         }
 
         if (resetSB)
@@ -395,6 +406,7 @@ public class MetaballSystem : ModSystem
     }
 
     public delegate void ModifyMetaballDelegate(ref Metaball metaball);
+
     public void ModifyActiveMetaballs(MetaballTypes type, ModifyMetaballDelegate modifier)
     {
         foreach (int index in ActiveMetaballs)
@@ -408,7 +420,8 @@ public class MetaballSystem : ModSystem
 
 public static class MetaballRegistry
 {
-    public static readonly MetaballTypeDefinition[] TypeDefinitions = new MetaballTypeDefinition[(int)(GetLastEnumValue<MetaballTypes>() + 1)];
+    public static readonly MetaballTypeDefinition[] TypeDefinitions =
+        new MetaballTypeDefinition[(int) (GetLastEnumValue<MetaballTypes>() + 1)];
 
     public static void Initialize()
     {
@@ -420,6 +433,7 @@ public static class MetaballRegistry
     }
 
     #region Plasma
+
     private struct PlasmaData
     {
         public float Brightness;
@@ -427,14 +441,15 @@ public static class MetaballRegistry
 
     private static void PlasmaMetaballDefinition()
     {
-        TypeDefinitions[(byte)MetaballTypes.Plasma] = new MetaballTypeDefinition(
+        TypeDefinitions[(byte) MetaballTypes.Plasma] = new MetaballTypeDefinition(
             Texture: AssetRegistry.GetTexture(AdditionsTexture.NebulaGas1),
             Shader: null,
             Update: static (ref m) =>
             {
-                float timeRatio = (float)m.Time / m.Lifetime;
+                float timeRatio = (float) m.Time / m.Lifetime;
                 m.Opacity = 1f - timeRatio;
-                m.Color = Color.Lerp(Color.White.Lerp(Color.DarkOrange, 1f - m.GetCustomData<PlasmaData>().Brightness), Color.Chocolate, Animators.MakePoly(4f).OutFunction(timeRatio));
+                m.Color = Color.Lerp(Color.White.Lerp(Color.DarkOrange, 1f - m.GetCustomData<PlasmaData>().Brightness),
+                    Color.Chocolate, Animators.MakePoly(4f).OutFunction(timeRatio));
                 m.Scale = 1f + timeRatio * 0.1f;
             },
             Draw: null,
@@ -449,7 +464,8 @@ public static class MetaballRegistry
         );
     }
 
-    public static void SpawnPlasmaMetaball(Vector2 position, Vector2 velocity, int lifetime, int size, float brightness = 1f)
+    public static void SpawnPlasmaMetaball(Vector2 position, Vector2 velocity, int lifetime, int size,
+        float brightness = 1f)
     {
         Metaball metaball = new()
         {
@@ -467,9 +483,11 @@ public static class MetaballRegistry
 
         ModContent.GetInstance<MetaballSystem>().AddMetaball(metaball);
     }
+
     #endregion
 
     #region Lava
+
     private struct LavaData
     {
         public bool Collided;
@@ -483,19 +501,19 @@ public static class MetaballRegistry
 
     private static void LavaMetaballDefinition()
     {
-        TypeDefinitions[(byte)MetaballTypes.Lava] = new MetaballTypeDefinition(
+        TypeDefinitions[(byte) MetaballTypes.Lava] = new MetaballTypeDefinition(
             Texture: AssetRegistry.GetTexture(AdditionsTexture.BrightLight),
             Shader: AssetRegistry.GetShader("LavaMetaball"),
             Update: static (ref m) =>
             {
                 ref LavaData data = ref m.GetCustomData<LavaData>();
-                float timeRatio = (float)m.Time / m.Lifetime;
+                float timeRatio = (float) m.Time / m.Lifetime;
                 m.Opacity = 1f - timeRatio;
                 m.Scale = m.Init.InitScale * m.Opacity;
 
                 if (!m.GetCustomData<LavaData>().Collided)
                 {
-                    bool wet = Collision.WetCollision(m.Position, (int)m.Size.X, (int)m.Size.Y);
+                    bool wet = Collision.WetCollision(m.Position, (int) m.Size.X, (int) m.Size.Y);
                     float yvel = wet ? .12f : .24f;
                     float maxYvel = wet ? 10f : 20f;
                     if (m.Velocity.Y < maxYvel)
@@ -528,7 +546,8 @@ public static class MetaballRegistry
                         {
                             if (npc.immune[data.Owner] == 0)
                             {
-                                NPC.HitInfo info = npc.CalculateHitInfo(data.Damage, (npc.Center.X > m.Position.X).ToDirectionInt(), false, 0f, DamageClass.Magic, true);
+                                NPC.HitInfo info = npc.CalculateHitInfo(data.Damage,
+                                    (npc.Center.X > m.Position.X).ToDirectionInt(), false, 0f, DamageClass.Magic, true);
                                 npc.StrikeNPC(info);
                                 npc.AddBuff(BuffID.OnFire, 180);
                                 npc.immune[data.Owner] = 20;
@@ -553,6 +572,7 @@ public static class MetaballRegistry
                         {
                             data.Sticking = false;
                         }
+
                         if (enemy != null && data.Sticking)
                         {
                             m.Velocity.Y = 0f;
@@ -564,7 +584,7 @@ public static class MetaballRegistry
                 // actual pyroclast
                 if ((data.Sticking || data.Collided) && Main.rand.NextBool(100) && m.Scale > .3f)
                 {
-                    int size = (int)(Main.rand.Next(30, 50) * m.Scale);
+                    int size = (int) (Main.rand.Next(30, 50) * m.Scale);
                     Metaball metaball = new()
                     {
                         Position = m.Position + Main.rand.NextVector2Circular(m.Size.X / 4, m.Size.Y / 4),
@@ -591,7 +611,8 @@ public static class MetaballRegistry
                     SoundID.SplashWeak.Play(m.Position, 1f, 0f, .2f);
 
                 // bright
-                Lighting.AddLight(m.Position, Color.OrangeRed.ToVector3() * CalculateIntensityForRadius(m.Size.X / 16) * 2.8f * m.Scale);
+                Lighting.AddLight(m.Position,
+                    Color.OrangeRed.ToVector3() * CalculateIntensityForRadius(m.Size.X / 16) * 2.8f * m.Scale);
             },
             DrawLayer: MetaballDrawLayers.AfterProjectiles,
             Draw: null,
@@ -613,7 +634,8 @@ public static class MetaballRegistry
             });
     }
 
-    public static void SpawnLavaMetaball(Vector2 position, Vector2 velocity, int lifetime, int size, int owner, int damage)
+    public static void SpawnLavaMetaball(Vector2 position, Vector2 velocity, int lifetime, int size, int owner,
+        int damage)
     {
         Metaball metaball = new()
         {
@@ -635,17 +657,19 @@ public static class MetaballRegistry
 
         ModContent.GetInstance<MetaballSystem>().AddMetaball(metaball);
     }
+
     #endregion
 
     #region Onyx
+
     private static void OnyxMetaballDefinition()
     {
-        TypeDefinitions[(byte)MetaballTypes.Onyx] = new MetaballTypeDefinition(
+        TypeDefinitions[(byte) MetaballTypes.Onyx] = new MetaballTypeDefinition(
             Texture: AssetRegistry.GetTexture(AdditionsTexture.BrightLight),
             Shader: AssetRegistry.GetShader("OnyxMetaball"),
             Update: static (ref m) =>
             {
-                float timeRatio = (float)m.Time / m.Lifetime;
+                float timeRatio = (float) m.Time / m.Lifetime;
                 m.Opacity = 1f - timeRatio;
                 m.Scale = m.Init.InitScale * m.Opacity;
             },
@@ -658,10 +682,7 @@ public static class MetaballRegistry
                 shader.TrySetParameter("epsilon", .1f);
                 shader.Render();
             },
-            OnCollision: static (ref m) =>
-            {
-                m.Velocity = Vector2.Zero;
-            }
+            OnCollision: static (ref m) => { m.Velocity = Vector2.Zero; }
         );
     }
 
@@ -681,17 +702,19 @@ public static class MetaballRegistry
         };
         ModContent.GetInstance<MetaballSystem>().AddMetaball(metaball);
     }
+
     #endregion
 
     #region Abyssal
+
     private static void AbyssalMetaballDefinition()
     {
-        TypeDefinitions[(byte)MetaballTypes.Abyssal] = new MetaballTypeDefinition(
+        TypeDefinitions[(byte) MetaballTypes.Abyssal] = new MetaballTypeDefinition(
             Texture: AssetRegistry.GetTexture(AdditionsTexture.SunGray),
             Shader: AssetRegistry.GetShader("AbyssalMetaball"),
             Update: static (ref m) =>
             {
-                float timeRatio = (float)m.Time / m.Lifetime;
+                float timeRatio = (float) m.Time / m.Lifetime;
                 m.Opacity = 1f - timeRatio;
                 m.Scale = m.Init.InitScale * m.Opacity;
             },
@@ -705,10 +728,7 @@ public static class MetaballRegistry
                 shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.CausticNoise), 2, SamplerState.LinearWrap);
                 shader.Render();
             },
-            OnCollision: static (ref m) =>
-            {
-                m.Velocity = Vector2.Zero;
-            }
+            OnCollision: static (ref m) => { m.Velocity = Vector2.Zero; }
         );
     }
 
@@ -729,30 +749,32 @@ public static class MetaballRegistry
         };
         ModContent.GetInstance<MetaballSystem>().AddMetaball(metaball);
     }
+
     #endregion
 
     #region Genedies
+
     private static void GenediesMetaballDefinition()
     {
-        TypeDefinitions[(byte)MetaballTypes.Genedies] = new MetaballTypeDefinition(
+        TypeDefinitions[(byte) MetaballTypes.Genedies] = new MetaballTypeDefinition(
             Texture: AssetRegistry.GetTexture(AdditionsTexture.NebulaGas2),
             Shader: AssetRegistry.GetShader("GenediesMetaball"),
             Update: static (ref m) =>
             {
-                float timeRatio = (float)m.Time / m.Lifetime;
+                float timeRatio = (float) m.Time / m.Lifetime;
                 m.Opacity = 1f - timeRatio;
                 m.Scale = m.Init.InitScale * m.Opacity;
                 m.Rotation += (MathF.Abs(m.Velocity.X) + MathF.Abs(m.Velocity.Y)) * .001f;
             },
             Draw: static (ref m, sb) =>
             {
-                Texture2D texture = TypeDefinitions[(byte)m.Type].Texture;
+                Texture2D texture = TypeDefinitions[(byte) m.Type].Texture;
                 Vector2 position = (m.Position - Main.screenPosition) / 2f;
                 Rectangle destRect = new(
-                    (int)position.X,
-                    (int)position.Y,
-                    (int)(m.Size.X * m.Scale / 2f * Utils.MultiLerp(InverseLerp(0f, m.Lifetime, m.Time), 0f, 1f, 0f)),
-                    (int)(m.Size.Y * m.Scale / 2f)
+                    (int) position.X,
+                    (int) position.Y,
+                    (int) (m.Size.X * m.Scale / 2f * Utils.MultiLerp(InverseLerp(0f, m.Lifetime, m.Time), 0f, 1f, 0f)),
+                    (int) (m.Size.Y * m.Scale / 2f)
                 );
                 Color color = m.Color * m.Opacity.Squared();
 
@@ -775,10 +797,7 @@ public static class MetaballRegistry
                 shader.TrySetParameter("epsilon", .3f);
                 shader.Render();
             },
-            OnCollision: static (ref m) =>
-            {
-                m.Velocity = Vector2.Zero;
-            }
+            OnCollision: static (ref m) => { m.Velocity = Vector2.Zero; }
         );
     }
 
@@ -799,5 +818,6 @@ public static class MetaballRegistry
         };
         ModContent.GetInstance<MetaballSystem>().AddMetaball(metaball);
     }
+
     #endregion
 }

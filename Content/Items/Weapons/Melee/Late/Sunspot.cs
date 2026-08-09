@@ -1,8 +1,6 @@
-﻿using CalamityMod.Items.Materials;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.Linq;
-using CalamityMod;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
@@ -22,10 +20,11 @@ public class Sunspot : ModItem, ILocalizedModType, IModType
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Sunspot);
 
     public const int Damage = 1480;
+
     public override void SetDefaults()
     {
         Item.damage = Damage;
-        Item.DamageType = ModContent.GetInstance<TrueMeleeNoSpeedDamageClass>();
+        Item.DamageType = ModContent.GetInstance<MeleeNoSpeedDamageClass>();
         Item.width = 30;
         Item.height = 242;
         Item.useTime = 24;
@@ -44,17 +43,22 @@ public class Sunspot : ModItem, ILocalizedModType, IModType
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
-        tooltips.FirstOrDefault(n => n.Name == "Damage").Text = tooltips.FirstOrDefault(n => n.Name == "Damage").Text.Replace("damage", GetTextValue("Items.SolarBrand.Damage"));
+        tooltips.FirstOrDefault(n => n.Name == "Damage")?.Text = tooltips.FirstOrDefault(n => n.Name == "Damage")
+            ?.Text
+            .Replace("damage", GetTextValue("Items.SolarBrand.Damage"));
         tooltips.ColorLocalization(new(255, 72, 31));
     }
 
-    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor,
+        Color itemColor, Vector2 origin, float scale)
     {
-        DrawInventoryCustomScale(spriteBatch, TextureAssets.Item[Type].Value, position, frame, drawColor, itemColor, origin, scale, .2f, new Vector2(0f, 0f));
+        DrawInventoryCustomScale(spriteBatch, TextureAssets.Item[Type].Value, position, frame, drawColor,
+            origin, scale, .2f, new Vector2(0f, 0f));
         return false;
     }
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback)
     {
         return false;
     }
@@ -64,10 +68,7 @@ public class Sunspot : ModItem, ILocalizedModType, IModType
         Recipe recipe = CreateRecipe();
         recipe.AddIngredient(ModContent.ItemType<SolarBrand>(), 1);
         recipe.AddIngredient(ModContent.ItemType<PlasmaCore>(), 1);
-        recipe.AddIngredient(ModContent.ItemType<UnholyEssence>(), 20);
-        recipe.AddIngredient(ModContent.ItemType<DivineGeode>(), 14);
-        recipe.AddIngredient(ModContent.ItemType<MysteriousCircuitry>(), 15);
-        recipe.AddIngredient(ModContent.ItemType<DubiousPlating>(), 15);
+        //TODO
         recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();
     }

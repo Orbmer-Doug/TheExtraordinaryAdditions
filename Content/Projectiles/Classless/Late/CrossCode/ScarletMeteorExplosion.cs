@@ -15,12 +15,13 @@ public class ScarletMeteorExplosion : ModProjectile
 
     public int FrameX
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
+
     public int FrameY
     {
-        get => (int)Projectile.ai[1];
+        get => (int) Projectile.ai[1];
         set => Projectile.ai[1] = value;
     }
 
@@ -46,23 +47,25 @@ public class ScarletMeteorExplosion : ModProjectile
                 FrameY++;
                 FrameX = 0;
             }
+
             if (FrameY >= 2)
             {
                 Projectile.Kill();
             }
         }
+
         Projectile.FacingUp();
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         // Prevent shredding of literally any enemy with more than one segment
-        Projectile.damage = (int)(Projectile.damage * .9f);
+        Projectile.damage = (int) (Projectile.damage * .9f);
     }
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return CalUtils.CircularHitboxCollision(Projectile.Center, 119f, targetHitbox);
+        return CircularHitboxCollision(Projectile.Center, 119f, targetHitbox);
     }
 
     public override bool PreDraw(ref Color lightColor)
@@ -70,7 +73,8 @@ public class ScarletMeteorExplosion : ModProjectile
         Texture2D tex = Projectile.ThisProjectileTexture();
         Rectangle frame = tex.Frame(Horiz, Vert, FrameX, FrameY);
         Vector2 orig = frame.Size() / 2;
-        Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, frame, Color.White, Projectile.rotation, orig, 1f, 0, 0f);
+        Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, frame, Color.White, Projectile.rotation,
+            orig, 1f, 0, 0f);
         return false;
     }
 }

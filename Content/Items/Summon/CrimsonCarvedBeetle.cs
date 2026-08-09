@@ -10,6 +10,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 using static Terraria.ID.ContentSamples.CreativeHelper;
 
 namespace TheExtraordinaryAdditions.Content.Items.Summon;
+
 public class CrimsonCarvedBeetle : ModItem, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CrimsonCarvedBeetle);
@@ -49,9 +50,11 @@ public class CrimsonCarvedBeetle : ModItem, ILocalizedModType, IModType
         return false;
     }
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback)
     {
-        player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI, 0f, (player.altFunctionUse == ItemAlternativeFunctionID.ActivatedAndUsed).ToInt());
+        player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI, 0f,
+            (player.altFunctionUse == ItemAlternativeFunctionID.ActivatedAndUsed).ToInt());
         return false;
     }
 

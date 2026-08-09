@@ -8,6 +8,7 @@ namespace TheExtraordinaryAdditions.Core.Utilities;
 public static class CollisionUtils
 {
     #region Raycasting
+
     [Flags]
     public enum CollisionTarget : byte
     {
@@ -18,7 +19,8 @@ public static class CollisionUtils
         Players = 1 << 4,
     }
 
-    public static Vector2 LaserCollision(Vector2 start, Vector2 end, CollisionTarget targets, float thickness = 0f, int numRays = 5)
+    public static Vector2 LaserCollision(Vector2 start, Vector2 end, CollisionTarget targets, float thickness = 0f,
+        int numRays = 5)
     {
         List<(Vector2 point, CollisionTarget targetType, bool noTileCollide)> intersections = [];
         float maxDistanceSquared = (end - start).LengthSquared();
@@ -64,12 +66,13 @@ public static class CollisionUtils
                     bool noTileCollide = false;
                     foreach (NPC npc in Main.ActiveNPCs)
                     {
-                        if (npc.Hitbox.Contains((int)npcPoint.Value.X, (int)npcPoint.Value.Y))
+                        if (npc.Hitbox.Contains((int) npcPoint.Value.X, (int) npcPoint.Value.Y))
                         {
                             noTileCollide = npc.noTileCollide;
                             break;
                         }
                     }
+
                     intersections.Add((npcPoint.Value, CollisionTarget.NPCs, noTileCollide));
                 }
             }
@@ -122,6 +125,7 @@ public static class CollisionUtils
                 if (closestTilePoint.HasValue && distanceSquared > closestTileDistanceSquared)
                     continue; // Skip grounded NPCs behind tiles
             }
+
             if (distanceSquared < closestDistanceSquared)
             {
                 closestDistanceSquared = distanceSquared;
@@ -132,7 +136,8 @@ public static class CollisionUtils
         return closestPoint;
     }
 
-    public static Vector2 LaserCollision(Vector2 start, Vector2 end, CollisionTarget targets, out CollisionTarget hitTarget, float thickness = 0f, int numRays = 5)
+    public static Vector2 LaserCollision(Vector2 start, Vector2 end, CollisionTarget targets,
+        out CollisionTarget hitTarget, float thickness = 0f, int numRays = 5)
     {
         List<(Vector2 point, CollisionTarget targetType, bool noTileCollide)> intersections = [];
         float maxDistanceSquared = (end - start).LengthSquared();
@@ -178,12 +183,13 @@ public static class CollisionUtils
                     bool noTileCollide = false;
                     foreach (NPC npc in Main.ActiveNPCs)
                     {
-                        if (npc.Hitbox.Contains((int)npcPoint.Value.X, (int)npcPoint.Value.Y))
+                        if (npc.Hitbox.Contains((int) npcPoint.Value.X, (int) npcPoint.Value.Y))
                         {
                             noTileCollide = npc.noTileCollide;
                             break;
                         }
                     }
+
                     intersections.Add((npcPoint.Value, CollisionTarget.NPCs, noTileCollide));
                 }
             }
@@ -240,6 +246,7 @@ public static class CollisionUtils
                 if (closestTilePoint.HasValue && distanceSquared > closestTileDistanceSquared)
                     continue; // Skip grounded NPCs behind tiles
             }
+
             if (distanceSquared < closestDistanceSquared)
             {
                 closestDistanceSquared = distanceSquared;
@@ -261,7 +268,8 @@ public static class CollisionUtils
     /// <param name="thickness">How many pixels wide should the line be?</param>
     /// <param name="numRays">The more rays the more precise</param>
     /// <returns>The point at which the created line hit a tile in any state</returns>
-    public static Vector2? RaytraceTiles(Vector2 start, Vector2 end, bool topSurfaces = false, float thickness = 0f, int numRays = 5)
+    public static Vector2? RaytraceTiles(Vector2 start, Vector2 end, bool topSurfaces = false, float thickness = 0f,
+        int numRays = 5)
     {
         if (thickness <= 0 || numRays <= 1)
         {
@@ -273,10 +281,10 @@ public static class CollisionUtils
             direction.Normalize();
 
             // Convert start and end to tile coordinates
-            int startX = (int)(start.X / 16f);
-            int startY = (int)(start.Y / 16f);
-            int endX = (int)(end.X / 16f);
-            int endY = (int)(end.Y / 16f);
+            int startX = (int) (start.X / 16f);
+            int startY = (int) (start.Y / 16f);
+            int endX = (int) (end.X / 16f);
+            int endY = (int) (end.Y / 16f);
 
             // DDA setup: determine step direction and distance per tile
             int stepX = direction.X > 0 ? 1 : (direction.X < 0 ? -1 : 0);
@@ -285,8 +293,12 @@ public static class CollisionUtils
             float tDeltaY = direction.Y != 0 ? 16f / Math.Abs(direction.Y) : float.MaxValue;
 
             // Calculate initial tMax for X and Y (distance to next tile boundary)
-            float tMaxX = direction.X != 0 ? ((direction.X > 0 ? startX + 1 : startX) * 16f - start.X) / direction.X : float.MaxValue;
-            float tMaxY = direction.Y != 0 ? ((direction.Y > 0 ? startY + 1 : startY) * 16f - start.Y) / direction.Y : float.MaxValue;
+            float tMaxX = direction.X != 0
+                ? ((direction.X > 0 ? startX + 1 : startX) * 16f - start.X) / direction.X
+                : float.MaxValue;
+            float tMaxY = direction.Y != 0
+                ? ((direction.Y > 0 ? startY + 1 : startY) * 16f - start.Y) / direction.Y
+                : float.MaxValue;
 
             // Current tile position
             int x = startX;
@@ -312,7 +324,8 @@ public static class CollisionUtils
                 {
                     bool solid = Main.tileSolid[tile.TileType] && !Main.tileSolidTop[tile.TileType];
                     if (topSurfaces)
-                        solid |= (Main.tileSolidTop[tile.TileType] && tile.TileFrameY == 0) || TileID.Sets.Platforms[tile.TileType];
+                        solid |= (Main.tileSolidTop[tile.TileType] && tile.TileFrameY == 0) ||
+                                 TileID.Sets.Platforms[tile.TileType];
 
                     if (solid)
                     {
@@ -371,10 +384,10 @@ public static class CollisionUtils
                         }
                         else
                         {
-                            edges.Add([topLeft, topRight]);      // Top edge
+                            edges.Add([topLeft, topRight]); // Top edge
                             edges.Add([bottomLeft, bottomRight]); // Bottom edge
-                            edges.Add([topLeft, bottomLeft]);    // Left edge
-                            edges.Add([topRight, bottomRight]);  // Right edge
+                            edges.Add([topLeft, bottomLeft]); // Left edge
+                            edges.Add([topRight, bottomRight]); // Right edge
                         }
 
                         // Check each edge for intersection with the ray
@@ -395,15 +408,19 @@ public static class CollisionUtils
                                 if (tile.Slope != SlopeType.Solid && !tile.IsHalfBlock)
                                 {
                                     // Project intersection onto slope line
-                                    float tSlope = Vector2.Dot(intersection - slopeStart, slopeEnd - slopeStart) / Vector2.Dot(slopeEnd - slopeStart, slopeEnd - slopeStart);
+                                    float tSlope = Vector2.Dot(intersection - slopeStart, slopeEnd - slopeStart) /
+                                                   Vector2.Dot(slopeEnd - slopeStart, slopeEnd - slopeStart);
                                     if (tSlope < 0 || tSlope > 1)
                                         isValid = false;
                                     else
                                     {
                                         float slopeY = slopeStart.Y + tSlope * (slopeEnd.Y - slopeStart.Y);
-                                        if ((tile.Slope == SlopeType.SlopeDownLeft || tile.Slope == SlopeType.SlopeDownRight) && intersection.Y > slopeY + 0.1f)
+                                        if ((tile.Slope == SlopeType.SlopeDownLeft ||
+                                             tile.Slope == SlopeType.SlopeDownRight) && intersection.Y > slopeY + 0.1f)
                                             isValid = false;
-                                        else if ((tile.Slope == SlopeType.SlopeUpLeft || tile.Slope == SlopeType.SlopeUpRight) && intersection.Y < slopeY - 0.1f)
+                                        else if ((tile.Slope == SlopeType.SlopeUpLeft ||
+                                                  tile.Slope == SlopeType.SlopeUpRight) &&
+                                                 intersection.Y < slopeY - 0.1f)
                                             isValid = false;
                                     }
                                 }
@@ -529,10 +546,10 @@ public static class CollisionUtils
             direction.Normalize();
 
             // Convert start and end to tile coordinates
-            int startX = (int)(start.X / 16f);
-            int startY = (int)(start.Y / 16f);
-            int endX = (int)(end.X / 16f);
-            int endY = (int)(end.Y / 16f);
+            int startX = (int) (start.X / 16f);
+            int startY = (int) (start.Y / 16f);
+            int endX = (int) (end.X / 16f);
+            int endY = (int) (end.Y / 16f);
 
             // DDA setup: determine step direction and distance per tile
             int stepX = direction.X > 0 ? 1 : (direction.X < 0 ? -1 : 0);
@@ -541,8 +558,12 @@ public static class CollisionUtils
             float tDeltaY = direction.Y != 0 ? 16f / Math.Abs(direction.Y) : float.MaxValue;
 
             // Calculate initial tMax for X and Y (distance to next tile boundary)
-            float tMaxX = direction.X != 0 ? ((direction.X > 0 ? startX + 1 : startX) * 16f - start.X) / direction.X : float.MaxValue;
-            float tMaxY = direction.Y != 0 ? ((direction.Y > 0 ? startY + 1 : startY) * 16f - start.Y) / direction.Y : float.MaxValue;
+            float tMaxX = direction.X != 0
+                ? ((direction.X > 0 ? startX + 1 : startX) * 16f - start.X) / direction.X
+                : float.MaxValue;
+            float tMaxY = direction.Y != 0
+                ? ((direction.Y > 0 ? startY + 1 : startY) * 16f - start.Y) / direction.Y
+                : float.MaxValue;
 
             // Current tile position
             int x = startX;
@@ -688,7 +709,8 @@ public static class CollisionUtils
     /// <param name="numRays">The more rays the more precise</param>
     /// <param name="requireHome">Do NPCs need to pass <see cref="NPCTargeting.CanHomeInto(NPC, bool, bool)"/>?</param>
     /// <returns>The point at which the created line hit a NPC's hitbox</returns>
-    public static Vector2? RaytraceNPCs(Vector2 start, Vector2 end, float thickness = 0f, int numRays = 5, bool requireHome = true)
+    public static Vector2? RaytraceNPCs(Vector2 start, Vector2 end, float thickness = 0f, int numRays = 5,
+        bool requireHome = true)
     {
         if (thickness <= 0 || numRays <= 1)
         {
@@ -860,7 +882,7 @@ public static class CollisionUtils
             Vector2? intersect = RaytracePlayers(startOffset, endOffset, 0f, 1);
             if (!intersect.HasValue)
                 continue;
-                
+
             // Project the intersection point onto the main ray (start to end)
             Vector2 intersection = intersect.Value;
             Vector2 toIntersection = intersection - start;
@@ -882,9 +904,9 @@ public static class CollisionUtils
 
         foreach (var (point, t) in intersections)
         {
-            if (!(t < bestT)) 
+            if (!(t < bestT))
                 continue;
-            
+
             bestT = t;
             bestPoint = point;
         }
@@ -926,7 +948,8 @@ public static class CollisionUtils
         // Check if the closest point on the AABB is within the maximum distance
         float closestX = Math.Clamp(start.X, objMinX, objMaxX);
         float closestY = Math.Clamp(start.Y, objMinY, objMaxY);
-        float distanceSquared = (start.X - closestX) * (start.X - closestX) + (start.Y - closestY) * (start.Y - closestY);
+        float distanceSquared =
+            (start.X - closestX) * (start.X - closestX) + (start.Y - closestY) * (start.Y - closestY);
         return distanceSquared <= (end - start).LengthSquared();
     }
 
@@ -958,6 +981,7 @@ public static class CollisionUtils
                 E -= verticalDistance;
                 x += horizontalIncrement;
             }
+
             if (E2 <= horizontalDistance)
             {
                 if (y == y1)
@@ -1011,10 +1035,13 @@ public static class CollisionUtils
                 y += verticalIncrement;
                 e += horizontalDistance;
             }
+
             i--;
         }
+
         return null;
     }
+
     #endregion
 
     /// <summary>
@@ -1077,24 +1104,30 @@ public static class CollisionUtils
         return (min, max);
     }
 
-    public static Vector2 ResolveCollision(ref Rectangle rect, RotatedRectangle rotatedRect, Vector2 velocity, out bool collisionOccurred, int iterations = 4)
+    public static Vector2 ResolveCollision(ref Rectangle rect, RotatedRectangle rotatedRect, Vector2 velocity,
+        out bool collisionOccurred, int iterations = 4)
     {
         collisionOccurred = false;
         iterations = Math.Max(1, Math.Min(iterations, 10));
 
         Vector2 newPosition = new Vector2(rect.X, rect.Y) + velocity;
-        Rectangle testRect = new((int)newPosition.X, (int)newPosition.Y, rect.Width, rect.Height);
+        Rectangle testRect = new((int) newPosition.X, (int) newPosition.Y, rect.Width, rect.Height);
 
-        Vector2[] rotatedCorners = [rotatedRect.Top, rotatedRect.TopRight, rotatedRect.BottomRight, rotatedRect.BottomLeft];
-        float minX = Math.Min(rotatedCorners[0].X, Math.Min(rotatedCorners[1].X, Math.Min(rotatedCorners[2].X, rotatedCorners[3].X)));
-        float minY = Math.Min(rotatedCorners[0].Y, Math.Min(rotatedCorners[1].Y, Math.Min(rotatedCorners[2].Y, rotatedCorners[3].Y)));
-        float maxX = Math.Max(rotatedCorners[0].X, Math.Max(rotatedCorners[1].X, Math.Max(rotatedCorners[2].X, rotatedCorners[3].X)));
-        float maxY = Math.Max(rotatedCorners[0].Y, Math.Max(rotatedCorners[1].Y, Math.Max(rotatedCorners[2].Y, rotatedCorners[3].Y)));
+        Vector2[] rotatedCorners =
+            [rotatedRect.Top, rotatedRect.TopRight, rotatedRect.BottomRight, rotatedRect.BottomLeft];
+        float minX = Math.Min(rotatedCorners[0].X,
+            Math.Min(rotatedCorners[1].X, Math.Min(rotatedCorners[2].X, rotatedCorners[3].X)));
+        float minY = Math.Min(rotatedCorners[0].Y,
+            Math.Min(rotatedCorners[1].Y, Math.Min(rotatedCorners[2].Y, rotatedCorners[3].Y)));
+        float maxX = Math.Max(rotatedCorners[0].X,
+            Math.Max(rotatedCorners[1].X, Math.Max(rotatedCorners[2].X, rotatedCorners[3].X)));
+        float maxY = Math.Max(rotatedCorners[0].Y,
+            Math.Max(rotatedCorners[1].Y, Math.Max(rotatedCorners[2].Y, rotatedCorners[3].Y)));
 
         if (testRect.Right < minX || testRect.Left > maxX || testRect.Bottom < minY || testRect.Top > maxY)
         {
-            rect.X = (int)newPosition.X;
-            rect.Y = (int)newPosition.Y;
+            rect.X = (int) newPosition.X;
+            rect.Y = (int) newPosition.Y;
             return velocity;
         }
 
@@ -1103,8 +1136,8 @@ public static class CollisionUtils
 
         if (!GetSeparationInfo(testRect, rotatedRect, out _, out _))
         {
-            rect.X = (int)newPosition.X;
-            rect.Y = (int)newPosition.Y;
+            rect.X = (int) newPosition.X;
+            rect.Y = (int) newPosition.Y;
             return velocity;
         }
 
@@ -1116,7 +1149,7 @@ public static class CollisionUtils
         for (int i = 0; i < iterations; i++)
         {
             Vector2 currentPos = new Vector2(rect.X, rect.Y) + (step * i);
-            testRect = new Rectangle((int)currentPos.X, (int)currentPos.Y, rect.Width, rect.Height);
+            testRect = new Rectangle((int) currentPos.X, (int) currentPos.Y, rect.Width, rect.Height);
 
             if (testRect.Right < minX || testRect.Left > maxX || testRect.Bottom < minY || testRect.Top > maxY)
                 continue;
@@ -1124,8 +1157,9 @@ public static class CollisionUtils
             if (GetSeparationInfo(testRect, rotatedRect, out Vector2 penetration, out Vector2 normal))
             {
                 if (!wasColliding && i == 0 || (i > 0 && !GetSeparationInfo(
-                    new Rectangle((int)(currentPos.X - step.X), (int)(currentPos.Y - step.Y), rect.Width, rect.Height),
-                    rotatedRect, out _, out _)))
+                        new Rectangle((int) (currentPos.X - step.X), (int) (currentPos.Y - step.Y), rect.Width,
+                            rect.Height),
+                        rotatedRect, out _, out _)))
                 {
                     collisionOccurred = true;
                 }
@@ -1150,12 +1184,13 @@ public static class CollisionUtils
             }
         }
 
-        rect.X = (int)(newPosition.X + resolvedVelocity.X);
-        rect.Y = (int)(newPosition.Y + resolvedVelocity.Y);
+        rect.X = (int) (newPosition.X + resolvedVelocity.X);
+        rect.Y = (int) (newPosition.Y + resolvedVelocity.Y);
         return resolvedVelocity;
     }
 
-    private static bool GetSeparationInfo(Rectangle rect, RotatedRectangle rotatedRect, out Vector2 penetrationVector, out Vector2 normal)
+    private static bool GetSeparationInfo(Rectangle rect, RotatedRectangle rotatedRect, out Vector2 penetrationVector,
+        out Vector2 normal)
     {
         penetrationVector = Vector2.Zero;
         normal = Vector2.Zero;
@@ -1274,9 +1309,9 @@ public static class CollisionUtils
     public static bool IsRectangleIntersectingTriangle(Rectangle rect, Vector2 v0, Vector2 v1, Vector2 v2)
     {
         // Check if any triangle vertex is inside the rectangle
-        if (rect.Contains((int)v0.X, (int)v0.Y) ||
-            rect.Contains((int)v1.X, (int)v1.Y) ||
-            rect.Contains((int)v2.X, (int)v2.Y))
+        if (rect.Contains((int) v0.X, (int) v0.Y) ||
+            rect.Contains((int) v1.X, (int) v1.Y) ||
+            rect.Contains((int) v2.X, (int) v2.Y))
             return true;
 
         // Check if any rectangle vertex is inside the triangle
@@ -1301,7 +1336,7 @@ public static class CollisionUtils
             rectCorners[0], rectCorners[1], // Top
             rectCorners[1], rectCorners[2], // Right
             rectCorners[2], rectCorners[3], // Bottom
-            rectCorners[3], rectCorners[0]  // Left
+            rectCorners[3], rectCorners[0] // Left
         ];
 
         for (int i = 0; i < 3; i++)
@@ -1347,12 +1382,12 @@ public static class CollisionUtils
         if (D.X > 0)
         {
             tEnter = Math.Max(tEnter, (minX - A.X) / D.X); // Entering x >= minX
-            tExit = Math.Min(tExit, (maxX - A.X) / D.X);   // Exiting x <= maxX
+            tExit = Math.Min(tExit, (maxX - A.X) / D.X); // Exiting x <= maxX
         }
         else if (D.X < 0)
         {
             tEnter = Math.Max(tEnter, (maxX - A.X) / D.X); // Entering x <= maxX
-            tExit = Math.Min(tExit, (minX - A.X) / D.X);   // Exiting x >= minX
+            tExit = Math.Min(tExit, (minX - A.X) / D.X); // Exiting x >= minX
         }
         else // D.X == 0
         {
@@ -1365,12 +1400,12 @@ public static class CollisionUtils
         if (D.Y > 0)
         {
             tEnter = Math.Max(tEnter, (minY - A.Y) / D.Y); // Entering y >= minY
-            tExit = Math.Min(tExit, (maxY - A.Y) / D.Y);   // Exiting y <= maxY
+            tExit = Math.Min(tExit, (maxY - A.Y) / D.Y); // Exiting y <= maxY
         }
         else if (D.Y < 0)
         {
             tEnter = Math.Max(tEnter, (maxY - A.Y) / D.Y); // Entering y <= maxY
-            tExit = Math.Min(tExit, (minY - A.Y) / D.Y);   // Exiting y >= minY
+            tExit = Math.Min(tExit, (minY - A.Y) / D.Y); // Exiting y >= minY
         }
         else // D.Y == 0
         {
@@ -1394,7 +1429,8 @@ public static class CollisionUtils
         return null; // No intersection
     }
 
-    public static bool CheckLinearCollision(Vector2 point1, Vector2 point2, Rectangle hitbox, out Vector2 start, out Vector2 end)
+    public static bool CheckLinearCollision(Vector2 point1, Vector2 point2, Rectangle hitbox, out Vector2 start,
+        out Vector2 end)
     {
         (Vector2 start, Vector2 end)? points = GetIntersectionPoints(point1, point2, hitbox);
         if (points.HasValue)
@@ -1422,7 +1458,7 @@ public static class CollisionUtils
         for (int i = 0; i < list.Count; i++)
         {
             Vector2 point = list[i];
-            if (new Rectangle((int)point.X - width / 2, (int)point.Y - width / 2, width, width).Intersects(target))
+            if (new Rectangle((int) point.X - width / 2, (int) point.Y - width / 2, width, width).Intersects(target))
                 return true;
         }
 
@@ -1437,15 +1473,16 @@ public static class CollisionUtils
         for (int i = 0; i < span.Length; i++)
         {
             Vector2 point = span[i];
-            int size = (int)width(InverseLerp(0f, span.Length, i));
-            if (new Rectangle((int)point.X - size / 2, (int)point.Y - size / 2, size, size).Intersects(target))
+            int size = (int) width(InverseLerp(0f, span.Length, i));
+            if (new Rectangle((int) point.X - size / 2, (int) point.Y - size / 2, size, size).Intersects(target))
                 return true;
         }
 
         return false;
     }
 
-    public static bool EllipseCollision(Rectangle target, float ellipseWidth, float ellipseHeight, float ellipseRotation, Vector2 ellipseCenter)
+    public static bool EllipseCollision(Rectangle target, float ellipseWidth, float ellipseHeight,
+        float ellipseRotation, Vector2 ellipseCenter)
     {
         // Rectangle center and half-extents
         Vector2 rectCenter = new(target.Center.X, target.Center.Y);
@@ -1459,8 +1496,8 @@ public static class CollisionUtils
         float b = ellipseHeight / 2f; // Half of minor axis
 
         // Ellipse rotation matrix components
-        float cosRot = (float)Math.Cos(ellipseRotation);
-        float sinRot = (float)Math.Sin(ellipseRotation);
+        float cosRot = (float) Math.Cos(ellipseRotation);
+        float sinRot = (float) Math.Sin(ellipseRotation);
 
         // Test axes: rectangle's X and Y, and ellipse's major and minor axes
         Vector2[] axes =
@@ -1478,7 +1515,7 @@ public static class CollisionUtils
 
             // Project ellipse onto axis
             float ellipseProj = a * Math.Abs(axis.X * cosRot + axis.Y * sinRot) +
-                               b * Math.Abs(axis.X * -sinRot + axis.Y * cosRot);
+                                b * Math.Abs(axis.X * -sinRot + axis.Y * cosRot);
 
             // Project ellipse center onto axis
             float centerProj = Math.Abs(Vector2.Dot(translatedEllipseCenter, axis));
@@ -1489,5 +1526,19 @@ public static class CollisionUtils
         }
 
         return true; // No separating axis found, shapes intersect
+    }
+
+    public static bool CircularHitboxCollision(Vector2 centerCheckPosition, float radius, Rectangle targetHitbox)
+    {
+        if (radius <= 0f)
+            return false;
+
+        float closestX = MathHelper.Clamp(centerCheckPosition.X, targetHitbox.Left, targetHitbox.Right);
+        float closestY = MathHelper.Clamp(centerCheckPosition.Y, targetHitbox.Top, targetHitbox.Bottom);
+
+        float dx = centerCheckPosition.X - closestX;
+        float dy = centerCheckPosition.Y - closestY;
+
+        return (dx * dx + dy * dy) <= (radius * radius);
     }
 }

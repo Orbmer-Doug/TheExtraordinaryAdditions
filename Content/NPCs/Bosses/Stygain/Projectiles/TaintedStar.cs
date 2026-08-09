@@ -27,13 +27,13 @@ public class TaintedStar : ProjOwnedByNPC<StygainHeart>
 
     public int Timer
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
 
     public bool Telegraph
     {
-        get => (int)Projectile.ai[1] == 1;
+        get => (int) Projectile.ai[1] == 1;
         set => Projectile.ai[1] = value.ToInt();
     }
 
@@ -116,14 +116,15 @@ public class TaintedStar : ProjOwnedByNPC<StygainHeart>
         {
             Texture2D starTexture = AssetRegistry.GetTexture(AdditionsTexture.Sparkle);
             Texture2D bloomTexture = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
-            float properBloomSize = starTexture.Height / (float)bloomTexture.Height;
+            float properBloomSize = starTexture.Height / (float) bloomTexture.Height;
             float rotation = Main.GlobalTimeWrappedHourly * 14f;
             Vector2 sparkCenter = Projectile.Center - Main.screenPosition;
             Main.EntitySpriteDraw(bloomTexture, sparkCenter, null, Color.IndianRed, 0f, bloomTexture.Size() / 2f,
                 properBloomSize, 0);
             Main.EntitySpriteDraw(starTexture, sparkCenter, null, Color.DarkRed, -rotation + MathHelper.PiOver4,
                 starTexture.Size() / 2f, 1.2f, 0);
-            Main.EntitySpriteDraw(starTexture, sparkCenter, null, Color.Red, rotation, starTexture.Size() / 2f, 1.7f, 0);
+            Main.EntitySpriteDraw(starTexture, sparkCenter, null, Color.Red, rotation, starTexture.Size() / 2f, 1.7f,
+                0);
 
             if (Telegraph)
             {

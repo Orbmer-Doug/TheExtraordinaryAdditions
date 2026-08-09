@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Terraria;
+﻿using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Common.Particles.Shader;
 
@@ -8,11 +7,12 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 public class MeltGlobule : ModProjectile, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.friendly = true;
         Projectile.width =
-        Projectile.height = 26;
+            Projectile.height = 26;
         Projectile.penetrate = 5;
         Projectile.timeLeft = 360;
         Projectile.tileCollide = true;

@@ -19,11 +19,7 @@ public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
     /// <summary>
     /// The rotation of this beam
     /// </summary>
-    public Quaternion Rotation
-    {
-        get;
-        set;
-    }
+    public Quaternion Rotation { get; set; }
 
     /// <summary>
     /// How long this beam has existed
@@ -45,7 +41,7 @@ public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
     /// </summary>
     public int SwayCounter
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[0];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[0];
         set => Projectile.AdditionsInfo().ExtraAI[0] = value;
     }
 
@@ -108,7 +104,8 @@ public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
     public override void SafeAI()
     {
         // Update the menacing sound
-        gamma ??= LoopedSoundManager.CreateNew(new(AdditionsSound.sunAura, () => MathHelper.Clamp(Projectile.scale, 0f, 1f), () => -.08f),
+        gamma ??= LoopedSoundManager.CreateNew(
+            new(AdditionsSound.sunAura, () => MathHelper.Clamp(Projectile.scale, 0f, 1f), () => -.08f),
             () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
         gamma.Update(Projectile.Center);
 
@@ -118,7 +115,8 @@ public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
         float minAngle = .2f;
         float maxAngle = MathHelper.Pi - minAngle;
         if (Time < Asterlin.Hyperbeam_BeamBuildTime)
-            SideAngle = Animators.MakePoly(2.2f).OutFunction.Evaluate(Time, 0f, Asterlin.Hyperbeam_BeamBuildTime, MathHelper.PiOver2, maxAngle);
+            SideAngle = Animators.MakePoly(2.2f).OutFunction
+                .Evaluate(Time, 0f, Asterlin.Hyperbeam_BeamBuildTime, MathHelper.PiOver2, maxAngle);
         else
         {
             SideAngle = MathHelper.Lerp(minAngle, maxAngle, Cos01(SwayCounter * .01f));
@@ -131,17 +129,23 @@ public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
 
         if (ModOwner.Hyperbeam_CurrentState == Asterlin.Hyperbeam_States.Fade)
         {
-            LaserbeamLength = Animators.Sine.InOutFunction.Evaluate(ModOwner.AITimer, 0f, Asterlin.Hyperbeam_FadeTime, MaxLaserbeamLength, 0f);
-            Projectile.Opacity = Animators.MakePoly(2.2f).InFunction.Evaluate(ModOwner.AITimer, 0f, Asterlin.Hyperbeam_FadeTime * .35f, 1f, 0f);
-            Projectile.scale = Animators.MakePoly(3f).InOutFunction.Evaluate(ModOwner.AITimer, 0f, Asterlin.Hyperbeam_FadeTime, 2f, 0f);
+            LaserbeamLength = Animators.Sine.InOutFunction.Evaluate(ModOwner.AITimer, 0f, Asterlin.Hyperbeam_FadeTime,
+                MaxLaserbeamLength, 0f);
+            Projectile.Opacity = Animators.MakePoly(2.2f).InFunction
+                .Evaluate(ModOwner.AITimer, 0f, Asterlin.Hyperbeam_FadeTime * .35f, 1f, 0f);
+            Projectile.scale = Animators.MakePoly(3f).InOutFunction
+                .Evaluate(ModOwner.AITimer, 0f, Asterlin.Hyperbeam_FadeTime, 2f, 0f);
             if (LaserbeamLength <= 0f)
                 Projectile.Kill();
         }
         else if (ModOwner.Hyperbeam_CurrentState != Asterlin.Hyperbeam_States.Fade)
         {
-            LaserbeamLength = Animators.CubicBezier(.12f, 1f, .61f, .98f).Evaluate(Time, 0f, Asterlin.Hyperbeam_BeamBuildTime, 0f, MaxLaserbeamLength);
-            Projectile.Opacity = Animators.MakePoly(2.2f).OutFunction.Evaluate(Time, 0f, Asterlin.Hyperbeam_BeamBuildTime * .35f, 0f, 1f);
-            Projectile.scale = Animators.MakePoly(3f).InOutFunction.Evaluate(Time, 0f, Asterlin.Hyperbeam_BeamBuildTime * .6f, 0f, 2f);
+            LaserbeamLength = Animators.CubicBezier(.12f, 1f, .61f, .98f)
+                .Evaluate(Time, 0f, Asterlin.Hyperbeam_BeamBuildTime, 0f, MaxLaserbeamLength);
+            Projectile.Opacity = Animators.MakePoly(2.2f).OutFunction
+                .Evaluate(Time, 0f, Asterlin.Hyperbeam_BeamBuildTime * .35f, 0f, 1f);
+            Projectile.scale = Animators.MakePoly(3f).InOutFunction
+                .Evaluate(Time, 0f, Asterlin.Hyperbeam_BeamBuildTime * .6f, 0f, 2f);
         }
 
         Time++;
@@ -172,10 +176,12 @@ public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
         float distanceToProjection = Vector3.Distance(endPoint, targetCenter);
 
         // Check if the target is in the lasers forward direction within a 16~ degree cone (arccos(.96) = 16 degrees)
-        return distanceToProjection <= Projectile.width * Projectile.scale && Vector3.Dot(directionToTarget, rayDirection) >= 0.96f;
+        return distanceToProjection <= Projectile.width * Projectile.scale &&
+               Vector3.Dot(directionToTarget, rayDirection) >= 0.96f;
     }
 
-    public void GetBloomVerticesAndIndices(Color baseColor, Vector3 start, Vector3 end, out Vertex2D[] leftVertices, out Vertex2D[] rightVertices, out int[] indices)
+    public void GetBloomVerticesAndIndices(Color baseColor, Vector3 start, Vector3 end, out Vertex2D[] leftVertices,
+        out Vertex2D[] rightVertices, out int[] indices)
     {
         int numVertices = (CylinderWidthSegments + 1) * (CylinderHeightSegments + 1);
         int numIndices = CylinderWidthSegments * CylinderHeightSegments * 6;
@@ -186,11 +192,13 @@ public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
 
         for (int i = 0; i < BloomSubdivisions; i++)
         {
-            float subdivisionInterpolant = i / (float)(BloomSubdivisions - 1f);
+            float subdivisionInterpolant = i / (float) (BloomSubdivisions - 1f);
             float bloomWidthFactor = subdivisionInterpolant * 1.3f + 1f;
             Color bloomColor = baseColor * MathHelper.SmoothStep(0.05f, 0.005f, MathF.Sqrt(subdivisionInterpolant));
-            GetVerticesAndIndices(bloomWidthFactor, bloomColor, start, end, MathHelper.Pi, out Vertex2D[] localRightVertices, out int[] localIndices);
-            GetVerticesAndIndices(bloomWidthFactor, bloomColor, start, end, 0f, out Vertex2D[] localLeftVertices, out _);
+            GetVerticesAndIndices(bloomWidthFactor, bloomColor, start, end, MathHelper.Pi,
+                out Vertex2D[] localRightVertices, out int[] localIndices);
+            GetVerticesAndIndices(bloomWidthFactor, bloomColor, start, end, 0f, out Vertex2D[] localLeftVertices,
+                out _);
 
             for (int j = 0; j < localIndices.Length; j++)
                 indices[j + i * numIndices] = localIndices[j] + i * numVertices;
@@ -212,7 +220,8 @@ public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
     /// <param name="cylinderOffsetAngle">The offset angle of the vertices on the cylinder.</param>
     /// <param name="vertices">The resulting vertices.</param>
     /// <param name="indices">The resulting indices.</param>
-    public void GetVerticesAndIndices(float widthFactor, Color baseColor, Vector3 start, Vector3 end, float cylinderOffsetAngle, out Vertex2D[] vertices, out int[] indices)
+    public void GetVerticesAndIndices(float widthFactor, Color baseColor, Vector3 start, Vector3 end,
+        float cylinderOffsetAngle, out Vertex2D[] vertices, out int[] indices)
     {
         int numVertices = (CylinderWidthSegments + 1) * (CylinderHeightSegments + 1);
         int numIndices = CylinderWidthSegments * CylinderHeightSegments * 6;
@@ -233,16 +242,19 @@ public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
             Vector3 cylinderPoint = start + direction * (length * curvedHeightFactor);
 
             // Taper width with a smooth decrease, rounding at the top
-            float baseWidth = Utils.Remap(heightInterpolant, 0f, 0.67f, 32f, Projectile.width * Projectile.scale) * widthFactor;
+            float baseWidth = Utils.Remap(heightInterpolant, 0f, 0.67f, 32f, Projectile.width * Projectile.scale) *
+                              widthFactor;
             float taperFactor = 1f - MathF.Pow(heightInterpolant, 3.4f);
             float width = baseWidth * taperFactor;
 
             for (int j = 0; j <= CylinderWidthSegments; j++)
             {
                 float angle = MathHelper.Pi * j * widthStep + cylinderOffsetAngle;
-                Vector3 orthogonalOffset = Vector3.Transform(new Vector3(0f, MathF.Sin(angle), MathF.Cos(angle)), Rotation) * width;
+                Vector3 orthogonalOffset =
+                    Vector3.Transform(new Vector3(0f, MathF.Sin(angle), MathF.Cos(angle)), Rotation) * width;
                 Vector3 finalPoint = cylinderPoint + orthogonalOffset;
-                vertices[i * (CylinderWidthSegments + 1) + j] = new(new(finalPoint.X, finalPoint.Y), baseColor, new SystemVector2(heightInterpolant, j * widthStep));
+                vertices[i * (CylinderWidthSegments + 1) + j] = new(new(finalPoint.X, finalPoint.Y), baseColor,
+                    new SystemVector2(heightInterpolant, j * widthStep));
             }
         }
 
@@ -284,12 +296,16 @@ public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
             Color bloomColor = Color.Orange with { A = 0 };
             ManagedShader bloomShader = ShaderRegistry.StandardPrimitiveShader;
             bloomShader.Render();
-            GetBloomVerticesAndIndices(bloomColor, start, end, out Vertex2D[] leftVertices, out Vertex2D[] rightVertices, out int[] indices);
-            gd.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, rightVertices, 0, rightVertices.Length, indices, 0, indices.Length / 3);
-            gd.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, leftVertices, 0, leftVertices.Length, indices, 0, indices.Length / 3);
+            GetBloomVerticesAndIndices(bloomColor, start, end, out Vertex2D[] leftVertices,
+                out Vertex2D[] rightVertices, out int[] indices);
+            gd.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, rightVertices, 0, rightVertices.Length, indices, 0,
+                indices.Length / 3);
+            gd.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, leftVertices, 0, leftVertices.Length, indices, 0,
+                indices.Length / 3);
 
             // Render the laser
-            Color color = new Color((byte)(byte.MaxValue * .961f), (byte)(byte.MaxValue * .592f), (byte)(byte.MaxValue * .078f));
+            Color color = new Color((byte) (byte.MaxValue * .961f), (byte) (byte.MaxValue * .592f),
+                (byte) (byte.MaxValue * .078f));
             ManagedShader shader = AssetRegistry.GetShader("AsterlinDeathrayShader");
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DendriticNoiseDim), 1, SamplerState.LinearWrap);
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.SuperPerlin), 2, SamplerState.LinearWrap);
@@ -297,11 +313,13 @@ public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
             shader.Render();
 
             GetVerticesAndIndices(1f, color, start, end, MathHelper.Pi, out rightVertices, out indices);
-            gd.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, rightVertices, 0, rightVertices.Length, indices, 0, indices.Length / 3);
+            gd.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, rightVertices, 0, rightVertices.Length, indices, 0,
+                indices.Length / 3);
             GetVerticesAndIndices(1f, color, start, end, 0f, out leftVertices, out _);
-            gd.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, leftVertices, 0, leftVertices.Length, indices, 0, indices.Length / 3);
-
+            gd.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, leftVertices, 0, leftVertices.Length, indices, 0,
+                indices.Length / 3);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(drawLaser, PixelationLayer.OverPlayers);
         return false;
     }

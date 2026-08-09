@@ -29,6 +29,7 @@ public class AstralKatanaSlice : ModProjectile
             AstralKatanaSweep.AstralOrangePalette[Main.rand.Next(0, AstralKatanaSweep.AstralOrangePalette.Length)];
         return blue ? (randBlue, randOrange) : (randOrange, randBlue);
     }
+
     public override void AI()
     {
         (Color, Color) pixelCol = GetRandomColor();
@@ -36,14 +37,14 @@ public class AstralKatanaSlice : ModProjectile
             -Projectile.velocity * Main.rand.NextFloat(.2f, .5f),
             Main.rand.Next(50, 58), Main.rand.NextFloat(.8f, 1.9f), pixelCol.Item1, pixelCol.Item2,
             4, false, false, Main.rand.NextFloat(-.1f, .1f));
-        
+
         if (Main.rand.NextBool(2))
             ParticleRegistry.SpawnBlurParticle(Projectile.Center, 50, 3.5f, 30f, .3f);
 
         (Color, Color) cloudCol = GetRandomColor();
-        ParticleRegistry.SpawnCloudParticle(Projectile.Center + Main.rand.NextVector2Circular(20, 20), 
-            Main.rand.NextVector2Circular(.3f, .3f), cloudCol.Item1,  cloudCol.Item2, 
-            Main.rand.Next(20, 35),Main.rand.NextFloat(20f, 35f), Main.rand.NextFloat(.65f, 1f), 2);
+        ParticleRegistry.SpawnCloudParticle(Projectile.Center + Main.rand.NextVector2Circular(20, 20),
+            Main.rand.NextVector2Circular(.3f, .3f), cloudCol.Item1, cloudCol.Item2,
+            Main.rand.Next(20, 35), Main.rand.NextFloat(20f, 35f), Main.rand.NextFloat(.65f, 1f), 2);
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)

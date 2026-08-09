@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -10,10 +9,11 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 public class IchorGlobule : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.width =
-        Projectile.height = 10;
+            Projectile.height = 10;
         Projectile.friendly = true;
         Projectile.penetrate = 1;
         Projectile.ignoreWater = true;
@@ -24,6 +24,7 @@ public class IchorGlobule : ModProjectile
 
     public ref float Time => ref Projectile.ai[1];
     public override bool? CanHitNPC(NPC target) => Time >= 35f ? null : false;
+
     public override void AI()
     {
         Time++;
@@ -31,11 +32,14 @@ public class IchorGlobule : ModProjectile
         Vector2 vel = Projectile.velocity.RotatedByRandom(.05f) * Main.rand.NextFloat(.1f, .2f);
         int life = Main.rand.Next(40, 50);
         float scale = Main.rand.NextFloat(1.4f, 1.7f);
-        ParticleRegistry.SpawnSquishyPixelParticle(Projectile.Center, vel, life, scale, Color.Gold, Color.PaleGoldenrod, 3, true);
-        Dust.NewDustPerfect(Projectile.RandAreaInEntity(), DustID.IchorTorch, vel * .1f, 0, default, Main.rand.NextFloat(.8f, 1.1f)).noGravity = true;
+        ParticleRegistry.SpawnSquishyPixelParticle(Projectile.Center, vel, life, scale, Color.Gold, Color.PaleGoldenrod,
+            3, true);
+        Dust.NewDustPerfect(Projectile.RandAreaInEntity(), DustID.IchorTorch, vel * .1f, 0, default,
+            Main.rand.NextFloat(.8f, 1.1f)).noGravity = true;
 
         if (NPCTargeting.TryGetClosestNPC(new(Projectile.Center, 650, true), out NPC target) && Time >= 35f)
-            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.SafeDirectionTo(target.Center) * 10f, .4f);
+            Projectile.velocity =
+                Vector2.SmoothStep(Projectile.velocity, Projectile.SafeDirectionTo(target.Center) * 10f, .4f);
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)

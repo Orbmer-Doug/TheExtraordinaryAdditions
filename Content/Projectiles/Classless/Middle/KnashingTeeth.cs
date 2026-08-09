@@ -11,6 +11,7 @@ public class KnashingTeeth : ModProjectile
     public override string Texture => AssetRegistry.Invis;
 
     private const int Lifetime = 200;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 2;
@@ -26,13 +27,14 @@ public class KnashingTeeth : ModProjectile
     public ref float RotationX => ref Projectile.ai[1];
     public ref float RotationY => ref Projectile.ai[2];
     public ref float Pullback => ref Projectile.localAI[0];
+
     public override void AI()
     {
         Time++;
 
         Vector2 projCenter = Projectile.Center;
         Projectile.scale = 1.1f - Pullback;
-        Projectile.width = (int)(20f * Projectile.scale);
+        Projectile.width = (int) (20f * Projectile.scale);
         Projectile.height = Projectile.width;
         Projectile.position.X = projCenter.X - Projectile.width / 2;
         Projectile.position.Y = projCenter.Y - Projectile.height / 2;
@@ -51,6 +53,7 @@ public class KnashingTeeth : ModProjectile
             // Gives the snappy poke at the end
             Projectile.velocity *= 20f;
         }
+
         Projectile.velocity = Projectile.velocity.RotatedBy(RotationX);
         RotationX *= 1.05f;
 
@@ -72,7 +75,8 @@ public class KnashingTeeth : ModProjectile
                     30, Main.rand.NextFloat(.3f, .5f), Color.DarkRed);
             }
 
-            ParticleRegistry.SpawnBloodParticle(Projectile.Center, -Projectile.velocity.RotatedByRandom(.5f) * Main.rand.NextFloat(.7f, 2f),
+            ParticleRegistry.SpawnBloodParticle(Projectile.Center,
+                -Projectile.velocity.RotatedByRandom(.5f) * Main.rand.NextFloat(.7f, 2f),
                 Main.rand.Next(48, 56), Main.rand.NextFloat(.5f, .9f),
                 Color.Lerp(Color.Crimson, Color.Red, Main.rand.NextFloat(.2f, .9f)));
 

@@ -18,7 +18,8 @@ public class AdditionsHooks
 
         public override void Load()
         {
-            MethodBase setVolumeMethod = typeof(SoundStyle).GetMethod("set_Volume", BindingFlags.Public | BindingFlags.Instance);
+            MethodBase setVolumeMethod =
+                typeof(SoundStyle).GetMethod("set_Volume", BindingFlags.Public | BindingFlags.Instance);
 
             if (setVolumeMethod is null)
             {
@@ -44,7 +45,7 @@ public class AdditionsHooks
 
             // Try to find the ldc.r4 1 instruction
             if (!cursor.TryGotoNext(MoveType.Before,
-                i => i.OpCode == OpCodes.Ldc_R4 && i.Operand is float f && f == 1f))
+                    i => i.OpCode == OpCodes.Ldc_R4 && i.Operand is float f && f == 1f))
             {
                 AdditionsMain.Instance.Logger.Error("Could not find ldc.r4 1 instruction in SoundStyle.set_Volume");
                 return;

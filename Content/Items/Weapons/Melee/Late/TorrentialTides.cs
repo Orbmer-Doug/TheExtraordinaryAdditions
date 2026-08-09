@@ -1,8 +1,4 @@
-﻿using CalamityMod.Items.Materials;
-using CalamityMod.Items.Placeables;
-using System.Collections.Generic;
-using CalamityMod;
-using CalamityMod.Items.Placeables.FurnitureVoid;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -29,13 +25,13 @@ public class TorrentialTides : ModItem
         Item.UseSound = null;
         Item.rare = ModContent.RarityType<BrackishRarity>();
         Item.value = AdditionsGlobalItem.UniqueRarityPrice;
-        Item.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
+        Item.DamageType = ModContent.GetInstance<MeleeNoSpeedDamageClass>();
         Item.shoot = ModContent.ProjectileType<TorrentialCleave>();
         Item.noMelee = true;
         Item.noUseGraphic = true;
         Item.autoReuse = true;
     }
-    
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(new Color(96, 143, 181));
@@ -47,9 +43,7 @@ public class TorrentialTides : ModItem
     {
         Recipe recipe = CreateRecipe();
         recipe.AddIngredient(ItemID.Flairon, 1);
-        recipe.AddIngredient(ModContent.ItemType<Lumenyl>(), 18);
-        recipe.AddIngredient(ModContent.ItemType<SmoothVoidstone>(), 250);
-        recipe.AddIngredient(ModContent.ItemType<ReaperTooth>(), 6);
+        //TODO
         recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();
     }

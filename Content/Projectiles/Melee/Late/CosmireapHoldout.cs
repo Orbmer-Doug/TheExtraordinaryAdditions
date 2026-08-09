@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -36,14 +35,14 @@ public sealed class CosmireapSweep : BaseSwordSwing
 
     public int SwingCounter
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[7];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[7];
         set => Projectile.AdditionsInfo().ExtraAI[7] = value;
     }
 
     public ReaperState CurrentState
     {
-        get => (ReaperState)Projectile.AdditionsInfo().ExtraAI[8];
-        set => Projectile.AdditionsInfo().ExtraAI[8] = (int)value;
+        get => (ReaperState) Projectile.AdditionsInfo().ExtraAI[8];
+        set => Projectile.AdditionsInfo().ExtraAI[8] = (int) value;
     }
 
     public override int SwingTime
@@ -147,7 +146,7 @@ public sealed class CosmireapSweep : BaseSwordSwing
             if (this.RunLocal() && Time % (MaxTime / 4) == (MaxTime / 4 - 1))
             {
                 Projectile.NewProj(Rect().Top, Vector2.Zero, ModContent.ProjectileType<NebulaicBolt>(),
-                    (int)(Projectile.damage / 4f), Projectile.knockBack, Projectile.owner);
+                    (int) (Projectile.damage / 4f), Projectile.knockBack, Projectile.owner);
             }
         }
 
@@ -298,29 +297,29 @@ public class CosmireapThrow : ModProjectile
 
     public int ReelTimer
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
 
     public int ThrowTimer
     {
-        get => (int)Projectile.ai[1];
+        get => (int) Projectile.ai[1];
         set => Projectile.ai[1] = value;
     }
 
     public bool Released
     {
-        get => (int)Projectile.ai[2] == 1;
+        get => (int) Projectile.ai[2] == 1;
         set => Projectile.ai[2] = value.ToInt();
     }
 
     public bool Created
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[0] == 1;
+        get => (int) Projectile.AdditionsInfo().ExtraAI[0] == 1;
         set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
 
-    public static readonly int ReelTime = CalUtils.SecondsToFrames(.45f);
+    public static readonly int ReelTime = SecondsToFrames(.45f);
     public static readonly int ThrowOutTime = 120;
     public float ChargeProgress => InverseLerp(0f, ReelTime, ReelTimer);
     private const float ArmAmt = PiOver2 + .4f;
@@ -330,13 +329,14 @@ public class CosmireapThrow : ModProjectile
 
     public const float ThrowOutDistance = 920f;
     public float ThrowCompletion => InverseLerp(0f, ThrowOutTime, ThrowTimer);
+
     internal float ThrowCurve() => new PiecewiseCurve()
         .Add(0.1f, 1f, .45f, Circ.OutFunction)
         .Add(1f, 1f, .6f, MakePoly(1).InOutFunction)
         .Add(1f, 0f, 1f, MakePoly(4.5f).OutFunction).Evaluate(ThrowCompletion);
 
     public FancyAfterimages after;
-    
+
     public override void AI()
     {
         Projectile.frame = 3;
@@ -356,7 +356,7 @@ public class CosmireapThrow : ModProjectile
                     this.Sync();
             }
 
-            Projectile.spriteDirection = (int)(Projectile.velocity.X.NonZeroSign() == -1
+            Projectile.spriteDirection = (int) (Projectile.velocity.X.NonZeroSign() == -1
                 ? SpriteEffects.FlipVertically
                 : SpriteEffects.None);
 
@@ -378,7 +378,7 @@ public class CosmireapThrow : ModProjectile
 
             return;
         }
-        
+
         if (ThrowTimer == 0f)
         {
             after ??= new(12, () => Projectile.Center);
@@ -390,9 +390,13 @@ public class CosmireapThrow : ModProjectile
             this.Sync();
         }
 
-        Projectile.Center = Owner.Center + Projectile.velocity * Projectile.scale * 10 + Projectile.velocity * ThrowOutDistance * ThrowCurve();
-        after?.UpdateFancyAfterimages(new(Projectile.Center, Projectile.scale * Vector2.One, Projectile.Opacity, Projectile.rotation,
-            (SpriteEffects)Projectile.spriteDirection, 0, 3, 3f, Projectile.ThisProjectileTexture().Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame), false, -.1f));
+        Projectile.Center = Owner.Center + Projectile.velocity * Projectile.scale * 10 +
+                            Projectile.velocity * ThrowOutDistance * ThrowCurve();
+        after?.UpdateFancyAfterimages(new(Projectile.Center, Projectile.scale * Vector2.One, Projectile.Opacity,
+            Projectile.rotation,
+            (SpriteEffects) Projectile.spriteDirection, 0, 3, 3f,
+            Projectile.ThisProjectileTexture().Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame), false,
+            -.1f));
 
         // Hold hand out to projectile
         Owner.SetFrontHandBetter(0, Owner.AngleTo(Projectile.Center));
@@ -407,7 +411,8 @@ public class CosmireapThrow : ModProjectile
             if (!Created)
             {
                 if (this.RunLocal())
-                    Projectile.NewProj(Projectile.Center, Owner.Center.SafeDirectionTo(Projectile.Center), type, Projectile.damage / 2, 0f, Owner.whoAmI);
+                    Projectile.NewProj(Projectile.Center, Owner.Center.SafeDirectionTo(Projectile.Center), type,
+                        Projectile.damage / 2, 0f, Owner.whoAmI);
                 AdditionsSound.etherealSplit.Play(Projectile.Center, 2f, -.1f);
                 Created = true;
                 this.Sync();
@@ -428,7 +433,8 @@ public class CosmireapThrow : ModProjectile
                 Projectile.Kill();
             }
 
-            Projectile.rotation = Projectile.AngleTo(Owner.Center) - Correction - (.85f * Projectile.velocity.X.NonZeroSign());
+            Projectile.rotation = Projectile.AngleTo(Owner.Center) - Correction -
+                                  (.85f * Projectile.velocity.X.NonZeroSign());
             Projectile.extraUpdates = 2;
             this.Sync();
         }
@@ -443,6 +449,7 @@ public class CosmireapThrow : ModProjectile
     public override bool ShouldUpdatePosition() => Released;
 
     private static readonly Texture2D chainTexture = AssetRegistry.GetTexture(AdditionsTexture.ReaperChain);
+
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D texture = Projectile.ThisProjectileTexture();
@@ -455,7 +462,7 @@ public class CosmireapThrow : ModProjectile
             float opacity = GetLerpBump(0f, .1f, 1f, .9f, ThrowCompletion);
             Vector2 shake = Vector2.One.RotatedByRandom(TwoPi) * InverseLerp(.45f, 0f, ThrowCompletion) * 6f;
 
-            int dist = (int)Vector2.Distance(Owner.Center, Projectile.Center) / 16;
+            int dist = (int) Vector2.Distance(Owner.Center, Projectile.Center) / 16;
             Vector2[] points = new Vector2[dist + 1];
             points[0] = Owner.Center;
             points[dist] = Projectile.Center;
@@ -463,14 +470,14 @@ public class CosmireapThrow : ModProjectile
             for (int i = 1; i < dist + 1; i++)
             {
                 Rectangle chainFrame = new(0, 0 + 18 * (i % 2), 12, 18);
-                Vector2 positionAlongLine = Vector2.Lerp(Owner.Center, Projectile.Center, i / (float)dist);
-                points[i] = positionAlongLine + shake * (float)Math.Sin(i / (float)dist * MathHelper.Pi);
+                Vector2 positionAlongLine = Vector2.Lerp(Owner.Center, Projectile.Center, i / (float) dist);
+                points[i] = positionAlongLine + shake * (float) Math.Sin(i / (float) dist * MathHelper.Pi);
 
                 float rotation = (points[i] - points[i - 1]).ToRotation() - MathHelper.PiOver2;
                 float yScale = Vector2.Distance(points[i], points[i - 1]) / chainFrame.Height;
                 Vector2 scale = new(1, yScale);
 
-                Color chainLightColor = Lighting.GetColor((int)points[i].X / 16, (int)points[i].Y / 16);
+                Color chainLightColor = Lighting.GetColor((int) points[i].X / 16, (int) points[i].Y / 16);
 
                 Vector2 chainOrigin = new(chainFrame.Width / 2f, chainFrame.Height);
                 Main.EntitySpriteDraw(chainTexture, points[i] - Main.screenPosition, chainFrame,
@@ -480,7 +487,7 @@ public class CosmireapThrow : ModProjectile
 
         after?.DrawFancyAfterimages(texture, [Color.DarkViolet, Color.BlueViolet, Color.Violet], Projectile.Opacity);
         Main.EntitySpriteDraw(texture, drawPosition, frame, Projectile.GetAlpha(Color.White), Projectile.rotation,
-            origin, Projectile.scale, (SpriteEffects)Projectile.spriteDirection, 0f);
+            origin, Projectile.scale, (SpriteEffects) Projectile.spriteDirection, 0f);
         return false;
     }
 }
@@ -506,7 +513,7 @@ public class NebulaicBolt : ModProjectile
 
     public int Timer
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
 
@@ -514,11 +521,11 @@ public class NebulaicBolt : ModProjectile
 
     public bool Hit
     {
-        get => (int)Projectile.ai[2] == 1;
+        get => (int) Projectile.ai[2] == 1;
         set => Projectile.ai[2] = value.ToInt();
     }
 
-    public static readonly int Wait = CalUtils.SecondsToFrames(.2f);
+    public static readonly int Wait = SecondsToFrames(.2f);
 
     public override void AI()
     {
@@ -603,7 +610,7 @@ public class LaceratedSpace : ModProjectile
         Projectile.ignoreWater = false;
         Projectile.tileCollide = false;
         Projectile.penetrate = -1;
-        Projectile.timeLeft = CalUtils.SecondsToFrames(4);
+        Projectile.timeLeft = SecondsToFrames(4);
         Projectile.DamageType = DamageClass.Generic;
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = 10;
@@ -611,12 +618,12 @@ public class LaceratedSpace : ModProjectile
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        Projectile.damage = (int)(Projectile.damage * 0.945);
+        Projectile.damage = (int) (Projectile.damage * 0.945);
     }
 
     public bool MakingPoints
     {
-        get => (int)Projectile.ai[0] == 1;
+        get => (int) Projectile.ai[0] == 1;
         set => Projectile.ai[0] = value.ToInt();
     }
 

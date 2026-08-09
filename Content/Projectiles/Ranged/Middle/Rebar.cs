@@ -12,6 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 public class Rebar : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Rebar);
+
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.TrailCacheLength[Projectile.type] = 8;
@@ -33,10 +34,12 @@ public class Rebar : ModProjectile
     }
 
     public bool Bounced;
+
     public override void AI()
     {
         after ??= new(8, () => Projectile.Center);
-        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 255));
+        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0,
+            255));
 
         if (Bounced)
             Projectile.rotation += Projectile.direction * .2f;
@@ -64,10 +67,12 @@ public class Rebar : ModProjectile
         {
             Projectile.velocity = lastVelocity.RotatedByRandom(.4f) * 1f;
         }
+
         return false;
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D texture = TextureAssets.Projectile[Projectile.type].Value;
@@ -75,7 +80,8 @@ public class Rebar : ModProjectile
         Vector2 origin = texture.Size() * 0.5f;
         Projectile.DrawProjectileBackglow(Color.DarkSlateGray, 6f, 72, 7);
         after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [lightColor]);
-        Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), Projectile.rotation, origin, Projectile.scale, 0, 0f);
+        Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), Projectile.rotation, origin,
+            Projectile.scale, 0, 0f);
         return false;
     }
 }

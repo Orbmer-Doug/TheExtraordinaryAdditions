@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using CalamityMod;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
@@ -25,25 +24,25 @@ public partial class Asterlin
         StateMachine.RegisterStateBehavior(AsterlinAIType.Disintegration, DoBehavior_Disintegration);
     }
 
-    public static readonly int Disintegration_HoverTime = CalUtils.SecondsToFrames(1.5f);
+    public static readonly int Disintegration_HoverTime = SecondsToFrames(1.5f);
     public static int Disintegration_TotalBeams => DifficultyBasedValue(10, 10, 12, 12, 15, 15);
     public static int Disintegration_TotalShots => DifficultyBasedValue(6, 6, 7, 7, 7, 8);
 
     public int Disintegration_CurrentShot
     {
-        get => (int)ExtraAI[0];
+        get => (int) ExtraAI[0];
         set => ExtraAI[0] = value;
     }
 
     public int Disintegration_Star1Index
     {
-        get => (int)ExtraAI[1];
+        get => (int) ExtraAI[1];
         set => ExtraAI[1] = value;
     }
 
     public int Disintegration_Star2Index
     {
-        get => (int)ExtraAI[2];
+        get => (int) ExtraAI[2];
         set => ExtraAI[2] = value;
     }
 

@@ -57,7 +57,7 @@ public sealed class FlagPolePlaced : ModTile
 
         int tileEntityID = ModContent.GetInstance<T>().Type;
         bool exists = TileEntity.ByPosition.TryGetValue(new Point16(left, top), out TileEntity? te);
-        return exists && te!.type == tileEntityID ? (T)te : null;
+        return exists && te!.type == tileEntityID ? (T) te : null;
     }
 
     public override void KillMultiTile(int i, int j, int frameX, int frameY)

@@ -1,4 +1,6 @@
-﻿using CalamityMod.Cooldowns;
+﻿// TODO
+/*
+using CalamityMod.Cooldowns;
 using Terraria.Localization;
 
 namespace TheExtraordinaryAdditions.Content.Cooldowns;
@@ -13,3 +15,6 @@ public class AbsoluteCooldown : CooldownHandler
     public override Color CooldownStartColor => Color.White;
     public override Color CooldownEndColor => Color.White;
 }
+*/
+
+

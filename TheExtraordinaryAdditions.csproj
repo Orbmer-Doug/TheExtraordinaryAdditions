@@ -1,47 +1,33 @@
-﻿<Project Sdk="Tomat.Terraria.ModLoader.Sdk/2.1.0">
+<Project Sdk="Tomat.Terraria.ModLoader.Sdk/2.1.1">
 
-	<!-- Import tModLoader mod properties -->
-	<Import Project="/mnt/Games/SteamLibrary/steamapps/common/tModLoader/tMLMod.targets" />
+    <!-- Import tModLoader mod properties -->
+    <Import Project="/home/doug/.local/share/tml-build/versions/2026.6.3.4/tMLMod.targets"/>
 
-	<!-- General -->
-	<PropertyGroup>
-	  <Configurations>Debug;Release</Configurations>
-	  <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-	  <Nullable>disable</Nullable>
-	  <LangVersion>latest</LangVersion>
-	  <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
-	  <RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
-	  <TargetFramework>net8.0</TargetFramework>
-	  <TmlVersion>stable</TmlVersion>
-	  <!-- 1.4.5 only!
-			<TargetFramework>net10.0</TargetFramework>
-			-->
-	  <PublicizerRuntimeStrategies>IgnoresAccessChecksTo</PublicizerRuntimeStrategies>
-	  <PublicizerClearCacheOnClean>true</PublicizerClearCacheOnClean>
-	</PropertyGroup>
+    <!-- General -->
+    <PropertyGroup>
+        <AssemblyName>TheExtraordinaryAdditions</AssemblyName>
+        <Configurations>Debug;Release</Configurations>
+        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+        <Nullable>disable</Nullable>
+        <LangVersion>latest</LangVersion>
+        <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
+        <RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
+        <TargetFramework>net8.0</TargetFramework>
+        <TmlVersion>stable</TmlVersion>
+    </PropertyGroup>
 
-	<!-- References -->
-	<ItemGroup>
-	  <PackageReference Include="Krafs.Publicizer" Version="2.3.0">
-	    <PrivateAssets>all</PrivateAssets>
-	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-	  </PackageReference>
-	  <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.0" />
-	  <Publicize Remove="tModLoader" />
+    <!-- References -->
+    <ItemGroup>
+        <Reference Include="DAYBREAK">
+            <HintPath>lib\Daybreak_2.4.0.dll</HintPath>
+        </Reference>
+        <Reference Include="SubworldLibrary">
+            <HintPath>lib\SubworldLibrary.dll</HintPath>
+        </Reference>
+    </ItemGroup>
 
-	</ItemGroup>
-	<ItemGroup>
-	  <Reference Include="CalamityMod">
-		 <HintPath>lib\CalamityMod_v2.2.1.dll</HintPath>
-	  </Reference>
-
-	 <Reference Include="SubworldLibrary">
-	    <HintPath>lib\SubworldLibrary.dll</HintPath>
-	  </Reference>
-
-	</ItemGroup>
-	<ItemGroup>
-	  <PackageReference Update="tModLoader.CodeAssist" Version="0.1.5" />
-	</ItemGroup>
+    <ItemGroup>
+        <PackageReference Update="tModLoader.CodeAssist" Version="0.1.5"/>
+    </ItemGroup>
 
 </Project>

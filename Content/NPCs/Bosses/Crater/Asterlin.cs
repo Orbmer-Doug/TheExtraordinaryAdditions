@@ -1,8 +1,4 @@
-﻿using CalamityMod;
-using CalamityMod.NPCs.Yharon;
-using CalamityMod.Projectiles.Boss;
-using CalamityMod.World;
-using System;
+﻿using System;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.Enums;
@@ -20,6 +16,7 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 public sealed partial class Asterlin : IBossDowned
 {
     #region Enums
+
     public enum AsterlinAIType : byte
     {
         // pondering the orb
@@ -57,10 +54,12 @@ public sealed partial class Asterlin : IBossDowned
     #endregion
 
     #region Balancing
+
     /// <summary>
     /// Represents the 1 - 0 ratio of life for asterlin
     /// </summary>
     public float LifeRatio => InverseLerp(0f, NPC.lifeMax, NPC.life);
+
     public const float Phase2LifeRatio = 0.65f;
     public const float Phase3LifeRatio = 0.3f;
 
@@ -68,18 +67,20 @@ public sealed partial class Asterlin : IBossDowned
     public static int MediumAttackDamage => DifficultyBasedValue(250, 440, 464, 488, 550, 700);
     public static int HeavyAttackDamage => DifficultyBasedValue(280, 480, 515, 588, 680, 730);
     public static int SuperHeavyAttackDamage => DifficultyBasedValue(340, 390, 605, 645, 780, 820);
+
     #endregion
 
     /// <summary>
     /// The aimed target for Asterlin, whether it be a player or NPC
     /// </summary>
     public NPCAimedTarget Target;
+
     public Player PlayerTarget;
     public ref float[] ExtraAI => ref NPC.AdditionsInfo().ExtraAI;
 
     public bool FightStarted
     {
-        get => (int)NPC.ai[0] == 1;
+        get => (int) NPC.ai[0] == 1;
         set => NPC.ai[0] = value.ToInt();
     }
 
@@ -89,51 +90,59 @@ public sealed partial class Asterlin : IBossDowned
 
     public bool DonePhase2Transition
     {
-        get => (int)ExtraAI[11] == 1;
+        get => (int) ExtraAI[11] == 1;
         set => ExtraAI[11] = value.ToInt();
     }
+
     public bool DonePhase3Transition
     {
-        get => (int)ExtraAI[12] == 1;
+        get => (int) ExtraAI[12] == 1;
         set => ExtraAI[12] = value.ToInt();
     }
+
     public bool DoneDesperationTransition
     {
-        get => (int)ExtraAI[13] == 1;
+        get => (int) ExtraAI[13] == 1;
         set => ExtraAI[13] = value.ToInt();
     }
+
     public ref float HeatDistortionArea => ref ExtraAI[14];
     public ref float HeatDistortionStrength => ref ExtraAI[15];
 
     public int SwordIndex
     {
-        get => (int)ExtraAI[16];
+        get => (int) ExtraAI[16];
         set => ExtraAI[16] = value;
     }
+
     public CyberneticSword Sword;
 
     public int GunIndex
     {
-        get => (int)ExtraAI[17];
+        get => (int) ExtraAI[17];
         set => ExtraAI[17] = value;
     }
+
     public TheTechnicBlitzripper Gun;
 
     public int StaffIndex
     {
-        get => (int)ExtraAI[18];
+        get => (int) ExtraAI[18];
         set => ExtraAI[18] = value;
     }
+
     public TheTesselesticMeltdown Staff;
 
     public int HammerIndex
     {
-        get => (int)ExtraAI[19];
+        get => (int) ExtraAI[19];
         set => ExtraAI[19] = value;
     }
+
     public JudgementHammer Hammer;
 
     #region AI
+
     public override void AI()
     {
         if (StateMachine is null)
@@ -165,8 +174,8 @@ public sealed partial class Asterlin : IBossDowned
                 if (player.DeadOrGhost)
                     continue;
 
-                player.GrantInfiniteFlight();
-                player.GrantBossEffectsBuff();
+                //TODO  
+                //player.GrantBossEffectsBuff();
                 player.moonLeech = true;
             }
 
@@ -182,8 +191,8 @@ public sealed partial class Asterlin : IBossDowned
         if (NPC.scale < .6f)
             NPC.ShowNameOnHover = false;
         int oldWidth = NPC.width;
-        int idealWidth = (int)(NPC.scale * 128f);
-        int idealHeight = (int)(NPC.scale * 278f);
+        int idealWidth = (int) (NPC.scale * 128f);
+        int idealHeight = (int) (NPC.scale * 278f);
         if (idealWidth != oldWidth)
         {
             NPC.position.X += NPC.width / 2f;
@@ -214,7 +223,8 @@ public sealed partial class Asterlin : IBossDowned
         }
     }
 
-    public override bool ModifyCollisionData(Rectangle victimHitbox, ref int immunityCooldownSlot, ref MultipliableFloat damageMultiplier, ref Rectangle npcHitbox)
+    public override bool ModifyCollisionData(Rectangle victimHitbox, ref int immunityCooldownSlot,
+        ref MultipliableFloat damageMultiplier, ref Rectangle npcHitbox)
     {
         return RotatedHitbox.Intersects(victimHitbox);
     }
@@ -229,5 +239,6 @@ public sealed partial class Asterlin : IBossDowned
         NPC.netUpdate = true;
         return false;
     }
+
     #endregion AI
 }

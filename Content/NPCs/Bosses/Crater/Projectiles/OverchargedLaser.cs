@@ -11,10 +11,12 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 public class OverchargedLaser : ProjOwnedByNPC<Asterlin>
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.DrawScreenCheckFluff[Type] = 3000;
     }
+
     public override void SetDefaults()
     {
         Projectile.Size = new(20);
@@ -26,11 +28,13 @@ public class OverchargedLaser : ProjOwnedByNPC<Asterlin>
     }
 
     public ref float Time => ref Projectile.ai[0];
+
     public bool DontHome
     {
-        get => (int)Projectile.ai[1] == 1;
+        get => (int) Projectile.ai[1] == 1;
         set => Projectile.ai[1] = value.ToInt();
     }
+
     public override void SafeAI()
     {
         if (trail == null || trail.Disposed)
@@ -43,7 +47,8 @@ public class OverchargedLaser : ProjOwnedByNPC<Asterlin>
             {
                 float speed = Animators.MakePoly(3f).OutFunction.Evaluate(Time, 50f, 80f, 20f, 12f);
                 float amt = InverseLerp(50f, 130f, Time) * .8f;
-                Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.Center.SafeDirectionTo(Target.Center) * speed, amt);
+                Projectile.velocity = Vector2.SmoothStep(Projectile.velocity,
+                    Projectile.Center.SafeDirectionTo(Target.Center) * speed, amt);
             }
         }
 
@@ -62,6 +67,7 @@ public class OverchargedLaser : ProjOwnedByNPC<Asterlin>
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints points = new(10);
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -74,6 +80,7 @@ public class OverchargedLaser : ProjOwnedByNPC<Asterlin>
             shader.TrySetParameter("time", Main.GlobalTimeWrappedHourly * 1.2f);
             trail.DrawTrail(shader, points.Points, 200, true);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;
     }

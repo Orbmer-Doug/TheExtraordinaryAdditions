@@ -16,15 +16,16 @@ public class CoalescentMass : ModNPC
     public override string BossHeadTexture => AssetRegistry.GetTexturePath(AdditionsTexture.CoalescentMass_Head_Boss);
     public override string Texture => AssetRegistry.Invis;
     public static readonly int Life = DifficultyBasedValue(15000, 30000, 43000, 56000, 65000, 80000);
+
     public override void SetStaticDefaults()
     {
         NPCID.Sets.ImmuneToRegularBuffs[Type] =
             NPCID.Sets.DontDoHardmodeScaling[Type] =
-            NPCID.Sets.CantTakeLunchMoney[Type] =
-            NPCID.Sets.MPAllowedEnemies[Type] =
-            NPCID.Sets.ProjectileNPC[Type] =
-            NPCID.Sets.TeleportationImmune[Type] =
-            NPCID.Sets.DoesntDespawnToInactivityAndCountsNPCSlots[Type] = true;
+                NPCID.Sets.CantTakeLunchMoney[Type] =
+                    NPCID.Sets.MPAllowedEnemies[Type] =
+                        NPCID.Sets.ProjectileNPC[Type] =
+                            NPCID.Sets.TeleportationImmune[Type] =
+                                NPCID.Sets.DoesntDespawnToInactivityAndCountsNPCSlots[Type] = true;
 
         NPCID.Sets.NPCBestiaryDrawModifiers bestiaryData = new NPCID.Sets.NPCBestiaryDrawModifiers()
         {
@@ -60,10 +61,11 @@ public class CoalescentMass : ModNPC
 
     public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)
     {
-        NPC.lifeMax = (int)(NPC.lifeMax * 0.8f * balance);
+        NPC.lifeMax = (int) (NPC.lifeMax * 0.8f * balance);
     }
 
     public ref float Time => ref NPC.ai[1];
+
     public override void AI()
     {
         if (Time == 0f)
@@ -91,10 +93,12 @@ public class CoalescentMass : ModNPC
 
     // Prevent complete annihilation by anything with piercing
     private const int ImmuneTime = 12;
+
     public override void OnHitByProjectile(Projectile projectile, NPC.HitInfo hit, int damageDone)
     {
         NPC.immune[projectile.owner] = ImmuneTime;
     }
+
     public override void OnHitByItem(Player player, Item item, NPC.HitInfo hit, int damageDone)
     {
         NPC.immune[player.whoAmI] = ImmuneTime;
@@ -103,6 +107,7 @@ public class CoalescentMass : ModNPC
     public override bool? CanFallThroughPlatforms() => true;
     public override bool CanHitPlayer(Player target, ref int cooldownSlot) => false;
     public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position) => false;
+
     public override void BossLoot(ref int potionType)
     {
         potionType = ItemID.None;
@@ -116,9 +121,9 @@ public class CoalescentMass : ModNPC
 
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
-        Main.spriteBatch.PrepareForShaders();
+        Main.spriteBatch.EnterShaderRegion();
         DrawField(NPC, NPC.Center - Main.screenPosition);
-        Main.spriteBatch.ExitShaderRegion();
+        Main.spriteBatch.ResetToDefault();
         return false;
     }
 
@@ -142,7 +147,8 @@ public class CoalescentMass : ModNPC
         float interpolant = Utils.GetLerpValue(0f, Life, npc.life, true);
 
         Texture2D pixel = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
-        Main.spriteBatch.Draw(pixel, pos, null, Color.Crimson * npc.Opacity, 0f, pixel.Size() / 2, npc.Size * (scale * 3f), 0, 0f);
+        Main.spriteBatch.Draw(pixel, pos, null, Color.Crimson * npc.Opacity, 0f, pixel.Size() / 2,
+            npc.Size * (scale * 3f), 0, 0f);
     }
 }
 
@@ -159,6 +165,7 @@ public class HeadDetour : ModSystem
     {
         On_Main.DrawNPCHeadBoss += On_Main_DrawNPCHeadBoss;
     }
+
     public override void Unload()
     {
         On_Main.DrawNPCHeadBoss -= On_Main_DrawNPCHeadBoss;
@@ -167,26 +174,29 @@ public class HeadDetour : ModSystem
     public static void On_Main_DrawNPCHeadBoss(On_Main.orig_DrawNPCHeadBoss orig, Entity theNPC,
         byte alpha, float headScale, float rotation, SpriteEffects effects, int bossHeadId, float x, float y)
     {
-        if (theNPC != null && NPCHeadLoader.GetBossHeadSlot(AssetRegistry.GetTexturePath(AdditionsTexture.CoalescentMass_Head_Boss)) == bossHeadId)
+        if (theNPC != null &&
+            NPCHeadLoader.GetBossHeadSlot(AssetRegistry.GetTexturePath(AdditionsTexture.CoalescentMass_Head_Boss)) ==
+            bossHeadId)
         {
             Vector2 pos = new(x, y);
 
             float mapScale = 1f;
             switch (Main.mapStyle)
             {
-                case (int)MapStyle.Fullscreen:
+                case (int) MapStyle.Fullscreen:
                     mapScale = Main.mapFullscreenScale * .1f;
                     break;
-                case (int)MapStyle.Minimap:
+                case (int) MapStyle.Minimap:
                     mapScale = Main.mapMinimapScale * .1f;
                     break;
-                case (int)MapStyle.Overlay:
+                case (int) MapStyle.Overlay:
                     mapScale = Main.mapOverlayScale * .05f;
                     break;
             }
 
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, null, Main.UIScaleMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, null,
+                Main.UIScaleMatrix);
 
             CoalescentMass.DrawField(theNPC as NPC, pos, mapScale);
 

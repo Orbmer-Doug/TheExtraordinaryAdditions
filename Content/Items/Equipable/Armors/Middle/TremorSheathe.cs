@@ -42,5 +42,4 @@ public class TremorSheathe : ModItem
         recipe.AddTile(TileID.HeavyWorkBench);
         recipe.Register();
     }
-
 }

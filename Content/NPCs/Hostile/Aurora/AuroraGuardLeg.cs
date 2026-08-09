@@ -11,7 +11,7 @@ using static TheExtraordinaryAdditions.Core.Graphics.Animators;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 
-// Largely designed off of the legs of Crabulon in Calamity Fables
+// Largely designed off of the legs of Crabulon in Fables
 public sealed class AuroraGuardLeg : Entity
 {
     public float Maxlength;
@@ -118,7 +118,7 @@ public sealed class AuroraGuardLeg : Entity
         UpdateDesiredGrabPosition(legDirection);
         bool frontSet = Math.Sign(Turret.NPC.velocity.X) == Direction;
 
-        width = height = (int)Maxlength;
+        width = height = (int) Maxlength;
         position = LegOrigin;
         Center = LegKnee;
 
@@ -182,8 +182,8 @@ public sealed class AuroraGuardLeg : Entity
 
                     // When falling, flail legs around a point
                     Vector2 fallingPosition = DesiredGrabPosition - Vector2.UnitY * 100f;
-                    Vector2 fallPositionOffset = new((float)Math.Sin(Main.GlobalTimeWrappedHourly * 20f) * 40f,
-                        21f + (float)Math.Sin(Main.GlobalTimeWrappedHourly * 30f) * 70f);
+                    Vector2 fallPositionOffset = new((float) Math.Sin(Main.GlobalTimeWrappedHourly * 20f) * 40f,
+                        21f + (float) Math.Sin(Main.GlobalTimeWrappedHourly * 30f) * 70f);
                     fallingPosition += fallPositionOffset;
 
                     // Back set of legs is a bit more retracted towards the center
@@ -221,7 +221,7 @@ public sealed class AuroraGuardLeg : Entity
                     LegTip = Vector2.SmoothStep(PreviousGrabPosition.Value, GrabPosition.Value, amount);
 
                     // Upwards bump motion
-                    LegTip.Y -= 12.5f * (float)Math.Sin(StrideTimer * Pi);
+                    LegTip.Y -= 12.5f * (float) Math.Sin(StrideTimer * Pi);
                 }
 
                 // If this is the first step after spawning, or after falling, do a slightly less clean motion towards the Target
@@ -446,7 +446,7 @@ public sealed class AuroraGuardLeg : Entity
         {
             // Try tilting the grab position downwards until we find ground
             Vector2 tiltedGrabPosition = LegOrigin +
-                                         toGrabPosition.RotatedBy(i * Direction / (float)iterations * angle) *
+                                         toGrabPosition.RotatedBy(i * Direction / (float) iterations * angle) *
                                          Maxlength * 0.95f;
 
             //if (debugView)
@@ -577,7 +577,8 @@ public sealed class AuroraGuardLeg : Entity
 
     private void ConfirmGrabPosition(Point potentialGrabPosition)
     {
-        if (GrabTile != null && (GrabPosition == null || RateGripPoint(potentialGrabPosition) > RateGripPoint(GrabTile.Value)))
+        if (GrabTile != null &&
+            (GrabPosition == null || RateGripPoint(potentialGrabPosition) > RateGripPoint(GrabTile.Value)))
         {
             Vector2 attachPoint = TileToGripPoint(potentialGrabPosition);
 
@@ -597,7 +598,7 @@ public sealed class AuroraGuardLeg : Entity
             tileWorldCoordinates + Vector2.One * 9f);
         if (!t.IsHalfBlock && t.Slope == SlopeType.Solid)
             return LegOrigin.ClampInRect(aroundTile);
-        
+
         aroundTile.Y += 8;
         aroundTile.Height -= 8;
 

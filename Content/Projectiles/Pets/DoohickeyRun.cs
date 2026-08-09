@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -18,9 +17,10 @@ public class DoohickeyRun : ModProjectile
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Doohickey);
     public Player Owner => Main.player[Projectile.owner];
     public GlobalPlayer Modded => Owner.Additions();
+
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
 
@@ -32,13 +32,13 @@ public class DoohickeyRun : ModProjectile
 
     public PetState State
     {
-        get => (PetState)Projectile.ai[1];
-        set => Projectile.ai[1] = (int)value;
+        get => (PetState) Projectile.ai[1];
+        set => Projectile.ai[1] = (int) value;
     }
 
     public int JumpCounter
     {
-        get => (int)Projectile.ai[2];
+        get => (int) Projectile.ai[2];
         set => Projectile.ai[2] = value;
     }
 
@@ -46,7 +46,8 @@ public class DoohickeyRun : ModProjectile
     {
         Main.projFrames[Projectile.type] = 4;
         Main.projPet[Projectile.type] = true;
-        ProjectileID.Sets.CharacterPreviewAnimations[Projectile.type] = ProjectileID.Sets.SimpleLoop(0, Main.projFrames[Projectile.type], 5);
+        ProjectileID.Sets.CharacterPreviewAnimations[Projectile.type] =
+            ProjectileID.Sets.SimpleLoop(0, Main.projFrames[Projectile.type], 5);
     }
 
     public override void SetDefaults()
@@ -72,7 +73,7 @@ public class DoohickeyRun : ModProjectile
         {
             case PetState.Walking:
                 Projectile.tileCollide = true;
-                Projectile.frameCounter += (int)MathHelper.Clamp(MathF.Abs(Projectile.velocity.X) * .5f, 0f, 2f);
+                Projectile.frameCounter += (int) MathHelper.Clamp(MathF.Abs(Projectile.velocity.X) * .5f, 0f, 2f);
                 if (Projectile.frameCounter > 3)
                 {
                     Projectile.frame = (Projectile.frame + 1) % Main.projFrames[Type];
@@ -88,14 +89,16 @@ public class DoohickeyRun : ModProjectile
                 if (Projectile.velocity.X.NonZeroSign() != direction)
                     acceleration *= 2f;
 
-                Collision.StepUp(ref Projectile.position, ref Projectile.velocity, Projectile.width, Projectile.height, ref Projectile.stepSpeed, ref Projectile.gfxOffY);
+                Collision.StepUp(ref Projectile.position, ref Projectile.velocity, Projectile.width, Projectile.height,
+                    ref Projectile.stepSpeed, ref Projectile.gfxOffY);
 
                 // Only jump when on the ground
-                if (Projectile.velocity.Y == 0f && !Collision.CanHitLine(direction == -1 ? Projectile.Left : Projectile.Right, 1, 1, dest, 1, 1))
+                if (Projectile.velocity.Y == 0f &&
+                    !Collision.CanHitLine(direction == -1 ? Projectile.Left : Projectile.Right, 1, 1, dest, 1, 1))
                 {
-                    int start = (int)Projectile.Center.X;
+                    int start = (int) Projectile.Center.X;
                     int end = start + (80 * direction);
-                    int y = (int)Projectile.Bottom.Y - 1;
+                    int y = (int) Projectile.Bottom.Y - 1;
                     Vector2 start2 = new(start, y);
                     Vector2 end2 = new(end, y);
                     Vector2 ray = RaytraceTiles(start2, end2) ?? start2;
@@ -103,7 +106,7 @@ public class DoohickeyRun : ModProjectile
                     int obstacleHeight = 0;
                     for (int i = 0; i < 5; i++)
                     {
-                        Tile tile = ParanoidTileRetrieval((int)(ray.X + (8 * direction)) / 16, ((int)ray.Y / 16) - i);
+                        Tile tile = ParanoidTileRetrieval((int) (ray.X + (8 * direction)) / 16, ((int) ray.Y / 16) - i);
                         if (tile.HasUnactuatedTile && Main.tileSolid[tile.TileType])
                             obstacleHeight++;
                         else
@@ -115,7 +118,8 @@ public class DoohickeyRun : ModProjectile
                         Projectile.velocity.Y = -(5f + obstacleHeight * 1.3f);
                         JumpCounter++;
                         SoundID.Item56.Play(Projectile.Bottom, .6f, .2f, .1f);
-                        ParticleRegistry.SpawnPulseRingParticle(Projectile.Bottom, Vector2.Zero, 15, 0f, new(1f, .2f), 0f, Projectile.width, Color.Gray);
+                        ParticleRegistry.SpawnPulseRingParticle(Projectile.Bottom, Vector2.Zero, 15, 0f, new(1f, .2f),
+                            0f, Projectile.width, Color.Gray);
                     }
                 }
                 else if (distanceToPlayer < 100f || Projectile.velocity.Y == 0f)
@@ -124,7 +128,8 @@ public class DoohickeyRun : ModProjectile
                     JumpCounter = 0;
                 }
 
-                Projectile.velocity.X = MathHelper.Lerp(Projectile.velocity.X, Projectile.SafeDirectionTo(dest).X * 6f, acceleration);
+                Projectile.velocity.X = MathHelper.Lerp(Projectile.velocity.X, Projectile.SafeDirectionTo(dest).X * 6f,
+                    acceleration);
                 Projectile.velocity.Y = MathHelper.Clamp(Projectile.velocity.Y + .3f, -20f, 20f);
 
                 if (distanceToPlayer > 1000 || verticalDistanceToPlayer > 300 || Owner.rocketDelay2 > 0)
@@ -137,7 +142,9 @@ public class DoohickeyRun : ModProjectile
 
                 Projectile.SetAnimation(Main.projFrames[Type], 4);
 
-                Vector2 idealDest = Owner.MountedCenter - Vector2.UnitY * MathHelper.Lerp(80f, 120f, Sin01(Time * .2f)) + Vector2.UnitX * MathHelper.Lerp(-40f, 40f, Sin01(Time * .05f));
+                Vector2 idealDest = Owner.MountedCenter -
+                                    Vector2.UnitY * MathHelper.Lerp(80f, 120f, Sin01(Time * .2f)) +
+                                    Vector2.UnitX * MathHelper.Lerp(-40f, 40f, Sin01(Time * .05f));
                 Projectile.velocity = Vector2.SmoothStep(Projectile.velocity,
                     Projectile.SafeDirectionTo(idealDest) * MathHelper.Min(Projectile.Distance(idealDest), 10f),
                     Animators.MakePoly(4f).InFunction.Evaluate(Projectile.Distance(idealDest), 0f, 200f, 0f, .4f));
@@ -146,13 +153,17 @@ public class DoohickeyRun : ModProjectile
                     && !Collision.SolidCollision(Projectile.position, Projectile.width, Projectile.height))
                     State = PetState.Walking;
 
-                Vector2 pos = Vector2.Lerp(Projectile.direction == -1 ? Projectile.RotHitbox().TopRight : Projectile.RotHitbox().BottomLeft,
-                    Projectile.direction == -1 ? Projectile.RotHitbox().Position : Projectile.RotHitbox().BottomRight, Main.rand.NextFloat());
-                Dust d = Dust.NewDustPerfect(pos, DustID.Cloud, -Projectile.velocity * .01f, 0, default, Main.rand.NextFloat(.8f, 1.2f));
+                Vector2 pos = Vector2.Lerp(
+                    Projectile.direction == -1 ? Projectile.RotHitbox().TopRight : Projectile.RotHitbox().BottomLeft,
+                    Projectile.direction == -1 ? Projectile.RotHitbox().Position : Projectile.RotHitbox().BottomRight,
+                    Main.rand.NextFloat());
+                Dust d = Dust.NewDustPerfect(pos, DustID.Cloud, -Projectile.velocity * .01f, 0, default,
+                    Main.rand.NextFloat(.8f, 1.2f));
 
                 Projectile.rotation = Projectile.velocity.ToRotation();
                 break;
         }
+
         Projectile.direction = Projectile.velocity.X.NonZeroSign();
 
         Time++;
@@ -167,7 +178,8 @@ public class DoohickeyRun : ModProjectile
         Rectangle frame = texture.Frame(1, Main.projFrames[Type], 0, Projectile.frame);
         Vector2 origin = frame.Size() * .5f;
 
-        Main.spriteBatch.Draw(texture, drawPosition, frame, Projectile.GetAlpha(lightColor), rotation, origin, Projectile.scale, effects, 0f);
+        Main.spriteBatch.Draw(texture, drawPosition, frame, Projectile.GetAlpha(lightColor), rotation, origin,
+            Projectile.scale, effects, 0f);
         return false;
     }
 }

@@ -10,6 +10,7 @@ public class TimberWhip : BaseWhip
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TimberWhip);
     public override int SegmentSkip => 8;
+
     public override void Defaults()
     {
         Projectile.Size = new(140, 50);
@@ -24,7 +25,8 @@ public class TimberWhip : BaseWhip
     {
         float rot = RandomRotation();
         for (int i = 0; i < 8; i++)
-            ParticleRegistry.SpawnSparkParticle(Tip, (MathHelper.TwoPi * i / 8 + rot).ToRotationVector2() * 4f, 14, .45f, Color.AntiqueWhite);
+            ParticleRegistry.SpawnSparkParticle(Tip, (MathHelper.TwoPi * i / 8 + rot).ToRotationVector2() * 4f, 14,
+                .45f, Color.AntiqueWhite);
 
         SoundID.Item153.Play(Tip, 1f, .14f);
     }
@@ -35,12 +37,14 @@ public class TimberWhip : BaseWhip
         {
             for (int i = 0; i < 12; i++)
             {
-                ParticleRegistry.SpawnSparkParticle(pos + Main.rand.NextVector2Circular(4f, 4f), vel.RotatedByRandom(.3f) * Main.rand.NextFloat(4f, 7f),
-                    Main.rand.Next(10, 20), Main.rand.NextFloat(.4f, .6f), Color.Chocolate.Lerp(Color.OrangeRed, Main.rand.NextFloat(.4f, .6f)));
+                ParticleRegistry.SpawnSparkParticle(pos + Main.rand.NextVector2Circular(4f, 4f),
+                    vel.RotatedByRandom(.3f) * Main.rand.NextFloat(4f, 7f),
+                    Main.rand.Next(10, 20), Main.rand.NextFloat(.4f, .6f),
+                    Color.Chocolate.Lerp(Color.OrangeRed, Main.rand.NextFloat(.4f, .6f)));
             }
         }
 
-        Projectile.damage = (int)(Projectile.damage * .8f);
+        Projectile.damage = (int) (Projectile.damage * .8f);
     }
 
     public override void ModifyNPCEffects(NPC target, ref NPC.HitModifiers modifiers, in Vector2 pos, in int index)
@@ -51,7 +55,8 @@ public class TimberWhip : BaseWhip
 
     public void Visuals()
     {
-        Projectile.scale = MathHelper.Lerp(.9f, 1.5f, GetLerpBump(0f, .4f, 1f, .6f, Completion)) * GetThin(GetCompletion());
+        Projectile.scale = MathHelper.Lerp(.9f, 1.5f, GetLerpBump(0f, .4f, 1f, .6f, Completion)) *
+                           GetThin(GetCompletion());
     }
 
     public override void DrawSegments()
@@ -96,7 +101,8 @@ public class TimberWhip : BaseWhip
                 Vector2 orig = frame.Size() / 2;
                 SpriteEffects flip = Owner.direction < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
 
-                Main.spriteBatch.DrawBetter(texture, pos, frame, color, rotation, orig, tip ? Projectile.scale : 1f, flip);
+                Main.spriteBatch.DrawBetter(texture, pos, frame, color, rotation, orig, tip ? Projectile.scale : 1f,
+                    flip);
             }
         }
     }

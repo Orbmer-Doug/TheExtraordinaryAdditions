@@ -39,13 +39,15 @@ public class InfluxWaverSwing : BaseSwordSwing
         if (Animation() >= .26f && !PlayedSound)
         {
             if (this.RunLocal())
-                Projectile.NewProj(Center, Projectile.velocity * 7f, ModContent.ProjectileType<InfluxWaverProj>(), Projectile.damage, Projectile.knockBack, Projectile.owner, 0f, 0f);
+                Projectile.NewProj(Center, Projectile.velocity * 7f, ModContent.ProjectileType<InfluxWaverProj>(),
+                    Projectile.damage, Projectile.knockBack, Projectile.owner, 0f, 0f);
 
             SoundID.Item1.Play(Projectile.Center, 1f, 0f, .2f);
             PlayedSound = true;
         }
 
-        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.scale, Projectile.Opacity, Projectile.rotation, Effects, 90));
+        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.scale, Projectile.Opacity,
+            Projectile.rotation, Effects, 90));
 
         if (VanishTime <= 0)
         {
@@ -78,10 +80,14 @@ public class InfluxWaverSwing : BaseSwordSwing
     public override void NPCHitEffects(in Vector2 start, in Vector2 end, NPC npc, NPC.HitInfo hit)
     {
         for (int i = 0; i < 18; i++)
-            Dust.NewDustPerfect(start + Main.rand.NextVector2Circular(10f, 10f), DustID.t_Martian, SwordDir.RotatedByRandom(.4f) * Main.rand.NextFloat(3f, 11f), 0, default, Main.rand.NextFloat(.5f, .9f)).noGravity = true;
+            Dust.NewDustPerfect(start + Main.rand.NextVector2Circular(10f, 10f), DustID.t_Martian,
+                    SwordDir.RotatedByRandom(.4f) * Main.rand.NextFloat(3f, 11f), 0, default,
+                    Main.rand.NextFloat(.5f, .9f))
+                .noGravity = true;
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         // Determine the effects for drawing. These must be done here otherwise silly things WILL happen.
@@ -105,7 +111,9 @@ public class InfluxWaverSwing : BaseSwordSwing
             Effects = SpriteEffects.FlipHorizontally;
         }
 
-        after?.DrawFancySwordAfterimages(Tex, Projectile.Center, [new(210, 255, 250), new(113, 251, 255), new(115, 204, 219), new(34, 128, 203)], origin, Effects, RotationOffset, Projectile.Opacity, Projectile.scale);
+        after?.DrawFancySwordAfterimages(Tex, Projectile.Center,
+            [new(210, 255, 250), new(113, 251, 255), new(115, 204, 219), new(34, 128, 203)], origin, Effects,
+            RotationOffset, Projectile.Opacity, Projectile.scale);
 
         Main.spriteBatch.Draw(Tex, Projectile.Center - Main.screenPosition, null, lightColor,
             Projectile.rotation + RotationOffset, origin, Projectile.scale, Effects, 0f);
@@ -116,6 +124,7 @@ public class InfluxWaverSwing : BaseSwordSwing
 public class InfluxWaverCreator : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 1;
@@ -124,17 +133,19 @@ public class InfluxWaverCreator : ModProjectile
         Projectile.DamageType = DamageClass.MeleeNoSpeed;
         Projectile.timeLeft = 50;
     }
+
     public override bool? CanDamage() => false;
     public override bool ShouldUpdatePosition() => false;
+
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
 
     public int TargetIndex
     {
-        get => (int)Projectile.ai[1];
+        get => (int) Projectile.ai[1];
         set => Projectile.ai[1] = value;
     }
 
@@ -150,7 +161,8 @@ public class InfluxWaverCreator : ModProjectile
         if (Time % 25 == 24 && this.RunLocal())
         {
             Vector2 pos = target.RandAreaInEntity();
-            InfluxWaverProj slash = Main.projectile[Projectile.NewProj(pos, Vector2.Zero, ModContent.ProjectileType<InfluxWaverProj>(),
+            InfluxWaverProj slash = Main.projectile[Projectile.NewProj(pos, Vector2.Zero,
+                ModContent.ProjectileType<InfluxWaverProj>(),
                 Projectile.damage, Projectile.knockBack, Projectile.owner)].As<InfluxWaverProj>();
 
             float dist = Main.rand.NextFloat(100f, 200f);
@@ -163,6 +175,7 @@ public class InfluxWaverCreator : ModProjectile
             slash.Copy = true;
             slash.Sync();
         }
+
         Time++;
     }
 }
@@ -170,6 +183,7 @@ public class InfluxWaverCreator : ModProjectile
 public class InfluxWaverProj : ModProjectile
 {
     public override string Texture => ProjectileID.InfluxWaver.GetTerrariaProj();
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 48;
@@ -191,21 +205,9 @@ public class InfluxWaverProj : ModProjectile
     public const int FadeTime = 30;
     public const int Lifetime = SliceTime + FadeTime;
 
-    public Vector2 Start
-    {
-        get;
-        set;
-    }
-    public Vector2 Center
-    {
-        get;
-        set;
-    }
-    public Vector2 End
-    {
-        get;
-        set;
-    }
+    public Vector2 Start { get; set; }
+    public Vector2 Center { get; set; }
+    public Vector2 End { get; set; }
 
     public override void SendExtraAI(BinaryWriter writer)
     {
@@ -228,12 +230,15 @@ public class InfluxWaverProj : ModProjectile
     }
 
     public ref float Time => ref Projectile.ai[0];
+
     public bool Copy
     {
         get => Projectile.ai[1] == 1f;
         set => Projectile.ai[1] = value.ToInt();
     }
+
     public Vector2[] Path = new Vector2[100];
+
     public override void AI()
     {
         if (Time == 0f)
@@ -260,9 +265,12 @@ public class InfluxWaverProj : ModProjectile
             {
                 Projectile.timeLeft = 400;
             }
+
             this.Sync();
         }
-        Projectile.Opacity = InverseLerp(0f, 10f * Projectile.MaxUpdates, Time) * InverseLerp(0f, FadeTime, Projectile.timeLeft);
+
+        Projectile.Opacity = InverseLerp(0f, 10f * Projectile.MaxUpdates, Time) *
+                             InverseLerp(0f, FadeTime, Projectile.timeLeft);
 
         if (Copy)
         {
@@ -276,7 +284,8 @@ public class InfluxWaverProj : ModProjectile
             Projectile.scale = MathF.Sin(Time * .15f) * .1f + .9f;
             Projectile.rotation = Projectile.velocity.ToRotation() + PiOver4;
             if (Time % 2 == 1)
-                ParticleRegistry.SpawnTechyHolosquareParticle(Projectile.RotHitbox().TopRight, -Projectile.velocity * Main.rand.NextFloat(.1f, .2f),
+                ParticleRegistry.SpawnTechyHolosquareParticle(Projectile.RotHitbox().TopRight,
+                    -Projectile.velocity * Main.rand.NextFloat(.1f, .2f),
                     Main.rand.Next(30, 50), Main.rand.NextFloat(.6f, .9f), new(34, 128, 203));
 
             if (Collision.SolidCollision(Projectile.Center, 4, 4))
@@ -292,6 +301,7 @@ public class InfluxWaverProj : ModProjectile
                     Projectile.friendly = Projectile.hostile = false;
                     this.Sync();
                 }
+
                 Projectile.velocity *= .9f;
             }
         }
@@ -301,7 +311,8 @@ public class InfluxWaverProj : ModProjectile
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return targetHitbox.LineCollision(Projectile.BaseRotHitbox().BottomLeft, Projectile.BaseRotHitbox().TopRight, 22f);
+        return targetHitbox.LineCollision(Projectile.BaseRotHitbox().BottomLeft, Projectile.BaseRotHitbox().TopRight,
+            22f);
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
@@ -313,8 +324,10 @@ public class InfluxWaverProj : ModProjectile
 
             if (this.RunLocal())
             {
-                Projectile.NewProj(target.Center, Vector2.Zero, ModContent.ProjectileType<InfluxWaverCreator>(), Projectile.damage, Projectile.knockBack, Projectile.owner, 0f, target.whoAmI);
+                Projectile.NewProj(target.Center, Vector2.Zero, ModContent.ProjectileType<InfluxWaverCreator>(),
+                    Projectile.damage, Projectile.knockBack, Projectile.owner, 0f, target.whoAmI);
             }
+
             this.Sync();
         }
     }
@@ -325,11 +338,16 @@ public class InfluxWaverProj : ModProjectile
         {
             DrawChromaticAberration(Projectile.rotation.ToRotationVector2(), 3f, (Vector2 offset, Color colorMod) =>
             {
-                Main.spriteBatch.DrawBetter(Projectile.ThisProjectileTexture(), Projectile.Center + offset, null, Color.White.MultiplyRGBA(colorMod) * Projectile.Opacity,
+                Main.spriteBatch.DrawBetter(Projectile.ThisProjectileTexture(), Projectile.Center + offset, null,
+                    Color.White.MultiplyRGBA(colorMod) * Projectile.Opacity,
                     Projectile.rotation, Projectile.ThisProjectileTexture().Size() / 2, Projectile.scale);
             });
         }
-        Projectile.DrawBaseProjectile((Color.White * Projectile.Opacity * (Copy ? .8f : 1f)) with { A = (byte)(Copy ? 10 : 255) });
+
+        Projectile.DrawBaseProjectile((Color.White * Projectile.Opacity * (Copy ? .8f : 1f)) with
+        {
+            A = (byte) (Copy ? 10 : 255)
+        });
         return false;
     }
 }

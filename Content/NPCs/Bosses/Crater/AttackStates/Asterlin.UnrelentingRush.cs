@@ -35,23 +35,23 @@ public partial class Asterlin : ModNPC
 
     public static int UnrelentingRush_TotalDashes => DifficultyBasedValue(10, 13, 16, 18, 20, 24);
 
-    public static int UnrelentingRush_SlowdownTime => DifficultyBasedValue(CalUtils.SecondsToFrames(.7f),
-        CalUtils.SecondsToFrames(.6f), CalUtils.SecondsToFrames(.5f), CalUtils.SecondsToFrames(.46f),
-        CalUtils.SecondsToFrames(.4f), CalUtils.SecondsToFrames(.36f));
+    public static int UnrelentingRush_SlowdownTime => DifficultyBasedValue(SecondsToFrames(.7f),
+        SecondsToFrames(.6f), SecondsToFrames(.5f), SecondsToFrames(.46f),
+        SecondsToFrames(.4f), SecondsToFrames(.36f));
 
-    public static int UnrelentingRush_InitialFadeTime => CalUtils.SecondsToFrames(.7f);
+    public static int UnrelentingRush_InitialFadeTime => SecondsToFrames(.7f);
 
-    public static int UnrelentingRush_PortalFadeIn => DifficultyBasedValue(CalUtils.SecondsToFrames(.8f),
-        CalUtils.SecondsToFrames(.64f), CalUtils.SecondsToFrames(.62f), CalUtils.SecondsToFrames(.59f),
-        CalUtils.SecondsToFrames(.55f), CalUtils.SecondsToFrames(.5f));
+    public static int UnrelentingRush_PortalFadeIn => DifficultyBasedValue(SecondsToFrames(.8f),
+        SecondsToFrames(.64f), SecondsToFrames(.62f), SecondsToFrames(.59f),
+        SecondsToFrames(.55f), SecondsToFrames(.5f));
 
     public static int UnrelentingRush_LaserCount => DifficultyBasedValue(6, 8, 10, 12, 14);
-    public static int UnrelentingRush_PortalFadeOut => CalUtils.SecondsToFrames(.9f);
+    public static int UnrelentingRush_PortalFadeOut => SecondsToFrames(.9f);
 
     public static int UnrelentingRush_PortalLifetime => UnrelentingRush_PortalFadeIn + UnrelentingRush_PortalFadeOut +
-                                                        CalUtils.SecondsToFrames(2f);
+                                                        SecondsToFrames(2f);
 
-    public static readonly int UnrelentingRush_WaitTime = CalUtils.SecondsToFrames(1.2f);
+    public static readonly int UnrelentingRush_WaitTime = SecondsToFrames(1.2f);
     public static readonly int UnrelentingRush_MaxUpdates = 10;
 
     public enum UnrelentingRush_States
@@ -63,27 +63,27 @@ public partial class Asterlin : ModNPC
 
     public int UnrelentingRush_DashCounter
     {
-        get => (int)ExtraAI[0];
+        get => (int) ExtraAI[0];
         set => ExtraAI[0] = value;
     }
 
     public UnrelentingRush_States UnrelentingRush_CurrentState
     {
-        get => (UnrelentingRush_States)ExtraAI[1];
-        set => ExtraAI[1] = (int)value;
+        get => (UnrelentingRush_States) ExtraAI[1];
+        set => ExtraAI[1] = (int) value;
     }
 
     public ref float UnrelentingRush_SavedRotation => ref ExtraAI[2];
 
     public int UnrelentingRush_DashTimer
     {
-        get => (int)ExtraAI[3];
+        get => (int) ExtraAI[3];
         set => ExtraAI[3] = value;
     }
 
     public int UnrelentingRush_WaitTimer
     {
-        get => (int)ExtraAI[4];
+        get => (int) ExtraAI[4];
         set => ExtraAI[4] = value;
     }
 
@@ -173,7 +173,7 @@ public partial class Asterlin : ModNPC
                         for (float i = .4f; i <= 1f; i += .1f)
                         {
                             Vector2 vel = -NPC.velocity.SafeNormalize(Vector2.Zero) * 60f * i;
-                            int life = (int)(50 * i);
+                            int life = (int) (50 * i);
                             float endScale = Utils.Remap(i, .5f, 1f, 800f, 100f);
                             for (int j = 0; j < 2; j++)
                                 ParticleRegistry.SpawnPulseRingParticle(NPC.Center, vel, life,

@@ -13,6 +13,7 @@ public class HonedTesselesticLightning : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
     private const int Life = 30;
+
     public override void SetDefaults()
     {
         Projectile.ignoreWater = Projectile.tileCollide = Projectile.hostile = true;
@@ -24,6 +25,7 @@ public class HonedTesselesticLightning : ModProjectile
     }
 
     public ref float Time => ref Projectile.ai[0];
+
     public Vector2 End
     {
         get => new Vector2(Projectile.ai[1], Projectile.ai[2]);
@@ -63,9 +65,13 @@ public class HonedTesselesticLightning : ModProjectile
     }
 
     public float WidthFunct(float c) => 40f * Projectile.Opacity;
-    public Color ColorFunct(SystemVector2 c, Vector2 pos) => MulticolorLerp(Completion, Color.White, Color.Cyan) * Projectile.Opacity;
+
+    public Color ColorFunct(SystemVector2 c, Vector2 pos) =>
+        MulticolorLerp(Completion, Color.White, Color.Cyan) * Projectile.Opacity;
+
     public TrailPoints points;
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -77,6 +83,7 @@ public class HonedTesselesticLightning : ModProjectile
                 trail.DrawTrail(shader, points.Points);
             }
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 
         return false;

@@ -29,19 +29,21 @@ public class CosmicImplosionHoldout : BaseIdleHoldoutProjectile
     public ref float Time => ref Projectile.ai[0];
     public ref float PullTime => ref Projectile.ai[1];
     public ref float ReleaseTime => ref Projectile.ai[2];
+
     public bool Released
     {
         get => Projectile.AdditionsInfo().ExtraAI[0] == 1f;
         set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
 
-    public static readonly int PullbackTime = CalUtils.SecondsToFrames(1.4f);
-    public static readonly int FireTime = CalUtils.SecondsToFrames(.4f);
+    public static readonly int PullbackTime = SecondsToFrames(1.4f);
+    public static readonly int FireTime = SecondsToFrames(.4f);
 
     public Vector2 CurrentEnd;
     public override void WriteExtraAI(BinaryWriter writer) => writer.WriteVector2(CurrentEnd);
     public override void GetExtraAI(BinaryReader reader) => CurrentEnd = reader.ReadVector2();
     public int Dir => Projectile.velocity.X.NonZeroSign();
+
     public override void SafeAI()
     {
         if (this.RunLocal())
@@ -50,8 +52,10 @@ public class CosmicImplosionHoldout : BaseIdleHoldoutProjectile
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
+
         Projectile.rotation = Projectile.velocity.ToRotation();
-        Projectile.Center = Center + PolarVector(25f * Projectile.scale, Projectile.rotation) + PolarVector(10f * Projectile.scale * Dir * Owner.gravDir, Projectile.rotation - PiOver2);
+        Projectile.Center = Center + PolarVector(25f * Projectile.scale, Projectile.rotation) +
+                            PolarVector(10f * Projectile.scale * Dir * Owner.gravDir, Projectile.rotation - PiOver2);
         Owner.itemRotation = (Projectile.direction * Projectile.velocity).ToRotation();
         Owner.ChangeDir(Dir);
         Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, Projectile.rotation);
@@ -59,10 +63,14 @@ public class CosmicImplosionHoldout : BaseIdleHoldoutProjectile
         if (String == null || String.Disposed)
             String = new(c => 3f, (c, pos) => Color.Cyan.Lerp(Color.Fuchsia, c.X), null, 40);
 
-        Vector2 cyanCenter = Projectile.Center + PolarVector(11f * Projectile.scale, Projectile.rotation) + PolarVector(16f * Projectile.scale * Dir * Owner.gravDir, Projectile.rotation - PiOver2);
-        Vector2 start = Projectile.Center + PolarVector(-10f * Projectile.scale, Projectile.rotation) + PolarVector(8f * Projectile.scale * Dir * Owner.gravDir, Projectile.rotation - PiOver2);
-        Vector2 end = Projectile.Center + PolarVector(12f * Projectile.scale, Projectile.rotation) + PolarVector(6f * Projectile.scale * Dir * Owner.gravDir, Projectile.rotation - PiOver2);
-        Vector2 purpleCenter = Projectile.Center + PolarVector(9f * Projectile.scale, Projectile.rotation) + PolarVector(11f * Projectile.scale * Dir * Owner.gravDir, Projectile.rotation + PiOver2);
+        Vector2 cyanCenter = Projectile.Center + PolarVector(11f * Projectile.scale, Projectile.rotation) +
+                             PolarVector(16f * Projectile.scale * Dir * Owner.gravDir, Projectile.rotation - PiOver2);
+        Vector2 start = Projectile.Center + PolarVector(-10f * Projectile.scale, Projectile.rotation) +
+                        PolarVector(8f * Projectile.scale * Dir * Owner.gravDir, Projectile.rotation - PiOver2);
+        Vector2 end = Projectile.Center + PolarVector(12f * Projectile.scale, Projectile.rotation) +
+                      PolarVector(6f * Projectile.scale * Dir * Owner.gravDir, Projectile.rotation - PiOver2);
+        Vector2 purpleCenter = Projectile.Center + PolarVector(9f * Projectile.scale, Projectile.rotation) +
+                               PolarVector(11f * Projectile.scale * Dir * Owner.gravDir, Projectile.rotation + PiOver2);
 
         float anim = Animators.MakePoly(3f).InFunction(InverseLerp(0f, PullbackTime, PullTime));
         if (Released)
@@ -74,7 +82,8 @@ public class CosmicImplosionHoldout : BaseIdleHoldoutProjectile
             {
                 AdditionsSound.etherealRelease2.Play(end, 1.2f, -.2f, .1f);
                 if (this.RunLocal())
-                    Projectile.NewProj(end, Projectile.velocity * 10f, ModContent.ProjectileType<EmpyreanRipshot>(), Projectile.damage, Projectile.knockBack, Owner.whoAmI);
+                    Projectile.NewProj(end, Projectile.velocity * 10f, ModContent.ProjectileType<EmpyreanRipshot>(),
+                        Projectile.damage, Projectile.knockBack, Owner.whoAmI);
             }
 
             ReleaseTime++;
@@ -111,18 +120,21 @@ public class CosmicImplosionHoldout : BaseIdleHoldoutProjectile
 
     public OptimizedPrimitiveTrail String;
     public TrailPoints Points = new(40);
+
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D texture = Projectile.ThisProjectileTexture();
         float rotation = Projectile.rotation;
         Vector2 origin = texture.Size() / 2;
-        Main.spriteBatch.DrawBetter(texture, Projectile.Center, null, Projectile.GetAlpha(lightColor), rotation, origin, Projectile.scale, FixedDirection());
+        Main.spriteBatch.DrawBetter(texture, Projectile.Center, null, Projectile.GetAlpha(lightColor), rotation, origin,
+            Projectile.scale, FixedDirection());
 
         void draw()
         {
             if (String != null && Points != null)
                 String.DrawTrail(ShaderRegistry.StandardPrimitiveShader, Points.Points, 100, true, false);
         }
+
         LayeredDrawSystem.QueueDrawAction(draw, PixelationLayer.Dusts);
 
         return false;

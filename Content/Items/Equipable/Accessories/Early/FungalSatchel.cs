@@ -11,6 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Early;
 public class FungalSatchel : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.FungalSatchel);
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(Color.AliceBlue);

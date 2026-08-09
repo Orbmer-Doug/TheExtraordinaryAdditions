@@ -12,6 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Early;
 public class VoltGrieves : ModItem, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.VoltGrieves);
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(new Color(231, 191, 255));

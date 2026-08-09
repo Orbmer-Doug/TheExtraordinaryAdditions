@@ -1,6 +1,7 @@
 ﻿using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Pets;
+
 namespace TheExtraordinaryAdditions.Content.Buffs.Summon;
 
 public class AntflyBuff : ModBuff

@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.Audio;
 using Terraria.Enums;
@@ -41,17 +40,17 @@ public class TankHeadHoldout : BaseIdleHoldoutProjectile
     public static Color GetTeamColor(Player player)
     {
         Color col = Color.Transparent;
-        if (player.team == (int)Team.None)
+        if (player.team == (int) Team.None)
             col = Color.Green;
-        if (player.team == (int)Team.Red)
+        if (player.team == (int) Team.Red)
             col = Color.Red;
-        if (player.team == (int)Team.Green || Main.netMode == NetmodeID.SinglePlayer)
+        if (player.team == (int) Team.Green || Main.netMode == NetmodeID.SinglePlayer)
             col = Color.LimeGreen;
-        if (player.team == (int)Team.Blue)
+        if (player.team == (int) Team.Blue)
             col = Color.Blue;
-        if (player.team == (int)Team.Yellow)
+        if (player.team == (int) Team.Yellow)
             col = Color.Gold;
-        if (player.team == (int)Team.Pink)
+        if (player.team == (int) Team.Pink)
             col = Color.Pink;
         return col;
     }
@@ -59,31 +58,37 @@ public class TankHeadHoldout : BaseIdleHoldoutProjectile
     public const float SightDistance = 900f;
     public const float TimeForLock = 60f;
     public int Recoil;
+
     public override void SafeAI()
     {
         if (Projectile.localAI[0] == 0f)
         {
-            Cooldown = CalUtils.SecondsToFrames(5f);
+            Cooldown = SecondsToFrames(5f);
             Projectile.localAI[0] = 1f;
         }
+
         if (Owner.dead || !Owner.active)
             Projectile.Kill();
 
         if (this.RunLocal())
         {
             float interpolant = Utils.GetLerpValue(5f, 40f, Projectile.Distance(Modded.MouseWorld), true);
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Modded.MouseWorld), interpolant);
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Modded.MouseWorld),
+                interpolant);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
+
         Owner.ChangeDir((Projectile.velocity.X > 0f).ToDirectionInt());
         Owner.SetFrontHandBetter(0, Projectile.velocity.ToRotation());
         Owner.SetBackHandBetter(0, Projectile.velocity.ToRotation());
         Projectile.FacingUp();
 
         float dist = 30f;
-        Projectile.Center = Owner.RotatedRelativePoint(Owner.MountedCenter) + Projectile.velocity * MathHelper.Clamp(dist - Recoil * 2, 0f, dist);
-        Vector2 tipOfGun = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.UnitY) * Owner.HeldItem.width * .5f;
+        Projectile.Center = Owner.RotatedRelativePoint(Owner.MountedCenter) +
+                            Projectile.velocity * MathHelper.Clamp(dist - Recoil * 2, 0f, dist);
+        Vector2 tipOfGun = Projectile.Center +
+                           Projectile.velocity.SafeNormalize(Vector2.UnitY) * Owner.HeldItem.width * .5f;
 
         if (Recoil > 0)
             Recoil--;
@@ -112,7 +117,8 @@ public class TankHeadHoldout : BaseIdleHoldoutProjectile
         if (Firing == 0f)
         {
             if (Cooldown > 0 && Cooldown % 2f == 0f && (State == GrubState || State == BeeState))
-                ParticleRegistry.SpawnHeavySmokeParticle(tipOfGun, -Vector2.UnitY.RotatedByRandom(.25f) * Main.rand.NextFloat(4f, 6f),
+                ParticleRegistry.SpawnHeavySmokeParticle(tipOfGun,
+                    -Vector2.UnitY.RotatedByRandom(.25f) * Main.rand.NextFloat(4f, 6f),
                     Main.rand.Next(10, 17), Main.rand.NextFloat(.4f, .7f), Color.Gray, .7f, true);
 
             if (State == GrubState)
@@ -120,6 +126,7 @@ public class TankHeadHoldout : BaseIdleHoldoutProjectile
                 Projectile.scale = 1.1f;
                 Projectile.frame = 7;
             }
+
             if (State == LaserState)
             {
                 if (this.RunLocal())
@@ -156,32 +163,36 @@ public class TankHeadHoldout : BaseIdleHoldoutProjectile
                     // congnito hazard
                     SoundEngine.PlaySound(SoundID.Item11, tipOfGun);
                     type = ModContent.ProjectileType<Slug>();
-                    damage = (int)(Projectile.damage * 1.1f);
+                    damage = (int) (Projectile.damage * 1.1f);
                 }
+
                 if (State == GrubState)
                 {
                     // grubulon
                     // grubmageddon
-                    Cooldown = CalUtils.SecondsToFrames(5f);
+                    Cooldown = SecondsToFrames(5f);
                     SoundEngine.PlaySound(SoundID.Item11 with { Pitch = -.5f, Volume = 1.3f }, tipOfGun);
                     type = ModContent.ProjectileType<Grub>();
                     damage = Projectile.damage / 15;
                 }
+
                 if (State == LaserState)
                 {
                     // snipe
                     SoundEngine.PlaySound(SoundID.Item12, tipOfGun);
                     type = ModContent.ProjectileType<Laser>();
-                    damage = (int)(Projectile.damage * 1.25f);
+                    damage = (int) (Projectile.damage * 1.25f);
                 }
+
                 if (State == MaggotState)
                 {
                     // fat tip
                     SoundEngine.PlaySound(SoundID.Item20, tipOfGun);
                     type = ModContent.ProjectileType<Maggot>();
                 }
+
                 if (this.RunLocal())
-                    Projectile.NewProj(tipOfGun, vel, type, (int)damage, 3f, Projectile.owner);
+                    Projectile.NewProj(tipOfGun, vel, type, (int) damage, 3f, Projectile.owner);
                 Recoil = 6;
             }
             else if (State == 4f)
@@ -192,29 +203,36 @@ public class TankHeadHoldout : BaseIdleHoldoutProjectile
                     Vector2 veloc = vel.RotatedByRandom(.35f) * Main.rand.NextFloat(.75f, 1.4f);
                     int damage = Projectile.damage / 9;
                     if (this.RunLocal())
-                        Projectile.NewProj(tipOfGun, veloc, ModContent.ProjectileType<TheSwarm>(), damage, 0f, Projectile.owner);
-                    SoundEngine.PlaySound(SoundID.Item11 with { MaxInstances = 0, Pitch = .15f, Volume = .9f }, tipOfGun);
+                        Projectile.NewProj(tipOfGun, veloc, ModContent.ProjectileType<TheSwarm>(), damage, 0f,
+                            Projectile.owner);
+                    SoundEngine.PlaySound(SoundID.Item11 with { MaxInstances = 0, Pitch = .15f, Volume = .9f },
+                        tipOfGun);
                 }
             }
+
             if (State == 0f || State == GrubState)
             {
                 if (State == GrubState)
                     Projectile.scale = 1.1f;
                 Projectile.SetAnimation(4, 7, true);
             }
+
             if (State == MaggotState)
                 Projectile.frame = 0;
             if (State == BeeState)
                 Projectile.frame = 6;
             if (Counter > 60f)
             {
-                if (State == BeeState)
-                    Cooldown = CalUtils.SecondsToFrames(3f);
+                // TODO
+                //if (State == BeeState)
+                //Cooldown =  
+                SecondsToFrames(3f);
                 Projectile.frameCounter = 0;
                 Firing = 0f;
                 Counter = 0f;
             }
         }
+
         Time++;
     }
 
@@ -224,7 +242,8 @@ public class TankHeadHoldout : BaseIdleHoldoutProjectile
         Rectangle frame = texture.Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame);
         Vector2 drawPosition = Projectile.Center - Main.screenPosition;
         SpriteEffects effects = 0;
-        Main.EntitySpriteDraw(texture, drawPosition, frame, Projectile.GetAlpha(GetTeamColor(Owner)), Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, effects, 0);
+        Main.EntitySpriteDraw(texture, drawPosition, frame, Projectile.GetAlpha(GetTeamColor(Owner)),
+            Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, effects, 0);
         return false;
     }
 }

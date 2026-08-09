@@ -1,5 +1,4 @@
 ﻿using System;
-using CalamityMod;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -36,16 +35,20 @@ public class SolarBrandSparks : ModProjectile
     internal Color ColorFunction(SystemVector2 c, Vector2 position)
     {
         float fade = InverseLerp(0f, 100f, Projectile.timeLeft);
-        return Color.Lerp(Color.DarkOrange, Color.OrangeRed * (MathF.Sin((Projectile.identity * 2 % 30) + Main.GlobalTimeWrappedHourly * 3f) * .5f + 1.5f), fade) * fade;
+        return Color.Lerp(Color.DarkOrange,
+            Color.OrangeRed * (MathF.Sin((Projectile.identity * 2 % 30) + Main.GlobalTimeWrappedHourly * 3f) * .5f +
+                               1.5f), fade) * fade;
     }
 
     internal float WidthFunction(float c)
     {
-        return OptimizedPrimitiveTrail.HemisphereWidthFunct(c, .5f * Projectile.width * MathHelper.SmoothStep(1f, 0f, c));
+        return OptimizedPrimitiveTrail.HemisphereWidthFunct(c,
+            .5f * Projectile.width * MathHelper.SmoothStep(1f, 0f, c));
     }
 
 
     public override bool? CanHitNPC(NPC target) => Projectile.numHits <= 0;
+
     public override void AI()
     {
         if (trail == null || trail.Disposed)
@@ -60,7 +63,8 @@ public class SolarBrandSparks : ModProjectile
         else
         {
             if (NPCTargeting.TryGetClosestNPC(new(Projectile.Center, 500, true, true), out NPC target))
-                Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.SafeDirectionTo(target.Center) * 30f, .1f);
+                Projectile.velocity = Vector2.SmoothStep(Projectile.velocity,
+                    Projectile.SafeDirectionTo(target.Center) * 30f, .1f);
         }
 
         cache ??= new(20);
@@ -74,7 +78,8 @@ public class SolarBrandSparks : ModProjectile
 
     public override bool OnTileCollide(Vector2 oldVelocity)
     {
-        Collision.HitTiles(Projectile.position + Projectile.velocity, Projectile.velocity, Projectile.width, Projectile.height);
+        Collision.HitTiles(Projectile.position + Projectile.velocity, Projectile.velocity, Projectile.width,
+            Projectile.height);
         Projectile.Kill();
         return false;
     }
@@ -84,13 +89,17 @@ public class SolarBrandSparks : ModProjectile
         for (int i = 0; i < 10; i++)
         {
             ParticleRegistry.SpawnHeavySmokeParticle(Projectile.Center + Main.rand.NextVector2Circular(2, 2),
-                -Projectile.velocity * Main.rand.NextFloat(.1f, .2f), 20, Main.rand.NextFloat(.3f, .4f), Color.OrangeRed, Main.rand.NextFloat(.6f, .8f), true);
-            ParticleRegistry.SpawnSparkParticle(Projectile.Center, -Projectile.velocity.RotatedByRandom(.3f) * Main.rand.NextFloat(.2f, .5f), 30, Main.rand.NextFloat(.2f, .5f), Color.OrangeRed);
+                -Projectile.velocity * Main.rand.NextFloat(.1f, .2f), 20, Main.rand.NextFloat(.3f, .4f),
+                Color.OrangeRed, Main.rand.NextFloat(.6f, .8f), true);
+            ParticleRegistry.SpawnSparkParticle(Projectile.Center,
+                -Projectile.velocity.RotatedByRandom(.3f) * Main.rand.NextFloat(.2f, .5f), 30,
+                Main.rand.NextFloat(.2f, .5f), Color.OrangeRed);
         }
     }
-    
+
     public OptimizedPrimitiveTrail trail;
     public TrailPoints cache;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -101,6 +110,7 @@ public class SolarBrandSparks : ModProjectile
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.StreakMagma), 1);
             trail.DrawTrail(shader, cache.Points, 60, true);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 
         return false;

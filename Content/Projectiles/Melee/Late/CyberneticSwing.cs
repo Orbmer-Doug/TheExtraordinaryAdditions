@@ -5,14 +5,12 @@ using System.Runtime.InteropServices;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Primitives;
 using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using static CalamityMod.CalamityUtils;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
 using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
@@ -51,16 +49,16 @@ public class CyberneticSwing : ModProjectile
     public Vector2 Center => Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
     public int Dir => Projectile.velocity.X.NonZeroSign();
     public float Speed => Owner.GetTotalAttackSpeed(DamageClass.Melee);
-    public int PunchTime => (int)(90 / Speed);
+    public int PunchTime => (int) (90 / Speed);
     public const int ReelTime = 40;
-    public int ParryTime => (int)(20 / Speed);
-    public int SmashTime => (int)(62 / Speed);
-    public int UppercutTime => (int)(70 / Speed);
+    public int ParryTime => (int) (20 / Speed);
+    public int SmashTime => (int) (62 / Speed);
+    public int UppercutTime => (int) (70 / Speed);
 
     public SwingState State
     {
-        get => (SwingState)Projectile.ai[0];
-        set => Projectile.ai[0] = (float)value;
+        get => (SwingState) Projectile.ai[0];
+        set => Projectile.ai[0] = (float) value;
     }
 
     public bool HitTarget
@@ -73,6 +71,7 @@ public class CyberneticSwing : ModProjectile
     public ref float Reel => ref Projectile.AdditionsInfo().ExtraAI[1];
     public ref float Dist => ref Projectile.AdditionsInfo().ExtraAI[2];
     public ref float OldDist => ref Projectile.AdditionsInfo().ExtraAI[3];
+
     public bool MadeWave
     {
         get => Projectile.AdditionsInfo().ExtraAI[4] == 1;
@@ -158,7 +157,9 @@ public class CyberneticSwing : ModProjectile
         if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, null, 20);
         points.Update(Projectile.Center);
-        ParticleRegistry.SpawnTechyHolosquareParticle(Projectile.RotHitbox().RandomPoint(), -Projectile.velocity * Main.rand.NextFloat(1f, 6f), Main.rand.Next(40, 60), Main.rand.NextFloat(.4f, .7f), Color.Cyan);
+        ParticleRegistry.SpawnTechyHolosquareParticle(Projectile.RotHitbox().RandomPoint(),
+            -Projectile.velocity * Main.rand.NextFloat(1f, 6f), Main.rand.Next(40, 60), Main.rand.NextFloat(.4f, .7f),
+            Color.Cyan);
 
         Projectile.Center = Center + PolarVector(Dist, Projectile.velocity.ToRotation());
         Projectile.rotation = Projectile.velocity.ToRotation();
@@ -167,6 +168,7 @@ public class CyberneticSwing : ModProjectile
     }
 
     public const float ParryDist = 130f;
+
     public void DoState_Parry()
     {
         if (Time == 0f)
@@ -176,22 +178,26 @@ public class CyberneticSwing : ModProjectile
             Projectile.Kill();
         }
 
-        if (!Owner.HasCooldown(CyberneticParryCooldown.ID))
+//TODO
+        //if (!Owner.HasCooldown(CyberneticParryCooldown.ID))
         {
             foreach (Projectile proj in Main.ActiveProjectiles)
             {
-                if (!proj.active || !proj.hostile || proj.damage <= 1 || !(proj.velocity.Length() * (proj.extraUpdates + 1) > 1f))
+                if (!proj.active || !proj.hostile || proj.damage <= 1 ||
+                    !(proj.velocity.Length() * (proj.extraUpdates + 1) > 1f))
                     continue;
-                if (!Projectile.Center.IsInFieldOfView(Projectile.velocity.ToRotation(), proj.Center, MathHelper.PiOver4, ParryDist))
+                if (!Projectile.Center.IsInFieldOfView(Projectile.velocity.ToRotation(), proj.Center,
+                        MathHelper.PiOver4, ParryDist))
                     continue;
                 if (HitTarget)
                     continue;
 
                 AdditionsSound.harpoonStop.Play(Projectile.Center, .9f, 0f, .1f, 10, Name);
-                ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 30, 0f, Vector2.One, 0f, 200f, Color.Cyan);
+                ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 30, 0f, Vector2.One, 0f, 200f,
+                    Color.Cyan);
                 float speed = proj.velocity.Length();
                 proj.velocity = proj.SafeDirectionTo(ModdedOwner.MouseWorld) * speed;
-                proj.ProjDamageMod().ParriedTimer = CalUtils.SecondsToFrames(3);
+                proj.ProjDamageMod().ParriedTimer = SecondsToFrames(3);
                 proj.netUpdate = true;
 
                 HitTarget = true;
@@ -218,18 +224,22 @@ public class CyberneticSwing : ModProjectile
             if (this.RunLocal())
             {
                 Vector2 dir = Projectile.velocity.SafeNormalize(Vector2.Zero);
-                Projectile.NewProj(Center + PolarVector(100f, dir.ToRotation()), dir * 10f, ModContent.ProjectileType<CyberPierce>(), (int)(Projectile.damage * .75f), 2f, Projectile.owner);
+                Projectile.NewProj(Center + PolarVector(100f, dir.ToRotation()), dir * 10f,
+                    ModContent.ProjectileType<CyberPierce>(), (int) (Projectile.damage * .75f), 2f, Projectile.owner);
             }
+
             MadeWave = true;
             this.Sync();
         }
 
         OldDist = Dist;
-        Dist = Projectile.velocity.ToRotation() + (MathHelper.PiOver2 + .2f) * Exp(2.2f).InOutFunction.Evaluate(-1f, 1f, comp) * Dir;
+        Dist = Projectile.velocity.ToRotation() +
+               (MathHelper.PiOver2 + .2f) * Exp(2.2f).InOutFunction.Evaluate(-1f, 1f, comp) * Dir;
         Projectile.Center = Center + PolarVector(100f, Dist);
         Projectile.rotation = Dist + MathHelper.PiOver2;
         Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, Center.AngleTo(Projectile.Center));
-        ParticleRegistry.SpawnTechyHolosquareParticle(Projectile.RotHitbox().RandomPoint(), -Projectile.rotation.ToRotationVector2() * Main.rand.NextFloat(1f, 6f),
+        ParticleRegistry.SpawnTechyHolosquareParticle(Projectile.RotHitbox().RandomPoint(),
+            -Projectile.rotation.ToRotationVector2() * Main.rand.NextFloat(1f, 6f),
             Main.rand.Next(30, 40), Main.rand.NextFloat(.4f, .7f), Color.DarkCyan);
 
         if (trail == null || trail.Disposed)
@@ -255,21 +265,27 @@ public class CyberneticSwing : ModProjectile
             {
                 for (int i = 0; i < 3; i++)
                 {
-                    Vector2 pos = Center + PolarVector(100f, Projectile.velocity.ToRotation() + (MathHelper.PiOver2 - .2f) * MathHelper.Lerp(1f, -1f, InverseLerp(0, 3 - 1, i)) * Dir);
-                    Projectile.NewProj(pos, Projectile.velocity * 18f, ModContent.ProjectileType<CyberDart>(), (int)(Projectile.damage * .33f), 0f, Projectile.owner);
+                    Vector2 pos = Center + PolarVector(100f,
+                        Projectile.velocity.ToRotation() + (MathHelper.PiOver2 - .2f) *
+                        MathHelper.Lerp(1f, -1f, InverseLerp(0, 3 - 1, i)) * Dir);
+                    Projectile.NewProj(pos, Projectile.velocity * 18f, ModContent.ProjectileType<CyberDart>(),
+                        (int) (Projectile.damage * .33f), 0f, Projectile.owner);
                 }
+
                 MadeWave = true;
                 this.Sync();
             }
         }
 
         OldDist = Dist;
-        Dist = Projectile.velocity.ToRotation() + (MathHelper.PiOver2 - .2f) * Exp(2.2f).OutFunction.Evaluate(1f, -1f, comp) * Dir;
+        Dist = Projectile.velocity.ToRotation() +
+               (MathHelper.PiOver2 - .2f) * Exp(2.2f).OutFunction.Evaluate(1f, -1f, comp) * Dir;
         Projectile.Center = Center + PolarVector(100f, Dist);
         Projectile.rotation = Dist - MathHelper.PiOver2;
         Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, Center.AngleTo(Projectile.Center));
-        ParticleRegistry.SpawnTechyHolosquareParticle(Projectile.RotHitbox().RandomPoint(), -Projectile.rotation.ToRotationVector2() * Main.rand.NextFloat(1f, 6f),
-    Main.rand.Next(30, 40), Main.rand.NextFloat(.4f, .7f), Color.DarkCyan);
+        ParticleRegistry.SpawnTechyHolosquareParticle(Projectile.RotHitbox().RandomPoint(),
+            -Projectile.rotation.ToRotationVector2() * Main.rand.NextFloat(1f, 6f),
+            Main.rand.Next(30, 40), Main.rand.NextFloat(.4f, .7f), Color.DarkCyan);
 
         if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, OffsetFunct, 20);
@@ -297,22 +313,28 @@ public class CyberneticSwing : ModProjectile
         }
     }
 
-    public override bool? CanDamage() => State == SwingState.Parry ? false : (State == SwingState.LightningPunch && HitTarget) ? false : null;
+    public override bool? CanDamage() => State == SwingState.Parry ? false :
+        (State == SwingState.LightningPunch && HitTarget) ? false : null;
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         if (State == SwingState.LightningPunch)
         {
             if (this.RunLocal())
-                Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<CyberneticBlast>(), Projectile.damage / 2, Projectile.knockBack / 2, Projectile.owner);
+                Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<CyberneticBlast>(),
+                    Projectile.damage / 2, Projectile.knockBack / 2, Projectile.owner);
             AdditionsSound.etherealSlam.Play(Projectile.Center, 1.4f, -.2f, .1f, 20, Name);
             ScreenShakeSystem.New(new(.5f, .3f), Projectile.Center);
             for (int i = 0; i < 30; i++)
             {
                 ParticleRegistry.SpawnHeavySmokeParticle(Projectile.Center, Main.rand.NextVector2Circular(7, 7),
-                    Main.rand.Next(40, 70), Main.rand.NextFloat(1f, 1.8f), Color.Cyan.Lerp(Color.LightCyan, Main.rand.NextFloat(.2f, .5f)));
-                ParticleRegistry.SpawnGlowParticle(Projectile.Center, Main.rand.NextVector2Circular(2f, 2f), Main.rand.Next(18, 20), Main.rand.NextFloat(70f, 100f), Color.LightCyan, Main.rand.NextFloat(.8f, 1f));
-                ParticleRegistry.SpawnBloomLineParticle(Projectile.Center, Main.rand.NextVector2Circular(10f, 10f), Main.rand.Next(20, 30), Main.rand.NextFloat(.5f, .8f), Color.Cyan);
+                    Main.rand.Next(40, 70), Main.rand.NextFloat(1f, 1.8f),
+                    Color.Cyan.Lerp(Color.LightCyan, Main.rand.NextFloat(.2f, .5f)));
+                ParticleRegistry.SpawnGlowParticle(Projectile.Center, Main.rand.NextVector2Circular(2f, 2f),
+                    Main.rand.Next(18, 20), Main.rand.NextFloat(70f, 100f), Color.LightCyan,
+                    Main.rand.NextFloat(.8f, 1f));
+                ParticleRegistry.SpawnBloomLineParticle(Projectile.Center, Main.rand.NextVector2Circular(10f, 10f),
+                    Main.rand.Next(20, 30), Main.rand.NextFloat(.5f, .8f), Color.Cyan);
             }
         }
 
@@ -320,13 +342,18 @@ public class CyberneticSwing : ModProjectile
         {
             for (int i = 0; i < 40; i++)
             {
-                Vector2 vel = Projectile.rotation.ToRotationVector2().RotatedByRandom(.3f) * Main.rand.NextFloat(2f, 11f);
+                Vector2 vel = Projectile.rotation.ToRotationVector2().RotatedByRandom(.3f) *
+                              Main.rand.NextFloat(2f, 11f);
 
                 if (i < 10)
-                    ParticleRegistry.SpawnTechyHolosquareParticle(Projectile.Center, vel, Main.rand.Next(30, 40), Main.rand.NextFloat(1.3f, 1.8f), Color.Cyan);
-                ParticleRegistry.SpawnSquishyLightParticle(Projectile.Center, vel, Main.rand.Next(20, 30), Main.rand.NextFloat(.5f, .9f), Color.Cyan);
+                    ParticleRegistry.SpawnTechyHolosquareParticle(Projectile.Center, vel, Main.rand.Next(30, 40),
+                        Main.rand.NextFloat(1.3f, 1.8f), Color.Cyan);
+                ParticleRegistry.SpawnSquishyLightParticle(Projectile.Center, vel, Main.rand.Next(20, 30),
+                    Main.rand.NextFloat(.5f, .9f), Color.Cyan);
             }
-            AdditionsSound.etherealHit5.Play(Projectile.Center, 1.8f, State == SwingState.Uppercut ? .1f : -.1f, .1f, 10, Name);
+
+            AdditionsSound.etherealHit5.Play(Projectile.Center, 1.8f, State == SwingState.Uppercut ? .1f : -.1f, .1f,
+                10, Name);
         }
 
         if (!HitTarget)
@@ -337,19 +364,24 @@ public class CyberneticSwing : ModProjectile
 
     public override void OnKill(int timeLeft)
     {
-        if (State == SwingState.Parry && !HitTarget && !Owner.HasCooldown(CyberneticParryCooldown.ID))
-            Owner.AddCooldown(CyberneticParryCooldown.ID, CalUtils.SecondsToFrames(4));
+        //TODO
+        //if (State == SwingState.Parry && !HitTarget && !Owner.HasCooldown(CyberneticParryCooldown.ID))
+        //  Owner.AddCooldown(CyberneticParryCooldown.ID, SecondsToFrames(4));
     }
 
     public float WidthFunct(float c) => MathHelper.SmoothStep(Projectile.height, 0f, c);
+
     public Color ColorFunct(SystemVector2 c, Vector2 pos)
     {
-        return CoreUtils.MulticolorLerp(c.X, Color.White, Color.LightCyan, Color.Cyan, Color.DarkCyan, Color.DarkSlateBlue) * Projectile.Opacity;
+        return CoreUtils.MulticolorLerp(c.X, Color.White, Color.LightCyan, Color.Cyan, Color.DarkCyan,
+            Color.DarkSlateBlue) * Projectile.Opacity;
     }
+
     public SystemVector2 OffsetFunct(float c) => Center.ToNumerics();
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints points = new(20);
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -372,15 +404,17 @@ public class CyberneticSwing : ModProjectile
 
         if (State == SwingState.LightningPunch)
         {
-            effects = Projectile.direction == -(int)Owner.gravDir ? SpriteEffects.FlipVertically : SpriteEffects.None;
-            if ((int)Owner.gravDir == -1 && Projectile.direction == -(int)Owner.gravDir)
+            effects = Projectile.direction == -(int) Owner.gravDir ? SpriteEffects.FlipVertically : SpriteEffects.None;
+            if ((int) Owner.gravDir == -1 && Projectile.direction == -(int) Owner.gravDir)
                 effects |= SpriteEffects.FlipVertically;
         }
 
         if (State == SwingState.Parry)
         {
-            effects = (Projectile.direction == 1 && (int)Owner.gravDir == 1) ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
-            if ((int)Owner.gravDir == -1 && Projectile.direction == -1)
+            effects = (Projectile.direction == 1 && (int) Owner.gravDir == 1)
+                ? SpriteEffects.FlipHorizontally
+                : SpriteEffects.None;
+            if ((int) Owner.gravDir == -1 && Projectile.direction == -1)
                 effects |= SpriteEffects.FlipHorizontally;
         }
 
@@ -397,11 +431,14 @@ public class CyberneticSwing : ModProjectile
                 effects |= SpriteEffects.FlipHorizontally;
         }
 
-        bool miss = (State == SwingState.Parry && Owner.HasCooldown(CyberneticParryCooldown.ID));
-        Projectile.DrawProjectileBackglow((miss ? Color.Red : Color.Cyan) * .5f * Projectile.Opacity, 2f, 0, 8, effects);
-        Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(miss ? Color.Red : Color.White), rotation, origin, Projectile.scale, effects, 0f);
+        bool miss = (State == SwingState.Parry /*&& Owner.HasCooldown(CyberneticParryCooldown.ID)*/); // TODO
+        Projectile.DrawProjectileBackglow((miss ? Color.Red : Color.Cyan) * .5f * Projectile.Opacity, 2f, 0, 8,
+            effects);
+        Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(miss ? Color.Red : Color.White),
+            rotation, origin, Projectile.scale, effects, 0f);
 
-        if (State == SwingState.Parry && !Owner.HasCooldown(CyberneticParryCooldown.ID))
+        //TODO
+        if (State == SwingState.Parry /*&& !Owner.HasCooldown(CyberneticParryCooldown.ID)*/)
         {
             ManagedShader shader = AssetRegistry.GetShader("ForcefieldLimited");
             shader.TrySetParameter("direction", Projectile.velocity.ToRotation());
@@ -410,10 +447,11 @@ public class CyberneticSwing : ModProjectile
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise), 1, SamplerState.LinearWrap);
 
             float size = ParryDist;
-            Main.spriteBatch.EnterShaderRegion(BlendState.Additive, shader.Effect);
+            Main.spriteBatch.EnterShaderRegion(shader.Effect, BlendState.Additive);
             shader.Render();
-            Main.spriteBatch.Draw(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise), ToTarget(Center - new Vector2(size / 2), new Vector2(size)), Color.White);
-            Main.spriteBatch.ExitShaderRegion();
+            Main.spriteBatch.Draw(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise),
+                ToTarget(Center - new Vector2(size / 2), new Vector2(size)), Color.White);
+            Main.spriteBatch.ResetToDefault();
         }
         else
             PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
@@ -426,6 +464,7 @@ public class CyberneticBlast : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
     public const int Lifetime = 40;
+
     public override void SetDefaults()
     {
         Projectile.Size = new(1);
@@ -438,20 +477,24 @@ public class CyberneticBlast : ModProjectile
     }
 
     public ref float Time => ref Projectile.ai[0];
+
     public int Radius
     {
-        get => (int)Projectile.ai[1];
+        get => (int) Projectile.ai[1];
         set => Projectile.ai[1] = value;
     }
+
     public float Completion => InverseLerp(0f, Lifetime, Time);
+
     public override void AI()
     {
         if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, null, 40);
 
-        Radius = (int)MakePoly(4f).OutFunction.Evaluate(0f, 100f, Completion);
+        Radius = (int) MakePoly(4f).OutFunction.Evaluate(0f, 100f, Completion);
         for (int i = 0; i < 40; i++)
-            points.SetPoint(i, Projectile.Center + Vector2.One.RotatedBy(i / (float)(40 - 1) * (MathF.Tau + float.Epsilon)) * Radius);
+            points.SetPoint(i,
+                Projectile.Center + Vector2.One.RotatedBy(i / (float) (40 - 1) * (MathF.Tau + float.Epsilon)) * Radius);
 
         Time++;
     }
@@ -468,11 +511,13 @@ public class CyberneticBlast : ModProjectile
 
     public Color ColorFunct(SystemVector2 c, Vector2 pos)
     {
-        return CoreUtils.MulticolorLerp(Completion, Color.White, Color.Cyan, Color.DarkCyan) * InverseLerp(0f, 5f, Time) * MakePoly(2f).OutFunction.Evaluate(1f, 0f, Completion);
+        return CoreUtils.MulticolorLerp(Completion, Color.White, Color.Cyan, Color.DarkCyan) *
+               InverseLerp(0f, 5f, Time) * MakePoly(2f).OutFunction.Evaluate(1f, 0f, Completion);
     }
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints points = new(40);
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -484,6 +529,7 @@ public class CyberneticBlast : ModProjectile
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WavyBlotchNoise), 1, SamplerState.LinearWrap);
             trail.DrawTrail(shader, points.Points, 100, true);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;
     }
@@ -492,6 +538,7 @@ public class CyberneticBlast : ModProjectile
 public class CyberDart : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.Size = new(20);
@@ -506,7 +553,7 @@ public class CyberDart : ModProjectile
 
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
 
@@ -518,8 +565,10 @@ public class CyberDart : ModProjectile
 
         Projectile.Opacity = InverseLerp(0f, 20f, Time) * InverseLerp(0f, 30f, Projectile.timeLeft);
         Projectile.scale = InverseLerp(0f, 30f, Projectile.timeLeft);
-        if (NPCTargeting.TryGetClosestNPC(new(Projectile.Center, 750, false, true), out NPC target) && Projectile.penetrate > 0 && Time > 20)
-            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.Center.SafeDirectionTo(target.Center) * 45f, .3f);
+        if (NPCTargeting.TryGetClosestNPC(new(Projectile.Center, 750, false, true), out NPC target) &&
+            Projectile.penetrate > 0 && Time > 20)
+            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity,
+                Projectile.Center.SafeDirectionTo(target.Center) * 45f, .3f);
 
         if (Projectile.penetrate <= 0)
         {
@@ -527,6 +576,7 @@ public class CyberDart : ModProjectile
             if (points.Points.AllPointsEqual())
                 Projectile.Kill();
         }
+
         Time++;
     }
 
@@ -535,9 +585,14 @@ public class CyberDart : ModProjectile
         AdditionsSound.etherealSmallHit.Play(Projectile.Center, .7f, 0f, .2f);
         for (int i = 0; i < 20; i++)
         {
-            ParticleRegistry.SpawnGlowParticle(Projectile.Center, Vector2.Zero, (int)Terraria.Utils.Remap(i, 0, 20, 20, 50), Terraria.Utils.Remap(i, 0, 20, 30f, 60f), Color.DeepSkyBlue);
-            ParticleRegistry.SpawnTechyHolosquareParticle(Projectile.Center + Main.rand.NextVector2Circular(10, 10), -Projectile.velocity.RotatedByRandom(.2f) * Main.rand.NextFloat(.2f, .5f), Main.rand.Next(30, 40), Main.rand.NextFloat(.4f, .8f), Color.Cyan);
+            ParticleRegistry.SpawnGlowParticle(Projectile.Center, Vector2.Zero,
+                (int) Terraria.Utils.Remap(i, 0, 20, 20, 50), Terraria.Utils.Remap(i, 0, 20, 30f, 60f),
+                Color.DeepSkyBlue);
+            ParticleRegistry.SpawnTechyHolosquareParticle(Projectile.Center + Main.rand.NextVector2Circular(10, 10),
+                -Projectile.velocity.RotatedByRandom(.2f) * Main.rand.NextFloat(.2f, .5f), Main.rand.Next(30, 40),
+                Main.rand.NextFloat(.4f, .8f), Color.Cyan);
         }
+
         Projectile.velocity *= 0;
     }
 
@@ -548,10 +603,14 @@ public class CyberDart : ModProjectile
         else
             return MathHelper.Lerp(Projectile.width, 0f, InverseLerp(.3f, 1f, c)) * Projectile.scale;
     }
-    public Color ColorFunct(SystemVector2 c, Vector2 pos) => Color.DeepSkyBlue * Terraria.Utils.Remap(Projectile.Opacity, 0f, 1f, c.X, MathHelper.Clamp(c.X + 1, 0, 1));
+
+    public Color ColorFunct(SystemVector2 c, Vector2 pos) => Color.DeepSkyBlue *
+                                                             Terraria.Utils.Remap(Projectile.Opacity, 0f, 1f, c.X,
+                                                                 MathHelper.Clamp(c.X + 1, 0, 1));
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints points = new(15);
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -559,11 +618,14 @@ public class CyberDart : ModProjectile
             if (trail != null && !trail.Disposed && points != null)
             {
                 ManagedShader shader = ShaderRegistry.BaseLaserShader;
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise), 1, SamplerState.AnisotropicWrap);
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.HarshNoise), 2, SamplerState.AnisotropicWrap);
+                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise), 1,
+                    SamplerState.AnisotropicWrap);
+                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.HarshNoise), 2,
+                    SamplerState.AnisotropicWrap);
                 trail.DrawTrail(shader, points.Points, 100, true);
             }
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;
     }
@@ -572,11 +634,13 @@ public class CyberDart : ModProjectile
 public class CyberPierce : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.Size = new(10);
         Projectile.hostile = Projectile.tileCollide = false;
-        Projectile.friendly = Projectile.ignoreWater = Projectile.noEnchantmentVisuals = Projectile.usesLocalNPCImmunity = true;
+        Projectile.friendly = Projectile.ignoreWater =
+            Projectile.noEnchantmentVisuals = Projectile.usesLocalNPCImmunity = true;
         Projectile.penetrate = 4;
         Projectile.MaxUpdates = 5;
         Projectile.timeLeft = 100 * Projectile.MaxUpdates;
@@ -585,6 +649,7 @@ public class CyberPierce : ModProjectile
     }
 
     public List<Vector2> points = [];
+
     public override void AI()
     {
         if (!Projectile.FinalExtraUpdate())
@@ -597,17 +662,21 @@ public class CyberPierce : ModProjectile
         points = CatmullRomSpline([c1, c2, c3], 30);
         foreach (Vector2 pos in CollectionsMarshal.AsSpan(points))
         {
-            ParticleRegistry.SpawnTechyHolosquareParticle(pos, pos.SafeDirectionTo(Projectile.Center - Projectile.rotation.ToRotationVector2() * 10f) * 4f,
-                Main.rand.Next(20, 30), Main.rand.NextFloat(.5f, .9f), Color.LightSkyBlue, Main.rand.NextFloat(.6f, 1.1f), Main.rand.NextFloat(1f, 1.8f));
-            ParticleRegistry.SpawnSparkParticle(pos, -Projectile.velocity * Main.rand.NextFloat(.1f, .2f), Main.rand.Next(20, 38), Main.rand.NextFloat(.4f, .6f), Color.Cyan);
+            ParticleRegistry.SpawnTechyHolosquareParticle(pos,
+                pos.SafeDirectionTo(Projectile.Center - Projectile.rotation.ToRotationVector2() * 10f) * 4f,
+                Main.rand.Next(20, 30), Main.rand.NextFloat(.5f, .9f), Color.LightSkyBlue,
+                Main.rand.NextFloat(.6f, 1.1f), Main.rand.NextFloat(1f, 1.8f));
+            ParticleRegistry.SpawnSparkParticle(pos, -Projectile.velocity * Main.rand.NextFloat(.1f, .2f),
+                Main.rand.Next(20, 38), Main.rand.NextFloat(.4f, .6f), Color.Cyan);
         }
     }
 
-    public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => targetHitbox.CollisionFromPoints(points, 10);
+    public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) =>
+        targetHitbox.CollisionFromPoints(points, 10);
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         Projectile.velocity *= .9f;
-        Projectile.damage = (int)(Projectile.damage * .8f);
+        Projectile.damage = (int) (Projectile.damage * .8f);
     }
 }

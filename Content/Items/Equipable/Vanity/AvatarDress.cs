@@ -1,5 +1,5 @@
-﻿using CalamityMod.Items.Materials;
-using CalamityMod.Tiles.Furniture.CraftingStations;
+﻿//TODO
+
 using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
@@ -30,8 +30,7 @@ public class AvatarDress : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        recipe.AddIngredient(ModContent.ItemType<DubiousPlating>(), 3);
-        recipe.AddIngredient(ModContent.ItemType<MysteriousCircuitry>(), 5);
+        //TODO
         recipe.AddIngredient(ItemID.Silk, 12);
         recipe.AddTile(TileID.Anvils);
         recipe.Register();

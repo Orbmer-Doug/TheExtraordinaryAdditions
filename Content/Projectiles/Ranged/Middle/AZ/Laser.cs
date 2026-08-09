@@ -10,6 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle.AZ;
 public class Laser : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 8;
@@ -22,9 +23,11 @@ public class Laser : ModProjectile
     }
 
     public Player Owner => Main.player[Projectile.owner];
+
     public override void AI()
     {
-        ParticleRegistry.SpawnSparkParticle(Projectile.Center, Projectile.velocity * Main.rand.NextFloat(-.01f, .01f), 30, .5f, TankHeadHoldout.GetTeamColor(Owner));
+        ParticleRegistry.SpawnSparkParticle(Projectile.Center, Projectile.velocity * Main.rand.NextFloat(-.01f, .01f),
+            30, .5f, TankHeadHoldout.GetTeamColor(Owner));
     }
 
     public override bool OnTileCollide(Vector2 oldVelocity)

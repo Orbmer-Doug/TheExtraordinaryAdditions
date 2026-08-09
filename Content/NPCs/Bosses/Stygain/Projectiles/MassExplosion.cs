@@ -42,7 +42,7 @@ public class MassExplosion : ModProjectile
             for (int i = 0; i < 6; i++)
             {
                 float scale = Utils.Remap(i, 0, 6, 300f, 900f);
-                int life = (int)Utils.Remap(i, 0, 6, 20, 40);
+                int life = (int) Utils.Remap(i, 0, 6, 20, 40);
                 Color col = MulticolorLerp(Main.rand.NextFloat(), Color.Crimson, Color.Crimson * 1.4f, Color.DarkRed,
                     Color.DarkRed * 1.8f);
                 ParticleRegistry.SpawnDetailedBlastParticle(pos, Vector2.Zero, Vector2.One * scale, Vector2.Zero, life,
@@ -56,6 +56,6 @@ public class MassExplosion : ModProjectile
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return CalUtils.CircularHitboxCollision(Projectile.Center, Projectile.scale, targetHitbox);
+        return CircularHitboxCollision(Projectile.Center, Projectile.scale, targetHitbox);
     }
 }

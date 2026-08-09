@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Core.DataStructures;
@@ -67,7 +66,7 @@ public class HemoglobTelegraph : ProjOwnedByNPC<StygainHeart>
         circle.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FractalNoise), 1, SamplerState.LinearWrap);
 
         Color main = Color.Lerp(Color.MediumVioletRed, Color.PaleVioletRed,
-            0.7f * (float)Math.Pow(Sin01(Main.GlobalTimeWrappedHourly), 3.0));
+            0.7f * (float) Math.Pow(Sin01(Main.GlobalTimeWrappedHourly), 3.0));
         Color outer = Color.Lerp(Color.MediumVioletRed, Color.White, 0.4f);
 
         circle.TrySetParameter("MainColor", main.ToVector3());
@@ -81,7 +80,7 @@ public class HemoglobTelegraph : ProjOwnedByNPC<StygainHeart>
         Main.EntitySpriteDraw(telegraphBase, drawPosition, null, Color.White, 0f, telegraphBase.Size() / 2f,
             StygainHeart.BarrierSize * 8, 0);
 
-        sb.ExitShaderRegion();
+        sb.ResetToDefault();
 
         // Draw evenly spaced arrows to emphasize to potentially offscreen players where to go
         // Otherwise they may just see fog appear and kaboom
@@ -97,15 +96,15 @@ public class HemoglobTelegraph : ProjOwnedByNPC<StygainHeart>
         {
             // Fluctuate in size
             float size = 2.5f + Utils.GetLerpValue(0.8f, 1f,
-                Cos01(i / count + Main.GlobalTimeWrappedHourly * -(float)Math.PI), clamped: true) * 0.15f;
+                Cos01(i / count + Main.GlobalTimeWrappedHourly * -(float) Math.PI), clamped: true) * 0.15f;
 
             // The distance apart to multiply by
             for (int k = 1; k <= 4; k++)
             {
                 Vector2 pos = Projectile.Center + (MathHelper.TwoPi * i / count).ToRotationVector2() *
                     ((-(StygainHeart.BarrierSize + 64) + Animators.BezierEase(timer) * 64) * k);
-                Color col = Color.Crimson * (float)Math.Sin(prog * MathHelper.TwoPi * 4 - i) *
-                            (float)Math.Sin(prog * MathHelper.Pi);
+                Color col = Color.Crimson * (float) Math.Sin(prog * MathHelper.TwoPi * 4 - i) *
+                            (float) Math.Sin(prog * MathHelper.Pi);
 
                 // Point to the end
                 float rot = pos.SafeDirectionTo(Projectile.Center).ToRotation();

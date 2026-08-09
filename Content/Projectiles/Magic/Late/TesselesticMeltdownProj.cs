@@ -40,47 +40,56 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
 
     public const float StaffLength = 218f;
     public ref float Heat => ref Owner.GetModPlayer<TesselesticPlayer>().Heat;
+
     public enum State
     {
         Idle,
         Barrage,
         Beam
     }
+
     private State CurrentState
     {
-        get => (State)Projectile.ai[0];
-        set => Projectile.ai[0] = (float)value;
+        get => (State) Projectile.ai[0];
+        set => Projectile.ai[0] = (float) value;
     }
+
     private ref float Time => ref Projectile.ai[1];
     private ref float OverallTime => ref Projectile.ai[2];
+
     public bool Released
     {
         get => Projectile.AdditionsInfo().ExtraAI[0] == 1f;
         set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
+
     public bool Overuse
     {
         get => Projectile.AdditionsInfo().ExtraAI[1] == 1f;
         set => Projectile.AdditionsInfo().ExtraAI[1] = value.ToInt();
     }
+
     public enum BeamState
     {
         Reel,
         Cast,
     }
+
     private BeamState SubState
     {
-        get => (BeamState)Projectile.AdditionsInfo().ExtraAI[2];
-        set => Projectile.AdditionsInfo().ExtraAI[2] = (float)value;
+        get => (BeamState) Projectile.AdditionsInfo().ExtraAI[2];
+        set => Projectile.AdditionsInfo().ExtraAI[2] = (float) value;
     }
 
     public RotatedRectangle Rect()
     {
-        return new(36, Projectile.Center, Projectile.Center + PolarVector(StaffLength, Projectile.rotation - MathHelper.PiOver4));
+        return new(36, Projectile.Center,
+            Projectile.Center + PolarVector(StaffLength, Projectile.rotation - MathHelper.PiOver4));
     }
 
     public Vector2 TipOfStaff => Rect().Top;
     public int Dir => Projectile.velocity.X.NonZeroSign();
+
     public override void SafeAI()
     {
         Projectile.Opacity = InverseLerp(0f, 20f, OverallTime);
@@ -99,12 +108,15 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
                 Behavior_Beam();
                 break;
         }
+
         if ((this.RunLocal() && Modded.SafeMouseLeft.Current) && !Overuse && CurrentState != State.Beam)
             CurrentState = State.Barrage;
-        if (this.RunLocal() && SubState != BeamState.Cast && Modded.SafeMouseRight.Current && CurrentState != State.Beam)
+        if (this.RunLocal() && SubState != BeamState.Cast && Modded.SafeMouseRight.Current &&
+            CurrentState != State.Beam)
             CurrentState = State.Beam;
 
-        slot ??= LoopedSoundManager.CreateNew(new(AdditionsSound.ElectricityContinuous, () => .67f, null), () => AdditionsLoopedSound.ProjectileNotActive(Projectile), () => CurrentState == State.Barrage);
+        slot ??= LoopedSoundManager.CreateNew(new(AdditionsSound.ElectricityContinuous, () => .67f, null),
+            () => AdditionsLoopedSound.ProjectileNotActive(Projectile), () => CurrentState == State.Barrage);
         slot?.Update(Projectile.Center);
 
         if (CurrentState != State.Idle)
@@ -121,13 +133,16 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
+
         Owner.ChangeDir(Projectile.velocity.X.NonZeroSign());
-        Vector2 pos = Owner.MountedCenter + Vector2.UnitX * (40f * Owner.direction) + Vector2.UnitY * 12f * MathF.Sin(Main.GlobalTimeWrappedHourly);
+        Vector2 pos = Owner.MountedCenter + Vector2.UnitX * (40f * Owner.direction) +
+                      Vector2.UnitY * 12f * MathF.Sin(Main.GlobalTimeWrappedHourly);
         Projectile.Center = Vector2.Lerp(Projectile.Center, pos + Vector2.UnitY * StaffLength / 2, .6f);
         Projectile.rotation = Projectile.rotation.AngleLerp(-MathHelper.PiOver4, .1f);
 
         if (Modded.GlobalTimer % 4f == 3f)
-            ParticleRegistry.SpawnLightningArcParticle(Rect().RandomPoint(), Main.rand.NextVector2Circular(100f, 100f), Main.rand.Next(12, 20), .6f, HeatColor);
+            ParticleRegistry.SpawnLightningArcParticle(Rect().RandomPoint(), Main.rand.NextVector2Circular(100f, 100f),
+                Main.rand.Next(12, 20), .6f, HeatColor);
 
         if (SubState != BeamState.Reel)
             SubState = BeamState.Reel;
@@ -143,17 +158,22 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
     public const int LightningWait = 50;
     public float HeatInterpolant => InverseLerp(0f, LightningWait, Heat);
     public Color HeatColor => Color.Lerp(Color.DeepSkyBlue, Color.Red, HeatInterpolant);
+
     private void Behavior_Barrage()
     {
         if (this.RunLocal())
         {
-            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Owner.MountedCenter.SafeDirectionTo(Modded.MouseWorld), .4f);
+            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity,
+                Owner.MountedCenter.SafeDirectionTo(Modded.MouseWorld), .4f);
             Projectile.netUpdate = true;
         }
-        Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver4;
-        Projectile.Center = Vector2.Lerp(Projectile.Center, Center - PolarVector(StaffLength / 2, Projectile.rotation - MathHelper.PiOver4), Terraria.Utils.Remap(Time, 0f, 20f, .2f, .7f));
 
-        int wait = (int)MathHelper.Lerp(6, 2, HeatInterpolant);
+        Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver4;
+        Projectile.Center = Vector2.Lerp(Projectile.Center,
+            Center - PolarVector(StaffLength / 2, Projectile.rotation - MathHelper.PiOver4),
+            Terraria.Utils.Remap(Time, 0f, 20f, .2f, .7f));
+
+        int wait = (int) MathHelper.Lerp(6, 2, HeatInterpolant);
 
         if (Time % wait == (wait - 1))
         {
@@ -162,9 +182,11 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
                 int type = ModContent.ProjectileType<TesselesticLightning>();
                 Vector2 pos = Modded.MouseWorld.ClampOutCircle(Center, StaffLength / 2).ClampInCircle(Center, 1000f);
                 TesselesticLightning tess = Main.projectile[Projectile.NewProj(TipOfStaff, Projectile.velocity,
-                    type, Projectile.damage, Projectile.knockBack, Owner.whoAmI, 0f, pos.X, pos.Y)].As<TesselesticLightning>();
+                        type, Projectile.damage, Projectile.knockBack, Owner.whoAmI, 0f, pos.X, pos.Y)]
+                    .As<TesselesticLightning>();
                 tess.MainColor = HeatColor;
             }
+
             this.Sync();
         }
 
@@ -180,9 +202,12 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
             ParticleRegistry.SpawnPulseRingParticle(TipOfStaff, Vector2.Zero, 20, 0f, Vector2.One, 0f, 190f, Color.Red);
             for (int i = 0; i < 30; i++)
             {
-                ParticleRegistry.SpawnBloomLineParticle(TipOfStaff, Main.rand.NextVector2CircularEdge(12f, 12f), Main.rand.Next(10, 20), Main.rand.NextFloat(.2f, .4f), Color.Red);
-                ParticleRegistry.SpawnBloomPixelParticle(TipOfStaff, Main.rand.NextVector2Circular(9f, 9f), Main.rand.Next(30, 40), Main.rand.NextFloat(.5f, .8f), HeatColor, Color.IndianRed, null, 1.2f, 4);
+                ParticleRegistry.SpawnBloomLineParticle(TipOfStaff, Main.rand.NextVector2CircularEdge(12f, 12f),
+                    Main.rand.Next(10, 20), Main.rand.NextFloat(.2f, .4f), Color.Red);
+                ParticleRegistry.SpawnBloomPixelParticle(TipOfStaff, Main.rand.NextVector2Circular(9f, 9f),
+                    Main.rand.Next(30, 40), Main.rand.NextFloat(.5f, .8f), HeatColor, Color.IndianRed, null, 1.2f, 4);
             }
+
             AdditionsSound.MediumExplosion.Play(TipOfStaff, 1.2f, -.1f, 0f, 4, Name);
             AdditionsSound.PowerDown.Play(TipOfStaff, 1f, -.1f, 0f, 4, Name);
             ScreenShakeSystem.New(new(.3f, .4f), TipOfStaff);
@@ -203,8 +228,8 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
     public override void WriteExtraAI(BinaryWriter writer) => writer.WriteVector2(offset);
     public override void GetExtraAI(BinaryReader reader) => offset = reader.ReadVector2();
 
-    public static readonly int ReelTime = CalUtils.SecondsToFrames(1.8f);
-    public static readonly int OutTime = CalUtils.SecondsToFrames(.4f);
+    public static readonly int ReelTime = SecondsToFrames(1.8f);
+    public static readonly int OutTime = SecondsToFrames(.4f);
     public float ReelCompletion => InverseLerp(0f, ReelTime, Time);
     public float OutCompletion => InverseLerp(0f, OutTime, Time);
 
@@ -218,7 +243,8 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
 
         if (this.RunLocal())
         {
-            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Center.SafeDirectionTo(Modded.MouseWorld), SubState == BeamState.Cast ? .3f : .7f);
+            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Center.SafeDirectionTo(Modded.MouseWorld),
+                SubState == BeamState.Cast ? .3f : .7f);
             Projectile.netUpdate = true;
         }
 
@@ -229,11 +255,13 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
 
                 dist = MakePoly(4f).InOutFunction.Evaluate(-20f, -100f, ReelCompletion);
 
-                if (this.RunLocal() && !Modded.SafeMouseRight.Current && ReelCompletion >= 1f && SubState != BeamState.Cast)
+                if (this.RunLocal() && !Modded.SafeMouseRight.Current && ReelCompletion >= 1f &&
+                    SubState != BeamState.Cast)
                 {
                     AdditionsSound.VirtueAttack.Play(Projectile.Center, 1.3f, 0f, .1f);
                     if (this.RunLocal())
-                        Projectile.NewProj(Rect().Top, Projectile.velocity.SafeNormalize(Vector2.Zero), ModContent.ProjectileType<TesselesticBeam>(),
+                        Projectile.NewProj(Rect().Top, Projectile.velocity.SafeNormalize(Vector2.Zero),
+                            ModContent.ProjectileType<TesselesticBeam>(),
                             Projectile.damage, Projectile.knockBack, Projectile.owner, 0f, 0f, Projectile.whoAmI);
 
                     Time = 0f;
@@ -244,6 +272,7 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
                 {
                     CurrentState = State.Idle;
                 }
+
                 break;
             case BeamState.Cast:
                 if (!FindProjectile(out _, ModContent.ProjectileType<TesselesticBeam>(), Owner.whoAmI))
@@ -254,7 +283,8 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
         }
 
         Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver4;
-        Projectile.Center = Vector2.Lerp(Projectile.Center, Center + PolarVector(dist, Projectile.rotation - MathHelper.PiOver4), .8f);
+        Projectile.Center = Vector2.Lerp(Projectile.Center,
+            Center + PolarVector(dist, Projectile.rotation - MathHelper.PiOver4), .8f);
 
         Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, Projectile.rotation - MathHelper.PiOver4);
         Owner.SetBackHandBetter(Player.CompositeArmStretchAmount.Full, Projectile.rotation - MathHelper.PiOver4);
@@ -281,12 +311,14 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
         {
             if (FindProjectile(out Projectile beam, ModContent.ProjectileType<TesselesticBeam>(), Owner.whoAmI))
             {
-                opac = InverseLerp(TesselesticBeam.BeamTime + TesselesticBeam.CollapseTime + TesselesticBeam.LaserExpandTime,
-                TesselesticBeam.BeamTime + TesselesticBeam.LaserExpandTime, beam.ai[0]);
+                opac = InverseLerp(
+                    TesselesticBeam.BeamTime + TesselesticBeam.CollapseTime + TesselesticBeam.LaserExpandTime,
+                    TesselesticBeam.BeamTime + TesselesticBeam.LaserExpandTime, beam.ai[0]);
             }
             else
                 opac = 0f;
         }
+
         opac *= .7f;
 
         Color col1 = ColorSwap(Color.Cyan, Color.DeepSkyBlue * 1.2f, 1f);
@@ -300,11 +332,13 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
         portal.TrySetParameter("secondColor", col2);
         portal.Render();
 
-        Main.spriteBatch.Draw(noiseTexture, drawPosition, null, Color.White, Projectile.rotation - MathHelper.PiOver4, origin, diskScale, SpriteEffects.None, 0f);
+        Main.spriteBatch.Draw(noiseTexture, drawPosition, null, Color.White, Projectile.rotation - MathHelper.PiOver4,
+            origin, diskScale, SpriteEffects.None, 0f);
 
         portal.TrySetParameter("secondColor", col2 * 2f);
         portal.Render();
-        Main.spriteBatch.Draw(noiseTexture, drawPosition, null, Color.White, Projectile.rotation - MathHelper.PiOver4, origin, diskScale, SpriteEffects.None, 0f);
+        Main.spriteBatch.Draw(noiseTexture, drawPosition, null, Color.White, Projectile.rotation - MathHelper.PiOver4,
+            origin, diskScale, SpriteEffects.None, 0f);
     }
 
     public override bool PreDraw(ref Color lightColor)
@@ -329,6 +363,7 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
             off = MathHelper.PiOver2;
             fx = SpriteEffects.FlipHorizontally;
         }
+
         Texture2D glow = AssetRegistry.GetTexture(AdditionsTexture.TesselesticMeltdown_Glowmask);
 
         Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, null, Color.White * Projectile.Opacity,
@@ -337,12 +372,15 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
         for (int i = 0; i < 8; i++)
         {
             Vector2 pos = (MathHelper.TwoPi * i / 8).ToRotationVector2() * 2f;
-            Main.spriteBatch.Draw(glow, Projectile.Center + pos - Main.screenPosition, null, HeatColor with { A = 0 } * HeatInterpolant * Projectile.Opacity,
+            Main.spriteBatch.Draw(glow, Projectile.Center + pos - Main.screenPosition, null,
+                HeatColor with { A = 0 } * HeatInterpolant * Projectile.Opacity,
                 Projectile.rotation + off, origin, Projectile.scale, fx, 0f);
         }
+
         if (CurrentState == State.Beam)
         {
-            PixelationSystem.QueueTextureRenderAction(DrawPortal, PixelationLayer.OverPlayers, null, ShaderRegistry.PortalShader);
+            PixelationSystem.QueueTextureRenderAction(DrawPortal, PixelationLayer.OverPlayers, null,
+                ShaderRegistry.PortalShader);
         }
 
         return false;
@@ -353,10 +391,10 @@ public class TesselesticBeam : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
 
-    public static readonly int BeamTime = CalUtils.SecondsToFrames(1.5f);
-    public static readonly int CollapseTime = CalUtils.SecondsToFrames(.25f);
+    public static readonly int BeamTime = SecondsToFrames(1.5f);
+    public static readonly int CollapseTime = SecondsToFrames(.25f);
 
-    public static readonly int LaserExpandTime = CalUtils.SecondsToFrames(.3f);
+    public static readonly int LaserExpandTime = SecondsToFrames(.3f);
 
     public static readonly int Lifetime = BeamTime + CollapseTime + LaserExpandTime;
 
@@ -364,7 +402,7 @@ public class TesselesticBeam : ModProjectile
 
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
 
@@ -390,20 +428,21 @@ public class TesselesticBeam : ModProjectile
 
     public override void AI()
     {
-        TesselesticMeltdownProj proj = Main.projectile[(int)Projectile.ai[2]].As<TesselesticMeltdownProj>();
+        TesselesticMeltdownProj proj = Main.projectile[(int) Projectile.ai[2]].As<TesselesticMeltdownProj>();
         if (proj != null && proj.Projectile.active && proj.Projectile.owner == Projectile.owner)
         {
             Projectile.Center = proj.Rect().Top;
             Projectile.velocity = proj.Projectile.velocity.SafeNormalize(Vector2.Zero);
         }
+
         Projectile.rotation = Projectile.velocity.ToRotation();
 
         Time++;
 
         float lifeInterpolant = InverseLerp(0f, Lifetime, Time);
 
-        float laserExpandEnd = (float)(LaserExpandTime) / Lifetime;
-        float beamEnd = (float)(LaserExpandTime + BeamTime) / Lifetime;
+        float laserExpandEnd = (float) (LaserExpandTime) / Lifetime;
+        float beamEnd = (float) (LaserExpandTime + BeamTime) / Lifetime;
         float collapseEnd = 1f;
 
         LaserLength = new PiecewiseCurve()
@@ -418,34 +457,41 @@ public class TesselesticBeam : ModProjectile
             .Add(1f, 0f, collapseEnd, MakePoly(3f).InOutFunction)
             .Evaluate(lifeInterpolant);
 
-        trailPoints.SetPoints(Projectile.Center.GetLaserControlPoints(Projectile.Center + Projectile.velocity * LaserLength, 100));
+        trailPoints.SetPoints(
+            Projectile.Center.GetLaserControlPoints(Projectile.Center + Projectile.velocity * LaserLength, 100));
 
         if (trail == null || trail.Disposed)
             trail = new(LaserWidthFunction, LaserColorFunction, null, 100);
 
         if (Time.BetweenNum(0, Lifetime - 10))
         {
-            Vector2 vel = Projectile.velocity.RotatedByRandom(Main.rand.NextFloat(.34f, .42f)) * Main.rand.NextFloat(150f, 980f);
-            ParticleRegistry.SpawnLightningArcParticle(Projectile.Center, vel, Main.rand.Next(10, 20), 1f, Color.DeepSkyBlue);
+            Vector2 vel = Projectile.velocity.RotatedByRandom(Main.rand.NextFloat(.34f, .42f)) *
+                          Main.rand.NextFloat(150f, 980f);
+            ParticleRegistry.SpawnLightningArcParticle(Projectile.Center, vel, Main.rand.Next(10, 20), 1f,
+                Color.DeepSkyBlue);
         }
     }
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return targetHitbox.LineCollision(Projectile.Center, Projectile.Center + Projectile.velocity * LaserLength, Projectile.Size.Length());
+        return targetHitbox.LineCollision(Projectile.Center, Projectile.Center + Projectile.velocity * LaserLength,
+            Projectile.Size.Length());
     }
 
     public override bool ShouldUpdatePosition() => false;
 
     public float LaserWidthFunction(float _) => Projectile.width * Projectile.scale;
+
     public Color LaserColorFunction(SystemVector2 completionRatio, Vector2 position)
     {
         float colorInterpolant = Sin01(Main.GlobalTimeWrappedHourly * -3.2f + completionRatio.X * 23f);
-        return Color.Lerp(Color.Cyan * 1.2f, Color.DeepSkyBlue, colorInterpolant * 0.67f) * MathHelper.SmoothStep(1f, .8f, completionRatio.X);
+        return Color.Lerp(Color.Cyan * 1.2f, Color.DeepSkyBlue, colorInterpolant * 0.67f) *
+               MathHelper.SmoothStep(1f, .8f, completionRatio.X);
     }
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints trailPoints = new(100);
+
     public override bool PreDraw(ref Color lightColor)
     {
         void drawBeam()
@@ -460,6 +506,7 @@ public class TesselesticBeam : ModProjectile
                 trail.DrawTrail(beam, trailPoints.Points);
             }
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(drawBeam, PixelationLayer.OverPlayers);
 
         return false;

@@ -21,17 +21,21 @@ public class SolemnLamentProj : BaseHoldoutProjectile
         get => Projectile.ai[0] == 1f;
         set => Projectile.ai[0] = value.ToInt();
     }
+
     public ref float GunType => ref Projectile.ai[1];
     public ref float Wait => ref Projectile.ai[2];
+
     public bool IsBlack
     {
         get => GunType == 0f;
         set => IsBlack.ToDirectionInt();
     }
+
     public ref float Time => ref Projectile.AdditionsInfo().ExtraAI[0];
     public ref float Recoil => ref Projectile.AdditionsInfo().ExtraAI[1];
 
     public int Firerate => Owner.HasBuff(ModContent.BuffType<EternalRest>()) ? 15 : 20;
+
     public override void Defaults()
     {
         Projectile.width = 44;
@@ -44,7 +48,8 @@ public class SolemnLamentProj : BaseHoldoutProjectile
         Projectile.tileCollide = false;
     }
 
-    public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
+    public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs,
+        List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
     {
         if (!IsBlack)
         {
@@ -78,7 +83,7 @@ public class SolemnLamentProj : BaseHoldoutProjectile
             Owner.SetFrontHandBetter(0, rot);
 
         Projectile.Center = center + PolarVector(Projectile.width / 2, rot)
-            - (!IsBlack ? new Vector2(6 * Projectile.spriteDirection, 6f) : Vector2.Zero);
+                            - (!IsBlack ? new Vector2(6 * Projectile.spriteDirection, 6f) : Vector2.Zero);
         Projectile.rotation = rot;
         Owner.ChangeDir(Projectile.spriteDirection);
         Projectile.timeLeft = Owner.itemTime = Owner.itemAnimation = 2;
@@ -98,10 +103,12 @@ public class SolemnLamentProj : BaseHoldoutProjectile
                 else
                     AdditionsSound.SolemnW.Play(gunPos, .5f, 0f, 0f, 1, Name);
 
-                int shootType = IsBlack ? ModContent.ProjectileType<SolemButterflyGrief>() : ModContent.ProjectileType<SolemButterflyLament>();
+                int shootType = IsBlack
+                    ? ModContent.ProjectileType<SolemButterflyGrief>()
+                    : ModContent.ProjectileType<SolemButterflyLament>();
                 int damage = Projectile.damage;
                 if (IsBlack)
-                    damage = (int)(damage * .75f);
+                    damage = (int) (damage * .75f);
 
                 for (int i = 0; i < 10; i++)
                 {
@@ -110,10 +117,13 @@ public class SolemnLamentProj : BaseHoldoutProjectile
                     Vector2 vel = PolarVector(shootSpeed, Projectile.velocity.ToRotation());
                     Vector2 vele = Utils.RotatedByRandom(vel, 0.35) * Utils.NextFloat(Main.rand, .2f, 1f);
 
-                    ParticleRegistry.SpawnSparkParticle(gunPos, vele, Main.rand.Next(50, 70), Main.rand.NextFloat(.6f, 1.1f), Color.Wheat);
+                    ParticleRegistry.SpawnSparkParticle(gunPos, vele, Main.rand.Next(50, 70),
+                        Main.rand.NextFloat(.6f, 1.1f), Color.Wheat);
                     if (this.RunLocal())
-                        Projectile.NewProj(gunPos, vele, shootType, damage, Projectile.knockBack, Owner.whoAmI, 0f, 0f, 0f);
+                        Projectile.NewProj(gunPos, vele, shootType, damage, Projectile.knockBack, Owner.whoAmI, 0f, 0f,
+                            0f);
                 }
+
                 Recoil = Firerate;
             }
 
@@ -126,7 +136,8 @@ public class SolemnLamentProj : BaseHoldoutProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        SpriteEffects spriteEffects = Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
+        SpriteEffects spriteEffects =
+            Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
         Texture2D black = AssetRegistry.GetTexture(AdditionsTexture.SolemnLamentProjBlack);
         Texture2D white = AssetRegistry.GetTexture(AdditionsTexture.SolemnLamentProjWhite);
         Vector2 pos = Projectile.Center;
@@ -135,13 +146,16 @@ public class SolemnLamentProj : BaseHoldoutProjectile
         if (IsBlack)
         {
             Main.EntitySpriteDraw(black, pos - Main.screenPosition,
-                null, Projectile.GetAlpha(Color.White), Projectile.rotation + num, black.Size() / 2, Projectile.scale, spriteEffects, 0f);
+                null, Projectile.GetAlpha(Color.White), Projectile.rotation + num, black.Size() / 2, Projectile.scale,
+                spriteEffects, 0f);
         }
         else
         {
             Main.EntitySpriteDraw(white, pos - Main.screenPosition, null,
-                Projectile.GetAlpha(lightColor), Projectile.rotation + num, white.Size() / 2, Projectile.scale, spriteEffects, 0f);
+                Projectile.GetAlpha(lightColor), Projectile.rotation + num, white.Size() / 2, Projectile.scale,
+                spriteEffects, 0f);
         }
+
         return false;
     }
 }

@@ -69,7 +69,8 @@ public partial class Asterlin
         }
     }
 
-    public void CasualHoverMovement(float xPos = 14.5f, float yPos = 200f, float sharpness = .07f, float smoothness = .94f)
+    public void CasualHoverMovement(float xPos = 14.5f, float yPos = 200f, float sharpness = .07f,
+        float smoothness = .94f)
     {
         float hoverHorizontalWaveSine = MathF.Sin(MathHelper.TwoPi * AITimer / 96f);
         float hoverVerticalWaveSine = MathF.Sin(MathHelper.TwoPi * AITimer / 120f);

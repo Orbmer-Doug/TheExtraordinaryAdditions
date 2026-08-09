@@ -10,10 +10,12 @@ namespace TheExtraordinaryAdditions.Content.Items.Tools;
 public class PortableDONTTOUCHME : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.PortableDONTTOUCHME);
+
     public override void SetStaticDefaults()
     {
         CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1;
     }
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(new Color(227, 170, 36));

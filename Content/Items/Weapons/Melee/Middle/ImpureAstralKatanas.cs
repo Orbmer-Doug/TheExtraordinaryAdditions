@@ -1,10 +1,8 @@
-﻿using CalamityMod.Items.Materials;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Early;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
@@ -41,19 +39,24 @@ public class ImpureAstralKatanas : ModItem
 
     public override bool CanShoot(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
 
-    public override bool AltFunctionUse(Player player) => !CalUtils.HasCooldown(player, AstralDashCooldown.ID);
+//TODO
+    //public override bool AltFunctionUse(Player player) => !.HasCooldown(player, AstralDashCooldown.ID);
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback)
     {
         if (player.altFunctionUse == 2)
         {
-            player.NewPlayerProj(position, velocity, ModContent.ProjectileType<AstralKatanaThrow>(), damage, knockback, player.whoAmI);
+            player.NewPlayerProj(position, velocity, ModContent.ProjectileType<AstralKatanaThrow>(), damage, knockback,
+                player.whoAmI);
         }
         else
         {
             player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI);
-            Main.projectile[player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI)].As<AstralKatanaSweep>().Orange = true;
+            Main.projectile[player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI)]
+                .As<AstralKatanaSweep>().Orange = true;
         }
+
         return false;
     }
 
@@ -62,8 +65,7 @@ public class ImpureAstralKatanas : ModItem
         Recipe recipe = CreateRecipe();
         recipe.AddIngredient(ItemID.AdamantiteBar, 10);
         recipe.AddIngredient(ModContent.ItemType<MeteorKatana>(), 1);
-        recipe.AddIngredient(ModContent.ItemType<TitanHeart>(), 2);
-        recipe.AddIngredient(ModContent.ItemType<StarblightSoot>(), 35);
+        //TODO
         recipe.AddTile(TileID.MythrilAnvil);
         recipe.Register();
     }

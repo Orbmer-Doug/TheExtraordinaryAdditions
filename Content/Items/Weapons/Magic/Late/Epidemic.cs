@@ -1,7 +1,4 @@
-﻿using CalamityMod.Items;
-using CalamityMod.Items.Materials;
-using CalamityMod.Rarities;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -32,8 +29,8 @@ public class Epidemic : ModItem
         Item.useStyle = ItemUseStyleID.Shoot;
         Item.noMelee = Item.noUseGraphic = Item.channel = Item.autoReuse = true;
         Item.knockBack = 2f;
-        Item.value = CalamityGlobalItem.RarityTurquoiseBuyPrice;
-        Item.rare = ModContent.RarityType<Turquoise>();
+        //Item.value = CalamityGlobalItem.RarityTurquoiseBuyPrice;
+        //Item.rare = ModContent.RarityType<Turquoise>();
         Item.UseSound = SoundID.Grass;
         Item.shoot = ModContent.ProjectileType<EpidemicHoldout>();
         Item.shootSpeed = 16f;
@@ -60,7 +57,7 @@ public class Epidemic : ModItem
         recipe.AddIngredient(ItemID.Vine, 3);
         recipe.AddIngredient(ItemID.JungleSpores, 16);
         recipe.AddIngredient(ItemID.MudBlock, 400);
-        recipe.AddIngredient(ModContent.ItemType<UelibloomBar>(), 10);
+        //TODO
         recipe.AddTile(TileID.Bookcases);
         recipe.Register();
     }

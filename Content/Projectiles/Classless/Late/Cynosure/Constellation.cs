@@ -15,6 +15,7 @@ public class Constellation : ModProjectile
 
     public const int Lifetime = 150;
     public const int FadeTime = 20;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 2;
@@ -27,11 +28,13 @@ public class Constellation : ModProjectile
     }
 
     public ref float Time => ref Projectile.ai[0];
+
     public bool MainProj
     {
-        get => (int)Projectile.ai[1] == 1;
+        get => (int) Projectile.ai[1] == 1;
         set => Projectile.ai[1] = value.ToInt();
     }
+
     public List<Projectile> Others = [];
     public ref float NextProjIndex => ref Projectile.ai[2];
 
@@ -39,6 +42,7 @@ public class Constellation : ModProjectile
     public ref float InitScale => ref Projectile.AdditionsInfo().ExtraAI[1];
     public ref float Spin => ref Projectile.AdditionsInfo().ExtraAI[2];
     public Player Owner => Main.player[Projectile.owner];
+
     public override void AI()
     {
         if (Time == 0f)
@@ -63,7 +67,8 @@ public class Constellation : ModProjectile
                     while (attempts < maxAttempts && !validPosition)
                     {
                         // Make the position
-                        newPosition = Projectile.Center + PolarVector(Main.rand.NextFloat(100f, 400f), RandomRotation());
+                        newPosition = Projectile.Center +
+                                      PolarVector(Main.rand.NextFloat(100f, 400f), RandomRotation());
                         validPosition = true;
 
                         // Check distance to all the other stars
@@ -75,12 +80,14 @@ public class Constellation : ModProjectile
                                 break;
                             }
                         }
+
                         attempts++;
                     }
 
                     if (this.RunLocal() && validPosition)
                     {
-                        int projIndex = Projectile.NewProj(newPosition, Main.rand.NextVector2Circular(.4f, .4f), Type, Projectile.damage, Projectile.knockBack, Main.myPlayer, 0f, 1f);
+                        int projIndex = Projectile.NewProj(newPosition, Main.rand.NextVector2Circular(.4f, .4f), Type,
+                            Projectile.damage, Projectile.knockBack, Main.myPlayer, 0f, 1f);
                         Projectile proj = Main.projectile[projIndex];
                         proj.As<Constellation>().Others = Others;
                         Others.Add(proj);
@@ -104,8 +111,11 @@ public class Constellation : ModProjectile
             Projectile.netUpdate = true;
         }
 
-        Projectile.Opacity = Animators.MakePoly(2f).OutFunction.Evaluate(Time, Lifetime, Lifetime - FadeTime, 0f, InitOpac) * InverseLerp(0f, 10f, Time);
-        Projectile.scale = Animators.MakePoly(4f).InOutFunction.Evaluate(Time, Lifetime, Lifetime - FadeTime, 0f, InitScale);
+        Projectile.Opacity =
+            Animators.MakePoly(2f).OutFunction.Evaluate(Time, Lifetime, Lifetime - FadeTime, 0f, InitOpac) *
+            InverseLerp(0f, 10f, Time);
+        Projectile.scale = Animators.MakePoly(4f).InOutFunction
+            .Evaluate(Time, Lifetime, Lifetime - FadeTime, 0f, InitScale);
 
         Time++;
     }
@@ -114,17 +124,20 @@ public class Constellation : ModProjectile
     {
         if (Others != null && NextProjIndex != 0)
         {
-            Projectile nextProj = Main.projectile[(int)NextProjIndex];
+            Projectile nextProj = Main.projectile[(int) NextProjIndex];
             if (nextProj.active && nextProj.type == Type)
             {
                 Vector2 pos = ClosestPointOnLineSegment(target.Center, Projectile.Center, nextProj.Center);
                 for (int i = 0; i < 12; i++)
                 {
-                    ParticleRegistry.SpawnGlowParticle(pos, Vector2.Zero, 20, Main.rand.NextFloat(60f, 90f), Color.White, 1.2f);
-                    ParticleRegistry.SpawnBloomPixelParticle(pos, Main.rand.NextVector2Circular(4f, 4f), Main.rand.Next(30, 50), Main.rand.NextFloat(.6f, .9f), Color.White, Color.AntiqueWhite);
+                    ParticleRegistry.SpawnGlowParticle(pos, Vector2.Zero, 20, Main.rand.NextFloat(60f, 90f),
+                        Color.White, 1.2f);
+                    ParticleRegistry.SpawnBloomPixelParticle(pos, Main.rand.NextVector2Circular(4f, 4f),
+                        Main.rand.Next(30, 50), Main.rand.NextFloat(.6f, .9f), Color.White, Color.AntiqueWhite);
                 }
             }
         }
+
         Owner.Heal(Main.rand.Next(3, 7));
     }
 
@@ -132,7 +145,7 @@ public class Constellation : ModProjectile
     {
         if (Others != null && NextProjIndex != 0)
         {
-            Projectile nextProj = Main.projectile[(int)NextProjIndex];
+            Projectile nextProj = Main.projectile[(int) NextProjIndex];
             if (nextProj.active && nextProj.type == Type)
                 return targetHitbox.LineCollision(Projectile.Center, nextProj.Center, 8f);
         }
@@ -151,7 +164,7 @@ public class Constellation : ModProjectile
                 Vector2 start = Projectile.Center;
 
                 // Draw a line to the next projectile in the chain
-                Projectile nextProj = Main.projectile[(int)NextProjIndex];
+                Projectile nextProj = Main.projectile[(int) NextProjIndex];
                 if (nextProj.active && nextProj.type == Type)
                 {
                     Vector2 end = nextProj.Center;
@@ -161,7 +174,9 @@ public class Constellation : ModProjectile
                     const float thicknessScale = 1f / imageThickness;
                     Vector2 middleOrigin = new(0, horiz.Height / 2f);
                     Vector2 middleScale = new(start.Distance(end) / horiz.Width, thicknessScale);
-                    Color col = Color.White * Animators.MakePoly(2f).OutFunction.Evaluate(Time, Lifetime, Lifetime - FadeTime, 0f, 1f) * InverseLerp(0f, 10f, Time);
+                    Color col = Color.White *
+                                Animators.MakePoly(2f).OutFunction
+                                    .Evaluate(Time, Lifetime, Lifetime - FadeTime, 0f, 1f) * InverseLerp(0f, 10f, Time);
                     Main.spriteBatch.DrawBetter(horiz, start, null, col, rotation, middleOrigin, middleScale);
                 }
             }
@@ -169,9 +184,12 @@ public class Constellation : ModProjectile
             Texture2D star = AssetRegistry.GetTexture(AdditionsTexture.Sparkle);
             Texture2D bloom = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
 
-            Main.spriteBatch.DrawBetterRect(star, ToTarget(Projectile.Center, Vector2.One * 50f * Projectile.scale), null, Color.White * Projectile.Opacity, Time * Spin, star.Size() / 2f);
-            Main.spriteBatch.DrawBetterRect(bloom, ToTarget(Projectile.Center, Vector2.One * 80f * Projectile.scale), null, Color.White * Projectile.Opacity * .5f, 0f, bloom.Size() / 2f);
+            Main.spriteBatch.DrawBetterRect(star, ToTarget(Projectile.Center, Vector2.One * 50f * Projectile.scale),
+                null, Color.White * Projectile.Opacity, Time * Spin, star.Size() / 2f);
+            Main.spriteBatch.DrawBetterRect(bloom, ToTarget(Projectile.Center, Vector2.One * 80f * Projectile.scale),
+                null, Color.White * Projectile.Opacity * .5f, 0f, bloom.Size() / 2f);
         }
+
         PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.UnderProjectiles, BlendState.Additive);
         return false;
     }

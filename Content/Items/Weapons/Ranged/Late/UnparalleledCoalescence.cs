@@ -1,6 +1,4 @@
-﻿using CalamityMod.Items.Materials;
-using CalamityMod.Tiles.Furniture.CraftingStations;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent;
@@ -18,9 +16,11 @@ public class UnparalleledCoalescence : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.UnparalleledCoalescence);
 
-    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor,
+        Color itemColor, Vector2 origin, float scale)
     {
-        DrawInventoryCustomScale(spriteBatch, TextureAssets.Item[Type].Value, position, frame, drawColor, itemColor, origin, scale, 0.2f, new Vector2(0f, 0f));
+        DrawInventoryCustomScale(spriteBatch, TextureAssets.Item[Type].Value, position, frame, drawColor,
+            origin, scale, 0.2f, new Vector2(0f, 0f));
         return false;
     }
 
@@ -65,10 +65,7 @@ public class UnparalleledCoalescence : ModItem
         recipe.AddIngredient(ModContent.ItemType<HeavenForgedCannon>(), 1);
         recipe.AddIngredient(ModContent.ItemType<Lanikea>(), 1);
         recipe.AddIngredient(ModContent.ItemType<CosmicImplosion>(), 1);
-        recipe.AddIngredient(ModContent.ItemType<DivineGeode>(), 15);
-        recipe.AddIngredient(ModContent.ItemType<AscendantSpiritEssence>(), 5);
-        recipe.AddIngredient(ModContent.ItemType<AuricBar>(), 5);
-        recipe.AddTile(ModContent.TileType<CosmicAnvil>());
+        //TODO
         recipe.Register();
     }
 }

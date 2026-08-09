@@ -33,7 +33,8 @@ public class RainDrop : ModProjectile
     public override void AI()
     {
         after ??= new(5, () => Projectile.Center);
-        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 255));
+        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0,
+            255));
 
         Projectile.Opacity = InverseLerp(0f, 10f, Time);
         Projectile.rotation = Projectile.velocity.ToRotation() - MathHelper.PiOver2;
@@ -46,10 +47,12 @@ public class RainDrop : ModProjectile
     public override void OnKill(int timeLeft)
     {
         for (int i = 0; i < 14; i++)
-            Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Water, 0f, 0f, 0, default, 1f);
+            Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Water, 0f, 0f, 0, default,
+                1f);
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D texture = Projectile.ThisProjectileTexture();

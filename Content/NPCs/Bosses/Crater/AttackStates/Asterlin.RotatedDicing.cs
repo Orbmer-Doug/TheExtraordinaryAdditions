@@ -32,13 +32,13 @@ public partial class Asterlin
 
     public int RotatedDicing_Cycle
     {
-        get => (int)ExtraAI[0];
+        get => (int) ExtraAI[0];
         set => ExtraAI[0] = value;
     }
 
     public int RotatedDicing_FadeTimer
     {
-        get => (int)ExtraAI[1];
+        get => (int) ExtraAI[1];
         set => ExtraAI[1] = value;
     }
 
@@ -51,7 +51,8 @@ public partial class Asterlin
                     HeavyAttackDamage, 0f);
         }
 
-        if ((RotatedDicing_Cycle >= RotatedDicing_Cycles && !AnyProjectile(ModContent.ProjectileType<RadiantPulser>())) || AITimer > CalUtils.SecondsToFrames(40))
+        if ((RotatedDicing_Cycle >= RotatedDicing_Cycles &&
+             !AnyProjectile(ModContent.ProjectileType<RadiantPulser>())) || AITimer > SecondsToFrames(40))
             RotatedDicing_FadeTimer++;
 
         SetLookingStraight(true);

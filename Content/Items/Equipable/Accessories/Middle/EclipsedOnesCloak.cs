@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
@@ -13,6 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
 public class EclipsedOnesCloak : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.EclipsedOnesCloak);
+
     public override void SetDefaults()
     {
         Item.width = 34;
@@ -53,6 +53,7 @@ public sealed class EclipsedOnesCloakPlayer : ModPlayer
 {
     public bool Equipped;
     public override void ResetEffects() => Equipped = false;
+
     public override void PostUpdate()
     {
         if (!Equipped)
@@ -61,9 +62,13 @@ public sealed class EclipsedOnesCloakPlayer : ModPlayer
         bool active = Player.active && !Player.DeadOrGhost;
         if (active && Player.velocity.Length() != 0 && !Player.mount.Active)
         {
-            Vector2 randPos = Player.RotatedRelativePoint(Player.MountedCenter) + PolarVector(Player.height / 2 * Player.gravDir, Player.fullRotation + MathHelper.PiOver2) + PolarVector(Main.rand.NextFloat(-Player.width / 2, Player.width / 2), Player.fullRotation);
+            Vector2 randPos = Player.RotatedRelativePoint(Player.MountedCenter) +
+                              PolarVector(Player.height / 2 * Player.gravDir,
+                                  Player.fullRotation + MathHelper.PiOver2) + PolarVector(
+                                  Main.rand.NextFloat(-Player.width / 2, Player.width / 2), Player.fullRotation);
             Vector2 vel = -Player.velocity.RotatedByRandom(.12f) * Main.rand.NextFloat(.1f, .4f);
-            ParticleRegistry.SpawnDustParticle(randPos, vel, Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .7f), Color.LightCyan);
+            ParticleRegistry.SpawnDustParticle(randPos, vel, Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .7f),
+                Color.LightCyan);
         }
     }
 }

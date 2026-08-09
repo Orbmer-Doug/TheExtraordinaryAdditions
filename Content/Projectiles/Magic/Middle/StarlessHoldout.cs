@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
-using CalamityMod;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Middle;
@@ -15,6 +14,7 @@ public class StarlessHoldout : BaseIdleHoldoutProjectile
     public override string Texture => AssetRegistry.Invis;
     public override int AssociatedItemID => ModContent.ItemType<StarlessSea>();
     public override int IntendedProjectileType => ModContent.ProjectileType<StarlessHoldout>();
+
     public override void Defaults()
     {
         Projectile.width = 38;
@@ -24,27 +24,32 @@ public class StarlessHoldout : BaseIdleHoldoutProjectile
 
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
+
     public bool Released
     {
         get => Projectile.ai[1] == 1f;
         set => Projectile.ai[1] = value.ToInt();
     }
+
     public ref float Counter => ref Projectile.ai[2];
     public ref float Offset => ref Projectile.AdditionsInfo().ExtraAI[0];
     public int?[] CurrentLances = new int?[4];
     private const int OffsetMax = 200;
+
     public override void SafeAI()
     {
         if (this.RunLocal())
         {
             float interpolant = Terraria.Utils.GetLerpValue(5f, 20f, Projectile.Distance(Modded.MouseWorld), true);
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Modded.MouseWorld), interpolant);
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Modded.MouseWorld),
+                interpolant);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
+
         Projectile.rotation = Projectile.velocity.ToRotation();
         Owner.ChangeDir(Projectile.velocity.X.NonZeroSign());
         Owner.SetFrontHandBetter(0, Projectile.rotation);
@@ -63,7 +68,8 @@ public class StarlessHoldout : BaseIdleHoldoutProjectile
                     if (proj.HasValue)
                         continue;
 
-                    int p = Projectile.NewProj(Owner.Center, Vector2.Zero, type, Projectile.damage, Projectile.knockBack, Owner.whoAmI, 0f, i, 0f, 0f, Projectile.whoAmI);
+                    int p = Projectile.NewProj(Owner.Center, Vector2.Zero, type, Projectile.damage,
+                        Projectile.knockBack, Owner.whoAmI, 0f, i, 0f, 0f, Projectile.whoAmI);
                     CurrentLances[i] = Main.projectile[p].whoAmI;
                     break;
                 }
@@ -78,7 +84,8 @@ public class StarlessHoldout : BaseIdleHoldoutProjectile
                     if (proj.HasValue)
                     {
                         Projectile projectile = Main.projectile[CurrentLances[i].Value];
-                        if (projectile is { active: true } && projectile.owner == Owner.whoAmI && projectile.ai[2] == 0 && projectile.ai[0] >= TheStarsAreAfraid.ChargeTime)
+                        if (projectile is { active: true } && projectile.owner == Owner.whoAmI &&
+                            projectile.ai[2] == 0 && projectile.ai[0] >= TheStarsAreAfraid.ChargeTime)
                         {
                             CurrentLances[i] = null;
                             projectile.ai[2] = 1;
@@ -121,6 +128,7 @@ public class StarlessHoldout : BaseIdleHoldoutProjectile
                         proj.netSpam = 0;
                     }
                 }
+
                 Released = true;
                 this.Sync();
             }
@@ -128,20 +136,22 @@ public class StarlessHoldout : BaseIdleHoldoutProjectile
 
         Time++;
 
-        if (!this.RunLocal() || Modded.MouseLeft.Current) 
+        if (!this.RunLocal() || Modded.MouseLeft.Current)
             return;
         Released = false;
         this.Sync();
     }
-    
+
     public override bool? CanDamage() => false;
     public override bool? CanCutTiles() => false;
+
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D tex = Main.bloodMoon ? StarlessSea.Fracture : StarlessSea.Starless;
         Vector2 pos = Projectile.Center - Main.screenPosition;
         Vector2 orig = tex.Size() / 2;
-        Main.spriteBatch.Draw(tex, pos, null, lightColor, Projectile.rotation, orig, Projectile.scale, FixedDirection(), 0f);
+        Main.spriteBatch.Draw(tex, pos, null, lightColor, Projectile.rotation, orig, Projectile.scale, FixedDirection(),
+            0f);
         return false;
     }
 }

@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -33,7 +32,10 @@ public class BlastSkull : ModProjectile
         after ??= new(5, () => Projectile.Center);
         Projectile.FacingRight();
         Projectile.SetAnimation(3, 2);
-        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, Projectile.spriteDirection.ToSpriteDirection(), 255, 0, 0, Projectile.ThisProjectileTexture().Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame), false, .3f));
+        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation,
+            Projectile.spriteDirection.ToSpriteDirection(), 255, 0, 0,
+            Projectile.ThisProjectileTexture().Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame), false,
+            .3f));
 
         Vector2 vel = Projectile.velocity * .2f;
         int time = Main.rand.Next(10, 20);
@@ -69,13 +71,16 @@ public class BlastSkull : ModProjectile
             ParticleRegistry.SpawnHeavySmokeParticle(pos, vel, time, size, col, .8f, true);
         }
 
-        ParticleRegistry.SpawnDetailedBlastParticle(Projectile.Center, Vector2.Zero, Vector2.One * 64f, Vector2.Zero, 30, Color.Orange, null, Color.OrangeRed, true);
+        ParticleRegistry.SpawnDetailedBlastParticle(Projectile.Center, Vector2.Zero, Vector2.One * 64f, Vector2.Zero,
+            30, Color.Orange, null, Color.OrangeRed, true);
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
-        Projectile.DrawBaseProjectile(Projectile.GetAlpha(lightColor), Projectile.direction == -1 ? SpriteEffects.FlipVertically : SpriteEffects.None);
+        Projectile.DrawBaseProjectile(Projectile.GetAlpha(lightColor),
+            Projectile.direction == -1 ? SpriteEffects.FlipVertically : SpriteEffects.None);
         after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [Projectile.GetAlpha(Color.Tan)], .2f);
         return false;
     }

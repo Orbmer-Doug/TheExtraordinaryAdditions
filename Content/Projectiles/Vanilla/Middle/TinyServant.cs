@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -39,6 +38,7 @@ public class TinyServant : ModProjectile
     }
 
     public ref float Timer => ref Projectile.ai[0];
+
     public override void AI()
     {
         if (trail == null || trail.Disposed)
@@ -48,7 +48,8 @@ public class TinyServant : ModProjectile
         Projectile.SetAnimation(2, 10);
         if (Main.rand.NextBool(5))
         {
-            Dust.NewDustPerfect(Projectile.RotHitbox().RandomPoint(), DustID.BloodWater, -Projectile.velocity * Main.rand.NextFloat(.2f, .6f), 0, default, Main.rand.NextFloat(.8f, 1.5f));
+            Dust.NewDustPerfect(Projectile.RotHitbox().RandomPoint(), DustID.BloodWater,
+                -Projectile.velocity * Main.rand.NextFloat(.2f, .6f), 0, default, Main.rand.NextFloat(.8f, 1.5f));
         }
 
         cache ??= new(20);
@@ -58,13 +59,16 @@ public class TinyServant : ModProjectile
         {
             if (NPCTargeting.TryGetClosestNPC(new(Projectile.Center, 500, true), out NPC target))
             {
-                Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.SafeDirectionTo(target.Center) * 16f, .1f);
+                Projectile.velocity = Vector2.SmoothStep(Projectile.velocity,
+                    Projectile.SafeDirectionTo(target.Center) * 16f, .1f);
             }
         }
+
         Timer++;
     }
 
     public override bool? CanHitNPC(NPC target) => Timer > 45 ? null : false;
+
     public override void OnKill(int timeLeft)
     {
         SoundID.NPCDeath1.Play(Projectile.Center, 1f, 0f, .2f, null, 0);
@@ -72,12 +76,13 @@ public class TinyServant : ModProjectile
         for (int a = 0; a < 20; a++)
         {
             Dust.NewDustPerfect(Projectile.RotHitbox().RandomPoint(), DustID.Blood,
-                Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.3f) * Main.rand.NextFloat(1f, 5f), 0, default, Main.rand.NextFloat(.5f, 1.1f));
+                Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.3f) * Main.rand.NextFloat(1f, 5f), 0,
+                default, Main.rand.NextFloat(.5f, 1.1f));
         }
-
     }
 
     public float WidthFunction(float c) => Projectile.height * MathHelper.SmoothStep(1f, 0f, c);
+
     public Color ColorFunction(SystemVector2 c, Vector2 position)
     {
         return Color.Red * MathF.Sqrt(c.X) * Projectile.Opacity;
@@ -85,6 +90,7 @@ public class TinyServant : ModProjectile
 
     public TrailPoints cache;
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -96,6 +102,7 @@ public class TinyServant : ModProjectile
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.ShadowTrail), 1);
             trail.DrawTrail(shader, cache.Points, 80);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 
         Texture2D texture = Projectile.ThisProjectileTexture();
@@ -103,7 +110,8 @@ public class TinyServant : ModProjectile
         Vector2 drawPosition = Projectile.Center - Main.screenPosition;
         Projectile.DrawProjectileBackglow(Color.DarkRed, 4f, 140, 4);
 
-        Main.EntitySpriteDraw(texture, drawPosition, frame, lightColor, Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, 0, 0);
+        Main.EntitySpriteDraw(texture, drawPosition, frame, lightColor, Projectile.rotation, frame.Size() * 0.5f,
+            Projectile.scale, 0, 0);
 
         return false;
     }

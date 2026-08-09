@@ -16,7 +16,7 @@ public class LesserBloodBeacon : ModProjectile
     public Vector2 Start;
     public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(Start);
     public override void ReceiveExtraAI(BinaryReader reader) => Start = reader.ReadVector2();
-    
+
     public const int Lifetime = 60;
     public ref float Time => ref Projectile.ai[0];
 
@@ -27,6 +27,7 @@ public class LesserBloodBeacon : ModProjectile
     {
         ProjectileID.Sets.DrawScreenCheckFluff[Type] = 4000;
     }
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 200;
@@ -55,7 +56,8 @@ public class LesserBloodBeacon : ModProjectile
 
         Projectile.scale = InverseLerp(0f, Lifetime / 2, Time);
         Projectile.Opacity = 1f - InverseLerp(Lifetime * .7f, Lifetime, Time);
-        Projectile.Center = Vector2.Lerp(Start - Projectile.velocity * LaserLength / 2, Start + Projectile.velocity * LaserLength / 2, Animators.MakePoly(3f).OutFunction(Projectile.scale));
+        Projectile.Center = Vector2.Lerp(Start - Projectile.velocity * LaserLength / 2,
+            Start + Projectile.velocity * LaserLength / 2, Animators.MakePoly(3f).OutFunction(Projectile.scale));
         if (Time < Lifetime / 2)
             cache.Update(Projectile.Center);
 
@@ -69,12 +71,16 @@ public class LesserBloodBeacon : ModProjectile
         float colorInterpolant = 0.5f * MathF.Sin(-9f * Main.GlobalTimeWrappedHourly) + 0.5f;
         return Color.Lerp(Color.DarkRed, Color.Black, 0.25f * colorInterpolant) * Projectile.Opacity;
     }
+
     public float AltWidthFunction(float _) => WidthFunction(_) * 2f;
-    public Color AltColorFunction(SystemVector2 completionRatio, Vector2 position) => ColorFunction(completionRatio, position) * .4f;
+
+    public Color AltColorFunction(SystemVector2 completionRatio, Vector2 position) =>
+        ColorFunction(completionRatio, position) * .4f;
 
     public TrailPoints cache = new(200);
     public OptimizedPrimitiveTrail trail;
     public OptimizedPrimitiveTrail trail2;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -93,8 +99,10 @@ public class LesserBloodBeacon : ModProjectile
 
             trail2.DrawTrail(shader, cache.Points, 80);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.OverPlayers);
-        PixelationSystem.QueueTextureRenderAction(Portal, PixelationLayer.OverProjectiles, null, ShaderRegistry.PortalShader);
+        PixelationSystem.QueueTextureRenderAction(Portal, PixelationLayer.OverProjectiles, null,
+            ShaderRegistry.PortalShader);
         return false;
     }
 
@@ -116,7 +124,8 @@ public class LesserBloodBeacon : ModProjectile
         portal.TrySetParameter("globalTime", Projectile.scale * 1.2f);
         portal.Render();
 
-        Main.spriteBatch.Draw(noiseTexture, drawPosition, null, Color.White, Projectile.velocity.ToRotation(), origin, diskScale, SpriteEffects.None, 0f);
+        Main.spriteBatch.Draw(noiseTexture, drawPosition, null, Color.White, Projectile.velocity.ToRotation(), origin,
+            diskScale, SpriteEffects.None, 0f);
     }
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)

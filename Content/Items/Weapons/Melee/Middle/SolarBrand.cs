@@ -47,15 +47,20 @@ public class SolarBrand : ModItem, ILocalizedModType, IModType
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
-        tooltips.FirstOrDefault(n => n.Name == "Damage").Text = tooltips.FirstOrDefault(n => n.Name == "Damage").Text.Replace("damage", GetTextValue("Items.SolarBrand.Damage"));
+        tooltips.FirstOrDefault(n => n.Name == "Damage")?.Text = tooltips.FirstOrDefault(n => n.Name == "Damage")
+            ?.Text
+            .Replace("damage", GetTextValue("Items.SolarBrand.Damage"));
         tooltips.ColorLocalization(new(255, 72, 31));
     }
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback) => false;
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback) => false;
 
-    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor,
+        Color itemColor, Vector2 origin, float scale)
     {
-        DrawInventoryCustomScale(spriteBatch, TextureAssets.Item[Type].Value, position, frame, drawColor, itemColor, origin, scale, .25f, new Vector2(0f, 0f));
+        DrawInventoryCustomScale(spriteBatch, TextureAssets.Item[Type].Value, position, frame, drawColor,
+            origin, scale, .25f, new Vector2(0f, 0f));
         return false;
     }
 

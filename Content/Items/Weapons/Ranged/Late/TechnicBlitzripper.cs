@@ -37,7 +37,7 @@ public class TechnicBlitzripper : ModItem, ILocalizedModType, IModType
         Item.rare = ModContent.RarityType<CyberneticRarity>();
         Item.value = AdditionsGlobalItem.LegendaryRarityPrice;
     }
-    
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(Color.Cyan);

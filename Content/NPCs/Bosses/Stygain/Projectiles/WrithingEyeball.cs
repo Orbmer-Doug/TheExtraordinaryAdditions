@@ -19,20 +19,21 @@ public class WrithingEyeball : ProjOwnedByNPC<StygainHeart>
 
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
+
     public ref float Dir => ref Projectile.ai[1];
 
     public bool Free
     {
-        get => (int)Projectile.ai[2] == 1;
+        get => (int) Projectile.ai[2] == 1;
         set => Projectile.ai[2] = value.ToInt();
     }
 
     public int State
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[1];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[1];
         set => Projectile.AdditionsInfo().ExtraAI[1] = value;
     }
 
@@ -80,9 +81,9 @@ public class WrithingEyeball : ProjOwnedByNPC<StygainHeart>
             {
                 if (player == null || player.dead)
                     continue;
-                if (!player.Hitbox.Intersects(Projectile.Hitbox) || State == 1) 
+                if (!player.Hitbox.Intersects(Projectile.Hitbox) || State == 1)
                     continue;
-                
+
                 State = 1;
                 Time = 0;
                 this.Sync();

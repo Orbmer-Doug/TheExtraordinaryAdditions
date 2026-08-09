@@ -8,14 +8,15 @@ namespace TheExtraordinaryAdditions.Core.Utilities;
 
 public static class TileUtils
 {
-    public static Vector2? FindNearestSurface(Vector2 searchOrigin, bool searchDown, float maxDistance, int searchWidth, bool finePrecision = false)
+    public static Vector2? FindNearestSurface(Vector2 searchOrigin, bool searchDown, float maxDistance, int searchWidth,
+        bool finePrecision = false)
     {
         // Convert search origin to tile coordinates
-        int startX = (int)(searchOrigin.X / 16f);
-        int startY = (int)(searchOrigin.Y / 16f);
+        int startX = (int) (searchOrigin.X / 16f);
+        int startY = (int) (searchOrigin.Y / 16f);
 
         // Calculate the maximum search depth in tiles
-        int maxDepth = (int)(maxDistance / 16f);
+        int maxDepth = (int) (maxDistance / 16f);
 
         // Define the x-range to search (centered on startX)
         int minX = Math.Max(0, startX - searchWidth);
@@ -43,13 +44,17 @@ public static class TileUtils
                     : ParanoidTileRetrieval(x, y + 1); // Tile below for upward search
 
                 // Check if this tile is a surface or ceiling
-                bool isSolid = tile.HasUnactuatedTile && (Main.tileSolid[tile.TileType] || (Main.tileSolidTop[tile.TileType] && tile.TileFrameY == 0));
-                bool hasAirAdjacent = adjacentTile == null || !adjacentTile.HasUnactuatedTile || !Main.tileSolid[adjacentTile.TileType];
+                bool isSolid = tile.HasUnactuatedTile && (Main.tileSolid[tile.TileType] ||
+                                                          (Main.tileSolidTop[tile.TileType] && tile.TileFrameY == 0));
+                bool hasAirAdjacent = adjacentTile == null || !adjacentTile.HasUnactuatedTile ||
+                                      !Main.tileSolid[adjacentTile.TileType];
 
                 if (isSolid && hasAirAdjacent)
                 {
-                    bool validGroundSlope = tile.Slope != SlopeType.Solid && tile.Slope != SlopeType.SlopeUpLeft && tile.Slope != SlopeType.SlopeUpRight;
-                    bool validCeilingSlope = tile.Slope != SlopeType.Solid && tile.Slope != SlopeType.SlopeDownLeft && tile.Slope != SlopeType.SlopeDownRight;
+                    bool validGroundSlope = tile.Slope != SlopeType.Solid && tile.Slope != SlopeType.SlopeUpLeft &&
+                                            tile.Slope != SlopeType.SlopeUpRight;
+                    bool validCeilingSlope = tile.Slope != SlopeType.Solid && tile.Slope != SlopeType.SlopeDownLeft &&
+                                             tile.Slope != SlopeType.SlopeDownRight;
 
                     // Found a surface (downward) or ceiling (upward); calculate its position
                     Vector2 surfacePos;
@@ -157,13 +162,14 @@ public static class TileUtils
         return closestSurface;
     }
 
-    public static bool IsThereAChasm(Entity entity, int widthThreshold, out Point start, out Point end, bool requiresLOS = false)
+    public static bool IsThereAChasm(Entity entity, int widthThreshold, out Point start, out Point end,
+        bool requiresLOS = false)
     {
         // Convert entity position to tile coordinates
-        int ex = (int)entity.Center.X >> 4; // X tile at entity's center
-        int ey = (int)entity.position.Y + entity.height >> 4; // Y tile just below entity's feet
+        int ex = (int) entity.Center.X >> 4; // X tile at entity's center
+        int ey = (int) entity.position.Y + entity.height >> 4; // Y tile just below entity's feet
         int direction = entity.direction; // 1 (right) or -1 (left)
-        int heightInTiles = (int)Math.Ceiling(entity.height / 16f); // Entity height in tiles
+        int heightInTiles = (int) Math.Ceiling(entity.height / 16f); // Entity height in tiles
         int clearanceHeight = heightInTiles; // Clearance height above the chasm, set to entity's height
 
         int currentCount = 0; // Count of consecutive chasm tiles
@@ -223,7 +229,8 @@ public static class TileUtils
 
                 currentCount++; // Increment consecutive chasm tiles
 
-                if (currentCount >= widthThreshold && !chasmFound) // Only check path if we haven't already found a valid chasm
+                if (currentCount >= widthThreshold &&
+                    !chasmFound) // Only check path if we haven't already found a valid chasm
                 {
                     // Check if the path to the chasm's start is unobstructed, if required
                     if (requiresLOS)
@@ -332,7 +339,8 @@ public static class TileUtils
 
         public ref LiquidData LiquidData => ref liquidData;
 
-        public ref TileWallBrightnessInvisibilityData TileWallBrightnessInvisibilityData => ref tileWallBrightnessInvisibilityData;
+        public ref TileWallBrightnessInvisibilityData TileWallBrightnessInvisibilityData =>
+            ref tileWallBrightnessInvisibilityData;
 
         public static implicit operator TileData(Tile tile)
         {
@@ -350,10 +358,10 @@ public static class TileUtils
 
     public static bool SolidCollisionFix(Vector2 position, int width, int height, bool acceptTopSurfaces = false)
     {
-        int value = (int)(position.X / 16f) - 1;
-        int value2 = (int)((position.X + width) / 16f) + 2;
-        int value3 = (int)(position.Y / 16f) - 1;
-        int value4 = (int)((position.Y + height) / 16f) + 2;
+        int value = (int) (position.X / 16f) - 1;
+        int value2 = (int) ((position.X + width) / 16f) + 2;
+        int value3 = (int) (position.Y / 16f) - 1;
+        int value4 = (int) ((position.Y + height) / 16f) + 2;
         int num = Terraria.Utils.Clamp(value, 0, Main.maxTilesX - 1);
         value2 = Terraria.Utils.Clamp(value2, 0, Main.maxTilesX - 1);
         value3 = Terraria.Utils.Clamp(value3, 0, Main.maxTilesY - 1);
@@ -369,7 +377,8 @@ public static class TileUtils
 
                 bool flag = Main.tileSolid[tile.TileType] && !Main.tileSolidTop[tile.TileType];
                 if (acceptTopSurfaces)
-                    flag |= (Main.tileSolidTop[tile.TileType] && tile.TileFrameY == 0) || TileID.Sets.Platforms[tile.TileType];
+                    flag |= (Main.tileSolidTop[tile.TileType] && tile.TileFrameY == 0) ||
+                            TileID.Sets.Platforms[tile.TileType];
 
                 if (flag)
                 {
@@ -382,7 +391,8 @@ public static class TileUtils
                         num2 -= 8;
                     }
 
-                    if (position.X + width > vector.X && position.X < vector.X + 16f && position.Y + height > vector.Y && position.Y < vector.Y + num2)
+                    if (position.X + width > vector.X && position.X < vector.X + 16f &&
+                        position.Y + height > vector.Y && position.Y < vector.Y + num2)
                         return true;
                 }
             }
@@ -391,8 +401,12 @@ public static class TileUtils
         return false;
     }
 
-    public static bool IsInWorld(this Point16 point) => point.X >= 0 && point.Y >= 0 && point.X < Main.maxTilesX && point.Y < Main.maxTilesY;
-    public static bool IsInWorld(this Point point) => point.X >= 0 && point.Y >= 0 && point.X < Main.maxTilesX && point.Y < Main.maxTilesY;
+    public static bool IsInWorld(this Point16 point) =>
+        point.X >= 0 && point.Y >= 0 && point.X < Main.maxTilesX && point.Y < Main.maxTilesY;
+
+    public static bool IsInWorld(this Point point) =>
+        point.X >= 0 && point.Y >= 0 && point.X < Main.maxTilesX && point.Y < Main.maxTilesY;
+
     public static Vector2 ClampInWorld(this Vector2 vector) => new(
         MathHelper.Clamp(vector.X, Main.leftWorld, Main.rightWorld),
         MathHelper.Clamp(vector.Y, Main.topWorld, Main.bottomWorld));
@@ -402,8 +416,8 @@ public static class TileUtils
         if (player.velocity.Y != 0f)
             return false;
 
-        int playerCenterX = (int)player.Center.X / 16;
-        int playerCenterY = (int)(player.position.Y + player.height - 1f) / 16 + 1;
+        int playerCenterX = (int) player.Center.X / 16;
+        int playerCenterY = (int) (player.position.Y + player.height - 1f) / 16 + 1;
         for (int i = 0; i <= solidGroundAhead; i++)
         {
             bool ground = Main.tile[playerCenterX + player.direction * i, playerCenterY].IsTileSolidGround();
@@ -412,11 +426,13 @@ public static class TileUtils
             for (int j = 1; j <= airExposureNeeded; j++)
             {
                 Tile checkedTile = Main.tile[playerCenterX + player.direction * i, playerCenterY - j];
-                ground = !(checkedTile != null) || !checkedTile.HasUnactuatedTile || !Main.tileSolid[checkedTile.TileType];
+                ground = !(checkedTile != null) || !checkedTile.HasUnactuatedTile ||
+                         !Main.tileSolid[checkedTile.TileType];
                 if (!ground)
                     return false;
             }
         }
+
         return true;
     }
 
@@ -445,14 +461,16 @@ public static class TileUtils
 
     public static float GetTileRNG(this Point tilePos, int shift = 0)
     {
-        return (float)(Math.Sin(tilePos.X * 17.07947 + shift * 36) + Math.Sin(tilePos.Y * 25.13274)) * 0.25f + 0.5f;
+        return (float) (Math.Sin(tilePos.X * 17.07947 + shift * 36) + Math.Sin(tilePos.Y * 25.13274)) * 0.25f + 0.5f;
     }
 
-    public static bool IsTileSolid(this Tile tile) => tile.HasUnactuatedTile && Main.tileSolid[tile.TileType] && !Main.tileSolidTop[tile.TileType];
+    public static bool IsTileSolid(this Tile tile) => tile.HasUnactuatedTile && Main.tileSolid[tile.TileType] &&
+                                                      !Main.tileSolidTop[tile.TileType];
 
     public static Point ToSafeTileCoordinates(this Vector2 vec)
     {
-        return new Point((int)MathHelper.Clamp((int)vec.X / 16f, 0, Main.maxTilesX), (int)MathHelper.Clamp((int)vec.Y / 16f, 0, Main.maxTilesY));
+        return new Point((int) MathHelper.Clamp((int) vec.X / 16f, 0, Main.maxTilesX),
+            (int) MathHelper.Clamp((int) vec.Y / 16f, 0, Main.maxTilesY));
     }
 
     public static bool ClearPath(Vector2 start, Vector2 end)
@@ -463,14 +481,16 @@ public static class TileUtils
         {
             Vector2 toLookAt = start + Vector2.Normalize(direction) * i;
 
-            if (Framing.GetTileSafely((int)(toLookAt.X / 16), (int)(toLookAt.Y / 16)).HasTile && Main.tileSolid[Framing.GetTileSafely((int)(toLookAt.X / 16), (int)(toLookAt.Y / 16)).TileType])
+            if (Framing.GetTileSafely((int) (toLookAt.X / 16), (int) (toLookAt.Y / 16)).HasTile &&
+                Main.tileSolid[Framing.GetTileSafely((int) (toLookAt.X / 16), (int) (toLookAt.Y / 16)).TileType])
                 return false;
         }
 
         return true;
     }
 
-    public static bool IsTileSolidOrPlatform(this Tile tile) => tile != null && tile.HasUnactuatedTile && Main.tileSolid[tile.TileType];
+    public static bool IsTileSolidOrPlatform(this Tile tile) =>
+        tile != null && tile.HasUnactuatedTile && Main.tileSolid[tile.TileType];
 
     public static bool IsEdgeTile(int x, int y)
     {
@@ -492,7 +512,7 @@ public static class TileUtils
     {
         if (tile == null || !tile.HasUnactuatedTile)
             return false;
-        
+
         return Main.tileSolid[tile.TileType] || Main.tileSolidTop[tile.TileType];
     }
 
@@ -517,24 +537,28 @@ public static class TileUtils
             angleToOpenAir = MathHelper.Pi;
             return true;
         }
+
         val = ParanoidTileRetrieval(x + 1, y);
         if (!val.HasTile)
         {
             angleToOpenAir = 0f;
             return true;
         }
+
         val = ParanoidTileRetrieval(x, y - 1);
         if (!val.HasTile)
         {
             angleToOpenAir = MathHelper.Pi / 2f;
             return true;
         }
+
         val = ParanoidTileRetrieval(x, y + 1);
         if (!val.HasTile)
         {
             angleToOpenAir = -MathHelper.Pi / 2f;
             return true;
         }
+
         return false;
     }
 

@@ -15,17 +15,21 @@ public class KrakenTentacle : ModProjectile, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.KrakenTentacle);
     public ref float Time => ref Projectile.ai[0];
+
     public bool Init
     {
         get => Projectile.ai[1] == 1f;
         set => Projectile.ai[1] = value.ToInt();
     }
-    public Projectile Kraken => Main.projectile[(int)Projectile.ai[2]];
+
+    public Projectile Kraken => Main.projectile[(int) Projectile.ai[2]];
+
     public bool Attack
     {
         get => Projectile.AdditionsInfo().ExtraAI[0] == 1f;
         set => Projectile.AdditionsInfo().ExtraAI[0] = value.ToInt();
     }
+
     public ref float AttackWait => ref Projectile.AdditionsInfo().ExtraAI[1];
     public float WaitTime => 40f;
     public ref float Spin => ref Projectile.AdditionsInfo().ExtraAI[2];
@@ -65,6 +69,7 @@ public class KrakenTentacle : ModProjectile, ILocalizedModType, IModType
                 VerletSimulatedSegment segment = new(Projectile.Center);
                 segments.Add(segment);
             }
+
             segments[0].Locked = true;
 
             Init = true;
@@ -78,6 +83,7 @@ public class KrakenTentacle : ModProjectile, ILocalizedModType, IModType
             for (int i = 0; i < MaxSegments; i++)
                 segments[i] = new VerletSimulatedSegment(Projectile.Center);
         }
+
         segments[0].OldPosition = segments[0].Position;
         segments[0].Position = Projectile.Center;
         segments = VerletSimulatedSegment.SimpleSimulation(segments, 12f);
@@ -101,6 +107,7 @@ public class KrakenTentacle : ModProjectile, ILocalizedModType, IModType
     }
 
     public override bool? CanCutTiles() => false;
+
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
         return Utils.CenteredRectangle(segments[^1].Position, new(28f)).Intersects(targetHitbox);
@@ -119,7 +126,9 @@ public class KrakenTentacle : ModProjectile, ILocalizedModType, IModType
         {
             for (int i = 0; i < 25; i++)
                 Dust.NewDustPerfect(segments[^1].Position + Main.rand.NextVector2Circular(8, 8),
-                    DustID.Water, target.Center.SafeDirectionTo(segments[^1].Position).RotatedByRandom(.4f) * Main.rand.NextFloat(4f, 8f),
+                    DustID.Water,
+                    target.Center.SafeDirectionTo(segments[^1].Position).RotatedByRandom(.4f) *
+                    Main.rand.NextFloat(4f, 8f),
                     0, default, Main.rand.NextFloat(.5f, 1.2f));
             AttackWait = WaitTime;
             Attack = false;
@@ -140,12 +149,13 @@ public class KrakenTentacle : ModProjectile, ILocalizedModType, IModType
         Vector2 val = segments[^1].Position - segments[^1].OldPosition;
         Vector2 scale = Vector2.One;
 
-        int totalChains = (int)(Vector2.Distance(segments[0].Position, segments[^1].Position) / inner.Height / scale.Length()) / 2;
-        totalChains = (int)MathHelper.Clamp(totalChains, 10f, 100f);
+        int totalChains = (int) (Vector2.Distance(segments[0].Position, segments[^1].Position) / inner.Height /
+                                 scale.Length()) / 2;
+        totalChains = (int) MathHelper.Clamp(totalChains, 10f, 100f);
         for (int i = 0; i < totalChains - 1; i++)
         {
-            Vector2 drawPosition = bezierCurve.Evaluate(i / (float)totalChains);
-            float completionRatio = i / (float)totalChains + 1f / totalChains;
+            Vector2 drawPosition = bezierCurve.Evaluate(i / (float) totalChains);
+            float completionRatio = i / (float) totalChains + 1f / totalChains;
             float angle = (bezierCurve.Evaluate(completionRatio) - drawPosition).ToRotation();
             if (i == totalChains - 2)
                 inner = tip;

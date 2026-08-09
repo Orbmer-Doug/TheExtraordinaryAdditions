@@ -25,7 +25,8 @@ public class Comet : ModProjectile
     {
         Projectile.Size = new(1);
         Projectile.hostile = Projectile.tileCollide = false;
-        Projectile.ignoreWater = Projectile.friendly = Projectile.usesLocalNPCImmunity = Projectile.stopsDealingDamageAfterPenetrateHits = true;
+        Projectile.ignoreWater = Projectile.friendly =
+            Projectile.usesLocalNPCImmunity = Projectile.stopsDealingDamageAfterPenetrateHits = true;
         Projectile.localNPCHitCooldown = 10;
         Projectile.penetrate = 2;
         Projectile.extraUpdates = 1;
@@ -34,11 +35,11 @@ public class Comet : ModProjectile
     }
 
     public Player Owner => Main.player[Projectile.owner];
-    public static readonly int FadeTime = CalUtils.SecondsToFrames(.7f);
+    public static readonly int FadeTime = SecondsToFrames(.7f);
 
     public int HitTime
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
 
@@ -60,16 +61,16 @@ public class Comet : ModProjectile
 
     public override void SendExtraAI(BinaryWriter writer)
     {
-        writer.Write((float)Projectile.scale);
-        writer.Write((int)Projectile.width);
-        writer.Write((int)Projectile.height);
+        writer.Write((float) Projectile.scale);
+        writer.Write((int) Projectile.width);
+        writer.Write((int) Projectile.height);
     }
 
     public override void ReceiveExtraAI(BinaryReader reader)
     {
-        Projectile.scale = (float)reader.ReadSingle();
-        Projectile.width = (int)reader.ReadInt32();
-        Projectile.height = (int)reader.ReadInt32();
+        Projectile.scale = (float) reader.ReadSingle();
+        Projectile.width = (int) reader.ReadInt32();
+        Projectile.height = (int) reader.ReadInt32();
     }
 
     public override void AI()
@@ -108,8 +109,10 @@ public class Comet : ModProjectile
             {
                 Vector2 rot = Projectile.velocity.RotatedBy(MathHelper.PiOver2 * i);
                 Vector2 vel = rot * 0.33f + Projectile.velocity / 4f;
-                Vector2 posit = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero) * Projectile.width * .5f + rot;
-                ParticleRegistry.SpawnDustParticle(posit, vel * 1.4f, Main.rand.Next(10, 18), Projectile.scale * .7f, Color.Cyan, .1f, false, true, false, false);
+                Vector2 posit = Projectile.Center +
+                                Projectile.velocity.SafeNormalize(Vector2.Zero) * Projectile.width * .5f + rot;
+                ParticleRegistry.SpawnDustParticle(posit, vel * 1.4f, Main.rand.Next(10, 18), Projectile.scale * .7f,
+                    Color.Cyan, .1f, false, true, false, false);
             }
         }
     }
@@ -121,13 +124,18 @@ public class Comet : ModProjectile
             for (int i = 0; i < 25; i++)
             {
                 Vector2 pos = Projectile.Center + Main.rand.NextVector2Circular(30f, 30f);
-                Vector2 vel = -oldVelocity.RotatedByRandom(Main.rand.NextFloat(.4f, .6f)) * Main.rand.NextFloat(.3f, 1f);
+                Vector2 vel = -oldVelocity.RotatedByRandom(Main.rand.NextFloat(.4f, .6f)) *
+                              Main.rand.NextFloat(.3f, 1f);
 
-                ParticleRegistry.SpawnGlowParticle(pos, vel * Main.rand.NextFloat(1.28f, 1.5f), 20, Main.rand.NextFloat(.9f, 1.4f) * Projectile.scale, Color.Cyan);
-                ParticleRegistry.SpawnSparkParticle(pos, vel, Main.rand.Next(120, 150), Main.rand.NextFloat(.7f, 1.2f), Color.White.Lerp(Color.DeepSkyBlue, Main.rand.NextFloat(.1f, .9f)), true, true);
+                ParticleRegistry.SpawnGlowParticle(pos, vel * Main.rand.NextFloat(1.28f, 1.5f), 20,
+                    Main.rand.NextFloat(.9f, 1.4f) * Projectile.scale, Color.Cyan);
+                ParticleRegistry.SpawnSparkParticle(pos, vel, Main.rand.Next(120, 150), Main.rand.NextFloat(.7f, 1.2f),
+                    Color.White.Lerp(Color.DeepSkyBlue, Main.rand.NextFloat(.1f, .9f)), true, true);
             }
+
             if (this.RunLocal())
-                Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<CometBlast>(), Projectile.damage, Projectile.knockBack, Projectile.owner, Projectile.scale);
+                Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<CometBlast>(),
+                    Projectile.damage, Projectile.knockBack, Projectile.owner, Projectile.scale);
             AdditionsSound.etherealSlam.Play(Projectile.Center, .6f, -Projectile.scale * .18f, .06f, 50);
 
             Projectile.velocity *= 0f;
@@ -135,6 +143,7 @@ public class Comet : ModProjectile
 
             HitGround = true;
         }
+
         return false;
     }
 
@@ -143,9 +152,10 @@ public class Comet : ModProjectile
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        Projectile.damage = (int)(Projectile.damage * .5f);
+        Projectile.damage = (int) (Projectile.damage * .5f);
         if (this.RunLocal())
-            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<CometBlast>(), Projectile.damage, Projectile.knockBack, Projectile.owner, Projectile.scale);
+            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<CometBlast>(),
+                Projectile.damage, Projectile.knockBack, Projectile.owner, Projectile.scale);
     }
 
     public float WidthFunct(float c)
@@ -157,12 +167,13 @@ public class Comet : ModProjectile
 
     public Color ColorFunct(SystemVector2 c, Vector2 position)
     {
-        Color col = new Color(20 + (Projectile.identity % byte.MaxValue), 50 + (int)(60 * c.X), 255);
+        Color col = new Color(20 + (Projectile.identity % byte.MaxValue), 50 + (int) (60 * c.X), 255);
         return col * Projectile.Opacity;
     }
 
     public TrailPoints points = new(30);
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -172,6 +183,7 @@ public class Comet : ModProjectile
             ManagedShader w = ShaderRegistry.PierceTrailShader;
             trail.DrawTrail(w, points.Points, 140);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;
     }

@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -38,24 +37,30 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
     public OptimizedPrimitiveTrail trail;
 
     public float RotationDifference => CurrentRotation - (Projectile.rotation + MathHelper.PiOver2);
-    private Vector2 ControlPointSmall => Projectile.Center - PolarVector(MaxHeight * .1f * Projectile.Opacity, Projectile.rotation + MathHelper.PiOver2);
-    private Vector2 ControlPointMed => Projectile.Center - PolarVector(MaxHeight * .3f, Projectile.rotation + MathHelper.PiOver2 - RotationDifference);
-    private Vector2 ControlPoint => Projectile.Center - PolarVector(MaxHeight * .7f, Projectile.rotation + MathHelper.PiOver2);
-    private Vector2 EndCurvePoint => Projectile.Center - PolarVector(MaxHeight * .85f, CurrentRotation - (RotationDifference * MathHelper.PiOver4));
+
+    private Vector2 ControlPointSmall => Projectile.Center -
+                                         PolarVector(MaxHeight * .1f * Projectile.Opacity,
+                                             Projectile.rotation + MathHelper.PiOver2);
+
+    private Vector2 ControlPointMed => Projectile.Center -
+                                       PolarVector(MaxHeight * .3f,
+                                           Projectile.rotation + MathHelper.PiOver2 - RotationDifference);
+
+    private Vector2 ControlPoint =>
+        Projectile.Center - PolarVector(MaxHeight * .7f, Projectile.rotation + MathHelper.PiOver2);
+
+    private Vector2 EndCurvePoint => Projectile.Center -
+                                     PolarVector(MaxHeight * .85f,
+                                         CurrentRotation - (RotationDifference * MathHelper.PiOver4));
+
     private Vector2 CurrentPoint => Projectile.Center - PolarVector(MaxHeight, CurrentRotation);
 
     public ref float Time => ref Projectile.ai[0];
 
     public float AngularDamageFactor
     {
-        get
-        {
-            return Projectile.ai[1];
-        }
-        set
-        {
-            Projectile.ai[1] = value;
-        }
+        get { return Projectile.ai[1]; }
+        set { Projectile.ai[1] = value; }
     }
 
     public ref float RotationUpdate => ref Projectile.ai[2];
@@ -81,6 +86,7 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
     {
         writer.Write(Projectile.rotation);
     }
+
     public override void GetExtraAI(BinaryReader reader)
     {
         Projectile.rotation = reader.ReadSingle();
@@ -96,6 +102,7 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
     }
 
     public override bool ShouldDie() => false;
+
     public override void SafeAI()
     {
         if (Time == 0f)
@@ -126,11 +133,16 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
         if (this.RunLocal())
         {
             // Rotation shenanigans
-            float rotDifference = ((Projectile.rotation + MathHelper.PiOver2 - CurrentRotation) % MathHelper.TwoPi + 9.42f) % MathHelper.TwoPi - MathHelper.Pi;
+            float rotDifference =
+                ((Projectile.rotation + MathHelper.PiOver2 - CurrentRotation) % MathHelper.TwoPi + 9.42f) %
+                MathHelper.TwoPi - MathHelper.Pi;
             CurrentRotation = MathHelper.Lerp(CurrentRotation, CurrentRotation + rotDifference, RotationUpdate);
 
-            float rotDifference2 = ((Center.SafeDirectionTo(Mouse).ToRotation() + MathHelper.PiOver2 - Projectile.rotation) % MathHelper.TwoPi + 9.42f) % MathHelper.TwoPi - MathHelper.Pi;
-            Projectile.rotation = MathHelper.Lerp(Projectile.rotation, Projectile.rotation + rotDifference2, RotationUpdate);
+            float rotDifference2 =
+                ((Center.SafeDirectionTo(Mouse).ToRotation() + MathHelper.PiOver2 - Projectile.rotation) %
+                    MathHelper.TwoPi + 9.42f) % MathHelper.TwoPi - MathHelper.Pi;
+            Projectile.rotation =
+                MathHelper.Lerp(Projectile.rotation, Projectile.rotation + rotDifference2, RotationUpdate);
             if (Projectile.rotation != Projectile.oldRot[1])
                 this.Sync();
         }
@@ -138,7 +150,8 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
         RotationUpdate = .18f;
 
         // Update fire sounds
-        slot ??= LoopedSoundManager.CreateNew(new(AdditionsSound.HeavyFireLoop, () => .47f * Projectile.scale), () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
+        slot ??= LoopedSoundManager.CreateNew(new(AdditionsSound.HeavyFireLoop, () => .47f * Projectile.scale),
+            () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
         slot.Update(Projectile.Center);
 
         float towards = Projectile.rotation - MathHelper.PiOver2;
@@ -153,13 +166,15 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
 
         Projectile.scale = Projectile.Opacity = MakePoly(2.7f).InFunction(FadeInterpolant);
         Projectile.direction = Owner.direction;
-        Projectile.height = (int)Utils.Remap(FadeTimer, 0f, FadeTime, 0f, MaxHeight);
+        Projectile.height = (int) Utils.Remap(FadeTimer, 0f, FadeTime, 0f, MaxHeight);
 
         // Visuals
-        Vector2 pos = ControlPointSmall + PolarVector(Main.rand.NextFloat(-30f, 30f) * Projectile.Opacity, towards + (Main.rand.NextBool().ToDirectionInt() * MathHelper.PiOver2))
-            + PolarVector(Main.rand.NextFloat(0f, 20f) * Projectile.Opacity, towards);
+        Vector2 pos = ControlPointSmall + PolarVector(Main.rand.NextFloat(-30f, 30f) * Projectile.Opacity,
+                                            towards + (Main.rand.NextBool().ToDirectionInt() * MathHelper.PiOver2))
+                                        + PolarVector(Main.rand.NextFloat(0f, 20f) * Projectile.Opacity, towards);
         Vector2 vel = ControlPointSmall.SafeDirectionTo(pos);
-        Color fireColor = MulticolorLerp(Main.rand.NextFloat(0.2f, 0.8f), Color.Red.Lerp(Color.OrangeRed, .3f), Color.OrangeRed, Color.Orange, Color.DarkOrange, Color.OrangeRed * 1.6f);
+        Color fireColor = MulticolorLerp(Main.rand.NextFloat(0.2f, 0.8f), Color.Red.Lerp(Color.OrangeRed, .3f),
+            Color.OrangeRed, Color.Orange, Color.DarkOrange, Color.OrangeRed * 1.6f);
 
         if (Main.rand.NextBool())
         {
@@ -167,25 +182,34 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
             float scale = Main.rand.NextFloat(.4f, .9f);
             Color col = Color.OrangeRed.Lerp(Color.Red, Main.rand.NextFloat(.4f, .7f));
 
-            ParticleRegistry.SpawnGlowParticle(pos, RandomVelocity(1f, 1f, 3f), life, scale * 20f * Projectile.scale, col, 1.8f);
+            ParticleRegistry.SpawnGlowParticle(pos, RandomVelocity(1f, 1f, 3f), life, scale * 20f * Projectile.scale,
+                col, 1.8f);
         }
+
         if (Main.rand.NextBool(7))
         {
-            ParticleRegistry.SpawnSparkParticle(pos, vel * Main.rand.NextFloat(8f, 12f), Main.rand.Next(72, 120), Main.rand.NextFloat(.3f, .5f) * Projectile.scale, fireColor.Lerp(Color.White, .4f), true, true);
+            ParticleRegistry.SpawnSparkParticle(pos, vel * Main.rand.NextFloat(8f, 12f), Main.rand.Next(72, 120),
+                Main.rand.NextFloat(.3f, .5f) * Projectile.scale, fireColor.Lerp(Color.White, .4f), true, true);
         }
+
         for (int i = 0; i < 3; i++)
         {
-            ParticleRegistry.SpawnHeavySmokeParticle(ControlPointSmall + Main.rand.NextVector2Circular(6, 6), vel, Main.rand.Next(30, 40), Main.rand.NextFloat(.4f, .5f) * Projectile.scale, fireColor);
-            ParticleRegistry.SpawnHeavySmokeParticle(pos, vel * Main.rand.NextFloat(1f, 3f), Main.rand.Next(30, 40), Main.rand.NextFloat(.4f, .8f) * Projectile.scale, fireColor, 2f);
+            ParticleRegistry.SpawnHeavySmokeParticle(ControlPointSmall + Main.rand.NextVector2Circular(6, 6), vel,
+                Main.rand.Next(30, 40), Main.rand.NextFloat(.4f, .5f) * Projectile.scale, fireColor);
+            ParticleRegistry.SpawnHeavySmokeParticle(pos, vel * Main.rand.NextFloat(1f, 3f), Main.rand.Next(30, 40),
+                Main.rand.NextFloat(.4f, .8f) * Projectile.scale, fireColor, 2f);
         }
 
-        if (MathF.Abs(MathHelper.WrapAngle(Projectile.rotation - Projectile.oldRot[1])) > .4f && Projectile.soundDelay == 0 && Time > 6f)
+        if (MathF.Abs(MathHelper.WrapAngle(Projectile.rotation - Projectile.oldRot[1])) > .4f &&
+            Projectile.soundDelay == 0 && Time > 6f)
         {
             if (this.RunLocal())
-                Projectile.NewProj(pos, Projectile.velocity * 15f, ModContent.ProjectileType<StarFlares>(), (int)(Projectile.damage * 0.35f), 0f, Owner.whoAmI, 0f, 0f, 0f);
+                Projectile.NewProj(pos, Projectile.velocity * 15f, ModContent.ProjectileType<StarFlares>(),
+                    (int) (Projectile.damage * 0.35f), 0f, Owner.whoAmI, 0f, 0f, 0f);
 
             for (int i = 0; i < 35; i++)
-                ParticleRegistry.SpawnHeavySmokeParticle(pos, vel.RotatedByRandom(.2f) * Main.rand.NextFloat(.8f, 1.3f), Main.rand.Next(20, 35), Main.rand.NextFloat(.4f, .8f), Color.OrangeRed);
+                ParticleRegistry.SpawnHeavySmokeParticle(pos, vel.RotatedByRandom(.2f) * Main.rand.NextFloat(.8f, 1.3f),
+                    Main.rand.Next(20, 35), Main.rand.NextFloat(.4f, .8f), Color.OrangeRed);
 
             SoundID.DD2_BetsyFireballShot.Play(Projectile.Center, 1.3f, -.4f, .2f);
 
@@ -205,10 +229,10 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
 
         AngularDamageFactor = MathHelper.Lerp(AngularDamageFactor, deltaAngle, 0.08f);
 
-        float speedDamageScalar = 0.166f + (float)Math.Log(AngularDamageFactor / ((float)Math.PI / 30f) + 1.5f, 3.0);
+        float speedDamageScalar = 0.166f + (float) Math.Log(AngularDamageFactor / ((float) Math.PI / 30f) + 1.5f, 3.0);
         int damageWithChargeAndStats = Owner.GetWeaponDamage(Owner.HeldItem, false);
         float sizeDamageScalar = 1f;
-        Projectile.damage = (int)(damageWithChargeAndStats * speedDamageScalar * sizeDamageScalar);
+        Projectile.damage = (int) (damageWithChargeAndStats * speedDamageScalar * sizeDamageScalar);
     }
 
     public override bool PreKill(int timeLeft)
@@ -226,7 +250,7 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        target.AddBuff(ModContent.BuffType<PlasmaIncineration>(), CalUtils.SecondsToFrames(6));
+        target.AddBuff(ModContent.BuffType<PlasmaIncineration>(), SecondsToFrames(6));
         if (AngularDamageFactor > 0.1f)
         {
             AdditionsSound.etherealHit1.Play(target.Center, 1.2f, 0f, .16f);
@@ -241,6 +265,7 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
 
     public ManagedScreenShader Shader { get; private set; }
     public bool HasShader { get; private set; } = false;
+
     public void InitializeShader()
     {
         Shader = ScreenShaderPool.GetShader("HeatDistortionFilter");
@@ -269,6 +294,7 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
             ScreenShaderUpdates.UnregisterEntity(this);
         }
     }
+
     public bool IsEntityActive() => Projectile.active;
 
     public override bool PreDraw(ref Color lightColor)
@@ -282,7 +308,8 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
 
         Texture2D tex = Projectile.ThisProjectileTexture();
         Vector2 orig = tex.Size() * .5f;
-        Main.spriteBatch.DrawBetter(tex, Projectile.Center, null, Color.White, Projectile.rotation, orig, Projectile.scale);
+        Main.spriteBatch.DrawBetter(tex, Projectile.Center, null, Color.White, Projectile.rotation, orig,
+            Projectile.scale);
 
         return false;
     }
@@ -291,7 +318,10 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
     {
         cache = [];
         Vector2 offset = PolarVector(6f * Projectile.scale, Projectile.rotation - MathHelper.PiOver2);
-        BezierCurves curve = new([Projectile.Center + offset, ControlPointSmall + offset, ControlPointMed + offset, ControlPoint + offset, EndCurvePoint + offset, CurrentPoint + offset]);
+        BezierCurves curve = new([
+            Projectile.Center + offset, ControlPointSmall + offset, ControlPointMed + offset, ControlPoint + offset,
+            EndCurvePoint + offset, CurrentPoint + offset
+        ]);
         cache = curve.GetPoints(Points);
         cache.Reverse();
 
@@ -312,7 +342,8 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
             if (trail != null)
             {
                 ManagedShader fire = AssetRegistry.GetShader("Emblazed");
-                fire.TrySetParameter("NoiseOffset", Vector2.One * Main.GameUpdateCount * 0.02f + Vector2.One * (0.003f * .6f));
+                fire.TrySetParameter("NoiseOffset",
+                    Vector2.One * Main.GameUpdateCount * 0.02f + Vector2.One * (0.003f * .6f));
                 fire.TrySetParameter("brightness", 20);
                 fire.TrySetParameter("MainScale", Projectile.scale);
                 fire.TrySetParameter("CenterPoint", new Vector2(0.5f, 1f));
@@ -328,6 +359,7 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
                 trail.DrawTrail(fire, points.Points, 500);
             }
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.HeldProjectiles, BlendState.Additive);
     }
 }
@@ -335,6 +367,7 @@ public class RendedStarHoldout : BaseIdleHoldoutProjectile, IHasScreenShader
 public class StarFlares : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.Size = new(20);
@@ -350,10 +383,12 @@ public class StarFlares : ModProjectile
     public override void AI()
     {
         MetaballRegistry.SpawnPlasmaMetaball(Projectile.Center, Vector2.Zero, 30, 100, 2f);
-        ParticleRegistry.SpawnGlowParticle(Projectile.Center, -Projectile.velocity * Main.rand.NextFloat(.1f, .5f), Main.rand.Next(20, 60), Main.rand.NextFloat(20f, 90f), Color.OrangeRed);
+        ParticleRegistry.SpawnGlowParticle(Projectile.Center, -Projectile.velocity * Main.rand.NextFloat(.1f, .5f),
+            Main.rand.Next(20, 60), Main.rand.NextFloat(20f, 90f), Color.OrangeRed);
         NPC target = NPCTargeting.GetNPCInLargestCluster(new(Projectile.Center, 800));
         if (target.CanHomeInto())
-            Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.SafeDirectionTo(target.Center) * 24f, .2f);
+            Projectile.velocity =
+                Vector2.SmoothStep(Projectile.velocity, Projectile.SafeDirectionTo(target.Center) * 24f, .2f);
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
@@ -361,9 +396,12 @@ public class StarFlares : ModProjectile
         for (int i = 0; i < 120; i++)
         {
             MetaballRegistry.SpawnPlasmaMetaball(Projectile.Center,
-                Main.rand.NextVector2Circular(5f, 5f) + Main.rand.NextVector2Circular(6f, 6f), Main.rand.Next(50, 100), Main.rand.Next(40, 100), 1.4f);
+                Main.rand.NextVector2Circular(5f, 5f) + Main.rand.NextVector2Circular(6f, 6f), Main.rand.Next(50, 100),
+                Main.rand.Next(40, 100), 1.4f);
         }
-        ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 20, 0f, Vector2.One, 0f, 200f, Color.OrangeRed, true);
+
+        ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 20, 0f, Vector2.One, 0f, 200f,
+            Color.OrangeRed, true);
 
         if (this.RunLocal())
         {
@@ -371,6 +409,7 @@ public class StarFlares : ModProjectile
             Projectile.ExpandHitboxBy(200);
             Projectile.Damage();
         }
+
         Projectile.Kill();
     }
 }

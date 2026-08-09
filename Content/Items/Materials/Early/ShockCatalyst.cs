@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
-using CalamityMod;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -29,14 +28,17 @@ public class ShockCatalyst : ModItem
 
     public int frameCounter;
     public int frame;
-    public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
+
+    public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation,
+        ref float scale, int whoAmI)
     {
         Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.ShockCatalyst);
         Texture2D texGlow = AssetRegistry.GetTexture(AdditionsTexture.ShockCatalyst_Glow);
 
         Rectangle framed = Item.GetCurrentFrame(ref frame, ref frameCounter, 9, 7);
         spriteBatch.Draw(tex, Item.position - Main.screenPosition, framed, lightColor, 0f, Vector2.Zero, 1f, 0, 0f);
-        spriteBatch.Draw(texGlow, Item.position - Main.screenPosition, framed, Color.White, 0f, Vector2.Zero, 1f, 0, 0f);
+        spriteBatch.Draw(texGlow, Item.position - Main.screenPosition, framed, Color.White, 0f, Vector2.Zero, 1f, 0,
+            0f);
         return false;
     }
 

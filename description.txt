@@ -15,17 +15,9 @@ Does this mod work with Boss Checklist? - yep!
 Is there any world generation to be aware of? - NO
 But does it work in multiplayer? - as best as can be!
 
-Everything unintentional is 100% unintentional :)
-
 Developed by:
 Orbmer Doug - Owner/Programmer/Sprites
 SomeRandomMalePerson - Sprites/Sounds/Music
 Ashes_Plus - Occasional Sounds/Promo Art/Video/Visonary
-
-Note
-The mod has no more content update plans.
-Why? I want to move on to helping other mods or to even pursue game development, rather than working on a random something for 2 years.
-Its aided a lot with my skills but I believe it is finally time to explore other things.
-Future updates are to only stay in compatibility with Terraria and Calamity or to fix any bugs.
 
 Hope you have just as much fun as we do!

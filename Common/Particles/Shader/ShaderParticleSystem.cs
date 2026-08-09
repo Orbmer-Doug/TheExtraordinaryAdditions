@@ -131,7 +131,7 @@ public class ShaderParticleSystem : ModSystem
         {
             ref ShaderParticle s = ref particles[index];
             s.Time++;
-            ShaderParticleTypeDefinition def = ShaderParticleRegistry.TypeDefinitions[(byte)s.Type];
+            ShaderParticleTypeDefinition def = ShaderParticleRegistry.TypeDefinitions[(byte) s.Type];
 
             if (def.ShouldKill(ref s))
             {
@@ -153,7 +153,7 @@ public class ShaderParticleSystem : ModSystem
             gd.SetRenderTarget(target);
             gd.Clear(Color.Transparent);
 
-            ShaderParticleTypeDefinition def = ShaderParticleRegistry.TypeDefinitions[(byte)type];
+            ShaderParticleTypeDefinition def = ShaderParticleRegistry.TypeDefinitions[(byte) type];
 
             // Prepare the sprite batch in accordance to the needs of the particle instance
             if (def.PrepareSB != null)
@@ -216,7 +216,7 @@ public class ShaderParticleSystem : ModSystem
         foreach (int index in ActiveShaderParticles)
         {
             ShaderParticle s = particles[index];
-            ShaderParticleTypeDefinition def = ShaderParticleRegistry.TypeDefinitions[(byte)s.Type];
+            ShaderParticleTypeDefinition def = ShaderParticleRegistry.TypeDefinitions[(byte) s.Type];
             if (!def.ShouldKill(ref s) && def.DrawLayer == layerType)
             {
                 hasParticles = true;
@@ -241,7 +241,7 @@ public class ShaderParticleSystem : ModSystem
 
         foreach (ShaderParticleTypes type in Enum.GetValues(typeof(ShaderParticleTypes)))
         {
-            ShaderParticleTypeDefinition def = ShaderParticleRegistry.TypeDefinitions[(byte)type];
+            ShaderParticleTypeDefinition def = ShaderParticleRegistry.TypeDefinitions[(byte) type];
             if (def.DrawLayer != layerType)
                 continue;
 
@@ -250,7 +250,7 @@ public class ShaderParticleSystem : ModSystem
             foreach (int index in ActiveShaderParticles)
             {
                 ShaderParticle s = particles[index];
-                if (ShaderParticleRegistry.TypeDefinitions[(byte)s.Type].ShouldKill(ref s) || s.Type != type)
+                if (ShaderParticleRegistry.TypeDefinitions[(byte) s.Type].ShouldKill(ref s) || s.Type != type)
                     continue;
 
                 typeHasParticles = true;
@@ -292,7 +292,7 @@ public class ShaderParticleSystem : ModSystem
 public static class ShaderParticleRegistry
 {
     public static readonly ShaderParticleTypeDefinition[] TypeDefinitions =
-        new ShaderParticleTypeDefinition[(int)(GetLastEnumValue<ShaderParticleTypes>() + 1)];
+        new ShaderParticleTypeDefinition[(int) (GetLastEnumValue<ShaderParticleTypes>() + 1)];
 
     public static void Initialize()
     {
@@ -306,7 +306,7 @@ public static class ShaderParticleRegistry
 
     private static void StygainParticleDefinition()
     {
-        TypeDefinitions[(byte)ShaderParticleTypes.Stygain] = new ShaderParticleTypeDefinition(
+        TypeDefinitions[(byte) ShaderParticleTypes.Stygain] = new ShaderParticleTypeDefinition(
             Texture: AssetRegistry.GetTexture(AdditionsTexture.BasicCircularCircle),
             LayerTexture: AssetRegistry.GetTexture(AdditionsTexture.TurbulentNoise),
             Shader: ShaderRegistry.EdgeDetectionShader,
@@ -323,7 +323,7 @@ public static class ShaderParticleRegistry
             ShouldKill: static (ref s) => s.Size.Length() <= 0.01f,
             Draw: static (ref s, _) =>
             {
-                ShaderParticleTypeDefinition def = TypeDefinitions[(byte)s.Type];
+                ShaderParticleTypeDefinition def = TypeDefinitions[(byte) s.Type];
                 Vector2 origin = def.Texture.Size() * 0.5f;
                 float squish = MathHelper.Clamp(s.Velocity.Length() / 5f, 1f, 2f);
                 Vector2 scale = new Vector2(s.Size.X - s.Size.X * squish * 0.3f, s.Size.Y * squish) * .6f;
@@ -335,8 +335,8 @@ public static class ShaderParticleRegistry
             PrepareSB: null,
             PrepareShader: null,
             LayerOffset: static () =>
-                (Vector2.One * (float)Math.Cos(Main.GlobalTimeWrappedHourly * 0.041f) * 2f).RotatedBy(
-                    (float)Math.Cos(Main.GlobalTimeWrappedHourly * 0.08f) * 0.97f),
+                (Vector2.One * (float) Math.Cos(Main.GlobalTimeWrappedHourly * 0.041f) * 2f).RotatedBy(
+                    (float) Math.Cos(Main.GlobalTimeWrappedHourly * 0.08f) * 0.97f),
             EdgeColor: Color.DarkRed
         );
     }
@@ -362,20 +362,21 @@ public static class ShaderParticleRegistry
 
     private static void MoltenParticleDefinition()
     {
-        TypeDefinitions[(byte)ShaderParticleTypes.Molten] = new ShaderParticleTypeDefinition(
+        TypeDefinitions[(byte) ShaderParticleTypes.Molten] = new ShaderParticleTypeDefinition(
             Texture: AssetRegistry.GetTexture(AdditionsTexture.BrightLight),
             LayerTexture: AssetRegistry.InvisTex,
             Shader: ShaderRegistry.AdditiveFusableParticleEdgeShader,
             Update: static (ref s) =>
             {
-                ShaderParticleTypeDefinition def = TypeDefinitions[(byte)s.Type];
+                ShaderParticleTypeDefinition def = TypeDefinitions[(byte) s.Type];
                 s.Size = Vector2.Clamp(s.Size - new Vector2(0.24f), Vector2.Zero, Vector2.One * 200f) * 0.9956f;
                 if (s.Size.Length() < 15f)
                     s.Size *= 0.95f - 0.9f;
 
                 s.Color = def.EdgeColor * 1.2f;
-                s.Color.B = (byte)(s.Color.B +
-                                   (int)(MathF.Cos(s.Position.Y * 0.015f + Main.GlobalTimeWrappedHourly * 0.1f) * 3f));
+                s.Color.B = (byte) (s.Color.B +
+                                    (int) (MathF.Cos(s.Position.Y * 0.015f + Main.GlobalTimeWrappedHourly * 0.1f) *
+                                           3f));
                 float brightnessInterpolant = InverseLerp(10f, 2f, s.Time) * 0.67f;
                 s.Color = Color.Lerp(s.Color, Color.Wheat, brightnessInterpolant);
             },
@@ -422,7 +423,7 @@ public static class ShaderParticleRegistry
 
     private static void EpidemicParticleDefinition()
     {
-        TypeDefinitions[(byte)ShaderParticleTypes.Epidemic] = new ShaderParticleTypeDefinition(
+        TypeDefinitions[(byte) ShaderParticleTypes.Epidemic] = new ShaderParticleTypeDefinition(
             Texture: AssetRegistry.GetTexture(AdditionsTexture.BasicCircle),
             LayerTexture: AssetRegistry.GetTexture(AdditionsTexture.WavyBlotchNoise),
             Shader: ShaderRegistry.EdgeDetectionShader,
@@ -438,8 +439,8 @@ public static class ShaderParticleRegistry
             PrepareSB: null,
             PrepareShader: null,
             LayerOffset: static () =>
-                (Vector2.One * (float)Math.Cos(Main.GlobalTimeWrappedHourly * 0.041f) * 2f).RotatedBy(
-                    (float)Math.Cos(Main.GlobalTimeWrappedHourly * 0.08f) * 0.97f),
+                (Vector2.One * (float) Math.Cos(Main.GlobalTimeWrappedHourly * 0.041f) * 2f).RotatedBy(
+                    (float) Math.Cos(Main.GlobalTimeWrappedHourly * 0.08f) * 0.97f),
             EdgeColor: Color.DarkOliveGreen
         );
     }
@@ -466,7 +467,7 @@ public static class ShaderParticleRegistry
 
     private static void CosmicParticleDefinition()
     {
-        TypeDefinitions[(byte)ShaderParticleTypes.Cosmic] = new ShaderParticleTypeDefinition(
+        TypeDefinitions[(byte) ShaderParticleTypes.Cosmic] = new ShaderParticleTypeDefinition(
             Texture: AssetRegistry.GetTexture(AdditionsTexture.BasicCircularCircle),
             LayerTexture: AssetRegistry.GetTexture(AdditionsTexture.PurpleNebulaBright),
             Shader: ShaderRegistry.EdgeDetectionShader,

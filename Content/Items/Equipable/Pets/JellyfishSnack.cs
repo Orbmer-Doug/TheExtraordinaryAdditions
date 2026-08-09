@@ -10,6 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Pets;
 public class JellyfishSnack : ModItem, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.JellyfishSnack);
+
     public override void SetDefaults()
     {
         Item.CloneDefaults(ItemID.WispinaBottle);

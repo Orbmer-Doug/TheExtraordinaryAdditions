@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.IO;
-using CalamityMod;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Assets.Audio;
@@ -20,8 +19,8 @@ public class PyroclasticHover : BaseIdleHoldoutProjectile
     public override int AssociatedItemID => ModContent.ItemType<PyroclasticVeil>();
     public override int IntendedProjectileType => ModContent.ProjectileType<PyroclasticHover>();
 
-    public static readonly int AppearTime = CalUtils.SecondsToFrames(.8f);
-    public static readonly int FadeTime = CalUtils.SecondsToFrames(.4f);
+    public static readonly int AppearTime = SecondsToFrames(.8f);
+    public static readonly int FadeTime = SecondsToFrames(.4f);
     public static readonly int CircleSize = 100;
     public ref float Time => ref Projectile.ai[0];
     public ref float AppearTimer => ref Projectile.ai[1];
@@ -31,6 +30,7 @@ public class PyroclasticHover : BaseIdleHoldoutProjectile
     public override bool? CanDamage() => false;
     public override void WriteExtraAI(BinaryWriter writer) => writer.WriteVector2(ArtifactCenter);
     public override void GetExtraAI(BinaryReader reader) => ArtifactCenter = reader.ReadVector2();
+
     public override void Defaults()
     {
         Projectile.width = Projectile.height = CircleSize;
@@ -59,6 +59,7 @@ public class PyroclasticHover : BaseIdleHoldoutProjectile
                 this.Sync();
             Projectile.spriteDirection = (Projectile.velocity.X > 0f).ToDirectionInt();
         }
+
         Owner.ChangeDir(Projectile.spriteDirection);
 
         const int height = 116;
@@ -87,17 +88,21 @@ public class PyroclasticHover : BaseIdleHoldoutProjectile
             float vel = Collision.WetCollision(Projectile.Center, 1, 1) ? 8f : 14f;
             MetaballRegistry.SpawnLavaMetaball(Projectile.Center,
                 Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.2f) * vel,
-                CalUtils.SecondsToFrames(7), 120, Owner.whoAmI, Projectile.damage);
+                SecondsToFrames(7), 120, Owner.whoAmI, Projectile.damage);
             if (Time % 2 == 1)
                 Item.CheckManaBetter(Owner, 1, true);
         }
 
-        fire ??= LoopedSoundManager.CreateNew(new AdditionsLoopedSound(AdditionsSound.FireBreathe4, () => .6f, () => .2f), () => AdditionsLoopedSound.ProjectileNotActive(Projectile), () => AppearCompletion >= 1f);
+        fire ??= LoopedSoundManager.CreateNew(
+            new AdditionsLoopedSound(AdditionsSound.FireBreathe4, () => .6f, () => .2f),
+            () => AdditionsLoopedSound.ProjectileNotActive(Projectile), () => AppearCompletion >= 1f);
         fire.Update(Projectile.Center);
 
         float dist = Animators.MakePoly(4f).InOutFunction.Evaluate(CircleSize, CircleSize * 2.2f, AppearCompletion);
-        Projectile.Center = Vector2.SmoothStep(Projectile.Center, Owner.Center + PolarVector(dist, Projectile.rotation), MathHelper.Lerp(.3f, .5f, AppearCompletion));
-        Projectile.width = (int)Animators.MakePoly(3f).OutFunction.Evaluate(CircleSize, CircleSize / 3, AppearCompletion * 2f);
+        Projectile.Center = Vector2.SmoothStep(Projectile.Center, Owner.Center + PolarVector(dist, Projectile.rotation),
+            MathHelper.Lerp(.3f, .5f, AppearCompletion));
+        Projectile.width = (int) Animators.MakePoly(3f).OutFunction
+            .Evaluate(CircleSize, CircleSize / 3, AppearCompletion * 2f);
         ArtifactCenter = center + PolarVector(height / 2, Projectile.rotation);
         Projectile.Opacity = InverseLerp(0f, 20f, Time);
 
@@ -130,12 +135,14 @@ public class PyroclasticHover : BaseIdleHoldoutProjectile
                 ManagedShader shader = ShaderRegistry.AppearShader;
                 shader.TrySetParameter("completion", 1f - AppearCompletion);
                 shader.TrySetParameter("dir", new Vector2(-.707f, .707f));
-                Main.spriteBatch.EnterShaderRegion(null, shader.Effect);
-                Main.spriteBatch.DrawBetter(tex, ArtifactCenter, null, Color.White * Projectile.Opacity, rotation, orig, Projectile.scale);
-                Main.spriteBatch.ExitShaderRegion();
+                Main.spriteBatch.EnterShaderRegion(shader.Effect);
+                Main.spriteBatch.DrawBetter(tex, ArtifactCenter, null, Color.White * Projectile.Opacity, rotation, orig,
+                    Projectile.scale);
+                Main.spriteBatch.ResetToDefault();
             }
             else
-                Main.spriteBatch.DrawBetter(tex, ArtifactCenter, null, Color.White * Projectile.Opacity, Projectile.rotation + MathHelper.PiOver4, orig, Projectile.scale);
+                Main.spriteBatch.DrawBetter(tex, ArtifactCenter, null, Color.White * Projectile.Opacity,
+                    Projectile.rotation + MathHelper.PiOver4, orig, Projectile.scale);
 
             float rot = Main.GameUpdateCount / 40f;
             ManagedShader effect = ShaderRegistry.MagicRing;
@@ -144,26 +151,33 @@ public class PyroclasticHover : BaseIdleHoldoutProjectile
             effect.TrySetParameter("opacity", MathHelper.Lerp(2f, 1.2f, AppearCompletion));
 
             effect.TrySetParameter("time", -rot * 2f);
-            effect.TrySetParameter("cosine", (float)Math.Cos(-rot * 2f));
+            effect.TrySetParameter("cosine", (float) Math.Cos(-rot * 2f));
 
-            Main.spriteBatch.EnterShaderRegion(BlendState.Additive, effect.Effect);
+            Main.spriteBatch.EnterShaderRegion(effect.Effect, BlendState.Additive);
 
             Texture2D magic = AssetRegistry.GetTexture(AdditionsTexture.EpidemicCircle);
-            Main.spriteBatch.DrawBetterRect(magic, ToTarget(Projectile.Center - PolarVector(Animators.MakePoly(3f).OutFunction.Evaluate(0f, 30f, AppearCompletion), Projectile.rotation),
-                Projectile.width * 3, Projectile.height * 3), null, Color.White, Projectile.rotation, magic.Size() / 2);
+            Main.spriteBatch.DrawBetterRect(magic,
+                ToTarget(
+                    Projectile.Center -
+                    PolarVector(Animators.MakePoly(3f).OutFunction.Evaluate(0f, 30f, AppearCompletion),
+                        Projectile.rotation),
+                    Projectile.width * 3, Projectile.height * 3), null, Color.White, Projectile.rotation,
+                magic.Size() / 2);
 
-            Main.spriteBatch.ExitShaderRegion();
+            Main.spriteBatch.ResetToDefault();
 
             effect.TrySetParameter("time", rot);
-            effect.TrySetParameter("cosine", (float)Math.Cos(rot));
+            effect.TrySetParameter("cosine", (float) Math.Cos(rot));
 
-            Main.spriteBatch.EnterShaderRegion(BlendState.Additive, effect.Effect);
+            Main.spriteBatch.EnterShaderRegion(effect.Effect, BlendState.Additive);
 
             magic = AssetRegistry.GetTexture(AdditionsTexture.ArmageddonCircle);
-            Main.spriteBatch.DrawBetterRect(magic, ToTarget(Projectile.Center, Projectile.width, Projectile.height), null, Color.White, Projectile.rotation, magic.Size() / 2);
+            Main.spriteBatch.DrawBetterRect(magic, ToTarget(Projectile.Center, Projectile.width, Projectile.height),
+                null, Color.White, Projectile.rotation, magic.Size() / 2);
 
-            Main.spriteBatch.ExitShaderRegion();
+            Main.spriteBatch.ResetToDefault();
         }
+
         LayeredDrawSystem.QueueDrawAction(draw, PixelationLayer.UnderPlayers);
         return false;
     }

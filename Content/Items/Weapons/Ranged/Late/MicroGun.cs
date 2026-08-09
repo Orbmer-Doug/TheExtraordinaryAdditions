@@ -1,7 +1,4 @@
-﻿using CalamityMod.Items.Materials;
-using CalamityMod.Items.Weapons.Ranged;
-using CalamityMod.Tiles.Furniture.CraftingStations;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
@@ -61,28 +58,30 @@ public class MicroGun : ModItem
         {
             return player.ownedProjectileCounts[Item.shoot] > 0;
         }
+
         return false;
     }
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback)
     {
-        Projectile.NewProjectile((IEntitySource)(object)source, position, velocity, ModContent.ProjectileType<MicroGunHoldout>(), damage, knockback, player.whoAmI, 0f, 0f, 0f);
+        Projectile.NewProjectile((IEntitySource) (object) source, position, velocity,
+            ModContent.ProjectileType<MicroGunHoldout>(), damage, knockback, player.whoAmI, 0f, 0f, 0f);
         return false;
     }
 
-    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor,
+        Color itemColor, Vector2 origin, float scale)
     {
-        DrawInventoryCustomScale(spriteBatch, TextureAssets.Item[Type].Value, position, frame, drawColor, itemColor, origin, scale, 0.13f, new Vector2(0f, 0f));
+        DrawInventoryCustomScale(spriteBatch, TextureAssets.Item[Type].Value, position, frame, drawColor,
+            origin, scale, 0.13f, new Vector2(0f, 0f));
         return false;
     }
 
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        recipe.AddIngredient(ModContent.ItemType<Kingsbane>(), 1);
-        recipe.AddIngredient(ModContent.ItemType<SDFMG>(), 1);
-        recipe.AddIngredient(ModContent.ItemType<ShadowspecBar>(), 5);
-        recipe.AddTile(ModContent.TileType<DraedonsForge>());
+        //TODO
         recipe.Register();
     }
 }

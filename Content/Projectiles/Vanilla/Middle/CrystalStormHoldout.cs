@@ -12,6 +12,7 @@ public class CrystalStormHoldout : BaseIdleHoldoutProjectile
     public override string Texture => ItemID.CrystalStorm.GetTerrariaItem();
     public override int AssociatedItemID => ItemID.CrystalStorm;
     public override int IntendedProjectileType => ModContent.ProjectileType<CrystalStormHoldout>();
+
     public override void Defaults()
     {
         Projectile.width = 24;
@@ -24,11 +25,13 @@ public class CrystalStormHoldout : BaseIdleHoldoutProjectile
 
     public readonly Color bookCrystal = new(41, 143, 166);
     public readonly Color bookRed = new(207, 42, 52);
+
     public override void SafeAI()
     {
         Vector2 pos = Projectile.Center + PolarVector(10f, Projectile.rotation);
         int shard = ModContent.ProjectileType<CrystalShard>();
-        if (Time % Item.useAnimation == Item.useAnimation - 1 && Modded.SafeMouseLeft.Current && this.RunLocal() && TryUseMana(false))
+        if (Time % Item.useAnimation == Item.useAnimation - 1 && Modded.SafeMouseLeft.Current && this.RunLocal() &&
+            TryUseMana(false))
         {
             SoundID.Item9.Play(pos);
             Vector2 vel = Projectile.velocity.RotatedByRandom(.25f) * Item.shootSpeed;
@@ -57,7 +60,8 @@ public class CrystalStormHoldout : BaseIdleHoldoutProjectile
         Rectangle frame = tex.Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame);
         SpriteEffects fx = Projectile.direction == -1 ? SpriteEffects.FlipVertically : SpriteEffects.None;
         Vector2 orig = new(0, tex.Height / 2);
-        Main.spriteBatch.DrawBetter(tex, Projectile.Center, frame, Projectile.GetAlpha(lightColor), Projectile.rotation, orig, 1, fx);
+        Main.spriteBatch.DrawBetter(tex, Projectile.Center, frame, Projectile.GetAlpha(lightColor), Projectile.rotation,
+            orig, 1, fx);
         return false;
     }
 }

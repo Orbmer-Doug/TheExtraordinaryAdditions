@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using CalamityMod;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -19,7 +18,7 @@ public class BirchStick : ModItem
     {
         Item.width = 106;
         Item.height = 98;
-        Item.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
+        Item.DamageType = ModContent.GetInstance<MeleeNoSpeedDamageClass>();
         Item.damage = 20;
         Item.crit = 8;
         Item.channel = true;
@@ -40,9 +39,12 @@ public class BirchStick : ModItem
         tooltips.ColorLocalization(new Color(200, 200, 200));
     }
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback)
     {
-        BirchStickLance lance = Main.projectile[player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI)].As<BirchStickLance>();
+        BirchStickLance lance = Main
+            .projectile[player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI)]
+            .As<BirchStickLance>();
 
         if (player.Additions().MouseRight.Current)
             lance.State = BirchStickLance.BirchStickState.Poke;

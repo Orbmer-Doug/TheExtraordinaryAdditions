@@ -1,4 +1,4 @@
-﻿using CalamityMod.Cooldowns;
+﻿/*
 using Terraria;
 using Terraria.ID;
 using Terraria.Localization;
@@ -17,15 +17,21 @@ public class SkullBombCooldown : CooldownHandler
     public override Color OutlineColor => new(45, 45, 29);
     public override Color CooldownStartColor => new(150, 150, 111);
     public override Color CooldownEndColor => new(221, 221, 188);
+
     public override void OnCompleted()
     {
         SoundID.MaxMana.Play(instance.player.Center, 1.5f, -.2f, .1f, null, 1, "BoneWait");
         for (int i = 0; i < 20; i++)
         {
             ParticleRegistry.SpawnSparkParticle(instance.player.RotHitbox().RandomPoint(),
-                -Vector2.UnitY * Main.rand.NextFloat(2f, 4f), Main.rand.Next(20, 30), Main.rand.NextFloat(.3f, .5f), Color.Gray);
+                -Vector2.UnitY * Main.rand.NextFloat(2f, 4f), Main.rand.Next(20, 30), Main.rand.NextFloat(.3f, .5f),
+                Color.Gray);
         }
     }
 
-    public override bool CanTickDown => instance.player.ownedProjectileCounts[ModContent.ProjectileType<CalciumBomb>()] <= 0;
+    public override bool CanTickDown =>
+        instance.player.ownedProjectileCounts[ModContent.ProjectileType<CalciumBomb>()] <= 0;
 }
+*/
+
+

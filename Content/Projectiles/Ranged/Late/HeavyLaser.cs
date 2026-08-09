@@ -18,10 +18,12 @@ public class HeavyLaser : ModProjectile
     public override string Texture => AssetRegistry.Invis;
     private const int MaxUpdates = 5;
     private const int Lifetime = 35 * MaxUpdates;
+
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.DrawScreenCheckFluff[Type] = MaxLaserLength;
     }
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 38;
@@ -37,19 +39,23 @@ public class HeavyLaser : ModProjectile
         Projectile.usesLocalNPCImmunity = true;
         Projectile.localNPCHitCooldown = 15;
     }
+
     private const int MaxLaserLength = 3000;
     public ref float Time => ref Projectile.ai[0];
     public ref float LaserLength => ref Projectile.ai[1];
+
     public bool HitSomething
     {
         get => Projectile.ai[2] == 1f;
         set => Projectile.ai[2] = value.ToInt();
     }
+
     public ref float LaserExpansion => ref Projectile.AdditionsInfo().ExtraAI[0];
     public Vector2 Start => Projectile.Center;
     public Vector2 End;
     public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(End);
     public override void ReceiveExtraAI(BinaryReader reader) => End = reader.ReadVector2();
+
     public override void AI()
     {
         if (trail == null || trail.Disposed)
@@ -78,9 +84,12 @@ public class HeavyLaser : ModProjectile
                         Vector2.Zero, 40 - MultiLerp(completion, 30, 20, 10, 0), Color.OrangeRed);
                 }
 
-                ParticleRegistry.SpawnSparkleParticle(End, Main.rand.NextVector2Unit() * Main.rand.NextFloat(4f, 10f), Main.rand.Next(30, 50), Main.rand.NextFloat(.4f, .8f), Color.OrangeRed, Color.Chocolate, Main.rand.NextFloat(1f, 1.4f), .15f);
+                ParticleRegistry.SpawnSparkleParticle(End, Main.rand.NextVector2Unit() * Main.rand.NextFloat(4f, 10f),
+                    Main.rand.Next(30, 50), Main.rand.NextFloat(.4f, .8f), Color.OrangeRed, Color.Chocolate,
+                    Main.rand.NextFloat(1f, 1.4f), .15f);
                 ParticleRegistry.SpawnSparkParticle(End, Main.rand.NextVector2CircularLimited(20f, 20f, .6f, 1f),
-                    Main.rand.Next(50, 90), Main.rand.NextFloat(.8f, 1.1f), Color.OrangeRed.Lerp(Color.Chocolate, .4f), true);
+                    Main.rand.Next(50, 90), Main.rand.NextFloat(.8f, 1.1f), Color.OrangeRed.Lerp(Color.Chocolate, .4f),
+                    true);
             }
 
             ScreenShakeSystem.New(new(.4f, .2f), End);
@@ -99,21 +108,26 @@ public class HeavyLaser : ModProjectile
 
     public override bool ShouldUpdatePosition() => false;
     public override bool? CanDamage() => HitSomething ? false : null;
+
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.Center, End + Projectile.velocity * 30f);
+        return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.Center,
+            End + Projectile.velocity * 30f);
     }
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints trailPoints = new(90);
+
     public float WidthFunct(float c)
     {
         return OptimizedPrimitiveTrail.HemisphereWidthFunct(1f - c, Projectile.scale * Projectile.width, 4f, .2f);
     }
+
     public Color ColorFunct(SystemVector2 c, Vector2 position)
     {
         return Color.Lerp(Color.OrangeRed.Lerp(Color.Chocolate, .32f), Color.Red, 0.5f) * InverseLerp(0f, .09f, c.X);
     }
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -125,6 +139,7 @@ public class HeavyLaser : ModProjectile
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FlameMap1), 1);
             trail.DrawTrail(shader, trailPoints.Points);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;
     }

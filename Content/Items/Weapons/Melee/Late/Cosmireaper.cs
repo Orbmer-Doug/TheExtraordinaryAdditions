@@ -1,6 +1,4 @@
-﻿using CalamityMod.Items.Materials;
-using CalamityMod.Tiles.Furniture.CraftingStations;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -41,15 +39,17 @@ public class Cosmireaper : ModItem
         tooltips.ColorLocalization(ColorSwap(Color.MediumPurple * 1.1f, Color.PaleVioletRed, 4f));
     }
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type,
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type,
         int damage, float knockback)
     {
         if (player.altFunctionUse == ItemAlternativeFunctionID.ActivatedAndUsed)
         {
-            player.NewPlayerProj(player.Center, Vector2.Zero, ModContent.ProjectileType<CosmireapThrow>(), damage, knockback);
+            player.NewPlayerProj(player.Center, Vector2.Zero, ModContent.ProjectileType<CosmireapThrow>(), damage,
+                knockback);
             return false;
         }
-        
+
         return base.Shoot(player, source, position, velocity, type, damage, knockback);
     }
 
@@ -57,16 +57,16 @@ public class Cosmireaper : ModItem
     {
         return CanShoot(player) && player.ownedProjectileCounts[ModContent.ProjectileType<LaceratedSpace>()] <= 0;
     }
-    
-    public override bool CanShoot(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0 && player.ownedProjectileCounts[ModContent.ProjectileType<CosmireapThrow>()] <= 0;
-    
+
+    public override bool CanShoot(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0 &&
+                                                    player.ownedProjectileCounts[
+                                                        ModContent.ProjectileType<CosmireapThrow>()] <= 0;
+
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
         recipe.AddIngredient(ItemID.Sickle, 1);
-        recipe.AddIngredient(ModContent.ItemType<AscendantSpiritEssence>(), 2);
-        recipe.AddIngredient(ModContent.ItemType<CosmiliteBar>(), 16);
-        recipe.AddTile(ModContent.TileType<CosmicAnvil>());
+        //TODO
         recipe.Register();
     }
 }

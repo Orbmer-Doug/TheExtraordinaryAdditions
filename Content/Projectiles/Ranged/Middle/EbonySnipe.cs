@@ -7,6 +7,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 public class EbonySnipe : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.Size = new(20);
@@ -19,6 +20,7 @@ public class EbonySnipe : ModProjectile
     }
 
     public ref float Time => ref Projectile.ai[0];
+
     public override void AI()
     {
         if (Time % 2 == 1)
@@ -29,7 +31,8 @@ public class EbonySnipe : ModProjectile
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         for (int i = 0; i < 50; i++)
-            MetaballRegistry.SpawnOnyxMetaball(Projectile.Center + Main.rand.NextVector2Circular(40f, 40f), Vector2.Zero, 70, 80);
+            MetaballRegistry.SpawnOnyxMetaball(Projectile.Center + Main.rand.NextVector2Circular(40f, 40f),
+                Vector2.Zero, 70, 80);
 
         if (damageDone > target.life)
             Projectile.penetrate++;
@@ -38,7 +41,8 @@ public class EbonySnipe : ModProjectile
     public override bool OnTileCollide(Vector2 oldVelocity)
     {
         for (int i = 0; i < 50; i++)
-            MetaballRegistry.SpawnOnyxMetaball(Projectile.Center + Main.rand.NextVector2Circular(40f, 40f), Vector2.Zero, 70, 80);
+            MetaballRegistry.SpawnOnyxMetaball(Projectile.Center + Main.rand.NextVector2Circular(40f, 40f),
+                Vector2.Zero, 70, 80);
         return true;
     }
 }

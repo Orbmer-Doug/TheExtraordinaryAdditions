@@ -36,9 +36,11 @@ public class IndustrialBlastDartKit : ModItem
         Item.rare = ItemRarityID.Orange;
     }
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback)
     {
-        Projectile.NewProjectile(source, position, velocity, ModContent.ProjectileType<ProximityDart>(), damage, knockback);
+        Projectile.NewProjectile(source, position, velocity, ModContent.ProjectileType<ProximityDart>(), damage,
+            knockback);
         return false;
     }
 

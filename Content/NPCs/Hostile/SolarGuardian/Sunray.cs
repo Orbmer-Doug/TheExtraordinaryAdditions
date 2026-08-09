@@ -19,6 +19,7 @@ public class Sunray : ModProjectile
     }
 
     public const int Lifetime = 220;
+
     public override void SetDefaults()
     {
         Projectile.Size = new(52);
@@ -31,9 +32,10 @@ public class Sunray : ModProjectile
 
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
+
     public override void AI()
     {
         if (trail == null || trail.Disposed)
@@ -62,6 +64,7 @@ public class Sunray : ModProjectile
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints points = new(20);
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -73,6 +76,7 @@ public class Sunray : ModProjectile
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Perlin), 1, SamplerState.LinearWrap);
             trail.DrawTrail(shader, points.Points, 100);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;
     }

@@ -20,6 +20,7 @@ public class ExtraordinaryHyperBlast : ModProjectile, ILocalizedModType, IModTyp
     public float Completion => 1f - Utils.GetLerpValue(0f, Lifetime, Projectile.timeLeft);
     public float Radius => Circ.OutFunction.Evaluate(0f, 120f * Projectile.scale, Completion);
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.timeLeft = Lifetime;
@@ -52,7 +53,8 @@ public class ExtraordinaryHyperBlast : ModProjectile, ILocalizedModType, IModTyp
                 ParticleRegistry.SpawnHeavySmokeParticle(pos, vel, life, size, col * 1.4f, .9f, true);
 
                 if (i % 2 == 1)
-                    ParticleRegistry.SpawnBloomLineParticle(pos, vel * Main.rand.NextFloat(1.4f, 2.2f), life - 10, size + Main.rand.NextFloat(.1f, .3f), col);
+                    ParticleRegistry.SpawnBloomLineParticle(pos, vel * Main.rand.NextFloat(1.4f, 2.2f), life - 10,
+                        size + Main.rand.NextFloat(.1f, .3f), col);
             }
 
             ScreenShakeSystem.New(new(.9f, .8f, 3000f), Projectile.Center);
@@ -66,7 +68,8 @@ public class ExtraordinaryHyperBlast : ModProjectile, ILocalizedModType, IModTyp
             float rot = RandomRotation();
 
             Vector2 pos = Projectile.Center + Vector2.One.RotatedBy(rot) * (Radius + 35);
-            Vector2 vel = Vector2.One.RotatedBy(rot + Main.rand.NextFloat(1.1f, 1.3f)) * 2 * Main.rand.NextFromList(-1, 1);
+            Vector2 vel = Vector2.One.RotatedBy(rot + Main.rand.NextFloat(1.1f, 1.3f)) * 2 *
+                          Main.rand.NextFromList(-1, 1);
             Color color = Color.Violet;
             ParticleRegistry.SpawnSquishyLightParticle(pos, vel, 20, Main.rand.NextFloat(.2f, .4f), color, .7f);
         }
@@ -74,12 +77,13 @@ public class ExtraordinaryHyperBlast : ModProjectile, ILocalizedModType, IModTyp
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return CalUtils.CircularHitboxCollision(Projectile.Center, (int)Radius + 75, targetHitbox);
+        return CircularHitboxCollision(Projectile.Center, (int) Radius + 75, targetHitbox);
     }
 
     private List<Vector2> cache;
     public const int amt = 70;
     private readonly TrailPoints points = new(amt);
+
     private void ManageCaches()
     {
         if (cache is null)
@@ -94,20 +98,25 @@ public class ExtraordinaryHyperBlast : ModProjectile, ILocalizedModType, IModTyp
 
         for (int k = 0; k < amt; k++)
         {
-            cache[k] = Projectile.Center + Vector2.One.RotatedBy(k / (float)(amt - 1) * (MathF.Tau + float.Epsilon)) * (Radius + 20);
+            cache[k] = Projectile.Center + Vector2.One.RotatedBy(k / (float) (amt - 1) * (MathF.Tau + float.Epsilon)) *
+                (Radius + 20);
         }
 
         while (cache.Count > amt)
         {
             cache.RemoveAt(0);
         }
+
         points.SetPoints(cache);
     }
 
     private float WidthFunct(float c) => 28f * Projectile.scale * (1f - Completion);
-    private Color ColorFunct(SystemVector2 c, Vector2 position) => Color.Lerp(Color.White, Color.Gold, Completion) * GetLerpBump(0f, .1f, 1f, .8f, Completion);
+
+    private Color ColorFunct(SystemVector2 c, Vector2 position) => Color.Lerp(Color.White, Color.Gold, Completion) *
+                                                                   GetLerpBump(0f, .1f, 1f, .8f, Completion);
 
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -119,6 +128,7 @@ public class ExtraordinaryHyperBlast : ModProjectile, ILocalizedModType, IModTyp
             beam.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WavyNeurons), 2, SamplerState.LinearWrap);
             trail.DrawTrail(beam, points.Points, 500);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.OverProjectiles);
 
         return false;

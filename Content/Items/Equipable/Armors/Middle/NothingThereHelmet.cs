@@ -3,7 +3,6 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
 using TheExtraordinaryAdditions.Core.Globals;
@@ -22,8 +21,10 @@ public class NothingThereHelmet : ModItem
     public override void SetStaticDefaults()
     {
         ArmorIDs.Head.Sets.DrawHead[Item.headSlot] = false; // Don't draw the head at all. Used by Space Creature Mask
-        ArmorIDs.Head.Sets.DrawHatHair[Item.headSlot] = false; // Draw hair as if a hat was covering the top. Used by Wizards Hat
-        ArmorIDs.Head.Sets.DrawFullHair[Item.headSlot] = false; // Draw all hair as normal. Used by Mime Mask, Sunglasses
+        ArmorIDs.Head.Sets.DrawHatHair[Item.headSlot] =
+            false; // Draw hair as if a hat was covering the top. Used by Wizards Hat
+        ArmorIDs.Head.Sets.DrawFullHair[Item.headSlot] =
+            false; // Draw all hair as normal. Used by Mime Mask, Sunglasses
         ArmorIDs.Head.Sets.DrawsBackHairWithoutHeadgear[Item.headSlot] = true;
     }
 
@@ -44,19 +45,22 @@ public class NothingThereHelmet : ModItem
     public override void UpdateArmorSet(Player player)
     {
         NothingTherePlayer there = player.GetModPlayer<NothingTherePlayer>();
-        player.setBonus = this.GetLocalization("SetBonus").Format(AdditionsKeybinds.SetBonusHotKey.TooltipHotkeyString());
+        player.setBonus = this.GetLocalization("SetBonus")
+            .Format(AdditionsKeybinds.SetBonusHotKey.TooltipHotkeyString());
         player.moveSpeed += 0.3f;
         ref int counter = ref there.Counter;
-        int time = CalUtils.SecondsToFrames(4);
+        int time = SecondsToFrames(4);
 
-        // Start knashing
-        if (player.whoAmI == Main.myPlayer && AdditionsKeybinds.SetBonusHotKey.JustPressed && counter <= 0 && !CalUtils.HasCooldown(player, MimicryCooldown.ID))
+        // TODO
+        //if (player.whoAmI == Main.myPlayer && AdditionsKeybinds.SetBonusHotKey.JustPressed && counter <= 0 &&
+        //  !.HasCooldown(player, MimicryCooldown.ID))
         {
             Vector2 pos = player.Center + new Vector2(0f, -20f);
             for (float i = .1f; i < .3f; i += .1f)
             {
-                int life = 20 + (int)(i * 15);
-                ParticleRegistry.SpawnPulseRingParticle(pos, player.velocity, life, RandomRotation(), new(1f), 0f, .1f + i, Color.Crimson, true);
+                int life = 20 + (int) (i * 15);
+                ParticleRegistry.SpawnPulseRingParticle(pos, player.velocity, life, RandomRotation(), new(1f), 0f,
+                    .1f + i, Color.Crimson, true);
 
                 for (int a = 0; a < 25; a++)
                 {
@@ -67,7 +71,8 @@ public class NothingThereHelmet : ModItem
 
             SoundEngine.PlaySound(SoundID.ForceRoarPitched with { Pitch = -.3f, Volume = 1.2f }, pos);
             counter = time;
-            CalUtils.AddCooldown(player, MimicryCooldown.ID, time * 3);
+            //TODO
+            //   .AddCooldown(player, MimicryCooldown.ID, time * 3);
         }
 
         // Summon the teeth while counting down
@@ -83,7 +88,9 @@ public class NothingThereHelmet : ModItem
             float turnX = Main.rand.NextFloat(-.02f, .02f);
             float turnY = Main.rand.NextFloat(-.02f, .02f);
             player.NewPlayerProj(pos, vel, type, dmg, kb, player.whoAmI, 0f, turnX, turnY);
-            SoundEngine.PlaySound(SoundID.DD2_JavelinThrowersAttack with { MaxInstances = 0, PitchVariance = .3f, Volume = 1.2f }, pos, null);
+            SoundEngine.PlaySound(
+                SoundID.DD2_JavelinThrowersAttack with { MaxInstances = 0, PitchVariance = .3f, Volume = 1.2f }, pos,
+                null);
         }
 
         there.Equipped = true;
@@ -95,6 +102,7 @@ public class NothingThereHelmet : ModItem
         {
             return legs.type == ModContent.ItemType<MimicryLeggings>();
         }
+
         return false;
     }
 

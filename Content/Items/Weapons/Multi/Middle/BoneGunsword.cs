@@ -3,7 +3,6 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Cooldowns;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Early;
 using TheExtraordinaryAdditions.Content.Projectiles.Multi.Middle;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
@@ -47,9 +46,11 @@ public class BoneGunsword : ModItem
         tooltips.ColorLocalization(new Color(166, 166, 166));
     }
 
-    public override bool AltFunctionUse(Player player) => !CalUtils.HasCooldown(player, SkullKaboomCooldown.ID);
+//TODO
+    //public override bool AltFunctionUse(Player player) => !.HasCooldown(player, SkullKaboomCooldown.ID);
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback)
     {
         player.NewPlayerProj(position, velocity,
             player.altFunctionUse == 2

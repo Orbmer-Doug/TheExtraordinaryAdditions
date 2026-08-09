@@ -13,6 +13,7 @@ public class ScreenSplit : ModProjectile, IHasScreenShader
     public ref float Time => ref Projectile.ai[0];
     public ref float Width => ref Projectile.ai[1];
     public const int Lifetime = 110;
+
     public override void SetStaticDefaults()
     {
         ProjectileID.Sets.DrawScreenCheckFluff[Type] = 60000;
@@ -54,6 +55,7 @@ public class ScreenSplit : ModProjectile, IHasScreenShader
 
     public ManagedScreenShader Shader { get; private set; }
     public bool HasShader { get; private set; }
+
     public void InitializeShader()
     {
         Shader = ScreenShaderPool.GetShader("GenediesScreenSplit");
@@ -85,6 +87,7 @@ public class ScreenSplit : ModProjectile, IHasScreenShader
             ScreenShaderUpdates.UnregisterEntity(this);
         }
     }
+
     public bool IsEntityActive() => Projectile.active;
 
     public override bool PreDraw(ref Color lightColor)

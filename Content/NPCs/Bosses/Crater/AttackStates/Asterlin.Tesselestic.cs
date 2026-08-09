@@ -35,40 +35,40 @@ public partial class Asterlin : ModNPC
 
     public int Tesselestic_Cycle
     {
-        get => (int)ExtraAI[0];
+        get => (int) ExtraAI[0];
         set => ExtraAI[0] = value;
     }
 
     public bool Tesselestic_Shooting
     {
-        get => (int)ExtraAI[1] == 1;
+        get => (int) ExtraAI[1] == 1;
         set => ExtraAI[1] = value.ToInt();
     }
 
     public int Tesselestic_AttackTime
     {
-        get => (int)ExtraAI[2];
+        get => (int) ExtraAI[2];
         set => ExtraAI[2] = value;
     }
 
     public int Tesselestic_FadeTime
     {
-        get => (int)ExtraAI[3];
+        get => (int) ExtraAI[3];
         set => ExtraAI[3] = value;
     }
 
     public static int Tesselestic_Cycles => DifficultyBasedValue(5, 6);
-    public static readonly int Tesselestic_ChargeUp = CalUtils.SecondsToFrames(2.2f);
+    public static readonly int Tesselestic_ChargeUp = SecondsToFrames(2.2f);
     public static int Tesselestic_NodeCount => DifficultyBasedValue(9, 13, 15, 18, 21, 24);
-    public static int Tesselestic_PositionTime => CalUtils.SecondsToFrames(1.8f);
+    public static int Tesselestic_PositionTime => SecondsToFrames(1.8f);
 
-    public static int Tesselestic_FireTime => DifficultyBasedValue(CalUtils.SecondsToFrames(1.4f),
-        CalUtils.SecondsToFrames(1.35f),
-        CalUtils.SecondsToFrames(1.16f), CalUtils.SecondsToFrames(1f), CalUtils.SecondsToFrames(.9f),
-        CalUtils.SecondsToFrames(.85f));
+    public static int Tesselestic_FireTime => DifficultyBasedValue(SecondsToFrames(1.4f),
+        SecondsToFrames(1.35f),
+        SecondsToFrames(1.16f), SecondsToFrames(1f), SecondsToFrames(.9f),
+        SecondsToFrames(.85f));
 
     public static float Tesselestic_NodeRotationAmt => DifficultyBasedValue(.5f, 1.7f, 2.8f, 3.4f, 4.5f, 5.2f);
-    public static int Tesselestic_FadeDuration => CalUtils.SecondsToFrames(.4f);
+    public static int Tesselestic_FadeDuration => SecondsToFrames(.4f);
 
     public void DoBehavior_Tesselestic()
     {
@@ -93,7 +93,7 @@ public partial class Asterlin : ModNPC
         if (AITimer < Tesselestic_ChargeUp)
         {
             float interpol = InverseLerp(0f, Tesselestic_ChargeUp, AITimer);
-            int area = (int)Animators.MakePoly(3f).InOutFunction.Evaluate(400, 10, interpol);
+            int area = (int) Animators.MakePoly(3f).InOutFunction.Evaluate(400, 10, interpol);
             Vector2 pos = Staff.TipOfStaff.ToRectangle(area, area).ToRotated(0f).RandomPoint(true);
 
             for (int i = 0; i < 20; i++)

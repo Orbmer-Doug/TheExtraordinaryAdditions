@@ -19,8 +19,8 @@ public sealed class CameraSystem : ModSystem
         Main.LocalPlayer.TopLeft + new Vector2(Main.LocalPlayer.width * 0.5f, Main.LocalPlayer.height - 21f) -
         Main.ScreenSize.ToVector2() * 0.5f + Vector2.UnitY * Main.LocalPlayer.gfxOffY;
 
-    public static Rectangle CameraRect => new((int)Main.Camera.ScaledPosition.X, (int)Main.Camera.ScaledPosition.Y,
-        (int)Main.Camera.ScaledSize.X, (int)Main.Camera.ScaledSize.Y);
+    public static Rectangle CameraRect => new((int) Main.Camera.ScaledPosition.X, (int) Main.Camera.ScaledPosition.Y,
+        (int) Main.Camera.ScaledSize.X, (int) Main.Camera.ScaledSize.Y);
 
     public delegate void CameraModifierDelegate(Action innerAction);
 
@@ -133,7 +133,7 @@ public sealed class CameraSystem : ModSystem
     {
         ScreenSize = new(Main.screenWidth, Main.screenHeight);
         ScreenHalf = new(Main.screenWidth * 0.5f, Main.screenHeight * 0.5f);
-        ScreenRect = new((int)Main.screenPosition.X, (int)Main.screenPosition.Y, Main.screenWidth, Main.screenHeight);
+        ScreenRect = new((int) Main.screenPosition.X, (int) Main.screenPosition.Y, Main.screenWidth, Main.screenHeight);
         screenCenter = new(Main.screenPosition.X + Main.screenWidth * 0.5f,
             Main.screenPosition.Y + Main.screenHeight * 0.5f);
     }

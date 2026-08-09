@@ -1,5 +1,4 @@
-﻿using CalamityMod.Items.Materials;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent;
@@ -45,7 +44,7 @@ public class HeavyLaserRifle : ModItem
         Item.shoot = ProjectileID.PurificationPowder;
         Item.shootSpeed = 5f;
     }
-    
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(new Color(209, 125, 0));
@@ -55,10 +54,12 @@ public class HeavyLaserRifle : ModItem
     {
         return false;
     }
-    
-    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
+
+    public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor,
+        Color itemColor, Vector2 origin, float scale)
     {
-        DrawInventoryCustomScale(spriteBatch, TextureAssets.Item[Type].Value, position, frame, drawColor, itemColor, origin, scale, 0.2f, new Vector2(0f, 0f));
+        DrawInventoryCustomScale(spriteBatch, TextureAssets.Item[Type].Value, position, frame, drawColor,
+            origin, scale, 0.2f, new Vector2(0f, 0f));
         return false;
     }
 
@@ -70,7 +71,7 @@ public class HeavyLaserRifle : ModItem
         recipe.AddIngredient(ItemID.LunarBar, 14);
         recipe.AddIngredient(ItemID.Wire, 120);
         recipe.AddIngredient(ItemID.Glass, 30);
-        recipe.AddIngredient(ModContent.ItemType<EssenceofSunlight>(), 12);
+        //TODO
         recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();
     }

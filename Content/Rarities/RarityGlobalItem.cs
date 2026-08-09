@@ -65,6 +65,7 @@ public class RarityGlobalItem : GlobalItem
                 return false;
             }
         }
+
         return true;
     }
 }

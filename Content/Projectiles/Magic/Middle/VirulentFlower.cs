@@ -10,7 +10,8 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
 public class VirulentFlower : ModProjectile, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.VirulentFlower);
-    private readonly int Timeleft = CalUtils.SecondsToFrames(5);
+    private readonly int Timeleft = SecondsToFrames(5);
+
     public override void SetDefaults()
     {
         Projectile.width = 32;
@@ -28,10 +29,12 @@ public class VirulentFlower : ModProjectile, ILocalizedModType, IModType
 
     public override void AI()
     {
-        Projectile.scale = Projectile.Opacity = GetLerpBump(0f, .3f, 1f, .7f, InverseLerp(0f, Timeleft, Projectile.timeLeft));
+        Projectile.scale = Projectile.Opacity =
+            GetLerpBump(0f, .3f, 1f, .7f, InverseLerp(0f, Timeleft, Projectile.timeLeft));
 
         // Sway left and right
-        Projectile.rotation += ((float)MathF.Sin(Main.GlobalTimeWrappedHourly + Projectile.identity) * .1f) * (Projectile.identity % 2f == 1f).ToDirectionInt();
+        Projectile.rotation += ((float) MathF.Sin(Main.GlobalTimeWrappedHourly + Projectile.identity) * .1f) *
+                               (Projectile.identity % 2f == 1f).ToDirectionInt();
 
         // Emit light
         Lighting.AddLight(Projectile.Center, Color.LawnGreen.ToVector3() * Projectile.scale);
@@ -39,15 +42,18 @@ public class VirulentFlower : ModProjectile, ILocalizedModType, IModType
         // Enable "punching" the flower to go boom
         foreach (Projectile proj in Main.ActiveProjectiles)
         {
-            if (proj.type == ModContent.ProjectileType<VirulentPunch>() && Projectile.Distance(proj.Center) <= (proj.width * .6f) && proj.owner == Projectile.owner)
+            if (proj.type == ModContent.ProjectileType<VirulentPunch>() &&
+                Projectile.Distance(proj.Center) <= (proj.width * .6f) && proj.owner == Projectile.owner)
             {
                 SoundID.Item43.Play(Projectile.Center, 1.2f, .1f, .1f);
                 float offsetAngle = Main.rand.NextFloat(MathHelper.TwoPi);
                 for (int a = 0; a < 6; a++)
                 {
-                    Vector2 shootVelocity = (MathHelper.TwoPi * a / 6f + offsetAngle).ToRotationVector2() * Main.rand.NextFloat(4f, 6f);
+                    Vector2 shootVelocity = (MathHelper.TwoPi * a / 6f + offsetAngle).ToRotationVector2() *
+                                            Main.rand.NextFloat(4f, 6f);
                     if (this.RunLocal())
-                        Projectile.NewProj(Projectile.Center, shootVelocity, ModContent.ProjectileType<VirulentSeed>(), Projectile.damage, Projectile.knockBack, Projectile.owner, 1f);
+                        Projectile.NewProj(Projectile.Center, shootVelocity, ModContent.ProjectileType<VirulentSeed>(),
+                            Projectile.damage, Projectile.knockBack, Projectile.owner, 1f);
                 }
 
                 Projectile.Kill();
@@ -60,7 +66,8 @@ public class VirulentFlower : ModProjectile, ILocalizedModType, IModType
         Texture2D tex = Projectile.ThisProjectileTexture();
         Vector2 drawPosition = Projectile.Center - Main.screenPosition;
         Vector2 orig = tex.Size() * 0.5f;
-        Main.EntitySpriteDraw(tex, drawPosition, null, Projectile.GetAlpha(lightColor), Projectile.rotation, orig, Projectile.scale, 0, 0);
+        Main.EntitySpriteDraw(tex, drawPosition, null, Projectile.GetAlpha(lightColor), Projectile.rotation, orig,
+            Projectile.scale, 0, 0);
         return false;
     }
 }

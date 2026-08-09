@@ -18,7 +18,7 @@ public partial class Asterlin
         StateMachine.RegisterStateBehavior(AsterlinAIType.EnterPhase2, DoBehavior_EnterPhase2);
     }
 
-    public static readonly int EnterPhase2_Length = CalUtils.SecondsToFrames(1.6f);
+    public static readonly int EnterPhase2_Length = SecondsToFrames(1.6f);
 
     public void DoBehavior_EnterPhase2()
     {

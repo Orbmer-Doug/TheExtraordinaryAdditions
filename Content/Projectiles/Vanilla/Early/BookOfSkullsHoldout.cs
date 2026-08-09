@@ -24,6 +24,7 @@ public class BookOfSkullsHoldout : BaseIdleHoldoutProjectile
     public ref float Time => ref Projectile.ai[0];
     public ref float Charge => ref Projectile.ai[1];
     private const float ChargeTime = 60f;
+
     public override void SafeAI()
     {
         Item item = Owner.HeldItem;
@@ -33,7 +34,8 @@ public class BookOfSkullsHoldout : BaseIdleHoldoutProjectile
         {
             Vector2 vel = Projectile.velocity * item.shootSpeed;
             SoundEngine.PlaySound(SoundID.Item8, pos);
-            Projectile.NewProj(pos + vel, vel, ModContent.ProjectileType<HomingSkull>(), item.damage, item.knockBack, Owner.whoAmI);
+            Projectile.NewProj(pos + vel, vel, ModContent.ProjectileType<HomingSkull>(), item.damage, item.knockBack,
+                Owner.whoAmI);
         }
 
         if (Modded.SafeMouseRight.Current && Charge < ChargeTime && !Modded.MouseLeft.Current && this.RunLocal())
@@ -54,21 +56,27 @@ public class BookOfSkullsHoldout : BaseIdleHoldoutProjectile
             int amount = 6;
             for (int i = 0; i < amount; i++)
             {
-                Vector2 velo = (MathHelper.TwoPi * i / amount + offsetAngle).ToRotationVector2() * Main.rand.NextFloat(4f, 7f);
-                ParticleRegistry.SpawnSparkParticle(pos, velo, Main.rand.Next(16, 22), Main.rand.NextFloat(.6f, .7f), Color.Chocolate);
+                Vector2 velo = (MathHelper.TwoPi * i / amount + offsetAngle).ToRotationVector2() *
+                               Main.rand.NextFloat(4f, 7f);
+                ParticleRegistry.SpawnSparkParticle(pos, velo, Main.rand.Next(16, 22), Main.rand.NextFloat(.6f, .7f),
+                    Color.Chocolate);
             }
+
             indicator = 1f;
             Projectile.netUpdate = true;
         }
 
-        if (!Modded.MouseLeft.Current && Charge == ChargeTime && Owner.HeldItem.CheckManaBetter(Owner, item.mana * 2, true) && this.RunLocal())
+        if (!Modded.MouseLeft.Current && Charge == ChargeTime &&
+            Owner.HeldItem.CheckManaBetter(Owner, item.mana * 2, true) && this.RunLocal())
         {
             int radius = 22;
             for (int i = -radius; i <= radius; i += radius)
             {
                 Vector2 rotVel = Projectile.velocity.RotatedBy(MathHelper.ToRadians(i)) * item.shootSpeed * 2;
-                Projectile.NewProj(pos, rotVel, ModContent.ProjectileType<BlastSkull>(), item.damage, item.knockBack, Owner.whoAmI, 0f, 1f);
+                Projectile.NewProj(pos, rotVel, ModContent.ProjectileType<BlastSkull>(), item.damage, item.knockBack,
+                    Owner.whoAmI, 0f, 1f);
             }
+
             SoundID.Item8.Play(Projectile.Center, 1.4f, -.2f);
             indicator = 0f;
             Charge = 0f;
@@ -77,7 +85,8 @@ public class BookOfSkullsHoldout : BaseIdleHoldoutProjectile
 
         if (this.RunLocal())
         {
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Owner.RotatedRelativePoint(Owner.MountedCenter, false, true).SafeDirectionTo(Modded.MouseWorld), 1f);
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity,
+                Owner.RotatedRelativePoint(Owner.MountedCenter, false, true).SafeDirectionTo(Modded.MouseWorld), 1f);
             if (Projectile.velocity != Projectile.oldVelocity)
                 this.Sync();
         }
@@ -97,8 +106,10 @@ public class BookOfSkullsHoldout : BaseIdleHoldoutProjectile
         SpriteEffects fx = Projectile.direction == -1 ? SpriteEffects.FlipVertically : SpriteEffects.None;
         Vector2 orig = new(0, tex.Height / 2);
         if (Charge > 0f)
-            Projectile.DrawProjectileBackglow(Color.Orange, InverseLerp(0f, ChargeTime, Charge) * 2f, 0, 20, fx, null, null, orig);
-        Main.spriteBatch.DrawBetter(tex, Projectile.Center, frame, Projectile.GetAlpha(lightColor), Projectile.rotation, orig, 1, fx);
+            Projectile.DrawProjectileBackglow(Color.Orange, InverseLerp(0f, ChargeTime, Charge) * 2f, 0, 20, fx, null,
+                null, orig);
+        Main.spriteBatch.DrawBetter(tex, Projectile.Center, frame, Projectile.GetAlpha(lightColor), Projectile.rotation,
+            orig, 1, fx);
         return false;
     }
 }

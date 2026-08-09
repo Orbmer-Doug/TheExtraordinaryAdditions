@@ -14,7 +14,6 @@ using static Microsoft.Xna.Framework.MathHelper;
 using static TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late.Zenith.CoalescenceHoldout;
 using static TheExtraordinaryAdditions.Core.Graphics.Animators;
 using Utils = Terraria.Utils;
-using static CalamityMod.CalamityUtils;
 using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late.Zenith;
@@ -22,6 +21,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late.Zenith;
 public class DivinityArrow : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.DivinityArrow);
+
     public override void SetDefaults()
     {
         Projectile.height = 124;
@@ -38,10 +38,11 @@ public class DivinityArrow : ModProjectile
     /// The bow
     /// </summary>
     public Projectile ProjOwner;
+
     public CoalescenceState State
     {
-        get => (CoalescenceState)Projectile.ai[1];
-        set => Projectile.ai[1] = (int)value;
+        get => (CoalescenceState) Projectile.ai[1];
+        set => Projectile.ai[1] = (int) value;
     }
 
     public NPC target;
@@ -102,7 +103,7 @@ public class DivinityArrow : ModProjectile
     public override void AI()
     {
         Projectile.extraUpdates = 0;
-        ProjOwner = Main.projectile?[(int)Projectile.ai[0]] ?? null;
+        ProjOwner = Main.projectile?[(int) Projectile.ai[0]] ?? null;
 
         // Begin
         if (!Init)
@@ -148,13 +149,15 @@ public class DivinityArrow : ModProjectile
                         int life = 20;
                         ParticleRegistry.SpawnSquishyLightParticle(TipOfArrow, vel, life, scale, Color.Gold);
                     }
+
                     break;
             }
 
             // Set the arrows position
             Projectile.velocity = Vector2.Zero;
             Vector2 centerString = PolarVector(14f, ProjOwner.rotation - Pi);
-            Vector2 drawBack = PolarVector(ReelDist * ProjOwner.As<CoalescenceHoldout>().StringCompletion, ProjOwner.rotation - Pi);
+            Vector2 drawBack = PolarVector(ReelDist * ProjOwner.As<CoalescenceHoldout>().StringCompletion,
+                ProjOwner.rotation - Pi);
             Vector2 top = ProjOwner.RotHitbox().Center + PolarVector(35f, ProjOwner.rotation - PiOver2) + centerString;
             Vector2 middle = ProjOwner.RotHitbox().Center + centerString + drawBack;
             Projectile.rotation = ProjOwner.rotation + rot + PiOver2;
@@ -183,8 +186,10 @@ public class DivinityArrow : ModProjectile
                             Vector2 vel = Projectile.SafeDirectionTo(target.Center + target.velocity) * 20f;
                             Projectile.velocity = Vector2.Lerp(Projectile.velocity, vel, .11f);
                         }
+
                         this.Sync();
                     }
+
                     break;
                 case CoalescenceState.Pierce:
                     Projectile.extraUpdates = 1;
@@ -206,8 +211,10 @@ public class DivinityArrow : ModProjectile
                             this.Sync();
                         }
                     }
+
                     break;
             }
+
             Projectile.rotation = Projectile.velocity.ToRotation() + PiOver2;
             Projectile.netUpdate = true;
         }
@@ -228,16 +235,21 @@ public class DivinityArrow : ModProjectile
                 {
                     for (int i = 1; i <= 3; i++)
                     {
-                        ParticleRegistry.SpawnGlowParticle(TipOfArrow, Vector2.Zero, 20, 3f - i, Color.LightGoldenrodYellow);
-                        ParticleRegistry.SpawnPulseRingParticle(TipOfArrow, Vector2.Zero, 15, RandomRotation(), new(.5f, 1f), 0f, Main.rand.NextFloat(260f, 300f), Color.DarkGoldenrod);
+                        ParticleRegistry.SpawnGlowParticle(TipOfArrow, Vector2.Zero, 20, 3f - i,
+                            Color.LightGoldenrodYellow);
+                        ParticleRegistry.SpawnPulseRingParticle(TipOfArrow, Vector2.Zero, 15, RandomRotation(),
+                            new(.5f, 1f), 0f, Main.rand.NextFloat(260f, 300f), Color.DarkGoldenrod);
                     }
+
                     for (int i = 0; i < 16; i++)
                     {
                         Vector2 vel = Main.rand.NextVector2Circular(2f, 2f);
                         float scale = Main.rand.NextFloat(1f, 1.7f);
-                        ParticleRegistry.SpawnBloomLineParticle(TipOfArrow, vel * Main.rand.NextFloat(1f, 3f), 35, scale, Color.Gold);
+                        ParticleRegistry.SpawnBloomLineParticle(TipOfArrow, vel * Main.rand.NextFloat(1f, 3f), 35,
+                            scale, Color.Gold);
                         ParticleRegistry.SpawnSparkParticle(TipOfArrow, vel, Main.rand.Next(20, 34), scale, Color.Gold);
                     }
+
                     AdditionsSound.etherealBounce.Play(TipOfArrow, 1f, 0f, .1f);
                     HitGround = true;
                 }
@@ -245,10 +257,15 @@ public class DivinityArrow : ModProjectile
                 {
                     for (int i = 0; i < 12; i++)
                     {
-                        ParticleRegistry.SpawnSquishyPixelParticle(TipOfArrow, oldVelocity.RotatedByRandom(.45f) * Main.rand.NextFloat(1.4f, 2.4f), Main.rand.Next(50, 90), Main.rand.NextFloat(.8f, 1.4f), Color.Gold, Color.Goldenrod, 5, true);
-                        ParticleRegistry.SpawnGlowParticle(TipOfArrow + Main.rand.NextVector2Circular(8f, 8f), Main.rand.NextVector2Circular(4f, 4f), Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .6f), Color.Gold);
+                        ParticleRegistry.SpawnSquishyPixelParticle(TipOfArrow,
+                            oldVelocity.RotatedByRandom(.45f) * Main.rand.NextFloat(1.4f, 2.4f), Main.rand.Next(50, 90),
+                            Main.rand.NextFloat(.8f, 1.4f), Color.Gold, Color.Goldenrod, 5, true);
+                        ParticleRegistry.SpawnGlowParticle(TipOfArrow + Main.rand.NextVector2Circular(8f, 8f),
+                            Main.rand.NextVector2Circular(4f, 4f), Main.rand.Next(20, 30),
+                            Main.rand.NextFloat(.4f, .6f), Color.Gold);
                     }
                 }
+
                 break;
             case CoalescenceState.Pierce:
                 break;
@@ -263,6 +280,7 @@ public class DivinityArrow : ModProjectile
     {
         writer.Write(Projectile.rotation);
     }
+
     public override void ReceiveExtraAI(BinaryReader reader)
     {
         Projectile.rotation = reader.ReadSingle();
@@ -272,7 +290,8 @@ public class DivinityArrow : ModProjectile
     {
         for (int i = 0; i < 30; i++)
         {
-            Vector2 vel = Projectile.velocity.SafeNormalize(Vector2.Zero) * Main.rand.NextFloat(1.2f, 4f) * ChargeCompletion;
+            Vector2 vel = Projectile.velocity.SafeNormalize(Vector2.Zero) * Main.rand.NextFloat(1.2f, 4f) *
+                          ChargeCompletion;
             int life = Main.rand.Next(58, 84);
             float scale = Main.rand.NextFloat(30f, 51f);
             ParticleRegistry.SpawnGlowParticle(Projectile.RotHitbox().RandomPoint(), vel, life, scale, Color.Gold, .5f);
@@ -281,7 +300,8 @@ public class DivinityArrow : ModProjectile
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
-        return targetHitbox.LineCollision(Projectile.BaseRotHitbox().Bottom, Projectile.BaseRotHitbox().Top, Projectile.width);
+        return targetHitbox.LineCollision(Projectile.BaseRotHitbox().Bottom, Projectile.BaseRotHitbox().Top,
+            Projectile.width);
     }
 
     public override bool? CanHitNPC(NPC target) => Release ? null : false;
@@ -301,43 +321,55 @@ public class DivinityArrow : ModProjectile
             case CoalescenceState.Richochet:
                 if (HitGround)
                 {
-                    ParticleRegistry.SpawnDetailedBlastParticle(pos, Vector2.Zero, new Vector2(1f, .5f) * 250f, Vector2.Zero, 22, Color.Gold, Projectile.rotation, Color.DarkGoldenrod, true);
+                    ParticleRegistry.SpawnDetailedBlastParticle(pos, Vector2.Zero, new Vector2(1f, .5f) * 250f,
+                        Vector2.Zero, 22, Color.Gold, Projectile.rotation, Color.DarkGoldenrod, true);
                     for (int i = 0; i < 2; i++)
                     {
                         int amal = ModContent.ProjectileType<CoalescedAmalgam>();
                         Vector2 amalVel = -Projectile.velocity.SafeNormalize(Vector2.Zero)
-                            .RotatedBy(Main.rand.NextFloat(.3f, .45f) * (i % 2f == 0f).ToDirectionInt()) * Main.rand.NextFloat(16f, 26f);
+                                              .RotatedBy(Main.rand.NextFloat(.3f, .45f) *
+                                                         (i % 2f == 0f).ToDirectionInt()) *
+                                          Main.rand.NextFloat(16f, 26f);
                         if (this.RunLocal())
-                            Projectile.NewProj(pos, amalVel, amal, Projectile.damage, Projectile.knockBack, Projectile.owner);
+                            Projectile.NewProj(pos, amalVel, amal, Projectile.damage, Projectile.knockBack,
+                                Projectile.owner);
                     }
+
                     AdditionsSound.etherealSmash2.Play(pos, 7f, 0f, .2f);
                     ScreenShakeSystem.New(new(6f, .7f), pos);
                 }
                 else
                 {
-                    ParticleRegistry.SpawnPulseRingParticle(TipOfArrow, Vector2.Zero, 30, Projectile.rotation, new(1f, .5f), 0f, 100f, Color.Gold);
+                    ParticleRegistry.SpawnPulseRingParticle(TipOfArrow, Vector2.Zero, 30, Projectile.rotation,
+                        new(1f, .5f), 0f, 100f, Color.Gold);
                     for (int i = 0; i < 20; i++)
                     {
-                        ParticleRegistry.SpawnSquishyLightParticle(Projectile.BaseRotHitbox().RandomPoint(), Projectile.velocity * Main.rand.NextFloat(.2f, .5f),
-                            Main.rand.Next(30, 50), Main.rand.NextFloat(.4f, .7f), Color.Goldenrod.Lerp(Color.Gold, Main.rand.NextFloat()));
+                        ParticleRegistry.SpawnSquishyLightParticle(Projectile.BaseRotHitbox().RandomPoint(),
+                            Projectile.velocity * Main.rand.NextFloat(.2f, .5f),
+                            Main.rand.Next(30, 50), Main.rand.NextFloat(.4f, .7f),
+                            Color.Goldenrod.Lerp(Color.Gold, Main.rand.NextFloat()));
                     }
                 }
+
                 break;
             case CoalescenceState.Pierce:
                 AdditionsSound.etherealHit2.Play(pos, 1f, 0f, .1f, 8);
                 for (int i = 0; i < 20; i++)
                 {
-                    Vector2 sparkVel = Projectile.velocity.RotatedByRandom(Main.rand.NextFloat(.33f, .46f)) * Main.rand.NextFloat(.9f, 1.8f);
+                    Vector2 sparkVel = Projectile.velocity.RotatedByRandom(Main.rand.NextFloat(.33f, .46f)) *
+                                       Main.rand.NextFloat(.9f, 1.8f);
                     float size = Main.rand.NextFloat(.8f, .9f);
                     int life = Main.rand.Next(22, 30);
                     Color col = Color.DarkGoldenrod;
                     ParticleRegistry.SpawnSparkParticle(pos, sparkVel, life, size, col);
-                    ParticleRegistry.SpawnSquishyPixelParticle(pos, sparkVel * .8f, life * 2, size * 1.2f, col, Color.PaleGoldenrod, 4);
+                    ParticleRegistry.SpawnSquishyPixelParticle(pos, sparkVel * .8f, life * 2, size * 1.2f, col,
+                        Color.PaleGoldenrod, 4);
                     if (i % 2f == 0f)
                     {
                         ParticleRegistry.SpawnGlowParticle(pos, sparkVel * .3f, 20, size * 16.75f, col);
                     }
                 }
+
                 break;
             case CoalescenceState.Blast:
                 CreateBlast(pos);
@@ -366,6 +398,7 @@ public class DivinityArrow : ModProjectile
 
     public OptimizedPrimitiveTrail trail;
     public TrailPoints trailPoints = new(20);
+
     public override bool PreDraw(ref Color lightColor)
     {
         if (Release)
@@ -381,6 +414,7 @@ public class DivinityArrow : ModProjectile
                 shader.TrySetParameter("thirdColor", Color.Goldenrod);
                 trail.DrawTrail(shader, trailPoints.Points, 200, true);
             }
+
             PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         }
 
@@ -394,9 +428,12 @@ public class DivinityArrow : ModProjectile
             float scale = Projectile.scale * ChargeCompletion * .5f;
             float rot = Projectile.rotation;
 
-            Main.spriteBatch.Draw(star, bloomDrawPos, null, Color.Gold * ChargeCompletion, rot, starOrig, new Vector2(scale * (Sin01(Main.GlobalTimeWrappedHourly) + .5f), scale), 0, 0f);
-            Main.spriteBatch.Draw(bloom, bloomDrawPos, null, Color.PaleGoldenrod * .5f * ChargeCompletion, rot, bloomOrig, scale * .75f, 0, 0f);
+            Main.spriteBatch.Draw(star, bloomDrawPos, null, Color.Gold * ChargeCompletion, rot, starOrig,
+                new Vector2(scale * (Sin01(Main.GlobalTimeWrappedHourly) + .5f), scale), 0, 0f);
+            Main.spriteBatch.Draw(bloom, bloomDrawPos, null, Color.PaleGoldenrod * .5f * ChargeCompletion, rot,
+                bloomOrig, scale * .75f, 0, 0f);
         }
+
         PixelationSystem.QueueTextureRenderAction(star, PixelationLayer.UnderProjectiles, BlendState.Additive);
 
         void arrow()
@@ -408,7 +445,8 @@ public class DivinityArrow : ModProjectile
             float scale = Projectile.scale;
             float rot = Projectile.rotation;
 
-            Color color1 = ArrowType == -1 ? Color.DarkGoldenrod : ArrowType == 1 ? Color.DarkGoldenrod : Color.PaleGoldenrod;
+            Color color1 = ArrowType == -1 ? Color.DarkGoldenrod :
+                ArrowType == 1 ? Color.DarkGoldenrod : Color.PaleGoldenrod;
             float speed = 16f;
             float finalSpeed = Main.GameUpdateCount / speed;
             float wavy = MathF.Sin(finalSpeed + (ArrowType == -1 ? 1 : ArrowType == 1 ? 2 : 3));
@@ -422,6 +460,7 @@ public class DivinityArrow : ModProjectile
 
             Main.spriteBatch.Draw(tex, drawPos, null, col, rot, orig, scale, 0, 0f);
         }
+
         LayeredDrawSystem.QueueDrawAction(arrow, PixelationLayer.UnderProjectiles, BlendState.Additive);
 
         return false;
@@ -439,17 +478,18 @@ public class DivinityArrow : ModProjectile
             return;
 
         effect.TrySetParameter("time", rotation);
-        effect.TrySetParameter("cosine", (float)Math.Cos(rotation));
+        effect.TrySetParameter("cosine", (float) Math.Cos(rotation));
         effect.TrySetParameter("firstCol", startingColor.ToVector3());
         effect.TrySetParameter("secondCol", endingColor.ToVector3());
         effect.TrySetParameter("opacity", prog);
 
-        sb.EnterShaderRegion(BlendState.Additive, effect.Shader.Value);
+        sb.EnterShaderRegion(effect.Shader.Value, BlendState.Additive);
 
-        Rectangle target = ToTarget(pos, (int)(20 * (w + prog)), (int)(60 * (h + prog)));
-        sb.Draw(outerCircleTexture, target, null, color * prog, Projectile.rotation - PiOver2, outerCircleTexture.Size() / 2, 0, 0);
+        Rectangle target = ToTarget(pos, (int) (20 * (w + prog)), (int) (60 * (h + prog)));
+        sb.Draw(outerCircleTexture, target, null, color * prog, Projectile.rotation - PiOver2,
+            outerCircleTexture.Size() / 2, 0, 0);
 
-        sb.EnterShaderRegion(BlendState.Additive);
+        sb.EnterShaderRegion(null, BlendState.Additive);
     }
 
     private static float RangeLerp(float input, float start, float end)

@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -24,18 +23,21 @@ public class BeanFire : ModProjectile
     }
 
     public ref float Speed => ref Projectile.ai[0];
+
     public override void AI()
     {
         after ??= new(5, () => Projectile.Center);
 
         if (Projectile.FinalExtraUpdate())
         {
-            after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 255));
+            after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation,
+                0, 255));
 
             Lighting.AddLight(Projectile.Center, Color.OrangeRed.ToVector3() * 3f);
             Projectile.rotation += Projectile.direction * .19f;
 
-            Dust.NewDustPerfect(Projectile.RotHitbox().RandomPoint(), DustID.WoodFurniture, -Projectile.velocity * .01f, 100, default, .7f).noGravity = true;
+            Dust.NewDustPerfect(Projectile.RotHitbox().RandomPoint(), DustID.WoodFurniture, -Projectile.velocity * .01f,
+                100, default, .7f).noGravity = true;
         }
     }
 
@@ -43,20 +45,23 @@ public class BeanFire : ModProjectile
     {
         for (int i = 0; i < 10; i++)
         {
-            Dust dust = Dust.NewDustDirect(target.Center, Projectile.width, Projectile.height, DustID.Torch, 0f, 0f, 400, default, 2f);
+            Dust dust = Dust.NewDustDirect(target.Center, Projectile.width, Projectile.height, DustID.Torch, 0f, 0f,
+                400, default, 2f);
             dust.noGravity = false;
             dust.velocity *= 1f;
-            dust = Dust.NewDustDirect(target.Center, Projectile.width, Projectile.height, DustID.Torch, 0f, 0f, 300, default, 2f);
+            dust = Dust.NewDustDirect(target.Center, Projectile.width, Projectile.height, DustID.Torch, 0f, 0f, 300,
+                default, 2f);
             dust.velocity *= 2f;
         }
 
-        Projectile.damage = (int)(Projectile.damage * 0.9f);
+        Projectile.damage = (int) (Projectile.damage * 0.9f);
     }
 
     public override void OnKill(int timeLeft)
     {
         for (int i = 0; i < 12; i++)
-            Dust.NewDustPerfect(Projectile.RotHitbox().RandomPoint(), DustID.WoodFurniture, Main.rand.NextVector2Circular(2f, 2f), 0, default, .7f).noGravity = true;
+            Dust.NewDustPerfect(Projectile.RotHitbox().RandomPoint(), DustID.WoodFurniture,
+                Main.rand.NextVector2Circular(2f, 2f), 0, default, .7f).noGravity = true;
     }
 
     public override bool OnTileCollide(Vector2 velocityChange)
@@ -78,6 +83,7 @@ public class BeanFire : ModProjectile
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [lightColor], Projectile.Opacity);

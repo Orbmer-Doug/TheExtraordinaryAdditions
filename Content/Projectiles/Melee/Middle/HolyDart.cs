@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using CalamityMod;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -18,6 +17,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 public class HolyDart : ModProjectile, ILocalizedModType, IModType
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 12;
@@ -37,13 +37,17 @@ public class HolyDart : ModProjectile, ILocalizedModType, IModType
             int life = Main.rand.Next(20, 30);
             float scale = Main.rand.NextFloat(.6f, .9f);
             Color col = Color.Gold.Lerp(Color.LightGoldenrodYellow, Main.rand.NextFloat(.3f, .6f));
-            ParticleRegistry.SpawnSparkleParticle(Projectile.Center + Main.rand.NextVector2Circular(8f, 8f), vel, life, scale, col, col * 2f);
-            ParticleRegistry.SpawnHeavySmokeParticle(Projectile.Center + Main.rand.NextVector2Circular(9f, 9f), vel, life, scale, col);
+            ParticleRegistry.SpawnSparkleParticle(Projectile.Center + Main.rand.NextVector2Circular(8f, 8f), vel, life,
+                scale, col, col * 2f);
+            ParticleRegistry.SpawnHeavySmokeParticle(Projectile.Center + Main.rand.NextVector2Circular(9f, 9f), vel,
+                life, scale, col);
         }
+
         Projectile.netUpdate = true;
     }
 
     public ref float Time => ref Projectile.ai[0];
+
     public override void AI()
     {
         if (trail == null || trail.Disposed)
@@ -64,8 +68,10 @@ public class HolyDart : ModProjectile, ILocalizedModType, IModType
         Projectile.scale = Animators.MakePoly(4f).InOutFunction(InverseLerp(0f, 30f, Time));
         if (Projectile.scale >= 1f && Projectile.numHits <= 0)
         {
-            if (NPCTargeting.TryGetClosestNPC(new(Projectile.Center, 1400), out NPC npc) && npc.GetGlobalNPC<HolyGlobalNPC>().MarkedTime > 0)
-                Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.SafeDirectionTo(npc.Center) * MathF.Min(Projectile.Distance(npc.Center), 20f), .4f);
+            if (NPCTargeting.TryGetClosestNPC(new(Projectile.Center, 1400), out NPC npc) &&
+                npc.GetGlobalNPC<HolyGlobalNPC>().MarkedTime > 0)
+                Projectile.velocity = Vector2.SmoothStep(Projectile.velocity,
+                    Projectile.SafeDirectionTo(npc.Center) * MathF.Min(Projectile.Distance(npc.Center), 20f), .4f);
         }
 
         Projectile.rotation = Projectile.velocity.ToRotation();
@@ -76,7 +82,8 @@ public class HolyDart : ModProjectile, ILocalizedModType, IModType
     {
         float fadeToEnd = MathHelper.Lerp(0.65f, 1f, Cos01((0f - Main.GlobalTimeWrappedHourly) * 3f));
         float fadeOpacity = Utils.GetLerpValue(1f, 0.64f, completionRatio.X, true) * Projectile.Opacity;
-        Color endColor = Color.Lerp(Color.Goldenrod, Color.PaleGoldenrod, Sin01(completionRatio.X * (float)Math.PI * 1.6f - Main.GlobalTimeWrappedHourly * 4f));
+        Color endColor = Color.Lerp(Color.Goldenrod, Color.PaleGoldenrod,
+            Sin01(completionRatio.X * (float) Math.PI * 1.6f - Main.GlobalTimeWrappedHourly * 4f));
         return Color.Lerp(Color.Yellow, endColor, fadeToEnd) * fadeOpacity;
     }
 
@@ -86,13 +93,15 @@ public class HolyDart : ModProjectile, ILocalizedModType, IModType
     }
 
     public override bool? CanHitNPC(NPC target) => Projectile.numHits <= 0;
+
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         SoundID.DD2_WitherBeastDeath.Play(Projectile.Center, Main.rand.NextFloat(1.5f, 2.2f), 0f, .3f, null, 20);
     }
-    
+
     public OptimizedPrimitiveTrail trail;
     public TrailPoints cache;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -104,6 +113,7 @@ public class HolyDart : ModProjectile, ILocalizedModType, IModType
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.CrackedNoise), 1);
             trail.DrawTrail(shader, cache.Points, 120);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 
         void flare()
@@ -113,9 +123,11 @@ public class HolyDart : ModProjectile, ILocalizedModType, IModType
                 Texture2D bloomTexture = AssetRegistry.GetTexture(AdditionsTexture.LensStar);
                 Color color = Main.hslToRgb(Main.GlobalTimeWrappedHourly * 0.6f % 1f, 1f, 0.85f, byte.MaxValue);
                 Vector2 bloomCenter = cache.Points[0] - Main.screenPosition;
-                Main.EntitySpriteDraw(bloomTexture, bloomCenter, null, color * 0.6f * Projectile.Opacity, Projectile.rotation, bloomTexture.Size() / 2f, i * Projectile.scale, 0, 0f);
+                Main.EntitySpriteDraw(bloomTexture, bloomCenter, null, color * 0.6f * Projectile.Opacity,
+                    Projectile.rotation, bloomTexture.Size() / 2f, i * Projectile.scale, 0, 0f);
             }
         }
+
         PixelationSystem.QueueTextureRenderAction(flare, PixelationLayer.UnderProjectiles, BlendState.Additive);
 
         return false;

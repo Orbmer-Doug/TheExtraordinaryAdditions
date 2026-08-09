@@ -14,6 +14,7 @@ using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Core.Graphics.Specific;
+
 [Autoload(Side = ModSide.Client)]
 public class AbsoluteTorsoDrawer : ModSystem
 {
@@ -40,7 +41,7 @@ public class AbsoluteTorsoDrawer : ModSystem
             BaseTorsoTarget = new(true, CreateScreenSizedTarget);
             BrokenGlassTarget = new(true, CreateScreenSizedTarget);
         });
-        
+
         RenderTargetManager.RenderTargetUpdateLoopEvent += PrepareAfterimageTarget;
         On_LegacyPlayerRenderer.DrawPlayers += DrawTorsoTarget;
         On_PlayerDrawLayers.DrawPlayer_17_TorsoComposite += DisallowTorsoDrawingIfNecessary;
@@ -65,16 +66,20 @@ public class AbsoluteTorsoDrawer : ModSystem
         On_PlayerDrawLayers.DrawPlayer_17_TorsoComposite -= DisallowTorsoDrawingIfNecessary;
     }
 
-    private void DrawTorsoTarget(On_LegacyPlayerRenderer.orig_DrawPlayers orig, LegacyPlayerRenderer self, Camera camera, IEnumerable<Player> players)
+    private void DrawTorsoTarget(On_LegacyPlayerRenderer.orig_DrawPlayers orig, LegacyPlayerRenderer self,
+        Camera camera, IEnumerable<Player> players)
     {
         if (anyoneIsUsingTorso)
         {
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.AnisotropicWrap, DepthStencilState.None, camera.Rasterizer, null, camera.GameViewMatrix.TransformationMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.AnisotropicWrap,
+                DepthStencilState.None, camera.Rasterizer, null, camera.GameViewMatrix.TransformationMatrix);
 
             if (Main.LocalPlayer.cBody != 0)
                 GameShaders.Armor.Apply(Main.LocalPlayer.cBody, Main.LocalPlayer);
 
-            Main.spriteBatch.Draw(AfterimageTargetPrevious, Main.screenLastPosition - Main.LocalPlayer.velocity * .1f - Main.screenPosition, LocalPlayerDrawManager.ShaderDrawAction is not null ? Color.Transparent : Color.White);
+            Main.spriteBatch.Draw(AfterimageTargetPrevious,
+                Main.screenLastPosition - Main.LocalPlayer.velocity * .1f - Main.screenPosition,
+                LocalPlayerDrawManager.ShaderDrawAction is not null ? Color.Transparent : Color.White);
             Main.spriteBatch.Draw(BrokenGlassTarget, Main.screenLastPosition - Main.screenPosition, Color.White);
             Main.spriteBatch.End();
         }
@@ -82,7 +87,8 @@ public class AbsoluteTorsoDrawer : ModSystem
         orig(self, camera, players);
     }
 
-    private void DisallowTorsoDrawingIfNecessary(On_PlayerDrawLayers.orig_DrawPlayer_17_TorsoComposite orig, ref PlayerDrawSet drawinfo)
+    private void DisallowTorsoDrawingIfNecessary(On_PlayerDrawLayers.orig_DrawPlayer_17_TorsoComposite orig,
+        ref PlayerDrawSet drawinfo)
     {
         if (drawinfo.hideEntirePlayer || drawinfo.drawPlayer.dead)
             return;
@@ -100,11 +106,15 @@ public class AbsoluteTorsoDrawer : ModSystem
                 num = 0;
 
             Vector2 pos = new Vector2(
-                (int)(drawinfo.Position.X - Main.screenPosition.X - drawinfo.drawPlayer.bodyFrame.Width / 2 + drawinfo.drawPlayer.width / 2) + num,
-                (int)(drawinfo.Position.Y - Main.screenPosition.Y + drawinfo.drawPlayer.height - drawinfo.drawPlayer.bodyFrame.Height + 4f)
-            ) + drawinfo.drawPlayer.bodyPosition + new Vector2(drawinfo.drawPlayer.bodyFrame.Width / 2, drawinfo.drawPlayer.bodyFrame.Height / 2);
+                (int) (drawinfo.Position.X - Main.screenPosition.X - drawinfo.drawPlayer.bodyFrame.Width / 2 +
+                       drawinfo.drawPlayer.width / 2) + num,
+                (int) (drawinfo.Position.Y - Main.screenPosition.Y + drawinfo.drawPlayer.height -
+                    drawinfo.drawPlayer.bodyFrame.Height + 4f)
+            ) + drawinfo.drawPlayer.bodyPosition + new Vector2(drawinfo.drawPlayer.bodyFrame.Width / 2,
+                drawinfo.drawPlayer.bodyFrame.Height / 2);
 
-            DrawData outline = new(ArmorOutlineTexture, pos, bodyFrame, Color.White, drawinfo.drawPlayer.bodyRotation, drawinfo.bodyVect, 1f, drawinfo.playerEffect)
+            DrawData outline = new(ArmorOutlineTexture, pos, bodyFrame, Color.White, drawinfo.drawPlayer.bodyRotation,
+                drawinfo.bodyVect, 1f, drawinfo.playerEffect)
             {
                 shader = drawinfo.drawPlayer.cBody
             };
@@ -135,7 +145,8 @@ public class AbsoluteTorsoDrawer : ModSystem
         var gd = Main.instance.GraphicsDevice;
 
         // Draw the chestplate
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.AnisotropicClamp, DepthStencilState.Default, Main.Rasterizer, null, Matrix.Identity);
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.AnisotropicClamp,
+            DepthStencilState.Default, Main.Rasterizer, null, Matrix.Identity);
         gd.SetRenderTarget(BaseTorsoTarget);
         gd.Clear(Color.Transparent);
 
@@ -143,7 +154,8 @@ public class AbsoluteTorsoDrawer : ModSystem
 
         Main.spriteBatch.End();
 
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.AnisotropicClamp, DepthStencilState.Default, Main.Rasterizer, null, Matrix.Identity);
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.AnisotropicClamp,
+            DepthStencilState.Default, Main.Rasterizer, null, Matrix.Identity);
         gd.SetRenderTarget(BrokenGlassTarget);
         gd.Clear(Color.Transparent);
 
@@ -157,12 +169,17 @@ public class AbsoluteTorsoDrawer : ModSystem
         Main.spriteBatch.End();
 
         // Apply the afterimage effect to AfterimageTarget
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.AnisotropicClamp, DepthStencilState.Default, Main.Rasterizer, null, Matrix.Identity);
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.AnisotropicClamp,
+            DepthStencilState.Default, Main.Rasterizer, null, Matrix.Identity);
         gd.SetRenderTarget(AfterimageTarget);
         gd.Clear(Color.Transparent);
 
-        bool probablyUsingSniperEffects = Main.LocalPlayer.scope || Main.LocalPlayer.HeldMouseItem().type == ItemID.SniperRifle || Main.LocalPlayer.HeldMouseItem().type == ItemID.Binoculars;
-        if (!probablyUsingSniperEffects || CameraSystem.UnmodifiedCameraPosition.WithinRange(Main.screenPosition, Main.LocalPlayer.velocity.Length() + 60f))
+        bool probablyUsingSniperEffects = Main.LocalPlayer.scope ||
+                                          Main.LocalPlayer.HeldMouseItem().type == ItemID.SniperRifle ||
+                                          Main.LocalPlayer.HeldMouseItem().type == ItemID.Binoculars;
+        if (!probablyUsingSniperEffects ||
+            CameraSystem.UnmodifiedCameraPosition.WithinRange(Main.screenPosition,
+                Main.LocalPlayer.velocity.Length() + 60f))
             Main.spriteBatch.Draw(AfterimageTargetPrevious, Vector2.Zero, Color.White);
 
         Main.spriteBatch.Draw(BaseTorsoTarget, Vector2.Zero, Color.White);
@@ -203,9 +220,12 @@ public class AbsoluteTorsoDrawer : ModSystem
 
             // Calculate position and vectors for torso rendering
             Vector2 position = new Vector2(
-                (int)(drawinfo.Position.X - Main.screenPosition.X - (drawinfo.drawPlayer.bodyFrame.Width / 2) + (drawinfo.drawPlayer.width / 2)),
-                (int)(drawinfo.Position.Y - Main.screenPosition.Y + drawinfo.drawPlayer.height - drawinfo.drawPlayer.bodyFrame.Height + 4f)
-            ) + drawinfo.drawPlayer.bodyPosition + new Vector2(drawinfo.drawPlayer.bodyFrame.Width / 2, drawinfo.drawPlayer.bodyFrame.Height / 2);
+                (int) (drawinfo.Position.X - Main.screenPosition.X - (drawinfo.drawPlayer.bodyFrame.Width / 2) +
+                       (drawinfo.drawPlayer.width / 2)),
+                (int) (drawinfo.Position.Y - Main.screenPosition.Y + drawinfo.drawPlayer.height -
+                    drawinfo.drawPlayer.bodyFrame.Height + 4f)
+            ) + drawinfo.drawPlayer.bodyPosition + new Vector2(drawinfo.drawPlayer.bodyFrame.Width / 2,
+                drawinfo.drawPlayer.bodyFrame.Height / 2);
 
             Vector2 bodyVect = drawinfo.bodyVect;
 

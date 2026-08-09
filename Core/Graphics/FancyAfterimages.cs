@@ -65,7 +65,7 @@ public sealed class FancyAfterimages
                 (colors.Length == 1 ? colors[0] : MulticolorLerp(interpolant + colorInterpolantOffset, colors))
                     with
                     {
-                        A = (byte)(afterimage.alpha * afterimage.opacity)
+                        A = (byte) (afterimage.alpha * afterimage.opacity)
                     } * interpolant * afterimage.opacity * overallOpacity;
 
             Main.spriteBatch.Draw(tex, center - Main.screenPosition, frame, color, prev, origin, scale, fx, 0f);
@@ -106,7 +106,7 @@ public sealed class FancyAfterimages
             Color color = MulticolorLerp(interpolant + colorInterpolantOffset, colors)
                 with
                 {
-                    A = (byte)(afterimage.alpha * afterimage.opacity)
+                    A = (byte) (afterimage.alpha * afterimage.opacity)
                 } * interpolant * afterimage.opacity * overallOpacity;
             float rotation = forceRot ? buffer[0].rot : afterimage.rot;
             Vector2 origin = (frame?.Size() ?? tex.Size()) / 2f;

@@ -17,18 +17,10 @@ FAQ:
 [*] But does it work in multiplayer? - as best as can be!
 [/olist]
 
-[i]Everything unintentional is 100% unintentional :)[/i]
-
 [i]Developed by:[/i]
 Orbmer Doug - Owner/Programmer/Sprites
 SomeRandomMalePerson - Sprites/Sounds/Music
 Ashes_Plus - Occasional Sounds/Promo Art/Video/Visonary
-
-[h3]Note[/h3]
-The mod has no more content update plans.
-Why? I want to move on to helping other mods or to even pursue game development, rather than working on a random something for 2 years.
-Its aided a lot with my skills but I believe it is finally time to explore other things.
-Future updates are to only stay in compatibility with Terraria and Calamity or to fix any bugs.
 
 Hope you have just as much fun as we do!
 

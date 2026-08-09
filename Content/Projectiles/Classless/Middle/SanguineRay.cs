@@ -16,6 +16,7 @@ public class SanguineRay : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
     private const int Lifetime = 45;
+
     public override void SetDefaults()
     {
         Projectile.width = Projectile.height = 20;
@@ -58,7 +59,8 @@ public class SanguineRay : ModProjectile
         cache?.SetPoints(Projectile.Center.GetLaserControlPoints(end, 40));
         if (end != expected && cache != null)
         {
-            ParticleRegistry.SpawnGlowParticle(end, cache.Points[^1].SafeDirectionTo(cache.Points[0]).RotatedByRandom(.3f) * Main.rand.NextFloat(3f, 14f),
+            ParticleRegistry.SpawnGlowParticle(end,
+                cache.Points[^1].SafeDirectionTo(cache.Points[0]).RotatedByRandom(.3f) * Main.rand.NextFloat(3f, 14f),
                 20, 40f, Color.Lerp(Color.Red, Color.DarkRed, Main.rand.NextFloat(.2f, .9f)));
         }
     }
@@ -69,12 +71,15 @@ public class SanguineRay : ModProjectile
         {
             for (int i = 0; i < 3; i++)
             {
-                Vector2 vel = -Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.46f) * Main.rand.NextFloat(5f, 15f);
+                Vector2 vel = -Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.46f) *
+                              Main.rand.NextFloat(5f, 15f);
                 Color color = Color.Lerp(Color.Red, Color.DarkRed, Main.rand.NextFloat(.4f, .9f));
-                ParticleRegistry.SpawnGlowParticle(pos, vel, Main.rand.Next(18, 26), Main.rand.NextFloat(30f, 50f), color * 2f, 1f, true);
+                ParticleRegistry.SpawnGlowParticle(pos, vel, Main.rand.Next(18, 26), Main.rand.NextFloat(30f, 50f),
+                    color * 2f, 1f, true);
                 ParticleRegistry.SpawnBloomLineParticle(pos, vel * 2f, 50, .5f, color);
                 ParticleRegistry.SpawnBloodParticle(pos, vel * Main.rand.NextFloat(1.1f, 1.5f),
-                    Main.rand.Next(30, 50), Main.rand.NextFloat(.8f, 1.3f), Color.Lerp(Color.DarkRed, Color.Crimson, Main.rand.NextFloat(.2f, .9f)) * 1.4f);
+                    Main.rand.Next(30, 50), Main.rand.NextFloat(.8f, 1.3f),
+                    Color.Lerp(Color.DarkRed, Color.Crimson, Main.rand.NextFloat(.2f, .9f)) * 1.4f);
             }
         }
     }
@@ -100,16 +105,18 @@ public class SanguineRay : ModProjectile
 
     public Color ColorFunct(SystemVector2 c, Vector2 position)
     {
-        Color val = Color.Lerp(Color.DarkRed, Color.Red, (float)Math.Cos(Main.GlobalTimeWrappedHourly * 0.67f - c.X / LaserLength * 29f) * 0.5f + 0.5f);
+        Color val = Color.Lerp(Color.DarkRed, Color.Red,
+            (float) Math.Cos(Main.GlobalTimeWrappedHourly * 0.67f - c.X / LaserLength * 29f) * 0.5f + 0.5f);
 
         float trailOpacity = GetLerpBump(0f, 0.067f, 1f, .56f, c.X) * 0.9f;
-        val.A = (byte)(trailOpacity * 255);
+        val.A = (byte) (trailOpacity * 255);
 
         return Color.Lerp(val, Color.Red, 0.5f) * trailOpacity;
     }
 
     public TrailPoints cache;
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -123,6 +130,7 @@ public class SanguineRay : ModProjectile
             shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.HarshNoise), 2, SamplerState.LinearWrap);
             trail.DrawTrail(shader, cache.Points, 80);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 
         return false;

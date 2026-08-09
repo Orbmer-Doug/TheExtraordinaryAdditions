@@ -28,17 +28,17 @@ public partial class Asterlin : ModNPC
 
     public bool DesperationDrama_BeginDialogue
     {
-        get => (int)ExtraAI[0] == 1;
+        get => (int) ExtraAI[0] == 1;
         set => ExtraAI[0] = value.ToInt();
     }
 
-    public static readonly float DesperationDrama_CameraScrollTime = CalUtils.SecondsToFrames(2f);
-    public static readonly float DesperationDrama_ScreenPullupTime = CalUtils.SecondsToFrames(.8f);
-    public static readonly float DesperationDrama_ChannelFindTime = CalUtils.SecondsToFrames(.5f);
+    public static readonly float DesperationDrama_CameraScrollTime = SecondsToFrames(2f);
+    public static readonly float DesperationDrama_ScreenPullupTime = SecondsToFrames(.8f);
+    public static readonly float DesperationDrama_ChannelFindTime = SecondsToFrames(.5f);
 
-    public static readonly int DesperationDrama_Wait = (int)(DesperationDrama_CameraScrollTime +
-                                                             DesperationDrama_ScreenPullupTime +
-                                                             DesperationDrama_ChannelFindTime);
+    public static readonly int DesperationDrama_Wait = (int) (DesperationDrama_CameraScrollTime +
+                                                              DesperationDrama_ScreenPullupTime +
+                                                              DesperationDrama_ChannelFindTime);
 
     public static readonly float DesperationDrama_MaxTime = DialogueTime + DesperationDrama_Wait;
 
@@ -60,10 +60,10 @@ public partial class Asterlin : ModNPC
             () => CurrentState != AsterlinAIType.DesperationDrama || AdditionsLoopedSound.NPCNotActive(NPC));
         Ominous?.Update(NPC.Center);
 
-        HeatDistortionArea = Animators.Sine.InOutFunction.Evaluate(AITimer, CalUtils.SecondsToFrames(2.6f),
-            CalUtils.SecondsToFrames(4f), EnterPhase3_MaxHeatDistortionArea, DesperationDrama_MaxHeatDistortionArea);
-        HeatDistortionStrength = Animators.MakePoly(3f).InFunction.Evaluate(AITimer, CalUtils.SecondsToFrames(2.6f),
-            CalUtils.SecondsToFrames(4f), EnterPhase3_MaxHeatDistortionStrength,
+        HeatDistortionArea = Animators.Sine.InOutFunction.Evaluate(AITimer, SecondsToFrames(2.6f),
+            SecondsToFrames(4f), EnterPhase3_MaxHeatDistortionArea, DesperationDrama_MaxHeatDistortionArea);
+        HeatDistortionStrength = Animators.MakePoly(3f).InFunction.Evaluate(AITimer, SecondsToFrames(2.6f),
+            SecondsToFrames(4f), EnterPhase3_MaxHeatDistortionStrength,
             DesperationDrama_MaxHeatDistortionStrength);
         GlowInterpolant = Utils.Remap(AITimer, TimeToUhOh, TimeToLast, 0f, .4f);
         PowerInterpolant = Utils.Remap(AITimer, TimeToUhOh, TimeToLast, 0f, 1f);
@@ -121,7 +121,7 @@ public partial class Asterlin : ModNPC
             // though legitimately I dont know why this isn't syncing and i dont wanna make a packet
             if (Main.netMode == NetmodeID.SinglePlayer && Keys.LeftAlt.GetKeyDown())
             {
-                AITimer = (int)startToFade;
+                AITimer = (int) startToFade;
                 Dialogue_Manager.CurrentProgress = DialogueTime;
                 this.Sync();
             }

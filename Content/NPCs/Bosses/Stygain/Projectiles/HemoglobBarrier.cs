@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using CalamityMod;
 using Terraria;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
@@ -17,9 +16,10 @@ public class HemoglobBarrier : ProjOwnedByNPC<StygainHeart>
     private List<Vector2> cache;
     private TrailPoints points;
     public ref float CurrentWidth => ref Projectile.ai[0];
+
     public bool FadeOut
     {
-        get => (int)Projectile.ai[1] == 1;
+        get => (int) Projectile.ai[1] == 1;
         set => Projectile.ai[1] = value.ToInt();
     }
 
@@ -54,7 +54,8 @@ public class HemoglobBarrier : ProjOwnedByNPC<StygainHeart>
         }
 
         for (int k = 0; k < Points; k++)
-            cache[k] = Projectile.Center + ((MathF.Tau + .1f) * InverseLerp(0f, Points, k)).ToRotationVector2() * StygainHeart.BarrierSize;
+            cache[k] = Projectile.Center + ((MathF.Tau + .1f) * InverseLerp(0f, Points, k)).ToRotationVector2() *
+                StygainHeart.BarrierSize;
 
         if (trail == null || trail.Disposed)
             trail = new(WidthFunction, ColorFunction, null, 5);
@@ -63,8 +64,10 @@ public class HemoglobBarrier : ProjOwnedByNPC<StygainHeart>
         for (int k = 0; k < 4; k++)
         {
             float rot = RandomRotation();
-            Vector2 pos = Projectile.Center + (MathHelper.TwoPi * Main.rand.NextFloat()).ToRotationVector2() * StygainHeart.BarrierSize;
-            Vector2 vel = Vector2.One.RotatedBy(rot + Main.rand.NextFloat(1.1f, 1.3f)) * 2 * Main.rand.NextBool().ToDirectionInt();
+            Vector2 pos = Projectile.Center + (MathHelper.TwoPi * Main.rand.NextFloat()).ToRotationVector2() *
+                StygainHeart.BarrierSize;
+            Vector2 vel = Vector2.One.RotatedBy(rot + Main.rand.NextFloat(1.1f, 1.3f)) * 2 *
+                          Main.rand.NextBool().ToDirectionInt();
             Color color = Color.Crimson;
             ParticleRegistry.SpawnSquishyLightParticle(pos, vel, 20, Main.rand.NextFloat(.2f, .4f), color, .2f);
         }
@@ -76,17 +79,22 @@ public class HemoglobBarrier : ProjOwnedByNPC<StygainHeart>
                 continue;
             if (player.Distance(Projectile.Center) > StygainHeart.BarrierSize)
             {
-                ParticleRegistry.SpawnBloomLineParticle(player.RotHitbox().RandomPoint(), Vector2.UnitY * -Main.rand.NextFloat(2f, 5f),
+                ParticleRegistry.SpawnBloomLineParticle(player.RotHitbox().RandomPoint(),
+                    Vector2.UnitY * -Main.rand.NextFloat(2f, 5f),
                     Main.rand.Next(10, 20), Main.rand.NextFloat(.3f, .6f), Color.DarkRed);
 
                 Vector2 edge = ClosestPointOnCircle(player.Center, Projectile.Center, StygainHeart.BarrierSize);
                 foreach (Vector2 point in edge.GetLaserControlPoints(player.Center, 30))
                 {
-                    ParticleRegistry.SpawnGlowParticle(point, player.Center.SafeDirectionTo(edge) * Main.rand.NextFloat(1f, 3f),
+                    ParticleRegistry.SpawnGlowParticle(point,
+                        player.Center.SafeDirectionTo(edge) * Main.rand.NextFloat(1f, 3f),
                         Main.rand.Next(30, 40), Main.rand.NextFloat(30f, 40f), Color.Crimson, 1.2f);
                 }
+
                 player.velocity = player.SafeDirectionTo(Projectile.Center)
-                    * MathF.Min(15f, player.Distance(Projectile.Center + PolarVector(StygainHeart.BarrierSize, player.SafeDirectionTo(Projectile.Center).ToRotation())));
+                                  * MathF.Min(15f,
+                                      player.Distance(Projectile.Center + PolarVector(StygainHeart.BarrierSize,
+                                          player.SafeDirectionTo(Projectile.Center).ToRotation())));
             }
         }
 
@@ -97,7 +105,7 @@ public class HemoglobBarrier : ProjOwnedByNPC<StygainHeart>
                 Projectile.Kill();
         }
 
-        if ((int)Projectile.ai[2] == 1)
+        if ((int) Projectile.ai[2] == 1)
         {
             this.Sync();
             Projectile.ai[2] = 0;
@@ -116,9 +124,9 @@ public class HemoglobBarrier : ProjOwnedByNPC<StygainHeart>
     {
         for (int i = 0; i < cache.Count; i++)
         {
-            int x = (int)cache[i].X;
-            int y = (int)cache[i].Y;
-            int width = (int)WidthFunction(i / cache.Count);
+            int x = (int) cache[i].X;
+            int y = (int) cache[i].Y;
+            int width = (int) WidthFunction(i / cache.Count);
             if (targetHitbox.Intersects(new Rectangle(x, y, width, width)))
                 return true;
         }
@@ -133,11 +141,13 @@ public class HemoglobBarrier : ProjOwnedByNPC<StygainHeart>
 
     private Color ColorFunction(SystemVector2 v, Vector2 position)
     {
-        Color col = MulticolorLerp(v.X + Sin01(Main.GlobalTimeWrappedHourly * 2f), Color.Crimson, Color.DarkRed, Color.IndianRed);
+        Color col = MulticolorLerp(v.X + Sin01(Main.GlobalTimeWrappedHourly * 2f), Color.Crimson, Color.DarkRed,
+            Color.IndianRed);
         return col;
     }
 
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -153,6 +163,7 @@ public class HemoglobBarrier : ProjOwnedByNPC<StygainHeart>
             barrier.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FractalNoise), 2, SamplerState.LinearWrap);
             trail.DrawTrail(barrier, points.Points, 30);
         }
+
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.OverPlayers);
         return false;
     }

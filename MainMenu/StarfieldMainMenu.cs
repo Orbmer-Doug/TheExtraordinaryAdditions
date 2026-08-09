@@ -31,8 +31,8 @@ public class StarfieldMainMenu : ModMenu
         logoScale = WorldGen.getGoodWorldGen ? .77f : .65f;
         drawColor = WorldGen.everythingWorldGen ? Main.DiscoColor : Color.White;
 
-        int width = (int)(Logo.Value.Width * logoScale);
-        int height = (int)(Logo.Value.Height * logoScale);
+        int width = (int) (Logo.Value.Width * logoScale);
+        int height = (int) (Logo.Value.Height * logoScale);
 
         Points ??= new(40);
 
@@ -57,9 +57,9 @@ public class StarfieldMainMenu : ModMenu
 
         Point pos = Main.alreadyGrabbingSunOrMoon
             ? Main.MouseScreen.ToPoint()
-            : new((int)logoDrawCenter.X, (int)logoDrawCenter.Y);
+            : new((int) logoDrawCenter.X, (int) logoDrawCenter.Y);
         RotatedRectangle iconHitbox = new(pos.X - width / 2, pos.Y - height / 2, width, height, logoRotation);
-        Rectangle mouseHitbox = new((int)Main.MouseScreen.X, (int)Main.MouseScreen.Y, 14, 14);
+        Rectangle mouseHitbox = new((int) Main.MouseScreen.X, (int) Main.MouseScreen.Y, 14, 14);
 
         if ((Main.mouseLeft || Main.starGame) && Main.hasFocus && iconHitbox.Intersects(mouseHitbox))
         {

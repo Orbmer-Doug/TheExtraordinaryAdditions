@@ -8,6 +8,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 public class BreakerStorm : ModProjectile
 {
     public override string Texture => AssetRegistry.Invis;
+
     public override void SetDefaults()
     {
         Projectile.height = Projectile.width = 120;
@@ -22,6 +23,7 @@ public class BreakerStorm : ModProjectile
     }
 
     public ref float Time => ref Projectile.ai[0];
+
     public override void AI()
     {
         if (Time % 10 == 9)
@@ -34,8 +36,10 @@ public class BreakerStorm : ModProjectile
                 Main.rand.NextVector2CircularLimited(3f, 3f, .5f, 1f), Main.rand.Next(28, 35), Color.LightBlue);
         }
 
-        ParticleRegistry.SpawnSparkParticle(Projectile.Center, Main.rand.NextVector2Circular(10f, 10f), Main.rand.Next(40, 60), Main.rand.NextFloat(.5f, .9f), Color.LightCyan);
-        ParticleRegistry.SpawnGlowParticle(Projectile.Center, Main.rand.NextVector2Circular(5f, 5f), Main.rand.Next(30, 40), Main.rand.NextFloat(.6f, 1f), Color.Cyan.Lerp(Color.White, .5f));
+        ParticleRegistry.SpawnSparkParticle(Projectile.Center, Main.rand.NextVector2Circular(10f, 10f),
+            Main.rand.Next(40, 60), Main.rand.NextFloat(.5f, .9f), Color.LightCyan);
+        ParticleRegistry.SpawnGlowParticle(Projectile.Center, Main.rand.NextVector2Circular(5f, 5f),
+            Main.rand.Next(30, 40), Main.rand.NextFloat(.6f, 1f), Color.Cyan.Lerp(Color.White, .5f));
 
         Time++;
     }

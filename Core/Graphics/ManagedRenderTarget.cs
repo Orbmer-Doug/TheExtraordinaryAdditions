@@ -6,7 +6,8 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Core.Graphics;
 
-[DebuggerDisplay("Width: {target?.Width ?? 0}, Height: {target?.Height ?? 0}, Uninitialized: {IsUninitialized}, Time since last usage: {TimeSinceLastUsage} frame(s)")]
+[DebuggerDisplay(
+    "Width: {target?.Width ?? 0}, Height: {target?.Height ?? 0}, Uninitialized: {IsUninitialized}, Time since last usage: {TimeSinceLastUsage} frame(s)")]
 public class ManagedRenderTarget : IDisposable
 {
     private RenderTarget2D target;
@@ -14,19 +15,12 @@ public class ManagedRenderTarget : IDisposable
     /// <summary>
     ///     Whether this render target if waiting for its first initialization or not
     /// </summary>
-    internal bool WaitingForFirstInitialization
-    {
-        get;
-        private set;
-    } = true;
+    internal bool WaitingForFirstInitialization { get; private set; } = true;
 
     /// <summary>
     ///     The initialization action that dictates how this render target should be (re)initialized
     /// </summary>
-    internal RenderTargetInitializationAction InitializationAction
-    {
-        get;
-    }
+    internal RenderTargetInitializationAction InitializationAction { get; }
 
     /// <summary>
     ///     Whether this render target is uninitialized or not.
@@ -39,38 +33,22 @@ public class ManagedRenderTarget : IDisposable
     /// <remarks>
     ///     This is based on calls to the <see cref="Target"/> property getter
     /// </remarks>
-    public int TimeSinceLastUsage
-    {
-        get;
-        internal set;
-    }
+    public int TimeSinceLastUsage { get; internal set; }
 
     /// <summary>
     ///     Whether this render target is disposed or not
     /// </summary>
-    public bool IsDisposed
-    {
-        get;
-        private set;
-    }
+    public bool IsDisposed { get; private set; }
 
     /// <summary>
     ///     Whether this render target should be reset when the screen size changes
     /// </summary>
-    public bool ShouldResetUponScreenResize
-    {
-        get;
-        private set;
-    }
+    public bool ShouldResetUponScreenResize { get; private set; }
 
     /// <summary>
     ///     Whether this render target should be subject to automatic garbage collection when not in use
     /// </summary>
-    public bool SubjectToGarbageCollection
-    {
-        get;
-        private set;
-    }
+    public bool SubjectToGarbageCollection { get; private set; }
 
     /// <summary>
     ///     The raw <see cref="RenderTarget2D"/> this wrapper holds
@@ -103,7 +81,8 @@ public class ManagedRenderTarget : IDisposable
 
     public delegate RenderTarget2D RenderTargetInitializationAction(int screenWidth, int screenHeight);
 
-    public ManagedRenderTarget(bool shouldResetUponScreenResize, RenderTargetInitializationAction creationCondition, bool subjectToGarbageCollection = true)
+    public ManagedRenderTarget(bool shouldResetUponScreenResize, RenderTargetInitializationAction creationCondition,
+        bool subjectToGarbageCollection = true)
     {
         ShouldResetUponScreenResize = shouldResetUponScreenResize;
         InitializationAction = creationCondition;
@@ -116,7 +95,8 @@ public class ManagedRenderTarget : IDisposable
     /// </summary>
     /// <param name="screenWidth">The screen width.</param>
     /// <param name="screenHeight">The screen height.</param>
-    public static RenderTarget2D CreateScreenSizedTarget(int screenWidth, int screenHeight) => new(Main.instance.GraphicsDevice, screenWidth, screenHeight);
+    public static RenderTarget2D CreateScreenSizedTarget(int screenWidth, int screenHeight) =>
+        new(Main.instance.GraphicsDevice, screenWidth, screenHeight);
 
     /// <summary>
     ///     Immediately disposes of this render target, freeing unmanaged GPU resources in the process
@@ -156,7 +136,8 @@ public class ManagedRenderTarget : IDisposable
         Main.instance.GraphicsDevice.SetRenderTarget(Target);
         Main.instance.GraphicsDevice.Clear(Color.Transparent);
 
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, Matrix.Identity);
+        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState,
+            DepthStencilState.None, RasterizerState.CullNone, null, Matrix.Identity);
         Main.spriteBatch.Draw(from, Vector2.Zero, null, Color.White);
         Main.spriteBatch.End();
 

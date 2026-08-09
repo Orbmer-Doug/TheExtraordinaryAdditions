@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
@@ -16,6 +15,7 @@ public class SnapcurveHeld : BaseIdleHoldoutProjectile
 {
     public override int AssociatedItemID => ModContent.ItemType<CrystallineSnapcurve>();
     public override int IntendedProjectileType => ModContent.ProjectileType<SnapcurveHeld>();
+
     public override void Defaults()
     {
         Projectile.width = Projectile.height = 176;
@@ -26,6 +26,7 @@ public class SnapcurveHeld : BaseIdleHoldoutProjectile
     public ref float Time => ref Projectile.ai[0];
     public ref float LimbRotation => ref Projectile.ai[1];
     public ref float Switch => ref Projectile.ai[2];
+
     public override void OnSpawn(IEntitySource source)
     {
         Switch = -1;
@@ -41,18 +42,22 @@ public class SnapcurveHeld : BaseIdleHoldoutProjectile
         if (this.RunLocal() && Owner.HasAmmo(Item) && activatingShoot)
         {
             Switch = 1;
-            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<CrystallineBlast>(), Projectile.damage, Projectile.knockBack, Owner.whoAmI, 0f, Projectile.whoAmI);
+            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<CrystallineBlast>(),
+                Projectile.damage, Projectile.knockBack, Owner.whoAmI, 0f, Projectile.whoAmI);
             this.Sync();
         }
 
         if (this.RunLocal())
         {
-            float aimInterpolant = Utils.GetLerpValue(10f, 40f, Projectile.Distance(Owner.Additions().MouseWorld), true);
+            float aimInterpolant =
+                Utils.GetLerpValue(10f, 40f, Projectile.Distance(Owner.Additions().MouseWorld), true);
             Vector2 oldVelocity = Projectile.velocity;
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(Owner.Additions().MouseWorld), aimInterpolant);
+            Projectile.velocity = Vector2.Lerp(Projectile.velocity,
+                Projectile.SafeDirectionTo(Owner.Additions().MouseWorld), aimInterpolant);
             if (Projectile.velocity != oldVelocity)
                 this.Sync();
         }
+
         Projectile.Center = Center + PolarVector(24f, Projectile.velocity.ToRotation());
         Projectile.rotation = Projectile.velocity.ToRotation();
         Projectile.spriteDirection = Projectile.direction;
@@ -76,6 +81,7 @@ public class SnapcurveHeld : BaseIdleHoldoutProjectile
                         Time = 0f;
                         this.Sync();
                     }
+
                     break;
                 case 1:
                     LimbRotation = Animators.MakePoly(2).OutFunction.Evaluate(0f, .65f, reel);
@@ -85,6 +91,7 @@ public class SnapcurveHeld : BaseIdleHoldoutProjectile
                         Time = 0f;
                         this.Sync();
                     }
+
                     break;
             }
 
@@ -100,6 +107,7 @@ public class SnapcurveHeld : BaseIdleHoldoutProjectile
 
     public static readonly Texture2D limb1 = AssetRegistry.GetTexture(AdditionsTexture.CrystallineSnapcurveProjLimb1);
     public static readonly Texture2D limb2 = AssetRegistry.GetTexture(AdditionsTexture.CrystallineSnapcurveProjLimb2);
+
     public override bool PreDraw(ref Color lightColor)
     {
         Color color = lightColor * Projectile.Opacity;
@@ -111,8 +119,10 @@ public class SnapcurveHeld : BaseIdleHoldoutProjectile
         Vector2 pos1 = Projectile.Center + PolarVector(30f, rot1 + .65f) + correction;
         Vector2 pos2 = Projectile.Center + PolarVector(30f, rot2 - .65f) + correction;
 
-        Main.EntitySpriteDraw(limb1, pos1 - Main.screenPosition, null, color, rot1, limb1.Size() * .5f, Projectile.scale, 0);
-        Main.EntitySpriteDraw(limb2, pos2 - Main.screenPosition, null, color, rot2, limb2.Size() * .5f, Projectile.scale, 0);
+        Main.EntitySpriteDraw(limb1, pos1 - Main.screenPosition, null, color, rot1, limb1.Size() * .5f,
+            Projectile.scale, 0);
+        Main.EntitySpriteDraw(limb2, pos2 - Main.screenPosition, null, color, rot2, limb2.Size() * .5f,
+            Projectile.scale, 0);
 
         return false;
     }

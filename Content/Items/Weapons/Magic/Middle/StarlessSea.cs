@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using CalamityMod.Items.Materials;
-using CalamityMod.Items.Placeables.Abyss;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
@@ -82,8 +80,7 @@ public class StarlessSea : ModItem
         recipe.AddIngredient(ItemID.Ectoplasm, 12);
         recipe.AddIngredient(ItemID.LihzahrdBrick, 25);
         recipe.AddIngredient(ItemID.RainCloud, 100);
-        recipe.AddIngredient(ModContent.ItemType<Lumenyl>(), 14);
-        recipe.AddIngredient(ModContent.ItemType<AbyssGravel>(), 150);
+        //TODO
         recipe.AddTile(TileID.MythrilAnvil);
         recipe.Register();
     }

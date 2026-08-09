@@ -34,13 +34,16 @@ public class TripleKatanas : ModItem
 
     public override bool CanShoot(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
 
-    public override bool AltFunctionUse(Player player) => player.ownedProjectileCounts[ModContent.ProjectileType<KatanaSweep>()] <= 0;
+    public override bool AltFunctionUse(Player player) =>
+        player.ownedProjectileCounts[ModContent.ProjectileType<KatanaSweep>()] <= 0;
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback)
     {
         if (player.altFunctionUse == 2)
         {
-            player.NewPlayerProj(position, velocity, ModContent.ProjectileType<KatanaSweep>(), damage, knockback, player.whoAmI);
+            player.NewPlayerProj(position, velocity, ModContent.ProjectileType<KatanaSweep>(), damage, knockback,
+                player.whoAmI);
         }
         else
             player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI);

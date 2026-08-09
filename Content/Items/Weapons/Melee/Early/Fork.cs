@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using CalamityMod;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -24,13 +23,13 @@ public class Fork : ModItem
         Item.knockBack = 1;
         Item.autoReuse = true;
         Item.damage = 25;
-        Item.DamageType = ModContent.GetInstance<TrueMeleeDamageClass>();
+        Item.DamageType = ModContent.GetInstance<MeleeNoSpeedDamageClass>();
         Item.noMelee = true;
         Item.noUseGraphic = true;
         Item.shoot = ModContent.ProjectileType<ForkStab>();
         Item.shootSpeed = 4f;
     }
-    
+
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
         tooltips.ColorLocalization(new Color(100, 100, 100));
@@ -38,7 +37,8 @@ public class Fork : ModItem
 
     public override bool CanUseItem(Player player) => player.ownedProjectileCounts[Item.shoot] <= 0;
 
-    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+    public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
+        int type, int damage, float knockback)
     {
         Projectile.NewProjectile(source, position, velocity, type, damage, knockback, player.whoAmI);
         return false;

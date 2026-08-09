@@ -1,5 +1,4 @@
-﻿using CalamityMod;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -20,6 +19,7 @@ public class EnchantedShield : ModProjectile
     public NPC Target => NPCTargeting.MinionHoming(new(Projectile.Center, 900), Owner);
 
     public const float ReelBackTime = 50f;
+
     public override void SetStaticDefaults()
     {
         Main.projFrames[Type] = 1;
@@ -47,22 +47,27 @@ public class EnchantedShield : ModProjectile
         Projectile.localNPCHitCooldown = 20;
         Projectile.netImportant = true;
     }
+
     public override bool MinionContactDamage() => true;
     public override bool? CanCutTiles() => false;
 
     public ref float Timer => ref Projectile.ai[0];
     public ref float State => ref Projectile.ai[1];
+
     public bool HasHitTarget
     {
         get => Projectile.ai[2] == 1f;
         set => Projectile.ai[2] = value.ToInt();
     }
+
     public ref float Counter => ref Projectile.AdditionsInfo().ExtraAI[0];
+
     public bool PlayedSound
     {
         get => Projectile.AdditionsInfo().ExtraAI[1] == 1f;
         set => Projectile.AdditionsInfo().ExtraAI[1] = value.ToInt();
     }
+
     public bool Init
     {
         get => Projectile.AdditionsInfo().ExtraAI[2] == 1f;
@@ -76,6 +81,7 @@ public class EnchantedShield : ModProjectile
             Owner.ClearBuff(ModContent.BuffType<FlockOfShields>());
             return false;
         }
+
         if (Owner.HasBuff(ModContent.BuffType<FlockOfShields>()))
             Projectile.timeLeft = 2;
         return true;
@@ -97,7 +103,8 @@ public class EnchantedShield : ModProjectile
             Projectile.Kill();
 
         after ??= new(8, () => Projectile.Center);
-        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0, 255));
+        after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0,
+            255));
 
         if (Target != null)
             Charge();
@@ -128,6 +135,7 @@ public class EnchantedShield : ModProjectile
         {
             Projectile.velocity = (Projectile.velocity * 37f + Projectile.SafeDirectionTo(origin) * 17f) / 40f;
         }
+
         if (!Projectile.WithinRange(origin, 1200f))
         {
             Projectile.position = origin;
@@ -154,7 +162,8 @@ public class EnchantedShield : ModProjectile
         float distance = Target.Size.Length() + 100;
         float rot = .97f;
         rot = MathHelper.Pi;
-        Vector2 spawnOffset = Vector2.UnitY.RotatedBy(MathHelper.Lerp(-rot, rot, Projectile.whoAmI % 16f / 16f)) * distance;
+        Vector2 spawnOffset = Vector2.UnitY.RotatedBy(MathHelper.Lerp(-rot, rot, Projectile.whoAmI % 16f / 16f)) *
+                              distance;
         if (Projectile.whoAmI * 113 % 2 == 1)
             spawnOffset *= -1f;
 
@@ -168,7 +177,8 @@ public class EnchantedShield : ModProjectile
         if (State == 0f)
         {
             PlayedSound = false;
-            Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(destination) * speed, 0.11f);
+            Projectile.velocity =
+                Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(destination) * speed, 0.11f);
             if (Projectile.WithinRange(destination, Projectile.velocity.Length() * 1.35f))
             {
                 // Reel back
@@ -177,6 +187,7 @@ public class EnchantedShield : ModProjectile
                 Projectile.netUpdate = true;
             }
         }
+
         // Slow down
         if (State == 1f)
         {
@@ -193,12 +204,14 @@ public class EnchantedShield : ModProjectile
                 Projectile.netUpdate = true;
             }
         }
+
         if (State == 2f)
         {
             // Make pretty trail sparks
             if (!HasHitTarget)
             {
-                ParticleRegistry.SpawnSparkParticle(Projectile.RandAreaInEntity(), -Projectile.velocity * Main.rand.NextFloat(.1f, .4f), 20, .3f, Color.AntiqueWhite);
+                ParticleRegistry.SpawnSparkParticle(Projectile.RandAreaInEntity(),
+                    -Projectile.velocity * Main.rand.NextFloat(.1f, .4f), 20, .3f, Color.AntiqueWhite);
             }
 
             // Manage hitting of a target
@@ -241,16 +254,20 @@ public class EnchantedShield : ModProjectile
         for (int i = 0; i < 20; i++)
         {
             Vector2 vel = -Projectile.velocity.RotatedByRandom(.3f) * Main.rand.NextFloat(.33f, 1f);
-            ParticleRegistry.SpawnMistParticle(pos, vel, Main.rand.NextFloat(.4f, .8f), Color.DarkGray, Color.Black, 160);
-            Dust.NewDustPerfect(pos, DustID.Stone, vel * Main.rand.NextFloat(.2f, .5f), 0, default, Main.rand.NextFloat(.7f, 1.4f));
+            ParticleRegistry.SpawnMistParticle(pos, vel, Main.rand.NextFloat(.4f, .8f), Color.DarkGray, Color.Black,
+                160);
+            Dust.NewDustPerfect(pos, DustID.Stone, vel * Main.rand.NextFloat(.2f, .5f), 0, default,
+                Main.rand.NextFloat(.7f, 1.4f));
         }
 
-        ParticleRegistry.SpawnSparkleParticle(pos, Vector2.Zero, Main.rand.Next(14, 18), Main.rand.NextFloat(1f, 2f), Color.White, Color.Gray);
+        ParticleRegistry.SpawnSparkleParticle(pos, Vector2.Zero, Main.rand.Next(14, 18), Main.rand.NextFloat(1f, 2f),
+            Color.White, Color.Gray);
 
         SoundEngine.PlaySound(SoundID.Tink with { Volume = 1.2f, Pitch = -Main.rand.NextFloat(.34f, .41f) }, pos);
     }
 
     public FancyAfterimages after;
+
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D texture = Projectile.ThisProjectileTexture();
@@ -264,7 +281,8 @@ public class EnchantedShield : ModProjectile
             Projectile.DrawProjectileBackglow(Color.Tan, interpol * 10f, 90, 12);
         }
 
-        Main.EntitySpriteDraw(texture, drawPosition, frame, Projectile.GetAlpha(Color.White), Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, 0, 0);
+        Main.EntitySpriteDraw(texture, drawPosition, frame, Projectile.GetAlpha(Color.White), Projectile.rotation,
+            frame.Size() * 0.5f, Projectile.scale, 0, 0);
         if (State == 2f && HasHitTarget == false)
             after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [lightColor], Projectile.Opacity);
         return false;

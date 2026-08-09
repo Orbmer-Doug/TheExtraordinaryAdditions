@@ -40,9 +40,9 @@ public partial class Asterlin
 
     public static int Cleave_MaxCycles => DifficultyBasedValue(6, 7, 8);
 
-    public static int Cleave_HammerReelTime => DifficultyBasedValue(CalUtils.SecondsToFrames(1.4f),
-        CalUtils.SecondsToFrames(1.2f), CalUtils.SecondsToFrames(1f), CalUtils.SecondsToFrames(.8f),
-        CalUtils.SecondsToFrames(.6f));
+    public static int Cleave_HammerReelTime => DifficultyBasedValue(SecondsToFrames(1.4f),
+        SecondsToFrames(1.2f), SecondsToFrames(1f), SecondsToFrames(.8f),
+        SecondsToFrames(.6f));
 
     public static float Cleave_DownAcceleration => 15f;
     public static float Cleave_MaxDownSpeed => 116f;
@@ -50,36 +50,36 @@ public partial class Asterlin
     public static int Cleave_PillarCount => 40;
     public static int Cleave_PillarWait => DifficultyBasedValue(30, 25, 20);
     public static float Cleave_PillarFallSpeed => DifficultyBasedValue(20f, 25f, 30f, 32f, 34f, 36f);
-    public static int Cleave_BreatheTime => CalUtils.SecondsToFrames(1.5f);
-    public static int Cleave_ThrowTime => CalUtils.SecondsToFrames(.85f);
+    public static int Cleave_BreatheTime => SecondsToFrames(1.5f);
+    public static int Cleave_ThrowTime => SecondsToFrames(.85f);
 
     public int Cleave_Cycle
     {
-        get => (int)ExtraAI[0];
+        get => (int) ExtraAI[0];
         set => ExtraAI[0] = value;
     }
 
     public bool Cleave_Diving
     {
-        get => (int)ExtraAI[1] == 1;
+        get => (int) ExtraAI[1] == 1;
         set => ExtraAI[1] = value.ToInt();
     }
 
     public int Cleave_Wait
     {
-        get => (int)ExtraAI[2];
+        get => (int) ExtraAI[2];
         set => ExtraAI[2] = value;
     }
 
     public bool Cleave_HitGround
     {
-        get => (int)ExtraAI[3] == 1;
+        get => (int) ExtraAI[3] == 1;
         set => ExtraAI[3] = value.ToInt();
     }
 
     public int Cleave_ThrowTimer
     {
-        get => (int)ExtraAI[4];
+        get => (int) ExtraAI[4];
         set => ExtraAI[4] = value;
     }
 
@@ -140,7 +140,7 @@ public partial class Asterlin
                             float speed = MathHelper.Lerp(Cleave_PillarFallSpeed, Cleave_PillarFallSpeed * 3, lerp);
 
                             int maxWait = -Cleave_PillarWait * i;
-                            int wait = (int)MathHelper.Lerp(maxWait, maxWait / 2f, lerp);
+                            int wait = (int) MathHelper.Lerp(maxWait, maxWait / 2f, lerp);
                             NPC.NewNPCProj(RotatedHitbox.Top + new Vector2(x, y), Vector2.Zero,
                                 ModContent.ProjectileType<LightPillar>(), MediumAttackDamage, 2f, ai0: wait,
                                 ai2: speed);
@@ -207,8 +207,8 @@ public partial class Asterlin
                         Vector2 vel = Vector2.UnitX * MathHelper.Lerp(-74f, 74f, completion);
                         if (vel == Vector2.Zero)
                             vel = Vector2.UnitX * 2f;
-                        int life = (int)MathHelper.Lerp(60, 80, Convert01To010(completion));
-                        float scale = (int)MathHelper.Lerp(.1f, 2f, Convert01To010(completion));
+                        int life = (int) MathHelper.Lerp(60, 80, Convert01To010(completion));
+                        float scale = (int) MathHelper.Lerp(.1f, 2f, Convert01To010(completion));
                         ParticleRegistry.SpawnGlowParticle(ground, vel, life, scale * 350f,
                             Color.OrangeRed.Lerp(Color.Gold, .4f));
                     }

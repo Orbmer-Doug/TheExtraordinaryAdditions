@@ -24,10 +24,10 @@ public struct RotatedRectangle : IEquatable<RotatedRectangle>
 
     public RotatedRectangle(Vector2 pos, Vector2 size, float rotation)
     {
-        X = (int)pos.X;
-        Y = (int)pos.Y;
-        Width = (int)size.X;
-        Height = (int)size.Y;
+        X = (int) pos.X;
+        Y = (int) pos.Y;
+        Width = (int) size.X;
+        Height = (int) size.Y;
         Rotation = rotation;
     }
 
@@ -35,12 +35,12 @@ public struct RotatedRectangle : IEquatable<RotatedRectangle>
     /// <param name="end">Will be <see cref="Top"/></param>
     public RotatedRectangle(float width, Vector2 start, Vector2 end)
     {
-        Width = (int)width;
-        Height = (int)start.Distance(end);
+        Width = (int) width;
+        Height = (int) start.Distance(end);
         Rotation = start.AngleTo(end) + MathHelper.PiOver2;
         Vector2 rot = PolarVector(Height / 2f, Rotation - MathHelper.PiOver2);
-        X = (int)(start.X - Width / 2f + rot.X);
-        Y = (int)(start.Y - Height / 2f + rot.Y);
+        X = (int) (start.X - Width / 2f + rot.X);
+        Y = (int) (start.Y - Height / 2f + rot.Y);
     }
 
     #endregion Constructors
@@ -91,64 +91,64 @@ public struct RotatedRectangle : IEquatable<RotatedRectangle>
     {
         Vector2 currentCenter = Center;
         Vector2 offset = position - currentCenter;
-        X = (int)(X + offset.X);
-        Y = (int)(Y + offset.Y);
+        X = (int) (X + offset.X);
+        Y = (int) (Y + offset.Y);
     }
 
     public void SetTopRight(Vector2 position)
     {
         Vector2 currentTopRight = TopRight;
         Vector2 offset = position - currentTopRight;
-        X = (int)(X + offset.X);
-        Y = (int)(Y + offset.Y);
+        X = (int) (X + offset.X);
+        Y = (int) (Y + offset.Y);
     }
 
     public void SetBottomLeft(Vector2 position)
     {
         Vector2 currentBottomLeft = BottomLeft;
         Vector2 offset = position - currentBottomLeft;
-        X = (int)(X + offset.X);
-        Y = (int)(Y + offset.Y);
+        X = (int) (X + offset.X);
+        Y = (int) (Y + offset.Y);
     }
 
     public void SetBottomRight(Vector2 position)
     {
         Vector2 currentBottomRight = BottomRight;
         Vector2 offset = position - currentBottomRight;
-        X = (int)(X + offset.X);
-        Y = (int)(Y + offset.Y);
+        X = (int) (X + offset.X);
+        Y = (int) (Y + offset.Y);
     }
 
     public void SetTop(Vector2 position)
     {
         Vector2 currentTop = Top;
         Vector2 offset = position - currentTop;
-        X = (int)(X + offset.X);
-        Y = (int)(Y + offset.Y);
+        X = (int) (X + offset.X);
+        Y = (int) (Y + offset.Y);
     }
 
     public void SetBottom(Vector2 position)
     {
         Vector2 currentBottom = Bottom;
         Vector2 offset = position - currentBottom;
-        X = (int)(X + offset.X);
-        Y = (int)(Y + offset.Y);
+        X = (int) (X + offset.X);
+        Y = (int) (Y + offset.Y);
     }
 
     public void SetLeft(Vector2 position)
     {
         Vector2 currentLeft = Left;
         Vector2 offset = position - currentLeft;
-        X = (int)(X + offset.X);
-        Y = (int)(Y + offset.Y);
+        X = (int) (X + offset.X);
+        Y = (int) (Y + offset.Y);
     }
 
     public void SetRight(Vector2 position)
     {
         Vector2 currentRight = Right;
         Vector2 offset = position - currentRight;
-        X = (int)(X + offset.X);
-        Y = (int)(Y + offset.Y);
+        X = (int) (X + offset.X);
+        Y = (int) (Y + offset.Y);
     }
 
     #endregion Positioning Methods
@@ -412,7 +412,7 @@ public struct RotatedRectangle : IEquatable<RotatedRectangle>
             Vector2 endPoint = corners[(i + 1) % corners.Length];
 
             float distance = Vector2.Distance(startPoint, endPoint);
-            int sampleCount = (int)(distance / sampleIncrement);
+            int sampleCount = (int) (distance / sampleIncrement);
             Vector2 direction = Vector2.Normalize(endPoint - startPoint);
 
             for (int j = 0; j <= sampleCount; j++)
@@ -451,7 +451,7 @@ public struct RotatedRectangle : IEquatable<RotatedRectangle>
             Vector2 endPoint = corners[(i + 1) % corners.Length];
 
             float distance = Vector2.Distance(startPoint, endPoint);
-            int sampleCount = (int)(distance / sampleIncrement);
+            int sampleCount = (int) (distance / sampleIncrement);
             Vector2 direction = Vector2.Normalize(endPoint - startPoint);
 
             for (int j = 0; j <= sampleCount; j++)

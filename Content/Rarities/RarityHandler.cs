@@ -55,7 +55,7 @@ public class CustomRaritySystem : ModSystem
     public static void GetTextDimensions(in DrawableTooltipLine line, out Vector2 size, out Rectangle rect)
     {
         size = line.Font.MeasureString(line.Text);
-        rect = new(-(int)(size.X * 0.5f), -(int)(size.Y * 0.5f), (int)size.X, (int)(size.Y * .75f));
+        rect = new(-(int) (size.X * 0.5f), -(int) (size.Y * 0.5f), (int) size.X, (int) (size.Y * .75f));
     }
 
     public static readonly Texture2D GlowTexture = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
@@ -82,7 +82,7 @@ public class CustomRaritySystem : ModSystem
             glowColor * .85f, 0f, glowTexture.Size() / 2f);
 
         // Get an offset to the afterimageOffset based on a sine wave.
-        float sine = (float)((1 + Math.Sin(Main.GlobalTimeWrappedHourly * 2.5f)) / 2);
+        float sine = (float) ((1 + Math.Sin(Main.GlobalTimeWrappedHourly * 2.5f)) / 2);
         float sineOffset = MathHelper.Lerp(0.5f, 1f, sine);
 
         // Draw text backglow effects.
@@ -191,7 +191,7 @@ public class CustomRaritySystem : ModSystem
                 continue;
 
             Behavior<RarityParticleInfo> particle =
-                (Behavior<RarityParticleInfo>)RuntimeHelpers.GetUninitializedObject(particleType);
+                (Behavior<RarityParticleInfo>) RuntimeHelpers.GetUninitializedObject(particleType);
 
             // Store an ID for the particle. All particles of this type that are spawned will copy the ID
             ParticleTypeLookup[particleType] = currentParticleID;

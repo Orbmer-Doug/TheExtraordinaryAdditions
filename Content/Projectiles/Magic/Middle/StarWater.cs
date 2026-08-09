@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.IO;
-using CalamityMod;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -25,6 +24,7 @@ public class StarWater : ModProjectile
     public Vector2 Offset;
     public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(Offset);
     public override void ReceiveExtraAI(BinaryReader reader) => Offset = reader.ReadVector2();
+
     public override void SetDefaults()
     {
         Projectile.width = 54;
@@ -50,21 +50,25 @@ public class StarWater : ModProjectile
 
     internal Color ColorFunction(SystemVector2 completionRatio, Vector2 position)
     {
-        return Color.Lerp(Color.DarkSlateBlue, Color.MidnightBlue, completionRatio.X) * UltrasmoothStep(1f, 0, completionRatio.X);
+        return Color.Lerp(Color.DarkSlateBlue, Color.MidnightBlue, completionRatio.X) *
+               UltrasmoothStep(1f, 0, completionRatio.X);
     }
 
     internal float WidthFunction(float completionRatio)
     {
-        return Projectile.width * 0.45f * MathHelper.SmoothStep(0.1f, 1f, Utils.GetLerpValue(0f, 0.3f, completionRatio, true));
+        return Projectile.width * 0.45f *
+               MathHelper.SmoothStep(0.1f, 1f, Utils.GetLerpValue(0f, 0.3f, completionRatio, true));
     }
 
     public override void AI()
     {
-        if (Owner == null || !Owner.active || Owner.HeldItem.type != ModContent.ItemType<StarlessSea>() || Main.bloodMoon)
+        if (Owner == null || !Owner.active || Owner.HeldItem.type != ModContent.ItemType<StarlessSea>() ||
+            Main.bloodMoon)
         {
             Projectile.Kill();
             return;
         }
+
         if (trail == null || trail.Disposed)
             trail = new(WidthFunction, ColorFunction, null, 20);
 
@@ -82,11 +86,13 @@ public class StarWater : ModProjectile
         else
         {
             Projectile.timeLeft = 400;
-            Projectile.Center = Vector2.Lerp(Projectile.Center, Vector2.Lerp(Owner.Center, Owner.Center + new Vector2(0f, -300f) + Offset, Completion), .75f);
+            Projectile.Center = Vector2.Lerp(Projectile.Center,
+                Vector2.Lerp(Owner.Center, Owner.Center + new Vector2(0f, -300f) + Offset, Completion), .75f);
             Projectile.Opacity = Completion;
             if (this.RunLocal())
             {
-                Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(ModdedOwner.MouseWorld + Offset) * 1.1f, .4f);
+                Projectile.velocity = Vector2.Lerp(Projectile.velocity,
+                    Projectile.SafeDirectionTo(ModdedOwner.MouseWorld + Offset) * 1.1f, .4f);
                 if (Projectile.velocity != Projectile.oldVelocity)
                     this.Sync();
             }
@@ -98,7 +104,8 @@ public class StarWater : ModProjectile
         {
             ParticleRegistry.SpawnBloomPixelParticle(Projectile.RotHitbox().RandomPoint(),
                 Main.rand.NextVector2Circular(3f, 3f) + -Projectile.velocity.ClampLength(0f, 2f),
-                Main.rand.Next(30, 40), Main.rand.NextFloat(.2f, .6f) * Projectile.Opacity, Color.DarkSlateBlue, Color.White, null, 1.2f);
+                Main.rand.Next(30, 40), Main.rand.NextFloat(.2f, .6f) * Projectile.Opacity, Color.DarkSlateBlue,
+                Color.White, null, 1.2f);
         }
 
         Time++;
@@ -107,15 +114,18 @@ public class StarWater : ModProjectile
     public override bool ShouldUpdatePosition() => Released;
     public override bool? CanDamage() => Released ? null : false;
     public float VelLength => Projectile.velocity.Length();
+
     public override bool OnTileCollide(Vector2 velocityChange)
     {
         if (VelLength > 3f)
         {
-            int amt = (int)MathHelper.Clamp(VelLength, 10f, 32f) / 2;
+            int amt = (int) MathHelper.Clamp(VelLength, 10f, 32f) / 2;
             for (int i = 0; i < amt; i++)
             {
-                Vector2 vel = -Projectile.velocity.RotatedByRandom(Main.rand.NextFloat(.2f, .45f)) * Main.rand.NextFloat(.4f, .85f);
-                ParticleRegistry.SpawnBloomLineParticle(Projectile.RotHitbox().RandomPoint(), vel, Main.rand.Next(20, 50), Main.rand.NextFloat(.5f, .7f), Color.MediumSlateBlue);
+                Vector2 vel = -Projectile.velocity.RotatedByRandom(Main.rand.NextFloat(.2f, .45f)) *
+                              Main.rand.NextFloat(.4f, .85f);
+                ParticleRegistry.SpawnBloomLineParticle(Projectile.RotHitbox().RandomPoint(), vel,
+                    Main.rand.Next(20, 50), Main.rand.NextFloat(.5f, .7f), Color.MediumSlateBlue);
             }
         }
 
@@ -130,20 +140,22 @@ public class StarWater : ModProjectile
 
         if (this.RunLocal() && Owner.HeldItem.type == ModContent.ItemType<StarlessSea>())
         {
-            int amt = (int)MathHelper.Clamp(VelLength, 1f, 14f);
+            int amt = (int) MathHelper.Clamp(VelLength, 1f, 14f);
             for (int i = 0; i < amt; i++)
             {
                 Vector2 pos = Projectile.Center;
                 Vector2 vel = -Projectile.velocity.RotatedByRandom(MathHelper.TwoPi);
                 vel *= Main.rand.NextFloat(.2f, .3f);
                 int proj = ModContent.ProjectileType<StarWaterBreak>();
-                Projectile.NewProj(pos, vel, proj, Projectile.damage / (amt + 10), Projectile.knockBack, Projectile.owner, 0f);
+                Projectile.NewProj(pos, vel, proj, Projectile.damage / (amt + 10), Projectile.knockBack,
+                    Projectile.owner, 0f);
             }
         }
     }
 
     public TrailPoints cache = new(6);
     public OptimizedPrimitiveTrail trail;
+
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
@@ -161,7 +173,8 @@ public class StarWater : ModProjectile
         Texture2D texture = Projectile.ThisProjectileTexture();
         Vector2 drawPosition = Projectile.Center - Main.screenPosition;
         SpriteEffects direction = Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
-        Main.EntitySpriteDraw(texture, drawPosition, null, Projectile.GetAlpha(Color.White), Projectile.rotation, texture.Size() * 0.5f, Projectile.scale, 0, 0);
+        Main.EntitySpriteDraw(texture, drawPosition, null, Projectile.GetAlpha(Color.White), Projectile.rotation,
+            texture.Size() * 0.5f, Projectile.scale, 0, 0);
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         return false;
     }

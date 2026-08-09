@@ -19,8 +19,8 @@ public class GlacialSpike : ProjOwnedByNPC<AuroraGuard>
 
     public override void SetDefaults()
     {
-        Projectile.width = (int)(70 * Scale);
-        Projectile.height = (int)(156 * Scale);
+        Projectile.width = (int) (70 * Scale);
+        Projectile.height = (int) (156 * Scale);
         Projectile.hostile = true;
         Projectile.friendly = false;
         Projectile.tileCollide = false;
@@ -30,7 +30,7 @@ public class GlacialSpike : ProjOwnedByNPC<AuroraGuard>
 
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
 

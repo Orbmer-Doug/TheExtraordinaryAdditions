@@ -17,7 +17,8 @@ public class JellyfishVro : ModProjectile, ILocalizedModType, IModType
     {
         Main.projFrames[Projectile.type] = 12;
         Main.projPet[Projectile.type] = true;
-        ProjectileID.Sets.CharacterPreviewAnimations[Projectile.type] = ProjectileID.Sets.SimpleLoop(0, Main.projFrames[Projectile.type], 6);
+        ProjectileID.Sets.CharacterPreviewAnimations[Projectile.type] =
+            ProjectileID.Sets.SimpleLoop(0, Main.projFrames[Projectile.type], 6);
     }
 
     public override void SetDefaults()
@@ -38,7 +39,8 @@ public class JellyfishVro : ModProjectile, ILocalizedModType, IModType
             Projectile.timeLeft = 2;
 
         float dist = Projectile.Center.Distance(Owner.Center);
-        Vector2 idealPosition = Owner.MountedCenter - Vector2.UnitY * MathHelper.Lerp(30f, 50f, Sin01(Time * .06f)) + Vector2.UnitX * Owner.direction * 40;
+        Vector2 idealPosition = Owner.MountedCenter - Vector2.UnitY * MathHelper.Lerp(30f, 50f, Sin01(Time * .06f)) +
+                                Vector2.UnitX * Owner.direction * 40;
         Vector2 goalVelocity = (idealPosition - Projectile.Center) * 0.03f;
 
         float approachAcceleration = 0.1f + MathF.Pow(InverseLerp(70, 0, dist), 2f) * 0.3f;

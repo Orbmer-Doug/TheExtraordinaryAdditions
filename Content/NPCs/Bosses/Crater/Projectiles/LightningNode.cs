@@ -1,5 +1,4 @@
 ﻿using System;
-using CalamityMod;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using TheExtraordinaryAdditions.Core.DataStructures;
@@ -27,19 +26,19 @@ public class LightningNode : ProjOwnedByNPC<Asterlin>
 
     public int Time
     {
-        get => (int)Projectile.ai[0];
+        get => (int) Projectile.ai[0];
         set => Projectile.ai[0] = value;
     }
 
     public bool Channeling
     {
-        get => (int)Projectile.ai[1] == 1;
+        get => (int) Projectile.ai[1] == 1;
         set => Projectile.ai[1] = value.ToInt();
     }
 
     public bool ChosePosition
     {
-        get => (int)Projectile.ai[2] == 1;
+        get => (int) Projectile.ai[2] == 1;
         set => Projectile.ai[2] = value.ToInt();
     }
 

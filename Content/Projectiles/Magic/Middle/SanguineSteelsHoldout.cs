@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using CalamityMod;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -20,7 +19,7 @@ public class SanguineSteelsHoldout : BaseHoldoutProjectile
 
     public int Wait
     {
-        get => (int)Projectile.ai[1];
+        get => (int) Projectile.ai[1];
         set => Projectile.ai[1] = value;
     }
 
@@ -29,7 +28,7 @@ public class SanguineSteelsHoldout : BaseHoldoutProjectile
 
     public int BoltWait
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[1];
+        get => (int) Projectile.AdditionsInfo().ExtraAI[1];
         set => Projectile.AdditionsInfo().ExtraAI[1] = value;
     }
 
@@ -108,7 +107,7 @@ public class SanguineSteelsHoldout : BaseHoldoutProjectile
                         Utils.Remap(i, 0, 3, 0f, MathHelper.TwoPi) + Rot);
                     Vector2 vel = pos.SafeDirectionTo(Modded.MouseWorld) * 12f;
                     Projectile.NewProj(pos, vel, ModContent.ProjectileType<VermillionDart>(),
-                        (int)(Projectile.damage / 4f), 0f,
+                        (int) (Projectile.damage / 4f), 0f,
                         Owner.whoAmI);
                 }
 
@@ -133,10 +132,10 @@ public class SanguineSteelsHoldout : BaseHoldoutProjectile
         effect.TrySetParameter("firstCol", Color.DarkRed.ToVector3());
         effect.TrySetParameter("secondCol", Color.BlueViolet.ToVector3());
         effect.TrySetParameter("time", rot);
-        effect.TrySetParameter("cosine", (float)Math.Cos(rot));
+        effect.TrySetParameter("cosine", (float) Math.Cos(rot));
         effect.TrySetParameter("opacity", 1.5f);
 
-        Main.spriteBatch.EnterShaderRegion(BlendState.Additive, effect.Effect);
+        Main.spriteBatch.EnterShaderRegion(effect.Effect, BlendState.Additive);
         Texture2D portal = AssetRegistry.GetTexture(AdditionsTexture.UnfathomablePortal);
 
         Main.spriteBatch.DrawBetterRect(portal,
@@ -148,15 +147,15 @@ public class SanguineSteelsHoldout : BaseHoldoutProjectile
         {
             float extra = Utils.Remap(i, 0, 3, 0f, MathHelper.TwoPi);
             Vector2 pos = Projectile.Center + PolarVector(PortalSize / 4 + ExtraPortalSize,
-                 extra + Rot);
-            
+                extra + Rot);
+
             Main.spriteBatch.DrawBetterRect(portal,
                 ToTarget(pos,
                     new Vector2(ExtraPortalSize)),
                 null, Color.DarkRed * Projectile.Opacity, -Projectile.rotation - extra, portal.Size() / 2);
         }
-        
-        Main.spriteBatch.ExitShaderRegion();
+
+        Main.spriteBatch.ResetToDefault();
 
         Projectile.DrawBaseProjectile(lightColor);
         return false;
@@ -180,6 +179,7 @@ public class VermillionDart : ModProjectile
     public ref float Time => ref Projectile.ai[0];
 
     public GlobalPlayer Modded => Main.player[Projectile.owner].Additions();
+
     public override void AI()
     {
         if (Time == 0f)
@@ -222,7 +222,7 @@ public class VermillionDart : ModProjectile
         Projectile.rotation = Projectile.velocity.ToRotation();
 
         if (Time % 10 == 0 && Projectile.damage < Projectile.originalDamage * 3)
-            Projectile.damage = (int)(Projectile.damage * 1.03f);
+            Projectile.damage = (int) (Projectile.damage * 1.03f);
         Time++;
     }
 
@@ -248,7 +248,11 @@ public class VermillionDart : ModProjectile
                 Color.Crimson * Projectile.Opacity, 0f, soft.Size() / 2);
 
             Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.LensStar);
-            after?.DrawFancyAfterimages(tex, [Color.Lerp(Color.DarkRed, Color.Crimson, InverseLerp(0f, Projectile.originalDamage * 3, Projectile.damage))], Projectile.Opacity, 1f, 0f,
+            after?.DrawFancyAfterimages(tex,
+                [
+                    Color.Lerp(Color.DarkRed, Color.Crimson,
+                        InverseLerp(0f, Projectile.originalDamage * 3, Projectile.damage))
+                ], Projectile.Opacity, 1f, 0f,
                 true);
         }
 

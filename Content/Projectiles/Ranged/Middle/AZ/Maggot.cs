@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using CalamityMod;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -11,6 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle.AZ;
 public class Maggot : ModProjectile
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Maggot);
+
     public override void SetDefaults()
     {
         Projectile.height = 22;
@@ -23,6 +23,7 @@ public class Maggot : ModProjectile
     }
 
     public ref float Time => ref Projectile.ai[0];
+
     private bool Homing
     {
         get => Projectile.ai[1] == 1;
@@ -30,6 +31,7 @@ public class Maggot : ModProjectile
     }
 
     public Player Owner => Main.player[Projectile.owner];
+
     public override void AI()
     {
         Time++;
@@ -41,25 +43,30 @@ public class Maggot : ModProjectile
 
         if (Time % 2f == 1f)
         {
-            ParticleRegistry.SpawnMistParticle(Projectile.Center, -Projectile.velocity.RotatedByRandom(.25f) * Main.rand.NextFloat(.2f, .5f),
+            ParticleRegistry.SpawnMistParticle(Projectile.Center,
+                -Projectile.velocity.RotatedByRandom(.25f) * Main.rand.NextFloat(.2f, .5f),
                 Main.rand.NextFloat(.5f, .8f), color, col * .1f, 190);
         }
 
-        if (Time > CalUtils.SecondsToFrames(2))
+        if (Time > SecondsToFrames(2))
         {
             Player player = Main.player[Player.FindClosest(Projectile.Center, Projectile.width, Projectile.height)];
-            if (CombinedHooks.CanHitPvpWithProj(Projectile, player) && player != Owner && player != null && PlayerLoader.CanHitPvpWithProj(Projectile, player))
+            if (CombinedHooks.CanHitPvpWithProj(Projectile, player) && player != Owner && player != null &&
+                PlayerLoader.CanHitPvpWithProj(Projectile, player))
             {
                 if (player.active)
                 {
-                    Projectile.velocity = Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(player.Center) * 15f, .05f);
+                    Projectile.velocity = Vector2.Lerp(Projectile.velocity,
+                        Projectile.SafeDirectionTo(player.Center) * 15f, .05f);
                 }
+
                 Homing = true;
             }
             else
             {
                 if (NPCTargeting.TryGetClosestNPC(new(Projectile.Center, 1000, true, false), out NPC target))
-                    Projectile.velocity = Vector2.SmoothStep(Projectile.velocity, Projectile.SafeDirectionTo(target.Center) * 15f, .05f);
+                    Projectile.velocity = Vector2.SmoothStep(Projectile.velocity,
+                        Projectile.SafeDirectionTo(target.Center) * 15f, .05f);
             }
         }
     }
@@ -79,7 +86,8 @@ public class Maggot : ModProjectile
         Rectangle frame = texture.Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame);
         Vector2 drawPosition = Projectile.Center - Main.screenPosition;
         SpriteEffects effects = 0;
-        Main.EntitySpriteDraw(texture, drawPosition, frame, Projectile.GetAlpha(TankHeadHoldout.GetTeamColor(Owner)), Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, effects, 0);
+        Main.EntitySpriteDraw(texture, drawPosition, frame, Projectile.GetAlpha(TankHeadHoldout.GetTeamColor(Owner)),
+            Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, effects, 0);
         return false;
     }
 }
