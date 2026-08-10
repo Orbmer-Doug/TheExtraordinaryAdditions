@@ -54,7 +54,7 @@ public class TripleKatanas : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        recipe.AddIngredient(ModContent.ItemType<ImpureAstralKatanas>(), 1);
+        //TODO
         recipe.AddIngredient(ItemID.Silk, 7);
         recipe.AddIngredient(ItemID.SoulofSight, 12);
         recipe.AddIngredient(ItemID.LunarBar, 16);

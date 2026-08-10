@@ -59,7 +59,7 @@ public class BeanBurrito : ModItem
         int amount = 1;
         float radians = 0f;
         float multiplier = 1f;
-        if (player.GetModPlayer<AshersWhiteTiePlayer>().Equipped || player.GetModPlayer<TungstenTiePlayer>().Equipped)
+        if (player.GetModPlayer<AshersWhiteTiePlayer>().Equipped)
         {
             amount = 4;
             radians = .15f;

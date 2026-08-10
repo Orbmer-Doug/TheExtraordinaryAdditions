@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Terraria;
 using Terraria.DataStructures;
@@ -563,8 +564,161 @@ public class FinalStrikeHoldout : ModProjectile
     }
 }
 
+
+public class Streaks : ModProjectile
+{
+    public const int Life = 75;
+    public ref float Time => ref Projectile.ai[0];
+    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SeamStrike);
+
+    public override void SetDefaults()
+    {
+        Projectile.width = 600;
+        Projectile.height = 40;
+        Projectile.friendly = true;
+        Projectile.DamageType = DamageClass.Melee;
+        Projectile.ignoreWater = true;
+        Projectile.tileCollide = false;
+        Projectile.penetrate = -1;
+        Projectile.Opacity = 1f;
+        Projectile.timeLeft = Life;
+        Projectile.MaxUpdates = 4;
+        Projectile.usesLocalNPCImmunity = true;
+        Projectile.localNPCHitCooldown = 10;
+        Projectile.noEnchantmentVisuals = true;
+    }
+
+    public override void AI()
+    {
+        Projectile.rotation = Projectile.velocity.ToRotation();
+        Time++;
+    }
+
+    public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+    {
+        return Projectile.RotHitbox().Intersects(targetHitbox);
+    }
+
+    public override bool PreDraw(ref Color lightColor)
+    {
+        void draw()
+        {
+            Texture2D bloomTexture = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
+            float ratio = InverseLerp(0f, Life, Time);
+            float completion = Animators.MakePoly(2).OutFunction(ratio);
+            float opacity = 1f - Animators.MakePoly(2.5f).InFunction(ratio);
+            Color color = MulticolorLerp(InverseLerp(0f, 10f, Projectile.identity / 10f % 1),
+                Color.LightSteelBlue, Color.White, Color.WhiteSmoke, Color.FloralWhite, Color.LightSkyBlue) * opacity;
+
+            float x = Projectile.width * completion;
+            float y = Projectile.height * opacity;
+            Vector2 scale = new(x, y);
+            Vector2 bloomOrigin = bloomTexture.Size() / 2;
+
+            for (float i = .1f; i <= 2f; i += .1f)
+            {
+                Main.spriteBatch.Draw(bloomTexture, ToTarget(Projectile.Center, scale * i), null, color * (2f - i),
+                    Projectile.rotation, bloomOrigin, 0, 0f);
+            }
+        }
+
+        PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.UnderProjectiles, BlendState.Additive);
+        return false;
+    }
+}
+
+public class DivineLightning : ModProjectile
+{
+    public override string Texture => AssetRegistry.Invis;
+    public const int Life = 30;
+
+    public override void SetDefaults()
+    {
+        Projectile.width = Projectile.height = 16;
+        Projectile.friendly = true;
+        Projectile.tileCollide = false;
+        Projectile.ignoreWater = true;
+        Projectile.timeLeft = Life;
+        Projectile.DamageType = DamageClass.Ranged;
+        Projectile.penetrate = -1;
+        Projectile.usesLocalNPCImmunity = true;
+        Projectile.localNPCHitCooldown = -1;
+    }
+
+    public ref float Time => ref Projectile.ai[0];
+
+    public Vector2 End
+    {
+        get => new(Projectile.ai[1], Projectile.ai[2]);
+        set
+        {
+            Projectile.ai[1] = value.X;
+            Projectile.ai[2] = value.Y;
+        }
+    }
+
+    public float Completion => Animators.MakePoly(6).OutFunction(InverseLerp(0f, Life, Time));
+
+    private List<Line>[] Branches = [];
+    public override bool ShouldUpdatePosition() => false;
+
+    public override void AI()
+    {
+        if (Time == 0f)
+            Branches = CreateLightningBranch(Projectile.Center, End, 0, 2f, 0f,
+                Main.rand.NextFloat(40f, 80f)).ToArray();
+
+        Projectile.Opacity = 1f - Completion;
+        if (Projectile.Opacity.BetweenNum(0f, .05f))
+            Projectile.Kill();
+
+        Time++;
+    }
+
+    public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+    {
+        Projectile.damage = (int) (Projectile.damage * .75f);
+    }
+
+    public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+    {
+        foreach (List<Line> list in Branches)
+        {
+            foreach (Line line in list)
+            {
+                const int width = 8;
+                if (new Rectangle((int) line.A.X - width / 2, (int) line.A.Y - width / 2, width, width).Intersects(
+                        targetHitbox))
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    public override bool PreDraw(ref Color lightColor)
+    {
+        if (Branches == null || Branches.Length == 0)
+            return false;
+
+        foreach (List<Line> list in Branches)
+        {
+            foreach (Line line in list)
+            {
+                PixelationSystem.QueueTextureRenderAction(() =>
+                    line.Draw(MulticolorLerp(Completion, Color.White, Color.AntiqueWhite, Color.WhiteSmoke)
+                              * Projectile.Opacity), PixelationLayer.OverNPCs, BlendState.Additive);
+            }
+        }
+
+        return false;
+    }
+}
+
 public sealed class FinalStrikePlayer : ModPlayer
 {
     public int Counter;
     public override void UpdateDead() => Counter = 0;
 }
+
+

@@ -31,7 +31,6 @@ public class AdditionsGlobalNPC : GlobalNPC
 
     public int VoidEnergy;
     public int Eclipsed;
-    public int Wavebreaked;
     public int StarKunai;
     public int Cursed;
 
@@ -70,7 +69,6 @@ public class AdditionsGlobalNPC : GlobalNPC
         AdditionsGlobalNPC myClone = (AdditionsGlobalNPC) Clone(npc, npcClone);
         myClone.PlasmaIncineration = PlasmaIncineration;
         myClone.VoidEnergy = VoidEnergy;
-        myClone.Wavebreaked = Wavebreaked;
         myClone.Eclipsed = Eclipsed;
         myClone.Cursed = Cursed;
         myClone.StarKunai = StarKunai;
@@ -98,12 +96,6 @@ public class AdditionsGlobalNPC : GlobalNPC
             const int plasmaIncineration = (int) 250.0;
             ApplyDPSDebuff(plasmaIncineration, plasmaIncineration, ref damage);
         }
-
-        if (Wavebreaked > 0)
-        {
-            const int torrential = (int) 180.0;
-            ApplyDPSDebuff(torrential, torrential, ref damage);
-        }
     }
 
     public override void PostAI(NPC npc)
@@ -113,9 +105,6 @@ public class AdditionsGlobalNPC : GlobalNPC
 
         if (VoidEnergy > 0)
             VoidEnergy--;
-
-        if (Wavebreaked > 0)
-            Wavebreaked--;
 
         if (StarKunai > 0)
             StarKunai--;
@@ -151,12 +140,6 @@ public class AdditionsGlobalNPC : GlobalNPC
             modifiers.FlatBonusDamage += 20;
             if (Main.rand.NextBool(5))
                 modifiers.SetCrit();
-        }
-
-        if (Wavebreaked > 0)
-        {
-            scaling += 0.15f;
-            modifiers.FlatBonusDamage += 35;
         }
 
         if (StarKunai > 0)

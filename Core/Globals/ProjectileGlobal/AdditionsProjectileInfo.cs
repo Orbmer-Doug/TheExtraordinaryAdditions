@@ -6,19 +6,6 @@ using Terraria.ModLoader.IO;
 
 namespace TheExtraordinaryAdditions.Core.Globals.ProjectileGlobal;
 
-/* look, i know some of this is incorrect but im not going to deal with the plausibility that some random projectile not from the mod is going to try to access
-   this global somehow and it crashes the game (plus it doesn't sound very pleasant to have to replace every single instance of extra ai in the entire mod)
-
-   from actual logs this is what i get after using the Etheral Claymore (or really anything) from a specific frame:
-   System.Collections.Generic.KeyNotFoundException: Acid Bubble (ID: 1260) is not registered in AdditionsProjectileInfo <-- Acid Bubble is from Calamity
-   at TheExtraordinaryAdditions.Core.Globals.GlobalExtensions.AdditionsInfo(Projectile projectile)
-   at TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle.EtherealSwing.get_FadeTimer()
-
-   its also not easily reputable.
-
-   i dont know if i just dont see a fix but any advice would be nice thanks
-*/
-
 public class AdditionsProjectileInfo : GlobalProjectile
 {
     public override bool InstancePerEntity => true;

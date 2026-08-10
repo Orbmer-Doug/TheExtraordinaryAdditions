@@ -52,7 +52,7 @@ public class TheTongue : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        recipe.AddIngredient(ModContent.ItemType<IchorWhip>(), 1);
+        //TODO
         recipe.AddIngredient(ItemID.SoulofFright, 12);
         recipe.AddTile(TileID.MythrilAnvil);
         recipe.Register();

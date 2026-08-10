@@ -1,0 +1,116 @@
+General:
+> Spice up mod panel
+> Resprite icon to something borderless (perhaps something that integrates with the panel)
+> i should totally add a physically accurate simulation of a hydrogen atoms electron field for no reason whatsoever in some inconspicuous place
+> wishes for linux-compat shader hot reloader that isn't bunnns
+> maaayyybbbeee use friflo but that's additional binary 
+
+UI:
+> Positioning is weird on different monitor resolutions and UI scale (i think cause it looks weird)
+
+Weapons:
+> All Post-ML weapons to be properly fit and tested against other mods with Post-ML content to ensure compat (namely MoR)
+    > Retiers undecided
+> Triple Katanas -> Post-Plant
+> Bat Lantern resprite into some grave-keeper "who gors there" ahh lantern that is held out and sways with movement + wind
+    > Move to post-skele
+    > Bats emerge from the lantern in unveiling infernos
+    > Bats chase after a controllable light source around the cursor (only visible to user)
+    > Does extra damage to tagged enemies
+> Brewing Storms hits instead charges the book, glowing with electric anticipation
+    > Right-Clicking causes the Terrarian to slap with the book like an improvised weapon
+    > This causes it to release an explosion of energies on hit that chain through 1 (2?) enemies (this encourages a back-and-forth playstyle and would likely create meta around wof due to crowd control ease)
+> Noxious Snare
+    > honestly just give nicer visuals
+> Hellfire
+    > Short-ranged, high power blast of flame
+    > Made with ashwood n' stuff
+> Starless Sea
+    > nicer easing?
+> Loose Sawblade
+    > No longer does the weird rouge thing
+    > Embedded blades can be hit by other blades, further digging them in and causing extra damage 
+> Hells Toothpick
+    > Does 3 consecutive jabs instead of whatever the hell its doing now
+> Bergcrusher
+    > Spins around 3 times while held from middle handle to create quick sniping snowflakes
+    > Then pulls out near pommel to do one downward cleave
+> Deepest Nadir
+    > releases lingering cosmiball sticks
+    > no longer multiple whips
+> Rebar
+    > wacky
+> Exingenedies
+    > remove that malicious gamma ray
+    > if wotg installed, added to nameless drop pool instead with no recipe
+> and so will come the glare of alsafi...
+
+Optimizations:
+> asterlins balls cause fps to drop for some reason lol
+> Use renderdoc for seeing what can be batched
+
+Bosses:
+> try to maximize dodging attacks over telegraphs? though this may be too drastic of reworks i'm unwilling to do, but at least i learned from it
+
+Asterlin:
+> asterlin is confirmed they/them guys
+> FIX TESSELESTIC ATTACK I HATE IT I HATE IT
+    > 8 nodes rotating around the player periodically zap across from each other
+    > are close but unharming so no line telegraphs needed
+    > staff is used at diagonals to throw 3 energy balls that erupt into pillars
+> sword becomes a hilt, instead coming out like a saber
+    > sky blue emission near hilt, cooler cyan backbone of blade, edge near tip hot white
+    > hilt is more dark tonal blue-gray steel with cyan specular
+    > add exponential fall-off bloom
+    > draw to a render target to add easy afterimages (gaussian blur for bloom merging?)
+> before sword swinging make sure it fully comes out (menacingly and dramatically) before swinging
+> for dicing make it a little like a memory game so its not just pure reaction
+    > larger spacing
+    > 2 at a time
+> for disintegration we BALLING
+    > throws a star in an arc to a position randomly above the player (in a fair region obv) and races toward it to damn spike it
+    > if it doesn't hit the player and hits the ground, lasers erupt
+> for lightripper predicts a line for a moment and begins to reel back, causing a screen distorting line to strengthen over time and then do a lightspeed chard
+    > this pushes the screen perpendicular to the beam and causes a cascade of darts
+> for gun throw out a mine field of the bombs first and head to some random location outside of it and then shoot
+    > bombs to have a little caridinal indicator and energy doesn't home
+> for hammer literally just have em throw it why are they crashing into the ground im crine (and do less cycles)
+> shorten the cutscene time oh my gah bruh
+> Might make an appearance in the main world after Golem trying to "scan" the area as if it is trying to find its mission
+> give power aura around asterlin to make them more auraful
+> wind pace should pick up on really strong attacks
+> Technic Transmitter:
+    > animated with place animation
+    > the first expedition there the transmitter materializes, hinting it hasn't been there and asterlin isn't just stupid
+> Asterlin is more protective of the orb and the fight starts by getting too close as they send it away
+    > it comes back to be fully absorbed in desp. to give reasonable power source 
+> instead of tv remote pet maybe placeable wall tv that can be cycled between channels
+    > the usual
+    > cosmic field
+    > other players
+> no more infinite flight... except
+> Desp.:
+    > Gains a solid """3D""" yellow shield that reflects projectiles (more believable than the current just ignoring damage. thinking akin to wotm apollo)
+    > actually looks like they are gaining power besides just the healthbar
+    > Not Kneeling
+    > Entire crater is lit ablaze and an updraft from the flames gives infinite flight
+        > if the fluids go Good then they could potentially be used, otherwise abuse particles ig
+    > then uhhhhhhhhhh bullet hell but like good like rabbit and steel good
+        > i just don't have enough mechanics introduced to warrant utilization of them, especially as an all-purpose kitchen sink mod
+        > boohoo it's insipid
+    > no hammer, instead big energy spike is used at end that is thrown into the ground to cause a big kaboom and end the ground flames, entering leaving state
+> Crater:
+    > trim width x height, too big rn
+    > base is variated with charred dirt and rock formations, pure ash at the center
+    > should act as a limited arena
+
+
+Stygain:
+> Add an ambient background object post-golem kind of like the eyes
+> turn crimson beetle into an actual bug (unconsumable still) that is released and flutters up to the sky
+    > reduces confusion with the current held-down item style
+> blood moon:
+    > higher spawns
+    > blood vortexes that suck in enemies but have dangerous tendril attacks (implies stygain gaining mass and such)
+    > darker vignette?
+    > moon gets brighter on stygain's blood beacon

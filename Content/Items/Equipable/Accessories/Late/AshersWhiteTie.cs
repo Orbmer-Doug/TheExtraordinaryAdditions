@@ -31,9 +31,6 @@ public class AshersWhiteTie : ModItem, ILocalizedModType, IModType
 
     public override void UpdateAccessory(Player player, bool hideVisual)
     {
-        if (!player.GetModPlayer<TungstenTiePlayer>().Equipped)
-            player.GetModPlayer<AshersWhiteTiePlayer>().Equipped = true;
-
         if (!Main.rand.NextBool(15))
             return;
 
@@ -79,7 +76,7 @@ public sealed class AshersWhiteTiePlayer : ModPlayer
     public override bool PreKill(double damage, int hitDirection, bool pvp, ref bool playSound, ref bool genDust,
         ref PlayerDeathReason damageSource)
     {
-        if (Equipped && !Player.HasBuff<TheTiesCooldown>() && !Player.GetModPlayer<TungstenTiePlayer>().Equipped)
+        if (Equipped && !Player.HasBuff<TheTiesCooldown>())
         {
             AdditionsSound.etherealNuhUh.Play(Player.Center);
             for (int l = 0; l < 50; l++)

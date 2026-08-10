@@ -58,7 +58,6 @@ public class DeepestNadir : ModItem
         recipe.AddIngredient(ItemID.FireWhip, 1);
         recipe.AddIngredient(ModContent.ItemType<Atorcoppe>(), 1);
         recipe.AddIngredient(ItemID.CoolWhip, 1);
-        recipe.AddIngredient(ModContent.ItemType<IchorWhip>(), 1);
         recipe.AddIngredient(ItemID.SwordWhip, 1);
         recipe.AddIngredient(ItemID.MaceWhip, 1);
         recipe.AddIngredient(ModContent.ItemType<EclipsedDuo>(), 1);

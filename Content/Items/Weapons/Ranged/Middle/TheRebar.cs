@@ -8,6 +8,7 @@ using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 
+//TODO
 public class TheRebar : ModItem
 {
     public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Rebar);

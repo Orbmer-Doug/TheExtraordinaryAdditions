@@ -1,0 +1,20 @@
+This mod will no longer require Calamity as a dependency, as it should have been.
+
+Resprited:
+
+Retiered:
+
+Removed:
+- Ichor Whip
+- Rended Star
+- Torrential Tides
+- Cosmireaper
+- Ethereal Claymore
+- Ice Mist Staff
+- Impure Astral Katanas
+- Tidal Deluge
+- Divine Spirit Catalyst
+- Tungsten Tie
+- Ancient Boon
+- Avragen
+- Void Debuff

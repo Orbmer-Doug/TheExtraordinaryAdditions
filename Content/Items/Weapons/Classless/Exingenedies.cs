@@ -175,7 +175,6 @@ public class Exingenedies : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        recipe.AddIngredient(ModContent.ItemType<DivineSpiritCatalyst>(), 1);
         //TODO
         recipe.Register();
     }
