@@ -55,13 +55,13 @@ public class HolySwordSwing : BaseSwordSwing
     public Vector2 LightPos => Owner.Center - Vector2.UnitY * Main.screenHeight / 2;
     public const float LightWidth = .3f;
 
-    public override bool CanHitPvp(Player target) => SwingCompletion is > ReelPercent and SwingPercent && !Mark;
+    public override bool CanHitPvp(Player target) => SwingCompletion is > ReelPercent and < SwingPercent && !Mark;
 
     public override bool? CanHitNPC(NPC target) =>
-        SwingCompletion is > ReelPercent and SwingPercent && !Mark ? null : false;
+        SwingCompletion is > ReelPercent and < SwingPercent && !Mark ? null : false;
 
     public override bool? CanCutTiles() =>
-        SwingCompletion is > ReelPercent and SwingPercent && !Mark ? null : false;
+        SwingCompletion is > ReelPercent and < SwingPercent && !Mark ? null : false;
 
     public override void SafeInitialize()
     {
@@ -94,7 +94,7 @@ public class HolySwordSwing : BaseSwordSwing
                 AssetRegistry.GennedSounds.BreakerSwingSpecial.Play(Projectile.Center, Main.rand.NextFloat(.9f, 1.3f),
                     0f, .3f);
             else
-                AssetRegistry.GennedSounds.Heavenly.Play(Projectile.Center, .9f);
+                AssetRegistry.GennedSounds.Heavenly.Play(Projectile.Center, .8f, 0f, .1f);
 
             PlayedSound = true;
         }
@@ -132,7 +132,7 @@ public class HolySwordSwing : BaseSwordSwing
                 foreach (NPC npc in Main.ActiveNPCs)
                 {
                     if (npc.CanHomeInto() && npc.GetGlobalNPC<HolyGlobalNPC>().MarkedTime > 0)
-                        count += (npc.boss ? 2 : 1);
+                        count += npc.boss ? 2 : 1;
                 }
 
                 const int maxDarts = 8;

@@ -549,13 +549,13 @@ public class FinalStrikeHoldout : ModProjectile
             size.Y += MathF.Sin(StateTime * .04f) * 10f * i;
             if (CurrentState == FinalStrikeState.Stab)
                 size = new(60f * i * Bump);
-            Rectangle target = ToTarget(Projectile.RotHitbox().TopRight, size);
+            Rectangle target = ToTarget(Projectile.RotHitbox(Vector2.One / 2f).TopRight, size);
             Vector2 orig = flare.Size() / 2f;
             float rot = Projectile.rotation - PiOver4;
             SpriteBatch.DrawRectPixelated(PixelationLayer.OverProjectiles, BlendState.Additive, flare, target, null,
                 Color.AntiqueWhite, rot, orig);
         }
-
+        
         return false;
     }
 }

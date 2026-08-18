@@ -897,7 +897,7 @@ public static class MathUtils
     /// <remarks>Due to terraria's updating, this should only be used in a update method</remarks>
     public static RotatedRectangle RotHitbox(this Entity entity, float rotation, Vector2? pivot = null)
     {
-        Point point = (entity.position + entity.velocity).ToPoint();
+        Point point = (entity.Center + entity.velocity).ToPoint();
         return new Rectangle(point.X, point.Y, entity.width, entity.height).ToRotated(rotation,
             pivot ?? Vector2.One / 2);
     }
@@ -905,7 +905,7 @@ public static class MathUtils
     /// <inheritdoc cref="RotHitbox(Entity, float, Vector2?)"></inheritdoc>
     public static RotatedRectangle RotHitbox(this Projectile projectile, Vector2? pivot = null)
     {
-        Point point = (projectile.position + projectile.velocity).ToPoint();
+        Point point = (projectile.Center + projectile.velocity).ToPoint();
         return new Rectangle(point.X, point.Y, (int) (projectile.width * projectile.scale),
             (int) (projectile.height * projectile.scale)).ToRotated(projectile.rotation, pivot ?? Vector2.One / 2);
     }
@@ -913,33 +913,33 @@ public static class MathUtils
     /// <inheritdoc cref="RotHitbox(Entity, float, Vector2?)"></inheritdoc>
     public static RotatedRectangle RotHitbox(this NPC npc, Vector2? pivot = null)
     {
-        Point point = (npc.position + npc.velocity).ToPoint();
+        Point point = (npc.Center + npc.velocity).ToPoint();
         return new Rectangle(point.X, point.Y, npc.width, npc.height).ToRotated(npc.rotation, pivot ?? Vector2.One / 2);
     }
 
     /// <inheritdoc cref="RotHitbox(Entity, float, Vector2?)"></inheritdoc>
     public static RotatedRectangle RotHitbox(this Player player, Vector2? pivot = null)
     {
-        Point point = (player.position + player.velocity).ToPoint();
+        Point point = (player.Center + player.velocity).ToPoint();
         return new Rectangle(point.X, point.Y, player.width, player.height).ToRotated(player.fullRotation,
             pivot ?? Vector2.One / 2);
     }
 
     public static RotatedRectangle BaseRotHitbox(this Projectile projectile, Vector2? pivot = null) =>
-        new Rectangle((int) projectile.position.X, (int) projectile.position.Y,
+        new Rectangle((int) projectile.Center.X, (int) projectile.Center.Y,
                 (int) (projectile.width * projectile.scale), (int) (projectile.height * projectile.scale))
             .ToRotated(projectile.rotation, pivot ?? Vector2.One / 2);
 
     public static RotatedRectangle BaseRotHitbox(this Entity entity, float rotation, Vector2? pivot = null) =>
-        new Rectangle((int) entity.position.X, (int) entity.position.Y, entity.width, entity.height)
+        new Rectangle((int) entity.Center.X, (int) entity.Center.Y, entity.width, entity.height)
             .ToRotated(rotation, pivot ?? Vector2.One / 2);
 
     public static RotatedRectangle BaseRotHitbox(this NPC npc, Vector2? pivot = null) =>
-        new Rectangle((int) npc.position.X, (int) npc.position.Y, npc.width, npc.height).ToRotated(npc.rotation,
+        new Rectangle((int) npc.Center.X, (int) npc.Center.Y, npc.width, npc.height).ToRotated(npc.rotation,
             pivot ?? Vector2.One / 2);
 
     public static RotatedRectangle BaseRotHitbox(this Player player, Vector2? pivot = null) =>
-        new Rectangle((int) player.position.X, (int) player.position.Y, player.width, player.height).ToRotated(
+        new Rectangle((int) player.Center.X, (int) player.Center.Y, player.width, player.height).ToRotated(
             player.fullRotation, pivot ?? Vector2.One / 2);
 
     #endregion

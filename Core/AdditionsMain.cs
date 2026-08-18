@@ -6,11 +6,25 @@ using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.CrossCompatibility;
+using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Netcode;
 using TheExtraordinaryAdditions.Core.Systems;
 
 namespace TheExtraordinaryAdditions.Core;
+
+public class debug : ModSystem
+{
+    public override void PostDrawTiles()
+    {
+        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState,
+            DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+        Vector2 start = Main.LocalPlayer.Center;
+        Vector2 end = Main.LocalPlayer.AdditionsMouse().MouseWorld;
+
+        Main.spriteBatch.End();
+    }
+}
 
 public class AdditionsMain : Mod
 {

@@ -1268,7 +1268,7 @@ public static class CollisionUtils
         for (int i = 0; i < poly1Count; i++)
         {
             Vector2 edge = polygon1[(i + 1) % poly1Count] - polygon1[i];
-            Vector2 axis = new(-edge.Y, edge.X); // Normal vector
+            Vector2 axis = edge.Perp(true); // Normal vector
 
             if (!IsOverlappingOnAxis(polygon1, polygon2, axis))
                 return false; // Found a separating axis
@@ -1279,7 +1279,7 @@ public static class CollisionUtils
         for (int i = 0; i < poly2Count; i++)
         {
             Vector2 edge = polygon2[(i + 1) % poly2Count] - polygon2[i];
-            Vector2 axis = new(-edge.Y, edge.X); // Normal vector
+            Vector2 axis = edge.Perp(true); // Normal vector
 
             if (!IsOverlappingOnAxis(polygon1, polygon2, axis))
                 return false; // Found a separating axis
@@ -1305,7 +1305,7 @@ public static class CollisionUtils
         float min = float.MaxValue;
         float max = float.MinValue;
 
-        foreach (var vertex in vertices)
+        foreach (Vector2 vertex in vertices)
         {
             float projection = Vector2.Dot(vertex, axis);
             min = Math.Min(min, projection);

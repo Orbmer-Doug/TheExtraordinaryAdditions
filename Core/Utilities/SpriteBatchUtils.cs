@@ -303,10 +303,24 @@ public static class SpriteBatchUtils
     public static Rectangle ToScreenTarget(Vector2 pos, Vector2 size) =>
         new((int) pos.X, (int) pos.Y, (int) size.X, (int) size.Y);
 
-    public static void RenderRect(this RotatedRectangle rect, bool subtract = true)
+    public static void RenderRect(this RotatedRectangle rect, Color? col = null)
     {
-        Texture2D pix = AssetRegistry.GennedTextures.Pixel;
-        Main.spriteBatch.DrawBetterRect(pix, rect.BaseRect, null, Color.White, rect.Rotation, rect.Pivot * pix.Size(),
-            0, subtract);
+        Rectangle destinationRectangle = new Rectangle(
+            (int)(rect.PivotPoint.X - Main.screenPosition.X),
+            (int)(rect.PivotPoint.Y - Main.screenPosition.Y),
+            rect.Width,
+            rect.Height
+        );
+
+        Main.spriteBatch.Draw(
+            AssetRegistry.GennedTextures.Pixel,
+            destinationRectangle,
+            null,
+            col ?? Color.White,
+            rect.Rotation,
+            rect.Pivot * AssetRegistry.GennedTextures.Pixel.Value.Size(),
+            SpriteEffects.None,
+            0f
+        );
     }
 }

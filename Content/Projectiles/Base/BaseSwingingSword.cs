@@ -235,7 +235,7 @@ public abstract class BaseSwordSwing : ModProjectile
         return Rect().Intersects(targetHitbox);
     }
 
-    public override bool? CanDamage() => SwingCompletion is >= .3f and <= .8f ? null : false;
+    public override bool? CanDamage() => SwingCompletion >= .3f && SwingCompletion <= .8f ? null : false;
 
     public override void CutTiles()
     {

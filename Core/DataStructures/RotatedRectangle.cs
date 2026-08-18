@@ -19,8 +19,11 @@ public struct RotatedRectangle
     /// <param name="size">The size of the rectangle</param>
     /// <param name="rotation">The rotation in radians</param>
     /// <param name="pivot">The [0, 1] value that determines where in the rectangle to rotate around</param>
-    public RotatedRectangle(Vector2 pos, Vector2 size, float rotation, Vector2 pivot)
+    /// <param name="adjustLocal">If the pivots local space should always rotate around <paramref name="pos"/></param>
+    public RotatedRectangle(Vector2 pos, Vector2 size, float rotation, Vector2 pivot, bool adjustLocal = true)
     {
+        if (adjustLocal)
+            pos -= size * pivot;
         X = (int) pos.X;
         Y = (int) pos.Y;
         Width = (int) size.X;
@@ -39,12 +42,12 @@ public struct RotatedRectangle
     {
         Width = (int) width;
         Height = (int) start.Distance(end);
-        float angle = start.AngleTo(end);
-        Rotation = angle - MathHelper.PiOver2;
-        Vector2 offset = PolarVector(width / 2f, angle + MathHelper.PiOver2);
-        X = (int) (start.X + offset.X);
-        Y = (int) (start.Y + offset.Y);
-        Pivot = Vector2.Zero;
+        Vector2 pivot = new Vector2(.5f, 1f);
+        Vector2 pos = start - new Vector2(Width, Height) * pivot;
+        X = (int) pos.X;
+        Y = (int) pos.Y;
+        Rotation = start.AngleTo(end) + MathHelper.PiOver2;
+        Pivot = pivot;
     }
 
     #endregion Constructors
@@ -62,7 +65,7 @@ public struct RotatedRectangle
 
     #region Private Helpers
 
-    private readonly Vector2 PivotPoint => new Vector2(X, Y) + Pivot * Size;
+    public readonly Vector2 PivotPoint => new Vector2(X, Y) + Pivot * Size;
 
     private readonly Vector2 RotateFromPivot(Vector2 localPoint)
     {
