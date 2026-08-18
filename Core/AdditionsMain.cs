@@ -13,19 +13,6 @@ using TheExtraordinaryAdditions.Core.Systems;
 
 namespace TheExtraordinaryAdditions.Core;
 
-public class debug : ModSystem
-{
-    public override void PostDrawTiles()
-    {
-        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState,
-            DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-        Vector2 start = Main.LocalPlayer.Center;
-        Vector2 end = Main.LocalPlayer.AdditionsMouse().MouseWorld;
-
-        Main.spriteBatch.End();
-    }
-}
-
 public class AdditionsMain : Mod
 {
     public static Mod Instance => ModContent.GetInstance<AdditionsMain>();

@@ -75,6 +75,25 @@ public class BrewingStormsHoldout : BaseIdleHoldoutProjectile
                     interpolant);
                 if (Projectile.oldVelocity != Projectile.velocity)
                     this.Sync();
+
+                if (Time % Item.useTime == Item.useTime - 1 && Modded.SafeMouseLeft.Current &&
+                    Item.CheckManaBetter(Owner, 3, true))
+                {
+                    SoundEngine.PlaySound(SoundID.DD2_LightningAuraZap with { PitchVariance = .1f }, Projectile.Center);
+                    for (int i = 0; i <= 1; i++)
+                    {
+                        Vector2 vel =
+                            Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(MathHelper.ToRadians(16)) *
+                            Item.shootSpeed;
+                        ParticleRegistry.SpawnLightningArcParticle(Projectile.Center,
+                            vel.RotatedByRandom(.25f).SafeNormalize(Vector2.Zero) * Main.rand.NextFloat(80f, 120f),
+                            Main.rand.Next(6, 8), Main.rand.NextFloat(.3f, .4f), Color.LightPink);
+
+                        Projectile.NewProj(Projectile.Center + vel, vel,
+                            ModContent.ProjectileType<LightningNimbusSparks>(),
+                            Item.damage, Item.knockBack, Owner.whoAmI);
+                    }
+                }
             }
 
             Projectile.Center = Center + Projectile.velocity * Projectile.width / 2f;
@@ -101,30 +120,13 @@ public class BrewingStormsHoldout : BaseIdleHoldoutProjectile
             Projectile.Center = Center + PolarVector(Projectile.width / 2f + dist, Projectile.rotation);
 
             if (SwingTime == MaxSwingTime / 2)
-                AssetRegistry.GennedSounds.IkeSpecial1A.Play(Projectile.Center, .9f, .2f, .3f);
+                AssetRegistry.GennedSounds.ElectricCast.Play(Projectile.Center, .6f, .1f, .3f);
         }
 
         Owner.ChangeDir(Projectile.direction);
 
         Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, Projectile.rotation);
 
-        if (this.RunLocal() && Time % Item.useTime == Item.useTime - 1 && Modded.SafeMouseLeft.Current &&
-            Item.CheckManaBetter(Owner, 3, true))
-        {
-            SoundEngine.PlaySound(SoundID.DD2_LightningAuraZap with { PitchVariance = .1f }, Projectile.Center);
-            for (int i = 0; i <= 1; i++)
-            {
-                Vector2 vel =
-                    Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(MathHelper.ToRadians(16)) *
-                    Item.shootSpeed;
-                ParticleRegistry.SpawnLightningArcParticle(Projectile.Center,
-                    vel.RotatedByRandom(.25f).SafeNormalize(Vector2.Zero) * Main.rand.NextFloat(80f, 120f),
-                    Main.rand.Next(6, 8), Main.rand.NextFloat(.3f, .4f), Color.LightPink);
-
-                Projectile.NewProj(Projectile.Center + vel, vel, ModContent.ProjectileType<LightningNimbusSparks>(),
-                    Item.damage, Item.knockBack, Owner.whoAmI);
-            }
-        }
 
         if (Main.rand.NextBool(2 + (int) Completion * 5))
         {
