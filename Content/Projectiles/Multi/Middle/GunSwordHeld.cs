@@ -7,7 +7,6 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;

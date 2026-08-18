@@ -6,7 +6,6 @@ using Terraria.IO;
 using Terraria.Localization;
 using Terraria.ModLoader.IO;
 using Terraria.WorldBuilding;
-using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain;
 using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Systems;

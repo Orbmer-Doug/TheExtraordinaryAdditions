@@ -4,7 +4,6 @@ using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
-using TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 

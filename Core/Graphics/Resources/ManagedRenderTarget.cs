@@ -3,7 +3,6 @@ using System.Diagnostics;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using TheExtraordinaryAdditions.Core.Graphics.Systems;
-using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Core.Graphics.Resources;
 

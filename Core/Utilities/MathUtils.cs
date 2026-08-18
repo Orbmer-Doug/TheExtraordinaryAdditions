@@ -8,7 +8,6 @@ using Terraria.GameContent.RGB;
 using Terraria.Utilities;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics.Systems;
-using static Terraria.Player;
 
 namespace TheExtraordinaryAdditions.Core.Utilities;
 

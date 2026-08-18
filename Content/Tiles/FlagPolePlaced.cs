@@ -8,7 +8,6 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 using TheExtraordinaryAdditions.Core;
-using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics.Simulations;
 
 namespace TheExtraordinaryAdditions.Content.Tiles;

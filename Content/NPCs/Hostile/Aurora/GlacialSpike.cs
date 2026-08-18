@@ -3,7 +3,6 @@ using System.IO;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using Utils = Terraria.Utils;

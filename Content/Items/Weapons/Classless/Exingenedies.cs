@@ -12,7 +12,6 @@ using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Late;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Late;
 using TheExtraordinaryAdditions.Content.Rarities;
-using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;

@@ -6,7 +6,6 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Summon;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;

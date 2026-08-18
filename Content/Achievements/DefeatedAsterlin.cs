@@ -1,6 +1,5 @@
 ﻿using Terraria.Achievements;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 using Asterlin = TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Asterlin;
 
 namespace TheExtraordinaryAdditions.Content.Achievements;

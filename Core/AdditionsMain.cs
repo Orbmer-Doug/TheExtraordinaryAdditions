@@ -6,7 +6,6 @@ using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.CrossCompatibility;
-using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Netcode;
 using TheExtraordinaryAdditions.Core.Systems;

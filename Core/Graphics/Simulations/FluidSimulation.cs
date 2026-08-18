@@ -1,11 +1,8 @@
 using System;
 using System.Collections.Generic;
-using Daybreak.Common.Rendering;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
-using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
 using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Graphics.Systems;
 

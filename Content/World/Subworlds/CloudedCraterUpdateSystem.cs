@@ -5,7 +5,6 @@ using Terraria.GameContent.Events;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Tools;
-using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 using TheExtraordinaryAdditions.Content.Projectiles.Misc;
 using TheExtraordinaryAdditions.Content.Tiles;
 using TheExtraordinaryAdditions.Core.Globals;

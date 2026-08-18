@@ -4,13 +4,11 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
-using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
@@ -134,7 +132,7 @@ public class LanikeaHoldout : BaseIdleHoldoutProjectile
         {
             AssetRegistry.GennedSounds.SniperShot.Play(Tip, .5f + .3f * ChargeProgress, 0f, .2f);
 
-            int amount = 7;
+            const int amount = 7;
 
             bool rand = Main.rand.NextBool();
             float val1 = rand ? 15f : 9f;

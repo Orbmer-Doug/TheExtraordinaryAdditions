@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics.Systems;
-using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 

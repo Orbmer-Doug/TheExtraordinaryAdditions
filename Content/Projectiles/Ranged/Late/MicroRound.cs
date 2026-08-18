@@ -1,7 +1,6 @@
 ﻿using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Utilities;
-using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 

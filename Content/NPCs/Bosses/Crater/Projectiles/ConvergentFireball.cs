@@ -5,7 +5,6 @@ using Terraria.DataStructures;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Assets.Audio;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Systems;

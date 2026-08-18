@@ -22,7 +22,6 @@ using TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Middle;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 using TheExtraordinaryAdditions.Content.NPCs.BossBars;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Netcode;
 using TheExtraordinaryAdditions.Core.Systems;

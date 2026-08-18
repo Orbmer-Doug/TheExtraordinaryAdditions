@@ -8,7 +8,6 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Pets;
 using TheExtraordinaryAdditions.Content.Items.Placeable;
 using TheExtraordinaryAdditions.Content.Items.Summon;
-using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain;
 using TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 using TheExtraordinaryAdditions.Core.Systems;

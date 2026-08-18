@@ -5,8 +5,6 @@ using TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Early;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
 using TheExtraordinaryAdditions.Content.Rarities;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
-using TheExtraordinaryAdditions.Core.Systems;
-using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Late;
 

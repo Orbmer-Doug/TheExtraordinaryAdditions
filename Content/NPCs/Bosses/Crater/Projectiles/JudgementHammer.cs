@@ -5,7 +5,6 @@ using Terraria.DataStructures;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;

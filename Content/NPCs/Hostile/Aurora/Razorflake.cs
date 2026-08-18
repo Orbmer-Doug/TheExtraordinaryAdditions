@@ -2,7 +2,6 @@
 using Terraria;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Graphics.Systems;
 

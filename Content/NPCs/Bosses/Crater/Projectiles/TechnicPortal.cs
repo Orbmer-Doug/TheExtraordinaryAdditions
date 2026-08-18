@@ -1,8 +1,6 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using Terraria;
+﻿using Terraria;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics.Resources;
-using TheExtraordinaryAdditions.Core.Graphics.Systems;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 

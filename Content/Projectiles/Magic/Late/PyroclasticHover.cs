@@ -6,7 +6,6 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Assets.Audio;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Late;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Graphics.Systems;
 

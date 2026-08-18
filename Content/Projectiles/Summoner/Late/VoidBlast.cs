@@ -1,10 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using System;
-using Terraria;
+﻿using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics.Meshes;
-using TheExtraordinaryAdditions.Core.Graphics.Resources;
-using TheExtraordinaryAdditions.Core.Graphics.Systems;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Late;
 

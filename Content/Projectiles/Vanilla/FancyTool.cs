@@ -13,7 +13,6 @@ using Terraria.ObjectData;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
 using TheExtraordinaryAdditions.Core.Globals.ProjectileGlobal;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;

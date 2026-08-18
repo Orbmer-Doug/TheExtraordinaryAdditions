@@ -1,6 +1,5 @@
 ﻿using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Buffs.Debuff;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
