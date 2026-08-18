@@ -1,225 +1,487 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Daybreak.Common.Features.Rarities;
+using Daybreak.Common.Rendering;
+using ReLogic.Graphics;
 using Terraria;
 using Terraria.ModLoader;
-using Terraria.ModLoader.Core;
 using Terraria.UI.Chat;
 using TheExtraordinaryAdditions.Core.Utilities;
+using SpriteBatchSnapshot = Daybreak.Common.Rendering.SpriteBatchSnapshot;
+using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace TheExtraordinaryAdditions.Content.Rarities;
 
-public abstract class Behavior<TInfo>
-    where TInfo : struct
-{
-    public abstract string TexturePath { get; }
-    public abstract void Update();
-    public abstract void Draw(SpriteBatch sb, Vector2 position, DrawableTooltipLine line = null);
-    public virtual bool UseAdditive => false;
-    public TInfo Info;
-}
-
-[StructLayout(LayoutKind.Auto)]
-public struct RarityParticleInfo(
-    Vector2 position,
-    Vector2 velocity,
-    int life,
-    float scale,
-    Color color,
-    float opacity,
-    float rotation)
-{
-    public Texture2D Texture;
-    public int Type;
-
-    public int Time;
-    public int Lifetime = life;
-    public float InitScale;
-    public float Scale = scale;
-    public float Rotation = rotation;
-    public Vector2 Position = position;
-    public Vector2 Velocity = velocity;
-    public float Opacity = opacity;
-    public Color DrawColor = color;
-
-    public readonly float TimeRatio => InverseLerp(0f, Lifetime, Time);
-}
-
 public class CustomRaritySystem : ModSystem
 {
-    public static void GetTextDimensions(in DrawableTooltipLine line, out Vector2 size, out Rectangle rect)
+    public override void OnModLoad()
     {
-        size = line.Font.MeasureString(line.Text);
-        rect = new(-(int) (size.X * 0.5f), -(int) (size.Y * 0.5f), (int) size.X, (int) (size.Y * .75f));
+        RarityParticles.RegisterAll();
     }
 
-    public static readonly Texture2D GlowTexture = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
-
-    public static void DrawTextWithGlow(DrawableTooltipLine line, Color glowColor, Color textOuterColor,
-        Color? textInnerColor = null, Texture2D glowTexture = null)
+    public static void GetTextDimensions(DynamicSpriteFont font, string text, Vector2 pos, out Vector2 size,
+        out Rectangle rect)
     {
-        textInnerColor ??= Color.Black;
-        glowTexture ??= GlowTexture;
-
-        string text = line.Text;
-        Vector2 textSize = line.Font.MeasureString(text);
-        Vector2 textCenter = textSize * 0.5f;
-        Vector2 textPosition = new(line.X, line.Y);
-
-        // Get the position to draw the glow behind the text.
-        Vector2 glowPosition = new(line.X + textCenter.X, line.Y + textCenter.Y / 1.5f);
-
-        // Get the scale of the glow texture based off of the text size.
-        glowColor.A = 0;
-
-        // Draw the glow texture.
-        Main.spriteBatch.DrawBetterRect(glowTexture, ToScreenTarget(glowPosition, textSize * 2.2f), null,
-            glowColor * .85f, 0f, glowTexture.Size() / 2f);
-
-        // Get an offset to the afterimageOffset based on a sine wave.
-        float sine = (float) ((1 + Math.Sin(Main.GlobalTimeWrappedHourly * 2.5f)) / 2);
-        float sineOffset = MathHelper.Lerp(0.5f, 1f, sine);
-
-        // Draw text backglow effects.
-        for (int i = 0; i < 12; i++)
-        {
-            Vector2 afterimageOffset = (MathHelper.TwoPi * i / 12f + Main.GlobalTimeWrappedHourly).ToRotationVector2() *
-                                       (2f * sineOffset);
-
-            ChatManager.DrawColorCodedString(Main.spriteBatch, line.Font, text,
-                (textPosition + afterimageOffset).RotatedBy(MathHelper.TwoPi * (i / 12)),
-                textOuterColor * 0.9f, line.Rotation, line.Origin, line.BaseScale);
-        }
-
-        // Draw the main inner text.
-        Color mainTextColor = Color.Lerp(glowColor, textInnerColor.Value, 0.9f);
-        ChatManager.DrawColorCodedString(Main.spriteBatch, line.Font, text,
-            textPosition, mainTextColor, line.Rotation, line.Origin, line.BaseScale);
+        size = font.MeasureString(text);
+        rect = new(0, 0, (int) size.X, (int) (size.Y * .75f));
     }
 
-    public static void DrawTextWithShader(DrawableTooltipLine line, Effect shader, Color textInnerColor)
+    public static void DrawTextWithShader(DynamicSpriteFont font, string text, Vector2 position, Color color,
+        float rotation,
+        Vector2 origin, Vector2 scale, Effect shader)
     {
-        string text = line.Text;
-        Vector2 textPosition = new(line.X, line.Y);
-
         Main.spriteBatch.End();
         Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.SamplerStateForCursor,
             DepthStencilState.None, RasterizerState.CullCounterClockwise, shader, Main.UIScaleMatrix);
 
-        ChatManager.DrawColorCodedString(Main.spriteBatch, line.Font, text,
-            textPosition, textInnerColor, line.Rotation, line.Origin, line.BaseScale);
+        ChatManager.DrawColorCodedString(Main.spriteBatch, font, text,
+            position, color, rotation, origin, scale);
 
         Main.spriteBatch.End();
         Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.SamplerStateForCursor,
             DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
     }
+}
 
-    public static void UpdateAndDrawParticles(DrawableTooltipLine line,
-        ref List<Behavior<RarityParticleInfo>> particleList)
+public static class RarityParticles
+{
+    public enum ParticleType : byte
     {
-        if (!Main.mouseText)
+        Sparkle,
+        Star,
+        Pixel,
+        Holosquare,
+        Droplet,
+    }
+
+    [StructLayout(LayoutKind.Auto)]
+    public unsafe struct ParticleInfo(
+        ParticleType type,
+        Vector2 position,
+        Vector2 velocity,
+        int life,
+        float scale,
+        Color color,
+        float opacity,
+        float rotation)
+    {
+        public readonly ParticleType Type = type;
+        public int Time;
+        public int Lifetime = life;
+        public float InitScale;
+        public float Scale = scale;
+        public float Rotation = rotation;
+        public Vector2 Position = position;
+        public Vector2 Velocity = velocity;
+        public float Opacity = opacity;
+        public Color DrawColor = color;
+
+        public readonly float TimeRatio => InverseLerp(0f, Lifetime, Time);
+
+        private const byte CustomDataSize = 128;
+        private fixed byte customData[CustomDataSize];
+        public Span<byte> CustomData => MemoryMarshal.CreateSpan(ref customData[0], CustomDataSize);
+
+        public ref T GetCustomData<T>() where T : unmanaged
+        {
+            if (sizeof(T) > CustomDataSize)
+                throw new ArgumentException(
+                    $"Type {typeof(T).Name} exceeds CustomData size ({CustomDataSize} bytes) by {sizeof(T)}.");
+            return ref MemoryMarshal.AsRef<T>(CustomData);
+        }
+    }
+
+    public delegate void Update(ref ParticleInfo info);
+
+    public delegate void Draw(ref ParticleInfo info, Vector2 offset);
+
+    public readonly struct ParticleDef(Update update, Draw draw, bool additive = false)
+    {
+        public readonly Update Update = update;
+        public readonly Draw Draw = draw;
+        public readonly bool Additive = additive;
+    }
+
+    public static readonly ParticleDef[] TypeDefinitions =
+        new ParticleDef[(int) (GetLastEnumValue<ParticleType>() + 1)];
+
+    public const uint MaxParticles = 256;
+
+    public static void UpdateAndDrawParticles(RarityDrawContext ctx, DynamicSpriteFont font, string text,
+        Vector2 position,
+        ref ParticleInfo[] particles, ref ulong[] presence)
+    {
+        if (ctx.DrawKind == RarityDrawContext.Kind.PopupText)
             return;
 
-        GetTextDimensions(in line, out Vector2 textSize, out _);
-
-        for (int i = 0; i < particleList.Count; i++)
+        var iterator = new BitmaskUtils.IndicesEnumerable(presence.AsSpan(0, presence.Length), MaxParticles);
+        foreach (int index in iterator)
         {
-            ref RarityParticleInfo info = ref particleList[i].Info;
+            ref ParticleInfo info = ref particles[index];
             info.Time++;
-
-            if (info.Time > info.Lifetime)
-                particleList.RemoveAt(i);
-
             info.Position += info.Velocity;
-            particleList[i].Update();
-        }
-
-        List<Behavior<RarityParticleInfo>> alpha = particleList.Where(p => !p.UseAdditive).ToList();
-        List<Behavior<RarityParticleInfo>> additive = particleList.Where(p => p.UseAdditive).ToList();
-
-        if (alpha.Count > 0)
-        {
-            foreach (Behavior<RarityParticleInfo> particle in alpha)
+            ref ParticleDef def = ref TypeDefinitions[(byte) info.Type];
+            def.Update.Invoke(ref info);
+            if (info.Time > info.Lifetime)
             {
-                RarityParticleInfo info = particle.Info;
-                particle.Draw(Main.spriteBatch, new Vector2(line.X, line.Y) + textSize * 0.5f + info.Position);
-            }
-        }
-
-        if (additive.Count > 0)
-        {
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.SamplerStateForCursor,
-                DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
-
-            foreach (Behavior<RarityParticleInfo> particle in additive)
-            {
-                RarityParticleInfo info = particle.Info;
-                particle.Draw(Main.spriteBatch, new Vector2(line.X, line.Y) + textSize * 0.5f + info.Position, line);
-            }
-
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.SamplerStateForCursor,
-                DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
-        }
-    }
-
-    public override void OnModLoad()
-    {
-        LoadParticles(Mod.Code);
-    }
-
-    internal static readonly Dictionary<Type, int> ParticleTypeLookup = [];
-    internal static readonly Dictionary<int, Texture2D> ParticleTextureLookup = [];
-
-    public static void LoadParticles(Assembly assembly)
-    {
-        int currentParticleID = 0;
-
-        if (ParticleTypeLookup.Count != 0 && ParticleTypeLookup != null)
-            currentParticleID = ParticleTypeLookup.Values.Max() + 1;
-
-        foreach (Type particleType in AssemblyManager.GetLoadableTypes(assembly))
-        {
-            // Don't attempt to load abstract types
-            if (!particleType.IsSubclassOf(typeof(Behavior<RarityParticleInfo>)) || particleType.IsAbstract)
+                BitmaskUtils.SetBit(in presence, index, false);
                 continue;
+            }
+        }
 
-            Behavior<RarityParticleInfo> particle =
-                (Behavior<RarityParticleInfo>) RuntimeHelpers.GetUninitializedObject(particleType);
+        // this is fine
 
-            // Store an ID for the particle. All particles of this type that are spawned will copy the ID
-            ParticleTypeLookup[particleType] = currentParticleID;
+        if (particles == null)
+            return;
 
-            // Store the particle's texture in the lookup table
-            Texture2D particleTexture =
-                ModContent.Request<Texture2D>(particle.TexturePath, AssetRequestMode.ImmediateLoad).Value;
-            ParticleTextureLookup[currentParticleID] = particleTexture;
+        var alpha = particles.Where(f => !TypeDefinitions[(byte) f.Type].Additive).ToArray();
+        if (alpha.Length > 0)
+        {
+            for (int i = 0; i < alpha.Length; i++)
+            {
+                ref ParticleInfo info = ref alpha[i];
+                TypeDefinitions[(byte) info.Type].Draw?.Invoke(ref info, position);
+            }
+        }
 
-            // Increment the particle ID
-            currentParticleID++;
+        var additive = particles.Where(f => TypeDefinitions[(byte) f.Type].Additive).ToArray();
+        if (additive.Length > 0)
+        {
+            Main.spriteBatch.End(out SpriteBatchSnapshot ss);
+            Main.spriteBatch.Begin(ss with { BlendState = BlendState.Additive });
+
+            for (int i = 0; i < additive.Length; i++)
+            {
+                ref ParticleInfo info = ref additive[i];
+                TypeDefinitions[(byte) info.Type].Draw?.Invoke(ref info, position);
+            }
+
+            Main.spriteBatch.Restart(ss);
         }
     }
 
-    public static Behavior<RarityParticleInfo> Spawn(ref List<Behavior<RarityParticleInfo>> list,
-        Behavior<RarityParticleInfo> particle)
+    public static void Add(ref ParticleInfo[] particles, ref ulong[] presence, in ParticleInfo particle)
     {
-        if (Main.dedServ)
-            return particle;
+        int index = BitmaskUtils.AllocateIndex(presence, MaxParticles, true);
+        particles[index] = particle with { InitScale = particle.Scale };
+    }
 
-        ref RarityParticleInfo info = ref particle.Info;
+    public static void RegisterAll()
+    {
+        SparkleDef();
+        StarDef();
+        PixelDef();
+        HolosquareDef();
+        DropletDef();
+    }
 
-        info.Time = new();
-        info.InitScale = info.Scale;
-        info.Type = ParticleTypeLookup[particle.GetType()];
-        info.Texture = ParticleTextureLookup[info.Type];
-        list.Add(particle);
+    private static void SparkleDef()
+    {
+        TypeDefinitions[(byte) ParticleType.Sparkle] = new ParticleDef(
+            (ref info) =>
+            {
+                info.Scale *= 0.97f;
+                info.Opacity = MathF.Pow(MathHelper.SmoothStep(1, 0, info.TimeRatio), .1f);
+                info.Rotation = info.Velocity.ToRotation() + MathHelper.PiOver2;
+                info.Velocity *= .96f;
+            },
+            (ref info, off) =>
+            {
+                Texture2D tex = AssetRegistry.GennedTextures.Gleam;
+                Vector2 orig = tex.Size() / 2;
+                Main.spriteBatch.Draw(tex, info.Position + off, null, info.DrawColor * .15f * info.Opacity,
+                    info.Rotation, orig,
+                    new Vector2(.5f, 1.4f) * info.Scale * 2f, 0, 0f);
+                Main.spriteBatch.Draw(tex, info.Position + off, null,
+                    info.DrawColor.Lerp(Color.White, .1f) * .5f * info.Opacity, info.Rotation,
+                    orig, new Vector2(.4f, 1.2f) * info.Scale * 1.5f, 0, 0f);
+                Main.spriteBatch.Draw(tex, info.Position + off, null,
+                    info.DrawColor.Lerp(Color.White, .2f) * info.Opacity, info.Rotation, orig,
+                    new Vector2(.3f, 1f) * info.Scale, 0, 0f);
+            },
+            additive: true
+        );
+    }
 
-        return particle;
+    public static void SpawnSparkle(ref ParticleInfo[] particles, ref ulong[] presence, Vector2 pos, Vector2 vel,
+        int life, float scale,
+        Color col)
+    {
+        Add(ref particles, ref presence, new ParticleInfo(
+            ParticleType.Sparkle,
+            pos,
+            vel,
+            life,
+            scale,
+            col,
+            1f,
+            0f
+        ));
+    }
+
+    private static void StarDef()
+    {
+        TypeDefinitions[(byte) ParticleType.Star] = new ParticleDef(
+            (ref info) =>
+            {
+                info.Opacity = MathHelper.SmoothStep(1f, 0f, info.TimeRatio);
+                info.Rotation += info.Velocity.Length() * .07f;
+                info.Scale = (1f - info.TimeRatio) * info.InitScale;
+                info.Velocity *= .92f;
+            },
+            (ref info, off) =>
+            {
+                Texture2D tex = AssetRegistry.GennedTextures.CritSpark;
+                Texture2D bloom = AssetRegistry.GennedTextures.GlowParticleSmall;
+                Vector2 bloomScale = tex.Size() / bloom.Size() + new Vector2(.05f);
+                Main.spriteBatch.Draw(bloom, info.Position + off, null, info.DrawColor * .12f * info.Opacity, 0f,
+                    bloom.Size() / 2,
+                    bloomScale, 0, 0f);
+                Main.spriteBatch.Draw(tex, info.Position + off, null, info.DrawColor * info.Opacity, info.Rotation,
+                    tex.Size() / 2,
+                    info.Scale, 0, 0f);
+            },
+            additive: true
+        );
+    }
+
+    public static void SpawnStar(ref ParticleInfo[] particles, ref ulong[] presence, Vector2 pos, Vector2 vel, int life,
+        float scale,
+        Color col)
+    {
+        Add(ref particles, ref presence, new ParticleInfo(
+            ParticleType.Star,
+            pos,
+            vel,
+            life,
+            scale,
+            col,
+            1f,
+            RandomRotation()
+        ));
+    }
+
+    private unsafe struct PixelData
+    {
+        public Color BloomColor;
+        public Vector2? HomeIn;
+        public byte TrailLength;
+        public float Delay;
+        public float Timer;
+        public Vector2 InitVel;
+
+        private const int Max = 10;
+        private fixed float oldPositions[Max * 2];
+
+        public Span<Vector2> OldPositions =>
+            MemoryMarshal.CreateSpan(ref Unsafe.As<float, Vector2>(ref oldPositions[0]), Max);
+    }
+
+    private static void PixelDef()
+    {
+        TypeDefinitions[(byte) ParticleType.Pixel] = new ParticleDef(
+            (ref info) =>
+            {
+                ref PixelData data = ref info.GetCustomData<PixelData>();
+                Span<Vector2> oldPos = data.OldPositions;
+                for (int i = oldPos.Length - 1; i >= 1; i--)
+                    oldPos[i] = oldPos[i - 1];
+                oldPos[0] = info.Position;
+
+                if (info.TimeRatio > .7f)
+                {
+                    info.Scale *= .9f;
+                    info.Opacity *= .92f;
+                }
+
+                Vector2? home = data.HomeIn;
+                if (home != null)
+                {
+                    info.Velocity = Vector2.Lerp(info.Velocity, info.Position.SafeDirectionTo(home.Value) * 5f, .2f);
+                    if (info.Position.WithinRange(home.Value, 10f))
+                        info.Time = info.Lifetime;
+                }
+                else
+                {
+                    info.Velocity = data.InitVel.VelEqualTrig(MathF.Cos, 20f, .4f, ref data.Delay, ref data.Timer);
+                    info.Velocity *= .96f;
+                }
+
+                info.Rotation += info.Velocity.Length() / 5;
+            },
+            (ref info, off) =>
+            {
+                Texture2D tex = AssetRegistry.GennedTextures.Pixel;
+                Texture2D bloom = AssetRegistry.GennedTextures.GlowParticleSmall;
+                ref PixelData data = ref info.GetCustomData<PixelData>();
+                Main.spriteBatch.Draw(bloom, info.Position + off, null, data.BloomColor * info.Opacity * .3f,
+                    info.Rotation, bloom.Size() / 2, info.Scale / 4,
+                    0, 0f);
+
+                if (data.TrailLength > 0)
+                {
+                    for (int i = 0; i < data.TrailLength && i < data.OldPositions.Length; i++)
+                    {
+                        Vector2 old = data.OldPositions[i];
+                        float completion = 1f - InverseLerp(0f, data.OldPositions.Length, i);
+                        Main.spriteBatch.Draw(tex, old + off, null, info.DrawColor * info.Opacity * completion,
+                            info.Rotation, tex.Size() / 2, info.Scale * 6 * completion, 0, 0f);
+                    }
+                }
+                else
+                    Main.spriteBatch.Draw(tex, info.Position + off, null, info.DrawColor * info.Opacity, info.Rotation,
+                        tex.Size() / 2,
+                        info.Scale * 6, 0, 0f);
+            },
+            additive: true
+        );
+    }
+
+    public static void SpawnPixel(ref ParticleInfo[] particles, ref ulong[] presence, Vector2 pos, Vector2 vel,
+        int life, float scale,
+        Color col, Color bloom, Vector2? home = null,
+        byte trail = 0)
+    {
+        ParticleInfo info = new ParticleInfo(
+            ParticleType.Pixel,
+            pos,
+            vel,
+            life,
+            scale,
+            col,
+            1f,
+            RandomRotation()
+        );
+        ref PixelData data = ref info.GetCustomData<PixelData>();
+        data.BloomColor = bloom;
+        data.HomeIn = home;
+        data.OldPositions.Fill(pos);
+        data.TrailLength = trail;
+        data.InitVel = vel;
+        Add(ref particles, ref presence, info);
+    }
+
+    public struct HolosquareData
+    {
+        public int Variant;
+        public Rectangle TechFrame;
+        public float Strength;
+    }
+
+    private static void HolosquareDef()
+    {
+        TypeDefinitions[(byte) ParticleType.Holosquare] = new ParticleDef(
+            (ref info) =>
+            {
+                if (info.Time < 3f)
+                    info.Velocity *= 1.2f;
+                else
+                    info.Velocity *= .975f;
+
+                float completion = GetLerpBump(0f, .1f, 1f, .7f, info.TimeRatio);
+                info.Scale = completion * info.InitScale;
+                info.Opacity = completion * info.GetCustomData<HolosquareData>().Strength;
+
+                info.Rotation = info.Velocity.ToRotation();
+            },
+            (ref info, off) =>
+            {
+                Texture2D tex = AssetRegistry.GennedTextures.TechyHolosquare;
+                ref HolosquareData data = ref info.GetCustomData<HolosquareData>();
+
+                for (int i = -1; i <= 1; i++)
+                {
+                    Color aberrationColor = i switch
+                    {
+                        -1 => new Color(255, 0, 0, 0),
+                        0 => new Color(0, 255, 0, 0),
+                        1 => new Color(0, 0, 255, 0),
+                        _ => Color.White
+                    };
+                    Vector2 offset = Vector2.UnitX.RotatedBy(info.Rotation).RotatedBy(MathHelper.PiOver2) * i;
+                    offset *= data.Strength;
+
+                    Main.spriteBatch.Draw(tex, info.Position + off + offset, data.TechFrame,
+                        info.DrawColor.MultiplyRGB(aberrationColor) * info.Opacity, info.Rotation,
+                        data.TechFrame.Size() / 2f,
+                        new Vector2(info.Scale, 1f), 0, 0f);
+                }
+            },
+            additive: true
+        );
+    }
+
+    public static void SpawnHolosquare(ref ParticleInfo[] particles, ref ulong[] presence, Vector2 pos, Vector2 vel,
+        int life, float scale,
+        Color col, float opacity = 1f, float strength = 1.5f)
+    {
+        ParticleInfo info = new ParticleInfo(
+            ParticleType.Holosquare,
+            pos,
+            vel,
+            life,
+            scale,
+            col,
+            opacity,
+            RandomRotation()
+        );
+        ref HolosquareData data = ref info.GetCustomData<HolosquareData>();
+        data.Variant = Main.rand.Next(6);
+        data.TechFrame = data.Variant switch
+        {
+            0 => new Rectangle(8, 0, 6, 6),
+            1 => new Rectangle(6, 8, 10, 6),
+            2 => new Rectangle(4, 16, 14, 8),
+            3 => new Rectangle(2, 26, 18, 10),
+            4 => new Rectangle(2, 38, 18, 8),
+            5 => new Rectangle(6, 48, 12, 12),
+            _ => data.TechFrame
+        };
+        data.Strength = strength;
+        Add(ref particles, ref presence, info);
+    }
+
+    private static void DropletDef()
+    {
+        TypeDefinitions[(byte) ParticleType.Droplet] = new ParticleDef(
+            (ref info) =>
+            {
+                info.DrawColor.A = 0;
+                info.Scale = MathF.Pow(MathHelper.SmoothStep(1, 0, info.TimeRatio), .4f);
+                info.Opacity *= .98f;
+                info.Rotation = info.Velocity.ToRotation() - MathHelper.PiOver2;
+                info.Velocity *= .92f;
+            },
+            (ref info, off) =>
+            {
+                Texture2D tex = AssetRegistry.GennedTextures.DropletTexture;
+                Main.spriteBatch.Draw(tex, info.Position + off, null, info.DrawColor * info.Opacity * .4f,
+                    info.Rotation, tex.Size() / 2, info.Scale / 3 * 1.2f, 0, 0f);
+
+                Main.spriteBatch.Draw(tex, info.Position + off, null, info.DrawColor * info.Opacity, info.Rotation,
+                    tex.Size() / 2,
+                    info.Scale / 3, 0, 0f);
+            },
+            additive: false
+        );
+    }
+
+    public static void SpawnDroplet(ref ParticleInfo[] particles, ref ulong[] presence, Vector2 pos, Vector2 vel,
+        int life, float scale,
+        Color col)
+    {
+        Add(ref particles, ref presence, new ParticleInfo(
+            ParticleType.Droplet,
+            pos,
+            vel,
+            life,
+            scale,
+            col,
+            1f,
+            0f
+        ));
     }
 }

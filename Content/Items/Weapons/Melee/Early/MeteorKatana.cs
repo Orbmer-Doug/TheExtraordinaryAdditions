@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Early;
 
 public class MeteorKatana : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.MeteorKatana);
+    public override string Texture => AssetRegistry.GennedTextures.MeteorKatana.Path;
 
     public override void SetDefaults()
     {

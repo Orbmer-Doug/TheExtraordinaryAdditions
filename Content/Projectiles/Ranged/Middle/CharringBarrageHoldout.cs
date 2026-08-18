@@ -4,15 +4,13 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 
 public class CharringBarrageHoldout : BaseIdleHoldoutProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CharringBarrage);
+    public override string Texture => AssetRegistry.GennedTextures.CharringBarrage.Path;
     public override int AssociatedItemID => ModContent.ItemType<CharringBarrage>();
     public override int IntendedProjectileType => ModContent.ProjectileType<CharringBarrageHoldout>();
 
@@ -36,8 +34,8 @@ public class CharringBarrageHoldout : BaseIdleHoldoutProjectile
         }
 
         int time = Item.useTime;
-        float rot = Animators.Bump(0f, .4f, 1f, .6f).Evaluate(time - Wait, 0f, time / 2, 0f, -.25f);
-        float recoil = Animators.Bump(0f, .3f, 1f, .7f).Evaluate(time - Wait, 0f, time, 0f, 4f);
+        float rot = Bump(0f, .4f, 1f, .6f).Evaluate(time - Wait, 0f, time / 2, 0f, -.25f);
+        float recoil = Bump(0f, .3f, 1f, .7f).Evaluate(time - Wait, 0f, time, 0f, 4f);
         Projectile.rotation = Projectile.velocity.ToRotation() + (rot * Dir);
         Projectile.Center = Center + PolarVector((Projectile.height * .43f) - recoil, Projectile.rotation);
         Owner.heldProj = Projectile.whoAmI;

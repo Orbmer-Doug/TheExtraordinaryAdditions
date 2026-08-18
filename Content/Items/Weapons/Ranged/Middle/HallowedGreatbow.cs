@@ -11,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 
 public class HallowedGreatbow : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.HallowedGreatbow);
+    public override string Texture => AssetRegistry.GennedTextures.HallowedGreatbow.Path;
 
     public override void SetStaticDefaults()
     {

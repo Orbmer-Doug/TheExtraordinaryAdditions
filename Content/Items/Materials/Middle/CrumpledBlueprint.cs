@@ -6,7 +6,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 
 public class CrumpledBlueprint : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CrumpledBlueprint);
+    public override string Texture => AssetRegistry.GennedTextures.CrumpledBlueprint.Path;
 
     public override void SetStaticDefaults()
     {

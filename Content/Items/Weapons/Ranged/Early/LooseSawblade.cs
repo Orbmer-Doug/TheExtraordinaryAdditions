@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Early;
 
 public class LooseSawblade : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.LooseSawblade);
+    public override string Texture => AssetRegistry.GennedTextures.LooseSawblade.Path;
 
     public override void SetStaticDefaults()
     {

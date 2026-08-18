@@ -9,7 +9,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Consumable;
 
 public class FrigidTonic : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.FrigidTonic);
+    public override string Texture => AssetRegistry.GennedTextures.FrigidTonic.Path;
 
     public override void SetStaticDefaults()
     {

@@ -1,17 +1,18 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using System;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
+using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Late.Zenith;
 
 public class NeedleStar : ModProjectile, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -51,20 +52,20 @@ public class NeedleStar : ModProjectile, ILocalizedModType, IModType
 
     internal Color ColorFunction(SystemVector2 completionRatio, Vector2 position)
     {
-        float fadeToEnd = MathHelper.Lerp(0.65f, 1f, (float) Cos01((0f - Main.GlobalTimeWrappedHourly) * 3f));
+        float fadeToEnd = MathHelper.Lerp(0.65f, 1f, Cos01((0f - Main.GlobalTimeWrappedHourly) * 3f));
         float fadeOpacity = Utils.GetLerpValue(1f, 0.64f, completionRatio.X, true) * Projectile.Opacity;
         Color endColor = Color.Lerp(Color.Cyan, Color.Magenta,
-            (float) Sin01(completionRatio.X * (float) Math.PI * 1.6f - Main.GlobalTimeWrappedHourly * 4f));
+            Sin01(completionRatio.X * (float) Math.PI * 1.6f - Main.GlobalTimeWrappedHourly * 4f));
         return Color.Lerp(Color.White, endColor, fadeToEnd) * fadeOpacity;
     }
 
     internal float WidthFunction(float c)
     {
-        return OptimizedPrimitiveTrail.HemisphereWidthFunct(c, MathHelper.SmoothStep(Projectile.height * .75f, 0f, c));
+        return Trail.HemisphereWidthFunct(c, MathHelper.SmoothStep(Projectile.height * .75f, 0f, c));
     }
 
     public TrailPoints cache;
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public override bool? CanHitNPC(NPC target) => Projectile.numHits <= 0 ? null : false;
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
@@ -78,33 +79,32 @@ public class NeedleStar : ModProjectile, ILocalizedModType, IModType
         {
             if (trail != null)
             {
-                ManagedShader shader = ShaderRegistry.FadedStreak;
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.StreakMagma), 1);
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WavyBlotchNoise), 2);
+                ManagedShader shader = AssetRegistry.GennedShaders.FadedStreak;
+                shader.SetTexture(AssetRegistry.GennedTextures.StreakMagma, 1);
+                shader.SetTexture(AssetRegistry.GennedTextures.WavyBlotchNoise, 2);
                 trail.DrawTrail(shader, cache.Points, 100);
             }
         }
 
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 
-        void star()
-        {
-            Texture2D starTexture = AssetRegistry.GetTexture(AdditionsTexture.CritSpark);
-            Texture2D bloomTexture = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
-            Color color = ColorFunction(SystemVector2.Zero, Vector2.Zero);
-            float rotation = Main.GlobalTimeWrappedHourly * 8f;
+        Texture2D starTexture = AssetRegistry.GennedTextures.CritSpark;
+        Texture2D bloomTexture = AssetRegistry.GennedTextures.GlowParticleSmall;
+        Color color = ColorFunction(SystemVector2.Zero, Vector2.Zero);
+        float rotation = Main.GlobalTimeWrappedHourly * 8f;
 
-            Main.spriteBatch.DrawBetterRect(bloomTexture, ToTarget(Projectile.Center, new Vector2(50)), null,
-                color * .6f, 0f, bloomTexture.Size() / 2);
-            Main.spriteBatch.DrawBetterRect(bloomTexture, ToTarget(Projectile.Center, new Vector2(90)), null,
-                color * .4f, 0f, bloomTexture.Size() / 2);
-            Main.spriteBatch.DrawBetter(starTexture, Projectile.Center, null, Color.White * Projectile.Opacity,
-                rotation, starTexture.Size() / 2, Projectile.scale * 2.3f);
-            Main.spriteBatch.DrawBetter(starTexture, Projectile.Center, null, Color.White * Projectile.Opacity,
-                -rotation + MathHelper.PiOver4, starTexture.Size() / 2, Projectile.scale * 1.6f);
-        }
-
-        PixelationSystem.QueueTextureRenderAction(star, PixelationLayer.UnderProjectiles, BlendState.Additive);
+        SpriteBatch.DrawRectPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, bloomTexture,
+            ToTarget(Projectile.Center, new Vector2(50)), null,
+            color * .6f, 0f, bloomTexture.Size() / 2);
+        SpriteBatch.DrawRectPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, bloomTexture,
+            ToTarget(Projectile.Center, new Vector2(90)), null,
+            color * .4f, 0f, bloomTexture.Size() / 2);
+        SpriteBatch.DrawAltPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, starTexture,
+            Projectile.Center, null, Color.White * Projectile.Opacity,
+            rotation, starTexture.Size() / 2, Projectile.scale * 2.3f);
+        SpriteBatch.DrawAltPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, starTexture,
+            Projectile.Center, null, Color.White * Projectile.Opacity,
+            -rotation + MathHelper.PiOver4, starTexture.Size() / 2, Projectile.scale * 1.6f);
 
         return false;
     }

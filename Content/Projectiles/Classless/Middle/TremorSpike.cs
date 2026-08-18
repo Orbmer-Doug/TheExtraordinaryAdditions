@@ -6,14 +6,13 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 
 public class TremorSpike : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     private static readonly int Lifetime = 300;
 
     public override void SetDefaults()
@@ -33,7 +32,6 @@ public class TremorSpike : ModProjectile
     }
 
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer ModdedOwner => Owner.Additions();
 
     public struct SegmentData(Vector2 position, float rotation, float opacity)
     {
@@ -60,7 +58,7 @@ public class TremorSpike : ModProjectile
         if (Projectile.localAI[0] == 0f)
         {
             Wait = Main.rand.NextFloat(10f, 16f);
-            MousePos = ModdedOwner.MouseWorld;
+            MousePos = Owner.AdditionsMouse().MouseWorld;
             Projectile.localAI[0] = 1f;
             Projectile.netUpdate = true;
         }
@@ -92,7 +90,8 @@ public class TremorSpike : ModProjectile
                         Main.rand.Next(16, 30), Main.rand.NextFloat(.4f, .8f), Color.Gray);
                 }
 
-                AdditionsSound.AsterlinHit.Play(Projectile.Center, Main.rand.NextFloat(.8f, 1.2f), 0f, .14f);
+                AssetRegistry.GennedSounds.AsterlinHit.Play(Projectile.Center, Main.rand.NextFloat(.8f, 1.2f), 0f,
+                    .14f);
                 Projectile.netUpdate = true;
                 Projectile.localAI[1] = 1f;
             }
@@ -153,8 +152,8 @@ public class TremorSpike : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        Texture2D middle = AssetRegistry.GetTexture(AdditionsTexture.TremorSpikeMiddle);
-        Texture2D end = AssetRegistry.GetTexture(AdditionsTexture.TremorSpikeEnd);
+        Texture2D middle = AssetRegistry.GennedTextures.TremorSpikeMiddle;
+        Texture2D end = AssetRegistry.GennedTextures.TremorSpikeEnd;
         for (int i = 0; i < Segments.Count; i++)
         {
             Texture2D texToUse = middle;

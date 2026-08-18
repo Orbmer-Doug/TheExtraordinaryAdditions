@@ -4,7 +4,7 @@ using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
-using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
+using TheExtraordinaryAdditions.Content.Rarities;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -12,7 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 
 public class HemoglobbedCapsule : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.HemoglobbedCapsule);
+    public override string Texture => AssetRegistry.GennedTextures.HemoglobbedCapsule.Path;
 
     public override void SetStaticDefaults()
     {

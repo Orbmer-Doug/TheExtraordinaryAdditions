@@ -1,8 +1,6 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.Enums;
 using Terraria.GameContent.Achievements;
 using Terraria.GameContent.Shaders;
@@ -10,10 +8,10 @@ using Terraria.Graphics.Effects;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using Utils = Terraria.Utils;
 
@@ -42,7 +40,7 @@ public abstract class BaseWhip : ModProjectile
 
     internal bool PauseTimer;
 
-    public OptimizedPrimitiveTrail Line;
+    public Trail Line;
     public TrailPoints WhipPoints = new(Samples);
     public Vector2 Tip;
     public Vector2 OutwardVel;
@@ -50,7 +48,7 @@ public abstract class BaseWhip : ModProjectile
     public ref float Time => ref Projectile.ai[0];
     public ref float Completion => ref Projectile.ai[1];
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
+    public PlayerMouse Modded => Owner.AdditionsMouse();
 
     public sealed override void SetStaticDefaults()
     {
@@ -311,7 +309,7 @@ public abstract class BaseWhip : ModProjectile
     {
         if (Line != null && !Line.Disposed)
         {
-            ManagedShader shader = ShaderRegistry.StandardPrimitiveShader;
+            ManagedShader shader = AssetRegistry.GennedShaders.StandardPrimitiveShader;
             Line.DrawTrail(shader, WhipPoints.Points);
         }
     }
@@ -320,7 +318,7 @@ public abstract class BaseWhip : ModProjectile
 
     public sealed override bool PreDraw(ref Color lightColor)
     {
-        if (Time.BetweenNum(10f, SwingTime - 10f))
+        if (Time > 10f && Time < SwingTime - 10f)
             PixelationSystem.QueuePrimitiveRenderAction(DrawLine, PixelationLayer.UnderProjectiles);
         DrawSegments();
 

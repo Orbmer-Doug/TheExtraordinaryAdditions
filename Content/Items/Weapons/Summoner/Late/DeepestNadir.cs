@@ -5,14 +5,14 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Early;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Summoner.Late;
-using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
+using TheExtraordinaryAdditions.Content.Rarities;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Late;
 
 public class DeepestNadir : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.DeepestNadir);
+    public override string Texture => AssetRegistry.GennedTextures.DeepestNadir.Path;
 
     public override void SetDefaults()
     {
@@ -38,8 +38,7 @@ public class DeepestNadir : ModItem
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
         int type, int damage, float knockback)
     {
-        for (int i = 0; i < 4; i++)
-            player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI);
+        player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI);
         return false;
     }
 

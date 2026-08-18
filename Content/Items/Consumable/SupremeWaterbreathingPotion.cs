@@ -9,7 +9,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Consumable;
 
 public class SupremeWaterbreathingPotion : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SupremeWaterbreathingPotion);
+    public override string Texture => AssetRegistry.GennedTextures.SupremeWaterbreathingPotion.Path;
 
     public override void SetStaticDefaults()
     {

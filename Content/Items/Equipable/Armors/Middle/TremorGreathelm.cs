@@ -3,7 +3,6 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Materials.Middle;
-using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -13,7 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
 [AutoloadEquip(EquipType.Head)]
 public class TremorGreathelm : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TremorGreathelm);
+    public override string Texture => AssetRegistry.GennedTextures.TremorGreathelm.Path;
 
     public override void SetStaticDefaults()
     {

@@ -1,17 +1,15 @@
-﻿using System;
-using Terraria;
+﻿using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
-using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Tools;
 
 public class BriefcaseOfBees : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BriefcaseOfBees);
+    public override string Texture => AssetRegistry.GennedTextures.BriefcaseOfBees.Path;
 
     public override void SetStaticDefaults()
     {

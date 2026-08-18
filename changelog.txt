@@ -1,15 +1,31 @@
 This mod will no longer require Calamity as a dependency, as it should have been.
 
-Resprited:
+General:
+- Special rarities work anywhere and many have been redone
+
+Reworked:
+Exingenedies
+Rended Star -> Glare of Alsafi
+Heaven Forged Sword
+Brewing Storms
+Hells Toothpick
+Bergcrusher
 
 Retiered:
+Lanikea -> Post-Vortex
+Caller of Birds -> Post-WOF
+The Spoon -> Post-Plantera 
+Triple Katanas -> Post-Golem
+Sunsplit Horizon -> Post-Solar
+Pyroclastic Veil -> Post-Solar
+
 
 Removed:
 - Ichor Whip
-- Rended Star
 - Torrential Tides
 - Cosmireaper
 - Ethereal Claymore
+- Decaying Cutlery
 - Ice Mist Staff
 - Impure Astral Katanas
 - Tidal Deluge
@@ -17,4 +33,14 @@ Removed:
 - Tungsten Tie
 - Ancient Boon
 - Avragen
+- Everbladed Heaven
+- Martian Laser Capsule
+- Heavy Laser Rifle
+- Cosmic Implosion
+- Florescence Rounds
+- Heaven Forged Cannon
+- Abyssal Currents
+- Superheated Plasma Array
+- Sunspot
 - Void Debuff
+- Gem staff changes

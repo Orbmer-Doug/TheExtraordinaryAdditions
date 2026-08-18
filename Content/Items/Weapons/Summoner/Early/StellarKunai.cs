@@ -11,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Early;
 
 public class StellarKunai : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.StellarKunai);
+    public override string Texture => AssetRegistry.GennedTextures.StellarKunai.Path;
 
     public override void SetDefaults()
     {
@@ -33,7 +33,7 @@ public class StellarKunai : ModItem
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
-        CoreUtils.ColorLocalization(tooltips, Color.CornflowerBlue);
+        tooltips.ColorLocalization(Color.CornflowerBlue);
     }
 
     public override bool CanUseItem(Player player)

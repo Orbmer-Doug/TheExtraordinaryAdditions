@@ -6,19 +6,19 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
 using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Multi.Middle;
 
 public class GunSwordSword : BaseSwordSwing
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BoneGunsword);
+    public override string Texture => AssetRegistry.GennedTextures.BoneGunsword.Path;
 
     public override int SwingTime => 40;
 
@@ -57,7 +57,7 @@ public class GunSwordSword : BaseSwordSwing
         // swoosh
         if (Animation() >= .26f && !PlayedSound)
         {
-            AdditionsSound.BreakerSwing.Play(Projectile.Center, .6f, .1f, .1f);
+            AssetRegistry.GennedSounds.BreakerSwing.Play(Projectile.Center, .6f, .1f, .1f);
             PlayedSound = true;
         }
 
@@ -129,7 +129,7 @@ public class GunSwordSword : BaseSwordSwing
         }
 
         npc.velocity += SwordDir * Item.knockBack * npc.knockBackResist;
-        AdditionsSound.etherealSwordSwingB.Play(start, 1f, .8f);
+        AssetRegistry.GennedSounds.etherealSwordSwingB.Play(start, 1f, .8f);
         ScreenShakeSystem.New(new(.1f, .1f), start);
         TimeStop = StopTime;
     }
@@ -148,7 +148,7 @@ public class GunSwordSword : BaseSwordSwing
         }
 
         ScreenShakeSystem.New(new(.1f, .1f), start);
-        AdditionsSound.RoySpecial2.Play(start, .6f, 0f, .3f);
+        AssetRegistry.GennedSounds.RoySpecial2.Play(start, .6f, 0f, .3f);
         TimeStop = StopTime;
     }
 
@@ -190,7 +190,7 @@ public class GunSwordSword : BaseSwordSwing
 
 public class GunGunSword : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BoneGunsword);
+    public override string Texture => AssetRegistry.GennedTextures.BoneGunsword.Path;
 
     public override void SetDefaults()
     {
@@ -242,7 +242,7 @@ public class GunGunSword : ModProjectile
 
     public NPC Target;
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
+    public PlayerMouse Modded => Owner.AdditionsMouse();
     public Vector2 Center => Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
     public int Direction => Projectile.velocity.X.NonZeroSign();
     public Item Item => Owner.HeldItem;
@@ -277,7 +277,7 @@ public class GunGunSword : ModProjectile
                 this.Sync();
             }
 
-            AdditionsSound.SnakeRocketOut.Play(Projectile.Center, .6f);
+            AssetRegistry.GennedSounds.SnakeRocketOut.Play(Projectile.Center, .6f);
         }
 
         Dist = MakePoly(20f).OutFunction.Evaluate(Time, 0f, StabTime, 0f, 60f);
@@ -329,10 +329,10 @@ public class GunGunSword : ModProjectile
                             8f, 8, 5);
 
                     Owner.velocity -= Projectile.velocity * Utils.Remap(Owner.Distance(pos), 0f, 500f, 10f, 0f);
-                    Modded.LungingDown = true;
+                    Owner.AdditionsMove().FastFall = true;
                     //TODO
                     //.AddCooldown(Owner, SkullKaboomCooldown.ID, SecondsToFrames(3));
-                    AdditionsSound.SnakeRocket.Play(Projectile.Center, 1.4f);
+                    AssetRegistry.GennedSounds.SnakeRocket.Play(Projectile.Center, 1.4f);
                     Projectile.MaxUpdates = 2;
                     this.Sync();
                 }
@@ -384,7 +384,7 @@ public class GunGunSword : ModProjectile
                             Color.Chocolate.Lerp(Color.OrangeRed, Main.rand.NextFloat(.4f, .5f)), false, true);
                     }
 
-                    AdditionsSound.banditShot1B.Play(pos, .8f, .1f, .1f);
+                    AssetRegistry.GennedSounds.banditShot1B.Play(pos, .8f, .1f, .1f);
                     Wait = Item.useTime;
                     Recoil = 15f;
                     this.Sync();
@@ -415,12 +415,6 @@ public class GunGunSword : ModProjectile
         Owner.itemRotation = WrapAngle(Projectile.rotation);
 
         Time += Engage ? InverseLerp(6f, 0f, EngagedTime) : 1f;
-    }
-
-    public override bool PreKill(int timeLeft)
-    {
-        Modded.LungingDown = false;
-        return base.PreKill(timeLeft);
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)

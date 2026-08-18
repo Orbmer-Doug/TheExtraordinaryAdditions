@@ -13,7 +13,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Summon;
 
 public class CrimsonCarvedBeetle : ModItem, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CrimsonCarvedBeetle);
+    public override string Texture => AssetRegistry.GennedTextures.CrimsonCarvedBeetle.Path;
 
     public override void SetStaticDefaults()
     {

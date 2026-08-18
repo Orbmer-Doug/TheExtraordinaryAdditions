@@ -3,9 +3,8 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Late;
 
@@ -22,7 +21,7 @@ public class CryogenicBlast : ModProjectile
         return c with { A = 80 };
     }
 
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetStaticDefaults()
     {
@@ -70,11 +69,11 @@ public class CryogenicBlast : ModProjectile
         Main.spriteBatch.End();
         Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearWrap,
             DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-        Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.CrackedNoise);
+        Texture2D tex = AssetRegistry.GennedTextures.CrackedNoise;
         DrawData explosionDrawData = new(tex, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight),
             Color.White * Projectile.Opacity);
 
-        ManagedShader shockwaveShader = ShaderRegistry.LightShockwave;
+        ManagedShader shockwaveShader = AssetRegistry.GennedShaders.LightShockwave;
         shockwaveShader.TrySetParameter("mainColor", DetermineExplosionColor().ToVector3());
         shockwaveShader.TrySetParameter("screenSize", Main.ScreenSize.ToVector2());
         shockwaveShader.TrySetParameter("explosionDistance", Radius * Projectile.scale * 0.5f);

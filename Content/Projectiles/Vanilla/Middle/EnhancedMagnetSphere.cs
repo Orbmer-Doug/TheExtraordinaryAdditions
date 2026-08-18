@@ -3,18 +3,17 @@ using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
 public class EnhancedMagnetSphere : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -126,14 +125,10 @@ public class EnhancedMagnetSphere : ModProjectile
 
             final.SetPoints(ends);
 
-            ManagedShader shader = ShaderRegistry.SpecialLightningTrail;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.CausticNoise), 1);
+            ManagedShader shader = AssetRegistry.GennedShaders.SpecialLightningTrail;
+            shader.SetTexture(AssetRegistry.GennedTextures.CausticNoise, 1);
 
-            OptimizedPrimitiveTrail trail = new(WidthFunction, ColorFunction, null, final.Count + 10);
-            trail.DrawTrail(shader, final.Points, 30);
-
-            OptimizedPrimitiveTrail trail2 = new(BackgroundWidthFunction, BackgroundColorFunction, null,
-                final.Count + 10);
+            Trail trail = new(WidthFunction, ColorFunction, null, final.Count + 10);
             trail.DrawTrail(shader, final.Points, 30);
         }
 
@@ -157,9 +152,9 @@ public class EnhancedMagnetSphere : ModProjectile
         foreach (Projectile sphere in OtherSpheres)
             DrawArcs(sphere.Center);
 
-        ManagedShader shader = ShaderRegistry.Forcefield;
-        float intensity = 1f;
-        float flickerPower = 0.25f;
+        ManagedShader shader = AssetRegistry.GennedShaders.Forcefield;
+        const float intensity = 1f;
+        const float flickerPower = 0.25f;
         float opacity = MathHelper.Lerp(1f, MathHelper.Max(1f - flickerPower, 0.56f),
             MathF.Pow(MathF.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Lerp(3f, 5f, flickerPower)), 24f)) * 2f;
         Color color = new Color(15, 88, 113) * opacity; // Magnet sphere within
@@ -176,16 +171,11 @@ public class EnhancedMagnetSphere : ModProjectile
         shader.TrySetParameter("blowUpSize", .5f);
         shader.TrySetParameter("edgeBlendStrength", 4f);
         shader.TrySetParameter("resolution", Projectile.Size);
-
-        PixelationSystem.QueueTextureRenderAction(DrawMagnetField, PixelationLayer.OverPlayers, BlendState.Additive,
-            shader, nameof(EnhancedMagnetSphere));
+        
+        Texture2D tex = AssetRegistry.GennedTextures.SuperPerlin;
+        SpriteBatch.DrawRectPixelated(PixelationLayer.OverPlayers, BlendState.Additive, tex,
+            ToTarget(Projectile.Center, new(Projectile.Opacity * Projectile.height)), null,
+            Color.White * Projectile.Opacity, MathHelper.PiOver2, tex.Size() * 0.5f, shader: shader);
         return false;
-    }
-
-    public void DrawMagnetField()
-    {
-        Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.SuperPerlin);
-        Main.spriteBatch.Draw(tex, ToTarget(Projectile.Center, new(Projectile.Opacity * Projectile.height)), null,
-            Color.White * Projectile.Opacity, MathHelper.PiOver2, tex.Size() * 0.5f, SpriteEffects.None, 0f);
     }
 }

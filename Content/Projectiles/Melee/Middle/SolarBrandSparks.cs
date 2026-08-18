@@ -1,17 +1,16 @@
 ﻿using System;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
 public class SolarBrandSparks : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -42,7 +41,7 @@ public class SolarBrandSparks : ModProjectile
 
     internal float WidthFunction(float c)
     {
-        return OptimizedPrimitiveTrail.HemisphereWidthFunct(c,
+        return Trail.HemisphereWidthFunct(c,
             .5f * Projectile.width * MathHelper.SmoothStep(1f, 0f, c));
     }
 
@@ -97,7 +96,7 @@ public class SolarBrandSparks : ModProjectile
         }
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints cache;
 
     public override bool PreDraw(ref Color lightColor)
@@ -106,8 +105,8 @@ public class SolarBrandSparks : ModProjectile
         {
             if (trail == null || cache == null)
                 return;
-            ManagedShader shader = ShaderRegistry.FadedStreak;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.StreakMagma), 1);
+            ManagedShader shader = AssetRegistry.GennedShaders.FadedStreak;
+            shader.SetTexture(AssetRegistry.GennedTextures.StreakMagma, 1);
             trail.DrawTrail(shader, cache.Points, 60, true);
         }
 

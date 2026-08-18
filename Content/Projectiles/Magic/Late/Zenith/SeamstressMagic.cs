@@ -1,13 +1,14 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Late.Zenith;
@@ -22,7 +23,7 @@ public class SeamstressDraw : ModProjectile
         Unknown
     }
 
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -35,7 +36,7 @@ public class SeamstressDraw : ModProjectile
     }
 
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
+    public PlayerMouse Modded => Owner.AdditionsMouse();
     public Item Item => Owner.HeldItem;
 
     public int Time
@@ -66,7 +67,7 @@ public class SeamstressDraw : ModProjectile
             {
                 if (Item.CheckManaBetter(Owner, 14, true) && CurrentType == ShapeType.Triangle)
                 {
-                    AdditionsSound.Laser4.Play(Projectile.Center, .7f, -.4f, .1f, 10);
+                    AssetRegistry.GennedSounds.Laser4.Play(Projectile.Center, .7f, -.4f, .1f, 10);
                     Vector2 pos = EstimateCenter(points.Points, ShapeType.Triangle) + Main.screenPosition;
                     List<Vector2> corners = DouglasPeucker(points.Points, SimplifyEpsilon);
                     corners.RemoveAt(corners.Count - 1);
@@ -101,13 +102,14 @@ public class SeamstressDraw : ModProjectile
                     {
                         if (!Item.CheckManaBetter(Owner, 16, true))
                             return;
-                        AdditionsSound.etherealSwordAttackBasic1.Play(Projectile.Center, .6f, -.1f, .2f, 10);
+                        AssetRegistry.GennedSounds.etherealSwordAttackBasic1.Play(Projectile.Center, .6f, -.1f, .2f,
+                            10);
                     }
                     else
                     {
                         if (!Item.CheckManaBetter(Owner, 6, true))
                             return;
-                        AdditionsSound.etherealSwordAttackBasic2.Play(Projectile.Center, .5f, .1f, .3f, 10);
+                        AssetRegistry.GennedSounds.etherealSwordAttackBasic2.Play(Projectile.Center, .5f, .1f, .3f, 10);
                     }
 
                     CollisionShape shape = CollisionShape.Build(points.Points, CurrentType);
@@ -262,7 +264,7 @@ public class SeamstressDraw : ModProjectile
 
     public float WidthFunct(float completion) => 20f;
 
-    private OptimizedPrimitiveTrail trail;
+    private Trail trail;
     private TrailPoints points = new(300);
 
     public override bool PreDraw(ref Color lightColor)
@@ -271,7 +273,16 @@ public class SeamstressDraw : ModProjectile
         if (this.RunLocal())
         {
             PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.OverProjectiles);
-            PixelationSystem.QueueTextureRenderAction(stars, PixelationLayer.OverProjectiles, BlendState.Additive);
+            Texture2D tex = AssetRegistry.GennedTextures.LensStar;
+            Vector2 orig = tex.Size() / 2;
+
+            for (int i = 0; i < 4; i++)
+                SpriteBatch.DrawRectPixelated(PixelationLayer.OverProjectiles, BlendState.Additive, tex, ToTarget(points.Points[0] + Main.screenPosition, new(50f)), null,
+                    Color.Violet.Lerp(Color.White, InverseLerp(0f, 4f, i)), 0f, orig);
+
+            for (int i = 0; i < 4; i++)
+                SpriteBatch.DrawRectPixelated(PixelationLayer.OverProjectiles, BlendState.Additive, tex, ToTarget(points.Points[^1] + Main.screenPosition, new(50f)), null,
+                    Color.Violet.Lerp(Color.White, InverseLerp(0f, 4f, i)), 0f, orig);
         }
 
         return false;
@@ -281,26 +292,12 @@ public class SeamstressDraw : ModProjectile
             if (trail == null || trail.Disposed || points == null)
                 return;
 
-            ManagedShader shader = ShaderRegistry.RealityTearShader;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Cosmos2), 0, SamplerState.LinearWrap);
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Cosmos), 1, SamplerState.LinearWrap);
+            ManagedShader shader = AssetRegistry.GennedShaders.RealityTearShader;
+            shader.SetTexture(AssetRegistry.GennedTextures.Cosmos2, 0, SamplerState.LinearWrap);
+            shader.SetTexture(AssetRegistry.GennedTextures.Cosmos, 1, SamplerState.LinearWrap);
 
-            trail.DrawTrail(shader, points.Points, 300, true, true,
-                Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, -1, 1));
-        }
-
-        void stars()
-        {
-            Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.LensStar);
-            Vector2 orig = tex.Size() / 2;
-
-            for (int i = 0; i < 4; i++)
-                Main.spriteBatch.DrawBetterRect(tex, ToTarget(points.Points[0] + Main.screenPosition, new(50f)), null,
-                    Color.Violet.Lerp(Color.White, InverseLerp(0f, 4f, i)), 0f, orig);
-
-            for (int i = 0; i < 4; i++)
-                Main.spriteBatch.DrawBetterRect(tex, ToTarget(points.Points[^1] + Main.screenPosition, new(50f)), null,
-                    Color.Violet.Lerp(Color.White, InverseLerp(0f, 4f, i)), 0f, orig);
+            trail.DrawTrail(shader, points.Points,
+                Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, -1, 1), 300, true);
         }
     }
 
@@ -577,10 +574,10 @@ public class SeamstressDraw : ModProjectile
         /// <summary>Cross-product sign test for segment intersection.</summary>
         private static bool SegmentsIntersect(Vector2 a, Vector2 b, Vector2 c, Vector2 d)
         {
-            float d1 = Cross(d - c, a - c);
-            float d2 = Cross(d - c, b - c);
-            float d3 = Cross(b - a, c - a);
-            float d4 = Cross(b - a, d - a);
+            float d1 = Wedge(d - c, a - c);
+            float d2 = Wedge(d - c, b - c);
+            float d3 = Wedge(b - a, c - a);
+            float d4 = Wedge(b - a, d - a);
 
             if (((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) &&
                 ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0)))
@@ -601,9 +598,9 @@ public class SeamstressDraw : ModProjectile
 
         private static bool IsPointInTriangle(Vector2 p, Vector2 a, Vector2 b, Vector2 c)
         {
-            float d1 = Cross(p - a, b - a);
-            float d2 = Cross(p - b, c - b);
-            float d3 = Cross(p - c, a - c);
+            float d1 = Wedge(p - a, b - a);
+            float d2 = Wedge(p - b, c - b);
+            float d3 = Wedge(p - c, a - c);
             return !((d1 > 0 || d2 > 0 || d3 > 0) && (d1 < 0 || d2 < 0 || d3 < 0));
         }
 
@@ -717,9 +714,9 @@ public class SeamstressDraw : ModProjectile
         // Barycentric sign test - point is inside if all three cross products have the same sign (all positive for a CCW triangle)
         private static bool IsPointInTriangle(Vector2 p, Vector2 a, Vector2 b, Vector2 c)
         {
-            float d1 = Cross(p - a, b - a);
-            float d2 = Cross(p - b, c - b);
-            float d3 = Cross(p - c, a - c);
+            float d1 = Wedge(p - a, b - a);
+            float d2 = Wedge(p - b, c - b);
+            float d3 = Wedge(p - c, a - c);
 
             bool hasNeg = d1 < 0 || d2 < 0 || d3 < 0;
             bool hasPos = d1 > 0 || d2 > 0 || d3 > 0;

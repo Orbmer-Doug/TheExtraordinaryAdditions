@@ -11,18 +11,17 @@ using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Early;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 
 public class TorrentialStormsHeld : BaseIdleHoldoutProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TorrentialStormsHeld);
+    public override string Texture => AssetRegistry.GennedTextures.TorrentialStormsHeld.Path;
     public override int AssociatedItemID => ModContent.ItemType<TorrentialStorms>();
     public override int IntendedProjectileType => ModContent.ProjectileType<TorrentialStormsHeld>();
 
@@ -70,7 +69,7 @@ public class TorrentialStormsHeld : BaseIdleHoldoutProjectile
         Item ammoItem = Owner.ChooseAmmo(Item);
         Texture2D arrow = ammoItem != null
             ? ammoItem.ThisItemTexture()
-            : AssetRegistry.GetTexture(AdditionsTexture.Pixel);
+            : AssetRegistry.GennedTextures.Pixel;
         if (trail == null || trail.Disposed)
             trail = new(c => 14f,
                 (c, pos) => MulticolorLerp(Sin01(Main.GlobalTimeWrappedHourly * 1.2f) + c.X, new(77, 89, 151),
@@ -93,7 +92,7 @@ public class TorrentialStormsHeld : BaseIdleHoldoutProjectile
         float close = InverseLerp(0f, 22f, Time);
 
         float armRot = Projectile.rotation + (.62f * Dir);
-        float reelAnim = Animators.MakePoly(2.2f).InFunction
+        float reelAnim = MakePoly(2.2f).InFunction
             .Evaluate(armRot, armRot + (.65f * Dir), Switch != 0 ? reel : OldStringCompletion);
         Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, reelAnim - MathHelper.PiOver2);
         Owner.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.ThreeQuarters,
@@ -126,7 +125,7 @@ public class TorrentialStormsHeld : BaseIdleHoldoutProjectile
             {
                 case 0:
                     Owner.itemTime = Owner.itemAnimation = 0;
-                    StringCompletion = Animators.Elastic.OutFunction.Evaluate(OldStringCompletion, 0f, close);
+                    StringCompletion = Elastic.OutFunction.Evaluate(OldStringCompletion, 0f, close);
                     if (close >= 1f)
                     {
                         Switch = -1;
@@ -136,7 +135,7 @@ public class TorrentialStormsHeld : BaseIdleHoldoutProjectile
 
                     break;
                 case 1:
-                    StringCompletion = Animators.MakePoly(2.2f).InFunction.Evaluate(0f, 1f, reel);
+                    StringCompletion = MakePoly(2.2f).InFunction.Evaluate(0f, 1f, reel);
                     if (reel >= 1f || (this.RunLocal() && !Modded.MouseLeft.Current))
                     {
                         Owner.PickAmmo(Item, out int type, out float speed, out int dmg, out float kb, out int ammo,
@@ -196,7 +195,7 @@ public class TorrentialStormsHeld : BaseIdleHoldoutProjectile
                                 .RotatedByRandom(.35f * (1f - reel));
                             Projectile.NewProj(pos, vel, ModContent.ProjectileType<TorrentialLightning>(), dmg, kb,
                                 Owner.whoAmI, 0f, reel);
-                            AdditionsSound.LightningStrike.Play(pos, MathHelper.Max(.2f, reel) * 2f,
+                            AssetRegistry.GennedSounds.LightningStrike.Play(pos, MathHelper.Max(.2f, reel) * 2f,
                                 -MathHelper.Max(.2f, reel) * .4f);
                         }
 
@@ -245,22 +244,22 @@ public class TorrentialStormsHeld : BaseIdleHoldoutProjectile
         }
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override bool PreDraw(ref Color lightColor)
     {
         Item ammoItem = Owner.ChooseAmmo(Item);
         Texture2D arrow = ammoItem != null
             ? ammoItem.ThisItemTexture()
-            : AssetRegistry.GetTexture(AdditionsTexture.Pixel);
+            : AssetRegistry.GennedTextures.Pixel;
 
         void draw()
         {
             if (trail == null || trail.Disposed || cache == null)
                 return;
-            ManagedShader shader = ShaderRegistry.EnlightenedBeam;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.StreakLightning), 1);
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Lightning2), 2);
+            ManagedShader shader = AssetRegistry.GennedShaders.EnlightenedBeam;
+            shader.SetTexture(AssetRegistry.GennedTextures.StreakLightning, 1);
+            shader.SetTexture(AssetRegistry.GennedTextures.Lightning2, 2);
             trail.DrawTrail(shader, cache.Points, 150);
         }
 

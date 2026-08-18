@@ -3,13 +3,12 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Summon;
 using TheExtraordinaryAdditions.Content.Projectiles.Pets;
-using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Pets;
 
-public class JellyfishSnack : ModItem, ILocalizedModType, IModType
+public class JellyfishSnack : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.JellyfishSnack);
+    public override string Texture => AssetRegistry.GennedTextures.JellyfishSnack.Path;
 
     public override void SetDefaults()
     {
@@ -25,7 +24,7 @@ public class JellyfishSnack : ModItem, ILocalizedModType, IModType
         Item.shoot = ModContent.ProjectileType<JellyfishVro>();
         Item.buffType = ModContent.BuffType<BubbleMan>();
         Item.value = Item.sellPrice(0, 5, 0, 0);
-        Item.rare = ModContent.RarityType<BrackishRarity>();
+        Item.rare = ItemRarityID.Blue;
     }
 
     public override void UseStyle(Player player, Rectangle heldItemFrame)

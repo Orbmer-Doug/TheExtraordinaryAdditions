@@ -12,7 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 
 public class SolemnLament : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SolemnLament);
+    public override string Texture => AssetRegistry.GennedTextures.SolemnLament.Path;
 
     public override void SetStaticDefaults()
     {

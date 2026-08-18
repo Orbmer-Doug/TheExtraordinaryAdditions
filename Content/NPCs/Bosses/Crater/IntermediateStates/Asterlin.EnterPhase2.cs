@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
@@ -24,13 +23,13 @@ public partial class Asterlin
     {
         if (AITimer == 1)
         {
-            AdditionsSound.AsterlinChange.Play(EyePosition, 1.8f, -.2f);
+            AssetRegistry.GennedSounds.AsterlinChange.Play(EyePosition, 1.8f, -.2f);
         }
 
         float completion = InverseLerp(0f, EnterPhase2_Length, AITimer);
-        EyeGleamInterpolant = new Animators.PiecewiseCurve()
-            .Add(0f, 1f, .5f, Animators.MakePoly(3f).OutFunction)
-            .Add(1f, 0f, 1f, Animators.MakePoly(4f).InOutFunction)
+        EyeGleamInterpolant = new PiecewiseCurve()
+            .Add(0f, 1f, .5f, MakePoly(3f).OutFunction)
+            .Add(1f, 0f, 1f, MakePoly(4f).InOutFunction)
             .Evaluate(completion);
 
         NPC.velocity *= .95f;

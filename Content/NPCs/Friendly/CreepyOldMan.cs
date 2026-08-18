@@ -10,13 +10,12 @@ using Terraria.Utilities;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Classless;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Friendly;
 
 public class CreepyOldMan : ModNPC
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CreepyOldMan);
+    public override string Texture => AssetRegistry.GennedTextures.CreepyOldMan.Path;
 
     public override void SetStaticDefaults()
     {
@@ -196,7 +195,7 @@ public class CreepyOldMan : ModNPC
 
 public class OldManBubble : ModEmoteBubble
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CreepOldManBubble);
+    public override string Texture => AssetRegistry.GennedTextures.CreepOldManBubble.Path;
 
     public override void SetStaticDefaults()
     {

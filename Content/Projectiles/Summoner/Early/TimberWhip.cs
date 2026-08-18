@@ -2,13 +2,12 @@
 using Terraria;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Early;
 
 public class TimberWhip : BaseWhip
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TimberWhip);
+    public override string Texture => AssetRegistry.GennedTextures.TimberWhip.Path;
     public override int SegmentSkip => 8;
 
     public override void Defaults()
@@ -33,7 +32,7 @@ public class TimberWhip : BaseWhip
 
     public override void NPCHitEffects(NPC target, NPC.HitInfo hit, in Vector2 pos, in Vector2 vel, in int index)
     {
-        if (index == (WhipPoints.Count - 1) && Completion.BetweenNum(.45f, .55f))
+        if (index == (WhipPoints.Count - 1) && Completion is > .45f and < .55f)
         {
             for (int i = 0; i < 12; i++)
             {
@@ -49,7 +48,7 @@ public class TimberWhip : BaseWhip
 
     public override void ModifyNPCEffects(NPC target, ref NPC.HitModifiers modifiers, in Vector2 pos, in int index)
     {
-        if (index == (WhipPoints.Count - 1) && Completion.BetweenNum(.45f, .55f))
+        if (index == (WhipPoints.Count - 1) && Completion is > .45f and .55f)
             modifiers.SetCrit();
     }
 

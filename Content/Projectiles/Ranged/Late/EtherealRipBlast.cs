@@ -2,17 +2,16 @@
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
 public class EtherealRipBlast : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     public ref float Time => ref Projectile.ai[0];
     public int Timeleft = 180;
 
@@ -101,7 +100,7 @@ public class EtherealRipBlast : ModProjectile
         return Projectile.width * 1.6f * Animators.MakePoly(4f).OutFunction(c);
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints cache = new(100);
 
     public override bool PreDraw(ref Color lightColor)
@@ -111,9 +110,9 @@ public class EtherealRipBlast : ModProjectile
             if (trail == null || cache == null)
                 return;
 
-            ManagedShader shader = ShaderRegistry.BaseLaserShader;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.CrackedNoise), 1);
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Streak), 2);
+            ManagedShader shader = AssetRegistry.GennedShaders.BaseLaserShader;
+            shader.SetTexture(AssetRegistry.GennedTextures.CrackedNoise, 1);
+            shader.SetTexture(AssetRegistry.GennedTextures.Streak, 2);
             shader.TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly * 12f);
             trail.DrawTrail(shader, cache.Points, 80);
         }

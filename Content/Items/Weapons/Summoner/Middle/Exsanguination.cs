@@ -2,7 +2,7 @@
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
-using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
+using TheExtraordinaryAdditions.Content.Rarities;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Middle;
 
 public class Exsanguination : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Exsanguination);
+    public override string Texture => AssetRegistry.GennedTextures.Exsanguination.Path;
 
     public override void SetDefaults()
     {

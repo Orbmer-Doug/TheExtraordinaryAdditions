@@ -4,10 +4,9 @@ using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
@@ -120,7 +119,7 @@ public partial class Asterlin : ModNPC
                             Vector2 dir = spawnPos.SafeDirectionTo(Target.Center);
                             if (!Main.masterMode && !Main.getGoodWorld)
                                 UnrelentingRush_SavedRotation = dir.ToRotation();
-                            if (this.RunServer())
+                            if (ModNPC.RunServer())
                                 NPC.NewNPCProj(spawnPos, Main.masterMode ? home : dir,
                                     ModContent.ProjectileType<TechnicPortal>(), 0, 0f);
                             NPC.netUpdate = true;
@@ -183,9 +182,9 @@ public partial class Asterlin : ModNPC
                         ParticleRegistry.SpawnBlurParticle(NPC.Center, 30, .6f, 1400f);
                         ParticleRegistry.SpawnChromaticAberration(NPC.Center, 30, .5f, 1400f);
                         ScreenShakeSystem.New(new ScreenShake(1f, .8f, 2000f), NPC.Center);
-                        AdditionsSound.IkeFinal.Play(NPC.Center, 2.2f, .3f, .1f);
+                        AssetRegistry.GennedSounds.IkeFinal.Play(NPC.Center, 2.2f, .3f, .1f);
 
-                        if (this.RunServer())
+                        if (ModNPC.RunServer())
                         {
                             for (int i = 0; i < UnrelentingRush_LaserCount; i++)
                             {
@@ -252,35 +251,5 @@ public partial class Asterlin : ModNPC
 
     public void UnrelentingRush_DrawTelegraph()
     {
-        if (!Main.masterMode || UnrelentingRush_CurrentState != UnrelentingRush_States.MakePortal)
-            return;
-
-        void draw()
-        {
-            float completion = InverseLerp(0f, UnrelentingRush_PortalFadeIn, UnrelentingRush_DashTimer);
-            Texture2D cap = AssetRegistry.GetTexture(AdditionsTexture.BloomLineCap);
-            Texture2D horiz = AssetRegistry.GetTexture(AdditionsTexture.BloomLineHoriz);
-            Vector2 dir = UnrelentingRush_SavedRotation.ToRotationVector2();
-            float fade = GetLerpBump(0f, .2f, 1f, .8f, completion);
-            const float dist = 2000;
-            Vector2 a = NPC.Center;
-            Vector2 b = NPC.Center + dir * dist;
-            Vector2 tangent = a.SafeDirectionTo(b) * a.Distance(b);
-            float rotation = tangent.ToRotation();
-            const float imageThickness = 8;
-            const float thicknessScale = 4f / imageThickness;
-            Vector2 capOrigin = new(cap.Width, cap.Height / 2f);
-            Vector2 middleOrigin = new(0, horiz.Height / 2f);
-            Vector2 middleScale = new(a.Distance(b) / horiz.Width, thicknessScale);
-            Color color = Color.DeepSkyBlue.Lerp(Color.LightCyan, completion) * fade;
-            Main.spriteBatch.Draw(horiz, a - Main.screenPosition, null, color, rotation, middleOrigin, middleScale,
-                SpriteEffects.None, 0f);
-            Main.spriteBatch.Draw(cap, a - Main.screenPosition, null, color, rotation, capOrigin, thicknessScale,
-                SpriteEffects.None, 0f);
-            Main.spriteBatch.Draw(cap, b - Main.screenPosition, null, color, rotation + MathHelper.Pi, capOrigin,
-                thicknessScale, SpriteEffects.None, 0f);
-        }
-
-        PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.UnderProjectiles, BlendState.Additive);
     }
 }

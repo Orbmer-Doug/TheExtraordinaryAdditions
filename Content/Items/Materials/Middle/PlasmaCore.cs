@@ -11,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 
 public class PlasmaCore : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.PlasmaCore);
+    public override string Texture => AssetRegistry.GennedTextures.PlasmaCore.Path;
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {

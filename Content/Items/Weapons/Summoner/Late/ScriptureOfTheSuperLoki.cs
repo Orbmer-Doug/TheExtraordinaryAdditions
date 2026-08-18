@@ -14,7 +14,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Late;
 
 public class ScriptureOfTheSuperLoki : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ScriptureOfTheSuperLoki);
+    public override string Texture => AssetRegistry.GennedTextures.ScriptureOfTheSuperLoki.Path;
 
     public override void SetStaticDefaults()
     {
@@ -52,7 +52,8 @@ public class ScriptureOfTheSuperLoki : ModItem
         int type, int damage, float knockback)
     {
         player.AddBuff(Item.buffType, 2);
-        Projectile projectile = Projectile.NewProjectileDirect(source, player.Additions().MouseWorld, velocity, type,
+        Projectile projectile = Projectile.NewProjectileDirect(source, player.AdditionsMouse().MouseWorld, velocity,
+            type,
             damage, knockback, Main.myPlayer);
         projectile.originalDamage = Item.damage;
         return false;

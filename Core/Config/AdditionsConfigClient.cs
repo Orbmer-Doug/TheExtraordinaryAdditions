@@ -26,7 +26,7 @@ public class AdditionsConfigClient : ModConfig
     public override void OnLoaded()
     {
         AdditionsMain.SetLoadingText("Loading assets...");
-        AssetRegistry.InitializeAssetDictionaries(Mod);
+        //AssetRegistry.InitializeAssetDictionaries(Mod);
     }
 
     public static AdditionsConfigClient Instance = ModContent.GetInstance<AdditionsConfigClient>();

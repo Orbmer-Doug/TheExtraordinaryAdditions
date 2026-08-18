@@ -1,19 +1,15 @@
 ﻿using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Early;
 using TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 using TheExtraordinaryAdditions.Core.Config;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
 using TheExtraordinaryAdditions.UI;
-using TheExtraordinaryAdditions.UI.LaserUI;
 
 namespace TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
@@ -178,7 +174,8 @@ public class VanillaChanges : GlobalItem
     public override bool Shoot(Item item, Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position,
         Vector2 velocity, int type, int damage, float knockback)
     {
-        GlobalPlayer mod = player.Additions();
+        GlobalPlayer mod = player.GetModPlayer<GlobalPlayer>();
+        PlayerMouse mouse = player.AdditionsMouse();
 
         void NewProj(int type, int? damag, Vector2? pos = default, Vector2? vel = default, float ai0 = 0f,
             float ai1 = 0f, float ai2 = 0f, float extra0 = 0f, float extra1 = 0f)
@@ -190,7 +187,7 @@ public class VanillaChanges : GlobalItem
                 Projectile p = Main.projectile[proj];
                 p.AdditionsInfo().ExtraAI[0] = extra0;
                 p.AdditionsInfo().ExtraAI[1] = extra1;
-                if (proj.BetweenNum(0, Main.maxProjectiles, true))
+                if (proj >= 0 && proj <= Main.maxProjectiles)
                     p.netUpdate = true;
             }
         }
@@ -247,21 +244,14 @@ public class VanillaChanges : GlobalItem
                         Projectile.NewProjectile(source, position, velocity, type, damage, knockback, Main.myPlayer)]
                     .As<BreakerBladeCrush>();
                 bool s = Main.keyState.IsKeyDown(Keys.S);
-                if (mod.SafeMouseRight.Current)
+                if (mouse.SafeMouseRight.Current)
                     crush.Beam = true;
-                if (!mod.SafeMouseRight.Current && s && !mod.AtMaxLimit)
+                if (!mouse.SafeMouseRight.Current && s && !mod.AtMaxLimit)
                     crush.State = BreakerBladeCrush.BladeState.Charging;
 
                 return false;
         }
 
-        bool damageClass = item.CountsAsClass<RangedDamageClass>() || item.CountsAsClass<MeleeDamageClass>()
-                                                                   || item.CountsAsClass<MagicDamageClass>() ||
-                                                                   item.CountsAsClass<ThrowingDamageClass>() ||
-                                                                   item.CountsAsClass<SummonDamageClass>();
-        if (mod.AridFlask && damageClass && Main.rand.NextBool(4) && !item.channel && player.whoAmI == Main.myPlayer)
-            Projectile.NewProjectile(source, position, velocity, ModContent.ProjectileType<SandBlast>(),
-                DamageSoftCap(damage, 80), 1f, player.whoAmI, 0f, 0f, 0f);
         return true;
     }
 
@@ -277,17 +267,6 @@ public class VanillaChanges : GlobalItem
             //!.HasCooldown(player, PumpkinDashCooldown.ID),
             _ => base.AltFunctionUse(item, player),
         };
-    }
-
-    public override bool CanUseItem(Item item, Player player)
-    {
-        switch (item.type)
-        {
-            case ItemID.HeatRay:
-                return !player.HasBuff(LaserResource.OverheatBuff);
-        }
-
-        return base.CanUseItem(item, player);
     }
 
     public override void UseItemFrame(Item item, Player player)
@@ -312,9 +291,9 @@ public class VanillaChanges : GlobalItem
 
         void DoShotAnimation(float amount)
         {
-            player.ChangeDir(Math.Sign((player.Additions().MouseWorld - player.Center).X));
+            player.ChangeDir(Math.Sign((player.AdditionsMouse().MouseWorld - player.Center).X));
             float animProgress = 1f - player.itemTime / (float) player.itemTimeMax;
-            float rotation = (player.Center - player.Additions().MouseWorld).ToRotation() * player.gravDir +
+            float rotation = (player.Center - player.AdditionsMouse().MouseWorld).ToRotation() * player.gravDir +
                              MathHelper.PiOver2;
             if (animProgress < 0.4f)
             {
@@ -326,8 +305,8 @@ public class VanillaChanges : GlobalItem
 
         void AimArms()
         {
-            player.ChangeDir(Math.Sign((player.Additions().MouseWorld - player.Center).X));
-            float rotation = (player.Center - player.Additions().MouseWorld).ToRotation() * player.gravDir +
+            player.ChangeDir(Math.Sign((player.AdditionsMouse().MouseWorld - player.Center).X));
+            float rotation = (player.Center - player.AdditionsMouse().MouseWorld).ToRotation() * player.gravDir +
                              MathHelper.PiOver2;
             player.SetCompositeArmFront(true, 0, rotation);
         }
@@ -353,7 +332,7 @@ public class VanillaChanges : GlobalItem
 
         void HoldOut(float dist, Vector2 itemSize, Vector2 itemOrigin, float rot = MathHelper.PiOver2)
         {
-            player.ChangeDir(Math.Sign((player.Additions().MouseWorld - player.Center).X));
+            player.ChangeDir(Math.Sign((player.AdditionsMouse().MouseWorld - player.Center).X));
             float itemRotation = player.compositeFrontArm.rotation + rot * player.gravDir;
             Vector2 itemPosition = player.MountedCenter + itemRotation.ToRotationVector2() * dist;
             CleanHoldStyle(player, itemRotation, itemPosition, itemSize, itemOrigin);

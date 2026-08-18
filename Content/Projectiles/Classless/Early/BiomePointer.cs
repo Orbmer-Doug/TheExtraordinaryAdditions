@@ -10,13 +10,12 @@ using TheExtraordinaryAdditions.Content.Items.Tools;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Utilities;
 using TheExtraordinaryAdditions.UI;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Early;
 
 public class BiomePointer : BaseIdleHoldoutProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BiomePointer);
+    public override string Texture => AssetRegistry.GennedTextures.BiomePointer.Path;
     public override int AssociatedItemID => ModContent.ItemType<BiomeFinder>();
     public override int IntendedProjectileType => ModContent.ProjectileType<BiomePointer>();
 

@@ -7,7 +7,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Placeable;
 
 public class StygainHeartTrophy : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.StygainHeartTrophy);
+    public override string Texture => AssetRegistry.GennedTextures.StygainHeartTrophy.Path;
 
     public override void SetStaticDefaults()
     {

@@ -3,16 +3,14 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Early;
 
 public class SnareHoldout : BaseHoldoutProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.NoxiousSnare);
+    public override string Texture => AssetRegistry.GennedTextures.NoxiousSnare.Path;
 
     public ref float Time => ref Projectile.ai[0];
     public ref float Radius => ref Projectile.ai[1];
@@ -84,16 +82,16 @@ public class SnareHoldout : BaseHoldoutProjectile
 
         // Expand radius
         Spin = (Spin + .005f) % MathHelper.TwoPi;
-        Radius = Animators.MakePoly(3f).InOutFunction.Evaluate(0f, MaxRadius, InverseLerp(0f, 30f, Time));
+        Radius = MakePoly(3f).InOutFunction.Evaluate(0f, MaxRadius, InverseLerp(0f, 30f, Time));
         float dustCount = MathHelper.TwoPi * Radius / 8f;
         for (int j = 0; j < dustCount; j++)
         {
             float angle = MathHelper.TwoPi * j / dustCount + Spin;
-            Dust obj = Dust.NewDustPerfect(Projectile.Center, DustID.Grass, null, 0, default, 1f);
+            Dust obj = Dust.NewDustPerfect(Projectile.Center, DustID.JunglePlants, null, 0, default, 1f);
             obj.position = Projectile.Center + angle.ToRotationVector2() * Radius;
             obj.scale = 0.7f;
             obj.noGravity = true;
-            obj.velocity = Vector2.Zero;
+            obj.velocity = -(angle + RandomRotation()).ToRotationVector2();
         }
 
         foreach (NPC npc in Main.ActiveNPCs)
@@ -114,5 +112,39 @@ public class SnareHoldout : BaseHoldoutProjectile
         Main.spriteBatch.DrawBetter(texture, Projectile.Center, frame, Projectile.GetAlpha(lightColor),
             Projectile.rotation, origin, Projectile.scale, effects);
         return false;
+    }
+}
+
+public class SnareGas : ModProjectile
+{
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
+
+    public override void SetDefaults()
+    {
+        Projectile.width = Projectile.height = 16;
+        Projectile.friendly = true;
+        Projectile.ignoreWater = false;
+        Projectile.tileCollide = false;
+        Projectile.penetrate = -1;
+        Projectile.timeLeft = 140;
+        Projectile.DamageType = DamageClass.Magic;
+        Projectile.usesLocalNPCImmunity = true;
+        Projectile.localNPCHitCooldown = 10;
+    }
+
+    public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+    {
+        Projectile.damage = (int) (Projectile.damage * 0.9);
+    }
+
+    public override void AI()
+    {
+        Projectile.velocity *= .975f;
+
+        if (Projectile.ai[0]++ % 2 == 1)
+            ParticleRegistry.SpawnMistParticle(Projectile.RandAreaInEntity(), RandomVelocity(1f, .1f, .6f) + Projectile.velocity, Main.rand.NextFloat(.2f, .3f), Color.Olive, Color.DarkOliveGreen, Main.rand.NextFloat(140f, 200f));
+
+        if (Collision.SolidCollision(Projectile.position, Projectile.width, Projectile.height))
+            Projectile.velocity *= .9f;
     }
 }

@@ -5,18 +5,17 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Summon;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Pets;
 
 public class DoohickeyRun : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Doohickey);
+    public override string Texture => AssetRegistry.GennedTextures.Doohickey.Path;
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
+    public PlayerMouse Modded => Owner.AdditionsMouse();
 
     public int Time
     {
@@ -82,7 +81,7 @@ public class DoohickeyRun : ModProjectile
 
                 Vector2 center = Owner.MountedCenter;
                 Vector2 expected = center - Vector2.UnitX * 50f * Owner.direction;
-                Vector2 dest = RaytraceTiles(center, expected) ?? expected;
+                Vector2 dest = RaycastTiles(center, expected) ?? expected;
                 int direction = (Owner.Center.X - Projectile.Center.X).NonZeroSign();
                 float acceleration = Utils.Remap(Projectile.Distance(dest), 0f, 100f, .09f, .4f);
 
@@ -101,7 +100,7 @@ public class DoohickeyRun : ModProjectile
                     int y = (int) Projectile.Bottom.Y - 1;
                     Vector2 start2 = new(start, y);
                     Vector2 end2 = new(end, y);
-                    Vector2 ray = RaytraceTiles(start2, end2) ?? start2;
+                    Vector2 ray = RaycastTiles(start2, end2) ?? start2;
 
                     int obstacleHeight = 0;
                     for (int i = 0; i < 5; i++)

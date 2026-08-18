@@ -6,7 +6,7 @@ namespace TheExtraordinaryAdditions.Content.Buffs.Summon;
 
 public class AntflyBuff : ModBuff
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AntBuff);
+    public override string Texture => AssetRegistry.GennedTextures.AntBuff.Path;
 
     public override void SetStaticDefaults()
     {

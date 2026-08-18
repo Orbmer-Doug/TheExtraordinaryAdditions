@@ -4,17 +4,16 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
 public class MimicrySpear : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Mimicry);
+    public override string Texture => AssetRegistry.GennedTextures.Mimicry.Path;
 
     public override void SetDefaults()
     {
@@ -32,7 +31,7 @@ public class MimicrySpear : ModProjectile
     }
 
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
+    public PlayerMouse Modded => Owner.AdditionsMouse();
     public ref float Time => ref Projectile.ai[0];
 
     public bool Start
@@ -67,7 +66,7 @@ public class MimicrySpear : ModProjectile
         {
             if (this.RunLocal())
                 Projectile.velocity = Vector2.Lerp(Projectile.velocity,
-                    Owner.SafeDirectionTo(Owner.Additions().MouseWorld), .5f);
+                    Owner.SafeDirectionTo(Owner.AdditionsMouse().MouseWorld), .5f);
 
             Offset = MakePoly(3).InOutFunction.Evaluate(55f, 31f, InverseLerp(0f, timeReeling, Time));
             Projectile.friendly = false;
@@ -101,7 +100,7 @@ public class MimicrySpear : ModProjectile
                     Projectile.friendly = true;
 
                     if (this.RunLocal())
-                        Projectile.velocity = Owner.SafeDirectionTo(Owner.Additions().MouseWorld);
+                        Projectile.velocity = Owner.SafeDirectionTo(Owner.AdditionsMouse().MouseWorld);
 
                     // Update the hitbox for visuals
                     Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver4;
@@ -149,7 +148,7 @@ public class MimicrySpear : ModProjectile
             ParticleRegistry.SpawnBloomLineParticle(pos, vel, life - 9, scale + .1f, color);
         }
 
-        AdditionsSound.MimicrySwing.Play(Projectile.Center, 2f, .3f);
+        AssetRegistry.GennedSounds.MimicrySwing.Play(Projectile.Center, 2f, .3f);
         ScreenShakeSystem.New(new(.4f, .3f), Projectile.Center);
     }
 

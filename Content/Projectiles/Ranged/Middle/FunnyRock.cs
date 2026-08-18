@@ -3,16 +3,15 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 
 public class FunnyRock : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CopperWireWrappedRock);
+    public override string Texture => AssetRegistry.GennedTextures.CopperWireWrappedRock.Path;
 
     public override void SetDefaults()
     {
@@ -58,7 +57,7 @@ public class FunnyRock : ModProjectile
             {
                 Projectile.velocity = Vector2.SmoothStep(Projectile.velocity,
                     Owner.RotatedRelativePoint(Owner.MountedCenter, false, true)
-                        .SafeDirectionTo(Owner.Additions().MouseWorld), .8f);
+                        .SafeDirectionTo(Owner.AdditionsMouse().MouseWorld), .8f);
             }
 
             Owner.ChangeDir(Dir);
@@ -140,8 +139,8 @@ public class FunnyRock : ModProjectile
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        AdditionsSound.LightningStrike.Play(Projectile.Center, .7f, 0f, 0f, 1, Name);
-        AdditionsSound.ElectricalPowBoom.Play(Projectile.Center, 1.2f, .2f, 0f, 0, Name);
+        AssetRegistry.GennedSounds.LightningStrike.Play(Projectile.Center, .7f, 0f, 0f, 1, Name);
+        AssetRegistry.GennedSounds.ElectricalPowBoom.Play(Projectile.Center, 1.2f, .2f, 0f, 0, Name);
         if (this.RunLocal())
             Projectile.NewProj(target.Center, Vector2.Zero, ModContent.ProjectileType<RockLightning>(),
                 Projectile.damage, Projectile.knockBack, Owner.whoAmI);

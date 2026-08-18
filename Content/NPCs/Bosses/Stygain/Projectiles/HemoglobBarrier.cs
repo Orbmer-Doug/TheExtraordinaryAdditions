@@ -3,11 +3,10 @@ using System;
 using System.Collections.Generic;
 using Terraria;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 
@@ -23,7 +22,7 @@ public class HemoglobBarrier : ProjOwnedByNPC<StygainHeart>
         set => Projectile.ai[1] = value.ToInt();
     }
 
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     private const int Points = 150;
 
     public override void SetDefaults()
@@ -146,7 +145,7 @@ public class HemoglobBarrier : ProjOwnedByNPC<StygainHeart>
         return col;
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override bool PreDraw(ref Color lightColor)
     {
@@ -155,12 +154,12 @@ public class HemoglobBarrier : ProjOwnedByNPC<StygainHeart>
             if (trail == null || trail.Disposed || points == null)
                 return;
 
-            ManagedShader barrier = ShaderRegistry.EnlightenedBeam;
+            ManagedShader barrier = AssetRegistry.GennedShaders.EnlightenedBeam;
 
             barrier.TrySetParameter("time", Projectile.timeLeft * 0.01f);
             barrier.TrySetParameter("repeats", 6f);
-            barrier.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.StreakMagma), 1, SamplerState.LinearWrap);
-            barrier.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FractalNoise), 2, SamplerState.LinearWrap);
+            barrier.SetTexture(AssetRegistry.GennedTextures.StreakMagma, 1, SamplerState.LinearWrap);
+            barrier.SetTexture(AssetRegistry.GennedTextures.FractalNoise, 2, SamplerState.LinearWrap);
             trail.DrawTrail(barrier, points.Points, 30);
         }
 

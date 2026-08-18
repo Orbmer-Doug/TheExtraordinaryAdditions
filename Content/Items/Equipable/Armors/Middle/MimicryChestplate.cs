@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
+using TheExtraordinaryAdditions.Content.Rarities;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
 [AutoloadEquip(EquipType.Body)]
 public class MimicryChestplate : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.MimicryChestplate);
+    public override string Texture => AssetRegistry.GennedTextures.MimicryChestplate.Path;
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {

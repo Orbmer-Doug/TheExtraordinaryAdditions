@@ -997,7 +997,7 @@ public static class DropHelper
                 WeightedItemStack stack = info.rng.NextFromList(stacks);
                 CommonCode.DropItem(info, stack.ItemID, stack.ChooseQuantity(info.rng));
             }
-            
+
             ItemDropAttemptResult result = default;
             result.State = ItemDropAttemptResultState.Success;
             return result;

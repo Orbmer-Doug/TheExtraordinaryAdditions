@@ -13,7 +13,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
 public class KrakenTentacle : ModProjectile, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.KrakenTentacle);
+    public override string Texture => AssetRegistry.GennedTextures.KrakenTentacle.Path;
     public ref float Time => ref Projectile.ai[0];
 
     public bool Init
@@ -35,7 +35,6 @@ public class KrakenTentacle : ModProjectile, ILocalizedModType, IModType
     public ref float Spin => ref Projectile.AdditionsInfo().ExtraAI[2];
 
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
 
     public const int MaxSegments = 10;
     public List<VerletSimulatedSegment> segments;
@@ -142,7 +141,7 @@ public class KrakenTentacle : ModProjectile, ILocalizedModType, IModType
             return false;
 
         Texture2D tip = Projectile.ThisProjectileTexture();
-        Texture2D inner = AssetRegistry.GetTexture(AdditionsTexture.KrakenTentacleSegment);
+        Texture2D inner = AssetRegistry.GennedTextures.KrakenTentacleSegment;
 
         Vector2[] bezierPoints = segments.Select(x => x.Position).ToArray();
         BezierCurves bezierCurve = new(bezierPoints);

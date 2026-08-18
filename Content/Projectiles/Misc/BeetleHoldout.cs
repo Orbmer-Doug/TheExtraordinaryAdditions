@@ -5,17 +5,16 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Summon;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
 using TheExtraordinaryAdditions.Core.Netcode;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Misc;
 
 public class BeetleHoldout : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CrimsonCarvedBeetle);
+    public override string Texture => AssetRegistry.GennedTextures.CrimsonCarvedBeetle.Path;
 
     public override void SetStaticDefaults()
     {
@@ -42,13 +41,10 @@ public class BeetleHoldout : ModProjectile
     public override bool? CanDamage() => false;
     public override bool ShouldUpdatePosition() => false;
 
-    public int AnimTime
-    {
-        get { return Right ? 50 : 90; }
-    }
+    public int AnimTime => Right ? 50 : 90;
 
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
+    public PlayerMouse Modded => Owner.AdditionsMouse();
     public float RiseInterpolant => InverseLerp(0f, AnimTime, Time);
     public float Interpolant => GetLerpBump(0f, AnimTime - 10f, AnimTime, AnimTime - 10f, Time);
 

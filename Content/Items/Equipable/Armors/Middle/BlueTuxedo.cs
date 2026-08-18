@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
 [AutoloadEquip(EquipType.Body)]
 public class BlueTuxedo : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BlueTuxedo);
+    public override string Texture => AssetRegistry.GennedTextures.BlueTuxedo.Path;
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {

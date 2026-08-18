@@ -5,10 +5,9 @@ using Terraria.Enums;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
@@ -24,7 +23,7 @@ public partial class Asterlin
             () => AITimer >= TechnicBombBarrage_TotalTime);
         StateMachine.RegisterStateEntryCallback(AsterlinAIType.TechnicBombBarrage, () =>
         {
-            if (this.RunServer())
+            if (ModNPC.RunServer())
                 NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<TheTechnicBlitzripper>(),
                     MediumAttackDamage, 0f);
             ReticlePosition = Target.Center - Vector2.UnitY * 200f;
@@ -66,7 +65,7 @@ public partial class Asterlin
     {
         if (AITimer <= 1)
         {
-            if (this.RunServer())
+            if (ModNPC.RunServer())
             {
                 TechnicBombBarrage_RotationStart = RandomRotation();
                 TechnicBombBarrage_RotationDir = Main.rand.NextFromList(1, -1);
@@ -140,7 +139,7 @@ public partial class Asterlin
                 {
                     Vector2 home = GetHomingVelocity(LeftHandPosition, Target.Center, Target.Velocity,
                         Main.rand.NextFloat(22f, 34f));
-                    if (this.RunServer())
+                    if (ModNPC.RunServer())
                         NPC.NewNPCProj(LeftHandPosition, home, ModContent.ProjectileType<TechnicBomb>(),
                             MediumAttackDamage, 0f);
 
@@ -166,20 +165,17 @@ public partial class Asterlin
 
     public void TechnicBombBarrage_Draw()
     {
-        void draw()
-        {
-            float size = 340f;
-            Main.spriteBatch.Draw(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise),
-                ToTarget(LeftHandPosition - new Vector2(size / 2), new Vector2(size)), Color.White);
-        }
-
         float interpol = InverseLerp(0f, 30f, AITimer) *
                          (1f - InverseLerp(0f, TechnicBombBarrage_WaitTime, TechnicBombBarrage_FadeTimer));
-        ManagedShader shader = AssetRegistry.GetShader("RadialTelegraph");
+        ManagedShader shader = AssetRegistry.GennedShaders.RadialTelegraph;
         shader.TrySetParameter("direction", LeftHandPosition.AngleTo(Target.Center));
         shader.TrySetParameter("angle", MathHelper.PiOver4 * interpol);
         shader.TrySetParameter("color", Color.DeepSkyBlue.ToVector4() * interpol);
-        PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.OverNPCs, BlendState.Additive, shader);
+        
+        const float size = 340f;
+        SpriteBatch.DrawRectPixelated(PixelationLayer.OverNPCs, BlendState.Additive,
+            AssetRegistry.GennedTextures.TechyNoise,
+            ToTarget(LeftHandPosition - new Vector2(size / 2), new Vector2(size)), Color.White);
     }
 
     public void TechnicBombBarrage_DrawReticle()
@@ -188,7 +184,7 @@ public partial class Asterlin
                          (1f - InverseLerp(0f, TechnicBombBarrage_WaitTime, TechnicBombBarrage_FadeTimer));
 
         Main.spriteBatch.SetBlendState(BlendState.Additive);
-        Texture2D line = AssetRegistry.GetTexture(AdditionsTexture.DimTrail);
+        Texture2D line = AssetRegistry.GennedTextures.DimTrail;
         Vector2 lineOrig = new(line.Width / 2f, 0f);
         for (int j = 0; j < 3; j++)
         {
@@ -205,16 +201,16 @@ public partial class Asterlin
 
         Main.spriteBatch.ResetToDefault();
 
-        ManagedShader shader = AssetRegistry.GetShader("ForcefieldLimited");
+        ManagedShader shader = AssetRegistry.GennedShaders.ForcefieldLimited;
         shader.TrySetParameter("direction", 0f);
         shader.TrySetParameter("angle", MathHelper.TwoPi);
         shader.TrySetParameter("color", Color.Cyan.ToVector4() * interpol);
-        shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WavyBlotchNoise), 1, SamplerState.LinearWrap);
+        shader.SetTexture(AssetRegistry.GennedTextures.WavyBlotchNoise, 1, SamplerState.LinearWrap);
         float size = 100f * interpol;
 
         Main.spriteBatch.EnterShaderRegion(shader.Effect, BlendState.Additive);
         shader.Render();
-        Main.spriteBatch.Draw(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise),
+        Main.spriteBatch.Draw(AssetRegistry.GennedTextures.TechyNoise,
             ToTarget(ReticlePosition - new Vector2(size / 2), new Vector2(size)), Color.White);
         Main.spriteBatch.ResetToDefault();
     }

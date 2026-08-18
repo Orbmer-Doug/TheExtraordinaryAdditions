@@ -6,7 +6,7 @@ namespace TheExtraordinaryAdditions.Content.Tiles;
 
 public class MeteorBlockPlaced : ModTile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.MeteorBlockPlaced);
+    public override string Texture => AssetRegistry.GennedTextures.MeteorBlockPlaced.Path;
 
     public override void SetStaticDefaults()
     {

@@ -1,19 +1,16 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
-using TheExtraordinaryAdditions.Common.Particles.Shader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
 
 public class ExsanguinationProj : BaseWhip
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ExsanguinationProj);
+    public override string Texture => AssetRegistry.GennedTextures.ExsanguinationProj.Path;
     public override int SegmentSkip => 3;
 
     public override void Defaults()
@@ -37,7 +34,7 @@ public class ExsanguinationProj : BaseWhip
         set => Projectile.AdditionsInfo().ExtraAI[1] = value.ToInt();
     }
 
-    public OptimizedPrimitiveTrail Line2;
+    public Trail Line2;
     public NPC target;
     public ref float SavedCompletion => ref Projectile.AdditionsInfo().ExtraAI[2];
     public ref float EmbedTime => ref Projectile.AdditionsInfo().ExtraAI[3];
@@ -94,7 +91,7 @@ public class ExsanguinationProj : BaseWhip
         }
         else
         {
-            if (Completion.BetweenNum(.2f, .8f) && Projectile.numUpdates < 4)
+            if (Completion is > .1f and < .8f && Projectile.numUpdates < 4)
             {
                 for (int i = 0; i < 2; i++)
                 {
@@ -119,7 +116,7 @@ public class ExsanguinationProj : BaseWhip
         {
             if (Embedded)
             {
-                AdditionsSound.SwordSlice.Play(pos, .8f, 0f, .2f, 10);
+                AssetRegistry.GennedSounds.SwordSlice.Play(pos, .8f, 0f, .2f, 10);
 
                 LineBrightness = 1f;
 
@@ -172,11 +169,11 @@ public class ExsanguinationProj : BaseWhip
     {
         if (Line != null && Line2 != null)
         {
-            ManagedShader beam = ShaderRegistry.EnlightenedBeam;
+            ManagedShader beam = AssetRegistry.GennedShaders.EnlightenedBeam;
             beam.TrySetParameter("time", Main.GlobalTimeWrappedHourly * 8f);
             beam.TrySetParameter("repeats", 2f);
-            beam.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.ShadowTrail), 1, SamplerState.LinearWrap);
-            beam.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FractalNoise), 2, SamplerState.LinearWrap);
+            beam.SetTexture(AssetRegistry.GennedTextures.ShadowTrail, 1, SamplerState.LinearWrap);
+            beam.SetTexture(AssetRegistry.GennedTextures.FractalNoise, 2, SamplerState.LinearWrap);
 
             Line.DrawTrail(beam, WhipPoints.Points);
             Line2.DrawTrail(beam, WhipPoints.Points);

@@ -6,7 +6,7 @@ namespace TheExtraordinaryAdditions.Content.Buffs.Summon;
 
 public class BubbleMan : ModBuff
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BubbleMan);
+    public override string Texture => AssetRegistry.GennedTextures.BubbleMan.Path;
 
     public override void SetStaticDefaults()
     {

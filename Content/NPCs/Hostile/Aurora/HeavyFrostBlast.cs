@@ -1,15 +1,14 @@
 ﻿using Terraria;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Utilities;
 using static TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora.AuroraGuard;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 
 public class HeavyFrostBlast : ProjOwnedByNPC<AuroraGuard>
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     public const int Lifetime = 80;
 
     public override void SetDefaults()

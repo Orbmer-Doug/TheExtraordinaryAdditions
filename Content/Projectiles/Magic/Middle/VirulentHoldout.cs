@@ -4,16 +4,14 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
 
 public class VirulentHoldout : BaseHoldoutProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.VirulentEntrapment);
+    public override string Texture => AssetRegistry.GennedTextures.VirulentEntrapment.Path;
     public ref float Time => ref Projectile.ai[0];
     public ref float Radius => ref Projectile.ai[1];
     public ref float Rotate => ref Projectile.ai[2];

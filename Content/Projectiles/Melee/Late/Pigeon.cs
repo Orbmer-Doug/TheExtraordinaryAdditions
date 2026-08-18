@@ -5,14 +5,14 @@ using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
 
 public class Pigeon : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Pigeon);
+    public override string Texture => AssetRegistry.GennedTextures.Pigeon.Path;
 
     public override void SetDefaults()
     {
@@ -78,7 +78,7 @@ public class Pigeon : ModProjectile
 
     public override void OnKill(int timeLeft)
     {
-        SoundID.NPCDeath1.Play(Projectile.Center, .3f, .3f, .2f, null, 400, Name);
+        SoundID.NPCDeath1.Play(Projectile.Center, .3f, .3f, .2f, 400, Name);
         for (int i = 0; i < 40; i++)
             Dust.NewDustPerfect(Projectile.RandAreaInEntity(), DustID.Blood, Main.rand.NextVector2Circular(4f, 4f), 0,
                 default, Main.rand.NextFloat(.9f, 1.5f));

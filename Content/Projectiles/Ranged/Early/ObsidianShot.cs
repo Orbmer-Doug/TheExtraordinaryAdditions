@@ -2,17 +2,16 @@
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Early;
 
 public class ObsidianShot : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ObsidianShot);
+    public override string Texture => AssetRegistry.GennedTextures.ObsidianShot.Path;
     public ref float Time => ref Projectile.ai[0];
 
     public override void SetStaticDefaults()
@@ -93,7 +92,7 @@ public class ObsidianShot : ModProjectile
         return true;
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints cache;
     private float WidthFunct(float c) => Projectile.height / 2 * MathHelper.SmoothStep(1f, 0f, c);
 
@@ -107,8 +106,8 @@ public class ObsidianShot : ModProjectile
         {
             if (trail == null || trail.Disposed || cache == null)
                 return;
-            ManagedShader shader = ShaderRegistry.FadedStreak;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Pixel), 1);
+            ManagedShader shader = AssetRegistry.GennedShaders.FadedStreak;
+            shader.SetTexture(AssetRegistry.GennedTextures.Pixel, 1);
             trail.DrawTrail(shader, cache.Points, 30);
         }
 

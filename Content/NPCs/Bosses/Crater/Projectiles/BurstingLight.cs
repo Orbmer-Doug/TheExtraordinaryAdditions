@@ -3,13 +3,14 @@ using System.IO;
 using Terraria;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
+using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
 public class BurstingLight : ProjOwnedByNPC<Asterlin>
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetStaticDefaults()
     {
@@ -44,16 +45,16 @@ public class BurstingLight : ProjOwnedByNPC<Asterlin>
             Kill();
 
         if (Time == Asterlin.RotatedDicing_TelegraphTime)
-            AdditionsSound.etherealHitCrunch.Play(Owner.Center, 1.8f, .1f, 0f, 1, Name);
+            AssetRegistry.GennedSounds.etherealHitCrunch.Play(Owner.Center, 1.8f, .1f, 0f, 1, Name);
 
         Projectile.rotation = Projectile.velocity.ToRotation();
-        Size.X = (int) new Animators.PiecewiseCurve()
+        Size.X = (int) new PiecewiseCurve()
             .AddStall(32f, TeleCompletion)
-            .Add(32f, 10000, 1f, Animators.MakePoly(4f).OutFunction)
+            .Add(32f, 10000, 1f, MakePoly(4f).OutFunction)
             .Evaluate(InverseLerp(0f, TotalTime, Time));
-        Size.Y = (int) new Animators.PiecewiseCurve()
+        Size.Y = (int) new PiecewiseCurve()
             .AddStall(32f, TeleCompletion)
-            .Add(32f, 0f, 1f, Animators.MakePoly(2f).InOutFunction)
+            .Add(32f, 0f, 1f, MakePoly(2f).InOutFunction)
             .Evaluate(InverseLerp(0f, TotalTime, Time));
         Time++;
     }
@@ -71,41 +72,6 @@ public class BurstingLight : ProjOwnedByNPC<Asterlin>
 
     public override bool PreDraw(ref Color lightColor)
     {
-        void draw()
-        {
-            float telegraphCompletion = InverseLerp(0f, Asterlin.RotatedDicing_TelegraphTime, Time);
-            for (float i = .6f; i < 1.2f; i += .05f)
-            {
-                Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
-                float anim = Animators.MakePoly(4f).InFunction.Evaluate(2f, 1f, telegraphCompletion);
-                Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Size * i * anim), null,
-                    Color.PaleGoldenrod.Lerp(Color.DarkGoldenrod, i), Projectile.rotation, tex.Size() / 2f);
-            }
-
-            Texture2D cap = AssetRegistry.GetTexture(AdditionsTexture.BloomLineCap);
-            Texture2D horiz = AssetRegistry.GetTexture(AdditionsTexture.BloomLineHoriz);
-            Vector2 dir = Projectile.velocity.SafeNormalize(Vector2.Zero);
-            float fade = GetLerpBump(0f, .2f, 1f, .8f, telegraphCompletion);
-            float dist = 10000;
-            Vector2 a = Projectile.Center - dir * dist;
-            Vector2 b = Projectile.Center + dir * dist;
-            Vector2 tangent = a.SafeDirectionTo(b) * a.Distance(b);
-            float rotation = tangent.ToRotation();
-            const float ImageThickness = 6;
-            float thicknessScale = 4f / ImageThickness;
-            Vector2 capOrigin = new(cap.Width, cap.Height / 2f);
-            Vector2 middleOrigin = new(0, horiz.Height / 2f);
-            Vector2 middleScale = new(a.Distance(b) / horiz.Width, thicknessScale);
-            Color color = Color.PaleGoldenrod * fade;
-            Main.spriteBatch.Draw(horiz, a - Main.screenPosition, null, color, rotation, middleOrigin, middleScale,
-                SpriteEffects.None, 0f);
-            Main.spriteBatch.Draw(cap, a - Main.screenPosition, null, color, rotation, capOrigin, thicknessScale,
-                SpriteEffects.None, 0f);
-            Main.spriteBatch.Draw(cap, b - Main.screenPosition, null, color, rotation + MathHelper.Pi, capOrigin,
-                thicknessScale, SpriteEffects.None, 0f);
-        }
-
-        PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.UnderProjectiles, BlendState.Additive);
         return false;
     }
 }

@@ -8,7 +8,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Pets;
 
 public class TVRemote : ModItem, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TVRemote);
+    public override string Texture => AssetRegistry.GennedTextures.TVRemote.Path;
 
     public override void SetDefaults()
     {
@@ -19,7 +19,7 @@ public class TVRemote : ModItem, ILocalizedModType, IModType
         Item.noMelee = true;
         Item.width = 50;
         Item.height = 36;
-        Item.UseSound = AssetRegistry.GetSound(AdditionsSound.AsterlinHit);
+        Item.UseSound = AssetRegistry.GennedSounds.AsterlinHit;
         Item.shoot = ModContent.ProjectileType<FloatingScreen>();
         Item.buffType = ModContent.BuffType<JudgingAsterlin>();
         Item.value = Item.sellPrice(0, 5, 0, 0);

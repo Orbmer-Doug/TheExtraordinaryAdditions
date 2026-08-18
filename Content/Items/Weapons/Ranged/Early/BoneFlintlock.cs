@@ -8,7 +8,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Early;
 
 public class BoneFlintlock : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BoneFlintlock);
+    public override string Texture => AssetRegistry.GennedTextures.BoneFlintlock.Path;
 
     public override void SetDefaults()
     {

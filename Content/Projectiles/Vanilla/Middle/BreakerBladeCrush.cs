@@ -6,15 +6,12 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Assets.Audio;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
-using static System.MathF;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
@@ -34,7 +31,7 @@ public class BreakerBladeCrush : BaseSwordSwing
         set => Projectile.AdditionsInfo().ExtraAI[7] = (int) value;
     }
 
-    public bool SpecialAttack => Modded.AtMaxLimit;
+    public bool SpecialAttack => Owner.Additions().AtMaxLimit;
 
     public bool Beam
     {
@@ -79,10 +76,10 @@ public class BreakerBladeCrush : BaseSwordSwing
 
                 if (Animation() >= .26f && !PlayedSound && !Main.dedServ)
                 {
-                    SoundStyle val = Beam ? AssetRegistry.GetSound(AdditionsSound.BreakerBeam) :
-                        SpecialAttack ? AssetRegistry.GetSound(AdditionsSound.BreakerSwingSpecial) :
-                        AssetRegistry.GetSound(AdditionsSound.BreakerSwing);
-                    val.Play(Projectile.Center, .6f * Projectile.scale, -.15f, .15f, null, 10, Name);
+                    SoundStyle val = Beam ? AssetRegistry.GennedSounds.BreakerBeam :
+                        SpecialAttack ? AssetRegistry.GennedSounds.BreakerSwingSpecial :
+                        AssetRegistry.GennedSounds.BreakerSwing;
+                    val.Play(Projectile.Center, .6f * Projectile.scale, -.15f, .15f, 10, Name);
 
                     if (Beam && this.RunLocal())
                     {
@@ -91,9 +88,9 @@ public class BreakerBladeCrush : BaseSwordSwing
                             Projectile.damage, Projectile.knockBack * .25f, Projectile.owner, 0f,
                             Owner.CheckSolidGround().ToInt(), 0f, SpecialAttack.ToInt());
 
-                        if (Modded.AtMaxLimit)
+                        if (Owner.Additions().AtMaxLimit)
                         {
-                            Modded.BreakerLimit = 0;
+                            Owner.Additions().BreakerLimit = 0;
                         }
                     }
 
@@ -142,21 +139,21 @@ public class BreakerBladeCrush : BaseSwordSwing
                 Owner.ChangeDir(Direction);
 
                 charge ??= LoopedSoundManager.CreateNew(
-                    new AdditionsLoopedSound(AdditionsSound.BreakerChargeFull, () => .85f),
-                    new AdditionsLoopedSound(AdditionsSound.BreakerCharge, () => 1.2f),
+                    new AdditionsLoopedSound(AssetRegistry.GennedSounds.BreakerChargeFull, () => .85f),
+                    new AdditionsLoopedSound(AssetRegistry.GennedSounds.BreakerCharge, () => 1.2f),
                     () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
                 charge.Update(Projectile.Center);
 
                 Projectile.rotation =
                     Projectile.rotation.AngleLerp(Direction == 1 ? SwordRotation : Pi + SwordRotation, .2f);
                 Owner.velocity.X = 0f;
-                Projectile.scale = Projectile.Opacity = Exp().OutFunction(InverseLerp(0f, 30f, Time));
-                Modded.BreakerLimit += .02f;
+                Projectile.scale = Projectile.Opacity = Expo().OutFunction(InverseLerp(0f, 30f, Time));
+                Owner.Additions().BreakerLimit += .02f;
                 Projectile.timeLeft = 40;
 
                 Projectile.Center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
 
-                if ((Modded.SafeMouseLeft.Current == false && this.RunLocal()) || Modded.AtMaxLimit)
+                if ((Modded.SafeMouseLeft.Current == false && this.RunLocal()) || Owner.Additions().AtMaxLimit)
                     Projectile.Kill();
 
                 if (Time % 2f == 1f)
@@ -189,14 +186,14 @@ public class BreakerBladeCrush : BaseSwordSwing
 
         if (SpecialAttack)
         {
-            AdditionsSound.BreakerUpHit.Play(Projectile.Center, .8f, 0f, .15f);
+            AssetRegistry.GennedSounds.BreakerUpHit.Play(Projectile.Center, .8f, 0f, .15f);
         }
         else
         {
-            Modded.BreakerLimit += hit.Damage * .01f;
+            Owner.Additions().BreakerLimit += hit.Damage * .01f;
             SoundStyle val = firstStrike
-                ? AssetRegistry.GetSound(AdditionsSound.BreakerHit2)
-                : AssetRegistry.GetSound(AdditionsSound.BreakerHit1);
+                ? AssetRegistry.GennedSounds.BreakerHit2
+                : AssetRegistry.GennedSounds.BreakerHit1;
             val.Play(Projectile.Center, .3f, -.15f, .15f);
         }
 
@@ -221,7 +218,7 @@ public class BreakerBladeCrush : BaseSwordSwing
         return Color.White * opacity;
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints points = new(20);
 
     public override bool PreDraw(ref Color lightColor)
@@ -253,8 +250,8 @@ public class BreakerBladeCrush : BaseSwordSwing
             if (trail == null || points == null)
                 return;
 
-            ManagedShader shader = ShaderRegistry.SwingShaderIntense;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FlameMap2), 0);
+            ManagedShader shader = AssetRegistry.GennedShaders.SwingShaderIntense;
+            shader.SetTexture(AssetRegistry.GennedTextures.FlameMap2, 0);
             shader.TrySetParameter("firstColor", Bright);
             shader.TrySetParameter("secondaryColor", Mid);
             shader.TrySetParameter("tertiaryColor", Dark);

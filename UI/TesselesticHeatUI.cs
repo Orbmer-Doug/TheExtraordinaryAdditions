@@ -30,8 +30,8 @@ public class TesselesticHeatUI : SmartUIState
         int heat = (int) proj.As<TesselesticMeltdownProj>().Heat;
         float interpolant = InverseLerp(0f, TesselesticMeltdownProj.LightningWait, heat);
 
-        Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.SmallBar1);
-        Texture2D tex2 = AssetRegistry.GetTexture(AdditionsTexture.SmallBar0);
+        Texture2D tex = AssetRegistry.GennedTextures.SmallBar1;
+        Texture2D tex2 = AssetRegistry.GennedTextures.SmallBar0;
         Point pos = (player.Center + new Vector2(-tex.Width / 2, -40) + (Vector2.UnitY * player.gfxOffY) -
                      Main.screenPosition).ToPoint();
         Rectangle target = new(pos.X, pos.Y, (int) (interpolant * tex.Width), tex.Height);

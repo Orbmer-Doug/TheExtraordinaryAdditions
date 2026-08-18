@@ -13,7 +13,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Middle;
 
 public class Acheron : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Acheron);
+    public override string Texture => AssetRegistry.GennedTextures.Acheron.Path;
 
     public override void SetStaticDefaults()
     {

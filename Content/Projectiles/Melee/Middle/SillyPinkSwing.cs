@@ -4,18 +4,16 @@ using Terraria.Audio;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
 public class SillyPinkSwing : BaseSwordSwing
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SillyPinkHammer);
+    public override string Texture => AssetRegistry.GennedTextures.SillyPinkHammer.Path;
 
     public enum SillyState
     {

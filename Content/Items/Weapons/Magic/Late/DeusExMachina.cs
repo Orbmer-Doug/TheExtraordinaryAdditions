@@ -5,7 +5,6 @@ using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
-using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -13,7 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Late;
 
 public class DeusExMachina : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.DeusExMachina);
+    public override string Texture => AssetRegistry.GennedTextures.DeusExMachina.Path;
 
     public override void SetStaticDefaults()
     {
@@ -28,7 +27,7 @@ public class DeusExMachina : ModItem
         Item.height = 50;
         Item.useTime = Item.useAnimation = 2;
         Item.knockBack = 0;
-        Item.rare = ModContent.RarityType<ShadowRarity>();
+        Item.rare = ItemRarityID.Purple;
         Item.value = AdditionsGlobalItem.LegendaryRarityPrice;
         Item.UseSound = null;
         Item.autoReuse = true;

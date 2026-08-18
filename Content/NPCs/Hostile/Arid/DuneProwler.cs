@@ -8,13 +8,13 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 using TheExtraordinaryAdditions.Content.Items.Placeable.Banners;
 using TheExtraordinaryAdditions.Core.Globals;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Arid;
 
 public class DuneProwler : ModNPC
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.DuneProwlerAssault);
+    public override string Texture => AssetRegistry.GennedTextures.DuneProwlerAssault.Path;
 
     public override void SetStaticDefaults()
     {
@@ -423,7 +423,7 @@ public class DuneProwler : ModNPC
                     }
 
                     WorldGen.KillTile(tileXObstacle, tileYObstacle - 1, fail: true);
-                    if ((this.RunServer() || !canDestroyDoor) && canDestroyDoor && this.RunServer())
+                    if ((ModProjectile.RunServer() || !canDestroyDoor) && canDestroyDoor && ModProjectile.RunServer())
                     {
                         if (TileLoader.IsClosedDoor(Main.tile[tileXObstacle, tileYObstacle - 1]))
                         {
@@ -434,7 +434,7 @@ public class DuneProwler : ModNPC
                                 NPC.netUpdate = true;
                             }
 
-                            if (this.RunClient() && opened)
+                            if (ModNPC.RunClient() && opened)
                             {
                                 NetMessage.SendData(MessageID.ToggleDoorState, -1, -1, null, 0, tileXObstacle,
                                     tileYObstacle - 1, NPC.direction);
@@ -450,7 +450,7 @@ public class DuneProwler : ModNPC
                                 NPC.netUpdate = true;
                             }
 
-                            if (this.RunClient() && opened)
+                            if (ModNPC.RunClient() && opened)
                             {
                                 NetMessage.SendData(MessageID.ToggleDoorState, -1, -1, null, 4, tileXObstacle,
                                     tileYObstacle - 1);

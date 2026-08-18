@@ -3,15 +3,12 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
 
 public class CometStormHoldout : BaseHoldoutProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CometStormHoldout);
+    public override string Texture => AssetRegistry.GennedTextures.CometStormHoldout.Path;
 
     public ref float Time => ref Projectile.ai[0];
 
@@ -34,7 +31,7 @@ public class CometStormHoldout : BaseHoldoutProjectile
         Projectile.Opacity = InverseLerp(0f, 16f, Time);
         Projectile.Center = Center +
                             PolarVector(
-                                Animators.MakePoly(2.8f).OutFunction.Evaluate(Projectile.width * .1f,
+                                MakePoly(2.8f).OutFunction.Evaluate(Projectile.width * .1f,
                                     Projectile.width * .4f + 27f, Projectile.Opacity),
                                 Projectile.velocity.ToRotation());
         Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.ToRadians(63.4f);
@@ -92,7 +89,7 @@ public class CometStormHoldout : BaseHoldoutProjectile
         Rectangle frame = texture.Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame);
         Vector2 drawPosition = Projectile.Center - Main.screenPosition;
         Main.EntitySpriteDraw(texture, drawPosition, frame, Projectile.GetAlpha(Color.White), Projectile.rotation,
-            frame.Size() * 0.5f, Projectile.scale, 0, 0);
+            frame.Size() * 0.5f, Projectile.scale, 0);
         return false;
     }
 }

@@ -19,8 +19,8 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 // Basic initialization for Asterlin
 public partial class Asterlin
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Asterlin_BossChecklist);
-    public override string BossHeadTexture => AssetRegistry.GetTexturePath(AdditionsTexture.Asterlin_Head_Boss);
+    public override string Texture => AssetRegistry.GennedTextures.Asterlin_BossChecklist.Path;
+    public override string BossHeadTexture => AssetRegistry.GennedTextures.Asterlin_Head_Boss.Path;
 
     public override void SetStaticDefaults()
     {
@@ -35,7 +35,7 @@ public partial class Asterlin
 
         NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers()
         {
-            CustomTexturePath = AssetRegistry.GetTexturePath(AdditionsTexture.Asterlin_BossChecklist),
+            CustomTexturePath = AssetRegistry.GennedTextures.Asterlin_BossChecklist.Path,
             PortraitScale = .4f,
             PortraitPositionYOverride = 100
         };
@@ -67,7 +67,7 @@ public partial class Asterlin
         NPC.boss = true;
         NPC.noGravity = false;
         NPC.noTileCollide = false;
-        NPC.HitSound = AssetRegistry.GetSound(AdditionsSound.AsterlinHit) with
+        NPC.HitSound = AssetRegistry.GennedSounds.AsterlinHit with
         {
             Volume = 1f, PitchVariance = .2f, PitchRange = new(-.2f, 0f)
         };
@@ -78,7 +78,7 @@ public partial class Asterlin
 
         if (!Main.dedServ)
         {
-            Music = MusicLoader.GetMusicSlot(Mod, AssetRegistry.GetMusicPath(AdditionsSound.MechanicalInNature));
+            Music = MusicLoader.GetMusicSlot(Mod, AssetRegistry.GennedSounds.Music.MechanicalInNature.SoundPath);
         }
 
         NPC.scale = NPC.Opacity = ZPosition = 1f;
@@ -93,21 +93,19 @@ public partial class Asterlin
 
     public override void Load()
     {
-        RelicAutoloader.Create(Mod, AssetRegistry.GetTexturePath(AdditionsTexture.AsterlinRelic),
-            AssetRegistry.GetTexturePath(AdditionsTexture.AsterlinRelicPlaced), out int id);
+        RelicAutoloader.Create(Mod, AssetRegistry.GennedTextures.AsterlinRelic.Path,
+            AssetRegistry.GennedTextures.AsterlinRelicPlaced.Path, out int id);
         RelicID = id;
-        MaskID = MaskAutoloader.Create(Mod, AssetRegistry.GetTexturePath(AdditionsTexture.AsterlinMask), false);
+        MaskID = MaskAutoloader.Create(Mod, AssetRegistry.GennedTextures.AsterlinMask.Path, false);
 
         On_NPC.UpdateNPC += MoreUpdates;
         LoadGraphics();
-        LoadDialogue();
     }
 
     public override void Unload()
     {
         On_NPC.UpdateNPC -= MoreUpdates;
         UnloadGraphics();
-        UnloadDialogue();
     }
 
     // For any high speed attacks we dont want the hitbox to skip over players

@@ -6,7 +6,7 @@ namespace TheExtraordinaryAdditions.Content.Buffs.Summon;
 
 public class JudgingAsterlin : ModBuff
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.JudgingAsterlin);
+    public override string Texture => AssetRegistry.GennedTextures.JudgingAsterlin.Path;
 
     public override void SetStaticDefaults()
     {

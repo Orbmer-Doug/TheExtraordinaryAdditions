@@ -4,36 +4,30 @@ using System;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 
 namespace TheExtraordinaryAdditions.Core.Utilities;
 
 public static class SpriteBatchUtils
 {
+    /// <summary>
+    /// Regular additive blending has the GPU calculating <c>result = shaderOutput.rgb * shaderOutput.a + destination</c>, which is not ideal in shaders returning 0 alpha
+    /// </summary>
+    public static readonly BlendState AdditiveBlendNoAlpha = new BlendState()
+    {
+        ColorBlendFunction = BlendFunction.Add,
+        ColorSourceBlend = Blend.One,
+        ColorDestinationBlend = Blend.One,
+        AlphaBlendFunction = BlendFunction.Add,
+        AlphaSourceBlend = Blend.One,
+        AlphaDestinationBlend = Blend.One
+    };
+
     public static Rectangle GetFrameRectangle(Point size, int frameX, int startY = 0, int startX = 0)
     {
         int x = startX + frameX * size.X;
         return new Rectangle(x, startY, size.X, size.Y);
-    }
-
-    public static void DrawText(this SpriteBatch spriteBatch, string text, int thickness, Vector2 position,
-        Color textColor, Color shadowColor, Vector2 origin = default, float scale = 1f, float rotation = 0f)
-    {
-        DynamicSpriteFont font = FontAssets.MouseText.Value;
-        Vector2 originFixed = ChatManager.GetStringSize(font, text, Vector2.One) * origin;
-        for (int i = -thickness; i <= thickness; i++)
-        {
-            for (int k = -thickness; k <= thickness; k++)
-            {
-                if (i == 0 && k == 0)
-                    continue;
-
-                float alpha = MathHelper.Lerp(1f, 0f, Math.Abs((i + k) / 2f));
-                spriteBatch.DrawString(font, text, position + new Vector2(i, k), Color.Multiply(shadowColor, alpha),
-                    rotation, originFixed, scale, SpriteEffects.None, 0f);
-            }
-        }
-
-        spriteBatch.DrawString(font, text, position, textColor, rotation, originFixed, scale, SpriteEffects.None, 0f);
     }
 
     public static void DrawBorderStringEightWay(SpriteBatch sb, DynamicSpriteFont font, string text,
@@ -53,26 +47,6 @@ public static class SpriteBatchUtils
 
         sb.DrawString(font, text, baseDrawPosition, main, rotation, default, scale, 0, 0f);
     }
-
-    public static void DrawBetterRect(this SpriteBatch sb, Texture2D tex, Rectangle rect, Rectangle? source,
-        Color color, float rot, Vector2 orig, SpriteEffects fx = SpriteEffects.None, bool subtract = false) =>
-        sb.Draw(tex,
-            subtract
-                ? new(rect.X - (int) Main.screenPosition.X, rect.Y - (int) Main.screenPosition.Y, rect.Width,
-                    rect.Height)
-                : rect, source, color, rot, orig, fx, 0f);
-
-    public static void DrawBetter(this SpriteBatch sb, Texture2D tex, Vector2 pos, Rectangle? source, Color color,
-        float rot, Vector2 orig, float scale, SpriteEffects fx = SpriteEffects.None) =>
-        sb.Draw(tex, pos - Main.screenPosition, source, color, rot, orig, scale, fx, 0f);
-
-    public static void DrawBetter(this SpriteBatch sb, Texture2D tex, Vector2 pos, Rectangle? source, Color color,
-        float rot, Vector2 orig, Vector2 scale, SpriteEffects fx = SpriteEffects.None) =>
-        sb.Draw(tex, pos - Main.screenPosition, source, color, rot, orig, scale, fx, 0f);
-
-    public static void PixelDraw(this SpriteBatch sb, Texture2D tex, Vector2 pos, Rectangle? source, Color color,
-        float rot, Vector2 orig, Vector2 scale, SpriteEffects fx = SpriteEffects.None) =>
-        sb.Draw(tex, (pos - Main.screenPosition) / 2f, source, color, rot, orig, scale / 2f, fx, 0f);
 
     public static RenderTarget2D CreateScreenSizedTarget(int screenWidth, int screenHeight) =>
         new(Main.graphics.GraphicsDevice, screenWidth, screenHeight, true, SurfaceFormat.Color, DepthFormat.Depth24, 8,
@@ -107,68 +81,83 @@ public static class SpriteBatchUtils
                 DepthStencilState.None,
                 Main.Rasterizer, null, Main.UIScaleMatrix);
         }
-    }
 
-    public static RasterizerState CullClockwiseAndScreen
-    {
-        get
+        public void DrawText(string text, int thickness, Vector2 position,
+            Color textColor, Color shadowColor, Vector2 origin = default, float scale = 1f, float rotation = 0f)
         {
-            if (field is not null)
-                return field;
+            DynamicSpriteFont font = FontAssets.MouseText.Value;
+            Vector2 originFixed = ChatManager.GetStringSize(font, text, Vector2.One) * origin;
+            for (int i = -thickness; i <= thickness; i++)
+            {
+                for (int k = -thickness; k <= thickness; k++)
+                {
+                    if (i == 0 && k == 0)
+                        continue;
 
-            field = RasterizerState.CullClockwise;
-            field.ScissorTestEnable = true;
+                    float alpha = MathHelper.Lerp(1f, 0f, Math.Abs((i + k) / 2f));
+                    spriteBatch.DrawString(font, text, position + new Vector2(i, k), Color.Multiply(shadowColor, alpha),
+                        rotation, originFixed, scale, SpriteEffects.None, 0f);
+                }
+            }
 
-            return field;
+            spriteBatch.DrawString(font, text, position, textColor, rotation, originFixed, scale, SpriteEffects.None,
+                0f);
         }
-    }
 
-    public static RasterizerState CullCounterclockwiseAndScreen
-    {
-        get
+        public void DrawBetterRect(Texture2D tex, Rectangle rect, Rectangle? source,
+            Color color, float rot, Vector2 orig, SpriteEffects fx = SpriteEffects.None, bool subtract = false) =>
+            spriteBatch.Draw(tex,
+                subtract
+                    ? new(rect.X - (int) Main.screenPosition.X, rect.Y - (int) Main.screenPosition.Y, rect.Width,
+                        rect.Height)
+                    : rect, source, color, rot, orig, fx, 0f);
+
+        public void DrawBetter(Texture2D tex, Vector2 pos, Rectangle? source, Color color,
+            float rot, Vector2 orig, float scale, SpriteEffects fx = SpriteEffects.None) =>
+            spriteBatch.Draw(tex, pos - Main.screenPosition, source, color, rot, orig, scale, fx, 0f);
+
+        public void DrawBetter(Texture2D tex, Vector2 pos, Rectangle? source, Color color,
+            float rot, Vector2 orig, Vector2 scale, SpriteEffects fx = SpriteEffects.None) =>
+            spriteBatch.Draw(tex, pos - Main.screenPosition, source, color, rot, orig, scale, fx, 0f);
+
+        public void PixelDraw(Texture2D tex, Vector2 pos, Rectangle? source, Color color,
+            float rot, Vector2 orig, Vector2 scale, SpriteEffects fx = SpriteEffects.None) =>
+            spriteBatch.Draw(tex, (pos - Main.screenPosition) / 2f, source, color, rot, orig, scale / 2f, fx, 0f);
+
+        public static void DrawAltPixelated(PixelationLayer layer, BlendState blend, Texture2D tex, Vector2 pos,
+            Rectangle? source, Color color, float rot, Vector2 orig, float scale, SpriteEffects fx = SpriteEffects.None,
+            ManagedShader shader = null) =>
+            PixelationSystem.QueueTextureRenderAction(tex, pos - Main.screenPosition, source, color, rot, orig, scale,
+                fx, layer, false, blend, shader);
+
+        public static void DrawAltPixelated(PixelationLayer layer, BlendState blend, Texture2D tex, Vector2 pos,
+            Rectangle? source, Color color, float rot, Vector2 orig, Vector2 scale,
+            SpriteEffects fx = SpriteEffects.None, ManagedShader shader = null) =>
+            PixelationSystem.QueueTextureRenderAction(tex, pos - Main.screenPosition, source, color, rot, orig, scale,
+                fx, layer, false, blend, shader);
+
+        public static void DrawRectPixelated(PixelationLayer layer, BlendState blend, Texture2D tex, Rectangle rect,
+            Color color, ManagedShader shader = null)
         {
-            if (field is not null)
-                return field;
-
-            field = RasterizerState.CullCounterClockwise;
-            field.ScissorTestEnable = true;
-
-            return field;
+            PixelationSystem.QueueTextureRenderAction(tex, rect.TopLeft(), null, color, 0f, Vector2.Zero, rect.Size(),
+                SpriteEffects.None,
+                layer, true, blend, shader);
         }
-    }
 
-    public static RasterizerState CullOnlyScreen
-    {
-        get
+        public static void DrawRectPixelated(PixelationLayer layer, BlendState blend, Texture2D tex, Rectangle rect,
+            Rectangle? source, Color color, float rot, Vector2 orig, SpriteEffects fx = SpriteEffects.None,
+            bool subtract = false, ManagedShader shader = null)
         {
-            if (field is not null)
-                return field;
+            Rectangle pos = subtract
+                ? new Rectangle(
+                    rect.X - (int) Main.screenPosition.X,
+                    rect.Y - (int) Main.screenPosition.Y, rect.Width,
+                    rect.Height)
+                : rect;
 
-            field = RasterizerState.CullNone;
-            field.ScissorTestEnable = true;
-
-            return field;
+            PixelationSystem.QueueTextureRenderAction(tex, pos.TopLeft(), source, color, rot, orig, pos.Size(), fx,
+                layer, true, blend, shader);
         }
-    }
-
-    public static RasterizerState DefaultRasterizerScreenCull => Main.gameMenu || (int) Main.LocalPlayer.gravDir == 1
-        ? CullCounterclockwiseAndScreen
-        : CullClockwiseAndScreen;
-
-    public static void SwapToRenderTarget(this RenderTarget2D renderTarget, Color? flushColor = null)
-    {
-        GraphicsDevice graphicsDevice = Main.graphics.GraphicsDevice;
-        SpriteBatch spriteBatch = Main.spriteBatch;
-
-        if (Main.gameMenu || Main.dedServ || renderTarget is null || graphicsDevice is null || spriteBatch is null)
-            return;
-
-        // Set the render target
-        graphicsDevice.SetRenderTarget(renderTarget);
-
-        // Flush the screen, removing any previous things drawn to it
-        flushColor ??= Color.Transparent;
-        graphicsDevice.Clear(flushColor.Value);
     }
 
     public static bool DrawTreasureBagInWorld(Item item, SpriteBatch spriteBatch, float rotation, float scale,
@@ -222,8 +211,20 @@ public static class SpriteBatchUtils
     {
         Texture2D texture = overrideTex ?? projectile.ThisProjectileTexture();
         Rectangle frame = texture.Frame(1, Main.projFrames[projectile.type], 0, projectile.frame);
-        Vector2 drawPosition = projectile.Center - Main.screenPosition;
-        Main.EntitySpriteDraw(texture, drawPosition, frame, projectile.GetAlpha(color), projectile.rotation,
+        Vector2 drawPosition = projectile.Center;
+        Main.spriteBatch.DrawBetter(texture, drawPosition, frame, projectile.GetAlpha(color), projectile.rotation,
+            frame.Size() / 2f, projectile.scale, fx);
+    }
+
+    public static void DrawBaseProjectile(this Projectile projectile, PixelationLayer layer, BlendState blend,
+        Color color,
+        SpriteEffects fx = SpriteEffects.None, Texture2D overrideTex = default)
+    {
+        Texture2D texture = overrideTex ?? projectile.ThisProjectileTexture();
+        Rectangle frame = texture.Frame(1, Main.projFrames[projectile.type], 0, projectile.frame);
+        Vector2 drawPosition = projectile.Center;
+        SpriteBatch.DrawAltPixelated(layer, blend, texture, drawPosition, frame, projectile.GetAlpha(color),
+            projectile.rotation,
             frame.Size() / 2f, projectile.scale, fx);
     }
 
@@ -247,6 +248,28 @@ public static class SpriteBatchUtils
         }
     }
 
+    public static void DrawProjectileBackglow(this Projectile projectile, PixelationLayer layer, BlendState blend,
+        Color backglowColor, float backglowArea,
+        byte alpha = 0,
+        int amount = 10, SpriteEffects spriteEffects = 0, Rectangle? frame = null, Texture2D overrideTexture = null,
+        Vector2? orig = null)
+    {
+        Texture2D texture = overrideTexture ?? TextureAssets.Projectile[projectile.type].Value;
+
+        frame ??= texture.Frame(1, Main.projFrames[projectile.type], 0, projectile.frame);
+
+        Vector2 drawPosition = projectile.Center - Main.screenPosition;
+        Vector2 origin = orig ?? frame.Value.Size() * 0.5f;
+        Color color = projectile.GetAlpha(backglowColor * projectile.Opacity) with { A = alpha };
+        for (int i = 0; i < amount; i++)
+        {
+            Vector2 drawOffset = (MathHelper.TwoPi * i / amount).ToRotationVector2() * backglowArea;
+            SpriteBatch.DrawAltPixelated(layer, blend, texture, drawPosition + drawOffset, frame, color * 0.95f,
+                projectile.rotation, origin,
+                projectile.scale, spriteEffects);
+        }
+    }
+
     public static void DrawNPCBackglow(this NPC npc, Color backglowColor, float backglowArea,
         SpriteEffects spriteEffects, Rectangle frame, byte alpha = 0, int amount = 10, Vector2 screenPos = default,
         Texture2D overrideTexture = null)
@@ -265,6 +288,9 @@ public static class SpriteBatchUtils
         }
     }
 
+    public static SpriteEffects ToSpriteDirection(this int dir) =>
+        dir == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
+
     public static Rectangle ToTarget(Vector2 pos, int width, int height) =>
         new((int) (pos.X - Main.screenPosition.X), (int) (pos.Y - Main.screenPosition.Y), width, height);
 
@@ -276,4 +302,11 @@ public static class SpriteBatchUtils
 
     public static Rectangle ToScreenTarget(Vector2 pos, Vector2 size) =>
         new((int) pos.X, (int) pos.Y, (int) size.X, (int) size.Y);
+
+    public static void RenderRect(this RotatedRectangle rect, bool subtract = true)
+    {
+        Texture2D pix = AssetRegistry.GennedTextures.Pixel;
+        Main.spriteBatch.DrawBetterRect(pix, rect.BaseRect, null, Color.White, rect.Rotation, rect.Pivot * pix.Size(),
+            0, subtract);
+    }
 }

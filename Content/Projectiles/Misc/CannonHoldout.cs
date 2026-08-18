@@ -7,17 +7,15 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Assets.Audio;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Terraria.Player;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Misc;
 
 public class CannonHoldout : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.MatterDisintegrationCannon);
+    public override string Texture => AssetRegistry.GennedTextures.MatterDisintegrationCannon.Path;
 
     public Player Owner => Main.player[Projectile.owner];
 
@@ -58,10 +56,10 @@ public class CannonHoldout : ModProjectile
     {
         Timer += 1f;
         SpeenBeams += Timer > 140f
-            ? Owner.Additions().MouseRight.Current ? 2f : 1f
+            ? Owner.AdditionsMouse().MouseRight.Current ? 2f : 1f
             : 1f + 2f * Animators.MakePoly(2f).InFunction(1f - Timer / 140f);
 
-        LaserSoundSlot ??= LoopedSoundManager.CreateNew(new(AdditionsSound.LaserHum, () => 1.2f),
+        LaserSoundSlot ??= LoopedSoundManager.CreateNew(new(AssetRegistry.GennedSounds.LaserHum, () => 1.2f),
             () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
         LaserSoundSlot.Update(Projectile.Center);
 
@@ -73,7 +71,7 @@ public class CannonHoldout : ModProjectile
 
         else if (MoveInIntervals <= 0f && this.RunLocal())
         {
-            Vector2 newVelocity = Owner.Additions().MouseWorld - Center;
+            Vector2 newVelocity = Owner.AdditionsMouse().MouseWorld - Center;
 
             Tile target = Main.tile[tileTargetX, tileTargetY];
             if (target.HasTile)
@@ -108,11 +106,11 @@ public class CannonHoldout : ModProjectile
         Owner.SetBackHandBetter(0, Projectile.rotation + (MathHelper.PiOver4 * Owner.gravDir * Owner.direction));
         Projectile.Center = Center + Projectile.velocity; // For the laser
 
-        if (Owner.Additions().SafeMouseRight.Current)
+        if (Owner.AdditionsMouse().SafeMouseRight.Current)
         {
             if (!PlayedSound)
             {
-                AdditionsSound.LaserShift.Play(Owner.Center, 2f, 0f, .1f);
+                AssetRegistry.GennedSounds.LaserShift.Play(Owner.Center, 2f, 0f, .1f);
                 PlayedSound = true;
             }
 
@@ -183,11 +181,11 @@ public class CannonHoldout : ModProjectile
 
     public void DrawBeam(Texture2D beamTex, Vector2 direction, int beamIndex, bool second)
     {
-        Vector2 val = Center + direction * (Owner.Additions().MouseRight.Current ? 20f : 10f);
+        Vector2 val = Center + direction * (Owner.AdditionsMouse().MouseRight.Current ? 20f : 10f);
         Vector2 val2 = default;
         Vector2 startPos = val + direction.RotatedBy(MathHelper.PiOver2, val2) *
             MathF.Cos(MathHelper.Pi * Around * beamIndex / Amount + SpeenBeams * 0.06f) *
-            (Owner.Additions().MouseRight.Current ? 24f : 12f);
+            (Owner.AdditionsMouse().MouseRight.Current ? 24f : 12f);
         float rotation = (Projectile.Center - startPos).ToRotation();
         Vector2 beamOrigin = new(beamTex.Width / 2f, beamTex.Height);
         val2 = startPos - Projectile.Center;
@@ -196,11 +194,11 @@ public class CannonHoldout : ModProjectile
 
         if (second)
         {
-            val = Center + direction * (Owner.Additions().MouseRight.Current ? 40f : 20f);
+            val = Center + direction * (Owner.AdditionsMouse().MouseRight.Current ? 40f : 20f);
             val2 = default;
             startPos = val + direction.RotatedBy(MathHelper.PiOver2, val2) *
                 MathF.Cos(MathHelper.Pi * Around * beamIndex / Amount + SpeenBeams * 0.06f) *
-                (Owner.Additions().MouseRight.Current ? 48f : 24f);
+                (Owner.AdditionsMouse().MouseRight.Current ? 48f : 24f);
             rotation = (Projectile.Center - startPos).ToRotation();
             beamOrigin = new(beamTex.Width / 2f, beamTex.Height);
             val2 = startPos - Projectile.Center;
@@ -240,7 +238,7 @@ public class CannonHoldout : ModProjectile
 
         Main.spriteBatch.SetBlendState(BlendState.Additive);
 
-        Texture2D beamTex = AssetRegistry.GetTexture(AdditionsTexture.SimpleGradient);
+        Texture2D beamTex = AssetRegistry.GennedTextures.SimpleGradient;
 
         for (int j = 0; j < Amountbeams; j++)
         {
@@ -251,14 +249,14 @@ public class CannonHoldout : ModProjectile
             }
         }
 
-        Texture2D bloomTex = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
+        Texture2D bloomTex = AssetRegistry.GennedTextures.GlowParticleSmall;
         Main.EntitySpriteDraw(bloomTex, Projectile.Center - Main.screenPosition, null, Color.OrangeRed * 0.3f,
             MathHelper.PiOver2, bloomTex.Size() / 2f, 0.3f * Projectile.scale, 0);
 
-        ManagedShader shader = ShaderRegistry.FadedStreak;
-        shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DoubleTrail), 1);
+        ManagedShader shader = AssetRegistry.GennedShaders.FadedStreak;
+        shader.SetTexture(AssetRegistry.GennedTextures.DoubleTrail, 1);
 
-        Texture2D bloom = AssetRegistry.GetTexture(AdditionsTexture.MatterDisintegrationCannonBloom);
+        Texture2D bloom = AssetRegistry.GennedTextures.MatterDisintegrationCannonBloom;
         float bloomOpacity = Animators.MakePoly(3f).InFunction(InverseLerp(0f, 30f, Timer)) *
                              (0.85f + Sin01(Main.GlobalTimeWrappedHourly)) * 0.8f;
         Color bloomColor = Color.Lerp(Color.OrangeRed, Color.Chocolate, Sin01(SpeenBeams * 0.2f + 1.2f));

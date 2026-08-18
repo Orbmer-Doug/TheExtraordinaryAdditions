@@ -1,19 +1,17 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using System;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Late;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
-using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
 
 public class EpidemicHoldout : BaseIdleHoldoutProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Epidemic);
+    public override string Texture => AssetRegistry.GennedTextures.Epidemic.Path;
     public override int IntendedProjectileType => ModContent.ProjectileType<EpidemicHoldout>();
     public override int AssociatedItemID => ModContent.ItemType<Epidemic>();
 
@@ -48,7 +46,7 @@ public class EpidemicHoldout : BaseIdleHoldoutProjectile
         }
 
         Owner.ChangeDir(Projectile.velocity.X.NonZeroSign());
-        Projectile.Center = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true) +
+        Projectile.Center = Owner.RotatedRelativePoint(Owner.MountedCenter) +
                             Projectile.velocity * Projectile.width * .4f;
         Projectile.damage = Owner.GetWeaponDamage(Owner.HeldItem);
         Projectile.rotation = Projectile.velocity.ToRotation();
@@ -84,7 +82,7 @@ public class EpidemicHoldout : BaseIdleHoldoutProjectile
             float wait = 60f * Owner.GetTotalAttackSpeed<MagicDamageClass>();
             if (this.RunLocal() && LeftCounter % wait == wait - 1f && Owner.HeldItem.CheckManaBetter(Owner, 8, true))
             {
-                AdditionsSound.WaterSpell.Play(Projectile.Center, 1f, 0f, 0f, 0);
+                AssetRegistry.GennedSounds.WaterSpell.Play(Projectile.Center, 1f, 0f, 0f, 0);
                 Projectile.NewProj(Projectile.Center, Projectile.SafeDirectionTo(Modded.MouseWorld) * 15f,
                     ModContent.ProjectileType<EpidemicLob>(), Projectile.damage, Projectile.knockBack,
                     Projectile.owner);
@@ -100,9 +98,9 @@ public class EpidemicHoldout : BaseIdleHoldoutProjectile
 
     private void DrawRing(SpriteBatch sb, Vector2 pos, float w, float h, float rotation, float prog, Color color)
     {
-        Texture2D ring = AssetRegistry.GetTexture(AdditionsTexture.EpidemicCircle);
+        Texture2D ring = AssetRegistry.GennedTextures.EpidemicCircle;
 
-        ManagedShader effect = ShaderRegistry.MagicRing;
+        ManagedShader effect = AssetRegistry.GennedShaders.MagicRing;
         effect.TrySetParameter("time", rotation);
         effect.TrySetParameter("cosine", (float) Math.Cos(rotation));
         effect.TrySetParameter("firstCol", color.ToVector3());

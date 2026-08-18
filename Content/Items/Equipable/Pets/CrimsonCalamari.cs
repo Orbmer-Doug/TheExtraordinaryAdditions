@@ -8,7 +8,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Pets;
 
 public class CrimsonCalamari : ModItem, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CrimsonCalamari);
+    public override string Texture => AssetRegistry.GennedTextures.CrimsonCalamari.Path;
 
     public override void SetDefaults()
     {

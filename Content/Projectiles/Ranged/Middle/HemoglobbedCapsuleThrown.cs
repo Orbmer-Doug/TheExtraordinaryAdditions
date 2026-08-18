@@ -5,17 +5,18 @@ using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
 using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 
 public class HemoglobbedCapsuleThrown : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.HemoglobbedCapsule);
+    public override string Texture => AssetRegistry.GennedTextures.HemoglobbedCapsule.Path;
 
     public enum BehaviorState
     {
@@ -30,7 +31,7 @@ public class HemoglobbedCapsuleThrown : ModProjectile
     }
 
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
+    public PlayerMouse Modded => Owner.AdditionsMouse();
 
     public ref float Time => ref Projectile.ai[1];
 
@@ -74,8 +75,8 @@ public class HemoglobbedCapsuleThrown : ModProjectile
         Projectile.SetAnimation(13, 6);
         after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0,
             120, 4, 1f,
-            AssetRegistry.GetTexture(AdditionsTexture.HemoglobbedCapsule)
-                .Frame(1, Main.projFrames[Type], 0, Projectile.frame), false, .15f));
+            AssetRegistry.GennedTextures.HemoglobbedCapsule.Asset.Frame(1, Main.projFrames[Type], 0, Projectile.frame),
+            false, .15f));
         Time++;
     }
 
@@ -113,7 +114,7 @@ public class HemoglobbedCapsuleThrown : ModProjectile
         Owner.SetDummyItemTime(2);
 
         float interpolant = MathF.Sin(MathHelper.Pi * animationCompletion * 2.5f);
-        CrimsonFormInterpolant = Animators.MakePoly(6f).InFunction(interpolant);
+        CrimsonFormInterpolant = MakePoly(6f).InFunction(interpolant);
 
         if (animationCompletion < 0.99f && CrimsonFormInterpolant >= 0.99f)
         {
@@ -215,7 +216,7 @@ public class HemoglobbedCapsuleThrown : ModProjectile
                 Main.rand.Next(30, 50), Main.rand.NextFloat(.7f, 1.2f), Color.DarkRed);
         }
 
-        AdditionsSound.Rapture.Play(Projectile.Center, 1.2f, -.1f);
+        AssetRegistry.GennedSounds.Rapture.Play(Projectile.Center, 1.2f, -.1f);
         ScreenShakeSystem.New(new(.6f, .6f, 3000f), Projectile.Center);
         if (this.RunLocal())
             Projectile.NewProj(Projectile.Center, Vector2.UnitY, ModContent.ProjectileType<LesserBloodBeacon>(),

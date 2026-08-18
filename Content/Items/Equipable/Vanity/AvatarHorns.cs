@@ -12,7 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Vanity;
 [AutoloadEquip(EquipType.Head)]
 public class AvatarHorns : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AvatarHorns);
+    public override string Texture => AssetRegistry.GennedTextures.AvatarHorns.Path;
 
     public override void SetStaticDefaults()
     {

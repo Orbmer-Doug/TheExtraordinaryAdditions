@@ -2,19 +2,17 @@
 using System;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 
 public class SanguineRay : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     private const int Lifetime = 45;
 
     public override void SetDefaults()
@@ -115,7 +113,7 @@ public class SanguineRay : ModProjectile
     }
 
     public TrailPoints cache;
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override bool PreDraw(ref Color lightColor)
     {
@@ -124,10 +122,10 @@ public class SanguineRay : ModProjectile
             if (trail == null || cache == null)
                 return;
 
-            ManagedShader shader = ShaderRegistry.PierceTrailShader;
+            ManagedShader shader = AssetRegistry.GennedShaders.PierceTrailShader;
             shader.TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly * 4f);
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.ShadowTrail), 1, SamplerState.LinearWrap);
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.HarshNoise), 2, SamplerState.LinearWrap);
+            shader.SetTexture(AssetRegistry.GennedTextures.ShadowTrail, 1, SamplerState.LinearWrap);
+            shader.SetTexture(AssetRegistry.GennedTextures.HarshNoise, 2, SamplerState.LinearWrap);
             trail.DrawTrail(shader, cache.Points, 80);
         }
 

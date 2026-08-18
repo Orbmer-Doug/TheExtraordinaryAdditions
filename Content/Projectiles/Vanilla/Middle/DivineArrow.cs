@@ -1,14 +1,14 @@
 ﻿using Terraria;
+using Terraria.GameContent.Drawing;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
 public class DivineArrow : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.DivineArrow);
+    public override string Texture => AssetRegistry.GennedTextures.DivineArrow.Path;
 
     public override void SetDefaults()
     {
@@ -52,8 +52,8 @@ public class DivineArrow : ModProjectile
         Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<DissipatingLight>(),
             (int) (Projectile.damage * .55f), 0f, Projectile.owner);
 
-        float offsetAngle = Main.rand.NextFloat(MathHelper.TwoPi);
-        int amount = 6;
+        float offsetAngle = RandomRotation();
+        const int amount = 6;
         for (int i = 0; i < amount; i++)
         {
             Vector2 shootVelocity = (MathHelper.TwoPi * i / amount + offsetAngle).ToRotationVector2() *
@@ -63,3 +63,38 @@ public class DivineArrow : ModProjectile
         }
     }
 }
+
+public class DissipatingLight : ModProjectile, ILocalizedModType, IModType
+{
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
+    public Player Owner => Main.player[Projectile.owner];
+
+    public override void SetDefaults()
+    {
+        Projectile.DamageType = DamageClass.Ranged;
+        Projectile.friendly = true;
+        Projectile.hostile = false;
+        Projectile.width =
+            Projectile.height = 60;
+        Projectile.alpha = 255;
+        Projectile.ignoreWater = true;
+        Projectile.tileCollide = false;
+        Projectile.timeLeft = 10;
+        Projectile.usesLocalNPCImmunity = true;
+        Projectile.localNPCHitCooldown = 10;
+        Projectile.penetrate = -1;
+    }
+
+    public override void AI()
+    {
+        if (Projectile.localAI[0] == 0f)
+        {
+            ParticleOrchestrator.RequestParticleSpawn(false,
+                ParticleOrchestraType.Excalibur,
+                new ParticleOrchestraSettings { PositionInWorld = Projectile.Center },
+                Projectile.owner);
+            Projectile.localAI[0] = 1f;
+        }
+    }
+}
+

@@ -2,13 +2,12 @@
 using Terraria.Achievements;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Misc;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Achievements;
 
 public class DefeatedSnail : ModAchievement
 {
-    public override string TextureName => AssetRegistry.GetTexturePath(AdditionsTexture.DefeatedSnail);
+    public override string TextureName => AssetRegistry.GennedTextures.DefeatedSnail.Path;
 
     public override void SetStaticDefaults()
     {

@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
 [AutoloadEquip(EquipType.Body)]
 public class SpecteriteChestPiece : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SpecteriteChestPiece);
+    public override string Texture => AssetRegistry.GennedTextures.SpecteriteChestPiece.Path;
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {

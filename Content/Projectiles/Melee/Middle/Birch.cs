@@ -4,18 +4,16 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
-using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
 public class Birch : BaseSwordSwing
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BirchTree);
+    public override string Texture => AssetRegistry.GennedTextures.BirchTree.Path;
 
     public override void Defaults()
     {
@@ -26,12 +24,12 @@ public class Birch : BaseSwordSwing
     {
         if (SwingDir == SwingDirection.Down)
         {
-            return Exp(2.3f).InOutFunction.Evaluate(-1f, 3.67f, SwingCompletion);
+            return Expo(2.3f).InOutFunction.Evaluate(-1f, 3.67f, SwingCompletion);
         }
 
         return new PiecewiseCurve()
             .Add(-1f, -.8f, .2f, MakePoly(2.4f).InFunction)
-            .Add(-.8f, 1f, 1f, Exp(1.8f).OutFunction)
+            .Add(-.8f, 1f, 1f, Expo(1.8f).OutFunction)
             .Evaluate(SwingCompletion);
     }
 
@@ -66,7 +64,7 @@ public class Birch : BaseSwordSwing
         // swoosh
         if (Animation() >= .26f && !PlayedSound && !Main.dedServ)
         {
-            AdditionsSound.Trees.Play(Projectile.Center, 1.3f, 0f, 1f, 400, Name);
+            AssetRegistry.GennedSounds.Trees.Play(Projectile.Center, 1.3f, 0f, 1f, 400, Name);
             PlayedSound = true;
         }
 
@@ -122,7 +120,7 @@ public class Birch : BaseSwordSwing
     public override void NPCHitEffects(in Vector2 start, in Vector2 end, NPC npc, NPC.HitInfo hit)
     {
         ParticleRegistry.SpawnPulseRingParticle(start, Vector2.Zero, 10, 0f, Vector2.One, 0f, 300f, Color.Brown);
-        AdditionsSound.etherealSmash.Play(start, 1.2f, -.1f, .2f);
+        AssetRegistry.GennedSounds.etherealSmash.Play(start, 1.2f, -.1f, .2f);
         for (int i = 0; i < 20; i++)
         {
             Dust.NewDustPerfect(start + Main.rand.NextVector2Circular(10f, 10f), DustID.WoodFurniture,
@@ -136,7 +134,7 @@ public class Birch : BaseSwordSwing
     public override void PlayerHitEffects(in Vector2 start, in Vector2 end, Player player, Player.HurtInfo info)
     {
         ParticleRegistry.SpawnPulseRingParticle(start, Vector2.Zero, 10, 0f, Vector2.One, 0f, 300f, Color.Brown);
-        AdditionsSound.etherealSmash.Play(start, 1.2f, -.1f, .2f);
+        AssetRegistry.GennedSounds.etherealSmash.Play(start, 1.2f, -.1f, .2f);
         for (int i = 0; i < 20; i++)
         {
             Dust.NewDustPerfect(start + Main.rand.NextVector2Circular(10f, 10f), DustID.WoodFurniture,

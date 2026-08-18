@@ -12,10 +12,9 @@ using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 
@@ -89,7 +88,7 @@ public class SmartPistolLayer : PlayerDrawLayer
 
 public class SmartPistolHeld : BaseIdleHoldoutProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SmartPistolMK6);
+    public override string Texture => AssetRegistry.GennedTextures.SmartPistolMK6.Path;
     public override int AssociatedItemID => ModContent.ItemType<SmartPistolMK6>();
     public override int IntendedProjectileType => ModContent.ProjectileType<SmartPistolHeld>();
 
@@ -372,13 +371,13 @@ public class SmartPistolHeld : BaseIdleHoldoutProjectile
                     float completion = InverseLerp(0f, SmartPistolGlobalNPC.TimeForLock, global.LockIn[i]);
                     Color col = Color.Lerp(Color.Yellow, Color.Red, completion);
 
-                    OptimizedPrimitiveTrail trail = new(c => 2f, (c, pos) => col, null, 40);
+                    Trail trail = new(c => 2f, (c, pos) => col, null, 40);
                     TrailPoints points = new(40);
                     Vector2 mid = (LaserTip + targetPos) / 2;
                     Vector2 b = ClosestPointOnLineSegment(mid, LaserTip, LaserTip + Projectile.velocity * SightDist);
                     for (int j = 0; j < 40; j++)
                         points.SetPoint(j, QuadraticBezier(LaserTip, b, targetPos, InverseLerp(0f, 40, j)));
-                    trail.DrawTrail(ShaderRegistry.StandardPrimitiveShader, points.Points, 200, true);
+                    trail.DrawTrail(AssetRegistry.GennedShaders.StandardPrimitiveShader, points.Points, 200, true);
                 }
             }
         }
@@ -402,7 +401,7 @@ public class SmartPistolHeld : BaseIdleHoldoutProjectile
                 {
                     Vector2 targetPos = target.boss ? target.Center + global.LockPositions[i] : target.Center;
                     float completion = InverseLerp(0f, SmartPistolGlobalNPC.TimeForLock, global.LockIn[i]);
-                    Texture2D reticleTexture = AssetRegistry.GetTexture(AdditionsTexture.scope);
+                    Texture2D reticleTexture = AssetRegistry.GennedTextures.scope;
                     Vector2 position = targetPos - Main.screenPosition;
                     float rotation = Main.GlobalTimeWrappedHourly +
                                      target.whoAmI * .5f * (target.whoAmI % 2 == 0).ToDirectionInt() + i * 0.1f;

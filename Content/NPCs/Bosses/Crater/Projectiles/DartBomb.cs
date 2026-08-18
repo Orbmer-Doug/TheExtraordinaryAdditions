@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
 public class DartBomb : ProjOwnedByNPC<Asterlin>
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     // To help with easing the dart animations
     public struct VisualDart(Vector2 center, float rotation, float opacity, int time)
@@ -46,7 +45,7 @@ public class DartBomb : ProjOwnedByNPC<Asterlin>
     public static int DartBuildRate => BuildTime / TotalDarts;
     public float Progress => InverseLerp(0f, TotalTime, Time);
     public float PullProgress => InverseLerp(BuildTime, TotalTime, Time);
-    public float DartDistance => Animators.MakePoly(3.1f).OutFunction.Evaluate(150f, 40f, Progress);
+    public float DartDistance => MakePoly(3.1f).OutFunction.Evaluate(150f, 40f, Progress);
 
     public override void SafeAI()
     {
@@ -59,12 +58,12 @@ public class DartBomb : ProjOwnedByNPC<Asterlin>
         // Explode darts outward once done
         if (Progress >= 1f)
         {
-            AdditionsSound.banditShot2A.Play(Projectile.Center, .9f, 0f, .1f, 40, Name);
+            AssetRegistry.GennedSounds.banditShot2A.Play(Projectile.Center, .9f, 0f, .1f, 40, Name);
             ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 30, 0f, Vector2.One, 0f, 212f,
                 Color.Cyan);
             ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 35, 0f, Vector2.One, 0f, 262f,
                 Color.Cyan * .3f);
-            if (this.RunServer())
+            if (ModProjectile.RunServer())
             {
                 for (int i = 0; i < DartList.Count; i++)
                 {
@@ -105,8 +104,8 @@ public class DartBomb : ProjOwnedByNPC<Asterlin>
 
     public override bool PreDraw(ref Color lightColor)
     {
-        Texture2D dart = AssetRegistry.GetTexture(AdditionsTexture.GodPiercingDart);
-        Texture2D glow = AssetRegistry.GetTexture(AdditionsTexture.Glow);
+        Texture2D dart = AssetRegistry.GennedTextures.GodPiercingDart;
+        Texture2D glow = AssetRegistry.GennedTextures.Glow;
 
         // Draw darts
         for (int i = 0; i < DartList.Count; i++)
@@ -117,20 +116,19 @@ public class DartBomb : ProjOwnedByNPC<Asterlin>
         }
 
         // Draw main bomb core
-        void draw()
-        {
-            float opac = Animators.BezierEase(InverseLerp(0f, 18f, Time));
-            Main.spriteBatch.DrawBetterRect(glow, ToTarget(Projectile.Center, new(30f * opac)), null,
-                Color.LightCyan * opac, 0f, glow.Size() / 2);
-            Main.spriteBatch.DrawBetterRect(glow, ToTarget(Projectile.Center, new(60f)), null, Color.Cyan * .75f * opac,
-                0f, glow.Size() / 2);
-            Main.spriteBatch.DrawBetterRect(glow, ToTarget(Projectile.Center, new(90f)), null,
-                Color.DarkCyan * .4f * opac, 0f, glow.Size() / 2);
-            Main.spriteBatch.DrawBetterRect(glow, ToTarget(Projectile.Center, new(120f)), null,
-                Color.DarkCyan * .2f * opac, 0f, glow.Size() / 2);
-        }
-
-        PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.UnderProjectiles, BlendState.Additive);
+        float opac = BezierEase(InverseLerp(0f, 18f, Time));
+        SpriteBatch.DrawRectPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, glow,
+            ToTarget(Projectile.Center, new(30f * opac)), null,
+            Color.LightCyan * opac, 0f, glow.Size() / 2);
+        SpriteBatch.DrawRectPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, glow,
+            ToTarget(Projectile.Center, new(60f)), null, Color.Cyan * .75f * opac,
+            0f, glow.Size() / 2);
+        SpriteBatch.DrawRectPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, glow,
+            ToTarget(Projectile.Center, new(90f)), null,
+            Color.DarkCyan * .4f * opac, 0f, glow.Size() / 2);
+        SpriteBatch.DrawRectPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, glow,
+            ToTarget(Projectile.Center, new(120f)), null,
+            Color.DarkCyan * .2f * opac, 0f, glow.Size() / 2);
 
         return false;
     }

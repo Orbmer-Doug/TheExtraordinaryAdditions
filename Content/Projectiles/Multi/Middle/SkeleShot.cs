@@ -1,15 +1,14 @@
 ﻿using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Multi.Middle;
 
 public class SkeleShot : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -23,7 +22,7 @@ public class SkeleShot : ModProjectile
         Projectile.localNPCHitCooldown = -1;
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints cache;
 
     public override void AI()
@@ -47,7 +46,7 @@ public class SkeleShot : ModProjectile
     {
         ParticleRegistry.SpawnSparkleParticle(Projectile.Center, Vector2.Zero, 8, Main.rand.NextFloat(1.1f, 1.4f),
             Color.White, Color.Chocolate);
-        AdditionsSound.AuroraTink1.Play(Projectile.Center, .5f, .4f, .1f, 20, Name);
+        AssetRegistry.GennedSounds.AuroraTink1.Play(Projectile.Center, .5f, .4f, .1f, 20, Name);
     }
 
     public override bool OnTileCollide(Vector2 oldVelocity)
@@ -74,8 +73,8 @@ public class SkeleShot : ModProjectile
             if (trail == null || trail.Disposed || cache == null)
                 return;
 
-            ManagedShader shader = ShaderRegistry.FlameTrail;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Pixel), 1);
+            ManagedShader shader = AssetRegistry.GennedShaders.FlameTrail;
+            shader.SetTexture(AssetRegistry.GennedTextures.Pixel, 1);
             trail.DrawTrail(shader, cache.Points, 30);
         }
 

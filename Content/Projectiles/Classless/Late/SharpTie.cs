@@ -1,14 +1,14 @@
 ﻿using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Late;
 
 public class SharpTie : ModProjectile, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SharpTie);
+    public override string Texture => AssetRegistry.GennedTextures.SharpTie.Path;
 
     public override void SetDefaults()
     {

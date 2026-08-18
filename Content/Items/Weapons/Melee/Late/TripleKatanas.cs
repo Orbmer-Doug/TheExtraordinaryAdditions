@@ -2,7 +2,6 @@
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
@@ -10,7 +9,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
 
 public class TripleKatanas : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TripleKatanas);
+    public override string Texture => AssetRegistry.GennedTextures.TripleKatanas.Path;
 
     public override void SetDefaults()
     {

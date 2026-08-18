@@ -8,7 +8,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Vanity;
 [AutoloadEquip(EquipType.Head)]
 public class EclipsedOnesHat : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.EclipsedOnesHat);
+    public override string Texture => AssetRegistry.GennedTextures.EclipsedOnesHat.Path;
 
     public override void SetStaticDefaults()
     {

@@ -4,14 +4,15 @@ using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
 
 public class HellishLance : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.HellishLance);
+    public override string Texture => AssetRegistry.GennedTextures.HellishLance.Path;
 
     public override void SetDefaults()
     {
@@ -121,7 +122,7 @@ public class HellishLance : ModProjectile
                 Projectile.timeLeft = 100;
 
             Vector2 start = Projectile.BaseRotHitbox().Right;
-            AdditionsSound.SwordSliceShort.Play(start, .5f, -.15f, .09f, 10);
+            AssetRegistry.GennedSounds.SwordSliceShort.Play(start, .5f, -.15f, .09f, 10);
             for (int i = 0; i < 20; i++)
             {
                 ParticleRegistry.SpawnSparkParticle(start,

@@ -1,7 +1,7 @@
 ﻿/*
 using Terraria;
 using Terraria.Localization;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using TheExtraordinaryAdditions.Core.Graphics.Particles;
 
 namespace TheExtraordinaryAdditions.Content.Cooldowns;
 
@@ -10,7 +10,7 @@ public class RedMistCooldown : CooldownHandler
     public static new string ID => "RedMist";
     public override bool ShouldDisplay => true;
     public override LocalizedText DisplayName => GetText($"Cooldowns.{ID}");
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CooldownRedMist);
+    public override string Texture => AssetRegistry.GennedTextures.CooldownRedMist.Path;
     public override Color OutlineColor => new(17, 17, 17);
     public override Color CooldownStartColor => new(104, 4, 3);
     public override Color CooldownEndColor => new(254, 38, 36);
@@ -24,5 +24,6 @@ public class RedMistCooldown : CooldownHandler
     }
 }
 */
+
 
 

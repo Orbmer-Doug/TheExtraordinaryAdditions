@@ -405,7 +405,7 @@ public static class CCDKinematics
             float angle = start.AngleTo(end);
 
             Main.spriteBatch.Draw(
-                AssetRegistry.GetTexture(AdditionsTexture.Pixel),
+                AssetRegistry.GennedTextures.Pixel,
                 start - Main.screenPosition,
                 null,
                 Color.Red.Lerp(Color.Blue, InverseLerp(0f, joints.Count, i)),

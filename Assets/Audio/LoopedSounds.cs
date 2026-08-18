@@ -3,36 +3,21 @@ using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
-using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace TheExtraordinaryAdditions.Assets.Audio;
 
-public readonly struct AdditionsLoopedSound
+public readonly struct AdditionsLoopedSound(SoundStyle style, Func<float> volume = null, Func<float> pitch = null)
 {
-    public AdditionsLoopedSound(SoundStyle style, Func<float> volume = null, Func<float> pitch = null)
-    {
-        Style = style with { MaxInstances = 0, PauseBehavior = PauseBehavior.PauseWithGame };
-        Volume = volume ?? (() => 1f);
-        Pitch = pitch ?? (() => 0f);
-    }
-
-    public AdditionsLoopedSound(AdditionsSound sound, Func<float> volume = null, Func<float> pitch = null)
-    {
-        Style = AssetRegistry.GetSound(sound) with { MaxInstances = 0, PauseBehavior = PauseBehavior.PauseWithGame };
-        Volume = volume ?? (() => 1f);
-        Pitch = pitch ?? (() => 0f);
-    }
-
     public static bool NPCNotActive(NPC npc) =>
         !npc.active || Main.gameMenu || Main.dedServ || !SoundEngine.IsAudioSupported;
 
     public static bool ProjectileNotActive(Projectile proj) =>
         !proj.active || Main.gameMenu || Main.dedServ || !SoundEngine.IsAudioSupported;
 
-    public readonly SoundStyle Style;
-    public readonly Func<float> Volume;
-    public readonly Func<float> Pitch;
+    public readonly SoundStyle Style = style with { MaxInstances = 0, PauseBehavior = PauseBehavior.PauseWithGame };
+    public readonly Func<float> Volume = volume ?? (() => 1f);
+    public readonly Func<float> Pitch = pitch ?? (() => 0f);
 }
 
 public sealed class LoopedSoundManager : ModSystem

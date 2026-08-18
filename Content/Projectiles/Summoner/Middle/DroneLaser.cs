@@ -2,16 +2,16 @@
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
 
 public class DroneLaser : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetStaticDefaults()
     {
@@ -60,7 +60,7 @@ public class DroneLaser : ModProjectile
         Projectile.width = Projectile.height = 10 + (int) (10 * ChargeCompletion);
 
         if (trail == null || trail.Disposed)
-            trail = new(c => OptimizedPrimitiveTrail.HemisphereWidthFunct(c, Projectile.height * Projectile.scale),
+            trail = new(c => Trail.HemisphereWidthFunct(c, Projectile.height * Projectile.scale),
                 (c, pos) => Color.Cyan * Projectile.scale, null, 50);
 
         Vector2 expected = Start + Projectile.velocity.SafeNormalize(Vector2.Zero) *
@@ -87,7 +87,7 @@ public class DroneLaser : ModProjectile
     }
 
     public TrailPoints cache;
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override bool PreDraw(ref Color lightColor)
     {
@@ -95,8 +95,8 @@ public class DroneLaser : ModProjectile
         {
             if (trail == null || cache == null)
                 return;
-            ManagedShader shader = ShaderRegistry.CrunchyLaserShader;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DarkTurbulentNoise), 1);
+            ManagedShader shader = AssetRegistry.GennedShaders.CrunchyLaserShader;
+            shader.SetTexture(AssetRegistry.GennedTextures.DarkTurbulentNoise, 1);
             trail.DrawTrail(shader, cache.Points);
         }
 

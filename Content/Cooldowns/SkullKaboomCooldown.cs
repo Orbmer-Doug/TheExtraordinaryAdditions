@@ -2,7 +2,7 @@
 using Terraria;
 using Terraria.ID;
 using Terraria.Localization;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using TheExtraordinaryAdditions.Core.Graphics.Particles;
 
 namespace TheExtraordinaryAdditions.Content.Cooldowns;
 
@@ -11,7 +11,7 @@ public class SkullKaboomCooldown : CooldownHandler
     public static new string ID => "SkullKablooey";
     public override bool ShouldDisplay => true;
     public override LocalizedText DisplayName => GetText($"Cooldowns.{ID}");
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CooldownSkullKablooey);
+    public override string Texture => AssetRegistry.GennedTextures.CooldownSkullKablooey.Path;
     public override Color OutlineColor => new(48, 47, 43);
     public override Color CooldownStartColor => new(66, 65, 47);
     public override Color CooldownEndColor => new(180, 180, 160);
@@ -28,5 +28,6 @@ public class SkullKaboomCooldown : CooldownHandler
     }
 }
 */
+
 
 

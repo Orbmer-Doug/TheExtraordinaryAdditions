@@ -4,17 +4,16 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
 public class TechnicBlitzripperProj : BaseIdleHoldoutProjectile, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TechnicBlitzripper);
+    public override string Texture => AssetRegistry.GennedTextures.TechnicBlitzripper.Path;
 
     public ref float Timer => ref Projectile.ai[0];
     public ref float ShootDelay => ref Projectile.ai[1];
@@ -92,7 +91,7 @@ public class TechnicBlitzripperProj : BaseIdleHoldoutProjectile, ILocalizedModTy
                     Main.rand.NextFloat(.4f, .6f), Color.Cyan, Color.DarkCyan, Main.rand.NextFloat(50f, 180f));
             }
 
-            AdditionsSound.banditShot1B.Play(Tip, .85f, 0f, .1f, 20, Name);
+            AssetRegistry.GennedSounds.banditShot1B.Play(Tip, .85f, 0f, .1f, 20, Name);
 
             Heat = MathHelper.Clamp(Heat + 1, 0f, MaxHeat);
             Recoil = 4f;
@@ -130,7 +129,7 @@ public class TechnicBlitzripperProj : BaseIdleHoldoutProjectile, ILocalizedModTy
         {
             if (SniperTimer >= FireSniper)
             {
-                AdditionsSound.LargeSniperFire.Play(Tip, 1.3f, -.1f, 0f, 2, Name);
+                AssetRegistry.GennedSounds.LargeSniperFire.Play(Tip, 1.3f, -.1f, 0f, 2, Name);
                 Projectile.NewProj(Tip, Projectile.velocity * 20f, ModContent.ProjectileType<EtherealRipBlast>(),
                     Projectile.damage * 70, Projectile.knockBack * 10f);
 
@@ -182,7 +181,7 @@ public class TechnicBlitzripperProj : BaseIdleHoldoutProjectile, ILocalizedModTy
         float comp = Overheating
             ? Animators.MakePoly(2f).InFunction.Evaluate(1.2f, 0f, overheatComp)
             : MathHelper.Lerp(0f, .7f, InverseLerp(0f, MaxHeat, Heat));
-        Texture2D glow = AssetRegistry.GetTexture(AdditionsTexture.TechnicBlitzripperHeat);
+        Texture2D glow = AssetRegistry.GennedTextures.TechnicBlitzripperHeat;
         for (int i = 0; i < 8; i++)
         {
             Vector2 off = (MathHelper.TwoPi * i / 8).ToRotationVector2() * 5f * comp;
@@ -191,19 +190,14 @@ public class TechnicBlitzripperProj : BaseIdleHoldoutProjectile, ILocalizedModTy
                 Projectile.scale, effects, 0f);
         }
 
-        void draw()
-        {
-            Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.LensStar);
-            float sniperComp = InverseLerp(0f, FireSniper, SniperTimer);
+        Texture2D tex = AssetRegistry.GennedTextures.LensStar;
+        float sniperComp = InverseLerp(0f, FireSniper, SniperTimer);
 
-            for (float i = .9f; i <= 1.3f; i += .1f)
-                Main.spriteBatch.DrawBetterRect(tex,
-                    ToTarget(Tip,
-                        new(MathHelper.Lerp(0f, 30f * i, sniperComp), MathHelper.Lerp(0f, 120f * i, sniperComp))),
-                    null, Color.DarkCyan.Lerp(Color.Cyan, sniperComp), Projectile.rotation, tex.Size() / 2);
-        }
-
-        PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.OverPlayers, BlendState.Additive);
+        for (float i = .9f; i <= 1.3f; i += .1f)
+            SpriteBatch.DrawRectPixelated(PixelationLayer.OverPlayers, BlendState.Additive, tex,
+                ToTarget(Tip,
+                    new(MathHelper.Lerp(0f, 30f * i, sniperComp), MathHelper.Lerp(0f, 120f * i, sniperComp))),
+                null, Color.DarkCyan.Lerp(Color.Cyan, sniperComp), Projectile.rotation, tex.Size() / 2);
 
         DrawScope();
 
@@ -212,7 +206,7 @@ public class TechnicBlitzripperProj : BaseIdleHoldoutProjectile, ILocalizedModTy
 
     public void DrawScope()
     {
-        Texture2D texture = AssetRegistry.InvisTex;
+        Texture2D texture = AssetRegistry.GennedTextures.Invisible;
 
         const float sightsSize = 300f;
         float sightsResolution = 2f;
@@ -221,7 +215,7 @@ public class TechnicBlitzripperProj : BaseIdleHoldoutProjectile, ILocalizedModTy
         Vector2 top = Projectile.Center + PolarVector(-12f, Projectile.rotation) +
                       PolarVector(13f * Dir * Owner.gravDir, Projectile.rotation - MathHelper.PiOver2);
 
-        ManagedShader scope = ShaderRegistry.PixelatedSightLine;
+        ManagedShader scope = AssetRegistry.GennedShaders.PixelatedSightLine;
         scope.TrySetParameter("noiseOffset", Main.GameUpdateCount * -0.003f);
         scope.TrySetParameter("mainOpacity", 1f);
         scope.TrySetParameter("resolution", new Vector2(sightsResolution * sightsSize));
@@ -238,7 +232,7 @@ public class TechnicBlitzripperProj : BaseIdleHoldoutProjectile, ILocalizedModTy
         Main.spriteBatch.EnterShaderRegion(scope.Effect, BlendState.Additive);
 
         Main.EntitySpriteDraw(texture, top - Main.screenPosition, null, Color.White, 0f, texture.Size() * .5f,
-            sightsSize, 0, 0f);
+            sightsSize, 0);
 
         Main.spriteBatch.ResetToDefault();
     }

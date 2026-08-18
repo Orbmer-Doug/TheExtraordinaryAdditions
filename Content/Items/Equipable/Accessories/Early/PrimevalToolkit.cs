@@ -7,7 +7,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Early;
 
 public class PrimevalToolkit : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.PrimevalToolkit);
+    public override string Texture => AssetRegistry.GennedTextures.PrimevalToolkit.Path;
 
     public override void SetDefaults()
     {

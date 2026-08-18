@@ -8,14 +8,14 @@ using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
 using static Microsoft.Xna.Framework.MathHelper;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla;
 
 public class FancyChainsaw : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetStaticDefaults()
     {
@@ -49,14 +49,14 @@ public class FancyChainsaw : ModProjectile
 
     public ref float Time => ref Projectile.ai[0];
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
+    public PlayerMouse Modded => Owner.AdditionsMouse();
     public Item Chainsaw => Owner.HeldItem;
     public int Dir => Projectile.velocity.X.NonZeroSign();
 
     public RotatedRectangle Rect()
     {
         Vector2 size = new(Projectile.width, Projectile.height);
-        return new(Projectile.Center - size / 2, size, Projectile.rotation);
+        return new(Projectile.Center - size / 2, size, Projectile.rotation, Vector2.Zero);
     }
 
     public override void AI()

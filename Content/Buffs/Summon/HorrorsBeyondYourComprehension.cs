@@ -6,7 +6,7 @@ namespace TheExtraordinaryAdditions.Content.Buffs.Summon;
 
 public class HorrorsBeyondYourComprehension : ModBuff
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.HorrorsBeyondYourComprehension);
+    public override string Texture => AssetRegistry.GennedTextures.HorrorsBeyondYourComprehension.Path;
 
     public override void SetStaticDefaults()
     {

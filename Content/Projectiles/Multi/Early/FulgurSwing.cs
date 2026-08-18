@@ -6,20 +6,18 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Multi.Early;
 
 public class FulgurSwing : BaseSwordSwing
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.FulgurSpear);
+    public override string Texture => AssetRegistry.GennedTextures.FulgurSpear.Path;
 
     public override void Defaults()
     {
@@ -33,7 +31,7 @@ public class FulgurSwing : BaseSwordSwing
     public override float Animation()
     {
         if (SwingDir == SwingDirection.Up)
-            return Exp(3f).InOutFunction.Evaluate(Time, 0f, MaxTime, -1f, 1f);
+            return Expo(3f).InOutFunction.Evaluate(Time, 0f, MaxTime, -1f, 1f);
 
         return new PiecewiseCurve()
             .Add(-1f, -.8f, .2f, MakePoly(3f).InFunction)
@@ -52,9 +50,9 @@ public class FulgurSwing : BaseSwordSwing
     public override bool? CanDamage()
     {
         if (SwingDir == SwingDirection.Down)
-            return SwingCompletion.BetweenNum(.2f, .7f) ? null : false;
+            return SwingCompletion is > .2f and < .7f ? null : false;
 
-        return SwingCompletion.BetweenNum(.2f, 1f) ? null : false;
+        return SwingCompletion is > .2f and < .7f ? null : false;
     }
 
     public override void OnSpawn(IEntitySource source)
@@ -84,7 +82,7 @@ public class FulgurSwing : BaseSwordSwing
         if (((Animation() >= .26f && SwingDir == SwingDirection.Up) ||
              (Animation() >= .04f && SwingDir == SwingDirection.Down)) && !PlayedSound)
         {
-            SoundID.DD2_GhastlyGlaivePierce.Play(Projectile.Center, 1f, 0f, .1f, null, 20, Name);
+            SoundID.DD2_GhastlyGlaivePierce.Play(Projectile.Center, 1f, 0f, .1f, 20, Name);
             PlayedSound = true;
         }
 
@@ -100,7 +98,7 @@ public class FulgurSwing : BaseSwordSwing
             points.Update(Projectile.Center +
                 PolarVector(148f * Projectile.scale, Projectile.rotation - SwordRotation) - Center);
 
-            if (Time % 20 == 0 && SwingCompletion.BetweenNum(.2f, .8f) &&
+            if (Time % 20 == 0 && SwingCompletion is > .2f and < .8f &&
                 NPCTargeting.TryGetClosestNPC(new(Rect().Top, 400, true), out NPC target))
             {
                 if (Item.CheckManaBetter(Owner, 2, true))
@@ -192,7 +190,7 @@ public class FulgurSwing : BaseSwordSwing
         npc.velocity += SwordDir * Item.knockBack * npc.knockBackResist;
 
         ScreenShakeSystem.New(new(.1f, .1f), start);
-        AdditionsSound.RoySpecial2.Play(start, .6f, 0f, .3f);
+        AssetRegistry.GennedSounds.RoySpecial2.Play(start, .6f, 0f, .3f);
         TimeStop = StopTime;
     }
 
@@ -210,12 +208,12 @@ public class FulgurSwing : BaseSwordSwing
         }
 
         ScreenShakeSystem.New(new(.1f, .1f), start);
-        AdditionsSound.RoySpecial2.Play(start, .6f, 0f, .3f);
+        AssetRegistry.GennedSounds.RoySpecial2.Play(start, .6f, 0f, .3f);
         TimeStop = StopTime;
     }
 
     public TrailPoints points = new(20);
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     private float WidthFunct(float c)
     {
@@ -256,8 +254,8 @@ public class FulgurSwing : BaseSwordSwing
             if (trail == null || points == null || trail.Disposed)
                 return;
 
-            ManagedShader shader = ShaderRegistry.SwingShader;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.CrackedNoise), 1);
+            ManagedShader shader = AssetRegistry.GennedShaders.SwingShader;
+            shader.SetTexture(AssetRegistry.GennedTextures.CrackedNoise, 1);
             shader.TrySetParameter("color", Color.LightCyan);
             shader.TrySetParameter("secondColor", Color.SkyBlue);
             shader.TrySetParameter("thirdColor", Color.DeepSkyBlue);
@@ -267,7 +265,7 @@ public class FulgurSwing : BaseSwordSwing
 
         Main.spriteBatch.Draw(Tex, Projectile.Center - Main.screenPosition, null, lightColor,
             Projectile.rotation + RotationOffset, origin, Projectile.scale, Effects, 0f);
-        Main.spriteBatch.Draw(AssetRegistry.GetTexture(AdditionsTexture.FulgurSpear_Glow),
+        Main.spriteBatch.Draw(AssetRegistry.GennedTextures.FulgurSpear_Glow,
             Projectile.Center - Main.screenPosition, null, Color.White,
             Projectile.rotation + RotationOffset, origin, Projectile.scale, Effects, 0f);
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);

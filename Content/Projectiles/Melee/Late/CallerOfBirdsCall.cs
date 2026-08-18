@@ -3,14 +3,13 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
 
 public class CallerOfBirdsCall : BaseHoldoutProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CallerOfBirds);
+    public override string Texture => AssetRegistry.GennedTextures.CallerOfBirds.Path;
 
     public override void Defaults()
     {
@@ -37,11 +36,11 @@ public class CallerOfBirdsCall : BaseHoldoutProjectile
         Owner.SetBackHandBetter(0, Projectile.velocity.ToRotation());
         Owner.ChangeDir(Projectile.velocity.X.NonZeroSign());
         Projectile.Center = Owner.GetFrontHandPositionImproved() +
-                            Vector2.UnitY * Animators.MakePoly(4f).InFunction.Evaluate(Time, 0f, 20f, 0f, -30f);
+                            Vector2.UnitY * MakePoly(4f).InFunction.Evaluate(Time, 0f, 20f, 0f, -30f);
 
         if (this.RunLocal() && Time % 4 == 3)
         {
-            Vector2 target = Owner.Additions().MouseWorld;
+            Vector2 target = Owner.AdditionsMouse().MouseWorld;
             for (int i = 0; i < 2; i++)
             {
                 Vector2 position = Owner.Center - new Vector2(Main.rand.NextFloat(401) * Owner.direction, 800f);
@@ -58,7 +57,7 @@ public class CallerOfBirdsCall : BaseHoldoutProjectile
         }
 
         if (Time % 16 == 15)
-            SoundID.Zombie11.Play(Projectile.Center + Main.rand.NextVector2Circular(40f, 40f), .5f, 0f, .4f, null, 50,
+            SoundID.Zombie11.Play(Projectile.Center + Main.rand.NextVector2Circular(40f, 40f), .5f, 0f, .4f, 50,
                 Name);
 
         Time++;

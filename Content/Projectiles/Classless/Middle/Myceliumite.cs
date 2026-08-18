@@ -1,18 +1,17 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
-using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 
 public class Myceliumite : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public enum MyceliumType
     {
@@ -74,7 +73,7 @@ public class Myceliumite : ModProjectile
         switch (Variant)
         {
             case MyceliumType.Homing:
-                tex = AssetRegistry.GetTexture(AdditionsTexture.HomingMyceliumite);
+                tex = AssetRegistry.GennedTextures.HomingMyceliumite;
                 after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity,
                     Projectile.rotation, 0, 30, 3, 1f,
                     tex.Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame), false, .2f));
@@ -93,7 +92,7 @@ public class Myceliumite : ModProjectile
                 Projectile.velocity.Y += .1f;
                 break;
             case MyceliumType.Bouncy:
-                tex = AssetRegistry.GetTexture(AdditionsTexture.BoingMyceliumite);
+                tex = AssetRegistry.GennedTextures.BoingMyceliumite;
                 Projectile.height = 20;
                 Projectile.width = 14;
 
@@ -101,7 +100,7 @@ public class Myceliumite : ModProjectile
                 Projectile.velocity.Y += .2f;
                 break;
             case MyceliumType.Piercing:
-                tex = AssetRegistry.GetTexture(AdditionsTexture.PiercingMyceliumite);
+                tex = AssetRegistry.GennedTextures.PiercingMyceliumite;
                 after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity,
                     Projectile.rotation, 0, 30, 3, 1f,
                     tex.Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame), false, -.4f));
@@ -116,7 +115,7 @@ public class Myceliumite : ModProjectile
 
                 break;
             case MyceliumType.Exploding:
-                tex = AssetRegistry.GetTexture(AdditionsTexture.ExplodingMyceliumite);
+                tex = AssetRegistry.GennedTextures.ExplodingMyceliumite;
                 Projectile.height = 26;
                 Projectile.width = 18;
                 Projectile.frame = 0;
@@ -139,7 +138,7 @@ public class Myceliumite : ModProjectile
                     Projectile.velocity.X = -oldVelocity.X;
                 if (Projectile.velocity.Y != oldVelocity.Y)
                     Projectile.velocity.Y = -oldVelocity.Y;
-                SoundID.Item56.Play(Projectile.Center, .3f, .4f, 0f, null, 40);
+                SoundID.Item56.Play(Projectile.Center, .3f, .4f, 0f, 40);
                 return false;
             case MyceliumType.Piercing:
                 return false;
@@ -196,7 +195,7 @@ public class Myceliumite : ModProjectile
 
                 ParticleRegistry.SpawnDetailedBlastParticle(Projectile.Center, Vector2.Zero, Vector2.One * 60f,
                     Vector2.Zero, 40, Color.DodgerBlue, 0f, Color.DarkBlue, true);
-                SoundID.Item14.Play(Projectile.Center, .9f, .4f, 0f, null, 20);
+                SoundID.Item14.Play(Projectile.Center, .9f, .4f, 0f, 20);
                 break;
         }
     }

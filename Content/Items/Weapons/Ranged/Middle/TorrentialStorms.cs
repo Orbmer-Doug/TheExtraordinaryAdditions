@@ -8,7 +8,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 
 public class TorrentialStorms : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TorrentialStorms);
+    public override string Texture => AssetRegistry.GennedTextures.TorrentialStorms.Path;
 
     public override void SetDefaults()
     {

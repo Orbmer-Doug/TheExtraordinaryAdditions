@@ -3,7 +3,6 @@ using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
@@ -13,7 +12,7 @@ public class EbonyNovaBlasterHeld : BaseIdleHoldoutProjectile
     public override int AssociatedItemID => ModContent.ItemType<EbonyNovaBlaster>();
 
     public override int IntendedProjectileType => ModContent.ProjectileType<EbonyNovaBlasterHeld>();
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.EbonyNovaBlaster);
+    public override string Texture => AssetRegistry.GennedTextures.EbonyNovaBlaster.Path;
 
     public const int WaitTime = 50;
     public ref float Wait => ref Projectile.ai[0];
@@ -36,9 +35,9 @@ public class EbonyNovaBlasterHeld : BaseIdleHoldoutProjectile
         Projectile.timeLeft = 2;
         Owner.ChangeDir((Projectile.velocity.X > 0f).ToDirectionInt());
 
-        float anim = new Animators.PiecewiseCurve()
-            .Add(0f, -1.2f, .5f, Animators.MakePoly(9f).OutFunction)
-            .Add(-1.2f, 0f, 1f, Animators.MakePoly(3f).InOutFunction)
+        float anim = new PiecewiseCurve()
+            .Add(0f, -1.2f, .5f, MakePoly(9f).OutFunction)
+            .Add(-1.2f, 0f, 1f, MakePoly(3f).InOutFunction)
             .Evaluate(InverseLerp(WaitTime, 10f, Wait));
 
         Projectile.rotation = Projectile.velocity.ToRotation() + (anim * Dir * Owner.gravDir);
@@ -56,7 +55,7 @@ public class EbonyNovaBlasterHeld : BaseIdleHoldoutProjectile
 
         if ((this.RunLocal() && Modded.SafeMouseLeft.Current) && Wait <= 0f)
         {
-            AdditionsSound.ImpSmash.Play(Tip, .6f, 0f, .15f, 2, Name);
+            AssetRegistry.GennedSounds.ImpSmash.Play(Tip, .6f, 0f, .15f, 2, Name);
             Vector2 vel = Projectile.velocity.SafeNormalize(Vector2.Zero);
             if (this.RunLocal())
                 Projectile.NewProj(Tip, vel * 2f, ModContent.ProjectileType<EbonySnipe>(), Projectile.damage,
@@ -66,7 +65,7 @@ public class EbonyNovaBlasterHeld : BaseIdleHoldoutProjectile
             this.Sync();
         }
 
-        Recoil = MathHelper.Clamp(Animators.MakePoly(3f).OutFunction.Evaluate(Recoil, -.25f, .03f), 0f, 20f);
+        Recoil = MathHelper.Clamp(MakePoly(3f).OutFunction.Evaluate(Recoil, -.25f, .03f), 0f, 20f);
         if (Wait > 0f)
             Wait--;
 

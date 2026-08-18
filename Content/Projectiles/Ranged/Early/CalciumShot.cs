@@ -1,15 +1,15 @@
 ﻿using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Early;
 
 public class CalciumShot : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -60,7 +60,7 @@ public class CalciumShot : ModProjectile
         Projectile.damage /= 2;
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override bool PreDraw(ref Color lightColor)
     {
@@ -68,8 +68,8 @@ public class CalciumShot : ModProjectile
         {
             if (trail == null || trail.Disposed || cache == null)
                 return;
-            ManagedShader shader = ShaderRegistry.FlameTrail;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Pixel), 1);
+            ManagedShader shader = AssetRegistry.GennedShaders.FlameTrail;
+            shader.SetTexture(AssetRegistry.GennedTextures.Pixel, 1);
             trail.DrawTrail(shader, cache.Points, 30);
         }
 

@@ -4,7 +4,6 @@ using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
-using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -12,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 
 public class JudgeOfHellsArmaments : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.JudgeOfHellsArmaments);
+    public override string Texture => AssetRegistry.GennedTextures.JudgeOfHellsArmaments.Path;
 
     public override void SetDefaults()
     {

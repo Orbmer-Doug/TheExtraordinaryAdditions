@@ -5,17 +5,16 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 
 public class BloodRay : ProjOwnedByNPC<StygainHeart>
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BloodRay);
+    public override string Texture => AssetRegistry.GennedTextures.BloodRay.Path;
 
     public override void SetStaticDefaults()
     {
@@ -59,7 +58,7 @@ public class BloodRay : ProjOwnedByNPC<StygainHeart>
         {
             if (Vector2.Distance(Projectile.Center, barrier.Center) >= StygainHeart.BarrierSize)
             {
-                if (this.RunServer())
+                if (ModProjectile.RunServer())
                 {
                     barrier.ai[0] += .1f;
                     barrier.ai[2] = 1;
@@ -114,7 +113,7 @@ public class BloodRay : ProjOwnedByNPC<StygainHeart>
     }
 
     public TrailPoints cache;
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override bool PreDraw(ref Color lightColor)
     {
@@ -122,8 +121,8 @@ public class BloodRay : ProjOwnedByNPC<StygainHeart>
         {
             if (trail == null || trail.Disposed || cache == null)
                 return;
-            ManagedShader shader = ShaderRegistry.FadedStreak;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.StreakMagma), 1);
+            ManagedShader shader = AssetRegistry.GennedShaders.FadedStreak;
+            shader.SetTexture(AssetRegistry.GennedTextures.StreakMagma, 1);
             trail.DrawTrail(shader, cache.Points, 30);
         }
 

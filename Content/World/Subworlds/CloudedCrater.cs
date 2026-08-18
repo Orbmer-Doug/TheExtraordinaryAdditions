@@ -8,7 +8,7 @@ using Terraria.ModLoader.IO;
 using Terraria.WorldBuilding;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Systems;
 
 namespace TheExtraordinaryAdditions.Content.World.Subworlds;
@@ -63,7 +63,7 @@ public class CloudedCrater : Subworld
 
     public override void DrawMenu(GameTime gameTime)
     {
-        Texture2D pixel = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
+        Texture2D pixel = AssetRegistry.GennedTextures.Pixel;
         Rectangle target = ToScreenTarget(Vector2.Zero, Main.ScreenSize.ToVector2());
         Main.spriteBatch.Draw(pixel, target, Color.White);
     }

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Utilities;
 using System;
 using Terraria;
 using Terraria.DataStructures;
@@ -7,13 +6,13 @@ using Terraria.Enums;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 
 namespace TheExtraordinaryAdditions.Content.Tiles;
 
 public class LockedCyberneticPedestal : ModTile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.LockedCyberneticPedestal);
+    public override string Texture => AssetRegistry.GennedTextures.LockedCyberneticPedestal.Path;
     public const int Width = 4;
     public const int Height = 1;
 
@@ -69,7 +68,7 @@ public class LockedCyberneticPedestal : ModTile
         Vector2 drawOffset = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
         Vector2 drawPosition = new Vector2(i * 16 - Main.screenPosition.X, j * 16 - Main.screenPosition.Y) + drawOffset;
 
-        ManagedShader effect = ShaderRegistry.SpreadTelegraph;
+        ManagedShader effect = AssetRegistry.GennedShaders.SpreadTelegraph;
         effect.TrySetParameter("centerOpacity", .7f);
         effect.TrySetParameter("mainOpacity", 1f);
         effect.TrySetParameter("halfSpreadAngle",
@@ -83,7 +82,7 @@ public class LockedCyberneticPedestal : ModTile
         Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState,
             DepthStencilState.None, Main.Rasterizer, effect.Effect, Matrix.Identity);
 
-        Texture2D invis = AssetRegistry.InvisTex;
+        Texture2D invis = AssetRegistry.GennedTextures.Invisible;
         Vector2 origin = new(invis.Width / 2f, invis.Height / 2f);
         Main.EntitySpriteDraw(invis, drawPosition + Vector2.UnitX * 32f, null, Color.White, -MathHelper.PiOver2, origin,
             900f, 0, 0f);
@@ -92,7 +91,7 @@ public class LockedCyberneticPedestal : ModTile
         Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState,
             DepthStencilState.None, Main.Rasterizer, null, Matrix.Identity);
 
-        Texture2D swordtex = AssetRegistry.GetTexture(AdditionsTexture.LockedCyberneticSword);
+        Texture2D swordtex = AssetRegistry.GennedTextures.LockedCyberneticSword;
         Main.EntitySpriteDraw(swordtex,
             drawPosition + Vector2.UnitX * 28f -
             Vector2.UnitY * (125f + (float) Math.Sin(Main.GameUpdateCount * 0.06f) * 30f), null, Color.White,

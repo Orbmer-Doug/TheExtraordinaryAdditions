@@ -3,9 +3,9 @@ using Terraria;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Assets.Audio;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -13,7 +13,7 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 
 public class BloodBeacon : ProjOwnedByNPC<StygainHeart>
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public static readonly int Lifetime = SecondsToFrames(15);
 
@@ -43,7 +43,8 @@ public class BloodBeacon : ProjOwnedByNPC<StygainHeart>
 
     public override void SafeAI()
     {
-        sound ??= LoopedSoundManager.CreateNew(new(AdditionsSound.BraveMediumFireLoop, () => Completion, () => -.1f),
+        sound ??= LoopedSoundManager.CreateNew(
+            new(AssetRegistry.GennedSounds.BraveMediumFireLoop, () => Completion, () => -.1f),
             () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
         sound?.Update(Projectile.Center);
 
@@ -80,8 +81,8 @@ public class BloodBeacon : ProjOwnedByNPC<StygainHeart>
         ColorFunction(completionRatio, position) * .4f;
 
     public TrailPoints cache = new(24);
-    public OptimizedPrimitiveTrail trail;
-    public OptimizedPrimitiveTrail trail2;
+    public Trail trail;
+    public Trail trail2;
 
     public override bool PreDraw(ref Color lightColor)
     {
@@ -90,14 +91,14 @@ public class BloodBeacon : ProjOwnedByNPC<StygainHeart>
             if (trail == null || trail2 == null || trail.Disposed || trail2.Disposed || cache == null)
                 return;
 
-            ManagedShader shader = ShaderRegistry.BloodBeacon;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Perlin), 1);
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.SuperWavyPerlin), 2);
+            ManagedShader shader = AssetRegistry.GennedShaders.BloodBeaconShader;
+            shader.SetTexture(AssetRegistry.GennedTextures.Perlin, 1);
+            shader.SetTexture(AssetRegistry.GennedTextures.SuperWavyPerlin, 2);
 
             trail.DrawTrail(shader, cache.Points, 80);
 
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FractalNoise), 1);
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WarpMap), 2);
+            shader.SetTexture(AssetRegistry.GennedTextures.FractalNoise, 1);
+            shader.SetTexture(AssetRegistry.GennedTextures.WarpMap, 2);
 
             trail2.DrawTrail(shader, cache.Points, 80);
         }

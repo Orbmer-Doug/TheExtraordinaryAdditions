@@ -3,17 +3,16 @@ using System.IO;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
 public class BreakerBeam : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -155,13 +154,13 @@ public class BreakerBeam : ModProjectile
             Projectile.NewProj(Projectile.Center + norm * 10f, Vector2.Zero, ModContent.ProjectileType<BreakerStorm>(),
                 Projectile.damage, Projectile.knockBack * 2, Projectile.owner);
 
-        AdditionsSound.BreakerStorm.Play(Projectile.Center, .5f, -.2f);
+        AssetRegistry.GennedSounds.BreakerStorm.Play(Projectile.Center, .5f, -.2f);
 
         Fading = true;
     }
 
     public const int MaxPoints = 20;
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints slashPoints = new(MaxPoints);
 
     public float WidthFunct(float c) =>
@@ -176,8 +175,8 @@ public class BreakerBeam : ModProjectile
             if (trail == null || slashPoints == null)
                 return;
 
-            ManagedShader shader = ShaderRegistry.FireTrail;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.SuperWavyPerlin), 1, SamplerState.LinearWrap);
+            ManagedShader shader = AssetRegistry.GennedShaders.FireTrail;
+            shader.SetTexture(AssetRegistry.GennedTextures.SuperWavyPerlin, 1, SamplerState.LinearWrap);
             trail.DrawTrail(shader, slashPoints.Points, -1, true);
         }
 

@@ -6,16 +6,16 @@ using Terraria.ID;
 using TheExtraordinaryAdditions.Assets.Audio;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
 public class ConvergentFireball : ProjOwnedByNPC<Asterlin>
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public float Time
     {
@@ -54,7 +54,7 @@ public class ConvergentFireball : ProjOwnedByNPC<Asterlin>
 
     public override void SafeAI()
     {
-        flame ??= LoopedSoundManager.CreateNew(new(AdditionsSound.BraveSmallFireLoop, () => .6f,
+        flame ??= LoopedSoundManager.CreateNew(new(AssetRegistry.GennedSounds.BraveSmallFireLoop, () => .6f,
             () => -.2f), () => AdditionsLoopedSound.ProjectileNotActive(Projectile), () => Projectile.active);
         flame?.Update(Projectile.Center);
 
@@ -64,7 +64,7 @@ public class ConvergentFireball : ProjOwnedByNPC<Asterlin>
         {
             if (playerTarget != null)
                 Projectile.velocity = Vector2.Lerp(Projectile.velocity, playerTarget.velocity, 0.6f);
-            Projectile.scale = Animators.MakePoly(3f).OutFunction.Evaluate(Time, 0f, ScaleUpTime, 0f, MaxScale);
+            Projectile.scale = MakePoly(3f).OutFunction.Evaluate(Time, 0f, ScaleUpTime, 0f, MaxScale);
         }
 
         float fade = InverseLerp(Asterlin.UnveilingZenith_TotalTime, Asterlin.UnveilingZenith_TotalTime - 80f,
@@ -130,8 +130,8 @@ public class ConvergentFireball : ProjOwnedByNPC<Asterlin>
 
         Projectile.scale = MathHelper.Lerp(0f, MaxScale,
             1f - InverseLerp(0f, Asterlin.UnveilingZenith_StarCollapseTime, ModOwner.UnveilingZenith_CollapseTimer));
-        Projectile.Opacity = Animators.BezierEase(InverseLerp(0f, ScaleUpTime, Time)) *
-                             Animators.MakePoly(2f).InFunction(fade);
+        Projectile.Opacity = BezierEase(InverseLerp(0f, ScaleUpTime, Time)) *
+                             MakePoly(2f).InFunction(fade);
         if (fade != 1)
         {
             for (int i = 0; i < 7; i++)
@@ -167,26 +167,21 @@ public class ConvergentFireball : ProjOwnedByNPC<Asterlin>
     {
         float rad = Projectile.scale;
 
-        void draw()
-        {
-            Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.OrganicNoise);
-            Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, new(rad)), null, Color.White, 0f,
-                tex.Size() / 2, 0);
-        }
-
-        ManagedShader shader = AssetRegistry.GetShader("IntenseFireball");
+        ManagedShader shader = AssetRegistry.GennedShaders.IntenseFireball;
         shader.TrySetParameter("time", Time * .01f);
         shader.TrySetParameter("resolution", new Vector2(rad));
         shader.TrySetParameter("opacity", Projectile.Opacity);
-
-        PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.UnderPlayers, null, shader);
+        Texture2D tex = AssetRegistry.GennedTextures.OrganicNoise;
+        SpriteBatch.DrawRectPixelated(PixelationLayer.UnderPlayers, BlendState.AlphaBlend, tex,
+            ToTarget(Projectile.Center, new(rad)), null, Color.White, 0f,
+            tex.Size() / 2, shader: shader);
         return false;
     }
 }
 
 public class DisintegrationNova : ProjOwnedByNPC<Asterlin>
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     public override bool IgnoreOwnerActivity => true;
     public static int Lifetime = SecondsToFrames(1.4f);
     public static int MaxRadius = 11000;
@@ -235,7 +230,7 @@ public class DisintegrationNova : ProjOwnedByNPC<Asterlin>
             ParticleRegistry.SpawnBlurParticle(Projectile.Center, Lifetime / 2, 1.5f, MaxRadius * 2);
             ParticleRegistry.SpawnChromaticAberration(Projectile.Center, Lifetime / 2, .5f, MaxRadius * 2);
             ParticleRegistry.SpawnFlash(Projectile.Center, 20, .2f, MaxRadius * 2);
-            AdditionsSound.MomentOfCreation.Play(Projectile.Center, 1.5f, -1f);
+            AssetRegistry.GennedSounds.MomentOfCreation.Play(Projectile.Center, 1.5f, -1f);
         }
 
         Projectile.scale = InverseLerp(0f, Lifetime, Time);
@@ -251,11 +246,11 @@ public class DisintegrationNova : ProjOwnedByNPC<Asterlin>
     {
         void draw()
         {
-            ManagedShader fireball = AssetRegistry.GetShader("FireballExplosion");
+            ManagedShader fireball = AssetRegistry.GennedShaders.FireballExplosion;
             fireball.TrySetParameter("scale", Projectile.scale);
 
             Main.spriteBatch.EnterShaderRegion(fireball.Effect);
-            Texture2D noise = AssetRegistry.GetTexture(AdditionsTexture.TurbulentNoise);
+            Texture2D noise = AssetRegistry.GennedTextures.TurbulentNoise;
             fireball.Render();
             Main.spriteBatch.DrawBetterRect(noise, ToTarget(Projectile.Center, new Vector2(MaxRadius)), null,
                 Color.Goldenrod, 0f, noise.Size() / 2f);

@@ -6,19 +6,18 @@ using Terraria;
 using Terraria.Enums;
 using Terraria.GameContent;
 using Terraria.GameContent.Shaders;
-using Terraria.GameInput;
 using Terraria.Graphics.Effects;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
 using TheExtraordinaryAdditions.Core.Globals.ProjectileGlobal;
 using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 using static System.MathF;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
 using SwingDirection = TheExtraordinaryAdditions.Content.Projectiles.Base.BaseSwordSwing.SwingDirection;
 using Utils = Terraria.Utils;
 
@@ -28,9 +27,9 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
 {
     #region Variables
 
-    public sealed override string Texture => AssetRegistry.Invis;
+    public sealed override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
+    public PlayerMouse Modded => Owner.AdditionsMouse();
     public Item Item => Owner.HeldItem;
     public AdditionsProjectileInfo ProjInfo => Projectile.AdditionsInfo();
     public Texture2D Tex => Item.ThisItemTexture();
@@ -189,7 +188,7 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
         return Rect().Intersects(targetHitbox);
     }
 
-    public override bool? CanDamage() => SwingCompletion.BetweenNum(.3f, .8f, true) ? null : false;
+    public override bool? CanDamage() => SwingCompletion is >= .3f and <= .8f ? null : false;
 
     public override bool? CanCutTiles() => CanDamage();
 
@@ -303,7 +302,7 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
             }
         }
 
-        if (SwingCompletion.BetweenNum(Wait + .3f, Swing, true) && !PlayedSound && Owner.controlUseItem)
+        if (SwingCompletion is >= Wait + .3f and <= Swing && !PlayedSound && Owner.controlUseItem)
         {
             if (Owner.whoAmI == Main.myPlayer)
             {
@@ -315,11 +314,9 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
                     Point tile = ToolModifierUtils.GetTileTarget(Owner);
                     bool canPlace = false;
                     bool newObjectType = false;
-                    bool? overrideCanPlace = null;
-                    int? forcedRandom = null;
                     TileObject objectData = default(TileObject);
                     Owner.FigureOutWhatToPlace(Main.tile[tile], Item, out int tileToCreate, out int previewPlaceStyle,
-                        out overrideCanPlace, out forcedRandom);
+                        out bool? overrideCanPlace, out int? forcedRandom);
                     PlantLoader.CheckAndInjectModSapling(tile.X, tile.Y, ref tileToCreate, ref previewPlaceStyle);
                     if (overrideCanPlace.HasValue)
                         canPlace = overrideCanPlace.Value;
@@ -391,7 +388,7 @@ public class FancyTool : ModProjectile, ILocalizedModType, IModType
             if (Item.type == ItemID.Hammush)
             {
                 int num = Owner.itemAnimationMax;
-                if (CanDamage() == null && OverallTime % 4 == 3)
+                if (CanDamage() == null && (int) OverallTime % 4 == 3)
                     Projectile.NewProjectile(Owner.GetProjectileSource_Item(Item), Rect().RandomPoint(),
                         ToolDir * Main.rand.NextFloat(12f, 20f), ProjectileID.Mushroom, Item.damage / 2, 0f,
                         Owner.whoAmI);

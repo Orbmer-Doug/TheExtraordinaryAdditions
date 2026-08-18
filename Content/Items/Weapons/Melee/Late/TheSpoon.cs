@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
 
 public class TheSpoon : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TheSpoon);
+    public override string Texture => AssetRegistry.GennedTextures.TheSpoon.Path;
 
     public override void SetDefaults()
     {

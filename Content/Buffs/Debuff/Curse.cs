@@ -7,7 +7,7 @@ namespace TheExtraordinaryAdditions.Content.Buffs.Debuff;
 
 public class Curse : ModBuff
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Curse);
+    public override string Texture => AssetRegistry.GennedTextures.Curse.Path;
 
     public override void SetStaticDefaults()
     {

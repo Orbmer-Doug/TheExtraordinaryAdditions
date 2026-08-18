@@ -11,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Middle;
 
 public class Fireball : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Fireball);
+    public override string Texture => AssetRegistry.GennedTextures.Fireball.Path;
 
     public override void SetStaticDefaults()
     {

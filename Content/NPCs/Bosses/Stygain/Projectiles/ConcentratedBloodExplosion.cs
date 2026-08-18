@@ -3,7 +3,7 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
@@ -21,7 +21,7 @@ public class ConcentratedBloodExplosion : ProjOwnedByNPC<StygainHeart>
         return c with { A = 80 };
     }
 
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetStaticDefaults()
     {
@@ -59,11 +59,11 @@ public class ConcentratedBloodExplosion : ProjOwnedByNPC<StygainHeart>
         Main.spriteBatch.End();
         Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearWrap,
             DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-        Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.FractalNoise);
+        Texture2D tex = AssetRegistry.GennedTextures.FractalNoise;
         DrawData explosionDrawData = new(tex, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight),
             Color.White * Projectile.Opacity);
 
-        ManagedShader shockwaveShader = ShaderRegistry.ShockwaveShader;
+        ManagedShader shockwaveShader = AssetRegistry.GennedShaders.ShockwaveShader;
         shockwaveShader.TrySetParameter("mainColor", DetermineExplosionColor().ToVector3());
         shockwaveShader.TrySetParameter("screenSize", Main.ScreenSize.ToVector2());
         shockwaveShader.TrySetParameter("explosionDistance", Radius * Projectile.scale * 0.5f);

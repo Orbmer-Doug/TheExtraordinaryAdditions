@@ -2,16 +2,16 @@
 using System.IO;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
+using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
 public class LaserBlast : ModProjectile, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public const int Lifetime = 30;
 
@@ -87,7 +87,7 @@ public class LaserBlast : ModProjectile, ILocalizedModType, IModType
 
     public float WidthFunct(float c)
     {
-        return OptimizedPrimitiveTrail.HemisphereWidthFunct(c, Projectile.height * Projectile.Opacity);
+        return Trail.HemisphereWidthFunct(c, Projectile.height * Projectile.Opacity);
     }
 
     public Color ColorFunct(SystemVector2 c, Vector2 pos)
@@ -96,7 +96,7 @@ public class LaserBlast : ModProjectile, ILocalizedModType, IModType
     }
 
     public TrailPoints points = new(50);
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override bool PreDraw(ref Color lightColor)
     {
@@ -105,8 +105,8 @@ public class LaserBlast : ModProjectile, ILocalizedModType, IModType
             if (trail == null || points == null)
                 return;
 
-            ManagedShader shader = ShaderRegistry.FlameTrail;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FireNoise), 1, SamplerState.LinearWrap);
+            ManagedShader shader = AssetRegistry.GennedShaders.FlameTrail;
+            shader.SetTexture(AssetRegistry.GennedTextures.FireNoise, 1, SamplerState.LinearWrap);
             trail.DrawTrail(shader, points.Points);
         }
 

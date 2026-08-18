@@ -4,14 +4,15 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
 public class VolatileStar : ModProjectile, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     public ref float Time => ref Projectile.ai[0];
 
     public override void SetDefaults()
@@ -40,7 +41,7 @@ public class VolatileStar : ModProjectile, ILocalizedModType, IModType
             ParticleRegistry.SpawnSparkleParticle(Projectile.RotHitbox().RandomPoint(),
                 -Projectile.velocity * Main.rand.NextFloat(.2f, .5f),
                 Main.rand.Next(20, 30), Main.rand.NextFloat(.7f, .8f), CurrentColor, Color.BlueViolet,
-                Main.rand.NextFloat(.5f, 1.3f));
+                Main.rand.NextFloat(.5f, 1.3f), 0f, Projectile.velocity.ToRotation());
 
         after ??= new(6, () => Projectile.Center);
         after.UpdateFancyAfterimages(new(Projectile.Center, Projectile.Size, Projectile.Opacity, Projectile.rotation, 0,
@@ -75,7 +76,7 @@ public class VolatileStar : ModProjectile, ILocalizedModType, IModType
 
     public override void OnKill(int timeLeft)
     {
-        SoundID.Item4.Play(Projectile.Center, Main.rand.NextFloat(.3f, .4f), 0f, .2f, null, 30);
+        SoundID.Item4.Play(Projectile.Center, Main.rand.NextFloat(.3f, .4f), 0f, .2f, 30);
 
         ParticleRegistry.SpawnDetailedBlastParticle(Projectile.Center, Vector2.Zero, Projectile.Size * 1.8f,
             Vector2.Zero, 20, CurrentColor);
@@ -85,7 +86,7 @@ public class VolatileStar : ModProjectile, ILocalizedModType, IModType
         for (int i = 0; i < 12; i++)
         {
             ParticleRegistry.SpawnSparkleParticle(Projectile.Center, Main.rand.NextVector2Circular(10f, 10f),
-                Main.rand.Next(20, 40), Main.rand.NextFloat(.4f, .8f), CurrentColor, Color.Violet, .8f);
+                Main.rand.Next(20, 40), Main.rand.NextFloat(.4f, .8f), CurrentColor, Color.Violet, .8f, 0f, 0f);
         }
     }
 
@@ -93,31 +94,27 @@ public class VolatileStar : ModProjectile, ILocalizedModType, IModType
 
     public override bool PreDraw(ref Color lightColor)
     {
-        void draw()
-        {
-            Texture2D starTexture = AssetRegistry.GetTexture(AdditionsTexture.LensStar);
-            Texture2D bloomTexture = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
+        Texture2D starTexture = AssetRegistry.GennedTextures.LensStar;
+        Texture2D bloomTexture = AssetRegistry.GennedTextures.GlowParticleSmall;
 
-            float rotation = Main.GlobalTimeWrappedHourly * 7f;
-            Vector2 center = Projectile.Center;
+        Vector2 center = Projectile.Center;
 
-            float properBloomSize = bloomTexture.Height / (float) starTexture.Height;
-            Color[] col = [CurrentColor * Projectile.Opacity * .8f];
-            after.DrawFancyAfterimages(starTexture, col, Projectile.Opacity, Projectile.scale, 0f, true);
-            after.DrawFancyAfterimages(bloomTexture, col, Projectile.Opacity, Projectile.scale, 0f, true);
+        Color[] col = [CurrentColor * Projectile.Opacity * .8f];
+        after.DrawFancyAfterimagesPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, starTexture, col, Projectile.Opacity, Projectile.scale, 0f, true);
+        after.DrawFancyAfterimagesPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, bloomTexture, col, Projectile.Opacity, Projectile.scale, 0f, true);
 
-            Vector2 origStar = starTexture.Size() / 2f;
-            Vector2 origBloom = bloomTexture.Size() / 2f;
+        Vector2 origStar = starTexture.Size() / 2f;
+        Vector2 origBloom = bloomTexture.Size() / 2f;
 
-            Main.spriteBatch.Draw(starTexture, ToTarget(center, Projectile.Size * .5f), null, Color.White,
-                -Projectile.rotation + MathHelper.PiOver4, origStar, 0, 0f);
-            Main.spriteBatch.Draw(starTexture, ToTarget(center, Projectile.Size), null, CurrentColor,
-                Projectile.rotation, origStar, 0, 0f);
-            Main.spriteBatch.Draw(bloomTexture, ToTarget(center, Projectile.Size * 1.5f), null, CurrentColor * .7f,
-                Projectile.rotation, origBloom, 0, 0f);
-        }
-
-        PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.UnderPlayers, BlendState.Additive);
+        SpriteBatch.DrawRectPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, starTexture,
+            ToTarget(center, Projectile.Size * .5f), null, Color.White,
+            -Projectile.rotation + MathHelper.PiOver4, origStar);
+        SpriteBatch.DrawRectPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, starTexture,
+            ToTarget(center, Projectile.Size), null, CurrentColor,
+            Projectile.rotation, origStar);
+        SpriteBatch.DrawRectPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, bloomTexture,
+            ToTarget(center, Projectile.Size * 1.5f), null, CurrentColor * .7f,
+            Projectile.rotation, origBloom);
         return false;
     }
 }

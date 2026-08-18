@@ -6,7 +6,7 @@ namespace TheExtraordinaryAdditions.Content.Buffs.Summon;
 
 public class LokiBuff : ModBuff
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.LokiBuff);
+    public override string Texture => AssetRegistry.GennedTextures.LokiBuff.Path;
 
     public override void SetStaticDefaults()
     {

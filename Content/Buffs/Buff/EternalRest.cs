@@ -8,7 +8,7 @@ namespace TheExtraordinaryAdditions.Content.Buffs.Buff;
 
 public class EternalRest : ModBuff
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.EternalRest);
+    public override string Texture => AssetRegistry.GennedTextures.EternalRest.Path;
 
     public override void SetStaticDefaults()
     {
@@ -20,7 +20,7 @@ public class EternalRest : ModBuff
 
     public override void Update(Player player, ref int buffIndex)
     {
-        player.Additions().EternalRested = true;
+        player.AdditionsBuffs().EternalRested = true;
         player.AddBuff(ModContent.BuffType<EternalRestCooldown>(), SecondsToFrames(30));
     }
 }

@@ -3,10 +3,8 @@ using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
@@ -30,7 +28,7 @@ public partial class Asterlin
 
         StateMachine.RegisterStateEntryCallback(AsterlinAIType.Cleave, () =>
         {
-            if (this.RunServer())
+            if (ModNPC.RunServer())
                 NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<JudgementHammer>(),
                     HeavyAttackDamage, 10f);
         });
@@ -96,7 +94,7 @@ public partial class Asterlin
 
             float interpol = InverseLerp(0f, Cleave_ThrowTime, Cleave_ThrowTimer);
             SetRightHandTarget(RightArm.RootPosition + PolarVector(400f,
-                (-MathHelper.PiOver2).AngleLerp(behind, Animators.MakePoly(5f).InFunction(interpol))));
+                (-MathHelper.PiOver2).AngleLerp(behind, MakePoly(5f).InFunction(interpol))));
 
             if (interpol >= 1 && Hammer != null)
             {
@@ -116,15 +114,15 @@ public partial class Asterlin
         {
             float interpol = InverseLerp(0f, Cleave_HammerReelTime, AITimer);
             NPC.SmoothFlyNear(new Vector2(Target.Center.X + Target.Velocity.ClampLength(0f, 50f).X * 20f,
-                Target.Center.Y - Animators.MakePoly(3f).InFunction.Evaluate(100f, 450f, interpol)), .15f, .9f);
+                Target.Center.Y - MakePoly(3f).InFunction.Evaluate(100f, 450f, interpol)), .15f, .9f);
 
             float rot = (dir == 1 ? 0f : MathHelper.Pi).AngleLerp(behind,
-                Animators.MakePoly(3f).InOutFunction(interpol));
+                MakePoly(3f).InOutFunction(interpol));
             SetRightHandTarget(RightArm.RootPosition + PolarVector(400f, rot));
 
             if (AITimer > Cleave_HammerReelTime + 20)
             {
-                if (this.RunServer())
+                if (ModNPC.RunServer())
                 {
                     const int spacing = AngledWidth * 2 + LightPillar.Width;
                     for (int o = -1; o <= 1; o += 2)
@@ -134,7 +132,7 @@ public partial class Asterlin
                             // Use an exponential to deter running away
                             float lerp = InverseLerp(0, Cleave_PillarCount, i);
                             float lerp2 = InverseLerp(0, Cleave_PillarCount - 1, i);
-                            float exp = Animators.MakePoly(4f).OutFunction(lerp2);
+                            float exp = MakePoly(4f).OutFunction(lerp2);
                             float x = spacing / 4f * i * o;
                             float y = -60f * (Cleave_PillarCount * exp);
                             float speed = MathHelper.Lerp(Cleave_PillarFallSpeed, Cleave_PillarFallSpeed * 3, lerp);
@@ -176,10 +174,10 @@ public partial class Asterlin
                 if (RotatedHitbox.SolidCollision())
                 {
                     Vector2 ground =
-                        RaytraceTiles(NPC.Center - Vector2.UnitY * 1500f, NPC.Center + Vector2.UnitY * 200f) ??
+                        RaycastTiles(NPC.Center - Vector2.UnitY * 1500f, NPC.Center + Vector2.UnitY * 200f) ??
                         NPC.Center;
 
-                    if (this.RunServer())
+                    if (ModNPC.RunServer())
                     {
                         for (int j = 0; j < Cleave_DartCount; j++)
                         {
@@ -213,7 +211,7 @@ public partial class Asterlin
                             Color.OrangeRed.Lerp(Color.Gold, .4f));
                     }
 
-                    AdditionsSound.MeteorImpact.Play(ground, 1.2f, -.1f, .1f);
+                    AssetRegistry.GennedSounds.MeteorImpact.Play(ground, 1.2f, -.1f, .1f);
                     ParticleRegistry.SpawnBlurParticle(ground, 70, .5f, 1000f);
                     ParticleRegistry.SpawnChromaticAberration(ground, 50, 1.4f, 800f);
                     ScreenShakeSystem.New(new(1.8f, 1.6f, 3000f), ground);

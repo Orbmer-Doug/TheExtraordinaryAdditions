@@ -5,15 +5,15 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
-using TheExtraordinaryAdditions.UI.LaserUI;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
 
 [AutoloadEquip(EquipType.Back)]
 public class NitrogenCoolingPack : ModItem, ILocalizedModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.NitrogenCoolingPack);
+    public override string Texture => AssetRegistry.GennedTextures.NitrogenCoolingPack.Path;
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
@@ -34,14 +34,11 @@ public class NitrogenCoolingPack : ModItem, ILocalizedModType
 
     public override void UpdateAccessory(Player player, bool hideVisual)
     {
-        LaserResource modPlayer = player.GetModPlayer<LaserResource>();
-
         player.GetModPlayer<NitrogenCoolingPackPlayer>().Equipped = true;
         player.buffImmune[
             BuffID.OnFire & BuffID.OnFire3 & BuffID.Burning & BuffID.Frostburn & BuffID.Frostburn2 & BuffID.Frozen &
             BuffID.Slow & BuffID.Chilled] = true;
         player.resistCold = true;
-        modPlayer.HeatRegenRate *= 2f;
         player.GetArmorPenetration(DamageClass.Generic) += 10;
     }
 
@@ -68,7 +65,7 @@ public sealed class NitrogenCoolingPackPlayer : ModPlayer
 
         Item item = Player.HeldItem;
 
-        if (Player.Additions().SafeMouseLeft.Current && GlobalPlayer.HasDamageClass(Player) && item.damage > 0)
+        if (Player.AdditionsMouse().SafeMouseLeft.Current && GlobalPlayer.HasDamageClass(Player) && item.damage > 0)
             Counter++;
 
         if (Counter >= 20)

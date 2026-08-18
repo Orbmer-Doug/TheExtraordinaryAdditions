@@ -12,7 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
 [AutoloadEquip(EquipType.Wings)]
 public class WingsOfTwilight : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.WingsOfTwilight);
+    public override string Texture => AssetRegistry.GennedTextures.WingsOfTwilight.Path;
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {

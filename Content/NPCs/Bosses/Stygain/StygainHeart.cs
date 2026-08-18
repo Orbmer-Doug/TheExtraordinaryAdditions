@@ -23,19 +23,18 @@ using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 using TheExtraordinaryAdditions.Content.NPCs.BossBars;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Netcode;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain;
 
 [AutoloadBossHead]
 public sealed partial class StygainHeart : ModNPC, IBossDowned
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.StygainHeart);
-    public override string BossHeadTexture => AssetRegistry.GetTexturePath(AdditionsTexture.StygainHeart_Head_Boss);
+    public override string Texture => AssetRegistry.GennedTextures.StygainHeart.Path;
+    public override string BossHeadTexture => AssetRegistry.GennedTextures.StygainHeart_Head_Boss.Path;
 
     public override void SetStaticDefaults()
     {
@@ -79,14 +78,14 @@ public sealed partial class StygainHeart : ModNPC, IBossDowned
         NPC.noGravity = true;
         NPC.noTileCollide = true;
         NPC.HitSound = SoundID.NPCHit18;
-        NPC.DeathSound = AssetRegistry.GetSound(AdditionsSound.heartbeat) with { Volume = 5f };
+        NPC.DeathSound = AssetRegistry.GennedSounds.heartbeat with { Volume = 5f };
         NPC.value = Item.buyPrice(0, 85, 50, 25);
         NPC.netAlways = true;
         NPC.BossBar = ModContent.GetInstance<StygainBossbar>();
 
         if (!Main.dedServ && !Main.gameMenu)
         {
-            Music = MusicLoader.GetMusicSlot(Mod, AssetRegistry.GetMusicPath(AdditionsSound.Ladikerfos));
+            Music = MusicLoader.GetMusicSlot(Mod, AssetRegistry.GennedSounds.Music.Ladikerfos.SoundPath);
         }
     }
 
@@ -379,7 +378,7 @@ public sealed partial class StygainHeart : ModNPC, IBossDowned
 
         if (target.HasBuff(ModContent.BuffType<HemorrhageTransfer>()))
         {
-            if (this.RunServer())
+            if (ModNPC.RunServer())
                 NPC.NewNPCProj(target.Center, Vector2.Zero, ModContent.ProjectileType<BloodletRelay>(), 0, 0f,
                     hurtInfo.Damage * .25f);
         }
@@ -551,8 +550,8 @@ public sealed partial class StygainHeart : ModNPC, IBossDowned
         if (die)
         {
             sb.EnterShaderRegion();
-            ManagedShader fade = AssetRegistry.GetShader("StygainDisintegration");
-            fade.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.noise), 1);
+            ManagedShader fade = AssetRegistry.GennedShaders.StygainDisintegration;
+            fade.SetTexture(AssetRegistry.GennedTextures.noise, 1);
             fade.TrySetParameter("opacity", 1.1f - InverseLerp(0f, deathAnimTime, AttackTimer));
             fade.Render();
         }
@@ -581,10 +580,10 @@ public sealed partial class StygainHeart : ModNPC, IBossDowned
 
     public override void Load()
     {
-        RelicAutoloader.Create(Mod, AssetRegistry.GetTexturePath(AdditionsTexture.StygainHeartRelic),
-            AssetRegistry.GetTexturePath(AdditionsTexture.StygainHeartRelicPlaced), out int id);
+        RelicAutoloader.Create(Mod, AssetRegistry.GennedTextures.StygainHeartRelic.Path,
+            AssetRegistry.GennedTextures.StygainHeartRelicPlaced.Path, out int id);
         RelicID = id;
-        MaskID = MaskAutoloader.Create(Mod, AssetRegistry.GetTexturePath(AdditionsTexture.StygainHeartMask), false);
+        MaskID = MaskAutoloader.Create(Mod, AssetRegistry.GennedTextures.StygainHeartMask.Path, false);
     }
 
     public override void ModifyNPCLoot(NPCLoot npcLoot)

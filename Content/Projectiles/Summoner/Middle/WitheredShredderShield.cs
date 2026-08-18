@@ -6,16 +6,15 @@ using TheExtraordinaryAdditions.Assets.Audio;
 using TheExtraordinaryAdditions.Content.Buffs.Summon;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
 
 public class WitheredShredderShield : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.WitheredShredder);
+    public override string Texture => AssetRegistry.GennedTextures.WitheredShredder.Path;
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer ModdedOwner => Owner.Additions();
     public NPC Target => NPCTargeting.MinionHoming(new(Projectile.Center, 1000, false, true), Owner);
 
     public const float ReelBackTime = 50f;
@@ -151,7 +150,7 @@ public class WitheredShredderShield : ModProjectile
         }
 
         SawSlot ??= LoopedSoundManager.CreateNew(
-            new(AdditionsSound.chainsawThrown, () => Terraria.Utils.Remap(ShredTimer, SecondsToFrames(4.3f),
+            new(AssetRegistry.GennedSounds.chainsawThrown, () => Terraria.Utils.Remap(ShredTimer, SecondsToFrames(4.3f),
                 SecondsToFrames(5), .3f, 0f)),
             () => AdditionsLoopedSound.ProjectileNotActive(Projectile), () =>
                 State == CurrentState.Charge && subState == SubState.Shred);
@@ -361,7 +360,7 @@ public class WitheredShredderShield : ModProjectile
                 Color.Chocolate);
         }
 
-        AdditionsSound.PlasticHit.Play(Projectile.Center, .6f, -.1f, .2f, 10, Name);
+        AssetRegistry.GennedSounds.PlasticHit.Play(Projectile.Center, .6f, -.1f, .2f, 10, Name);
     }
 
     public FancyAfterimages after;

@@ -6,9 +6,10 @@ using Terraria.ID;
 using TheExtraordinaryAdditions.Assets.Audio;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
+using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
@@ -67,7 +68,7 @@ public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
 
     public LoopedSoundInstance gamma;
 
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     public override void SetStaticDefaults() => ProjectileID.Sets.DrawScreenCheckFluff[Type] = 6000;
 
     public override void SetDefaults()
@@ -105,7 +106,7 @@ public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
     {
         // Update the menacing sound
         gamma ??= LoopedSoundManager.CreateNew(
-            new(AdditionsSound.sunAura, () => MathHelper.Clamp(Projectile.scale, 0f, 1f), () => -.08f),
+            new(AssetRegistry.GennedSounds.sunAura, () => MathHelper.Clamp(Projectile.scale, 0f, 1f), () => -.08f),
             () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
         gamma.Update(Projectile.Center);
 
@@ -115,7 +116,7 @@ public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
         float minAngle = .2f;
         float maxAngle = MathHelper.Pi - minAngle;
         if (Time < Asterlin.Hyperbeam_BeamBuildTime)
-            SideAngle = Animators.MakePoly(2.2f).OutFunction
+            SideAngle = MakePoly(2.2f).OutFunction
                 .Evaluate(Time, 0f, Asterlin.Hyperbeam_BeamBuildTime, MathHelper.PiOver2, maxAngle);
         else
         {
@@ -123,28 +124,28 @@ public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
             SwayCounter++;
         }
 
-        Rotation = Animators.EulerAnglesConversion(1, Projectile.rotation, SideAngle);
+        Rotation = QuaternionUtils.CreateFromPolarAngles(Projectile.rotation, SideAngle);
 
         Projectile.Center = Owner.Center;
 
         if (ModOwner.Hyperbeam_CurrentState == Asterlin.Hyperbeam_States.Fade)
         {
-            LaserbeamLength = Animators.Sine.InOutFunction.Evaluate(ModOwner.AITimer, 0f, Asterlin.Hyperbeam_FadeTime,
+            LaserbeamLength = Sine.InOutFunction.Evaluate(ModOwner.AITimer, 0f, Asterlin.Hyperbeam_FadeTime,
                 MaxLaserbeamLength, 0f);
-            Projectile.Opacity = Animators.MakePoly(2.2f).InFunction
+            Projectile.Opacity = MakePoly(2.2f).InFunction
                 .Evaluate(ModOwner.AITimer, 0f, Asterlin.Hyperbeam_FadeTime * .35f, 1f, 0f);
-            Projectile.scale = Animators.MakePoly(3f).InOutFunction
+            Projectile.scale = MakePoly(3f).InOutFunction
                 .Evaluate(ModOwner.AITimer, 0f, Asterlin.Hyperbeam_FadeTime, 2f, 0f);
             if (LaserbeamLength <= 0f)
                 Projectile.Kill();
         }
         else if (ModOwner.Hyperbeam_CurrentState != Asterlin.Hyperbeam_States.Fade)
         {
-            LaserbeamLength = Animators.CubicBezier(.12f, 1f, .61f, .98f)
+            LaserbeamLength = CubicBezier(.12f, 1f, .61f, .98f)
                 .Evaluate(Time, 0f, Asterlin.Hyperbeam_BeamBuildTime, 0f, MaxLaserbeamLength);
-            Projectile.Opacity = Animators.MakePoly(2.2f).OutFunction
+            Projectile.Opacity = MakePoly(2.2f).OutFunction
                 .Evaluate(Time, 0f, Asterlin.Hyperbeam_BeamBuildTime * .35f, 0f, 1f);
-            Projectile.scale = Animators.MakePoly(3f).InOutFunction
+            Projectile.scale = MakePoly(3f).InOutFunction
                 .Evaluate(Time, 0f, Asterlin.Hyperbeam_BeamBuildTime * .6f, 0f, 2f);
         }
 
@@ -294,7 +295,7 @@ public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
 
             // Render the bloom
             Color bloomColor = Color.Orange with { A = 0 };
-            ManagedShader bloomShader = ShaderRegistry.StandardPrimitiveShader;
+            ManagedShader bloomShader = AssetRegistry.GennedShaders.StandardPrimitiveShader;
             bloomShader.Render();
             GetBloomVerticesAndIndices(bloomColor, start, end, out Vertex2D[] leftVertices,
                 out Vertex2D[] rightVertices, out int[] indices);
@@ -306,9 +307,9 @@ public class TranscendentSoulRay : ProjOwnedByNPC<Asterlin>
             // Render the laser
             Color color = new Color((byte) (byte.MaxValue * .961f), (byte) (byte.MaxValue * .592f),
                 (byte) (byte.MaxValue * .078f));
-            ManagedShader shader = AssetRegistry.GetShader("AsterlinDeathrayShader");
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DendriticNoiseDim), 1, SamplerState.LinearWrap);
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.SuperPerlin), 2, SamplerState.LinearWrap);
+            ManagedShader shader = AssetRegistry.GennedShaders.AsterlinDeathrayShader;
+            shader.SetTexture(AssetRegistry.GennedTextures.DendriticNoiseDim, 1, SamplerState.LinearWrap);
+            shader.SetTexture(AssetRegistry.GennedTextures.SuperPerlin, 2, SamplerState.LinearWrap);
             shader.TrySetParameter("baseColor", color.ToVector3());
             shader.Render();
 

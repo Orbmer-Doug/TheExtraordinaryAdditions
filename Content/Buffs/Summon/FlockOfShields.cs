@@ -6,7 +6,7 @@ namespace TheExtraordinaryAdditions.Content.Buffs.Summon;
 
 public class FlockOfShields : ModBuff
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.FlockOfShields);
+    public override string Texture => AssetRegistry.GennedTextures.FlockOfShields.Path;
 
     public override void SetStaticDefaults()
     {

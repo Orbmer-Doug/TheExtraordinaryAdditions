@@ -3,14 +3,14 @@ using System;
 using Terraria;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
+using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 
 public class TaintedStar : ProjOwnedByNPC<StygainHeart>
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -112,38 +112,38 @@ public class TaintedStar : ProjOwnedByNPC<StygainHeart>
 
     public override bool PreDraw(ref Color lightColor)
     {
-        void draw()
-        {
-            Texture2D starTexture = AssetRegistry.GetTexture(AdditionsTexture.Sparkle);
-            Texture2D bloomTexture = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
-            float properBloomSize = starTexture.Height / (float) bloomTexture.Height;
-            float rotation = Main.GlobalTimeWrappedHourly * 14f;
-            Vector2 sparkCenter = Projectile.Center - Main.screenPosition;
-            Main.EntitySpriteDraw(bloomTexture, sparkCenter, null, Color.IndianRed, 0f, bloomTexture.Size() / 2f,
-                properBloomSize, 0);
-            Main.EntitySpriteDraw(starTexture, sparkCenter, null, Color.DarkRed, -rotation + MathHelper.PiOver4,
-                starTexture.Size() / 2f, 1.2f, 0);
-            Main.EntitySpriteDraw(starTexture, sparkCenter, null, Color.Red, rotation, starTexture.Size() / 2f, 1.7f,
-                0);
+        Texture2D starTexture = AssetRegistry.GennedTextures.Sparkle;
+        Texture2D bloomTexture = AssetRegistry.GennedTextures.GlowParticleSmall;
+        float properBloomSize = starTexture.Height / (float) bloomTexture.Height;
+        float rotation = Main.GlobalTimeWrappedHourly * 14f;
+        Vector2 sparkCenter = Projectile.Center - Main.screenPosition;
 
-            if (Telegraph)
-            {
-                Texture2D horiz = AssetRegistry.GetTexture(AdditionsTexture.BloomLineHoriz);
-                Vector2 start = Projectile.Center;
-                Vector2 end = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero) * 2000f;
-                const float imageThickness = 8;
-                const float thicknessScale = 1f / imageThickness;
-                Vector2 middleOrigin = new(0, horiz.Height / 2f);
-                float rot = start.AngleTo(end);
-                float opacity = GetLerpBump(0f, 10f, 50f, 40f, Timer);
-                Main.spriteBatch.DrawBetter(horiz, start, null, Color.Crimson * opacity, rot, middleOrigin,
-                    new Vector2(start.Distance(end) / horiz.Width, thicknessScale * opacity));
-                Main.spriteBatch.DrawBetter(horiz, start, null, Color.DarkRed * opacity * .6f, rot, middleOrigin,
-                    new Vector2(start.Distance(end) / horiz.Width, thicknessScale * opacity * 2f));
-            }
+        SpriteBatch.DrawAltPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, bloomTexture, sparkCenter,
+            null, Color.IndianRed, 0f, bloomTexture.Size() / 2f,
+            properBloomSize);
+        SpriteBatch.DrawAltPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, starTexture, sparkCenter,
+            null, Color.DarkRed, -rotation + MathHelper.PiOver4,
+            starTexture.Size() / 2f, 1.2f);
+        SpriteBatch.DrawAltPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, starTexture, sparkCenter,
+            null, Color.Red, rotation, starTexture.Size() / 2f, 1.7f);
+        if (Telegraph)
+        {
+            Texture2D horiz = AssetRegistry.GennedTextures.BloomLineHoriz;
+            Vector2 start = Projectile.Center;
+            Vector2 end = Projectile.Center + Projectile.velocity.SafeNormalize(Vector2.Zero) * 2000f;
+            const float imageThickness = 8;
+            const float thicknessScale = 1f / imageThickness;
+            Vector2 middleOrigin = new(0, horiz.Height / 2f);
+            float rot = start.AngleTo(end);
+            float opacity = GetLerpBump(0f, 10f, 50f, 40f, Timer);
+            SpriteBatch.DrawAltPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, horiz, start, null,
+                Color.Crimson * opacity, rot, middleOrigin,
+                new Vector2(start.Distance(end) / horiz.Width, thicknessScale * opacity));
+            SpriteBatch.DrawAltPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, horiz, start, null,
+                Color.DarkRed * opacity * .6f, rot, middleOrigin,
+                new Vector2(start.Distance(end) / horiz.Width, thicknessScale * opacity * 2f));
         }
 
-        PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.UnderProjectiles, BlendState.Additive);
         return false;
     }
 }

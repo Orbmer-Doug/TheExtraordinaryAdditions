@@ -5,16 +5,16 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
 
 public class AcheronHeld : BaseIdleHoldoutProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Acheron);
+    public override string Texture => AssetRegistry.GennedTextures.Acheron.Path;
     public override int AssociatedItemID => ModContent.ItemType<Acheron>();
     public override int IntendedProjectileType => ModContent.ProjectileType<AcheronHeld>();
 
@@ -97,7 +97,7 @@ public class AcheronHeld : BaseIdleHoldoutProjectile
 
     public static float WidthFunct(float c) => TeleWidth;
 
-    public OptimizedPrimitiveTrail telegraph;
+    public Trail telegraph;
     public TrailPoints points = new(50);
 
     public override bool PreDraw(ref Color lightColor)
@@ -110,11 +110,11 @@ public class AcheronHeld : BaseIdleHoldoutProjectile
             {
                 if (telegraph != null)
                 {
-                    ManagedShader shader = ShaderRegistry.EnlightenedBeam;
+                    ManagedShader shader = AssetRegistry.GennedShaders.EnlightenedBeam;
                     shader.TrySetParameter("time", Main.GlobalTimeWrappedHourly * .4f);
                     shader.TrySetParameter("repeats", 0f);
-                    shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DendriticNoise), 1);
-                    shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DarkTurbulentNoise), 2);
+                    shader.SetTexture(AssetRegistry.GennedTextures.DendriticNoise, 1);
+                    shader.SetTexture(AssetRegistry.GennedTextures.DarkTurbulentNoise, 2);
 
                     telegraph.DrawTrail(shader, points.Points);
                 }
@@ -123,19 +123,16 @@ public class AcheronHeld : BaseIdleHoldoutProjectile
             PixelationSystem.QueuePrimitiveRenderAction(tele, PixelationLayer.UnderProjectiles);
         }
 
-        void glow()
+        Texture2D tex = AssetRegistry.GennedTextures.GlowParticleSmall;
+        Vector2 orig = tex.Size() / 2;
+        for (float i = .4f; i <= .6f; i += .1f)
         {
-            Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
-            Vector2 orig = tex.Size() / 2;
-            for (float i = .4f; i <= .6f; i += .1f)
-            {
-                float bright = i + (Flash * .05f) * .7f;
-                Main.spriteBatch.DrawBetterRect(tex, ToTarget(Eye, new Vector2(80) * bright), null,
-                    Color.Violet * bright, 0f, orig);
-            }
+            float bright = i + (Flash * .05f) * .7f;
+            SpriteBatch.DrawRectPixelated(PixelationLayer.Dusts, BlendState.Additive, tex,
+                ToTarget(Eye, new Vector2(80) * bright), null,
+                Color.Violet * bright, 0f, orig);
         }
 
-        PixelationSystem.QueueTextureRenderAction(glow, PixelationLayer.Dusts, BlendState.Additive);
         return false;
     }
 }

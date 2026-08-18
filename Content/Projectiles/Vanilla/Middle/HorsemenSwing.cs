@@ -5,11 +5,11 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
 using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
@@ -141,7 +141,7 @@ public class HorsemenDive : ModProjectile
     }
 
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
+    public PlayerMouse Modded => Owner.AdditionsMouse();
     public Vector2 Start;
     public Vector2 End;
     public Vector2 Center => Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
@@ -188,7 +188,7 @@ public class HorsemenDive : ModProjectile
         Owner.velocity = Vector2.Zero;
 
         Vector2 expectedEnd = Start + Projectile.velocity * MaxDist;
-        Vector2? tile = RaytraceTiles(Start, expectedEnd);
+        Vector2? tile = RaycastTiles(Start, expectedEnd);
         if (tile.HasValue)
             End = tile.Value - Projectile.velocity * Owner.height;
         else
@@ -201,7 +201,7 @@ public class HorsemenDive : ModProjectile
                                   PiOver2 * MakePoly(3f).InOutFunction.Evaluate(1f, 0f, comp) * Dir * Owner.gravDir;
         }
         else if (Time == WaitTime)
-            SoundID.Item73.Play(Projectile.Center, 1.1f, -.2f, 0f, null, 20, Name);
+            SoundID.Item73.Play(Projectile.Center, 1.1f, -.2f, 0f, 20, Name);
         else if (Time < (WaitTime + DiveTime))
         {
             float comp = MakePoly(4f).OutFunction(InverseLerp(WaitTime, WaitTime + DiveTime, Time));

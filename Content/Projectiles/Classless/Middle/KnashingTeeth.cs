@@ -1,14 +1,12 @@
 ﻿using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles.Shader;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 
 public class KnashingTeeth : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     private const int Lifetime = 200;
 
@@ -85,6 +83,6 @@ public class KnashingTeeth : ModProjectile
                 Main.rand.Next(20, 35), Main.rand.NextFloat(.4f, .6f), Color.Crimson);
         }
 
-        AdditionsSound.MimicryLand.Play(Projectile.Center, .8f, 0f, .3f, 10, Name);
+        AssetRegistry.GennedSounds.MimicryLand.Play(Projectile.Center, .8f, 0f, .3f, 10, Name);
     }
 }

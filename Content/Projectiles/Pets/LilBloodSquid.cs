@@ -4,15 +4,14 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Summon;
-using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Pets;
 
-public class LilBloodSquid : ModProjectile, ILocalizedModType, IModType
+public class LilBloodSquid : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.LilBloodSquid);
+    public override string Texture => AssetRegistry.GennedTextures.LilBloodSquid.Path;
     public Player Owner => Main.player[Projectile.owner];
     public ref float Time => ref Projectile.ai[0];
 
@@ -50,7 +49,7 @@ public class LilBloodSquid : ModProjectile, ILocalizedModType, IModType
         Projectile.velocity *= 0.98f;
         Projectile.rotation = Projectile.rotation.AngleLerp(Projectile.velocity.X * .05f, .2f);
 
-        if (Utils.NextBool(Main.rand, 50))
+        if (Main.rand.NextBool(50))
         {
             int d1 = Dust.NewDust(Projectile.Center, Projectile.width, Projectile.height, DustID.Blood, 0f, 0f, 100,
                 default(Color), 1.5f);
@@ -73,26 +72,25 @@ public class LilBloodSquid : ModProjectile, ILocalizedModType, IModType
         Projectile.DrawBaseProjectile(lightColor);
         if (Main.bloodMoon)
         {
-            void draw()
-            {
-                Texture2D star = AssetRegistry.GetTexture(AdditionsTexture.LensStar);
-                Vector2 orig = star.Size() / 2;
-                Vector2 eye1 = Projectile.Center + PolarVector(-3f * Projectile.scale, Projectile.rotation) +
-                               PolarVector(23f * Projectile.scale, Projectile.rotation - MathHelper.PiOver2);
-                Vector2 eye2 = Projectile.Center +
-                               PolarVector(14f * Projectile.scale, Projectile.rotation - MathHelper.PiOver2);
-                Vector2 eye3 = Projectile.Center + PolarVector(9f * Projectile.scale, Projectile.rotation) +
-                               PolarVector(7f * Projectile.scale, Projectile.rotation - MathHelper.PiOver2);
-                Vector2 eye4 = Projectile.Center + PolarVector(-7f * Projectile.scale, Projectile.rotation) +
-                               PolarVector(2f * Projectile.scale, Projectile.rotation - MathHelper.PiOver2);
+            Texture2D star = AssetRegistry.GennedTextures.LensStar;
+            Vector2 orig = star.Size() / 2;
+            Vector2 eye1 = Projectile.Center + PolarVector(-3f * Projectile.scale, Projectile.rotation) +
+                           PolarVector(23f * Projectile.scale, Projectile.rotation - MathHelper.PiOver2);
+            Vector2 eye2 = Projectile.Center +
+                           PolarVector(14f * Projectile.scale, Projectile.rotation - MathHelper.PiOver2);
+            Vector2 eye3 = Projectile.Center + PolarVector(9f * Projectile.scale, Projectile.rotation) +
+                           PolarVector(7f * Projectile.scale, Projectile.rotation - MathHelper.PiOver2);
+            Vector2 eye4 = Projectile.Center + PolarVector(-7f * Projectile.scale, Projectile.rotation) +
+                           PolarVector(2f * Projectile.scale, Projectile.rotation - MathHelper.PiOver2);
 
-                Main.spriteBatch.DrawBetterRect(star, ToTarget(eye1, Vector2.One * 25f), null, Color.Crimson, 0f, orig);
-                Main.spriteBatch.DrawBetterRect(star, ToTarget(eye2, Vector2.One * 25f), null, Color.Crimson, 0f, orig);
-                Main.spriteBatch.DrawBetterRect(star, ToTarget(eye3, Vector2.One * 25f), null, Color.Crimson, 0f, orig);
-                Main.spriteBatch.DrawBetterRect(star, ToTarget(eye4, Vector2.One * 25f), null, Color.Crimson, 0f, orig);
-            }
-
-            PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.OverProjectiles, BlendState.Additive);
+            SpriteBatch.DrawRectPixelated(PixelationLayer.OverProjectiles, BlendState.Additive, star,
+                ToTarget(eye1, Vector2.One * 25f), null, Color.Crimson, 0f, orig);
+            SpriteBatch.DrawRectPixelated(PixelationLayer.OverProjectiles, BlendState.Additive, star,
+                ToTarget(eye2, Vector2.One * 25f), null, Color.Crimson, 0f, orig);
+            SpriteBatch.DrawRectPixelated(PixelationLayer.OverProjectiles, BlendState.Additive, star,
+                ToTarget(eye3, Vector2.One * 25f), null, Color.Crimson, 0f, orig);
+            SpriteBatch.DrawRectPixelated(PixelationLayer.OverProjectiles, BlendState.Additive, star,
+                ToTarget(eye4, Vector2.One * 25f), null, Color.Crimson, 0f, orig);
         }
 
         return false;

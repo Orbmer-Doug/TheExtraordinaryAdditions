@@ -7,7 +7,6 @@ using Terraria.ID;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 
@@ -84,8 +83,8 @@ public sealed class AuroraGuardLeg : Entity
         LegTipGraphic = LegTip;
         LegOriginGraphic = LegOrigin + Vector2.UnitY * turret.VerticalVisualOffset;
 
-        ForelimbAsset = AssetRegistry.GetTexture(AdditionsTexture.AuroraLimbStart);
-        LimbAsset = AssetRegistry.GetTexture(AdditionsTexture.AuroraLimbEnd);
+        ForelimbAsset = AssetRegistry.GennedTextures.AuroraLimbStart;
+        LimbAsset = AssetRegistry.GennedTextures.AuroraLimbEnd;
 
         ForelegSpriteOrigin = new Vector2(6, 6);
 
@@ -146,7 +145,7 @@ public sealed class AuroraGuardLeg : Entity
                     // Step sound volume scales with how long the leg has been out in the air
                     float stepPitch = InverseLerp(300f, 1000f, LegTip.Distance(Main.LocalPlayer.Center)) * .3f;
                     float stepVolume = InverseLerp(0.5f, 1f, StepEffectForce);
-                    AdditionsSound.LegStomp.Play(LegTip, stepVolume * .36f, stepPitch, .1f, 20);
+                    AssetRegistry.GennedSounds.LegStomp.Play(LegTip, stepVolume * .36f, stepPitch, .1f, 20);
                     Collision.HitTiles(LegTip, LegTip.SafeDirectionTo(Turret.VisualCenter), 15, 15);
 
                     // Screenshake if big enough
@@ -392,7 +391,7 @@ public sealed class AuroraGuardLeg : Entity
             }
         }
 
-        Vector2? trace = RaytraceTiles(shoulder, grip, true);
+        Vector2? trace = RaycastTiles(shoulder, grip, true);
         Point? fromShoulderGuess = trace?.ToTileCoordinates();
         Point? bestGuess = null;
         bool tooClose = false;
@@ -452,7 +451,7 @@ public sealed class AuroraGuardLeg : Entity
             //if (debugView)
             //  tiltedGrabPosition.SuperQuickDust(Color.Green);
 
-            Vector2? trace = RaytraceTiles(LegOrigin, tiltedGrabPosition, true);
+            Vector2? trace = RaycastTiles(LegOrigin, tiltedGrabPosition, true);
             bestGuess = trace?.ToTileCoordinates();
 
             // Cant grab if the resulting grip location would be too close
@@ -594,7 +593,7 @@ public sealed class AuroraGuardLeg : Entity
     {
         Tile t = Main.tile[tilePosition];
         Vector2 tileWorldCoordinates = tilePosition.ToWorldCoordinates();
-        Rectangle aroundTile = RectangleFromVectors(tileWorldCoordinates - Vector2.One * 9f,
+        Rectangle aroundTile = RectangleFromPoints(tileWorldCoordinates - Vector2.One * 9f,
             tileWorldCoordinates + Vector2.One * 9f);
         if (!t.IsHalfBlock && t.Slope == SlopeType.Solid)
             return LegOrigin.ClampInRect(aroundTile);

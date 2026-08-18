@@ -9,18 +9,16 @@ using TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 using TheExtraordinaryAdditions.Content.Items.Placeable.Banners;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using static Terraria.Utilities.NPCUtils;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Arid;
 
 public class GlassPiercer : ModNPC
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.DuneProwlerSniper);
+    public override string Texture => AssetRegistry.GennedTextures.DuneProwlerSniper.Path;
 
     public override void SetStaticDefaults()
     {
@@ -133,7 +131,7 @@ public class GlassPiercer : ModNPC
     {
         if (NPC.localAI[0] == 0)
         {
-            if (this.RunServer())
+            if (ModNPC.RunServer())
                 NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<GlassFocusedSniper>(), NPC.damage,
                     2f, NPC.whoAmI);
             Running = false;
@@ -478,7 +476,7 @@ public class GlassPiercer : ModNPC
                     }
 
                     WorldGen.KillTile(tileXObstacle, tileYObstacle - 1, fail: true);
-                    if ((this.RunServer() || !canDestroyDoor) && canDestroyDoor && this.RunServer())
+                    if ((ModNPC.RunServer() || !canDestroyDoor) && canDestroyDoor && ModNPC.RunServer())
                     {
                         if (TileLoader.IsClosedDoor(Main.tile[tileXObstacle, tileYObstacle - 1]))
                         {
@@ -489,7 +487,7 @@ public class GlassPiercer : ModNPC
                                 NPC.netUpdate = true;
                             }
 
-                            if (this.RunClient() && opened)
+                            if (ModNPC.RunClient() && opened)
                             {
                                 NetMessage.SendData(MessageID.ToggleDoorState, -1, -1, null, 0, tileXObstacle,
                                     tileYObstacle - 1, NPC.direction);
@@ -505,7 +503,7 @@ public class GlassPiercer : ModNPC
                                 NPC.netUpdate = true;
                             }
 
-                            if (this.RunClient() && opened)
+                            if (ModNPC.RunClient() && opened)
                             {
                                 NetMessage.SendData(MessageID.ToggleDoorState, -1, -1, null, 4, tileXObstacle,
                                     tileYObstacle - 1);
@@ -640,7 +638,7 @@ public class GlassPiercer : ModNPC
 
 public class GlassFocusedSniper : ProjOwnedByNPC<GlassPiercer>
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GlassFocusedSniper);
+    public override string Texture => AssetRegistry.GennedTextures.GlassFocusedSniper.Path;
 
     public override void SetDefaults()
     {
@@ -691,7 +689,7 @@ public class GlassFocusedSniper : ProjOwnedByNPC<GlassPiercer>
         {
             Vector2 tip = Projectile.RotHitbox().Right;
 
-            if (this.RunServer())
+            if (ModProjectile.RunServer())
             {
                 SpawnProjectile(tip, Projectile.velocity * 10f, ModContent.ProjectileType<GlassFocusedShot>(),
                     ShotDamage, 2f);
@@ -724,7 +722,7 @@ public class GlassFocusedSniper : ProjOwnedByNPC<GlassPiercer>
 
 public class GlassShell : ProjOwnedByNPC<GlassPiercer>
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.EmptyRound);
+    public override string Texture => AssetRegistry.GennedTextures.EmptyRound.Path;
     public override bool IgnoreOwnerActivity => true;
 
     public override void SetDefaults()
@@ -771,7 +769,7 @@ public class GlassShell : ProjOwnedByNPC<GlassPiercer>
 
 public class GlassFocusedShot : ProjOwnedByNPC<GlassPiercer>
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     public override bool IgnoreOwnerActivity => true;
 
     public override void SetDefaults()
@@ -802,7 +800,7 @@ public class GlassFocusedShot : ProjOwnedByNPC<GlassPiercer>
         return Color.OrangeRed * GetLerpBump(0f, .1f, .8f, .27f, c.X) * Projectile.Opacity;
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints points = new(20);
 
     public override bool PreDraw(ref Color lightColor)
@@ -812,8 +810,8 @@ public class GlassFocusedShot : ProjOwnedByNPC<GlassPiercer>
             if (trail == null || trail.Disposed || points == null)
                 return;
 
-            ManagedShader shader = ShaderRegistry.FlameTrail;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Pixel), 1);
+            ManagedShader shader = AssetRegistry.GennedShaders.FlameTrail;
+            shader.SetTexture(AssetRegistry.GennedTextures.Pixel, 1);
             trail.DrawTrail(shader, points.Points);
         }
 

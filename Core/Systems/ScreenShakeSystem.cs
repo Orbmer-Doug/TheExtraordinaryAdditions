@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Config;
+using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Core.Systems;

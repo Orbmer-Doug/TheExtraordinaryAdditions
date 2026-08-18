@@ -8,7 +8,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Early;
 
 public class Downpour : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Downpour);
+    public override string Texture => AssetRegistry.GennedTextures.Downpour.Path;
 
     public override void SetDefaults()
     {

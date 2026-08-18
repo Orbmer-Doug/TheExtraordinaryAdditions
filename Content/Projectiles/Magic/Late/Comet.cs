@@ -4,17 +4,15 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
-using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
 
 public class Comet : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetStaticDefaults()
     {
@@ -61,23 +59,23 @@ public class Comet : ModProjectile
 
     public override void SendExtraAI(BinaryWriter writer)
     {
-        writer.Write((float) Projectile.scale);
-        writer.Write((int) Projectile.width);
-        writer.Write((int) Projectile.height);
+        writer.Write(Projectile.scale);
+        writer.Write(Projectile.width);
+        writer.Write(Projectile.height);
     }
 
     public override void ReceiveExtraAI(BinaryReader reader)
     {
-        Projectile.scale = (float) reader.ReadSingle();
-        Projectile.width = (int) reader.ReadInt32();
-        Projectile.height = (int) reader.ReadInt32();
+        Projectile.scale = reader.ReadSingle();
+        Projectile.width = reader.ReadInt32();
+        Projectile.height = reader.ReadInt32();
     }
 
     public override void AI()
     {
         if (!Init && this.RunLocal())
         {
-            StoredY = Owner.Additions().MouseWorld.Y;
+            StoredY = Owner.AdditionsMouse().MouseWorld.Y;
             WidthInterpolant = 1f;
             Projectile.scale = Main.rand.NextFloat(.4f, 1f);
             Projectile.Size = new(50f * Projectile.scale);
@@ -97,7 +95,7 @@ public class Comet : ModProjectile
             Projectile.velocity *= .94f;
             float lerp = InverseLerp(FadeTime, 0f, HitTime);
             WidthInterpolant = lerp;
-            Projectile.Opacity = Animators.MakePoly(3).InFunction(lerp);
+            Projectile.Opacity = MakePoly(3).InFunction(lerp);
 
             if (lerp <= 0f && points.Points.AllPointsEqual())
                 Projectile.Kill();
@@ -136,7 +134,7 @@ public class Comet : ModProjectile
             if (this.RunLocal())
                 Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<CometBlast>(),
                     Projectile.damage, Projectile.knockBack, Projectile.owner, Projectile.scale);
-            AdditionsSound.etherealSlam.Play(Projectile.Center, .6f, -Projectile.scale * .18f, .06f, 50);
+            AssetRegistry.GennedSounds.etherealSlam.Play(Projectile.Center, .6f, -Projectile.scale * .18f, .06f, 50);
 
             Projectile.velocity *= 0f;
             Projectile.extraUpdates = 0;
@@ -160,7 +158,7 @@ public class Comet : ModProjectile
 
     public float WidthFunct(float c)
     {
-        float tipInterpolant = MathF.Sqrt(1f - Animators.MakePoly(2f).InFunction(InverseLerp(0.3f, 0f, c)));
+        float tipInterpolant = MathF.Sqrt(1f - MakePoly(2f).InFunction(InverseLerp(0.3f, 0f, c)));
         float width = InverseLerp(1f, 0.4f, c) * tipInterpolant;
         return (width * Projectile.width * 4f) * WidthInterpolant;
     }
@@ -172,7 +170,7 @@ public class Comet : ModProjectile
     }
 
     public TrailPoints points = new(30);
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override bool PreDraw(ref Color lightColor)
     {
@@ -180,7 +178,7 @@ public class Comet : ModProjectile
         {
             if (trail == null || trail.Disposed || points == null)
                 return;
-            ManagedShader w = ShaderRegistry.PierceTrailShader;
+            ManagedShader w = AssetRegistry.GennedShaders.PierceTrailShader;
             trail.DrawTrail(w, points.Points, 140);
         }
 

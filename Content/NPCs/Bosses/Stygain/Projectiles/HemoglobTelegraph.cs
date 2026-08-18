@@ -3,17 +3,15 @@ using System;
 using Terraria;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 
 public class HemoglobTelegraph : ProjOwnedByNPC<StygainHeart>
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetStaticDefaults()
     {
@@ -61,9 +59,9 @@ public class HemoglobTelegraph : ProjOwnedByNPC<StygainHeart>
 
         sb.EnterShaderRegion();
 
-        Texture2D telegraphBase = AssetRegistry.InvisTex;
-        ManagedShader circle = ShaderRegistry.InverseCircularAOE;
-        circle.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FractalNoise), 1, SamplerState.LinearWrap);
+        Texture2D telegraphBase = AssetRegistry.GennedTextures.Invisible;
+        ManagedShader circle = AssetRegistry.GennedShaders.InverseCircularAOE;
+        circle.SetTexture(AssetRegistry.GennedTextures.FractalNoise, 1, SamplerState.LinearWrap);
 
         Color main = Color.Lerp(Color.MediumVioletRed, Color.PaleVioletRed,
             0.7f * (float) Math.Pow(Sin01(Main.GlobalTimeWrappedHourly), 3.0));
@@ -85,7 +83,7 @@ public class HemoglobTelegraph : ProjOwnedByNPC<StygainHeart>
         // Draw evenly spaced arrows to emphasize to potentially offscreen players where to go
         // Otherwise they may just see fog appear and kaboom
         const int count = 16;
-        Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.HemoglobTeleArrow);
+        Texture2D tex = AssetRegistry.GennedTextures.HemoglobTeleArrow;
         Vector2 orig = tex.Size() / 2;
 
         float timer = TeleTime - Projectile.timeLeft;

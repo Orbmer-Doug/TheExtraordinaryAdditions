@@ -6,13 +6,12 @@ using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
 
 public class FlameInsignia : ModItem, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.FlameInsignia);
+    public override string Texture => AssetRegistry.GennedTextures.FlameInsignia.Path;
 
     public override void SetDefaults()
     {
@@ -68,7 +67,7 @@ public sealed class FlameInsigniaPlayer : ModPlayer
             }
         }
 
-        if (Player.Additions().GlobalTimer % 20 == 19)
+        if (Player.AdditionsMisc().GlobalTimer % 20 == 19)
         {
             List<NPC> targets = NPCTargeting.GetNPCsClosestToFarthest(new(Player.Center, radius, true));
             if (targets.Count != 0)

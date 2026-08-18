@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Early;
 
 public class TimberLash : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TimberLash);
+    public override string Texture => AssetRegistry.GennedTextures.TimberLash.Path;
 
     public override void SetDefaults()
     {

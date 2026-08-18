@@ -6,20 +6,18 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
-using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
 
 public class CyberneticSwing : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CyberneticSwing);
+    public override string Texture => AssetRegistry.GennedTextures.CyberneticSwing.Path;
 
     public enum SwingState
     {
@@ -45,7 +43,7 @@ public class CyberneticSwing : ModProjectile
     }
 
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer ModdedOwner => Owner.Additions();
+    public PlayerMouse ModdedOwner => Owner.AdditionsMouse();
     public Vector2 Center => Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
     public int Dir => Projectile.velocity.X.NonZeroSign();
     public float Speed => Owner.GetTotalAttackSpeed(DamageClass.Melee);
@@ -133,7 +131,7 @@ public class CyberneticSwing : ModProjectile
     public void DoState_LightningPunch()
     {
         if (Time == 0f)
-            AdditionsSound.etherealReleaseA.Play(Projectile.Center, 1.1f, 0f, .1f);
+            AssetRegistry.GennedSounds.etherealReleaseA.Play(Projectile.Center, 1.1f, 0f, .1f);
 
         float comp = InverseLerp(0f, PunchTime, Time);
         if (Reel >= ReelTime || comp >= 1f)
@@ -192,7 +190,7 @@ public class CyberneticSwing : ModProjectile
                 if (HitTarget)
                     continue;
 
-                AdditionsSound.harpoonStop.Play(Projectile.Center, .9f, 0f, .1f, 10, Name);
+                AssetRegistry.GennedSounds.harpoonStop.Play(Projectile.Center, .9f, 0f, .1f, 10, Name);
                 ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 30, 0f, Vector2.One, 0f, 200f,
                     Color.Cyan);
                 float speed = proj.velocity.Length();
@@ -213,7 +211,7 @@ public class CyberneticSwing : ModProjectile
     public void DoState_SMASH()
     {
         if (Time == 0f)
-            SoundID.DD2_GhastlyGlaivePierce.Play(Projectile.Center, 1.2f, -.2f, .1f, null, 10, Name);
+            SoundID.DD2_GhastlyGlaivePierce.Play(Projectile.Center, 1.2f, -.2f, .1f, 10, Name);
 
         float comp = InverseLerp(0f, SmashTime, Time);
         if (comp >= 1f)
@@ -234,7 +232,7 @@ public class CyberneticSwing : ModProjectile
 
         OldDist = Dist;
         Dist = Projectile.velocity.ToRotation() +
-               (MathHelper.PiOver2 + .2f) * Exp(2.2f).InOutFunction.Evaluate(-1f, 1f, comp) * Dir;
+               (MathHelper.PiOver2 + .2f) * Expo(2.2f).InOutFunction.Evaluate(-1f, 1f, comp) * Dir;
         Projectile.Center = Center + PolarVector(100f, Dist);
         Projectile.rotation = Dist + MathHelper.PiOver2;
         Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, Center.AngleTo(Projectile.Center));
@@ -251,7 +249,7 @@ public class CyberneticSwing : ModProjectile
     public void DoState_Uppercut()
     {
         if (Time == 0f)
-            SoundID.DD2_GhastlyGlaivePierce.Play(Projectile.Center, 1.2f, .2f, .1f, null, 10, Name);
+            SoundID.DD2_GhastlyGlaivePierce.Play(Projectile.Center, 1.2f, .2f, .1f, 10, Name);
 
         float comp = MathF.Round(InverseLerp(0f, UppercutTime, Time), 2);
         if (comp >= 1f)
@@ -279,7 +277,7 @@ public class CyberneticSwing : ModProjectile
 
         OldDist = Dist;
         Dist = Projectile.velocity.ToRotation() +
-               (MathHelper.PiOver2 - .2f) * Exp(2.2f).OutFunction.Evaluate(1f, -1f, comp) * Dir;
+               (MathHelper.PiOver2 - .2f) * Expo(2.2f).OutFunction.Evaluate(1f, -1f, comp) * Dir;
         Projectile.Center = Center + PolarVector(100f, Dist);
         Projectile.rotation = Dist - MathHelper.PiOver2;
         Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, Center.AngleTo(Projectile.Center));
@@ -323,7 +321,7 @@ public class CyberneticSwing : ModProjectile
             if (this.RunLocal())
                 Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<CyberneticBlast>(),
                     Projectile.damage / 2, Projectile.knockBack / 2, Projectile.owner);
-            AdditionsSound.etherealSlam.Play(Projectile.Center, 1.4f, -.2f, .1f, 20, Name);
+            AssetRegistry.GennedSounds.etherealSlam.Play(Projectile.Center, 1.4f, -.2f, .1f, 20, Name);
             ScreenShakeSystem.New(new(.5f, .3f), Projectile.Center);
             for (int i = 0; i < 30; i++)
             {
@@ -352,7 +350,8 @@ public class CyberneticSwing : ModProjectile
                     Main.rand.NextFloat(.5f, .9f), Color.Cyan);
             }
 
-            AdditionsSound.etherealHit5.Play(Projectile.Center, 1.8f, State == SwingState.Uppercut ? .1f : -.1f, .1f,
+            AssetRegistry.GennedSounds.etherealHit5.Play(Projectile.Center, 1.8f,
+                State == SwingState.Uppercut ? .1f : -.1f, .1f,
                 10, Name);
         }
 
@@ -373,13 +372,13 @@ public class CyberneticSwing : ModProjectile
 
     public Color ColorFunct(SystemVector2 c, Vector2 pos)
     {
-        return CoreUtils.MulticolorLerp(c.X, Color.White, Color.LightCyan, Color.Cyan, Color.DarkCyan,
+        return MulticolorLerp(c.X, Color.White, Color.LightCyan, Color.Cyan, Color.DarkCyan,
             Color.DarkSlateBlue) * Projectile.Opacity;
     }
 
     public SystemVector2 OffsetFunct(float c) => Center.ToNumerics();
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints points = new(20);
 
     public override bool PreDraw(ref Color lightColor)
@@ -389,8 +388,8 @@ public class CyberneticSwing : ModProjectile
             if (trail == null || points == null)
                 return;
 
-            ManagedShader shader = ShaderRegistry.SmoothFlame;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise), 1, SamplerState.LinearWrap);
+            ManagedShader shader = AssetRegistry.GennedShaders.SmoothFlame;
+            shader.SetTexture(AssetRegistry.GennedTextures.TechyNoise, 1, SamplerState.LinearWrap);
             shader.TrySetParameter("heatInterpolant", .8f);
             trail.DrawTrail(shader, points.Points, 120, false);
         }
@@ -440,16 +439,16 @@ public class CyberneticSwing : ModProjectile
         //TODO
         if (State == SwingState.Parry /*&& !Owner.HasCooldown(CyberneticParryCooldown.ID)*/)
         {
-            ManagedShader shader = AssetRegistry.GetShader("ForcefieldLimited");
+            ManagedShader shader = AssetRegistry.GennedShaders.ForcefieldLimited;
             shader.TrySetParameter("direction", Projectile.velocity.ToRotation());
             shader.TrySetParameter("angle", MathHelper.PiOver4);
             shader.TrySetParameter("color", Color.Cyan.ToVector4() * Projectile.Opacity);
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise), 1, SamplerState.LinearWrap);
+            shader.SetTexture(AssetRegistry.GennedTextures.TechyNoise, 1, SamplerState.LinearWrap);
 
             float size = ParryDist;
             Main.spriteBatch.EnterShaderRegion(shader.Effect, BlendState.Additive);
             shader.Render();
-            Main.spriteBatch.Draw(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise),
+            Main.spriteBatch.Draw(AssetRegistry.GennedTextures.TechyNoise,
                 ToTarget(Center - new Vector2(size / 2), new Vector2(size)), Color.White);
             Main.spriteBatch.ResetToDefault();
         }
@@ -462,7 +461,7 @@ public class CyberneticSwing : ModProjectile
 
 public class CyberneticBlast : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     public const int Lifetime = 40;
 
     public override void SetDefaults()
@@ -511,11 +510,11 @@ public class CyberneticBlast : ModProjectile
 
     public Color ColorFunct(SystemVector2 c, Vector2 pos)
     {
-        return CoreUtils.MulticolorLerp(Completion, Color.White, Color.Cyan, Color.DarkCyan) *
+        return MulticolorLerp(Completion, Color.White, Color.Cyan, Color.DarkCyan) *
                InverseLerp(0f, 5f, Time) * MakePoly(2f).OutFunction.Evaluate(1f, 0f, Completion);
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints points = new(40);
 
     public override bool PreDraw(ref Color lightColor)
@@ -525,8 +524,8 @@ public class CyberneticBlast : ModProjectile
             if (trail == null || points == null)
                 return;
 
-            ManagedShader shader = ShaderRegistry.FlameTrail;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WavyBlotchNoise), 1, SamplerState.LinearWrap);
+            ManagedShader shader = AssetRegistry.GennedShaders.FlameTrail;
+            shader.SetTexture(AssetRegistry.GennedTextures.WavyBlotchNoise, 1, SamplerState.LinearWrap);
             trail.DrawTrail(shader, points.Points, 100, true);
         }
 
@@ -537,7 +536,7 @@ public class CyberneticBlast : ModProjectile
 
 public class CyberDart : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -582,11 +581,11 @@ public class CyberDart : ModProjectile
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        AdditionsSound.etherealSmallHit.Play(Projectile.Center, .7f, 0f, .2f);
+        AssetRegistry.GennedSounds.etherealSmallHit.Play(Projectile.Center, .7f, 0f, .2f);
         for (int i = 0; i < 20; i++)
         {
             ParticleRegistry.SpawnGlowParticle(Projectile.Center, Vector2.Zero,
-                (int) Terraria.Utils.Remap(i, 0, 20, 20, 50), Terraria.Utils.Remap(i, 0, 20, 30f, 60f),
+                (int) Utils.Remap(i, 0, 20, 20, 50), Utils.Remap(i, 0, 20, 30f, 60f),
                 Color.DeepSkyBlue);
             ParticleRegistry.SpawnTechyHolosquareParticle(Projectile.Center + Main.rand.NextVector2Circular(10, 10),
                 -Projectile.velocity.RotatedByRandom(.2f) * Main.rand.NextFloat(.2f, .5f), Main.rand.Next(30, 40),
@@ -605,10 +604,10 @@ public class CyberDart : ModProjectile
     }
 
     public Color ColorFunct(SystemVector2 c, Vector2 pos) => Color.DeepSkyBlue *
-                                                             Terraria.Utils.Remap(Projectile.Opacity, 0f, 1f, c.X,
+                                                             Utils.Remap(Projectile.Opacity, 0f, 1f, c.X,
                                                                  MathHelper.Clamp(c.X + 1, 0, 1));
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints points = new(15);
 
     public override bool PreDraw(ref Color lightColor)
@@ -617,10 +616,10 @@ public class CyberDart : ModProjectile
         {
             if (trail != null && !trail.Disposed && points != null)
             {
-                ManagedShader shader = ShaderRegistry.BaseLaserShader;
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise), 1,
+                ManagedShader shader = AssetRegistry.GennedShaders.BaseLaserShader;
+                shader.SetTexture(AssetRegistry.GennedTextures.TechyNoise, 1,
                     SamplerState.AnisotropicWrap);
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.HarshNoise), 2,
+                shader.SetTexture(AssetRegistry.GennedTextures.HarshNoise, 2,
                     SamplerState.AnisotropicWrap);
                 trail.DrawTrail(shader, points.Points, 100, true);
             }
@@ -633,7 +632,7 @@ public class CyberDart : ModProjectile
 
 public class CyberPierce : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {

@@ -4,9 +4,9 @@ using System.IO;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
@@ -21,7 +21,7 @@ public class LesserBloodBeacon : ModProjectile
     public ref float Time => ref Projectile.ai[0];
 
     public const float LaserLength = 2000f;
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetStaticDefaults()
     {
@@ -57,7 +57,7 @@ public class LesserBloodBeacon : ModProjectile
         Projectile.scale = InverseLerp(0f, Lifetime / 2, Time);
         Projectile.Opacity = 1f - InverseLerp(Lifetime * .7f, Lifetime, Time);
         Projectile.Center = Vector2.Lerp(Start - Projectile.velocity * LaserLength / 2,
-            Start + Projectile.velocity * LaserLength / 2, Animators.MakePoly(3f).OutFunction(Projectile.scale));
+            Start + Projectile.velocity * LaserLength / 2, MakePoly(3f).OutFunction(Projectile.scale));
         if (Time < Lifetime / 2)
             cache.Update(Projectile.Center);
 
@@ -78,8 +78,8 @@ public class LesserBloodBeacon : ModProjectile
         ColorFunction(completionRatio, position) * .4f;
 
     public TrailPoints cache = new(200);
-    public OptimizedPrimitiveTrail trail;
-    public OptimizedPrimitiveTrail trail2;
+    public Trail trail;
+    public Trail trail2;
 
     public override bool PreDraw(ref Color lightColor)
     {
@@ -88,27 +88,20 @@ public class LesserBloodBeacon : ModProjectile
             if (trail == null || trail2 == null || trail.Disposed || trail2.Disposed || cache == null)
                 return;
 
-            ManagedShader shader = ShaderRegistry.BloodBeacon;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Perlin), 1);
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.SuperWavyPerlin), 2);
+            ManagedShader shader = AssetRegistry.GennedShaders.BloodBeaconShader;
+            shader.SetTexture(AssetRegistry.GennedTextures.Perlin, 1);
+            shader.SetTexture(AssetRegistry.GennedTextures.SuperWavyPerlin, 2);
 
             trail.DrawTrail(shader, cache.Points, 80);
 
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FractalNoise), 1);
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WarpMap), 2);
+            shader.SetTexture(AssetRegistry.GennedTextures.FractalNoise, 1);
+            shader.SetTexture(AssetRegistry.GennedTextures.WarpMap, 2);
 
             trail2.DrawTrail(shader, cache.Points, 80);
         }
 
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.OverPlayers);
-        PixelationSystem.QueueTextureRenderAction(Portal, PixelationLayer.OverProjectiles, null,
-            ShaderRegistry.PortalShader);
-        return false;
-    }
-
-    public void Portal()
-    {
-        Texture2D noiseTexture = AssetRegistry.GetTexture(AdditionsTexture.FractalNoise);
+        Texture2D noiseTexture = AssetRegistry.GennedTextures.FractalNoise;
         Vector2 drawPosition = Start - Projectile.velocity * LaserLength / 2 - Main.screenPosition;
         Vector2 origin = noiseTexture.Size() * 0.5f;
 
@@ -116,16 +109,17 @@ public class LesserBloodBeacon : ModProjectile
         Color col2 = Color.Crimson * 1.5f;
 
         Vector2 diskScale = 2.5f * Projectile.scale * new Vector2(.3f, 1f);
-        ManagedShader portal = ShaderRegistry.PortalShader;
+        ManagedShader portal = AssetRegistry.GennedShaders.PortalShader;
 
         portal.TrySetParameter("opacity", Projectile.Opacity);
         portal.TrySetParameter("color", col1);
         portal.TrySetParameter("secondColor", col2);
         portal.TrySetParameter("globalTime", Projectile.scale * 1.2f);
-        portal.Render();
-
-        Main.spriteBatch.Draw(noiseTexture, drawPosition, null, Color.White, Projectile.velocity.ToRotation(), origin,
-            diskScale, SpriteEffects.None, 0f);
+        SpriteBatch.DrawAltPixelated(PixelationLayer.OverProjectiles, BlendState.AlphaBlend, noiseTexture, drawPosition,
+            null, Color.White, Projectile.velocity.ToRotation(),
+            origin,
+            diskScale, shader: portal);
+        return false;
     }
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)

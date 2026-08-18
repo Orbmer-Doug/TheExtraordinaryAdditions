@@ -1,6 +1,7 @@
 ﻿using Terraria;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Globals.NPCGlobal;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
 using TheExtraordinaryAdditions.Core.Globals.ProjectileGlobal;
 
 namespace TheExtraordinaryAdditions.Core.Globals;
@@ -8,6 +9,11 @@ namespace TheExtraordinaryAdditions.Core.Globals;
 public static class GlobalExtensions
 {
     public static GlobalPlayer Additions(this Player player) => player.GetModPlayer<GlobalPlayer>();
+    public static PlayerBuffs AdditionsBuffs(this Player player) => player.GetModPlayer<PlayerBuffs>();
+    public static PlayerMinion AdditionsMinion(this Player player) => player.GetModPlayer<PlayerMinion>();
+    public static PlayerMisc AdditionsMisc(this Player player) => player.GetModPlayer<PlayerMisc>();
+    public static PlayerMouse AdditionsMouse(this Player player) => player.GetModPlayer<PlayerMouse>();
+    public static PlayerMovement AdditionsMove(this Player player) => player.GetModPlayer<PlayerMovement>();
 
     public static AdditionsGlobalNPC Additions(this NPC npc) => npc.GetGlobalNPC<AdditionsGlobalNPC>();
     public static AdditionsNPCInfo AdditionsInfo(this NPC npc) => npc.GetGlobalNPC<AdditionsNPCInfo>();

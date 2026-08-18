@@ -1,11 +1,10 @@
-﻿using Terraria;
-using Terraria.ModLoader;
+﻿using Terraria.ModLoader;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Arid;
 
 public class EmptyRound : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.EmptyRound);
+    public override string Texture => AssetRegistry.GennedTextures.EmptyRound.Path;
     public bool TouchedGrass;
 
     public override void SetDefaults()

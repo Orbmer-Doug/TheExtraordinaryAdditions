@@ -1,19 +1,17 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
 public class MimicrySlash : BaseSwordSwing
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Mimicry);
+    public override string Texture => AssetRegistry.GennedTextures.Mimicry.Path;
 
     public override int StopTimeFrames => 2;
     public override int SwingTime => 34;
@@ -53,7 +51,7 @@ public class MimicrySlash : BaseSwordSwing
         // swoosh
         if (Animation() >= .26f && !PlayedSound)
         {
-            AdditionsSound.MimicrySwing.Play(Projectile.Center, 1.6f, 0f, .1f);
+            AssetRegistry.GennedSounds.MimicrySwing.Play(Projectile.Center, 1.6f, 0f, .1f);
             PlayedSound = true;
         }
 
@@ -175,15 +173,15 @@ public class MimicrySlash : BaseSwordSwing
                 }
             }
 
-            AdditionsSound.MimicryLand.Play(target.Center, 4f, -.45f, 0f, 1, "Obliteration");
+            AssetRegistry.GennedSounds.MimicryLand.Play(target.Center, 4f, -.45f, 0f, 1, "Obliteration");
         }
         else
         {
-            AdditionsSound.MimicryLand.Play(target.Center, 2.5f, 0f, .2f);
+            AssetRegistry.GennedSounds.MimicryLand.Play(target.Center, 2.5f, 0f, .2f);
         }
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints old = new(25);
 
     public static float WidthFunct(float c)
@@ -227,10 +225,10 @@ public class MimicrySlash : BaseSwordSwing
             if (trail == null || old == null || SwingCompletion < .45f || SwingCompletion > .95f)
                 return;
 
-            ManagedShader shader = ShaderRegistry.DissipatedGlowTrail;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.noise), 0);
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FlameMap2), 1);
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Cosmos), 2);
+            ManagedShader shader = AssetRegistry.GennedShaders.DissipatedGlowTrail;
+            shader.SetTexture(AssetRegistry.GennedTextures.noise, 0);
+            shader.SetTexture(AssetRegistry.GennedTextures.FlameMap2, 1);
+            shader.SetTexture(AssetRegistry.GennedTextures.Cosmos, 2);
             shader.TrySetParameter("OutlineColor", Color.Red.ToVector3());
             trail.DrawTrail(shader, old.Points);
         }

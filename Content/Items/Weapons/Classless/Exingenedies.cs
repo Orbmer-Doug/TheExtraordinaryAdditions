@@ -1,23 +1,28 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.UI.Chat;
-using TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.Cynosure;
-using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
-using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
-using TheExtraordinaryAdditions.Core.Systems;
+using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Late;
+using TheExtraordinaryAdditions.Content.Items.Weapons.Melee;
+using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
+using TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Late;
+using TheExtraordinaryAdditions.Content.Projectiles.Classless.Late;
+using TheExtraordinaryAdditions.Content.Rarities;
+using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using TextSnippet = TheExtraordinaryAdditions.Core.Graphics.Systems.TextSnippet;
 
-namespace TheExtraordinaryAdditions.Content.Items.Weapons.Cynosure;
+namespace TheExtraordinaryAdditions.Content.Items.Weapons.Classless;
 
 public class Exingenedies : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Invisible);
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override string LocalizationCategory => "Content.Items.Weapons.Cynosure";
 
@@ -36,11 +41,11 @@ public class Exingenedies : ModItem
         Item.width = Item.height = 1;
         Item.useTime = Item.useAnimation = 25;
         Item.useStyle = ItemUseStyleID.Shoot;
-        Item.knockBack = .1f;
-        Item.shootSpeed = 9f;
+        Item.knockBack = 0f;
+        Item.shootSpeed = 0f;
         Item.shoot = ModContent.ProjectileType<TheExingendies>();
-        Item.rare = ModContent.RarityType<PrimordialRarity>();
-        Item.value = AdditionsGlobalItem.LegendaryRarityPrice;
+        Item.rare = ModContent.RarityType<FractallineRarity>();
+        Item.value = 0;
     }
 
     public override void ModifyWeaponDamage(Player player, ref StatModifier damage)
@@ -51,43 +56,80 @@ public class Exingenedies : ModItem
     public override void UpdateInventory(Player player)
     {
         Item.crit = Main.rand.Next(1, 99);
-        Item.knockBack = Main.rand.NextFloat(2f, 3f);
+        Item.knockBack = 0f;
         Item.useTime = Item.useAnimation = Main.rand.Next(2, 25);
         Item.value = Main.rand.Next(0, int.MaxValue / 2);
+
+        if (Keys.LeftShift.Current())
+            TooltipCounter++;
+        if (!Keys.LeftShift.Current())
+            TooltipCounter = 0;
     }
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
+        tooltips.FirstOrDefault(n => n.Name == "Knockback")?.Text = tooltips.FirstOrDefault(n => n.Name == "Knockback")
+            ?.Text
+            .Replace("No", "?");
         tooltips.DrawHeldShiftTooltip([
-            new(Name,
-                this.GetLocalization("Shift").Format(AdditionsKeybinds.SetBonusHotKey.TooltipHotkeyString(),
-                    AdditionsKeybinds.MiscHotKey.TooltipHotkeyString()))
+            new TooltipLine(Name, this.GetLocalization("Shift").Value),
         ]);
-        tooltips.IntegrateHotkey(AdditionsKeybinds.MiscHotKey, "[KEY]");
-        tooltips.IntegrateHotkey(AdditionsKeybinds.SetBonusHotKey, "[KEY2]");
     }
+
+    public static int TooltipCounter;
+    public const int TotalTime = 120;
 
     public override bool PreDrawTooltipLine(DrawableTooltipLine line, ref int yOffset)
     {
-        if (line.Name == "Tooltip1")
+        if (line.Name == "Exingenedies")
         {
+            float completion = InverseLerp(0f, TotalTime, TooltipCounter);
+
             Vector2 drawOffset = Vector2.UnitY * yOffset;
-            drawOffset.X += DrawLine(line, drawOffset, "");
 
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.SamplerStateForCursor,
                 DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
 
-            // Apply glitch effects to a sentence
-            ManagedShader displace = ShaderRegistry.NoiseDisplacement;
-            displace.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Perlin), 1);
-            displace.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.noise), 2);
-            displace.TrySetParameter("color", Color.SlateBlue);
-            displace.TrySetParameter("noiseIntensity", 2.67f);
-            displace.TrySetParameter("horizontalDisplacementFactor", 0.0204f);
-            displace.Render();
+            string text = this.GetLocalization("Shift").Value;
+            Vector2 textPosition = new Vector2(line.X, line.Y) + drawOffset;
 
-            drawOffset.Y += DrawLine(line, drawOffset, this.GetLocalization("Line").Value);
+            TextBlock block = new([
+                new TextSnippet(text, 1f, Color.White, TextSnippet.AppearFadingFromRight,
+                    TextSnippet.WaveDisplacement(2.2f))
+            ])
+            {
+                AnimationCompletion = completion
+            };
+            const float width = 300f;
+            block.ApplyWordWrap(width);
+
+            Vector2 size = new Vector2(width, line.Font.MeasureString(text).Y);
+            const int amt = 12;
+            for (int i = 0; i < amt; i++)
+            {
+                Texture2D tex = AssetRegistry.GennedTextures.Pixel;
+                Vector2 afterimageOffset = (MathHelper.TwoPi * i / amt).ToRotationVector2() * 10f;
+                Main.spriteBatch.DrawBetterRect(tex,
+                    ToTarget(new Vector2(line.X, line.Y) + drawOffset + afterimageOffset + Main.screenPosition, size),
+                    null, Color.Black * .1f, 0f, Vector2.Zero);
+            }
+
+            ManagedShader displace = AssetRegistry.GennedShaders.NoiseDisplacement;
+            displace.SetTexture(AssetRegistry.GennedTextures.Perlin, 1);
+            displace.SetTexture(AssetRegistry.GennedTextures.noise, 2);
+            displace.TrySetParameter("noiseIntensity", 6.67f);
+
+            displace.TrySetParameter("color", Color.Transparent);
+            displace.TrySetParameter("horizontalDisplacementFactor", 0.5104f + (1f - completion));
+            displace.Render();
+            block.Draw(textPosition + new Vector2(4f, 0f), MathF.Max(completion, .4f));
+            displace.TrySetParameter("color", Color.White);
+            displace.TrySetParameter("horizontalDisplacementFactor", 0.0104f + (1f - completion));
+            displace.Render();
+            block.Draw(textPosition, MathF.Max(completion, .4f));
+
+            drawOffset.Y += size.X * line.BaseScale.X;
 
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.SamplerStateForCursor,
@@ -99,32 +141,6 @@ public class Exingenedies : ModItem
         return true;
     }
 
-    public static float DrawLine(DrawableTooltipLine line, Vector2 drawOffset, string text)
-    {
-        Color textOuterColor = Color.Black;
-
-        // Get the text of the tooltip line
-        Vector2 textPosition = new Vector2(line.X, line.Y) + drawOffset;
-
-        // Get an offset to the afterimageOffset based on a sine wave
-        float sine = (float) ((1f + Math.Sin(Main.GlobalTimeWrappedHourly * 2.5f)) * 0.5f);
-        float sineOffset = MathHelper.Lerp(0.4f, 0.775f, sine);
-
-        // Draw text backglow effects
-        for (int i = 0; i < 12; i++)
-        {
-            Vector2 afterimageOffset = (MathHelper.TwoPi * i / 12f).ToRotationVector2() * (2f * sineOffset);
-            ChatManager.DrawColorCodedString(Main.spriteBatch, line.Font, text,
-                (textPosition + afterimageOffset).RotatedBy(MathHelper.TwoPi * (i / 12)), textOuterColor * 0.9f,
-                line.Rotation, line.Origin, line.BaseScale);
-        }
-
-        ChatManager.DrawColorCodedString(Main.spriteBatch, line.Font, text, textPosition, Color.DarkSlateBlue,
-            line.Rotation, line.Origin, line.BaseScale);
-
-        return line.Font.MeasureString(text).X * line.BaseScale.X;
-    }
-
     public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor,
         Color itemColor, Vector2 origin, float scale)
     {
@@ -132,12 +148,12 @@ public class Exingenedies : ModItem
         Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, null,
             Main.UIScaleMatrix);
 
-        ManagedShader shader = AssetRegistry.GetShader("GenediesFlame");
+        ManagedShader shader = AssetRegistry.GennedShaders.GenediesFlame;
         shader.TrySetParameter("Time", Main.GlobalTimeWrappedHourly);
-        shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.MeltNoise), 0, SamplerState.AnisotropicWrap);
+        shader.SetTexture(AssetRegistry.GennedTextures.MeltNoise, 0, SamplerState.AnisotropicWrap);
         shader.Render();
 
-        Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
+        Texture2D tex = AssetRegistry.GennedTextures.Pixel;
         Main.spriteBatch.Draw(tex, position, null, Color.White, 0f, tex.Size() / 2f, 60f, 0, 0f);
 
         Main.spriteBatch.End();
@@ -148,16 +164,16 @@ public class Exingenedies : ModItem
     public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation,
         ref float scale, int whoAmI)
     {
-        ManagedShader shader = AssetRegistry.GetShader("GenediesFlame");
+        ManagedShader shader = AssetRegistry.GennedShaders.GenediesFlame;
         shader.TrySetParameter("Time", Main.GlobalTimeWrappedHourly);
-        shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.MeltNoise), 0, SamplerState.AnisotropicWrap);
+        shader.SetTexture(AssetRegistry.GennedTextures.MeltNoise, 0, SamplerState.AnisotropicWrap);
 
         ScreenShaderUpdates.QueueDrawAction(draw, BlendState.AlphaBlend, shader);
         return false;
 
         void draw()
         {
-            Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
+            Texture2D tex = AssetRegistry.GennedTextures.Pixel;
             Main.spriteBatch.Draw(tex, Item.position - Main.screenPosition, null, Color.White, 0f, tex.Size() / 2f,
                 500f, 0, 0f);
         }
@@ -174,8 +190,11 @@ public class Exingenedies : ModItem
 
     public override void AddRecipes()
     {
-        Recipe recipe = CreateRecipe();
-        //TODO
-        recipe.Register();
+        CreateRecipe()
+            .AddIngredient<GlareOfAlsafi>()
+            .AddIngredient<UnparalleledCoalescence>()
+            .AddIngredient<RealitySeamstressesGlove>()
+            .AddIngredient<DeepestNadir>()
+            .Register();
     }
 }

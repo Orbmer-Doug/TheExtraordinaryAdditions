@@ -12,7 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Late;
 [AutoloadEquip(EquipType.Wings)]
 public class GodGauntlet : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GodGauntlet);
+    public override string Texture => AssetRegistry.GennedTextures.GodGauntlet.Path;
 
     public override void SetStaticDefaults()
     {

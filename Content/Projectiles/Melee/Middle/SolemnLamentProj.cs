@@ -6,15 +6,13 @@ using TheExtraordinaryAdditions.Content.Buffs.Buff;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
 public class SolemnLamentProj : BaseHoldoutProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public bool Swap
     {
@@ -99,9 +97,9 @@ public class SolemnLamentProj : BaseHoldoutProjectile
                 Vector2 gunPos = Projectile.RotHitbox().Right;
 
                 if (IsBlack)
-                    AdditionsSound.SolemnB.Play(gunPos, .5f, 0f, 0f, 1, Name);
+                    AssetRegistry.GennedSounds.SolemnB.Play(gunPos, .5f, 0f, 0f, 1, Name);
                 else
-                    AdditionsSound.SolemnW.Play(gunPos, .5f, 0f, 0f, 1, Name);
+                    AssetRegistry.GennedSounds.SolemnW.Play(gunPos, .5f, 0f, 0f, 1, Name);
 
                 int shootType = IsBlack
                     ? ModContent.ProjectileType<SolemButterflyGrief>()
@@ -138,8 +136,8 @@ public class SolemnLamentProj : BaseHoldoutProjectile
     {
         SpriteEffects spriteEffects =
             Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
-        Texture2D black = AssetRegistry.GetTexture(AdditionsTexture.SolemnLamentProjBlack);
-        Texture2D white = AssetRegistry.GetTexture(AdditionsTexture.SolemnLamentProjWhite);
+        Texture2D black = AssetRegistry.GennedTextures.SolemnLamentProjBlack;
+        Texture2D white = AssetRegistry.GennedTextures.SolemnLamentProjWhite;
         Vector2 pos = Projectile.Center;
 
         float num = Projectile.spriteDirection == -1 ? MathHelper.Pi : 0f;

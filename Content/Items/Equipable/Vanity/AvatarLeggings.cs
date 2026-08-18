@@ -11,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Vanity;
 [AutoloadEquip(EquipType.Legs)]
 public class AvatarLeggings : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AvatarLeggings);
+    public override string Texture => AssetRegistry.GennedTextures.AvatarLeggings.Path;
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {

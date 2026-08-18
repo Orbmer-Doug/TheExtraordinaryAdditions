@@ -11,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Materials.Early;
 
 public class ShockCatalyst : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ShockCatalyst);
+    public override string Texture => AssetRegistry.GennedTextures.ShockCatalyst.Path;
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
@@ -32,8 +32,8 @@ public class ShockCatalyst : ModItem
     public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation,
         ref float scale, int whoAmI)
     {
-        Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.ShockCatalyst);
-        Texture2D texGlow = AssetRegistry.GetTexture(AdditionsTexture.ShockCatalyst_Glow);
+        Texture2D tex = AssetRegistry.GennedTextures.ShockCatalyst;
+        Texture2D texGlow = AssetRegistry.GennedTextures.ShockCatalyst_Glow;
 
         Rectangle framed = Item.GetCurrentFrame(ref frame, ref frameCounter, 9, 7);
         spriteBatch.Draw(tex, Item.position - Main.screenPosition, framed, lightColor, 0f, Vector2.Zero, 1f, 0, 0f);

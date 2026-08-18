@@ -11,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
 public class SunsplitHoldout : BaseIdleHoldoutProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SunsplitHorizon);
+    public override string Texture => AssetRegistry.GennedTextures.SunsplitHorizon.Path;
     public override int AssociatedItemID => ModContent.ItemType<SunsplitHorizon>();
     public override int IntendedProjectileType => ModContent.ProjectileType<SunsplitHoldout>();
 
@@ -65,7 +65,7 @@ public class SunsplitHoldout : BaseIdleHoldoutProjectile
             if (SoundEngine.TryGetActiveSound(Slot, out var t) && t.IsPlaying)
                 t.Position = Projectile.Center;
             else
-                Slot = AdditionsSound.FireBeamLoop.Play(Projectile.Center, .6f, .2f);
+                Slot = AssetRegistry.GennedSounds.FireBeamLoop.Play(Projectile.Center, .6f, .2f);
 
             ShootTime++;
         }
@@ -76,7 +76,7 @@ public class SunsplitHoldout : BaseIdleHoldoutProjectile
                 if (SoundEngine.TryGetActiveSound(Slot, out var t) && t.IsPlaying)
                     t.Stop();
 
-                AdditionsSound.FireBeamEnd.Play(Projectile.Center, 1f, 0f, 0f, 1, Name);
+                AssetRegistry.GennedSounds.FireBeamEnd.Play(Projectile.Center, 1f, 0f, 0f, 1, Name);
                 ShootTime = 0f;
             }
         }

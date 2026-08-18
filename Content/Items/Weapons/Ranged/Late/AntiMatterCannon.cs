@@ -16,7 +16,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
 /// </summary>
 public class AntiMatterCannon : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AntiMatterCannon);
+    public override string Texture => AssetRegistry.GennedTextures.AntiMatterCannon.Path;
 
     public override void SetStaticDefaults()
     {

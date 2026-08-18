@@ -7,14 +7,12 @@ using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Globals.ProjectileGlobal;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 
 public class AuroricShield : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AuroricShield);
+    public override string Texture => AssetRegistry.GennedTextures.AuroricShield.Path;
 
     private const int MaxTime = 50;
 
@@ -61,7 +59,7 @@ public class AuroricShield : ModProjectile
         {
             if (this.RunLocal())
             {
-                Projectile.velocity = center.SafeDirectionTo(Owner.Additions().MouseWorld);
+                Projectile.velocity = center.SafeDirectionTo(Owner.AdditionsMouse().MouseWorld);
                 this.Sync();
             }
         }
@@ -69,9 +67,9 @@ public class AuroricShield : ModProjectile
         if (Time < 20f)
             Offset = Vector2.Lerp(new(0f, 50f), new(0f, 10f), Circ.InFunction(InverseLerp(0f, 20f, Time)));
         else if ((int) Time == 30)
-            SoundID.Item1.Play(Projectile.Center, 1.1f, -.2f, .1f, null);
+            SoundID.Item1.Play(Projectile.Center, 1.1f, -.2f, .1f);
         else if (Time < 30f)
-            Offset = Vector2.Lerp(new(0f, 10f), new(0f, 100f), Exp().OutFunction(InverseLerp(20f, 30f, Time)));
+            Offset = Vector2.Lerp(new(0f, 10f), new(0f, 100f), Expo().OutFunction(InverseLerp(20f, 30f, Time)));
         else if (Time < MaxTime)
             Offset = Vector2.Lerp(new(0f, 100f), new(0f, 10f), MakePoly(3).InFunction(InverseLerp(30f, MaxTime, Time)));
 
@@ -82,7 +80,7 @@ public class AuroricShield : ModProjectile
         Owner.heldProj = Projectile.whoAmI;
         Time++;
 
-        if (Time.BetweenNum(20f, 30f))
+        if (Time is > 20f and < 30f)
         {
             float _ = 0f;
             foreach (Projectile p in Main.ActiveProjectiles)
@@ -114,13 +112,13 @@ public class AuroricShield : ModProjectile
 
     public override bool? CanDamage()
     {
-        return Time.BetweenNum(20f, 30f) ? null : false;
+        return Time is > 20f and < 30f ? null : false;
     }
 
     private void ParryEffects()
     {
         ScreenShakeSystem.New(new(5f, .6f), Projectile.Center);
-        AdditionsSound.ColdPunch.Play(Projectile.Center, 1.2f, -.1f, .2f);
+        AssetRegistry.GennedSounds.ColdPunch.Play(Projectile.Center, 1.2f, -.1f, .2f);
         for (int i = 0; i < 18; i++)
         {
             Vector2 pos = Projectile.Hitbox.ToRotated(Projectile.rotation).RandomPoint();

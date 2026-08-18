@@ -1,7 +1,7 @@
 ﻿/*
 using Terraria;
 using Terraria.Localization;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using TheExtraordinaryAdditions.Core.Graphics.Particles;
 
 namespace TheExtraordinaryAdditions.Content.Cooldowns;
 
@@ -10,7 +10,7 @@ public class MimicryCooldown : CooldownHandler
     public static new string ID => "Mimicry";
     public override bool ShouldDisplay => true;
     public override LocalizedText DisplayName => GetText($"Cooldowns.{ID}");
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CooldownMimicry);
+    public override string Texture => AssetRegistry.GennedTextures.CooldownMimicry.Path;
     public override Color OutlineColor => new(22, 3, 3);
     public override Color CooldownStartColor => new(68, 11, 11);
     public override Color CooldownEndColor => new(207, 166, 126);
@@ -25,5 +25,6 @@ public class MimicryCooldown : CooldownHandler
     }
 }
 */
+
 
 

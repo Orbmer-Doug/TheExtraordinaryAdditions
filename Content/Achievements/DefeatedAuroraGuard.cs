@@ -6,7 +6,7 @@ namespace TheExtraordinaryAdditions.Content.Achievements;
 
 public class DefeatedAuroraGuard : ModAchievement
 {
-    public override string TextureName => AssetRegistry.GetTexturePath(AdditionsTexture.DefeatedAuroraGuard);
+    public override string TextureName => AssetRegistry.GennedTextures.DefeatedAuroraGuard.Path;
 
     public override void SetStaticDefaults()
     {

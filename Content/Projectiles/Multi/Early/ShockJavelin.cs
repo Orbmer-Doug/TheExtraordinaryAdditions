@@ -6,18 +6,17 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Multi.Early;
 
 public class ShockJavelin : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ShockJavelin);
+    public override string Texture => AssetRegistry.GennedTextures.ShockJavelin.Path;
     private const int StartingLife = 200;
 
     public override void SetDefaults()
@@ -262,7 +261,7 @@ public class ShockJavelin : ModProjectile
         }
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints cache;
 
     public override bool PreDraw(ref Color lightColor)
@@ -274,8 +273,8 @@ public class ShockJavelin : ModProjectile
 
             if (AccumulatedVel > 2f)
             {
-                ManagedShader shader = ShaderRegistry.SpecialLightningTrail;
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.StreakMagma), 1);
+                ManagedShader shader = AssetRegistry.GennedShaders.SpecialLightningTrail;
+                shader.SetTexture(AssetRegistry.GennedTextures.StreakMagma, 1);
                 shader.TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly * 5f);
                 trail.DrawTrail(shader, cache.Points, 200, true);
             }
@@ -308,7 +307,7 @@ public class ShockJavelin : ModProjectile
 
     internal float StripWidth(float c)
     {
-        return OptimizedPrimitiveTrail.HemisphereWidthFunct(c,
+        return Trail.HemisphereWidthFunct(c,
             MathHelper.SmoothStep(Projectile.height * .9f, 0f, c) * Projectile.scale * 1.5f);
     }
 

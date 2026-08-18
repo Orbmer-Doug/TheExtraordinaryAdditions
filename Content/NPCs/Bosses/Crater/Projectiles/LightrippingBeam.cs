@@ -2,18 +2,16 @@
 using Terraria;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
 public class LightrippingBeam : ProjOwnedByNPC<Asterlin>
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public static readonly int TelegraphTime = SecondsToFrames(.8f);
     public static readonly int BeamTime = SecondsToFrames(1.5f);
@@ -105,10 +103,10 @@ public class LightrippingBeam : ProjOwnedByNPC<Asterlin>
         {
             ParticleRegistry.SpawnChromaticAberration(Projectile.Center, 50, .6f, 600f);
             ParticleRegistry.SpawnBlurParticle(Projectile.Center, 50, 1f, 400f);
-            AdditionsSound.VirtueAttack.Play(Projectile.Center, 1.3f, 0f, .1f);
+            AssetRegistry.GennedSounds.VirtueAttack.Play(Projectile.Center, 1.3f, 0f, .1f);
         }
 
-        if (Time.BetweenNum(TelegraphTime, Lifetime - 10))
+        if (Time > TelegraphTime && Time < Lifetime - 10)
         {
             Vector2 vel = Projectile.velocity.RotatedByRandom(Main.rand.NextFloat(.34f, .42f)) *
                           Main.rand.NextFloat(150f, 980f);
@@ -145,45 +143,19 @@ public class LightrippingBeam : ProjOwnedByNPC<Asterlin>
                MathHelper.Lerp(1f, 0f, TelegraphCompletion) * InverseLerp(0f, .08f, completionRatio.X);
     }
 
-    public OptimizedPrimitiveTrail trail;
-    public OptimizedPrimitiveTrail telegraph;
+    public Trail trail;
+    public Trail telegraph;
     public TrailPoints trailPoints = new(100);
     public TrailPoints telePoints = new(100);
 
     public override bool PreDraw(ref Color lightColor)
     {
-        void drawPortal()
-        {
-            Texture2D noiseTexture = AssetRegistry.GetTexture(AdditionsTexture.Cosmos);
-            Vector2 drawPosition = Projectile.Center - Main.screenPosition;
-            Vector2 origin = noiseTexture.Size() * 0.5f;
-
-            Color col1 = ColorSwap(Color.Cyan, Color.DeepSkyBlue * 1.2f, 1f);
-            Color col2 = Color.Lerp(Color.White, Color.Cyan, .5f);
-
-            Vector2 diskScale = Projectile.Opacity * new Vector2(.5f, 1f);
-            ManagedShader portal = ShaderRegistry.PortalShader;
-
-            portal.TrySetParameter("opacity", Projectile.Opacity);
-            portal.TrySetParameter("color", col1);
-            portal.TrySetParameter("secondColor", col2);
-            portal.Render();
-
-            Main.spriteBatch.Draw(noiseTexture, drawPosition, null, Color.White, Projectile.rotation, origin, diskScale,
-                SpriteEffects.None, 0f);
-
-            portal.TrySetParameter("secondColor", col2 * 2f);
-            portal.Render();
-            Main.spriteBatch.Draw(noiseTexture, drawPosition, null, Color.White, Projectile.rotation, origin, diskScale,
-                SpriteEffects.None, 0f);
-        }
-
         void drawTelegraph()
         {
             if (telegraph != null && !telegraph.Disposed)
             {
-                ManagedShader shader = ShaderRegistry.SideStreakTrail;
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise), 1);
+                ManagedShader shader = AssetRegistry.GennedShaders.SideStreakTrail;
+                shader.SetTexture(AssetRegistry.GennedTextures.TechyNoise, 1);
 
                 telegraph.DrawTrail(shader, telePoints.Points);
             }
@@ -193,17 +165,15 @@ public class LightrippingBeam : ProjOwnedByNPC<Asterlin>
         {
             if (trail != null && !trail.Disposed)
             {
-                ManagedShader beam = ShaderRegistry.BaseLaserShader;
+                ManagedShader beam = AssetRegistry.GennedShaders.BaseLaserShader;
                 beam.TrySetParameter("heatInterpolant", 2f);
-                beam.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.CrackedNoise), 0);
-                beam.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FlameMap2), 1);
-                beam.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.SuperWavyPerlin), 2);
+                beam.SetTexture(AssetRegistry.GennedTextures.CrackedNoise, 0);
+                beam.SetTexture(AssetRegistry.GennedTextures.FlameMap2, 1);
+                beam.SetTexture(AssetRegistry.GennedTextures.SuperWavyPerlin, 2);
                 trail.DrawTrail(beam, trailPoints.Points);
             }
         }
 
-        PixelationSystem.QueueTextureRenderAction(drawPortal, PixelationLayer.OverPlayers, null,
-            ShaderRegistry.PortalShader);
         if (Time < TelegraphTime)
             PixelationSystem.QueuePrimitiveRenderAction(drawTelegraph, PixelationLayer.OverPlayers);
         else

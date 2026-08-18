@@ -6,17 +6,16 @@ using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Early;
 
 public class BirchStickLance : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BirchStick);
+    public override string Texture => AssetRegistry.GennedTextures.BirchStick.Path;
 
     public const int MaxUpdates = 3;
 
@@ -45,7 +44,7 @@ public class BirchStickLance : ModProjectile
     }
 
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
+    public PlayerMouse Modded => Owner.AdditionsMouse();
     public float AngularVelocity => MathF.Abs(Projectile.rotation - OldRot);
 
     public enum BirchStickState
@@ -290,7 +289,7 @@ public class BirchStickLance : ModProjectile
 
     public override bool CanHitPvp(Player target)
     {
-        return State != BirchStickState.Poke ? SwingCompletion.BetweenNum(ReelPercent, SwingPercent) : Stabbing;
+        return State != BirchStickState.Poke ? SwingCompletion is > ReelPercent and SwingPercent : Stabbing;
     }
 
     public override void OnHitPlayer(Player target, Player.HurtInfo info)
@@ -312,13 +311,13 @@ public class BirchStickLance : ModProjectile
         float y = a.Distance(b) * scale;
 
         return new RotatedRectangle(Vector2.Lerp(a, b, .5f) - Vector2.UnitY * y / 2, new(width, y),
-            Projectile.rotation + MathHelper.PiOver4);
+            Projectile.rotation + MathHelper.PiOver4, Vector2.Zero);
     }
 
     public override bool? CanHitNPC(NPC target)
     {
         if (State != BirchStickState.Poke)
-            return SwingCompletion.BetweenNum(ReelPercent, SwingPercent) ? null : false;
+            return SwingCompletion is > ReelPercent and SwingPercent ? null : false;
         else
             return Stabbing ? null : false;
     }
@@ -410,14 +409,14 @@ public class BirchStickLance : ModProjectile
                                                                            .ToTileCoordinates()).R);
 
     private float WidthFunct(float c) => Projectile.width;
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     private TrailPoints cache;
 
     public override bool PreDraw(ref Color lightColor)
     {
         if (State != BirchStickState.Poke && trail != null && cache != null)
         {
-            trail.DrawTrail(ShaderRegistry.StandardPrimitiveShader, cache.Points, 100, false, false);
+            trail.DrawTrail(AssetRegistry.GennedShaders.StandardPrimitiveShader, cache.Points, 100, false, false);
         }
 
         Texture2D tex = Projectile.ThisProjectileTexture();

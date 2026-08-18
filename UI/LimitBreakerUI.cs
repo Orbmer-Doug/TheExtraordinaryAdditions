@@ -25,8 +25,8 @@ public class LimitBreakerUI : SmartUIState
 
         float interpolant = player.Additions().CurrentLimit;
 
-        Texture2D bar = AssetRegistry.GetTexture(AdditionsTexture.LimitBreakerBar);
-        Texture2D border = AssetRegistry.GetTexture(AdditionsTexture.LimitBreakerBorder);
+        Texture2D bar = AssetRegistry.GennedTextures.LimitBreakerBar;
+        Texture2D border = AssetRegistry.GennedTextures.LimitBreakerBorder;
 
         Point pos = (player.Center + new Vector2(-border.Width / 2, -border.Height * 2) +
             Vector2.UnitY * player.gfxOffY - Main.screenPosition).ToPoint();
@@ -34,7 +34,7 @@ public class LimitBreakerUI : SmartUIState
 
         int frameY = 0;
         if (player.Additions().AtMaxLimit)
-            frameY = player.Additions().GlobalTimer % 8f == 7f ? 10 : 20;
+            frameY = player.AdditionsMisc().GlobalTimer % 8 == 7 ? 10 : 20;
 
         Rectangle barFrame = new(0, frameY, (int) (interpolant * 42), 10);
 

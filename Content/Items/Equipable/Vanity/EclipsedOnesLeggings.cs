@@ -8,7 +8,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Vanity;
 [AutoloadEquip(EquipType.Legs)]
 public class EclipsedOnesLeggings : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.EclipsedOnesLeggings);
+    public override string Texture => AssetRegistry.GennedTextures.EclipsedOnesLeggings.Path;
 
     public override void SetDefaults()
     {

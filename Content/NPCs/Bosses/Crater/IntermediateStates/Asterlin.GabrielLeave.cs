@@ -2,9 +2,8 @@
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Systems;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
@@ -44,7 +43,7 @@ public partial class Asterlin : ModNPC
         }
         else if (AITimer == GabrielLeave_HoverTime)
         {
-            AdditionsSound.VirtueAttack.Play(NPC.Center, 1.4f);
+            AssetRegistry.GennedSounds.VirtueAttack.Play(NPC.Center, 1.4f);
             ParticleRegistry.SpawnBlurParticle(NPC.Center, 50, .2f, 1900f);
             ScreenShakeSystem.New(new(.2f, .2f), NPC.Center);
         }
@@ -58,7 +57,7 @@ public partial class Asterlin : ModNPC
 
             if (AITimer >= GabrielLeave_MaxTime)
             {
-                AdditionsSound.GabrielWeaponBreak.Play(NPC.Center, 1.2f);
+                AssetRegistry.GennedSounds.GabrielWeaponBreak.Play(NPC.Center, 1.2f);
                 for (int i = 0; i < 8; i++)
                 {
                     float lerper = InverseLerp(0, 8, i);
@@ -83,8 +82,8 @@ public partial class Asterlin : ModNPC
         if (AITimer < GabrielLeave_HoverTime)
             return;
 
-        Texture2D pix = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
-        float beamWidth = 1f - Animators.MakePoly(2f).OutFunction(InverseLerp(
+        Texture2D pix = AssetRegistry.GennedTextures.Pixel;
+        float beamWidth = 1f - MakePoly(2f).OutFunction(InverseLerp(
             GabrielLeave_HoverTime + GabrielLeave_DisintegrationWaitTime + GabrielLeave_DisintegrationTime,
             GabrielLeave_HoverTime + GabrielLeave_DisintegrationWaitTime + GabrielLeave_DisintegrationTime +
             GabrielLeave_BeamFadeTime, AITimer));
@@ -99,7 +98,7 @@ public partial class Asterlin : ModNPC
         {
             float interpol = InverseLerp(0f, 16f, i);
             Vector2 middleScale = new(a.Distance(b) / pix.Width, beamWidth * MathHelper.Lerp(200f, 500f, interpol));
-            Color col = Color.White.Lerp(Color.DarkGoldenrod, Animators.MakePoly(3f).OutFunction(interpol)) with
+            Color col = Color.White.Lerp(Color.DarkGoldenrod, MakePoly(3f).OutFunction(interpol)) with
             {
                 A = 0
             };

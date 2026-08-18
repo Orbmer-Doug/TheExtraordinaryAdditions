@@ -1,13 +1,13 @@
 ﻿using Terraria;
+using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 
 public class BloodletRelay : ProjOwnedByNPC<StygainHeart>
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -46,7 +46,7 @@ public class BloodletRelay : ProjOwnedByNPC<StygainHeart>
             if (Owner.life > Owner.lifeMax)
                 Owner.life = Owner.lifeMax;
 
-            if (this.RunServer())
+            if (ModProjectile.RunServer())
             {
                 Owner.HealEffect(healAmount);
                 Owner.netUpdate = true;

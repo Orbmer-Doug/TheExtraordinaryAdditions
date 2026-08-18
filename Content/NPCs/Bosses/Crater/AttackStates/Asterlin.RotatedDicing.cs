@@ -4,7 +4,7 @@ using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
@@ -46,7 +46,7 @@ public partial class Asterlin
     {
         if (AITimer == 1)
         {
-            if (this.RunServer())
+            if (ModNPC.RunServer())
                 NPC.NewNPCProj(RightHandPosition, Vector2.Zero, ModContent.ProjectileType<RadiantPulser>(),
                     HeavyAttackDamage, 0f);
         }
@@ -59,8 +59,8 @@ public partial class Asterlin
 
         float fade = InverseLerp(0f, RotatedDicing_BreatheTime, RotatedDicing_FadeTimer);
         SetRightHandTarget(RightArm.RootPosition +
-                           PolarVector(Animators.MakePoly(2f).OutFunction.Evaluate(80f, 200f, fade),
-                               Animators.MakePoly(4f).InOutFunction.Evaluate(-.5f, MathHelper.PiOver2, fade)));
+                           PolarVector(MakePoly(2f).OutFunction.Evaluate(80f, 200f, fade),
+                               MakePoly(4f).InOutFunction.Evaluate(-.5f, MathHelper.PiOver2, fade)));
         SetLeftHandTarget(LeftArm.RootPosition + Vector2.UnitY * 100f);
         CasualHoverMovement();
     }
@@ -70,33 +70,31 @@ public partial class Asterlin
         if (CurrentState != AsterlinAIType.RotatedDicing)
             return;
 
-        void draw()
-        {
-            Texture2D smear = AssetRegistry.GetTexture(AdditionsTexture.SemiCircularSmear);
-            Texture2D glow = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
-            Texture2D star = AssetRegistry.GetTexture(AdditionsTexture.LensStar);
-            float fade = Animators.MakePoly(2f)
-                .InOutFunction(InverseLerp(RotatedDicing_BreatheTime, 0f, RotatedDicing_FadeTimer));
-
-            Main.spriteBatch.DrawBetterRect(glow, ToTarget(RightHandPosition, new(30f)), null, Color.White * fade, 0f,
-                glow.Size() / 2);
-            Main.spriteBatch.DrawBetterRect(glow, ToTarget(RightHandPosition, new(40f)), null, Color.Gold * .8f * fade,
-                0f, glow.Size() / 2);
-            Main.spriteBatch.DrawBetterRect(glow, ToTarget(RightHandPosition, new(50f)), null,
-                Color.Goldenrod * .6f * fade, 0f, glow.Size() / 2);
-            Main.spriteBatch.DrawBetterRect(glow, ToTarget(RightHandPosition, new(60f)), null,
-                Color.DarkGoldenrod * .4f * fade, 0f, glow.Size() / 2);
-
-            Main.spriteBatch.DrawBetterRect(star,
-                ToTarget(RightHandPosition, new(MathHelper.Lerp(120f, 160f, Sin01(AITimer * .04f)) * fade)), null,
-                Color.Goldenrod * .5f, AITimer * .06f, star.Size() / 2);
-
-            Main.spriteBatch.DrawBetterRect(smear, ToTarget(RightHandPosition, new(100f * fade)), null, Color.Goldenrod,
-                AITimer * .01f, smear.Size() / 2);
-            Main.spriteBatch.DrawBetterRect(smear, ToTarget(RightHandPosition, new(180f * fade)), null, Color.Goldenrod,
-                -AITimer * .04f, smear.Size() / 2);
-        }
-
-        PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.OverNPCs, BlendState.Additive);
+        Texture2D smear = AssetRegistry.GennedTextures.SemiCircularSmear;
+        Texture2D glow = AssetRegistry.GennedTextures.GlowParticleSmall;
+        Texture2D star = AssetRegistry.GennedTextures.LensStar;
+        float fade = MakePoly(2f)
+            .InOutFunction(InverseLerp(RotatedDicing_BreatheTime, 0f, RotatedDicing_FadeTimer));
+        SpriteBatch.DrawRectPixelated(PixelationLayer.OverNPCs, BlendState.Additive, glow,
+            ToTarget(RightHandPosition, new(30f)), null, Color.White * fade, 0f,
+            glow.Size() / 2);
+        SpriteBatch.DrawRectPixelated(PixelationLayer.OverNPCs, BlendState.Additive, glow,
+            ToTarget(RightHandPosition, new(40f)), null, Color.Gold * .8f * fade,
+            0f, glow.Size() / 2);
+        SpriteBatch.DrawRectPixelated(PixelationLayer.OverNPCs, BlendState.Additive, glow,
+            ToTarget(RightHandPosition, new(50f)), null,
+            Color.Goldenrod * .6f * fade, 0f, glow.Size() / 2);
+        SpriteBatch.DrawRectPixelated(PixelationLayer.OverNPCs, BlendState.Additive, glow,
+            ToTarget(RightHandPosition, new(60f)), null,
+            Color.DarkGoldenrod * .4f * fade, 0f, glow.Size() / 2);
+        SpriteBatch.DrawRectPixelated(PixelationLayer.OverNPCs, BlendState.Additive, star,
+            ToTarget(RightHandPosition, new(MathHelper.Lerp(120f, 160f, Sin01(AITimer * .04f)) * fade)), null,
+            Color.Goldenrod * .5f, AITimer * .06f, star.Size() / 2);
+        SpriteBatch.DrawRectPixelated(PixelationLayer.OverNPCs, BlendState.Additive, smear,
+            ToTarget(RightHandPosition, new(100f * fade)), null, Color.Goldenrod,
+            AITimer * .01f, smear.Size() / 2);
+        SpriteBatch.DrawRectPixelated(PixelationLayer.OverNPCs, BlendState.Additive, smear,
+            ToTarget(RightHandPosition, new(180f * fade)), null, Color.Goldenrod,
+            -AITimer * .04f, smear.Size() / 2);
     }
 }

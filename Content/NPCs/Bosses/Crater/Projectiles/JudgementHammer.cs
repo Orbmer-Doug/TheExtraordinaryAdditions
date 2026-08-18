@@ -6,6 +6,7 @@ using Terraria.ID;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 using Utils = Terraria.Utils;
@@ -14,7 +15,7 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
 public class JudgementHammer : ProjOwnedByNPC<Asterlin>
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.JudgementHammer);
+    public override string Texture => AssetRegistry.GennedTextures.JudgementHammer.Path;
 
     public override void SetDefaults()
     {

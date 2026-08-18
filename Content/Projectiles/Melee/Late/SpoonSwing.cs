@@ -6,11 +6,11 @@ using TheExtraordinaryAdditions.Content.Buffs.Debuff;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
 
@@ -19,7 +19,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
 /// </summary>
 public class SpoonSwing : BaseSwordSwing
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TheSpoon);
+    public override string Texture => AssetRegistry.GennedTextures.TheSpoon.Path;
 
     public override void Defaults()
     {
@@ -55,7 +55,7 @@ public class SpoonSwing : BaseSwordSwing
 
     public override int SwingTime => GetSwingTime;
     public override int MaxUpdates => 10;
-    public override bool? CanDamage() => SwingCompletion.BetweenNum(.2f, .94f, true) ? null : false;
+    public override bool? CanDamage() => SwingCompletion is >= .2f and <= .94f ? null : false;
 
     public float IdealSize
     {
@@ -142,13 +142,13 @@ public class SpoonSwing : BaseSwordSwing
             switch (CurrentState)
             {
                 case SpoonState.Poke:
-                    AdditionsSound.BraveSwingLarge.Play(Projectile.Center, 1.4f, -.2f);
+                    AssetRegistry.GennedSounds.BraveSwingLarge.Play(Projectile.Center, 1.4f, -.2f);
                     break;
                 case SpoonState.Scoop:
-                    AdditionsSound.BraveSwingLarge.Play(Projectile.Center, 1.4f, -.2f);
+                    AssetRegistry.GennedSounds.BraveSwingLarge.Play(Projectile.Center, 1.4f, -.2f);
                     break;
                 case SpoonState.Smash:
-                    AdditionsSound.BraveSwingLarge.Play(Projectile.Center, 2f, -.45f);
+                    AssetRegistry.GennedSounds.BraveSwingLarge.Play(Projectile.Center, 2f, -.45f);
                     break;
             }
 
@@ -249,12 +249,12 @@ public class SpoonSwing : BaseSwordSwing
         switch (CurrentState)
         {
             case SpoonState.Poke:
-                AdditionsSound.BeegBell.Play(Projectile.Center, .3f, 0f, .2f);
+                AssetRegistry.GennedSounds.BeegBell.Play(Projectile.Center, .3f, 0f, .2f);
                 ScreenShakeSystem.New(new(.6f, .15f), Projectile.Center);
 
                 break;
             case SpoonState.Scoop:
-                AdditionsSound.BeegBell.Play(Projectile.Center, .58f, 0f, .3f);
+                AssetRegistry.GennedSounds.BeegBell.Play(Projectile.Center, .58f, 0f, .3f);
                 ScreenShakeSystem.New(new(2f), Projectile.Center);
 
                 break;
@@ -268,7 +268,7 @@ public class SpoonSwing : BaseSwordSwing
                     Projectile.NewProj(npc.Bottom, Vector2.Zero, type, dmg, 0f, Owner.whoAmI);
                 }
 
-                AdditionsSound.metalSlam.Play(Projectile.Center, 2.2f);
+                AssetRegistry.GennedSounds.metalSlam.Play(Projectile.Center, 2.2f);
                 ScreenShakeSystem.New(new(3f, 1f), Projectile.Center);
 
                 break;
@@ -278,7 +278,7 @@ public class SpoonSwing : BaseSwordSwing
 
 public class SpoonShockwave : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GlowParticleSmall);
+    public override string Texture => AssetRegistry.GennedTextures.GlowParticleSmall.Path;
 
     public const int Life = 150;
 
@@ -305,7 +305,7 @@ public class SpoonShockwave : ModProjectile
     public override void AI()
     {
         Projectile.Opacity = GetLerpBump(0f, 30f, Life, Life - 50f, Time);
-        Size.X += Animators.MakePoly(4f).OutFunction.Evaluate(0f, 50f, InverseLerp(0f, Life, Time));
+        Size.X += MakePoly(4f).OutFunction.Evaluate(0f, 50f, InverseLerp(0f, Life, Time));
         Size.Y = 100f;
 
         Time++;
@@ -321,16 +321,12 @@ public class SpoonShockwave : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        void draw()
-        {
-            Texture2D tex = Projectile.ThisProjectileTexture();
-            Vector2 orig = tex.Size() / 2;
-            for (float i = .9f; i < 1.3f; i += .1f)
-                Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Size * i), null,
-                    Color.White * Projectile.Opacity, 0f, orig);
-        }
-
-        PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.OverNPCs, BlendState.Additive);
+        Texture2D tex = Projectile.ThisProjectileTexture();
+        Vector2 orig = tex.Size() / 2;
+        for (float i = .9f; i < 1.3f; i += .1f)
+            SpriteBatch.DrawRectPixelated(PixelationLayer.OverNPCs, BlendState.Additive, tex,
+                ToTarget(Projectile.Center, Size * i), null,
+                Color.White * Projectile.Opacity, 0f, orig);
 
         return false;
     }

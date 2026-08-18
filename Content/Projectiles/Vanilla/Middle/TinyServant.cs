@@ -3,9 +3,9 @@ using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
@@ -71,7 +71,7 @@ public class TinyServant : ModProjectile
 
     public override void OnKill(int timeLeft)
     {
-        SoundID.NPCDeath1.Play(Projectile.Center, 1f, 0f, .2f, null, 0);
+        SoundID.NPCDeath1.Play(Projectile.Center, 1f, 0f, .2f, 0);
 
         for (int a = 0; a < 20; a++)
         {
@@ -89,7 +89,7 @@ public class TinyServant : ModProjectile
     }
 
     public TrailPoints cache;
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override bool PreDraw(ref Color lightColor)
     {
@@ -98,8 +98,8 @@ public class TinyServant : ModProjectile
             if (trail == null || cache == null)
                 return;
 
-            ManagedShader shader = ShaderRegistry.FadedStreak;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.ShadowTrail), 1);
+            ManagedShader shader = AssetRegistry.GennedShaders.FadedStreak;
+            shader.SetTexture(AssetRegistry.GennedTextures.ShadowTrail, 1);
             trail.DrawTrail(shader, cache.Points, 80);
         }
 

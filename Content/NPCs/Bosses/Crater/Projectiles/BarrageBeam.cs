@@ -8,7 +8,9 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
+using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
@@ -54,9 +56,9 @@ public sealed class BarrageBeamManager : ModSystem
     public static bool Golden;
 
     public static readonly Quaternion Rotation =
-        Animators.EulerAnglesConversion(1, MathHelper.PiOver2, (3f * MathHelper.Pi) / 2f);
+        QuaternionUtils.CreateFromPolarAngles(MathHelper.PiOver2, 3f * MathHelper.Pi / 2f);
 
-    public static readonly Quaternion PortalRotation = Animators.EulerAnglesConversion(1, MathHelper.PiOver2, 0f);
+    public static readonly Quaternion PortalRotation = QuaternionUtils.CreateFromPolarAngles(MathHelper.PiOver2, 0f);
     public static readonly Matrix RotationMatrix = Matrix.CreateFromQuaternion(Rotation);
 
     public override void OnModLoad()
@@ -192,12 +194,12 @@ public sealed class BarrageBeamManager : ModSystem
 
     private static void DrawToTargets()
     {
-        if (!AssetRegistry.HasFinishedLoading || Main.gameMenu || Main.netMode == NetmodeID.Server ||
+        if (Main.gameMenu || Main.netMode == NetmodeID.Server ||
             ActiveBeams.Count == 0)
             return;
 
         // Compute primitive matrices
-        Matrix overall = Get3DPerspectivePrimitiveMatrix();
+        Matrix overall = GetPerspectiveMeshMatrix();
 
         // Fill batched vertex buffers
         VertexPositionColorTexture[] beamVertices = new VertexPositionColorTexture[NumVertices * ActiveBeams.Count];
@@ -218,7 +220,7 @@ public sealed class BarrageBeamManager : ModSystem
             Vector3 end = start + Vector3.Transform(Vector3.UnitX, Rotation) * beam.LaserbeamLength;
 
             // Fill beam vertices
-            FillCylinderVertices(beam.Projectile.scale, RotationMatrix,
+            FillTaperedCylinderVertices(beam.Projectile.scale, RotationMatrix,
                 (Golden ? Color.Gold : new Color(28, 225, 255)) * beam.Projectile.Opacity, start, end,
                 beamVertices.AsSpan(i * NumVertices, NumVertices), CylinderWidthSegments, CylinderHeightSegments);
 
@@ -227,7 +229,7 @@ public sealed class BarrageBeamManager : ModSystem
             {
                 float scaleFactor = 1f + (b + 1) * 0.2f;
                 float alpha = 0.5f / (b + 1);
-                FillCylinderVertices(beam.Projectile.scale, RotationMatrix,
+                FillTaperedCylinderVertices(beam.Projectile.scale, RotationMatrix,
                     (Golden ? Color.Goldenrod : Color.DeepSkyBlue) with { A = 0 } * alpha * beam.Projectile.Opacity,
                     start, end, bloomVertices.AsSpan((i * NumBloomLayers + b) * BloomNumVertices, BloomNumVertices),
                     BloomWidthSegments, BloomHeightSegments, scaleFactor);
@@ -235,7 +237,7 @@ public sealed class BarrageBeamManager : ModSystem
 
             // Fill portal vertices
             VertexPositionColorTexture[] portalVerts = GenerateQuadClockwise(new(beam.Projectile.scale * 12f),
-                portalStart, PortalRotation, Color.White, true);
+                portalStart, PortalRotation, Color.White, Vector2.One / 2);
             Array.Copy(portalVerts, 0, portalVertices, i * NumPortalVertices, NumPortalVertices);
         }
 
@@ -253,11 +255,11 @@ public sealed class BarrageBeamManager : ModSystem
         device.Clear(Color.Transparent);
 
         // Draw portal
-        ManagedShader portalShader = AssetRegistry.GetShader("3DPortalShaderAlt");
-        portalShader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Pixel), 0, SamplerState.PointClamp);
-        portalShader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DendriticNoiseDim), 1,
+        ManagedShader portalShader = AssetRegistry.GennedShaders._3DPortalShaderAlt;
+        portalShader.SetTexture(AssetRegistry.GennedTextures.Pixel, 0, SamplerState.PointClamp);
+        portalShader.SetTexture(AssetRegistry.GennedTextures.DendriticNoiseDim, 1,
             SamplerState.LinearWrap);
-        portalShader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TurbulentNoise), 2, SamplerState.LinearWrap);
+        portalShader.SetTexture(AssetRegistry.GennedTextures.TurbulentNoise, 2, SamplerState.LinearWrap);
         portalShader.TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly);
         portalShader.TrySetParameter("coolColor", (Golden ? Color.DarkGoldenrod : Color.DarkCyan).ToVector3());
         portalShader.TrySetParameter("mediumColor", (Golden ? Color.Gold : Color.Cyan).ToVector3());
@@ -277,7 +279,7 @@ public sealed class BarrageBeamManager : ModSystem
         device.Clear(Color.Transparent);
 
         // Draw bloom
-        ManagedShader bloomShader = ShaderRegistry.StandardPrimitiveShader;
+        ManagedShader bloomShader = AssetRegistry.GennedShaders.StandardPrimitiveShader;
         bloomShader.TrySetParameter("transformMatrix", overall);
         bloomShader.Effect.CurrentTechnique.Passes[ManagedShader.DefaultPassName].Apply();
         device.SetVertexBuffer(BatchBloomVertexBuffer);
@@ -287,9 +289,9 @@ public sealed class BarrageBeamManager : ModSystem
             BloomNumIndices * ActiveBeams.Count * NumBloomLayers / 3);
 
         // Draw main beam
-        ManagedShader shader = AssetRegistry.GetShader("AsterlinDeathrayShader");
-        shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.ManifoldNoise), 1, SamplerState.LinearWrap);
-        shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TurbulentNoise), 2, SamplerState.LinearWrap);
+        ManagedShader shader = AssetRegistry.GennedShaders.AsterlinDeathrayShader;
+        shader.SetTexture(AssetRegistry.GennedTextures.ManifoldNoise, 1, SamplerState.LinearWrap);
+        shader.SetTexture(AssetRegistry.GennedTextures.TurbulentNoise, 2, SamplerState.LinearWrap);
         shader.TrySetParameter("transformMatrix", overall);
         shader.TrySetParameter("baseColor", (Golden ? Color.Goldenrod : new Color(28, 225, 255)).ToVector3());
         shader.TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly);
@@ -309,7 +311,7 @@ public sealed class BarrageBeamManager : ModSystem
 
     private static void DrawPortalTarget(On_Main.orig_DoDraw_WallsTilesNPCs orig, Main self)
     {
-        if (ActiveBeams.Count != 0 && AssetRegistry.HasFinishedLoading && !Main.gameMenu &&
+        if (ActiveBeams.Count != 0 && !Main.gameMenu &&
             Main.netMode != NetmodeID.Server)
         {
             Main.spriteBatch.End();
@@ -329,7 +331,7 @@ public sealed class BarrageBeamManager : ModSystem
     {
         orig(self);
 
-        if (ActiveBeams.Count != 0 && AssetRegistry.HasFinishedLoading && !Main.gameMenu &&
+        if (ActiveBeams.Count != 0 && !Main.gameMenu &&
             Main.netMode != NetmodeID.Server)
         {
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp,
@@ -343,7 +345,7 @@ public sealed class BarrageBeamManager : ModSystem
 
 public class BarrageBeam : ProjOwnedByNPC<Asterlin>
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     public int MaxLaserLength => 1500;
     public ref float Time => ref Projectile.ai[0];
     public ref float LaserbeamLength => ref Projectile.ai[1];
@@ -378,7 +380,7 @@ public class BarrageBeam : ProjOwnedByNPC<Asterlin>
 
     public override void SafeAI()
     {
-        if (Time == 0 && this.RunServer())
+        if (Time == 0 && ModProjectile.RunServer())
         {
             const float clusteringDistance = 360f;
             const int maxTries = 150;
@@ -419,23 +421,23 @@ public class BarrageBeam : ProjOwnedByNPC<Asterlin>
 
         float hoverInterpol = InverseLerp(0f, Asterlin.Barrage_HoverTime, Time);
         Projectile.Center = Vector2.SmoothStep(Projectile.Center, TargetPosition,
-            Animators.CubicBezier(.48f, .41f, 0f, 1f)(hoverInterpol));
+            CubicBezier(.48f, .41f, 0f, 1f)(hoverInterpol));
         Projectile.Opacity = hoverInterpol;
 
         int timeUntilFade = Asterlin.Barrage_HoverTime + Asterlin.Barrage_BeamExpandTime + Asterlin.Barrage_BeamTime;
         if (Time < timeUntilFade)
         {
             PortalZPos = LaserZPos = -300f;
-            PortalInterpolant = Animators.MakePoly(3f).OutFunction(hoverInterpol);
-            LaserbeamLength = Animators.MakePoly(3.6f).OutFunction.Evaluate(Time, Asterlin.Barrage_HoverTime,
+            PortalInterpolant = MakePoly(3f).OutFunction(hoverInterpol);
+            LaserbeamLength = MakePoly(3.6f).OutFunction.Evaluate(Time, Asterlin.Barrage_HoverTime,
                 Asterlin.Barrage_HoverTime + Asterlin.Barrage_BeamExpandTime, 0f, MaxLaserLength);
         }
         else
         {
             float fadeInterpolant = InverseLerp(timeUntilFade, timeUntilFade + Asterlin.Barrage_BeamFadeTime, Time);
-            LaserZPos = Animators.MakePoly(2.8f).InFunction.Evaluate(-300f, -2000f, fadeInterpolant);
+            LaserZPos = MakePoly(2.8f).InFunction.Evaluate(-300f, -2000f, fadeInterpolant);
             PortalInterpolant = 1f - fadeInterpolant;
-            LaserbeamLength = Animators.MakePoly(1.8f).InOutFunction.Evaluate(0f, MaxLaserLength, 1f - fadeInterpolant);
+            LaserbeamLength = MakePoly(1.8f).InOutFunction.Evaluate(0f, MaxLaserLength, 1f - fadeInterpolant);
             if (fadeInterpolant >= 1f)
                 Projectile.Kill();
         }

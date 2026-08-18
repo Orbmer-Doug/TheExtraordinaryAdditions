@@ -7,23 +7,20 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Novelty;
 using TheExtraordinaryAdditions.Content.Items.Placeable;
-using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle.AZ;
 using TheExtraordinaryAdditions.Core;
-using TheExtraordinaryAdditions.Core.Config;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Misc;
 
 // sorry
 public sealed class TheGiantSnailFromAncientTimes : ModNPC
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TheGiantSnailFromAncientTimes);
+    public override string Texture => AssetRegistry.GennedTextures.TheGiantSnailFromAncientTimes.Path;
 
     public override string BossHeadTexture =>
-        AssetRegistry.GetTexturePath(AdditionsTexture.TheGiantSnailFromAncientTimes);
+        AssetRegistry.GennedTextures.TheGiantSnailFromAncientTimes.Path;
 
     public override void SetStaticDefaults()
     {
@@ -50,7 +47,7 @@ public sealed class TheGiantSnailFromAncientTimes : ModNPC
         NPC.netAlways = true;
         if (!Main.dedServ)
         {
-            Music = MusicLoader.GetMusicSlot(Mod, AssetRegistry.GetMusicPath(AdditionsSound.sickest_beat_ever));
+            Music = MusicLoader.GetMusicSlot(Mod, AssetRegistry.GennedSounds.Music.sickest_beat_ever.SoundPath);
         }
     }
 
@@ -83,13 +80,13 @@ public sealed class TheGiantSnailFromAncientTimes : ModNPC
     {
         orig(self);
         if (Main.newMusic == MusicLoader.GetMusicSlot(AdditionsMain.Instance,
-                AssetRegistry.GetMusicPath(AdditionsSound.FrigidGale)))
+                AssetRegistry.GennedSounds.Music.FrigidGale.SoundPath))
             return;
 
         if (FindNPC(out NPC npc, ModContent.NPCType<TheGiantSnailFromAncientTimes>()))
         {
             Main.newMusic = MusicLoader.GetMusicSlot(AdditionsMain.Instance,
-                AssetRegistry.GetMusicPath(AdditionsSound.sickest_beat_ever));
+                AssetRegistry.GennedSounds.Music.sickest_beat_ever.SoundPath);
         }
     }
 
@@ -131,11 +128,11 @@ public sealed class TheGiantSnailFromAncientTimes : ModNPC
 
         if (Timer % 60 == 59 && Vector2.Distance(NPC.Center, target.Center) < 2000)
         {
-            AdditionsSound.PETER.Play(NPC.Center, .6f, 0f, .3f, 0);
+            AssetRegistry.GennedSounds.PETER.Play(NPC.Center, .6f, 0f, .3f, 0);
             Vector2 direction = (target.Center - NPC.Center).SafeNormalize(Vector2.UnitX);
             int damage = DifficultyBasedValue(30, 50, 65, 69, 80);
             const float speed = 10f;
-            if (this.RunServer())
+            if (ModNPC.RunServer())
                 NPC.NewNPCProj(NPC.Center, direction.RotatedByRandom(.5f) * speed,
                     ModContent.ProjectileType<ParmaJawn>(), damage, 1f);
             NPC.netUpdate = true;
@@ -179,7 +176,8 @@ public sealed class TheGiantSnailFromAncientTimes : ModNPC
         ScreenShakeSystem.New(new(40f, 3f, 50000f), NPC.Center);
 
         // the result of an oopsie in audacity
-        AdditionsSound.WibtorNUKE.Play(NPC.Center, 1f, 0f, 0f, 1, Name, Terraria.Audio.PauseBehavior.PauseWithGame);
+        AssetRegistry.GennedSounds.WibtorNUKE.Play(NPC.Center, 1f, 0f, 0f, 1, Name,
+            Terraria.Audio.PauseBehavior.PauseWithGame);
         for (int j = 0; j < 100; j++)
         {
             ParticleRegistry.SpawnBloomLineParticle(NPC.Center, Main.rand.NextVector2Circular(40f, 40f),

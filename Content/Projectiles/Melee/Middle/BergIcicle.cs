@@ -3,15 +3,15 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
 public class BergIcicle : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.IcyShards);
+    public override string Texture => AssetRegistry.GennedTextures.IcyShards.Path;
 
     public override void SetStaticDefaults()
     {
@@ -37,7 +37,7 @@ public class BergIcicle : ModProjectile
     }
 
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
+    public PlayerMouse Modded => Owner.AdditionsMouse();
     public const int WaitTime = 50;
 
     public override void AI()
@@ -101,7 +101,7 @@ public class BergIcicle : ModProjectile
             ParticleRegistry.SpawnDustParticle(Projectile.RotHitbox().RandomPoint(),
                 Projectile.velocity * Main.rand.NextFloat(.1f, .2f),
                 Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .6f), Color.LightCyan);
-        SoundID.Item49.Play(Projectile.Center, .7f, 0f, .1f, null, 20);
+        SoundID.Item49.Play(Projectile.Center, .7f, 0f, .1f, 20);
     }
 
     public override bool? CanDamage() => Hit == true ? null : false;

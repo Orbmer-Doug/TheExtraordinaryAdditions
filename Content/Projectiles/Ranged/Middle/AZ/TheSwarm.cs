@@ -1,13 +1,12 @@
 ﻿using System;
 using Terraria;
 using Terraria.ModLoader;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle.AZ;
 
 public class TheSwarm : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TheSwarm);
+    public override string Texture => AssetRegistry.GennedTextures.TheSwarm.Path;
 
     public override void SetDefaults()
     {

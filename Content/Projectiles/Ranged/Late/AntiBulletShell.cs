@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
 public class AntiBulletShell : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AntiBulletShell);
+    public override string Texture => AssetRegistry.GennedTextures.AntiBulletShell.Path;
     private const int Lifetime = 400;
 
     public override void SetDefaults()

@@ -11,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 
 public class Bergcrusher : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Bergcrusher);
+    public override string Texture => AssetRegistry.GennedTextures.Bergcrusher.Path;
 
     public override void SetDefaults()
     {

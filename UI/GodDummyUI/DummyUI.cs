@@ -9,6 +9,7 @@ using Terraria.UI;
 using Terraria.UI.Chat;
 using TheExtraordinaryAdditions.Content.Items.Tools;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static TheExtraordinaryAdditions.UI.GodDummyUI.DummyUI;
 
@@ -23,8 +24,8 @@ public class DummyUI : SmartUIState
     public static bool visible;
     public override bool Visible => visible;
 
-    public static readonly Texture2D BGTex = AssetRegistry.GetTexture(AdditionsTexture.GodDummyUIBackground);
-    public static readonly Texture2D ButtonTextures = AssetRegistry.GetTexture(AdditionsTexture.GodDummyButtons);
+    public static readonly Texture2D BGTex = AssetRegistry.GennedTextures.GodDummyUIBackground;
+    public static readonly Texture2D ButtonTextures = AssetRegistry.GennedTextures.GodDummyButtons;
     public static Player Owner => Main.LocalPlayer;
     public Vector2 Position;
 
@@ -191,7 +192,7 @@ public class DummyButton(ButtonType type) : SmartUIElement
         switch (Type)
         {
             case ButtonType.Life:
-                if (MaxLife.BetweenNum(GodDummy.LifeAmount - 1, GodDummy.MaxLifeAmount))
+                if (MaxLife is > GodDummy.LifeAmount - 1 and < GodDummy.MaxLifeAmount)
                 {
                     MaxLife += GodDummy.LifeAmount;
                     Interpolant = 1f;
@@ -203,7 +204,7 @@ public class DummyButton(ButtonType type) : SmartUIElement
 
                 break;
             case ButtonType.Defense:
-                if (Defense.BetweenNum(-GodDummy.MaxDefense - 1, GodDummy.MaxDefense))
+                if (Defense is > -GodDummy.MaxDefense - 1 and < GodDummy.MaxDefense)
                 {
                     Defense += 5;
                     Interpolant = 1f;
@@ -215,7 +216,7 @@ public class DummyButton(ButtonType type) : SmartUIElement
 
                 break;
             case ButtonType.Scale:
-                if (Size.BetweenNum(.75f - .1f, GodDummy.MaxScale))
+                if (Size is > .75f - .1f and < GodDummy.MaxScale)
                 {
                     Size += .25f;
                     Interpolant = 1f;
@@ -253,7 +254,7 @@ public class DummyButton(ButtonType type) : SmartUIElement
         switch (Type)
         {
             case ButtonType.Life:
-                if (MaxLife.BetweenNum(GodDummy.LifeAmount, GodDummy.MaxLifeAmount + 1))
+                if (MaxLife is > GodDummy.LifeAmount and < GodDummy.MaxLifeAmount + 1)
                 {
                     MaxLife -= GodDummy.LifeAmount;
                     Interpolant = 1f;
@@ -265,7 +266,7 @@ public class DummyButton(ButtonType type) : SmartUIElement
 
                 break;
             case ButtonType.Defense:
-                if (Defense.BetweenNum(-GodDummy.MaxDefense, GodDummy.MaxDefense + 1))
+                if (Defense is > -GodDummy.MaxDefense and < GodDummy.MaxDefense + 1)
                 {
                     Defense -= 5;
                     Interpolant = 1f;
@@ -277,7 +278,7 @@ public class DummyButton(ButtonType type) : SmartUIElement
 
                 break;
             case ButtonType.Scale:
-                if (Size.BetweenNum(.75f, GodDummy.MaxScale + .1f))
+                if (Size is > .75f and GodDummy.MaxScale + .1f)
                 {
                     Size -= .25f;
                     Interpolant = 1f;
@@ -305,7 +306,7 @@ public class DummyButton(ButtonType type) : SmartUIElement
     public override void SafeUpdate(GameTime gameTime)
     {
         Player p = Main.LocalPlayer;
-        GlobalPlayer m = p.Additions();
+        PlayerMouse m = p.AdditionsMouse();
 
         if (IsMouseHovering && Type == ButtonType.Rotation)
         {
@@ -324,7 +325,7 @@ public class DummyButton(ButtonType type) : SmartUIElement
         {
             if (Type == ButtonType.Info)
             {
-                Main.instance.MouseText(GetTextValue("UI.DummyInfo"), 0, 0, -1, -1, -1, -1, 0);
+                Main.instance.MouseText(GetTextValue("UI.DummyInfo"));
             }
 
             Main.LocalPlayer.mouseInterface = true;

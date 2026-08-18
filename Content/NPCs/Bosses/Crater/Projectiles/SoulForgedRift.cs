@@ -3,15 +3,15 @@ using System.IO;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
 public class SoulForgedRift : ProjOwnedByNPC<Asterlin>
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -68,7 +68,7 @@ public class SoulForgedRift : ProjOwnedByNPC<Asterlin>
             Vector2 pos = Projectile.Center;
             Vector2 vel = Vector2.Zero;
             int damage = Asterlin.SuperHeavyAttackDamage;
-            if (this.RunServer())
+            if (ModProjectile.RunServer())
             {
                 RayIndex = SpawnProjectile(pos, vel, type, damage, 0f);
                 ray = Main.projectile[RayIndex];
@@ -78,7 +78,7 @@ public class SoulForgedRift : ProjOwnedByNPC<Asterlin>
 
         if (ray != null && ray.type == type)
         {
-            Rotation = Animators.EulerAnglesConversion(1, 0f, ray.ai[2] /*SideAngle*/ - MathHelper.PiOver2);
+            Rotation = QuaternionUtils.CreateFromPolarAngles(0f, ray.ai[2] /*SideAngle*/ - MathHelper.PiOver2);
         }
 
         if (ModOwner.Hyperbeam_CurrentState == Asterlin.Hyperbeam_States.Fade)
@@ -90,9 +90,9 @@ public class SoulForgedRift : ProjOwnedByNPC<Asterlin>
         }
         else
         {
-            Projectile.Opacity = Animators.MakePoly(4f)
+            Projectile.Opacity = MakePoly(4f)
                 .InFunction(InverseLerp(0f, Asterlin.Hyperbeam_PortalChargeTime, Time));
-            Projectile.scale = Animators.Sine.OutFunction(InverseLerp(0f, Asterlin.Hyperbeam_PortalChargeTime, Time));
+            Projectile.scale = Sine.OutFunction(InverseLerp(0f, Asterlin.Hyperbeam_PortalChargeTime, Time));
         }
 
         Animation += .01f;
@@ -103,10 +103,10 @@ public class SoulForgedRift : ProjOwnedByNPC<Asterlin>
     {
         void portal()
         {
-            VertexPositionColorTexture[] quad = GenerateQuadClockwise(Projectile.Size, Color.White, true);
-            ManagedShader projectionShader = AssetRegistry.GetShader("3DPortalProjection");
+            VertexPositionColorTexture[] quad = GenerateQuadClockwise(Projectile.Size, Color.White, Vector2.One / 2);
+            ManagedShader projectionShader = AssetRegistry.GennedShaders._3DPortalProjection;
             projectionShader.TrySetParameter("vertexMatrix",
-                Get3DTextureMatrix(Projectile.Center, Rotation, Projectile.scale, 0f, 1));
+                Get3DTextureMatrix(Projectile.Center, Rotation, Projectile.scale, 0f, true));
             projectionShader.TrySetParameter("time", Animation);
             projectionShader.TrySetParameter("opacity", Projectile.Opacity);
             projectionShader.Render();
@@ -132,7 +132,7 @@ public class SoulForgedRift : ProjOwnedByNPC<Asterlin>
             gd.BlendState = prevBlend;
         }
 
-        PixelationSystem.QueueTextureRenderAction(portal, PixelationLayer.UnderPlayers);
+        PixelationSystem.QueuePrimitiveRenderAction(portal, PixelationLayer.UnderPlayers);
         return false;
     }
 }

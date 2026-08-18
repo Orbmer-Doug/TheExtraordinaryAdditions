@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 using TheExtraordinaryAdditions.Core.DataStructures;
@@ -65,7 +64,7 @@ public partial class Asterlin
 
                 if (AITimer >= Hyperbeam_HoverTime)
                 {
-                    if (this.RunServer())
+                    if (ModNPC.RunServer())
                         NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<SoulForgedRift>(), 0, 0f);
                     Hyperbeam_CurrentState = Hyperbeam_States.SummonPortal;
                     AITimer = 0;
@@ -91,7 +90,7 @@ public partial class Asterlin
 
                 if (AITimer % Hyperbeam_FireInterval == (Hyperbeam_FireInterval - 1))
                 {
-                    if (this.RunServer())
+                    if (ModNPC.RunServer())
                         NPC.NewNPCProj(NPC.Center, NPC.SafeDirectionTo(Target.Center + Target.Velocity * 10f) * 25f,
                             ModContent.ProjectileType<SoulCleansingFlame>(), 0, 0f);
                 }

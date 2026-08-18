@@ -1,5 +1,4 @@
-﻿using Terraria;
-using Terraria.ID;
+﻿using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Tiles;
 
@@ -7,7 +6,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Placeable;
 
 public class MeteorBlock : ModItem, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.MeteorBlock);
+    public override string Texture => AssetRegistry.GennedTextures.MeteorBlock.Path;
 
     public override void SetStaticDefaults()
     {

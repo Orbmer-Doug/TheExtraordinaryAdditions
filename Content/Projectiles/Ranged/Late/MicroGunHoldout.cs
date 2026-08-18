@@ -4,14 +4,13 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
 public class MicroGunHoldout : BaseHoldoutProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.MicroGun);
+    public override string Texture => AssetRegistry.GennedTextures.MicroGun.Path;
     public ref float Timer => ref Projectile.ai[0];
     public ref float Recoil => ref Projectile.ai[1];
 
@@ -61,7 +60,7 @@ public class MicroGunHoldout : BaseHoldoutProjectile
                 Vector2 position = Projectile.Center +
                                    Projectile.velocity.SafeNormalize(Vector2.UnitY) * Item.width * 0.5f;
                 if (this.RunLocal())
-                    Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(null), position, velocity, type,
+                    Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), position, velocity, type,
                         damage, knockback, Owner.whoAmI);
 
                 ParticleRegistry.SpawnHeavySmokeParticle(position, velocity.RotatedByRandom(.3f) * .01f,
@@ -78,7 +77,7 @@ public class MicroGunHoldout : BaseHoldoutProjectile
             }
 
             Recoil = 20;
-            Projectile.position += Utils.NextVector2Circular(Main.rand, 4.5f, 4.5f);
+            Projectile.position += Main.rand.NextVector2Circular(4.5f, 4.5f);
         }
 
         if (Recoil > 0)

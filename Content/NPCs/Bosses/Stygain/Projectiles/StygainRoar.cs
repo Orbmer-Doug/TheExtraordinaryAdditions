@@ -3,8 +3,7 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
@@ -13,7 +12,7 @@ public class StygainRoar : ModProjectile
 {
     public static readonly float Lifetime = SecondsToFrames(.8f);
     public ref float Radius => ref Projectile.ai[1];
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetStaticDefaults()
     {
@@ -44,11 +43,11 @@ public class StygainRoar : ModProjectile
     {
         Main.spriteBatch.EnterShaderRegion();
 
-        Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.BigWavyBlobNoise);
+        Texture2D tex = AssetRegistry.GennedTextures.BigWavyBlobNoise;
         DrawData explosionDrawData = new(tex, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight),
             Color.White * Projectile.Opacity);
 
-        ManagedShader wave = ShaderRegistry.LightShockwave;
+        ManagedShader wave = AssetRegistry.GennedShaders.LightShockwave;
         wave.TrySetParameter("mainColor", Color.Crimson.ToVector3());
         wave.TrySetParameter("screenSize", Main.ScreenSize.ToVector2());
         wave.TrySetParameter("explosionDistance", Radius * Projectile.scale * 0.5f);

@@ -3,13 +3,12 @@ using System;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle.AZ;
 
 public class Maggot : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Maggot);
+    public override string Texture => AssetRegistry.GennedTextures.Maggot.Path;
 
     public override void SetDefaults()
     {

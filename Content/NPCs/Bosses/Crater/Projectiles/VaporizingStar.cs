@@ -4,8 +4,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
@@ -44,7 +43,7 @@ public class VaporizingStar : ProjOwnedByNPC<Asterlin>
 
     public static readonly float GrowTime = SecondsToFrames(1.4f);
 
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -73,8 +72,8 @@ public class VaporizingStar : ProjOwnedByNPC<Asterlin>
             case StateType.Grow:
                 Projectile.velocity = Vector2.Lerp(Projectile.Center, targetPos, .1f) - Projectile.Center;
 
-                Projectile.Opacity = Animators.MakePoly(3f).InFunction(InverseLerp(0f, GrowTime * .75f, Timer));
-                Projectile.scale = Animators.Sine.InOutFunction(InverseLerp(0f, GrowTime, Timer));
+                Projectile.Opacity = MakePoly(3f).InFunction(InverseLerp(0f, GrowTime * .75f, Timer));
+                Projectile.scale = Sine.InOutFunction(InverseLerp(0f, GrowTime, Timer));
                 if (Timer >= GrowTime)
                 {
                     CurrentState = StateType.Fire;
@@ -97,8 +96,8 @@ public class VaporizingStar : ProjOwnedByNPC<Asterlin>
                 {
                     if (Timer % LaserWait == LaserWait - 1)
                     {
-                        AdditionsSound.spearLaser.Play(Projectile.Center);
-                        if (this.RunServer())
+                        AssetRegistry.GennedSounds.spearLaser.Play(Projectile.Center);
+                        if (ModProjectile.RunServer())
                         {
                             for (int i = 0; i < Asterlin.Disintegration_TotalBeams; i++)
                             {
@@ -130,8 +129,8 @@ public class VaporizingStar : ProjOwnedByNPC<Asterlin>
 
     public override bool PreDraw(ref Color lightColor)
     {
-        Texture2D noise = AssetRegistry.GetTexture(AdditionsTexture.FlameMap1);
-        ManagedShader fireball = ShaderRegistry.FireballShader;
+        Texture2D noise = AssetRegistry.GennedTextures.FlameMap1;
+        ManagedShader fireball = AssetRegistry.GennedShaders.FireballShader;
         fireball.SetTexture(noise, 1, SamplerState.AnisotropicWrap);
         fireball.TrySetParameter("mainColor", Color.Lerp(Color.Goldenrod, Color.Gold, 0.3f).ToVector3());
         fireball.TrySetParameter("resolution", new Vector2(Projectile.scale * 400f));
@@ -140,7 +139,7 @@ public class VaporizingStar : ProjOwnedByNPC<Asterlin>
 
         Main.spriteBatch.EnterShaderRegion(fireball.Effect, BlendState.AlphaBlend);
         Vector2 drawPos = Projectile.Center - Main.screenPosition;
-        Texture2D invis = AssetRegistry.GetTexture(AdditionsTexture.Invisible);
+        Texture2D invis = AssetRegistry.GennedTextures.Invisible;
         fireball.Render();
         Main.spriteBatch.Draw(invis, drawPos, null, Color.White * Projectile.Opacity, 0f, invis.Size() * 0.5f,
             Projectile.scale * 400f, SpriteEffects.None, 0f);

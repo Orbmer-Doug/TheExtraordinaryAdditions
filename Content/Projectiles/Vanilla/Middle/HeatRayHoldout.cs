@@ -5,8 +5,6 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Utilities;
-using TheExtraordinaryAdditions.UI.LaserUI;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
@@ -27,8 +25,6 @@ public class HeatRayHoldout : BaseIdleHoldoutProjectile
 
     public override void SafeAI()
     {
-        LaserResource.ApplyLaserOverheating(Owner);
-
         if (this.RunLocal())
         {
             Projectile.velocity = Center.SafeDirectionTo(Modded.MouseWorld);
@@ -44,12 +40,10 @@ public class HeatRayHoldout : BaseIdleHoldoutProjectile
 
         Vector2 vel = Projectile.velocity * Item.shootSpeed;
         Vector2 pos = Projectile.Center + PolarVector(Projectile.width * .5f, Projectile.rotation);
-        LaserResource laser = Owner.GetModPlayer<LaserResource>();
 
         if (this.RunLocal() && Modded.SafeMouseLeft.Current && Time % Item.useTime == Item.useTime - 1 &&
-            LaserResource.CanFire(Owner) && TryUseMana(false))
+            TryUseMana(false))
         {
-            laser.HeatCurrent++;
             SoundEngine.PlaySound(SoundID.Item12, Projectile.Center);
             Projectile.NewProj(pos, vel, ModContent.ProjectileType<ScorchRay>(), Item.damage, Item.knockBack / 5,
                 Owner.whoAmI);
@@ -59,11 +53,10 @@ public class HeatRayHoldout : BaseIdleHoldoutProjectile
         }
 
         int wait = Item.useTime * 2;
-        if (this.RunLocal() && Modded.SafeMouseRight.Current && Time % wait == wait - 1 && LaserResource.CanFire(Owner))
+        if (this.RunLocal() && Modded.SafeMouseRight.Current && Time % wait == wait - 1)
         {
             if (TryUseMana())
             {
-                laser.HeatCurrent += 2;
                 SoundEngine.PlaySound(SoundID.Item12 with { Pitch = -.1f, Volume = 1.2f }, Projectile.Center);
                 Projectile.NewProj(pos, vel, ModContent.ProjectileType<MeltRay>(), Item.damage, Item.knockBack,
                     Owner.whoAmI);

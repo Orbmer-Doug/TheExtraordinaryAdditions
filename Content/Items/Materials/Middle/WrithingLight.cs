@@ -12,7 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 
 public class WrithingLight : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.WrithingLight);
+    public override string Texture => AssetRegistry.GennedTextures.WrithingLight.Path;
 
     public override void SetStaticDefaults()
     {

@@ -1,25 +1,21 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
-using System.IO;
 using Terraria;
-using Terraria.Graphics.Renderers;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
 public class JudgeSwing : BaseSwordSwing
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.JusticeIsSplendorW);
+    public override string Texture => AssetRegistry.GennedTextures.JusticeIsSplendorW.Path;
 
     /// <summary>
     /// BLUE
@@ -76,7 +72,7 @@ public class JudgeSwing : BaseSwordSwing
         // swoosh
         if (Animation() >= .26f && !PlayedSound && !Main.dedServ)
         {
-            AdditionsSound.GabrielSwing.Play(Projectile.Center, .6f, 0f, .2f);
+            AssetRegistry.GennedSounds.GabrielSwing.Play(Projectile.Center, .6f, 0f, .2f);
             PlayedSound = true;
         }
 
@@ -135,7 +131,7 @@ public class JudgeSwing : BaseSwordSwing
 
         npc.velocity += SwordDir * Item.knockBack * npc.knockBackResist;
 
-        AdditionsSound.RoySpecial2.Play(start, .6f, 0f, .3f);
+        AssetRegistry.GennedSounds.RoySpecial2.Play(start, .6f, 0f, .3f);
     }
 
     public override void PlayerHitEffects(in Vector2 start, in Vector2 end, Player player, Player.HurtInfo info)
@@ -150,7 +146,7 @@ public class JudgeSwing : BaseSwordSwing
                 color);
         }
 
-        AdditionsSound.RoySpecial2.Play(start, .6f, 0f, .3f);
+        AssetRegistry.GennedSounds.RoySpecial2.Play(start, .6f, 0f, .3f);
     }
 
     public float WidthFunct(float c) => 66f * Projectile.scale;
@@ -161,7 +157,7 @@ public class JudgeSwing : BaseSwordSwing
         return (Splendor ? new Color(48, 114, 194) : new(255, 226, 42)) * (1f - c.X) * opacity;
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints points = new(20);
 
     public override bool PreDraw(ref Color lightColor)
@@ -171,7 +167,7 @@ public class JudgeSwing : BaseSwordSwing
             if (trail == null || points == null)
                 return;
 
-            trail.DrawTrail(ShaderRegistry.StandardPrimitiveShader, points.Points);
+            trail.DrawTrail(AssetRegistry.GennedShaders.StandardPrimitiveShader, points.Points);
         }
 
         Vector2 origin;
@@ -194,7 +190,7 @@ public class JudgeSwing : BaseSwordSwing
             Effects = SpriteEffects.FlipHorizontally;
         }
 
-        Texture2D tex = Splendor ? AssetRegistry.GetTexture(AdditionsTexture.SplendorIsJusticeW) : Tex;
+        Texture2D tex = Splendor ? AssetRegistry.GennedTextures.SplendorIsJusticeW : Tex;
         float rot = RotationOffset;
         SpriteEffects fx = Effects;
 
@@ -214,7 +210,7 @@ public class JudgeSwing : BaseSwordSwing
 
 public class JudgeSpear : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GabesSpear);
+    public override string Texture => AssetRegistry.GennedTextures.GabesSpear.Path;
 
     public Vector2 Size = new Vector2(30, 126);
     public Vector2 Top => Projectile.Center + PolarVector(Size.Y / 2, Projectile.rotation - PiOver2);
@@ -264,7 +260,7 @@ public class JudgeSpear : ModProjectile
     public static readonly int ThrowTime = SecondsToFrames(4);
 
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
+    public PlayerMouse Modded => Owner.AdditionsMouse();
     public Vector2 Center => Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
 
     public override void AI()
@@ -375,7 +371,7 @@ public class JudgeSpear : ModProjectile
         if (this.RunLocal())
             Projectile.NewProj(Projectile.RotHitbox().Top, Vector2.Zero, ModContent.ProjectileType<JudgeKaboom>(),
                 (int) (Projectile.damage * .5f), 1f, Projectile.owner);
-        AdditionsSound.GenericExplo.Play(Top, .6f, 0f, .2f, 20);
+        AssetRegistry.GennedSounds.GenericExplo.Play(Top, .6f, 0f, .2f, 20);
         Hit = true;
         this.Sync();
     }
@@ -406,7 +402,7 @@ public class JudgeSpear : ModProjectile
 
 public class JudgeKaboom : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     private const int Lifetime = 55;
 
@@ -465,25 +461,19 @@ public class JudgeKaboom : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        void render()
-        {
-            Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
-            Texture2D noise = AssetRegistry.GetTexture(AdditionsTexture.DarkRidgeNoise);
-            float opacity = InverseLerp(0, Lifetime, Projectile.timeLeft);
-            ManagedShader shader = AssetRegistry.GetShader("GabrielExplosion");
-            shader.TrySetParameter("sides", 8);
-            shader.TrySetParameter("opacity", opacity);
-            shader.TrySetParameter("time", Time * .01f + TimeOffset);
-            shader.TrySetParameter("col1", new Vector3(1f, 0.885f, 0f));
-            shader.TrySetParameter("col2", new Vector3(1f, 0.515f, 0f));
-            shader.SetTexture(noise, 1, SamplerState.LinearWrap);
-            shader.Render();
-            Main.spriteBatch.DrawBetter(tex,
-                Projectile.Center, null, Color.White, 0f, Vector2.One / 2, Projectile.scale);
-        }
-
-        PixelationSystem.QueueTextureRenderAction(render, PixelationLayer.UnderProjectiles, BlendState.AlphaBlend,
-            AssetRegistry.GetShader("GabrielExplosion"));
+        Texture2D tex = AssetRegistry.GennedTextures.Pixel;
+        Texture2D noise = AssetRegistry.GennedTextures.DarkRidgeNoise;
+        float opacity = InverseLerp(0, Lifetime, Projectile.timeLeft);
+        ManagedShader shader = AssetRegistry.GennedShaders.GabrielExplosion;
+        shader.TrySetParameter("sides", 8);
+        shader.TrySetParameter("opacity", opacity);
+        shader.TrySetParameter("time", Time * .01f + TimeOffset);
+        shader.TrySetParameter("col1", new Vector3(1f, 0.885f, 0f));
+        shader.TrySetParameter("col2", new Vector3(1f, 0.515f, 0f));
+        shader.SetTexture(noise, 1, SamplerState.LinearWrap);
+        SpriteBatch.DrawAltPixelated(PixelationLayer.UnderProjectiles, BlendState.AlphaBlend, tex,
+            Projectile.Center, null, Color.White, 0f, Vector2.One / 2, Projectile.scale,
+            shader: shader);
         return false;
     }
 }

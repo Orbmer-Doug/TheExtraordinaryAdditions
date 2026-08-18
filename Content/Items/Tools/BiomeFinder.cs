@@ -8,7 +8,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Tools;
 
 public class BiomeFinder : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BiomeFinder);
+    public override string Texture => AssetRegistry.GennedTextures.BiomeFinder.Path;
 
     public override void SetStaticDefaults()
     {

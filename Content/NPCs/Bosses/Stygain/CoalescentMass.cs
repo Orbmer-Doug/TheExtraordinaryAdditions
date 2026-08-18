@@ -4,7 +4,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Debuff;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
 using Utils = Terraria.Utils;
 
@@ -13,8 +13,8 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain;
 [AutoloadBossHead]
 public class CoalescentMass : ModNPC
 {
-    public override string BossHeadTexture => AssetRegistry.GetTexturePath(AdditionsTexture.CoalescentMass_Head_Boss);
-    public override string Texture => AssetRegistry.Invis;
+    public override string BossHeadTexture => AssetRegistry.GennedTextures.CoalescentMass_Head_Boss.Path;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     public static readonly int Life = DifficultyBasedValue(15000, 30000, 43000, 56000, 65000, 80000);
 
     public override void SetStaticDefaults()
@@ -115,7 +115,7 @@ public class CoalescentMass : ModNPC
 
     public override void OnKill()
     {
-        AdditionsSound.BlackHoleExplosion.Play(NPC.Center, .9f, -.3f);
+        AssetRegistry.GennedSounds.BlackHoleExplosion.Play(NPC.Center, .9f, -.3f);
         NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<MassExplosion>(), 5000, 6f);
     }
 
@@ -131,10 +131,10 @@ public class CoalescentMass : ModNPC
     {
         float time = Main.GlobalTimeWrappedHourly;
 
-        ManagedShader shader = AssetRegistry.GetShader("StygainMass");
+        ManagedShader shader = AssetRegistry.GennedShaders.StygainMass;
 
-        shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WavyBlotchNoise), 1, SamplerState.LinearWrap);
-        shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FractalNoise), 2, SamplerState.LinearWrap);
+        shader.SetTexture(AssetRegistry.GennedTextures.WavyBlotchNoise, 1, SamplerState.LinearWrap);
+        shader.SetTexture(AssetRegistry.GennedTextures.FractalNoise, 2, SamplerState.LinearWrap);
         shader.TrySetParameter("pixelationFactor", new Vector2(200f, 200f));
         shader.TrySetParameter("posterizationPrecision", 14f);
         shader.TrySetParameter("globalTime", time * 1f);
@@ -146,7 +146,7 @@ public class CoalescentMass : ModNPC
         Vector2 scale = new Vector2(scaleX, scaleY) * size;
         float interpolant = Utils.GetLerpValue(0f, Life, npc.life, true);
 
-        Texture2D pixel = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
+        Texture2D pixel = AssetRegistry.GennedTextures.Pixel;
         Main.spriteBatch.Draw(pixel, pos, null, Color.Crimson * npc.Opacity, 0f, pixel.Size() / 2,
             npc.Size * (scale * 3f), 0, 0f);
     }
@@ -175,7 +175,7 @@ public class HeadDetour : ModSystem
         byte alpha, float headScale, float rotation, SpriteEffects effects, int bossHeadId, float x, float y)
     {
         if (theNPC != null &&
-            NPCHeadLoader.GetBossHeadSlot(AssetRegistry.GetTexturePath(AdditionsTexture.CoalescentMass_Head_Boss)) ==
+            NPCHeadLoader.GetBossHeadSlot(AssetRegistry.GennedTextures.CoalescentMass_Head_Boss.Path) ==
             bossHeadId)
         {
             Vector2 pos = new(x, y);

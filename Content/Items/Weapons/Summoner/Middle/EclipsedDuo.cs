@@ -11,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Middle;
 
 public class EclipsedDuo : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.EclipsedDuo);
+    public override string Texture => AssetRegistry.GennedTextures.EclipsedDuo.Path;
 
     public override void SetDefaults()
     {

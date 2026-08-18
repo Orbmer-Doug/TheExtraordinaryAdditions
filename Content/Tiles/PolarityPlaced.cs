@@ -8,7 +8,7 @@ namespace TheExtraordinaryAdditions.Content.Tiles;
 
 public class PolarityPlaced : ModTile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.PolarityPlaced);
+    public override string Texture => AssetRegistry.GennedTextures.PolarityPlaced.Path;
 
     public override void SetStaticDefaults()
     {

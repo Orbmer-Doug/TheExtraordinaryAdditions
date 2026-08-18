@@ -1,13 +1,13 @@
 ﻿using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
+using TheExtraordinaryAdditions.Content.Rarities;
 using TheExtraordinaryAdditions.Content.Tiles;
 
 namespace TheExtraordinaryAdditions.Content.Items.Placeable;
 
 public class LockedCyberneticSword : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.LockedCyberneticSword);
+    public override string Texture => AssetRegistry.GennedTextures.LockedCyberneticSword.Path;
 
     public override void SetStaticDefaults()
     {

@@ -4,19 +4,17 @@ using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
 public class BergcrusherSwing : BaseSwordSwing
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Bergcrusher);
+    public override string Texture => AssetRegistry.GennedTextures.Bergcrusher.Path;
 
     public override int StopTimeFrames => 2;
     public override int SwingTime => 50;
@@ -78,7 +76,7 @@ public class BergcrusherSwing : BaseSwordSwing
             if (this.RunLocal())
                 Projectile.NewProj(Center, Projectile.velocity * 14f, ModContent.ProjectileType<Bergwave>(),
                     (int) (Projectile.damage * .5f), .3f, Owner.whoAmI);
-            AdditionsSound.BraveIceSlash.Play(Projectile.Center, 1f, -.2f, .1f);
+            AssetRegistry.GennedSounds.BraveIceSlash.Play(Projectile.Center, 1f, -.2f, .1f);
             PlayedSound = true;
         }
 
@@ -174,7 +172,7 @@ public class BergcrusherSwing : BaseSwordSwing
         else
             npc.velocity += SwordDir * Item.knockBack * npc.knockBackResist;
 
-        AdditionsSound.ColdPunch.Play(Projectile.Center, .9f, 0f, .11f);
+        AssetRegistry.GennedSounds.ColdPunch.Play(Projectile.Center, .9f, 0f, .11f);
     }
 
     // Do the same for players (if it ever happened)
@@ -192,7 +190,7 @@ public class BergcrusherSwing : BaseSwordSwing
                 default, Main.rand.NextFloat(.8f, 1.5f));
         }
 
-        AdditionsSound.ColdPunch.Play(Projectile.Center, .9f, 0f, .11f);
+        AssetRegistry.GennedSounds.ColdPunch.Play(Projectile.Center, .9f, 0f, .11f);
     }
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
@@ -201,7 +199,7 @@ public class BergcrusherSwing : BaseSwordSwing
             modifiers.FinalDamage /= 2;
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints old = new(25);
 
     public static float WidthFunct(float c)
@@ -245,8 +243,8 @@ public class BergcrusherSwing : BaseSwordSwing
             if (trail == null || old == null || SwingCompletion < .45f || SwingCompletion > .95f)
                 return;
 
-            ManagedShader slash = ShaderRegistry.BloodBeacon;
-            slash.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.CrackedNoise), 1);
+            ManagedShader slash = AssetRegistry.GennedShaders.BloodBeaconShader;
+            slash.SetTexture(AssetRegistry.GennedTextures.CrackedNoise, 1);
             trail.DrawTrail(slash, old.Points, 200, true);
         }
 

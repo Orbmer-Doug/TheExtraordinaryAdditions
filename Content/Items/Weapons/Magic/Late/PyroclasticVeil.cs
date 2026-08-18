@@ -13,7 +13,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Late;
 
 public class PyroclasticVeil : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.PyroclasticVeil);
+    public override string Texture => AssetRegistry.GennedTextures.PyroclasticVeil.Path;
 
     public override void SetStaticDefaults()
     {

@@ -3,15 +3,15 @@ using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 
 public class TheAnvil : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TheAnvil);
+    public override string Texture => AssetRegistry.GennedTextures.TheAnvil.Path;
 
     public override void SetDefaults()
     {
@@ -50,7 +50,7 @@ public class TheAnvil : ModProjectile
         // Crash
         if (oldVelocity.Y >= CrashSpeed)
         {
-            SoundID.DD2_OgreGroundPound.Play(Projectile.Center, Main.rand.NextFloat(1.2f, 1.6f), -.2f, .1f, null, 10);
+            SoundID.DD2_OgreGroundPound.Play(Projectile.Center, Main.rand.NextFloat(1.2f, 1.6f), -.2f, .1f, 10);
             Projectile.CreateFriendlyExplosion(Projectile.Center.Lerp(Projectile.Bottom, .25f),
                 new(Projectile.width * 4, Projectile.height), Projectile.damage / 2, Projectile.knockBack, 7, 8);
 
@@ -72,8 +72,9 @@ public class TheAnvil : ModProjectile
         }
 
         // Sliding sparks
-        else if ((oldVelocity.X.BetweenNum(-14, -1f, true) || oldVelocity.X.BetweenNum(1f, 14f, true)) &&
-                 Time % 2f == 0f)
+
+        if (oldVelocity.X is >= -14 and <= -1f or >= 1f and <= 14f &&
+            Time % 2f == 0f)
         {
             for (int i = 0; i < 10; i++)
             {

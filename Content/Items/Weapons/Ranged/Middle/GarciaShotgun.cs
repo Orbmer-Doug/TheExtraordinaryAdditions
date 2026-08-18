@@ -9,7 +9,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 
 public class GarciaShotgun : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GarciaShotgun);
+    public override string Texture => AssetRegistry.GennedTextures.GarciaShotgun.Path;
 
     public override void SetStaticDefaults()
     {

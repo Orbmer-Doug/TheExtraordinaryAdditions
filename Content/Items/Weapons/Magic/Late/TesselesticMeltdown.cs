@@ -3,17 +3,16 @@ using Terraria;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
+using TheExtraordinaryAdditions.Content.Rarities;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 using TheExtraordinaryAdditions.UI;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Late;
 
 public class TesselesticMeltdown : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TesselesticMeltdown);
+    public override string Texture => AssetRegistry.GennedTextures.TesselesticMeltdown.Path;
 
     public override void SetStaticDefaults()
     {

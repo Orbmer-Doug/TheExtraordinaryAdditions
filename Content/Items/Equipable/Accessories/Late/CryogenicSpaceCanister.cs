@@ -7,15 +7,13 @@ using TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Late;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
-using TheExtraordinaryAdditions.UI.LaserUI;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Late;
 
 [AutoloadEquip(EquipType.Back)]
 public class CryogenicSpaceCanister : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CryogenicSpaceCanister);
+    public override string Texture => AssetRegistry.GennedTextures.CryogenicSpaceCanister.Path;
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
@@ -34,8 +32,6 @@ public class CryogenicSpaceCanister : ModItem
 
     public override void UpdateAccessory(Player player, bool hideVisual)
     {
-        LaserResource resource = player.GetModPlayer<LaserResource>();
-
         player.buffImmune[
             BuffID.OnFire & BuffID.OnFire3 & BuffID.Burning & BuffID.Frostburn & BuffID.Frostburn2 & BuffID.Frozen &
             BuffID.Slow & BuffID.Chilled] = true;
@@ -43,16 +39,13 @@ public class CryogenicSpaceCanister : ModItem
         player.GetModPlayer<NitrogenCoolingPackPlayer>().Equipped = true;
 
         ref bool cryo = ref player.GetModPlayer<CryogenicSpaceCanisterPlayer>().Equipped;
-        if (resource.HeatCurrent == 0)
         {
             cryo = true;
             player.statDefense += 20;
         }
 
-        if (resource.HeatCurrent > 0)
         {
             cryo = false;
-            resource.HeatRegenRate *= 2.7f;
             player.GetArmorPenetration(DamageClass.Generic) += 15;
         }
     }
@@ -69,7 +62,7 @@ public class CryogenicSpaceCanister : ModItem
 
 public sealed class CryogenicSpaceCanisterPlayer : ModPlayer
 {
-    public static readonly int TimeForCryogenic = SecondsToFrames(10);
+    public const int TimeForCryogenic = 600;
 
     public bool Equipped;
     public override void ResetEffects() => Equipped = false;
@@ -87,7 +80,7 @@ public sealed class CryogenicSpaceCanisterPlayer : ModPlayer
         Counter++;
         if (Counter > TimeForCryogenic)
         {
-            AdditionsSound.ColdHitMassive.Play(Player.Center, .7f, 0f, .1f);
+            AssetRegistry.GennedSounds.ColdHitMassive.Play(Player.Center, .7f, 0f, .1f);
             if (Main.myPlayer == Player.whoAmI)
                 Player.NewPlayerProj(Player.Center, Vector2.Zero, ModContent.ProjectileType<CryogenicBlast>(),
                     (int) Player.GetTotalDamage<GenericDamageClass>().ApplyTo(4000), 4f, Player.whoAmI);
@@ -100,7 +93,7 @@ public sealed class CryogenicSpaceCanisterPlayer : ModPlayer
     {
         if (!Equipped)
             return;
-        if (Counter.BetweenNum(0, TimeForCryogenic))
+        if (Counter is > 0 and < TimeForCryogenic)
         {
             if (Main.rand.NextBool(5) && drawInfo.shadow == 0)
             {

@@ -2,16 +2,14 @@
 using System;
 using Terraria;
 using TheExtraordinaryAdditions.Assets.Audio;
-using TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using static TheExtraordinaryAdditions.Content.Projectiles.Magic.Late.TesselesticMeltdownProj;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
 public class TheTesselesticMeltdown : ProjOwnedByNPC<Asterlin>
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TesselesticMeltdown);
+    public override string Texture => AssetRegistry.GennedTextures.TesselesticMeltdown.Path;
 
     public override void SetDefaults()
     {
@@ -69,7 +67,7 @@ public class TheTesselesticMeltdown : ProjOwnedByNPC<Asterlin>
                 break;
         }
 
-        slot ??= LoopedSoundManager.CreateNew(new(AdditionsSound.ElectricityContinuous, () => .67f),
+        slot ??= LoopedSoundManager.CreateNew(new(AssetRegistry.GennedSounds.ElectricityContinuous, () => .67f),
             () => AdditionsLoopedSound.ProjectileNotActive(Projectile),
             () => CurrentState == State.Barrage && ModOwner.Tesselestic_Shooting);
         slot?.Update(Projectile.Center);
@@ -137,7 +135,7 @@ public class TheTesselesticMeltdown : ProjOwnedByNPC<Asterlin>
             fx = SpriteEffects.FlipHorizontally;
         }
 
-        Texture2D glow = AssetRegistry.GetTexture(AdditionsTexture.TesselesticMeltdown_Glowmask);
+        Texture2D glow = AssetRegistry.GennedTextures.TesselesticMeltdown_Glowmask;
 
         Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, null, Color.White * Projectile.Opacity,
             Projectile.rotation + off, origin, Projectile.scale, fx, 0f);

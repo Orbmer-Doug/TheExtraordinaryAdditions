@@ -15,7 +15,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 /// </summary>
 public class RejuvenatedHolySword : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.RejuvenatedHolySword);
+    public override string Texture => AssetRegistry.GennedTextures.RejuvenatedHolySword.Path;
 
     public override void SetDefaults()
     {
@@ -43,7 +43,7 @@ public class RejuvenatedHolySword : ModItem
             .projectile[
                 Projectile.NewProjectile(source, position, velocity, type, damage, knockback, player.whoAmI, 0f, 0f)]
             .As<HolySwordSwing>();
-        swing.Mark = player.Additions().SafeMouseRight.Current;
+        swing.Mark = player.AdditionsMouse().SafeMouseRight.Current;
         return false;
     }
 

@@ -10,7 +10,7 @@ public class TremorCooldown : CooldownHandler
     public static new string ID => "Tremor";
     public override bool ShouldDisplay => true;
     public override LocalizedText DisplayName => GetText($"Cooldowns.{ID}");
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CooldownTremor);
+    public override string Texture => AssetRegistry.GennedTextures.CooldownTremor.Path;
     public override Color OutlineColor => new(30, 17, 25);
     public override Color CooldownStartColor => new(140, 131, 138);
     public override Color CooldownEndColor => new(177, 166, 174);
@@ -31,5 +31,6 @@ public class TremorCooldown : CooldownHandler
     }
 }
 */
+
 
 

@@ -1,16 +1,13 @@
 ﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles.Shader;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
 
 public class EpidemicSpear : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     public ref float Time => ref Projectile.ai[0];
     public Projectile Proj => Main.projectile[(int) Projectile.ai[1]];
     public Player Owner => Main.player[Projectile.owner];
@@ -57,7 +54,7 @@ public class EpidemicSpear : ModProjectile
         Projectile.scale = InverseLerp(0f, TotalCharge, Time) * 1.2f;
         Projectile.ExpandHitboxBy((int) (Projectile.scale * 20f));
 
-        if (this.RunLocal() && Owner.Additions().MouseRight.Current && !Released)
+        if (this.RunLocal() && Owner.AdditionsMouse().MouseRight.Current && !Released)
         {
             Projectile.timeLeft = 180;
             Projectile.velocity = Vector2.Lerp(Projectile.velocity,
@@ -65,11 +62,11 @@ public class EpidemicSpear : ModProjectile
                 MathHelper.Max(10f, Projectile.velocity.Length()), .2f);
         }
 
-        if (this.RunLocal() && Owner.Additions().MouseRight.Current == false && Time >= TotalCharge && !Released)
+        if (this.RunLocal() && !Owner.AdditionsMouse().MouseRight.Current && Time >= TotalCharge && !Released)
         {
             Projectile.extraUpdates = 2;
-            Projectile.velocity = Projectile.SafeDirectionTo(Owner.Additions().MouseWorld) * 15f;
-            AdditionsSound.etherealLoose.Play(Projectile.Center, 1.2f, -.3f);
+            Projectile.velocity = Projectile.SafeDirectionTo(Owner.AdditionsMouse().MouseWorld) * 15f;
+            AssetRegistry.GennedSounds.etherealLoose.Play(Projectile.Center, 1.2f, -.3f);
 
             Released = true;
         }
@@ -77,7 +74,7 @@ public class EpidemicSpear : ModProjectile
         if (Projectile.velocity != Projectile.oldVelocity)
             this.Sync();
 
-        if (this.RunLocal() && Owner.Additions().MouseRight.Current == false && Time < TotalCharge && !Released)
+        if (this.RunLocal() && !Owner.AdditionsMouse().MouseRight.Current && Time < TotalCharge && !Released)
             Projectile.Kill();
 
         ref float Offset = ref Projectile.AdditionsInfo().ExtraAI[0];
@@ -119,7 +116,7 @@ public class EpidemicSpear : ModProjectile
         {
             ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 30, RandomRotation(), Vector2.One,
                 0f, 220f, Color.DarkOliveGreen);
-            AdditionsSound.HeatTail.Play(Projectile.Center, .8f, -.3f);
+            AssetRegistry.GennedSounds.HeatTail.Play(Projectile.Center, .8f, -.3f);
             Projectile.localAI[0] = 1f;
         }
 
@@ -137,7 +134,7 @@ public class EpidemicSpear : ModProjectile
                 Main.rand.NextFloat(.5f, 1.2f));
         }
 
-        AdditionsSound.etherealHit2.Play(Projectile.Center, .8f, -.2f, 0f, 10, Name);
+        AssetRegistry.GennedSounds.etherealHit2.Play(Projectile.Center, .8f, -.2f, 0f, 10, Name);
         target.AddBuff(BuffID.Poisoned, SecondsToFrames(6));
         target.AddBuff(BuffID.Venom, 120);
     }

@@ -8,7 +8,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
 public class SolemButterflyGrief : ModProjectile, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SolemButterflyGrief);
+    public override string Texture => AssetRegistry.GennedTextures.SolemButterflyGrief.Path;
 
     public override void SetStaticDefaults()
     {

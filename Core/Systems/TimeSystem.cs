@@ -95,3 +95,21 @@ public sealed class TimeSystem : ModSystem
     public override void PostUpdateEverything() =>
         UpdateCount++;
 }
+
+public sealed class TimeStopSystem : ModSystem
+{
+    public static int StopFrames { get; set; }
+
+    public override void OnModLoad()
+    {
+        On_Main.DoUpdate += On_MainOnDoUpdate;
+    }
+
+    private static void On_MainOnDoUpdate(On_Main.orig_DoUpdate orig, Main self, ref GameTime gameTime)
+    {
+        if (StopFrames > 0)
+            StopFrames--;
+        else
+            orig(self, ref gameTime);
+    }
+}

@@ -12,7 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Early;
 
 public class BirchStick : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BirchStick);
+    public override string Texture => AssetRegistry.GennedTextures.BirchStick.Path;
 
     public override void SetDefaults()
     {
@@ -46,7 +46,7 @@ public class BirchStick : ModItem
             .projectile[player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI)]
             .As<BirchStickLance>();
 
-        if (player.Additions().MouseRight.Current)
+        if (player.AdditionsMouse().MouseRight.Current)
             lance.State = BirchStickLance.BirchStickState.Poke;
         else
             lance.State = BirchStickLance.BirchStickState.BashDown;

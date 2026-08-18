@@ -3,11 +3,10 @@ using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
@@ -15,7 +14,7 @@ public class CosmicSlugCharge : ModProjectile, ILocalizedModType, IModType
 {
     internal static readonly int UpdateCount = 8;
     internal static readonly int Lifetime = UpdateCount * SecondsToFrames(2);
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetStaticDefaults()
     {
@@ -89,7 +88,7 @@ public class CosmicSlugCharge : ModProjectile, ILocalizedModType, IModType
         return (1f - completionRatio) * Projectile.width * width * Projectile.scale;
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints cache;
 
     public override bool PreDraw(ref Color lightColor)
@@ -98,29 +97,28 @@ public class CosmicSlugCharge : ModProjectile, ILocalizedModType, IModType
         {
             if (trail == null || trail.Disposed || cache == null)
                 return;
-            ManagedShader shader = ShaderRegistry.SmoothFlame;
+            ManagedShader shader = AssetRegistry.GennedShaders.SmoothFlame;
             shader.TrySetParameter("heatInterpolant", 1f);
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.StreakLightning), 1);
+            shader.SetTexture(AssetRegistry.GennedTextures.StreakLightning, 1);
             trail.DrawTrail(shader, cache.Points, 90);
         }
 
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 
-        void flare()
-        {
-            Vector2 pos = Projectile.Center - Main.screenPosition;
-            Texture2D star = AssetRegistry.GetTexture(AdditionsTexture.LensStar);
-            Main.EntitySpriteDraw(star, pos, null, ColorFunction(SystemVector2.One / 2, Vector2.Zero),
-                Projectile.velocity.ToRotation(), star.Size() * .5f, Projectile.Opacity * .5f, 0, 0f);
-            Main.EntitySpriteDraw(star, pos, null, Color.White, Projectile.velocity.ToRotation(), star.Size() * .5f,
-                Projectile.Opacity * .25f, 0, 0f);
+        Vector2 pos = Projectile.Center - Main.screenPosition;
+        Texture2D star = AssetRegistry.GennedTextures.LensStar;
+        SpriteBatch.DrawAltPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, star, pos, null,
+            ColorFunction(SystemVector2.One / 2, Vector2.Zero),
+            Projectile.velocity.ToRotation(), star.Size() * .5f, Projectile.Opacity * .5f);
+        SpriteBatch.DrawAltPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, star, pos, null,
+            Color.White, Projectile.velocity.ToRotation(), star.Size() * .5f,
+            Projectile.Opacity * .25f);
 
-            Texture2D bloom = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
-            Main.EntitySpriteDraw(bloom, pos, null, ColorFunction(SystemVector2.One / 2, Vector2.Zero) * .5f,
-                Projectile.velocity.ToRotation(), bloom.Size() * .5f, Projectile.Opacity * .5f, 0, 0f);
-        }
+        Texture2D bloom = AssetRegistry.GennedTextures.GlowParticleSmall;
+        SpriteBatch.DrawAltPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, bloom, pos, null,
+            ColorFunction(SystemVector2.One / 2, Vector2.Zero) * .5f,
+            Projectile.velocity.ToRotation(), bloom.Size() * .5f, Projectile.Opacity * .5f);
 
-        PixelationSystem.QueueTextureRenderAction(flare, PixelationLayer.UnderProjectiles, BlendState.Additive);
         return false;
     }
 }

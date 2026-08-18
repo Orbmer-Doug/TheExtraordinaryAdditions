@@ -3,7 +3,8 @@ using Terraria;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 
@@ -16,7 +17,7 @@ public class Razorflake : ProjOwnedByNPC<AuroraGuard>
     }
 
     public ref float Time => ref Projectile.ai[2];
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Snowflake);
+    public override string Texture => AssetRegistry.GennedTextures.Snowflake.Path;
 
     public override void SetStaticDefaults()
     {
@@ -60,7 +61,7 @@ public class Razorflake : ProjOwnedByNPC<AuroraGuard>
         {
             if (Projectile.timeLeft > 60)
                 Projectile.timeLeft = 60;
-            SoundID.Item51.Play(Projectile.Center, .7f, .1f, .1f, null, 40);
+            SoundID.Item51.Play(Projectile.Center, .7f, .1f, .1f, 40);
             Projectile.velocity *= 0f;
             HitGround = true;
         }
@@ -87,13 +88,9 @@ public class Razorflake : ProjOwnedByNPC<AuroraGuard>
         int frameY = frameHeight * Projectile.frame;
         Rectangle frame = new(0, frameY, tex.Width, frameHeight);
 
-        void draw()
-        {
-            after.DrawFancyAfterimages(AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall),
-                [AuroraGuard.DeepBlue, Color.DeepSkyBlue, Color.SkyBlue], Projectile.Opacity, 1f, 0f, true);
-        }
-
-        PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.UnderProjectiles, BlendState.Additive);
+        after.DrawFancyAfterimagesPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive,
+            AssetRegistry.GennedTextures.GlowParticleSmall,
+            [AuroraGuard.DeepBlue, Color.DeepSkyBlue, Color.SkyBlue], Projectile.Opacity, 1f, 0f, true);
 
         Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Vector2.One * Projectile.width), frame,
             Color.White * Projectile.Opacity, Projectile.rotation, frame.Size() / 2);

@@ -2,12 +2,13 @@
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Summoner.Late;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Buffs.Summon;
 
 public class LittleStar : ModBuff
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.LittleStar);
+    public override string Texture => AssetRegistry.GennedTextures.LittleStar.Path;
 
     public override void SetStaticDefaults()
     {
@@ -17,7 +18,7 @@ public class LittleStar : ModBuff
 
     public override void Update(Player player, ref int buffIndex)
     {
-        GlobalPlayer modded = player.GetModPlayer<GlobalPlayer>();
+        PlayerMinion modded = player.AdditionsMinion();
         if (player.ownedProjectileCounts[ModContent.ProjectileType<LivingStarFlareMinion>()] > 0)
             modded.Flare = true;
         if (!modded.Flare)

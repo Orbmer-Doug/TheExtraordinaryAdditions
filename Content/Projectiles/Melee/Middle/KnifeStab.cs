@@ -6,8 +6,6 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
@@ -29,7 +27,7 @@ public class KnifeStab : ModProjectile
         set => Projectile.AdditionsInfo().ExtraAI[1] = value.ToInt();
     }
 
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ComicallyLargeKnife);
+    public override string Texture => AssetRegistry.GennedTextures.ComicallyLargeKnife.Path;
     private Player Owner => Main.player[Projectile.owner];
 
     public override void SetStaticDefaults()
@@ -100,7 +98,7 @@ public class KnifeStab : ModProjectile
                     if (this.RunLocal())
                     {
                         Projectile.velocity =
-                            Owner.SafeDirectionTo(Owner.Additions().MouseWorld).RotatedByRandom(0.25f);
+                            Owner.SafeDirectionTo(Owner.AdditionsMouse().MouseWorld).RotatedByRandom(0.25f);
                         this.Sync();
                     }
 
@@ -121,7 +119,7 @@ public class KnifeStab : ModProjectile
                 {
                     if (!PlayedSound)
                     {
-                        AdditionsSound.SwordSliceShort.Play(Owner.Center, .7f, .3f, .2f);
+                        AssetRegistry.GennedSounds.SwordSliceShort.Play(Owner.Center, .7f, .3f, .2f);
                         PlayedSound = true;
                     }
 
@@ -222,7 +220,7 @@ public class KnifeStab : ModProjectile
             }
         }
 
-        AdditionsSound.SwordSlice.Play(Owner.Center, .4f, -.1f, .1f, 10);
+        AssetRegistry.GennedSounds.SwordSlice.Play(Owner.Center, .4f, -.1f, .1f, 10);
     }
 
     public override bool? CanHitNPC(NPC target) => hitNPCs.Contains(target) ? false : null;

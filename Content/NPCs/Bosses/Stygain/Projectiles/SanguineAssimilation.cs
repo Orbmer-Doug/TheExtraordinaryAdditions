@@ -1,20 +1,21 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
+using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 
 public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -93,7 +94,7 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
                     Color.Crimson, Color.DarkRed, 40, Main.rand.NextFloat(.3f, .5f), .6f, 1);
             }
 
-            if (this.RunServer())
+            if (ModProjectile.RunServer())
             {
                 SpinSpeed = Main.rand.NextFloat(.12f, .34f);
                 this.Sync();
@@ -121,8 +122,8 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
         }
         else if (Time == TimeForBeam)
         {
-            AssetRegistry.GetSound(AdditionsSound.etherealHit3)
-                .Play(Projectile.Center, .6f, -.4f, .1f, new(-.4f, 0f), 4);
+            AssetRegistry.GennedSounds.etherealHit3
+                .PlayVariance(Projectile.Center, .6f, -.4f, .1f, new(-.4f, 0f), 4);
             SavedDistance = start.Distance(Target.Center);
             this.Sync();
         }
@@ -178,8 +179,8 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
         return targetHitbox.CollisionFromPoints(basePoints.Points, WidthFunction);
     }
 
-    public OptimizedPrimitiveTrail beam;
-    public OptimizedPrimitiveTrail tele;
+    public Trail beam;
+    public Trail tele;
     public TrailPoints basePoints;
 
     public override bool PreDraw(ref Color lightColor)
@@ -193,8 +194,8 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
             {
                 if (beam != null && !beam.Disposed && basePoints != null)
                 {
-                    ManagedShader shader = ShaderRegistry.BloodBeacon;
-                    shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.CrackedNoise), 1);
+                    ManagedShader shader = AssetRegistry.GennedShaders.BloodBeaconShader;
+                    shader.SetTexture(AssetRegistry.GennedTextures.CrackedNoise, 1);
                     beam.DrawTrail(shader, basePoints.Points, 30);
                 }
             }
@@ -202,8 +203,8 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
             {
                 if (tele != null && !tele.Disposed && basePoints != null)
                 {
-                    ManagedShader shader = ShaderRegistry.SideStreakTrail;
-                    shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.HarshNoise), 1);
+                    ManagedShader shader = AssetRegistry.GennedShaders.SideStreakTrail;
+                    shader.SetTexture(AssetRegistry.GennedTextures.HarshNoise, 1);
                     tele.DrawTrail(shader, basePoints.Points, 30);
                 }
             }
@@ -219,7 +220,7 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
 
                 for (float i = 0f; i < .2f; i += .05f)
                 {
-                    Texture2D bloom = AssetRegistry.GetTexture(AdditionsTexture.BloomFlare);
+                    Texture2D bloom = AssetRegistry.GennedTextures.BloomFlare;
                     Vector2 pos = end - Main.screenPosition;
                     Vector2 orig = bloom.Size() * .5f;
                     Color col = Color.DarkRed * 1.4f * OpacityInterpolant;
@@ -233,16 +234,16 @@ public class SanguineAssimilation : ProjOwnedByNPC<StygainHeart>
         LayeredDrawSystem.QueueDrawAction(flare, PixelationLayer.OverPlayers, BlendState.Additive);
 
         Main.spriteBatch.EnterShaderRegion();
-        Texture2D pixel = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
+        Texture2D pixel = AssetRegistry.GennedTextures.Pixel;
 
         Vector2 pos = Projectile.Center - Main.screenPosition;
         Vector2 scale = Projectile.Size * 2.4f / pixel.Size() * OpacityInterpolant;
         Color color = MulticolorLerp(Sin01(Main.GlobalTimeWrappedHourly), Color.Crimson, Color.Crimson * 1.5f,
             Color.Crimson.Lerp(Color.DarkRed, .5f)) * OpacityInterpolant;
 
-        ManagedShader sphere = ShaderRegistry.MagicSphere;
-        sphere.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FractalNoise), 1, SamplerState.LinearWrap);
-        sphere.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.CrackedNoise), 2, SamplerState.LinearWrap);
+        ManagedShader sphere = AssetRegistry.GennedShaders.MagicSphere;
+        sphere.SetTexture(AssetRegistry.GennedTextures.FractalNoise, 1, SamplerState.LinearWrap);
+        sphere.SetTexture(AssetRegistry.GennedTextures.CrackedNoise, 2, SamplerState.LinearWrap);
         sphere.TrySetParameter("resolution", new Vector2(400, 400));
         sphere.TrySetParameter("posterizationPrecision", 20f);
         sphere.TrySetParameter("mainColor", color.ToVector3());

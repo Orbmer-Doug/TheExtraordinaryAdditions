@@ -11,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
 [AutoloadEquip(EquipType.Body)]
 public class TremorPlating : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TremorPlating);
+    public override string Texture => AssetRegistry.GennedTextures.TremorPlating.Path;
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {

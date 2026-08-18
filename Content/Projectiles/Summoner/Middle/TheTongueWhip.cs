@@ -10,7 +10,6 @@ using TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
@@ -21,7 +20,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
 /// </summary>
 public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TheTongueWhip);
+    public override string Texture => AssetRegistry.GennedTextures.TheTongueWhip.Path;
     public const int SegmentCount = 20;
     public const int FadeoutTime = 20;
 
@@ -66,7 +65,7 @@ public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
     }
 
     public override bool? CanCutTiles() => false;
-    public Vector2 MouseWorld => Owner.Additions().MouseWorld;
+    public Vector2 MouseWorld => Owner.AdditionsMouse().MouseWorld;
 
     public override void AI()
     {
@@ -206,7 +205,7 @@ public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
 
     public override bool PreDraw(ref Color lightColor)
     {
-        Texture2D innerTongueTex = AssetRegistry.GetTexture(AdditionsTexture.TongueSegment);
+        Texture2D innerTongueTex = AssetRegistry.GennedTextures.TongueSegment;
         Texture2D tongueTex = Projectile.ThisProjectileTexture();
 
         // Collect chain draw positions.

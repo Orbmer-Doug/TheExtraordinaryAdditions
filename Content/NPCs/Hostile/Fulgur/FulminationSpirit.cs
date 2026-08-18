@@ -12,13 +12,12 @@ using TheExtraordinaryAdditions.Content.Items.Materials.Early;
 using TheExtraordinaryAdditions.Content.Items.Placeable.Banners;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Early;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Fulgur;
 
 public class FulminationSpirit : ModNPC
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.FulminationSpirit);
+    public override string Texture => AssetRegistry.GennedTextures.FulminationSpirit.Path;
 
     public override void SetStaticDefaults()
     {
@@ -218,7 +217,7 @@ public class FulminationSpirit : ModNPC
         if (FireTime > FireWait && canHit)
         {
             Vector2 vel = NPC.rotation.ToRotationVector2();
-            if (this.RunServer())
+            if (ModNPC.RunServer())
                 NPC.NewNPCProj(NPC.Center, vel * 10f, ModContent.ProjectileType<LightningVolt>(), VoltDamage, 0f);
             for (int i = 0; i < 14; i++)
             {

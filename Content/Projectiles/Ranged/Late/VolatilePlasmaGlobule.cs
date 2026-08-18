@@ -2,14 +2,12 @@
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
 public class VolatilePlasmaGlobule : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -115,6 +113,6 @@ public class VolatilePlasmaGlobule : ModProjectile
     public override void OnKill(int timeLeft)
     {
         ParticleRegistry.SpawnSparkleParticle(Projectile.Center, Vector2.Zero, 18, Main.rand.NextFloat(1f, 1.5f),
-            Color.Yellow * 1.8f, Color.AntiqueWhite, 2f, .1f);
+            Color.Yellow * 1.8f, Color.AntiqueWhite, 2f);
     }
 }

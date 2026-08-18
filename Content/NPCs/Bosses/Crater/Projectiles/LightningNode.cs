@@ -1,16 +1,13 @@
-﻿using System;
-using Microsoft.Xna.Framework.Graphics;
-using Terraria;
+﻿using Terraria;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
 public class LightningNode : ProjOwnedByNPC<Asterlin>
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.LightningNode);
+    public override string Texture => AssetRegistry.GennedTextures.LightningNode.Path;
 
     public override void SetStaticDefaults()
     {

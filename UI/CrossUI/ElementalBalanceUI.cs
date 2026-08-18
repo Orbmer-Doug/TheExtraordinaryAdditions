@@ -3,27 +3,26 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
-using TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.CrossCode;
+using TheExtraordinaryAdditions.Content.Projectiles.Classless.Late;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using static TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.CrossCode.CrossDiscHoldout;
+using static TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.CrossDiscHoldout;
 
 namespace TheExtraordinaryAdditions.UI.CrossUI;
 
 public class ElementalBalanceUI : SmartUIState
 {
-    public static readonly Texture2D ElementBase = AssetRegistry.GetTexture(AdditionsTexture.ElementalBalanceBase);
-    public static readonly Texture2D Fill = AssetRegistry.GetTexture(AdditionsTexture.ElementalBalanceFill);
-    public static readonly Texture2D Neutral = AssetRegistry.GetTexture(AdditionsTexture.Neutral);
-    public static readonly Texture2D Ice = AssetRegistry.GetTexture(AdditionsTexture.Ice);
-    public static readonly Texture2D Fire = AssetRegistry.GetTexture(AdditionsTexture.Fire);
-    public static readonly Texture2D Shock = AssetRegistry.GetTexture(AdditionsTexture.Shock);
-    public static readonly Texture2D Wave = AssetRegistry.GetTexture(AdditionsTexture.Wave);
-    public static readonly Texture2D Outline = AssetRegistry.GetTexture(AdditionsTexture.ElementalBalanceOutline);
-    public static readonly Texture2D Index = AssetRegistry.GetTexture(AdditionsTexture.Index);
-    public static readonly Texture2D Background = AssetRegistry.GetTexture(AdditionsTexture.Background);
+    public static readonly Texture2D ElementBase = AssetRegistry.GennedTextures.ElementalBalanceBase;
+    public static readonly Texture2D Fill = AssetRegistry.GennedTextures.ElementalBalanceFill;
+    public static readonly Texture2D Neutral = AssetRegistry.GennedTextures.Neutral;
+    public static readonly Texture2D Ice = AssetRegistry.GennedTextures.Ice;
+    public static readonly Texture2D Fire = AssetRegistry.GennedTextures.Fire;
+    public static readonly Texture2D Shock = AssetRegistry.GennedTextures.Shock;
+    public static readonly Texture2D Wave = AssetRegistry.GennedTextures.Wave;
+    public static readonly Texture2D Outline = AssetRegistry.GennedTextures.ElementalBalanceOutline;
+    public static readonly Texture2D Index = AssetRegistry.GennedTextures.Index;
+    public static readonly Texture2D Background = AssetRegistry.GennedTextures.Background;
 
     public override int InsertionIndex(List<GameInterfaceLayer> layers) =>
         layers.FindIndex(layer => layer.Name == "Vanilla: Mouse Text");
@@ -281,7 +280,7 @@ public class ElementalBalanceUI : SmartUIState
         }
     }
 
-    public static readonly Texture2D Overload = AssetRegistry.GetTexture(AdditionsTexture.Overlay);
+    public static readonly Texture2D Overload = AssetRegistry.GennedTextures.Overlay;
 
     private void DrawOverload(Player player, ElementalBalance element)
     {

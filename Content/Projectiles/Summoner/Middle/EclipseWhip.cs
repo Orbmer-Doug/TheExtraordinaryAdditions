@@ -4,16 +4,15 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Debuff;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
 
 public class EclipseWhip : BaseWhip
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.LunarWhip);
+    public override string Texture => AssetRegistry.GennedTextures.LunarWhip.Path;
     public override int TipSize => 9;
     public override int SegmentSkip => 3;
 
@@ -74,7 +73,7 @@ public class EclipseWhip : BaseWhip
 
     public override void SafeAI()
     {
-        if (Completion.BetweenNum(.2f, .8f))
+        if (Completion is > .2f and < .8f)
         {
             Vector2 vel =
                 OutwardVel.RotatedBy(MathHelper.PiOver2 * Owner.direction * Owner.gravDir).RotatedByRandom(.2f) *
@@ -152,7 +151,7 @@ public class EclipseWhip : BaseWhip
 
     public override void ModifyNPCEffects(NPC target, ref NPC.HitModifiers modifiers, in Vector2 pos, in int index)
     {
-        if (index > (WhipPoints.Count - 4) && Completion.BetweenNum(.45f, .55f) && Moon)
+        if (index > (WhipPoints.Count - 4) && Completion is > .45f and .55f && Moon)
         {
             modifiers.Knockback += 3f;
             modifiers.SetCrit();
@@ -189,8 +188,8 @@ public class EclipseWhip : BaseWhip
         {
             if (Line != null && !Line.Disposed)
             {
-                ManagedShader shader = ShaderRegistry.CrunchyLaserShader;
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DarkTurbulentNoise), 1,
+                ManagedShader shader = AssetRegistry.GennedShaders.CrunchyLaserShader;
+                shader.SetTexture(AssetRegistry.GennedTextures.DarkTurbulentNoise, 1,
                     SamplerState.LinearWrap);
                 Line.DrawTrail(shader, WhipPoints.Points);
             }
@@ -205,19 +204,15 @@ public class EclipseWhip : BaseWhip
     {
         if (!Moon)
         {
-            void glow()
+            Texture2D tex = AssetRegistry.GennedTextures.GlowParticleSmall;
+            Vector2 orig = tex.Size() / 2;
+            float completion = Convert01To010(GetCompletion());
+            for (int i = 0; i < EclipsePalette.Length; i++)
             {
-                Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
-                Vector2 orig = tex.Size() / 2;
-                float completion = Convert01To010(GetCompletion());
-                for (int i = 0; i < EclipsePalette.Length; i++)
-                {
-                    Rectangle targ = ToTarget(Tip, new Vector2(30 + (i * 10)) * completion);
-                    Main.spriteBatch.DrawBetterRect(tex, targ, null, EclipsePalette[i] * completion, 0f, orig);
-                }
+                Rectangle targ = ToTarget(Tip, new Vector2(30 + (i * 10)) * completion);
+                SpriteBatch.DrawRectPixelated(PixelationLayer.OverProjectiles, BlendState.Additive, tex, targ, null,
+                    EclipsePalette[i] * completion, 0f, orig);
             }
-
-            PixelationSystem.QueueTextureRenderAction(glow, PixelationLayer.OverProjectiles, BlendState.Additive);
         }
         else
         {

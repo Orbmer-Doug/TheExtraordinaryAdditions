@@ -3,12 +3,10 @@ using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
@@ -66,7 +64,7 @@ public partial class Asterlin
                 float comp = InverseLerp(0f, Lightripper_ReelbackTime, AITimer);
                 if (Lightripper_State != LightripperState.Reel)
                     comp = 0f;
-                return Color.Cyan * comp * Animators.MakePoly(4f).OutFunction(1f - uv.X);
+                return Color.Cyan * comp * MakePoly(4f).OutFunction(1f - uv.X);
             }, null, 50);
 
         switch (Lightripper_State)
@@ -82,7 +80,7 @@ public partial class Asterlin
                     float offsetAngle = MathHelper.Lerp(-Lightripper_FanOffset, Lightripper_FanOffset, fanInterpolant);
                     Vector2 shootVelocity = (Lightripper_InitialDirection + offsetAngle).ToRotationVector2();
 
-                    if (this.RunServer() && AITimer % Lightripper_ReleaseRate == Lightripper_ReleaseRate - 1)
+                    if (ModNPC.RunServer() && AITimer % Lightripper_ReleaseRate == Lightripper_ReleaseRate - 1)
                     {
                         int type = ModContent.ProjectileType<LightrippingBeam>();
                         NPC.NewNPCProj(RightHandPosition + shootVelocity.SafeNormalize(Vector2.Zero) * 100f,
@@ -111,7 +109,7 @@ public partial class Asterlin
                 NPC.SmoothFlyNear(hoverDestination, flySpeed, 1f - flySpeed);
                 if (AITimer >= Lightripper_HoverTime)
                 {
-                    AdditionsSound.spearLaser.Play(NPC.Center, 2f, .12f);
+                    AssetRegistry.GennedSounds.spearLaser.Play(NPC.Center, 2f, .12f);
                     Lightripper_State = LightripperState.Reel;
                     AITimer = 0;
                     this.Sync();
@@ -143,7 +141,7 @@ public partial class Asterlin
 
                 break;
             case LightripperState.Dash:
-                if (this.RunServer())
+                if (ModNPC.RunServer())
                 {
                     // Release some bombs
                     for (int i = 0; i < Lightripper_DartBombCount; i++)
@@ -155,7 +153,7 @@ public partial class Asterlin
                     }
                 }
 
-                AdditionsSound.BlackHoleExplosion.Play(NPC.Center, 1.3f, -.3f);
+                AssetRegistry.GennedSounds.BlackHoleExplosion.Play(NPC.Center, 1.3f, -.3f);
                 ScreenShakeSystem.New(new(.5f, .9f, 4000f), NPC.Center);
                 NPC.velocity = NPC.rotation.ToRotationVector2() * 275f;
                 Lightripper_State = LightripperState.Wait;
@@ -178,7 +176,7 @@ public partial class Asterlin
         }
     }
 
-    public OptimizedPrimitiveTrail Lightripper_Tele;
+    public Trail Lightripper_Tele;
     public TrailPoints Lightripper_Points = new TrailPoints(50);
 
     public void Lightripper_Draw()
@@ -188,7 +186,7 @@ public partial class Asterlin
             if (Lightripper_Tele == null || Lightripper_Tele.Disposed || Lightripper_Points == null)
                 return;
 
-            Lightripper_Tele.DrawTrail(ShaderRegistry.StandardPrimitiveShader, Lightripper_Points.Points);
+            Lightripper_Tele.DrawTrail(AssetRegistry.GennedShaders.StandardPrimitiveShader, Lightripper_Points.Points);
         }
 
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderNPCs);

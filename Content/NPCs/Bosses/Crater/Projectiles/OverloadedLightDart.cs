@@ -3,17 +3,16 @@ using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
 public class OverloadedLightDart : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.OverloadedLightDart);
+    public override string Texture => AssetRegistry.GennedTextures.OverloadedLightDart.Path;
 
     public int Time
     {
@@ -53,7 +52,7 @@ public class OverloadedLightDart : ModProjectile
         Projectile.FacingUp();
 
         Vector2 start = Projectile.RotHitbox().Bottom;
-        float dist = Animators.MakePoly(3f).InOutFunction.Evaluate(Time, 0f, Supersonic, 0f, 2200f);
+        float dist = MakePoly(3f).InOutFunction.Evaluate(Time, 0f, Supersonic, 0f, 2200f);
         telePoints.SetPoints(start.GetLaserControlPoints(start + Projectile.velocity.SafeNormalize(Vector2.Zero) * dist,
             30));
 
@@ -76,7 +75,7 @@ public class OverloadedLightDart : ModProjectile
                     Main.rand.NextFloat(.3f, .4f), Color.Gold);
             }
 
-            AdditionsSound.explo04.Play(start, .7f, -.2f);
+            AssetRegistry.GennedSounds.explo04.Play(start, .7f, -.2f);
             Projectile.timeLeft = 800;
             this.Sync();
         }
@@ -108,7 +107,7 @@ public class OverloadedLightDart : ModProjectile
         return Color.Goldenrod * MathF.Sqrt(completion.X) * Projectile.Opacity;
     }
 
-    public float FadeAway => Animators.MakePoly(2f).InFunction
+    public float FadeAway => MakePoly(2f).InFunction
         .Evaluate(Time, Supersonic, Supersonic + (18f * Projectile.MaxUpdates), 1f, 0f);
 
     public float TelegraphWidthFunction(float completionRatio)
@@ -116,7 +115,7 @@ public class OverloadedLightDart : ModProjectile
         float width = Projectile.width * .5f * FadeAway;
         float completion = InverseLerp(0.015f, 0.25f, completionRatio);
         float maxSize = width + completionRatio * width * 1.5f;
-        return Animators.MakePoly(2).OutFunction.Evaluate(2f, maxSize, completion);
+        return MakePoly(2).OutFunction.Evaluate(2f, maxSize, completion);
     }
 
     public Color TelegraphColorFunction(SystemVector2 completion, Vector2 pos)
@@ -131,8 +130,8 @@ public class OverloadedLightDart : ModProjectile
         return telegraphColor * endFadeOpacity * FadeAway * .3f;
     }
 
-    public OptimizedPrimitiveTrail trail;
-    public OptimizedPrimitiveTrail tele;
+    public Trail trail;
+    public Trail tele;
     public TrailPoints points = new(20);
     public TrailPoints telePoints = new(30);
 
@@ -142,16 +141,16 @@ public class OverloadedLightDart : ModProjectile
         {
             if (tele != null && telePoints != null)
             {
-                ManagedShader shader = ShaderRegistry.SideStreakTrail;
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise), 1, SamplerState.LinearWrap);
+                ManagedShader shader = AssetRegistry.GennedShaders.SideStreakTrail;
+                shader.SetTexture(AssetRegistry.GennedTextures.TechyNoise, 1, SamplerState.LinearWrap);
                 tele.DrawTrail(shader, telePoints.Points);
             }
 
             if (trail != null && points != null)
             {
-                ManagedShader shader = ShaderRegistry.BaseLaserShader;
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise), 1, SamplerState.LinearWrap);
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FlameMap1), 2, SamplerState.LinearWrap);
+                ManagedShader shader = AssetRegistry.GennedShaders.BaseLaserShader;
+                shader.SetTexture(AssetRegistry.GennedTextures.TechyNoise, 1, SamplerState.LinearWrap);
+                shader.SetTexture(AssetRegistry.GennedTextures.FlameMap1, 2, SamplerState.LinearWrap);
                 trail.DrawTrail(shader, points.Points);
             }
         }

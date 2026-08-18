@@ -6,7 +6,7 @@ namespace TheExtraordinaryAdditions.Content.Buffs.Debuff;
 
 public class TheTiesCooldown : ModBuff
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TheTiesCooldown);
+    public override string Texture => AssetRegistry.GennedTextures.TheTiesCooldown.Path;
 
     public override void SetStaticDefaults()
     {

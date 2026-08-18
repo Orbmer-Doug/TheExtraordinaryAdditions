@@ -1,5 +1,4 @@
 ﻿using System;
-using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;

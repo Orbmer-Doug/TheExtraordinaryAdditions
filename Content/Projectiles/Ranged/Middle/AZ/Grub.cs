@@ -3,14 +3,13 @@ using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle.AZ;
 
 // jerma
 public class Grub : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Grub);
+    public override string Texture => AssetRegistry.GennedTextures.Grub.Path;
 
     public override void SetDefaults()
     {
@@ -33,7 +32,7 @@ public class Grub : ModProjectile
 
     public override void OnKill(int timeLeft)
     {
-        AdditionsSound.explosion_large_08.Play(Projectile.Center);
+        AssetRegistry.GennedSounds.explosion_large_08.Play(Projectile.Center);
         for (int i = 0; i < 30; i++)
             ParticleRegistry.SpawnMistParticle(Projectile.Center, Main.rand.NextVector2Circular(4f, 4f),
                 Main.rand.NextFloat(.5f, 1.3f), Color.DarkGray, Color.Black, 255);

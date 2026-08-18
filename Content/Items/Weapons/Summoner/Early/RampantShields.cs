@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Early;
 
 public class RampantShields : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.RampantShields);
+    public override string Texture => AssetRegistry.GennedTextures.RampantShields.Path;
 
     public override void SetStaticDefaults()
     {

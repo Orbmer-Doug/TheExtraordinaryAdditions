@@ -4,20 +4,18 @@ using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
 public class HolySwordSwing : BaseSwordSwing
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.RejuvenatedHolySword);
+    public override string Texture => AssetRegistry.GennedTextures.RejuvenatedHolySword.Path;
 
     public bool Mark
     {
@@ -57,13 +55,13 @@ public class HolySwordSwing : BaseSwordSwing
     public Vector2 LightPos => Owner.Center - Vector2.UnitY * Main.screenHeight / 2;
     public const float LightWidth = .3f;
 
-    public override bool CanHitPvp(Player target) => SwingCompletion.BetweenNum(ReelPercent, SwingPercent) && !Mark;
+    public override bool CanHitPvp(Player target) => SwingCompletion is > ReelPercent and SwingPercent && !Mark;
 
     public override bool? CanHitNPC(NPC target) =>
-        SwingCompletion.BetweenNum(ReelPercent, SwingPercent) && !Mark ? null : false;
+        SwingCompletion is > ReelPercent and SwingPercent && !Mark ? null : false;
 
     public override bool? CanCutTiles() =>
-        SwingCompletion.BetweenNum(ReelPercent, SwingPercent) && !Mark ? null : false;
+        SwingCompletion is > ReelPercent and SwingPercent && !Mark ? null : false;
 
     public override void SafeInitialize()
     {
@@ -93,9 +91,10 @@ public class HolySwordSwing : BaseSwordSwing
         if (Animation() >= .26f && !PlayedSound)
         {
             if (!Mark)
-                AdditionsSound.BreakerSwingSpecial.Play(Projectile.Center, Main.rand.NextFloat(.9f, 1.3f), 0f, .3f);
+                AssetRegistry.GennedSounds.BreakerSwingSpecial.Play(Projectile.Center, Main.rand.NextFloat(.9f, 1.3f),
+                    0f, .3f);
             else
-                AdditionsSound.Heavenly.Play(Projectile.Center, .9f);
+                AssetRegistry.GennedSounds.Heavenly.Play(Projectile.Center, .9f);
 
             PlayedSound = true;
         }
@@ -116,7 +115,8 @@ public class HolySwordSwing : BaseSwordSwing
 
                     if (!PlayedSound)
                     {
-                        AdditionsSound.MediumSwing2.Play(Projectile.Center, Main.rand.NextFloat(.9f, 1.3f), 0f, .3f);
+                        AssetRegistry.GennedSounds.MediumSwing2.Play(Projectile.Center, Main.rand.NextFloat(.9f, 1.3f),
+                            0f, .3f);
                         PlayedSound = true;
                     }
                 }
@@ -183,13 +183,13 @@ public class HolySwordSwing : BaseSwordSwing
             {
                 SwingDir = SwingDir == SwingDirection.Up ? SwingDirection.Down : SwingDirection.Up;
                 Initialized = false;
-                this.Sync();
             }
             else
             {
                 VanishTime++;
-                this.Sync();
             }
+
+            this.Sync();
         }
     }
 
@@ -236,7 +236,8 @@ public class HolySwordSwing : BaseSwordSwing
         npc.velocity += SwordDir * Item.knockBack * npc.knockBackResist;
 
         ScreenShakeSystem.New(new(.1f, .1f), start);
-        AdditionsSound.SwordSlice.Play(start, Main.rand.NextFloat(.9f, 1.2f), npc.IsFleshy() ? .12f : -.1f, .3f, 30);
+        AssetRegistry.GennedSounds.SwordSlice.Play(start, Main.rand.NextFloat(.9f, 1.2f), npc.IsFleshy() ? .12f : -.1f,
+            .3f, 30);
         TimeStop = StopTime;
     }
 
@@ -262,16 +263,16 @@ public class HolySwordSwing : BaseSwordSwing
         }
 
         ScreenShakeSystem.New(new(.1f, .1f), start);
-        AdditionsSound.SwordSlice.Play(start, Main.rand.NextFloat(.9f, 1.2f), .12f, .3f, 30);
+        AssetRegistry.GennedSounds.SwordSlice.Play(start, Main.rand.NextFloat(.9f, 1.2f), .12f, .3f, 30);
         TimeStop = StopTime;
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints points = new(20);
 
     public static float WidthFunct(float c)
     {
-        return OptimizedPrimitiveTrail.HemisphereWidthFunct(c, SmoothStep(1f, 0f, c) * 30f);
+        return Trail.HemisphereWidthFunct(c, SmoothStep(1f, 0f, c) * 30f);
     }
 
     public Color ColorFunct(SystemVector2 c, Vector2 position)
@@ -286,7 +287,7 @@ public class HolySwordSwing : BaseSwordSwing
     {
         if (Mark)
         {
-            ManagedShader effect = ShaderRegistry.SpreadTelegraph;
+            ManagedShader effect = AssetRegistry.GennedShaders.SpreadTelegraph;
             effect.TrySetParameter("centerOpacity", GetLerpBump(ThrustReel, .7f, 1f, .3f, SwingCompletion) * 2f);
             effect.TrySetParameter("mainOpacity", GetLerpBump(ThrustReel, .8f, 1f, .2f, SwingCompletion) * 3f);
             effect.TrySetParameter("halfSpreadAngle", LightWidth * InverseLerp(ThrustReel, .4f, SwingCompletion));
@@ -297,7 +298,7 @@ public class HolySwordSwing : BaseSwordSwing
             effect.TrySetParameter("edgeBlendStrength", 13f);
 
             Main.spriteBatch.EnterShaderRegion(effect.Effect, BlendState.Additive);
-            Texture2D invis = AssetRegistry.InvisTex;
+            Texture2D invis = AssetRegistry.GennedTextures.Invisible;
             Main.EntitySpriteDraw(invis, LightPos - Main.screenPosition, null, Color.White, PiOver2, invis.Size() / 2,
                 2400f, 0, 0f);
             Main.spriteBatch.ResetToDefault();
@@ -327,9 +328,9 @@ public class HolySwordSwing : BaseSwordSwing
         {
             if (trail != null && !trail.Disposed && points != null)
             {
-                ManagedShader shader = ShaderRegistry.SpecialLightningTrail;
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FlameMap2), 1);
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Cosmos), 2);
+                ManagedShader shader = AssetRegistry.GennedShaders.SpecialLightningTrail;
+                shader.SetTexture(AssetRegistry.GennedTextures.FlameMap2, 1);
+                shader.SetTexture(AssetRegistry.GennedTextures.Cosmos, 2);
                 trail.DrawTrail(shader, points.Points, 150, true);
             }
         }
@@ -370,7 +371,7 @@ public class HolyGlobalNPC : GlobalNPC
     {
         if (MarkedTime > 0)
         {
-            Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.HolyCross);
+            Texture2D tex = AssetRegistry.GennedTextures.HolyCross;
             Vector2 drawPosition = CrossPos - screenPos;
             Color backglow = Color.Gold;
             Vector2 spinPoint = -Vector2.UnitY * 4f;

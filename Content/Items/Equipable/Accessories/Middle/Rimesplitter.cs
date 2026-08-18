@@ -12,7 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
 
 public class Rimesplitter : ModItem, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Rimesplitter);
+    public override string Texture => AssetRegistry.GennedTextures.Rimesplitter.Path;
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {

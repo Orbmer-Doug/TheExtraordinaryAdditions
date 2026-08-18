@@ -9,13 +9,12 @@ using TheExtraordinaryAdditions.Content.Items.Tools;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Misc;
 
 public class GodDummyNPC : ModNPC
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GodDummyNPC);
+    public override string Texture => AssetRegistry.GennedTextures.GodDummyNPC.Path;
 
     public override void SetStaticDefaults()
     {
@@ -104,7 +103,7 @@ public class GodDummyNPC : ModNPC
 
         NPC.timeLeft = 7200;
 
-        if (this.RunServer())
+        if (ModNPC.RunServer())
         {
             int oldWidth = NPC.width;
             int idealWidth = (int) (NPC.scale * 18);

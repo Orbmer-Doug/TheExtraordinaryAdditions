@@ -3,19 +3,17 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Early;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
-using TheExtraordinaryAdditions.Content.Projectiles.Classless.Late;
-using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
+using TheExtraordinaryAdditions.Content.Rarities;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Late;
 
 [AutoloadEquip(EquipType.Head)]
 public class AbsoluteGreathelm : ModItem, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AbsoluteGreathelm);
+    public override string Texture => AssetRegistry.GennedTextures.AbsoluteGreathelm.Path;
     public static int HeadSlotID { get; private set; }
 
     public override void SetStaticDefaults()
@@ -27,9 +25,9 @@ public class AbsoluteGreathelm : ModItem, ILocalizedModType, IModType
     {
         Item.width = 24;
         Item.height = 26;
-        Item.defense = 40;
         Item.rare = ModContent.RarityType<UniqueRarity>();
         Item.value = AdditionsGlobalItem.UniqueRarityPrice;
+        Item.vanity = true;
     }
 
     public override bool IsArmorSet(Item head, Item body, Item legs)
@@ -40,24 +38,6 @@ public class AbsoluteGreathelm : ModItem, ILocalizedModType, IModType
         }
 
         return false;
-    }
-
-    public override void UpdateArmorSet(Player player)
-    {
-        player.GetModPlayer<AbsoluteArmorPlayer>().Equipped = true;
-        player.GetAttackSpeed<MeleeDamageClass>() += 0.15f;
-
-        player.ignoreWater = true;
-        player.aggro += 1500;
-        player.manaCost *= .75f;
-        player.statManaMax2 += 90;
-        player.maxMinions += 4;
-        player.maxTurrets += 2;
-
-        string hotkey = AdditionsKeybinds.SetBonusHotKey.TooltipHotkeyString();
-        player.setBonus = this.GetLocalization("SetBonus").Format(hotkey);
-
-//TODO
     }
 
     public override void UpdateEquip(Player player)
@@ -72,12 +52,11 @@ public class AbsoluteGreathelm : ModItem, ILocalizedModType, IModType
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        recipe.AddIngredient(ModContent.ItemType<VoltHelmet>(), 1);
-        recipe.AddIngredient(ModContent.ItemType<SpecteriteMask>(), 1);
-        recipe.AddIngredient(ModContent.ItemType<BlueTopHat>(), 1);
-        recipe.AddIngredient(ModContent.ItemType<TremorGreathelm>(), 1);
-        recipe.AddIngredient(ItemID.SolarFlareHelmet, 1);
-        //TODO
+        recipe.AddIngredient(ModContent.ItemType<VoltHelmet>());
+        recipe.AddIngredient(ModContent.ItemType<SpecteriteMask>());
+        recipe.AddIngredient(ModContent.ItemType<BlueTopHat>());
+        recipe.AddIngredient(ModContent.ItemType<TremorGreathelm>());
+        recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();
     }
 }

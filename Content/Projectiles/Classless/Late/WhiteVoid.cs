@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Late;
 
@@ -14,7 +14,7 @@ public class WhiteVoid : ModProjectile, IHasScreenShader
     public static readonly int DisappearTime = SecondsToFrames(0.11f);
     public static readonly int FillInTime = SecondsToFrames(0.25f);
     public static readonly int FillInDelay = SecondsToFrames(0.42f);
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     public Player Owner => Main.player[Projectile.owner];
 
     public override void SetDefaults()
@@ -33,7 +33,7 @@ public class WhiteVoid : ModProjectile, IHasScreenShader
             Projectile.Center = Owner.RotatedRelativePoint(Owner.MountedCenter);
 
         if ((int) Time == FillInDelay)
-            AdditionsSound.HeavyWhooshShort.Play(Projectile.Center, 1.1f, .1f, .1f, 20, Name);
+            AssetRegistry.GennedSounds.HeavyWhooshShort.Play(Projectile.Center, 1.1f, .1f, .1f, 20, Name);
 
         Projectile.ExpandHitboxBy((int) Animators.MakePoly(3f).InFunction
             .Evaluate(Time, Lifetime, Lifetime - DisappearTime, 0f, 400f));
@@ -65,7 +65,7 @@ public class WhiteVoid : ModProjectile, IHasScreenShader
         Shader.TrySetParameter("radius", (float) Projectile.width / Main.screenWidth * Main.GameViewMatrix.Zoom.X);
         Shader.TrySetParameter("scale", scale);
         Shader.TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly);
-        Shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FlameMap2), 1, SamplerState.LinearWrap);
+        Shader.SetTexture(AssetRegistry.GennedTextures.FlameMap2, 1, SamplerState.LinearWrap);
 
         Shader.Activate();
     }

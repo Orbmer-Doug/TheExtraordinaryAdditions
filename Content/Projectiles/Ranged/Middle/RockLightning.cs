@@ -1,15 +1,14 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
-using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 
 public class RockLightning : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     public const int Life = 60;
 
     public override void SetDefaults()
@@ -26,7 +25,7 @@ public class RockLightning : ModProjectile
     }
 
     public ref float Time => ref Projectile.ai[0];
-    public float Completion => Animators.MakePoly(6).OutFunction(InverseLerp(0f, Life, Time));
+    public float Completion => MakePoly(6).OutFunction(InverseLerp(0f, Life, Time));
 
     private List<Line> Branches;
     public override bool ShouldUpdatePosition() => false;
@@ -39,7 +38,7 @@ public class RockLightning : ModProjectile
         }
 
         Projectile.Opacity = 1f - Completion;
-        if (Projectile.Opacity.BetweenNum(0f, .05f))
+        if (Projectile.Opacity is > 0f and .05f)
             Projectile.Kill();
 
         Time++;
@@ -65,9 +64,9 @@ public class RockLightning : ModProjectile
 
         foreach (Line line in Branches)
         {
-            PixelationSystem.QueueTextureRenderAction(() =>
-                line.Draw(MulticolorLerp(Completion, Color.White, Color.AntiqueWhite, Color.WhiteSmoke)
-                          * Projectile.Opacity, Projectile.Opacity), PixelationLayer.OverNPCs, BlendState.Additive);
+            line.DrawPixelated(PixelationLayer.OverNPCs, BlendState.Additive,
+                MulticolorLerp(Completion, Color.White, Color.AntiqueWhite, Color.WhiteSmoke)
+                * Projectile.Opacity, Projectile.Opacity);
         }
 
         return false;

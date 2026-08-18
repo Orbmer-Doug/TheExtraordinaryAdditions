@@ -10,17 +10,16 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
+using TheExtraordinaryAdditions.Core.Utilities;
 
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 
 public class HallowedGreatbowHeld : BaseIdleHoldoutProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.HallowedGreatbowHeld);
+    public override string Texture => AssetRegistry.GennedTextures.HallowedGreatbowHeld.Path;
     public override int AssociatedItemID => ModContent.ItemType<HallowedGreatbow>();
     public override int IntendedProjectileType => ModContent.ProjectileType<HallowedGreatbowHeld>();
 
@@ -71,7 +70,7 @@ public class HallowedGreatbowHeld : BaseIdleHoldoutProjectile
         Item ammoItem = Owner.ChooseAmmo(Item);
         Texture2D arrow = ammoItem != null
             ? ammoItem.ThisItemTexture()
-            : AssetRegistry.GetTexture(AdditionsTexture.Pixel);
+            : AssetRegistry.GennedTextures.Pixel;
 
         if (trail == null || trail.Disposed)
             trail = new(c => 2f, (c, pos) => Color.White, null, MaxPoints);
@@ -93,7 +92,7 @@ public class HallowedGreatbowHeld : BaseIdleHoldoutProjectile
         float close = InverseLerp(0f, 22f, Time);
 
         float armRot = Projectile.rotation + (.72f * Dir);
-        float reelAnim = Animators.MakePoly(2.2f).InFunction
+        float reelAnim = MakePoly(2.2f).InFunction
             .Evaluate(armRot, armRot + (.7f * Dir), Switch != 0 ? reel : OldStringCompletion);
         Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, reelAnim - MathHelper.PiOver2);
         Owner.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.ThreeQuarters,
@@ -136,7 +135,7 @@ public class HallowedGreatbowHeld : BaseIdleHoldoutProjectile
             {
                 case 0:
                     Owner.itemTime = Owner.itemAnimation = 0;
-                    StringCompletion = Animators.Elastic.OutFunction.Evaluate(OldStringCompletion, 0f, close);
+                    StringCompletion = Elastic.OutFunction.Evaluate(OldStringCompletion, 0f, close);
                     if (close >= 1f)
                     {
                         Switch = -1;
@@ -146,7 +145,7 @@ public class HallowedGreatbowHeld : BaseIdleHoldoutProjectile
 
                     break;
                 case 1:
-                    StringCompletion = Animators.MakePoly(2.2f).InFunction.Evaluate(0f, 1f, reel);
+                    StringCompletion = MakePoly(2.2f).InFunction.Evaluate(0f, 1f, reel);
                     if (reel >= 1f || (this.RunLocal() && !Modded.MouseLeft.Current))
                     {
                         Owner.PickAmmo(Item, out int type, out float speed, out int dmg, out float kb, out int ammo,
@@ -193,12 +192,12 @@ public class HallowedGreatbowHeld : BaseIdleHoldoutProjectile
         }
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override bool PreDraw(ref Color lightColor)
     {
         if (trail != null && !trail.Disposed && cache != null)
-            trail.DrawTrail(ShaderRegistry.StandardPrimitiveShader, cache.Points, 100, false, false);
+            trail.DrawTrail(AssetRegistry.GennedShaders.StandardPrimitiveShader, cache.Points, 100, false, false);
 
         Texture2D texture = Projectile.ThisProjectileTexture();
         float rotation = Projectile.rotation;
@@ -214,23 +213,20 @@ public class HallowedGreatbowHeld : BaseIdleHoldoutProjectile
         Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), rotation, origin,
             Projectile.scale, direction, 0f);
 
-        void draw()
-        {
-            Texture2D arrow = AssetRegistry.GetTexture(AdditionsTexture.LensStar);
-            Texture2D bloom = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
-            float opacity = Animators.MakePoly(2.4f).InFunction(InverseLerp(0f, 12f, TotalTime));
-            if (Switch == 0)
-                opacity = 0f;
-            Vector2 size = (Vector2.One / arrow.Size()) *
-                           new Vector2(1f - (Switch == 1 ? InverseLerp(0f, ReelTime, Time) : 0f), 1f) * (55f * opacity);
-            float rot = Projectile.rotation - MathHelper.PiOver2;
-            Main.spriteBatch.Draw(arrow, arrowPos - Main.screenPosition, null, Color.Gold * opacity, rot,
-                arrow.Size() / 2, size, 0, 0f);
-            Main.spriteBatch.Draw(bloom, arrowPos - Main.screenPosition, null, Color.Yellow * opacity, rot,
-                bloom.Size() / 2, size, 0, 0f);
-        }
-
-        PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.HeldProjectiles, BlendState.Additive);
+        Texture2D arrow = AssetRegistry.GennedTextures.LensStar;
+        Texture2D bloom = AssetRegistry.GennedTextures.GlowParticleSmall;
+        float opacity = MakePoly(2.4f).InFunction(InverseLerp(0f, 12f, TotalTime));
+        if (Switch == 0)
+            opacity = 0f;
+        Vector2 size = (Vector2.One / arrow.Size()) *
+                       new Vector2(1f - (Switch == 1 ? InverseLerp(0f, ReelTime, Time) : 0f), 1f) * (55f * opacity);
+        float rot = Projectile.rotation - MathHelper.PiOver2;
+        SpriteBatch.DrawAltPixelated(PixelationLayer.HeldProjectiles, BlendState.Additive, arrow,
+            arrowPos - Main.screenPosition, null, Color.Gold * opacity, rot,
+            arrow.Size() / 2, size);
+        SpriteBatch.DrawAltPixelated(PixelationLayer.HeldProjectiles, BlendState.Additive, bloom,
+            arrowPos - Main.screenPosition, null, Color.Yellow * opacity, rot,
+            bloom.Size() / 2, size);
 
         return false;
     }

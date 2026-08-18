@@ -1,9 +1,7 @@
-﻿using Microsoft.CodeAnalysis.Differencing;
-using Mono.Cecil.Cil;
+﻿using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using System.Reflection;
-using Terraria;
 using Terraria.Audio;
 using Terraria.ModLoader;
 

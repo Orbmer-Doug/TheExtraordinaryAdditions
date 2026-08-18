@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 
 public class SillyPinkHammer : ModItem, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SillyPinkHammer);
+    public override string Texture => AssetRegistry.GennedTextures.SillyPinkHammer.Path;
 
     public const int BaseUseTime = 50;
 

@@ -2,12 +2,13 @@
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Buffs.Summon;
 
 public class LaserDrones : ModBuff
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.LaserDrones);
+    public override string Texture => AssetRegistry.GennedTextures.LaserDrones.Path;
 
     public override void SetStaticDefaults()
     {
@@ -17,7 +18,7 @@ public class LaserDrones : ModBuff
 
     public override void Update(Player player, ref int buffIndex)
     {
-        GlobalPlayer modded = player.GetModPlayer<GlobalPlayer>();
+        PlayerMinion modded = player.AdditionsMinion();
         if (player.ownedProjectileCounts[ModContent.ProjectileType<LazerDrone>()] > 0)
             modded.LaserDrones = true;
         if (!modded.LaserDrones)

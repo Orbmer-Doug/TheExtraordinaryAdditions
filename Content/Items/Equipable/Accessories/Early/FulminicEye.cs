@@ -8,13 +8,12 @@ using TheExtraordinaryAdditions.Content.Projectiles.Classless.Early;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Early;
 
 public class FulminicEye : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.FulminicEye);
+    public override string Texture => AssetRegistry.GennedTextures.FulminicEye.Path;
 
     public override void SetStaticDefaults()
     {
@@ -43,7 +42,7 @@ public class FulminicEye : ModItem
         spriteBatch.Draw(texture, Item.position - Main.screenPosition,
             Item.GetCurrentFrame(ref frame, ref frameCounter, 9, 6), lightColor, 0f, Vector2.Zero, 1f, 0, 0f);
 
-        Texture2D texture2 = AssetRegistry.GetTexture(AdditionsTexture.FulminicEye_Glow);
+        Texture2D texture2 = AssetRegistry.GennedTextures.FulminicEye_Glow;
         spriteBatch.Draw(texture2, Item.position - Main.screenPosition,
             Item.GetCurrentFrame(ref frame, ref frameCounter, 9, 6), Color.White, 0f, Vector2.Zero, 1f, 0, 0f);
         return false;
@@ -57,7 +56,7 @@ public class FulminicEye : ModItem
             Item.GetCurrentFrame(ref frame, ref frameCounter, 9, 6, frameCounterUp: false), lightColor, 0f,
             Vector2.Zero, 1f, 0, 0f);
 
-        Texture2D texture2 = AssetRegistry.GetTexture(AdditionsTexture.FulminicEye_Glow);
+        Texture2D texture2 = AssetRegistry.GennedTextures.FulminicEye_Glow;
         spriteBatch.Draw(texture2, Item.position - Main.screenPosition,
             Item.GetCurrentFrame(ref frame, ref frameCounter, 9, 6, frameCounterUp: false), Color.White, 0f,
             Vector2.Zero, 1f, 0, 0f);
@@ -81,7 +80,7 @@ public sealed class FulminicEyePlayer : ModPlayer
             return;
 
         NPC n = NPCTargeting.GetClosestNPC(new(Player.Center, 400, true));
-        if (n.CanHomeInto() && Player.Additions().GlobalTimer % SecondsToFrames(1.25f) == 0f)
+        if (n.CanHomeInto() && Player.AdditionsMisc().GlobalTimer % SecondsToFrames(1.25f) == 0f)
         {
             SoundEngine.PlaySound(SoundID.DD2_LightningAuraZap, Player.Center);
             Vector2 vel = Player.SafeDirectionTo(n.Center) * 10f;

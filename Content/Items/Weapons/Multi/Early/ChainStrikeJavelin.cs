@@ -11,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Multi.Early;
 
 public class ChainStrikeJavelin : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ChainStrikeJavelin);
+    public override string Texture => AssetRegistry.GennedTextures.ChainStrikeJavelin.Path;
 
     public override void SetStaticDefaults()
     {

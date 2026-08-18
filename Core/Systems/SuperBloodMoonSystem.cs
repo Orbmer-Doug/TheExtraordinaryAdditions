@@ -11,10 +11,10 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Terraria.Main;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Core.Systems;
@@ -126,7 +126,7 @@ public class IncreaseBloodMoonSpawnRate : ModSystem
             spriteBatch.End();
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, DefaultSamplerState, DepthStencilState.None,
                 Rasterizer, null, Matrix.Identity);
-            Texture2D bloom = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
+            Texture2D bloom = AssetRegistry.GennedTextures.GlowParticleSmall;
 
             float intensity = Convert01To010(nightCompletion);
             spriteBatch.Draw(bloom, moonPos, null, Color.Crimson * .6f * intensity, 0f, bloom.Size() / 2, 1.2f, 0, 0f);
@@ -134,9 +134,9 @@ public class IncreaseBloodMoonSpawnRate : ModSystem
             spriteBatch.Draw(bloom, moonPos, null, Color.DarkRed * .2f * intensity, 0f, bloom.Size() / 2, 3.8f, 0, 0f);
 
             // Draw the distorted moon
-            ManagedShader distort = ShaderRegistry.HeatDistortionShader;
+            ManagedShader distort = AssetRegistry.GennedShaders.HeatDistortionShader;
             distort.SetTexture(moon.Value, 1, SamplerState.LinearWrap);
-            distort.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DendriticNoise), 2, SamplerState.LinearWrap);
+            distort.SetTexture(AssetRegistry.GennedTextures.DendriticNoise, 2, SamplerState.LinearWrap);
             distort.TrySetParameter("globalTime", GlobalTimeWrappedHourly);
             distort.TrySetParameter("intensity", Convert01To010(nightCompletion) * 1.2f);
             distort.TrySetParameter("screenZoom", GameViewMatrix.Zoom);
@@ -353,7 +353,7 @@ public class SuperBloodMoonGlobalNPC : GlobalNPC
                                     Color.Crimson.Lerp(Color.Red, rand.NextFloat(.2f, .5f)), 1f);
                             }
 
-                            SoundID.DD2_WyvernDiveDown.Play(npc.position, .7f, .2f, .1f, null, 20);
+                            SoundID.DD2_WyvernDiveDown.Play(npc.position, .7f, .2f, .1f, 20);
                         }
 
                         timer++;
@@ -476,7 +476,7 @@ public class JumpingFighterAI : GlobalNPC
 
 public class VermillionTear : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -530,18 +530,15 @@ public class VermillionTear : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        void glow()
-        {
-            Texture2D soft = AssetRegistry.GetTexture(AdditionsTexture.GlowSoft);
-            spriteBatch.DrawBetterRect(soft, ToTarget(Projectile.Center, Projectile.Size * 2.5f), null,
-                Color.Crimson * Projectile.Opacity, 0f, soft.Size() / 2);
-
-            Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.LensStar);
-            after?.DrawFancyAfterimages(tex, [Color.Crimson, Color.Red, Color.DarkRed], Projectile.Opacity, 1f, 0f,
-                true);
-        }
-
-        PixelationSystem.QueueTextureRenderAction(glow, PixelationLayer.UnderProjectiles, BlendState.Additive);
+        Texture2D soft = AssetRegistry.GennedTextures.GlowSoft;
+        SpriteBatch.DrawRectPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, soft,
+            ToTarget(Projectile.Center, Projectile.Size * 2.5f), null,
+            Color.Crimson * Projectile.Opacity, 0f, soft.Size() / 2);
+            
+        Texture2D tex = AssetRegistry.GennedTextures.LensStar;
+        after?.DrawFancyAfterimagesPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, tex,
+            [Color.Crimson, Color.Red, Color.DarkRed], Projectile.Opacity, 1f, 0f,
+            true);
         return false;
     }
 }

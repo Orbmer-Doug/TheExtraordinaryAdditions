@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Middle;
 
 public class WitheredShredder : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.WitheredShredder);
+    public override string Texture => AssetRegistry.GennedTextures.WitheredShredder.Path;
 
     public override void SetStaticDefaults()
     {

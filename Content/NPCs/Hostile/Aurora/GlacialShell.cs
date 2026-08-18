@@ -1,17 +1,17 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
-using TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 
 public class GlacialShell : ProjOwnedByNPC<AuroraGuard>
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GlacialShell);
+    public override string Texture => AssetRegistry.GennedTextures.GlacialShell.Path;
 
     public override void SetDefaults()
     {
@@ -35,7 +35,7 @@ public class GlacialShell : ProjOwnedByNPC<AuroraGuard>
                 Main.rand.NextFloat(-.1f, .1f));
         }
 
-        SoundID.Item51.Play(Projectile.Center, .8f, .14f, .05f, null, 10);
+        SoundID.Item51.Play(Projectile.Center, .8f, .14f, .05f, 10);
         Projectile.Kill();
     }
 
@@ -83,16 +83,13 @@ public class GlacialShell : ProjOwnedByNPC<AuroraGuard>
 
     public override bool PreDraw(ref Color lightColor)
     {
-        void glow()
-        {
-            Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
-            Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Projectile.Size * 1.65f), null,
-                Color.LightCyan, Projectile.rotation, tex.Size() / 2);
-            Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Projectile.Size * 1.85f), null,
-                Color.DarkBlue, Projectile.rotation, tex.Size() / 2);
-        }
-
-        PixelationSystem.QueueTextureRenderAction(glow, PixelationLayer.UnderProjectiles, BlendState.Additive);
+        Texture2D tex = AssetRegistry.GennedTextures.GlowParticleSmall;
+        SpriteBatch.DrawRectPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, tex,
+            ToTarget(Projectile.Center, Projectile.Size * 1.65f), null,
+            Color.LightCyan, Projectile.rotation, tex.Size() / 2);
+        SpriteBatch.DrawRectPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, tex,
+            ToTarget(Projectile.Center, Projectile.Size * 1.85f), null,
+            Color.DarkBlue, Projectile.rotation, tex.Size() / 2);
 
         after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [new(14, 32, 168)], Projectile.Opacity,
             Projectile.scale);

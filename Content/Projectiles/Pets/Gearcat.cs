@@ -4,15 +4,13 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Summon;
-using TheExtraordinaryAdditions.Core.Globals;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Pets;
 
 public class Gearcat : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GearCat);
+    public override string Texture => AssetRegistry.GennedTextures.GearCat.Path;
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
 
     public int Time
     {
@@ -78,7 +76,7 @@ public class Gearcat : ModProjectile
 
                 Vector2 center = Owner.MountedCenter;
                 Vector2 expected = center - Vector2.UnitX * 50f * Owner.direction;
-                Vector2 dest = RaytraceTiles(center, expected) ?? expected;
+                Vector2 dest = RaycastTiles(center, expected) ?? expected;
                 int direction = (Owner.Center.X - Projectile.Center.X).NonZeroSign();
                 float acceleration = Utils.Remap(Projectile.Distance(dest), 0f, 100f, .09f, .4f);
 
@@ -97,7 +95,7 @@ public class Gearcat : ModProjectile
                     int y = (int) Projectile.Bottom.Y - 1;
                     Vector2 start2 = new(start, y);
                     Vector2 end2 = new(end, y);
-                    Vector2 ray = RaytraceTiles(start2, end2) ?? start2;
+                    Vector2 ray = RaycastTiles(start2, end2) ?? start2;
 
                     int obstacleHeight = 0;
                     for (int i = 0; i < 5; i++)
@@ -172,7 +170,7 @@ public class Gearcat : ModProjectile
         if (State == PetState.Flying)
         {
             frames = 3;
-            texture = AssetRegistry.GetTexture(AdditionsTexture.GearCat_Fly);
+            texture = AssetRegistry.GennedTextures.GearCat_Fly;
         }
 
         float rotation = Projectile.rotation;

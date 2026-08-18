@@ -11,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Vanity;
 [AutoloadEquip(EquipType.Body)]
 public class AvatarDress : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AvatarDress);
+    public override string Texture => AssetRegistry.GennedTextures.AvatarDress.Path;
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {

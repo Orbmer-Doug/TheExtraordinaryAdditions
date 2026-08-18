@@ -11,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Tools;
 
 public class GodDummy : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GodDummy);
+    public override string Texture => AssetRegistry.GennedTextures.GodDummy.Path;
 
     public const int MaxDefense = 200;
     public const int LifeAmount = 20000;
@@ -62,7 +62,7 @@ public class GodDummy : ModItem
         else
         {
             if (NPC.CountNPCS(ModContent.NPCType<GodDummyNPC>()) < 25)
-                AdditionsNetcode.SpawnGodDummy(player.Additions().MouseWorld);
+                AdditionsNetcode.SpawnGodDummy(player.AdditionsMouse().MouseWorld);
         }
 
         return true;

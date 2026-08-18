@@ -4,7 +4,7 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Early;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using TheExtraordinaryAdditions.Core.Graphics.Particles;
 
 namespace TheExtraordinaryAdditions.Content.Cooldowns;
 
@@ -13,7 +13,7 @@ public class SkullBombCooldown : CooldownHandler
     public static new string ID => "SkullBomb";
     public override bool ShouldDisplay => true;
     public override LocalizedText DisplayName => GetText($"Cooldowns.{ID}");
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CooldownSkullBomb);
+    public override string Texture => AssetRegistry.GennedTextures.CooldownSkullBomb.Path;
     public override Color OutlineColor => new(45, 45, 29);
     public override Color CooldownStartColor => new(150, 150, 111);
     public override Color CooldownEndColor => new(221, 221, 188);
@@ -33,5 +33,6 @@ public class SkullBombCooldown : CooldownHandler
         instance.player.ownedProjectileCounts[ModContent.ProjectileType<CalciumBomb>()] <= 0;
 }
 */
+
 
 

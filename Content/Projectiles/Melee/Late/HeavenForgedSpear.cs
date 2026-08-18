@@ -1,18 +1,16 @@
-﻿using Terraria;
-using Terraria.Audio;
-using Terraria.ID;
+﻿using Microsoft.Xna.Framework.Graphics;
+using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
 
-public class HeavenForgedSpear : ModProjectile, ILocalizedModType, IModType
+public class HeavenForgedSpear : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.HeavenForgedSpear);
+    public override string Texture => AssetRegistry.GennedTextures.HeavenForgedSpear.Path;
 
     public Player Owner => Main.player[Projectile.owner];
 
@@ -30,6 +28,8 @@ public class HeavenForgedSpear : ModProjectile, ILocalizedModType, IModType
         Projectile.DamageType = DamageClass.MeleeNoSpeed;
         Projectile.ignoreWater = true;
         Projectile.tileCollide = false;
+        Projectile.usesLocalNPCImmunity = true;
+        Projectile.localNPCHitCooldown = -1;
     }
 
     public ref float Time => ref Projectile.ai[0];
@@ -38,7 +38,14 @@ public class HeavenForgedSpear : ModProjectile, ILocalizedModType, IModType
     public override void AI()
     {
         if (trail == null || trail.Disposed)
-            trail = new(WidthFunction, ColorFunction, null, 40);
+            trail = new(
+                c => Trail.HemisphereWidthFunct(c, MathHelper.SmoothStep(Projectile.height, 0f, c)) *
+                     Projectile.Opacity,
+                (c, _) => MulticolorLerp(c.X, Color.DarkBlue, new Color(50, 200, 220), new Color(120, 140, 220)) *
+                          Projectile.Opacity,
+                null,
+                40
+            );
         cache ??= new(20);
         cache.Update(Projectile.RotHitbox().Right);
 
@@ -58,13 +65,22 @@ public class HeavenForgedSpear : ModProjectile, ILocalizedModType, IModType
 
         if (Projectile.numHits > 0)
         {
-            Projectile.velocity *= .9f;
+            Projectile.velocity *= .5f;
             Projectile.timeLeft = Lifetime;
 
-            Projectile.Opacity = InverseLerp(30f, 0f, Fade);
+            Projectile.Opacity = 1f - InverseLerp(0f, 30f, Fade);
             if (Fade > 30f)
                 Projectile.Kill();
             Fade++;
+        }
+        else
+        {
+            NPC closest = NPCTargeting.GetClosestNPC(new(Projectile.Center, 850, true, true));
+            if (Time > 3 && closest.CanHomeInto())
+            {
+                Vector2 vel = Projectile.Center.SafeDirectionTo(closest.Center) * 20f;
+                Projectile.velocity = Vector2.Lerp(Projectile.velocity, vel, .1f);
+            }
         }
 
         Projectile.scale = GetLerpBump(0f, 20f, Lifetime, Lifetime - 5f, Time);
@@ -74,52 +90,19 @@ public class HeavenForgedSpear : ModProjectile, ILocalizedModType, IModType
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         Projectile.friendly = false;
-    }
-
-    public override void OnKill(int timeLeft)
-    {
-        if (this.RunLocal())
-        {
-            Vector2 pos = Projectile.Center;
-            for (int i = 0; i < 20; i++)
-            {
-                ParticleRegistry.SpawnCloudParticle(Projectile.Center, RandomVelocity(2f, 1f, 3f), Color.DeepSkyBlue,
-                    Color.DarkCyan, Main.rand.Next(60, 80), Main.rand.NextFloat(30f, 50f),
-                    Main.rand.NextFloat(.4f, .7f));
-                ParticleRegistry.SpawnSparkleParticle(Projectile.Center, RandomVelocity(1f, 1f, 6f),
-                    Main.rand.Next(30, 40), Main.rand.NextFloat(.3f, .5f), Color.Cyan, Color.CornflowerBlue, 1.4f);
-                ParticleRegistry.SpawnBloomPixelParticle(Projectile.Center, RandomVelocity(1.4f, 2f, 8f),
-                    Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .5f), Color.Cyan, Color.DeepSkyBlue, null, 1f, 4);
-                ParticleRegistry.SpawnGlowParticle(Projectile.Center, Vector2.Zero, Main.rand.Next(24, 28),
-                    Main.rand.NextFloat(50f, 80f), Color.LightCyan);
-            }
-
-            Projectile.CreateFriendlyExplosion(Projectile.Center, Vector2.One * 120f, Projectile.damage / 2,
-                Projectile.knockBack, 4, 3);
-            SoundEngine.PlaySound(SoundID.Item125 with { MaxInstances = 40, PitchVariance = .2f }, Projectile.Center,
-                null);
-        }
-    }
-
-    private float WidthFunction(float c)
-    {
-        return OptimizedPrimitiveTrail.HemisphereWidthFunct(c,
-            MathHelper.SmoothStep(Projectile.height * 3f, 0f, c) * Projectile.Opacity);
-    }
-
-    private Color ColorFunction(SystemVector2 c, Vector2 position)
-    {
-        return Color.SkyBlue * Projectile.Opacity;
+        AssetRegistry.GennedSounds.PlasticHit.Play(Projectile.Center, .6f, .66f, .2f, 30);
     }
 
     public TrailPoints cache;
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
         {
-            ManagedShader prim = ShaderRegistry.PierceTrailShader;
+            ManagedShader prim = AssetRegistry.GennedShaders.GammaRay;
+            prim.TrySetParameter("time", Time * .2f);
+            prim.SetTexture(AssetRegistry.GennedTextures.DarkTurbulentNoise, 1, SamplerState.LinearWrap);
             trail.DrawTrail(prim, cache.Points);
         }
 

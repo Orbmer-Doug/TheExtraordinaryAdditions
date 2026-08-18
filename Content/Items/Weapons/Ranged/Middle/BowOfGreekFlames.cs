@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 
 public class BowOfGreekFlames : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BowOfGreekFlames);
+    public override string Texture => AssetRegistry.GennedTextures.BowOfGreekFlames.Path;
 
     public override void SetDefaults()
     {

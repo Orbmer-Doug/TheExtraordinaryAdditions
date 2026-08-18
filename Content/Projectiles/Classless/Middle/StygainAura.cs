@@ -2,17 +2,16 @@
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 
 public class StygainAura : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -72,7 +71,7 @@ public class StygainAura : ModProjectile
         {
             Vector2 pos = target.RandAreaInEntity();
             Vector2 vel = pos.SafeDirectionTo(Owner.Center).SafeNormalize(Vector2.Zero) * Main.rand.NextFloat(4f, 12f);
-            if (i.BetweenNum(0, 4))
+            if (i is > 0 and < 4)
             {
                 ParticleRegistry.SpawnBloodStreakParticle(pos, vel, 40, Main.rand.NextFloat(.2f, .4f), Color.DarkRed);
             }
@@ -89,7 +88,7 @@ public class StygainAura : ModProjectile
         if (StoredDamage >= 10000f)
         {
             Vector2 pos = Owner.Center + new Vector2(-4f * Owner.direction, -20f);
-            Vector2 vel = pos.SafeDirectionTo(Owner.Additions().MouseWorld).SafeNormalize(Vector2.Zero);
+            Vector2 vel = pos.SafeDirectionTo(Owner.AdditionsMouse().MouseWorld).SafeNormalize(Vector2.Zero);
             for (float i = 1f; i > 0f; i -= .2f)
                 ParticleRegistry.SpawnPulseRingParticle(Owner.Center, vel * (14f * i), 40, vel.ToRotation(),
                     new(.5f, 1f), 0f, i * 320f, Color.Crimson);
@@ -97,14 +96,14 @@ public class StygainAura : ModProjectile
                 Projectile.NewProj(pos, vel, ModContent.ProjectileType<SanguineRay>(), Projectile.damage * 2, 0f,
                     Owner.whoAmI);
 
-            AdditionsSound.VirtueAttack.Play(pos, .8f, -.3f);
+            AssetRegistry.GennedSounds.VirtueAttack.Play(pos, .8f, -.3f);
         }
     }
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => CircularHitboxCollision(
         Projectile.Center, Radius + 75, targetHitbox);
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints points = new(40);
 
     public override bool PreDraw(ref Color lightColor)
@@ -114,9 +113,9 @@ public class StygainAura : ModProjectile
             if (trail == null || points == null)
                 return;
 
-            ManagedShader prim = ShaderRegistry.EnlightenedBeam;
-            prim.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.ShadowTrail), 1, SamplerState.LinearWrap);
-            prim.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WavyBlotchNoise), 2, SamplerState.LinearWrap);
+            ManagedShader prim = AssetRegistry.GennedShaders.EnlightenedBeam;
+            prim.SetTexture(AssetRegistry.GennedTextures.ShadowTrail, 1, SamplerState.LinearWrap);
+            prim.SetTexture(AssetRegistry.GennedTextures.WavyBlotchNoise, 2, SamplerState.LinearWrap);
             prim.TrySetParameter("time", Main.GlobalTimeWrappedHourly * 2f);
             prim.TrySetParameter("repeats", 10f);
             trail.DrawTrail(prim, points.Points, 100, true);

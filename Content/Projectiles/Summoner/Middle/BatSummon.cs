@@ -8,7 +8,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
 
 public class BatSummon : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BatSummon);
+    public override string Texture => AssetRegistry.GennedTextures.BatSummon.Path;
 
     public override void SetStaticDefaults()
     {
@@ -51,12 +51,12 @@ public class BatSummon : ModProjectile
         NPC target = NPCTargeting.MinionHoming(new(Projectile.Center, 1200), Owner);
         if (target != null)
         {
-            CoreUtils.ProjAntiClump(Projectile, .3f);
+            Projectile.ProjAntiClump(.3f);
             Charging(target.Center);
         }
         else
         {
-            CoreUtils.ProjAntiClump(Projectile, .15f);
+            Projectile.ProjAntiClump(.15f);
             Hover();
         }
     }

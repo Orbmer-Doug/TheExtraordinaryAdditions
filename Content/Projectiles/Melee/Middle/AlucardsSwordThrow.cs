@@ -3,18 +3,17 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
 public class AlucardsSwordThrow : ModProjectile, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AlucardsSwordThrow);
+    public override string Texture => AssetRegistry.GennedTextures.AlucardsSwordThrow.Path;
     public Player Owner => Main.player[Projectile.owner];
     public ref float Time => ref Projectile.ai[0];
 
@@ -75,7 +74,7 @@ public class AlucardsSwordThrow : ModProjectile, ILocalizedModType, IModType
         {
             if (this.RunLocal())
             {
-                Vector2 mouse = Owner.Additions().MouseWorld;
+                Vector2 mouse = Owner.AdditionsMouse().MouseWorld;
                 float dist = Projectile.Distance(mouse);
                 float ratio = (1.45f - InverseLerp(0f, 1000f, dist)) * .25f;
                 Projectile.velocity = Vector2.SmoothStep(Projectile.velocity,
@@ -138,16 +137,16 @@ public class AlucardsSwordThrow : ModProjectile, ILocalizedModType, IModType
             Main.rand.NextFloat(1.4f, 1.6f));
 
         // fun fact these are the sounds of me hitting a tungsten cube with solid glass
-        AdditionsSound.MetalHit3.Play(Projectile.Center, 1f, .1f, .1f, 5);
+        AssetRegistry.GennedSounds.MetalHit3.Play(Projectile.Center, 1f, .1f, .1f, 5);
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints cache;
 
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D texture = Projectile.ThisProjectileTexture();
-        Texture2D glowmask = AssetRegistry.GetTexture(AdditionsTexture.AlucardsSwordThrow_Glow);
+        Texture2D glowmask = AssetRegistry.GennedTextures.AlucardsSwordThrow_Glow;
         Rectangle frame = texture.Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame);
         Vector2 drawPosition = Projectile.Center - Main.screenPosition;
         SpriteEffects direction = Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
@@ -157,8 +156,8 @@ public class AlucardsSwordThrow : ModProjectile, ILocalizedModType, IModType
             if (trail == null || cache == null)
                 return;
 
-            ManagedShader shader = ShaderRegistry.FadedStreak;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Streak), 1);
+            ManagedShader shader = AssetRegistry.GennedShaders.FadedStreak;
+            shader.SetTexture(AssetRegistry.GennedTextures.Streak, 1);
             trail.DrawTrail(shader, cache.Points, 120);
         }
 

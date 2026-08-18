@@ -3,19 +3,19 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
-using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
 // gurt
 public class ThreadripperYo : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Threadripper);
+    public override string Texture => AssetRegistry.GennedTextures.Threadripper.Path;
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
+    public PlayerMouse Modded => Owner.AdditionsMouse();
     public ref float Timer => ref Projectile.AdditionsInfo().ExtraAI[4];
     public ref float Shred => ref Projectile.AdditionsInfo().ExtraAI[5];
     public ref float Wait => ref Projectile.AdditionsInfo().ExtraAI[6];
@@ -119,10 +119,10 @@ public class ThreadripperYo : ModProjectile
             Vector2 splatterDirection = Projectile.SafeDirectionTo(Owner.Center) * 8f + Projectile.velocity * 1.2f;
 
             int life = Main.rand.Next(55, 70);
-            float scale = Utils.NextFloat(Main.rand, 1.7f, Utils.NextFloat(Main.rand, 1.3f, 2.2f)) * 0.85f;
-            Color col = Color.Lerp(Color.DarkOrange, Color.Orange * 1.2f, Utils.NextFloat(Main.rand, 0.7f));
-            col = Color.Lerp(col, Color.OrangeRed, Utils.NextFloat(Main.rand));
-            Vector2 vel = Utils.RotatedByRandom(splatterDirection, 0.9) * Utils.NextFloat(Main.rand, .5f, 1.2f);
+            float scale = Main.rand.NextFloat(1.7f, Main.rand.NextFloat(1.3f, 2.2f)) * 0.85f;
+            Color col = Color.Lerp(Color.DarkOrange, Color.Orange * 1.2f, Main.rand.NextFloat(0.7f));
+            col = Color.Lerp(col, Color.OrangeRed, Main.rand.NextFloat());
+            Vector2 vel = splatterDirection.RotatedByRandom(0.9) * Main.rand.NextFloat(.5f, 1.2f);
 
             ParticleRegistry.SpawnSparkParticle(Projectile.Center, vel, life, scale, col, true, true);
             ParticleRegistry.SpawnSquishyPixelParticle(Projectile.Center, vel * 1.4f, life, scale * 1.4f, col * 1.6f,
@@ -151,9 +151,9 @@ public class ThreadripperYo : ModProjectile
         for (int i = 0; i < 3; i++)
         {
             int life = Main.rand.Next(65, 80);
-            float scale = Utils.NextFloat(Main.rand, 1.7f, Utils.NextFloat(Main.rand, 1.3f, 2.2f)) * 0.85f;
+            float scale = Main.rand.NextFloat(1.7f, Main.rand.NextFloat(1.3f, 2.2f)) * 0.85f;
             Color color = Color.Lerp(Color.DarkRed, Color.Crimson, Main.rand.NextFloat(.4f, .6f)) * 0.75f;
-            Vector2 vel = Utils.RotatedByRandom(splatterDirection, 0.699) * Utils.NextFloat(Main.rand, .5f, 1.2f);
+            Vector2 vel = splatterDirection.RotatedByRandom(0.699) * Main.rand.NextFloat(.5f, 1.2f);
             ParticleRegistry.SpawnBloodParticle(target.Center, vel, life, scale, color);
         }
     }
@@ -162,25 +162,24 @@ public class ThreadripperYo : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        void glow()
-        {
-            Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
-            Vector2 orig = tex.Size() / 2f;
-            Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Vector2.One * Projectile.height * 4f),
-                null, Color.DarkRed * .6f * Interpol, 0f, orig);
-            Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Vector2.One * Projectile.height * 3.5f),
-                null, Color.Red * .85f * Interpol, 0f, orig);
-            Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Vector2.One * Projectile.height * 3f),
-                null, Color.Crimson * Interpol, 0f, orig);
-        }
-
         Texture2D tex = Projectile.ThisProjectileTexture();
         Point p = Projectile.Center.ToTileCoordinates();
         float light = Lighting.Brightness(p.X, p.Y);
         Color col = Color.LightGray.Lerp(Color.DarkRed, Interpol);
         after.DrawFancyAfterimages(tex, [col * .76f], light, 1f, 0f, false, true);
         Projectile.DrawBaseProjectile(col * light);
-        PixelationSystem.QueueTextureRenderAction(glow, PixelationLayer.UnderProjectiles, BlendState.Additive);
+
+        Texture2D glow = AssetRegistry.GennedTextures.GlowParticleSmall;
+        Vector2 orig = glow.Size() / 2f;
+        SpriteBatch.DrawRectPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, glow,
+            ToTarget(Projectile.Center, Vector2.One * Projectile.height * 4f),
+            null, Color.DarkRed * .6f * Interpol, 0f, orig);
+        SpriteBatch.DrawRectPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, glow,
+            ToTarget(Projectile.Center, Vector2.One * Projectile.height * 3.5f),
+            null, Color.Red * .85f * Interpol, 0f, orig);
+        SpriteBatch.DrawRectPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, glow,
+            ToTarget(Projectile.Center, Vector2.One * Projectile.height * 3f),
+            null, Color.Crimson * Interpol, 0f, orig);
         return false;
     }
 }

@@ -3,15 +3,14 @@ using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
 public class SangueGlare : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Gleam);
+    public override string Texture => AssetRegistry.GennedTextures.Gleam.Path;
 
     public override void SetStaticDefaults()
     {
@@ -59,59 +58,59 @@ public class SangueGlare : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        void draw()
+        Texture2D texture = Projectile.ThisProjectileTexture();
+        Vector2 drawPosition = Projectile.Center - Main.screenPosition + new Vector2(0f, Projectile.gfxOffY);
+        Vector2 origin = texture.Size() * 0.5f;
+        for (int i = 0; i < Projectile.oldPos.Length; ++i)
         {
-            Texture2D texture = Projectile.ThisProjectileTexture();
-            Vector2 drawPosition = Projectile.Center - Main.screenPosition + new Vector2(0f, Projectile.gfxOffY);
-            Vector2 origin = texture.Size() * 0.5f;
-            for (int i = 0; i < Projectile.oldPos.Length; ++i)
-            {
-                float afterimageRot = Projectile.oldRot[i];
-                Vector2 drawPos = Projectile.oldPos[i] + Projectile.Size * 0.5f - Main.screenPosition +
-                                  new Vector2(0f, Projectile.gfxOffY);
-                Color afterimageColor = Color.DarkRed *
-                                        ((Projectile.oldPos.Length - i) / (float) Projectile.oldPos.Length) *
-                                        Projectile.Opacity;
-                Main.spriteBatch.Draw(texture, drawPos, null, afterimageColor, afterimageRot, origin,
-                    Projectile.scale * 0.5f, 0, 0f);
+            float afterimageRot = Projectile.oldRot[i];
+            Vector2 drawPos = Projectile.oldPos[i] + Projectile.Size * 0.5f - Main.screenPosition +
+                              new Vector2(0f, Projectile.gfxOffY);
+            Color afterimageColor = Color.DarkRed *
+                                    ((Projectile.oldPos.Length - i) / (float) Projectile.oldPos.Length) *
+                                    Projectile.Opacity;
+            SpriteBatch.DrawAltPixelated(PixelationLayer.UnderProjectiles, BlendState.AlphaBlend, texture, drawPos,
+                null, afterimageColor, afterimageRot, origin,
+                Projectile.scale * 0.5f);
 
-                if (i > 0)
+            if (i > 0)
+            {
+                for (float j = 0.2f; j < 0.8f; j += 0.2f)
                 {
-                    for (float j = 0.2f; j < 0.8f; j += 0.2f)
-                    {
-                        drawPos = Vector2.Lerp(Projectile.oldPos[i - 1], Projectile.oldPos[i], j) +
-                            Projectile.Size * 0.5f - Main.screenPosition + new Vector2(0f, Projectile.gfxOffY);
-                        Main.spriteBatch.Draw(texture, drawPos, null, afterimageColor, afterimageRot, origin,
-                            Projectile.scale * 0.5f, 0, 0f);
-                    }
+                    drawPos = Vector2.Lerp(Projectile.oldPos[i - 1], Projectile.oldPos[i], j) +
+                        Projectile.Size * 0.5f - Main.screenPosition + new Vector2(0f, Projectile.gfxOffY);
+                    SpriteBatch.DrawAltPixelated(PixelationLayer.UnderProjectiles, BlendState.AlphaBlend, texture,
+                        drawPos, null, afterimageColor, afterimageRot, origin,
+                        Projectile.scale * 0.5f);
                 }
             }
-
-            Color color = Color.DarkRed * 0.5f;
-            color.A = 0;
-
-            Main.spriteBatch.Draw(texture, drawPosition, null, color, Projectile.rotation, origin,
-                Projectile.scale * 0.9f, 0, 0);
-            Color bigGleamColor = color;
-            Color smallGleamColor = color * 0.5f;
-            float opacity = Projectile.Opacity *
-                            (1f + 0.2f * MathF.Cos(Main.GlobalTimeWrappedHourly % 30f / 0.5f * MathHelper.Pi * 6f)) *
-                            0.8f;
-            Vector2 bigGleamScale = new Vector2(0.5f, 5f) * opacity;
-            Vector2 smallGleamScale = new Vector2(0.5f, 2f) * opacity;
-            bigGleamColor *= opacity;
-            smallGleamColor *= opacity;
-
-            Main.spriteBatch.Draw(texture, drawPosition, null, bigGleamColor, MathHelper.PiOver2, origin, bigGleamScale,
-                0, 0);
-            Main.spriteBatch.Draw(texture, drawPosition, null, bigGleamColor, 0f, origin, smallGleamScale, 0, 0);
-            Main.spriteBatch.Draw(texture, drawPosition, null, smallGleamColor, MathHelper.PiOver2, origin,
-                bigGleamScale * 0.6f, 0, 0);
-            Main.spriteBatch.Draw(texture, drawPosition, null, smallGleamColor, 0f, origin, smallGleamScale * 0.6f, 0,
-                0);
         }
 
-        PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.UnderProjectiles);
+        Color color = Color.DarkRed * 0.5f;
+        color.A = 0;
+
+        SpriteBatch.DrawAltPixelated(PixelationLayer.UnderProjectiles, BlendState.AlphaBlend, texture, drawPosition,
+            null, color, Projectile.rotation, origin,
+            Projectile.scale * 0.9f);
+        Color bigGleamColor = color;
+        Color smallGleamColor = color * 0.5f;
+        float opacity = Projectile.Opacity *
+                        (1f + 0.2f * MathF.Cos(Main.GlobalTimeWrappedHourly % 30f / 0.5f * MathHelper.Pi * 6f)) *
+                        0.8f;
+        Vector2 bigGleamScale = new Vector2(0.5f, 5f) * opacity;
+        Vector2 smallGleamScale = new Vector2(0.5f, 2f) * opacity;
+        bigGleamColor *= opacity;
+        smallGleamColor *= opacity;
+
+        SpriteBatch.DrawAltPixelated(PixelationLayer.UnderProjectiles, BlendState.AlphaBlend, texture, drawPosition,
+            null, bigGleamColor, MathHelper.PiOver2, origin, bigGleamScale);
+        SpriteBatch.DrawAltPixelated(PixelationLayer.UnderProjectiles, BlendState.AlphaBlend, texture, drawPosition,
+            null, bigGleamColor, 0f, origin, smallGleamScale);
+        SpriteBatch.DrawAltPixelated(PixelationLayer.UnderProjectiles, BlendState.AlphaBlend, texture, drawPosition,
+            null, smallGleamColor, MathHelper.PiOver2, origin,
+            bigGleamScale * 0.6f);
+        SpriteBatch.DrawAltPixelated(PixelationLayer.UnderProjectiles, BlendState.AlphaBlend, texture, drawPosition,
+            null, smallGleamColor, 0f, origin, smallGleamScale * 0.6f);
 
         return false;
     }

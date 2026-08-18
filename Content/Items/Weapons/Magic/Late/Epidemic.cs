@@ -11,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Late;
 
 public class Epidemic : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Epidemic);
+    public override string Texture => AssetRegistry.GennedTextures.Epidemic.Path;
 
     public override void SetStaticDefaults()
     {

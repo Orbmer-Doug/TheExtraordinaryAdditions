@@ -9,7 +9,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Middle;
 
 public class Atorcoppe : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Atorcoppe);
+    public override string Texture => AssetRegistry.GennedTextures.Atorcoppe.Path;
 
     public override void SetDefaults()
     {

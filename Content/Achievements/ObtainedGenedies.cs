@@ -1,13 +1,13 @@
 ﻿using Terraria.Achievements;
 using Terraria.GameContent.Achievements;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Items.Weapons.Cynosure;
+using TheExtraordinaryAdditions.Content.Items.Weapons.Classless;
 
 namespace TheExtraordinaryAdditions.Content.Achievements;
 
 public class ObtainedGenedies : ModAchievement
 {
-    public override string TextureName => AssetRegistry.GetTexturePath(AdditionsTexture.ObtainedGenedies);
+    public override string TextureName => AssetRegistry.GennedTextures.ObtainedGenedies.Path;
     public ItemCraftCondition Condition { get; private set; }
     public override bool Hidden => !Condition.IsCompleted;
 

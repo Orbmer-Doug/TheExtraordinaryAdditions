@@ -7,14 +7,13 @@ using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
 
 [AutoloadEquip(EquipType.Head)]
 public class BlueTopHat : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BlueTopHat);
+    public override string Texture => AssetRegistry.GennedTextures.BlueTopHat.Path;
 
     public override void SetStaticDefaults()
     {

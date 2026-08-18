@@ -1,14 +1,14 @@
 ﻿using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 
 public class MartianLaser : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -24,7 +24,7 @@ public class MartianLaser : ModProjectile
 
     public ref float Time => ref Projectile.ai[0];
     public TrailPoints cache;
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override void AI()
     {
@@ -59,8 +59,8 @@ public class MartianLaser : ModProjectile
             if (trail == null || cache == null)
                 return;
 
-            ManagedShader prim = ShaderRegistry.SpecialLightningTrail;
-            prim.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise), 1);
+            ManagedShader prim = AssetRegistry.GennedShaders.SpecialLightningTrail;
+            prim.SetTexture(AssetRegistry.GennedTextures.TechyNoise, 1);
             trail.DrawTrail(prim, cache.Points, 50);
         }
 

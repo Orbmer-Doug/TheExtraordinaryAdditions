@@ -1,9 +1,11 @@
-﻿using Terraria;
+﻿using Microsoft.Xna.Framework.Graphics;
+using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
@@ -86,15 +88,12 @@ public class CrystalShard : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        void draw()
-        {
-            Projectile.DrawBaseProjectile(Lighting.GetColor(Projectile.Center.ToTileCoordinates()));
-            fancy?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(),
-                [new(0, 39, 65), new(0, 73, 121), new(74, 128, 164)],
-                Lighting.Brightness((int) Projectile.Center.X / 16, (int) Projectile.Center.Y / 16));
-        }
-
-        PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.UnderProjectiles);
+        Projectile.DrawBaseProjectile(PixelationLayer.UnderProjectiles, BlendState.AlphaBlend,
+            Lighting.GetColor(Projectile.Center.ToTileCoordinates()));
+        fancy?.DrawFancyAfterimagesPixelated(PixelationLayer.UnderProjectiles, BlendState.AlphaBlend,
+            Projectile.ThisProjectileTexture(),
+            [new(0, 39, 65), new(0, 73, 121), new(74, 128, 164)],
+            Lighting.Brightness((int) Projectile.Center.X / 16, (int) Projectile.Center.Y / 16));
         return false;
     }
 }

@@ -1,46 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using Terraria;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Core.DataStructures;
 
 /// <summary>
-/// Describes a rotatable 2D-rectangle.
+/// Describes a rotatable 2D-rectangle
 /// </summary>
-public struct RotatedRectangle : IEquatable<RotatedRectangle>
+public struct RotatedRectangle
 {
     #region Constructors
 
-    public RotatedRectangle(int x, int y, int width, int height, float rotation)
-    {
-        X = x;
-        Y = y;
-        Width = width;
-        Height = height;
-        Rotation = rotation;
-    }
-
-    public RotatedRectangle(Vector2 pos, Vector2 size, float rotation)
+    /// <summary>
+    /// Creates a rotated rectangle
+    /// </summary>
+    /// <param name="pos">The position of the rectangle</param>
+    /// <param name="size">The size of the rectangle</param>
+    /// <param name="rotation">The rotation in radians</param>
+    /// <param name="pivot">The [0, 1] value that determines where in the rectangle to rotate around</param>
+    public RotatedRectangle(Vector2 pos, Vector2 size, float rotation, Vector2 pivot)
     {
         X = (int) pos.X;
         Y = (int) pos.Y;
         Width = (int) size.X;
         Height = (int) size.Y;
         Rotation = rotation;
+        Pivot = pivot;
     }
 
+    /// <summary>
+    /// Creates a line
+    /// </summary>
+    /// <param name="width">Width of this line</param>
     /// <param name="start">Will be <see cref="Bottom"/></param>
     /// <param name="end">Will be <see cref="Top"/></param>
     public RotatedRectangle(float width, Vector2 start, Vector2 end)
     {
         Width = (int) width;
         Height = (int) start.Distance(end);
-        Rotation = start.AngleTo(end) + MathHelper.PiOver2;
-        Vector2 rot = PolarVector(Height / 2f, Rotation - MathHelper.PiOver2);
-        X = (int) (start.X - Width / 2f + rot.X);
-        Y = (int) (start.Y - Height / 2f + rot.Y);
+        float angle = start.AngleTo(end);
+        Rotation = angle - MathHelper.PiOver2;
+        Vector2 offset = PolarVector(width / 2f, angle + MathHelper.PiOver2);
+        X = (int) (start.X + offset.X);
+        Y = (int) (start.Y + offset.Y);
+        Pivot = Vector2.Zero;
     }
 
     #endregion Constructors
@@ -52,34 +56,47 @@ public struct RotatedRectangle : IEquatable<RotatedRectangle>
     public int Width;
     public int Height;
     public float Rotation;
+    public Vector2 Pivot;
 
     #endregion Public Fields
+
+    #region Private Helpers
+
+    private readonly Vector2 PivotPoint => new Vector2(X, Y) + Pivot * Size;
+
+    private readonly Vector2 RotateFromPivot(Vector2 localPoint)
+    {
+        Vector2 offset = localPoint - Pivot * Size;
+        return PivotPoint
+               + PolarVector(offset.X, Rotation)
+               + PolarVector(offset.Y, Rotation + MathHelper.PiOver2);
+    }
+
+    #endregion Private Helpers
 
     #region Public Properties
 
     public readonly Vector2 Size => new(Width, Height);
 
-    public readonly Vector2 Center => new Vector2(X, Y) + Size / 2;
+    public readonly Vector2 Center => RotateFromPivot(new Vector2(Width / 2f, Height / 2f));
 
-    public readonly Vector2 Position => Center + PolarVector(Width / 2f, Rotation + MathHelper.Pi) +
-                                        PolarVector(Height / 2f, Rotation - MathHelper.PiOver2);
+    public readonly Vector2 Position => RotateFromPivot(Vector2.Zero);
 
-    public readonly Vector2 Top => Center + PolarVector(Height / 2f, Rotation - MathHelper.PiOver2);
+    public readonly Vector2 TopRight => RotateFromPivot(new Vector2(Width, 0));
 
-    public readonly Vector2 TopRight => Center + PolarVector(Height / 2f, Rotation - MathHelper.PiOver2) +
-                                        PolarVector(Width / 2f, Rotation);
+    public readonly Vector2 Bottom => RotateFromPivot(new Vector2(Width / 2f, Height));
 
-    public readonly Vector2 Bottom => Center + PolarVector(Height / 2f, Rotation + MathHelper.PiOver2);
+    public readonly Vector2 BottomLeft => RotateFromPivot(new Vector2(0, Height));
 
-    public readonly Vector2 BottomLeft => Center + PolarVector(Height / 2f, Rotation + MathHelper.PiOver2) +
-                                          PolarVector(Width / 2f, Rotation + MathHelper.Pi);
+    public readonly Vector2 BottomRight => RotateFromPivot(new Vector2(Width, Height));
 
-    public readonly Vector2 BottomRight => Center + PolarVector(Height / 2f, Rotation + MathHelper.PiOver2) +
-                                           PolarVector(Width / 2f, Rotation);
+    public readonly Vector2 Top => RotateFromPivot(new Vector2(Width / 2f, 0));
 
-    public readonly Vector2 Left => Center + PolarVector(Width / 2f, Rotation + MathHelper.Pi);
+    public readonly Vector2 Left => RotateFromPivot(new Vector2(0, Height / 2f));
 
-    public readonly Vector2 Right => Center + PolarVector(Width / 2f, Rotation);
+    public readonly Vector2 Right => RotateFromPivot(new Vector2(Width, Height / 2f));
+
+    public readonly Rectangle BaseRect => new(X, Y, Width, Height);
 
     #endregion Public Properties
 
@@ -173,33 +190,25 @@ public struct RotatedRectangle : IEquatable<RotatedRectangle>
         return rotated + Center;
     }
 
-    public (Vector2 start, Vector2 end)? GetIntersectionLine(Vector2 A, Vector2 B)
+    public (Vector2 start, Vector2 end)? GetIntersectionLine(Vector2 start, Vector2 end)
     {
-        // Calculate direction and length
-        Vector2 D = B - A;
-        float L = D.Length();
+        Vector2 direction = end - start;
+        float length = direction.Length();
 
-        // Avoid division by zero; if A and B are the same point, there's no line segment
-        if (L == 0)
+        // There's no line segment
+        if (length == 0)
             return null;
 
-        // Transform the line into the rectangle's local space (unrotate and translate)
         Vector2 center = Center;
 
-        // Translate points relative to the rectangle's center
-        Vector2 ATranslated = A - center;
-        Vector2 BTranslated = B - center;
-
-        // Rotate points to align the rectangle with the axes
-        Vector2 ALocal = ATranslated.RotatedBy(-Rotation);
-        Vector2 BLocal = BTranslated.RotatedBy(-Rotation);
+        // Translate points relative to the rectangles center and rotate points to align the rectangle with the axes
+        Vector2 startLocal = center.DirectionTo(start).RotatedBy(-Rotation);
+        Vector2 endLocal = center.DirectionTo(end).RotatedBy(-Rotation);
 
         // Compute local direction and length
-        Vector2 DLocal = BLocal - ALocal;
-        float LLocal = DLocal.Length();
-        if (LLocal == 0)
-            return null; // Shouldn't happen since L != 0
-        DLocal /= LLocal;
+        Vector2 dirLocal = startLocal.DirectionTo(endLocal);
+        float lengthLocal = dirLocal.Length();
+        dirLocal /= lengthLocal;
 
         // Define the axis-aligned bounds of the rectangle in local space
         float minX = -Width / 2f;
@@ -207,45 +216,43 @@ public struct RotatedRectangle : IEquatable<RotatedRectangle>
         float minY = -Height / 2f;
         float maxY = Height / 2f;
 
-        // Apply Liang-Barsky algorithm in local space
+        // Liang-Barsky algorithm in local space
         float tEnter = float.NegativeInfinity;
         float tExit = float.PositiveInfinity;
 
-        switch (DLocal.X)
+        switch (dirLocal.X)
         {
             // Check X constraints
             case > 0:
-                tEnter = Math.Max(tEnter, (minX - ALocal.X) / DLocal.X);
-                tExit = Math.Min(tExit, (maxX - ALocal.X) / DLocal.X);
+                tEnter = Math.Max(tEnter, (minX - startLocal.X) / dirLocal.X);
+                tExit = Math.Min(tExit, (maxX - startLocal.X) / dirLocal.X);
                 break;
             case < 0:
-                tEnter = Math.Max(tEnter, (maxX - ALocal.X) / DLocal.X);
-                tExit = Math.Min(tExit, (minX - ALocal.X) / DLocal.X);
+                tEnter = Math.Max(tEnter, (maxX - startLocal.X) / dirLocal.X);
+                tExit = Math.Min(tExit, (minX - startLocal.X) / dirLocal.X);
                 break;
-            // DLocal.X == 0
             default:
             {
-                if (ALocal.X < minX || ALocal.X > maxX)
+                if (startLocal.X < minX || startLocal.X > maxX)
                     return null;
                 break;
             }
         }
 
-        switch (DLocal.Y)
+        switch (dirLocal.Y)
         {
             // Check Y constraints
             case > 0:
-                tEnter = Math.Max(tEnter, (minY - ALocal.Y) / DLocal.Y);
-                tExit = Math.Min(tExit, (maxY - ALocal.Y) / DLocal.Y);
+                tEnter = Math.Max(tEnter, (minY - startLocal.Y) / dirLocal.Y);
+                tExit = Math.Min(tExit, (maxY - startLocal.Y) / dirLocal.Y);
                 break;
             case < 0:
-                tEnter = Math.Max(tEnter, (maxY - ALocal.Y) / DLocal.Y);
-                tExit = Math.Min(tExit, (minY - ALocal.Y) / DLocal.Y);
+                tEnter = Math.Max(tEnter, (maxY - startLocal.Y) / dirLocal.Y);
+                tExit = Math.Min(tExit, (minY - startLocal.Y) / dirLocal.Y);
                 break;
-            // DLocal.Y == 0
             default:
             {
-                if (ALocal.Y < minY || ALocal.Y > maxY)
+                if (startLocal.Y < minY || startLocal.Y > maxY)
                     return null;
                 break;
             }
@@ -253,23 +260,20 @@ public struct RotatedRectangle : IEquatable<RotatedRectangle>
 
         // Clip to the line segment's range [0, LLocal]
         float tStart = Math.Max(0, tEnter);
-        float tEnd = Math.Min(LLocal, tExit);
+        float tEnd = Math.Min(lengthLocal, tExit);
 
-        // If tStart <= tEnd, there is an intersection
-        if (tStart <= tEnd)
-        {
-            // Compute intersection points in local space
-            Vector2 startLocal = ALocal + tStart * DLocal;
-            Vector2 endLocal = ALocal + tEnd * DLocal;
+        if (!(tStart <= tEnd))
+            return null; // No intersection
 
-            // Transform points back to world space (rotate and translate)
-            Vector2 startWorld = startLocal.RotatedBy(Rotation) + center;
-            Vector2 endWorld = endLocal.RotatedBy(Rotation) + center;
+        // Compute intersection points in local space
+        Vector2 intersectionStart = startLocal + tStart * dirLocal;
+        Vector2 intersectionEnd = startLocal + tEnd * dirLocal;
 
-            return (startWorld, endWorld);
-        }
+        // Transform points back to world space (rotate and translate)
+        Vector2 startWorld = intersectionStart.RotatedBy(Rotation) + center;
+        Vector2 endWorld = intersectionEnd.RotatedBy(Rotation) + center;
 
-        return null; // No intersection
+        return (startWorld, endWorld);
     }
 
     public Vector2 GetClosestPoint(Vector2 point, bool sidesOnly = false)
@@ -413,7 +417,7 @@ public struct RotatedRectangle : IEquatable<RotatedRectangle>
 
             float distance = Vector2.Distance(startPoint, endPoint);
             int sampleCount = (int) (distance / sampleIncrement);
-            Vector2 direction = Vector2.Normalize(endPoint - startPoint);
+            Vector2 direction = startPoint.SafeDirectionTo(endPoint);
 
             for (int j = 0; j <= sampleCount; j++)
             {
@@ -452,7 +456,7 @@ public struct RotatedRectangle : IEquatable<RotatedRectangle>
 
             float distance = Vector2.Distance(startPoint, endPoint);
             int sampleCount = (int) (distance / sampleIncrement);
-            Vector2 direction = Vector2.Normalize(endPoint - startPoint);
+            Vector2 direction = startPoint.SafeDirectionTo(endPoint);
 
             for (int j = 0; j <= sampleCount; j++)
             {
@@ -467,7 +471,7 @@ public struct RotatedRectangle : IEquatable<RotatedRectangle>
                     continue;
 
                 float completion = 1f - InverseLerp(0f, byte.MaxValue, tile.LiquidAmount);
-                Vector2 liquidPosition = new(tilePoint.X * 16, tilePoint.Y * 16 + (16 * completion));
+                Vector2 liquidPosition = new(tilePoint.X * 16, tilePoint.Y * 16 + 16 * completion);
 
                 // Check if the sample point is below the liquid height
                 if (samplePoint.Y >= liquidPosition.Y)
@@ -477,7 +481,6 @@ public struct RotatedRectangle : IEquatable<RotatedRectangle>
 
         return false;
     }
-
 
     /// <summary>
     /// Gets a random point from this <see cref="RotatedRectangle"/>
@@ -501,78 +504,19 @@ public struct RotatedRectangle : IEquatable<RotatedRectangle>
         return Vector2.Lerp(randLeft, randRight, Main.rand.NextFloat());
     }
 
-    public bool Equals(RotatedRectangle other)
-    {
-        return X == other.X && Y == other.Y && Width == other.Width && Height == other.Height &&
-               Rotation.Equals(other.Rotation);
-    }
-
     #endregion Public Methods
-
-    #region Public Static Methods
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static RotatedRectangle Max(RotatedRectangle value1, RotatedRectangle value2)
-    {
-        return new RotatedRectangle(
-            (value1.X > value2.X) ? value1.X : value2.X,
-            (value1.Y > value2.Y) ? value1.Y : value2.Y,
-            (value1.Width > value2.Width) ? value1.Width : value2.Width,
-            (value1.Height > value2.Height) ? value1.Height : value2.Height,
-            (value1.Rotation > value2.Rotation) ? value1.Rotation : value2.Rotation
-        );
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static RotatedRectangle Min(RotatedRectangle value1, RotatedRectangle value2)
-    {
-        return new RotatedRectangle(
-            (value1.X < value2.X) ? value1.X : value2.X,
-            (value1.Y < value2.Y) ? value1.Y : value2.Y,
-            (value1.Width < value2.Width) ? value1.Width : value2.Width,
-            (value1.Height < value2.Height) ? value1.Height : value2.Height,
-            (value1.Rotation < value2.Rotation) ? value1.Rotation : value2.Rotation
-        );
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static RotatedRectangle Clamp(RotatedRectangle value, RotatedRectangle min, RotatedRectangle max)
-    {
-        return Min(Max(value, min), max);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(RotatedRectangle a, RotatedRectangle b)
-    {
-        return ((a.X == b.X) &&
-                (a.Y == b.Y) &&
-                (a.Width == b.Width) &&
-                (a.Height == b.Height));
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(RotatedRectangle a, RotatedRectangle b)
-    {
-        return !(a == b);
-    }
-
-    #endregion Public Static Methods
 
     #region Overrides
 
-    public override readonly bool Equals(object obj)
-    {
-        return (obj is RotatedRectangle rectangle) && this == rectangle;
-    }
-
     public override readonly int GetHashCode()
     {
-        return HashCode.Combine(X, Y, Width, Height);
+        return HashCode.Combine(X, Y, Width, Height, Pivot);
     }
 
     public override readonly string ToString()
     {
-        return $"[Position: {Position}, Width: {Width}, Height: {Height}, Current Rotation: {Rotation}]";
+        return
+            $"[Position: {Position}, Width: {Width}, Height: {Height}, Current Rotation: {Rotation:F2}, Pivot: {Pivot}]";
     }
 
     #endregion

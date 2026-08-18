@@ -5,16 +5,16 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Early;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Early;
 
 public class CrystallineBlast : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetStaticDefaults()
     {
@@ -54,7 +54,7 @@ public class CrystallineBlast : ModProjectile
     private const float maxTime = CrystallineSnapcurve.TotalTime;
     public float Completion => InverseLerp(0f, maxTime, Timer);
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
+    public PlayerMouse Modded => Owner.AdditionsMouse();
     public const float IdealScale = .5f;
 
     public override void AI()
@@ -96,11 +96,11 @@ public class CrystallineBlast : ModProjectile
                     return;
                 }
 
-                AdditionsSound.etherealRelease2.Play(Projectile.Center, .7f, 0f, .1f);
+                AssetRegistry.GennedSounds.etherealRelease2.Play(Projectile.Center, .7f, 0f, .1f);
                 if (this.RunLocal())
                 {
                     float vel = 20f + Completion;
-                    Projectile.velocity = Projectile.SafeDirectionTo(Owner.Additions().MouseWorld) * vel;
+                    Projectile.velocity = Projectile.SafeDirectionTo(Owner.AdditionsMouse().MouseWorld) * vel;
 
                     for (int i = 0; i < 12; i++)
                     {
@@ -162,7 +162,7 @@ public class CrystallineBlast : ModProjectile
                 30 - (int) Utils.Remap(Projectile.scale, 0f, .5f, 15, 0), Main.rand.NextFloat(.5f, .8f), Color.Cyan);
         }
 
-        AdditionsSound.etherealSmallHit.Play(pos, Projectile.scale * 2f);
+        AssetRegistry.GennedSounds.etherealSmallHit.Play(pos, Projectile.scale * 2f);
     }
 
     public override bool OnTileCollide(Vector2 lastVelocity)
@@ -185,38 +185,36 @@ public class CrystallineBlast : ModProjectile
                 Color.Lerp(Color.WhiteSmoke, Color.Wheat, Main.rand.NextFloat(.2f, .8f)));
         }
 
-        AdditionsSound.etherealBounceSmall.Play(Projectile.Center, Projectile.scale * 2, 0f, .05f, 10);
+        AssetRegistry.GennedSounds.etherealBounceSmall.Play(Projectile.Center, Projectile.scale * 2, 0f, .05f, 10);
 
         return false;
     }
 
     public override bool PreDraw(ref Color lightColor)
     {
-        void draw()
-        {
-            Vector2 origin = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall).Size() * 0.5f;
-            Vector2 drawPosition = Projectile.Center - Main.screenPosition;
+        Vector2 origin = AssetRegistry.GennedTextures.GlowParticleSmall.Size() * 0.5f;
+        Vector2 drawPosition = Projectile.Center - Main.screenPosition;
 
-            float val = .1f;
-            Vector2 baseScale = new Vector2(val) * Projectile.scale;
+        const float val = .1f;
+        Vector2 baseScale = new Vector2(val) * Projectile.scale;
 
-            Main.spriteBatch.Draw(AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall), drawPosition, null,
-                Color.White, 0f, origin, baseScale, 0, 0f);
+        SpriteBatch.DrawAltPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive,
+            AssetRegistry.GennedTextures.GlowParticleSmall, drawPosition, null,
+            Color.White, 0f, origin, baseScale);
 
-            Vector2 flareOrigin = AssetRegistry.GetTexture(AdditionsTexture.BloomFlare).Size() * .5f;
-            Color bloomFlareColor = Color.Lerp(Color.Wheat, Color.WhiteSmoke, 0.7f);
-            float bloomFlareRotation = Main.GlobalTimeWrappedHourly * 1.76f;
-            Main.spriteBatch.Draw(AssetRegistry.GetTexture(AdditionsTexture.BloomFlare), drawPosition, null,
-                bloomFlareColor, -bloomFlareRotation, flareOrigin, baseScale, 0, 0f);
+        Vector2 flareOrigin = AssetRegistry.GennedTextures.BloomFlare.Size() * .5f;
+        Color bloomFlareColor = Color.Lerp(Color.Wheat, Color.WhiteSmoke, 0.7f);
+        float bloomFlareRotation = Main.GlobalTimeWrappedHourly * 1.76f;
+        SpriteBatch.DrawAltPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive,
+            AssetRegistry.GennedTextures.BloomFlare, drawPosition, null,
+            bloomFlareColor, -bloomFlareRotation, flareOrigin, baseScale);
 
-            bloomFlareColor = Color.Lerp(Color.Wheat,
-                Main.hslToRgb((Main.GlobalTimeWrappedHourly * 0.2f + 0.5f) % 1f, 1f, 0.55f), 0.7f);
-            bloomFlareColor = Color.Lerp(bloomFlareColor, Color.LightCyan, 0.63f);
-            Main.spriteBatch.Draw(AssetRegistry.GetTexture(AdditionsTexture.BloomFlare), drawPosition, null,
-                bloomFlareColor, bloomFlareRotation, flareOrigin, baseScale, 0, 0f);
-        }
-
-        PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.UnderProjectiles, BlendState.Additive);
+        bloomFlareColor = Color.Lerp(Color.Wheat,
+            Main.hslToRgb((Main.GlobalTimeWrappedHourly * 0.2f + 0.5f) % 1f, 1f, 0.55f), 0.7f);
+        bloomFlareColor = Color.Lerp(bloomFlareColor, Color.LightCyan, 0.63f);
+        SpriteBatch.DrawAltPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive,
+            AssetRegistry.GennedTextures.BloomFlare, drawPosition, null,
+            bloomFlareColor, bloomFlareRotation, flareOrigin, baseScale);
         return false;
     }
 

@@ -12,7 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Multi.Middle;
 
 public class BoneGunsword : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BoneGunsword);
+    public override string Texture => AssetRegistry.GennedTextures.BoneGunsword.Path;
 
     public override void SetStaticDefaults()
     {

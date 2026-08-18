@@ -8,10 +8,9 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
 
 
 namespace TheExtraordinaryAdditions.Content.Projectiles;
@@ -45,7 +44,7 @@ public class UnitCircle : ModProjectile
     {
         // Set position
         if (Time == 0f)
-            Projectile.Center = Owner.Additions().MouseWorld;
+            Projectile.Center = Owner.AdditionsMouse().MouseWorld;
 
         // Increment timer
         Time++;
@@ -54,7 +53,7 @@ public class UnitCircle : ModProjectile
         Projectile.scale = Projectile.Opacity = MakePoly(4).InFunction(InverseLerp(0f, 35f, Time));
 
         // So as to it doesn't last forever
-        if (Owner.Additions().MouseRight.Current)
+        if (Owner.AdditionsMouse().MouseRight.Current)
             Projectile.Kill();
 
         // Otherwise just don't die
@@ -83,7 +82,7 @@ public class UnitCircle : ModProjectile
             -1f, 2f);
     }
 
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     private const int RayCount = 16;
 
     public override bool PreDraw(ref Color lightColor)
@@ -92,8 +91,8 @@ public class UnitCircle : ModProjectile
         const float scale = 900f;
 
         Main.spriteBatch.EnterShaderRegion();
-        Texture2D telegraphBase = AssetRegistry.InvisTex;
-        ManagedShader circle = ShaderRegistry.CircularAoETelegraph;
+        Texture2D telegraphBase = AssetRegistry.GennedTextures.Invisible;
+        ManagedShader circle = AssetRegistry.GennedShaders.CircularAoETelegraph;
         circle.TrySetParameter("opacity", 1f);
         float interpolant = MathF.Pow(Sin01(Main.GlobalTimeWrappedHourly * 2f), 2);
         circle.TrySetParameter("color", (Color.Lerp(Color.DarkRed, Color.Red, interpolant)));
@@ -113,8 +112,8 @@ public class UnitCircle : ModProjectile
             TrailPoints points = new(10);
             points.SetPoints(
                 Projectile.Center.GetLaserControlPoints(Projectile.Center + PolarVector(scale / 2, rot), 10));
-            OptimizedPrimitiveTrail trail = new(c => 6f, (c, pos) => Color.IndianRed * .6f, null, 10);
-            trail.DrawTrail(ShaderRegistry.StandardPrimitiveShader, points.Points, -1, false, false);
+            Trail trail = new(c => 6f, (c, pos) => Color.IndianRed * .6f, null, 10);
+            trail.DrawTrail(AssetRegistry.GennedShaders.StandardPrimitiveShader, points.Points, -1, false, false);
 
             float textRot = 0f;
 

@@ -6,7 +6,7 @@ using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.CrossCompatibility;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Netcode;
 using TheExtraordinaryAdditions.Core.Systems;
 
@@ -41,14 +41,14 @@ public class AdditionsMain : Mod
         DoneLoading = false;
 
         SetLoadingText("Loading shaders...");
-        AssetRegistry.LoadShaders(this);
+        AssetRegistry.GennedShaders.LoadShaders(this);
 
         SetLoadingText("Initializing screen shaders...");
         Main.QueueMainThreadAction(() =>
         {
-            foreach (string key in AssetRegistry.Filters.Keys)
+            foreach (string key in AssetRegistry.GennedShaders.Filters.Keys)
             {
-                if (AssetRegistry.Filters.TryGetValue(key, out ManagedScreenShader shader))
+                if (AssetRegistry.GennedShaders.Filters.TryGetValue(key, out ManagedScreenShader shader))
                     ScreenShaderPool.InitializePool(filterName: key, baseEffect: shader.Shader, initialCapacity: 10);
             }
         });
@@ -56,9 +56,9 @@ public class AdditionsMain : Mod
         SetLoadingText("Loading boss heads...");
         if (!Main.dedServ)
         {
-            AddBossHeadTexture(AssetRegistry.GetTexturePath(AdditionsTexture.StygainHeart_Head_Boss));
-            AddBossHeadTexture(AssetRegistry.GetTexturePath(AdditionsTexture.Asterlin_Head_Boss));
-            AddBossHeadTexture(AssetRegistry.GetTexturePath(AdditionsTexture.AuroraTurretHead_Head_Boss));
+            AddBossHeadTexture(AssetRegistry.GennedTextures.StygainHeart_Head_Boss.Path);
+            AddBossHeadTexture(AssetRegistry.GennedTextures.Asterlin_Head_Boss.Path);
+            AddBossHeadTexture(AssetRegistry.GennedTextures.AuroraTurretHead_Head_Boss.Path);
         }
 
         SetLoadingText("Loading projectile relationships and overrides...");

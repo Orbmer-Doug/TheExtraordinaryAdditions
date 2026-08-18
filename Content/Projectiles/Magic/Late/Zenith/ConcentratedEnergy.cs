@@ -1,21 +1,20 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using System;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Late.Zenith;
 
 public class ConcentratedEnergy : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ConcentratedEnergy);
+    public override string Texture => AssetRegistry.GennedTextures.ConcentratedEnergy.Path;
 
     public override void SetDefaults()
     {
@@ -75,7 +74,7 @@ public class ConcentratedEnergy : ModProjectile
         }
         else
         {
-            Projectile.Opacity = Projectile.scale = Animators.MakePoly(2f).InFunction(InverseLerp(0f, 15f, Time)) *
+            Projectile.Opacity = Projectile.scale = MakePoly(2f).InFunction(InverseLerp(0f, 15f, Time)) *
                                                     InverseLerp(0f, 20f, Projectile.timeLeft);
         }
 
@@ -89,11 +88,11 @@ public class ConcentratedEnergy : ModProjectile
 
     internal Color ColorFunction(SystemVector2 completionRatio, Vector2 position)
     {
-        float fadeToEnd = MathHelper.Lerp(0.65f, 1f, (float) Cos01((0f - Main.GlobalTimeWrappedHourly) * 3f));
+        float fadeToEnd = MathHelper.Lerp(0.65f, 1f, Cos01((0f - Main.GlobalTimeWrappedHourly) * 3f));
         float fadeOpacity = Utils.GetLerpValue(1f, 0.64f, completionRatio.X, true) * InverseLerp(0f, 8f, Time) *
                             Projectile.Opacity;
         Color endColor = Color.Lerp(Color.DarkMagenta, Color.Cyan,
-            (float) Sin01(completionRatio.X * (float) Math.PI * 1.6f - Main.GlobalTimeWrappedHourly * 4f));
+            Sin01(completionRatio.X * (float) Math.PI * 1.6f - Main.GlobalTimeWrappedHourly * 4f));
         return Color.Lerp(Color.White, endColor, fadeToEnd) * fadeOpacity;
     }
 
@@ -105,7 +104,7 @@ public class ConcentratedEnergy : ModProjectile
     }
 
     public TrailPoints cache;
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override bool PreDraw(ref Color lightColor)
     {
@@ -113,8 +112,8 @@ public class ConcentratedEnergy : ModProjectile
         {
             if (trail != null)
             {
-                ManagedShader shader = ShaderRegistry.FadedStreak;
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.ShadowTrail), 1);
+                ManagedShader shader = AssetRegistry.GennedShaders.FadedStreak;
+                shader.SetTexture(AssetRegistry.GennedTextures.ShadowTrail, 1);
                 trail.DrawTrail(shader, cache.Points, 40, true);
             }
         }

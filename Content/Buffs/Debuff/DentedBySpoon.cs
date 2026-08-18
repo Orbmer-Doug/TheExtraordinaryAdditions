@@ -7,7 +7,7 @@ namespace TheExtraordinaryAdditions.Content.Buffs.Debuff;
 
 public class DentedBySpoon : ModBuff
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.DentedBySpoon);
+    public override string Texture => AssetRegistry.GennedTextures.DentedBySpoon.Path;
 
     public override void SetStaticDefaults()
     {
@@ -21,7 +21,7 @@ public class DentedBySpoon : ModBuff
 
     public override void Update(Player player, ref int buffIndex)
     {
-        player.GetModPlayer<GlobalPlayer>().DentedBySpoon = true;
+        player.AdditionsBuffs().DentedBySpoon = true;
         player.statDefense *= .75f;
     }
 }

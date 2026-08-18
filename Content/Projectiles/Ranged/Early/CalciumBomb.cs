@@ -1,15 +1,15 @@
 ﻿using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Early;
 
 public class CalciumBomb : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CalciumBomb);
+    public override string Texture => AssetRegistry.GennedTextures.CalciumBomb.Path;
 
     public override void SetDefaults()
     {
@@ -63,7 +63,7 @@ public class CalciumBomb : ModProjectile
         Projectile.CreateFriendlyExplosion(Projectile.Center, from, Projectile.damage / 2, Projectile.knockBack / 2f, 9,
             8, to);
         ScreenShakeSystem.New(new(.1f, .1f), Projectile.Center);
-        AdditionsSound.banditShot2B.Play(Projectile.Center, .6f, -.3f, .1f);
+        AssetRegistry.GennedSounds.banditShot2B.Play(Projectile.Center, .6f, -.3f, .1f);
 
         for (int i = 0; i < 20; i++)
         {

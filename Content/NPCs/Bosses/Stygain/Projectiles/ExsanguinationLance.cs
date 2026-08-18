@@ -3,17 +3,16 @@ using Terraria;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 
 public class ExsanguinationLance : ProjOwnedByNPC<StygainHeart>
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ExsanguinationLance);
+    public override string Texture => AssetRegistry.GennedTextures.ExsanguinationLance.Path;
 
     public ref float Time => ref Projectile.ai[0];
 
@@ -152,7 +151,7 @@ public class ExsanguinationLance : ProjOwnedByNPC<StygainHeart>
     }
 
     public TrailPoints cache = new(24);
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public float WidthFunct(float c) =>
         Projectile.height / 2f * GetLerpBump(0f, .75f, 1f, .25f, c) * Projectile.Opacity;
@@ -168,8 +167,8 @@ public class ExsanguinationLance : ProjOwnedByNPC<StygainHeart>
             if (trail == null || cache == null)
                 return;
 
-            ManagedShader shader = ShaderRegistry.FlameTrail;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FractalNoise), 1);
+            ManagedShader shader = AssetRegistry.GennedShaders.FlameTrail;
+            shader.SetTexture(AssetRegistry.GennedTextures.FractalNoise, 1);
             trail.DrawTrail(shader, cache.Points, 70);
         }
 

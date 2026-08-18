@@ -4,15 +4,14 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Misc;
-using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Tools;
 
-public class MatterDisintegrationDrill : ModItem, ILocalizedModType, IModType
+public class MatterDisintegrationDrill : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.MatterDisintegrationCannon);
+    public override string Texture => AssetRegistry.GennedTextures.MatterDisintegrationCannon.Path;
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
@@ -32,7 +31,7 @@ public class MatterDisintegrationDrill : ModItem, ILocalizedModType, IModType
         Item.channel = Item.noUseGraphic = Item.noMelee = Item.autoReuse = true;
         Item.useStyle = ItemUseStyleID.Shoot;
         Item.value = AdditionsGlobalItem.LaserRarityPrice;
-        Item.rare = ModContent.RarityType<LaserClassRarity>();
+        Item.rare = ItemRarityID.Red;
         Item.UseSound = SoundID.Item23;
         Item.shoot = ModContent.ProjectileType<CannonHoldout>();
         Item.shootSpeed = 40f;
@@ -42,10 +41,9 @@ public class MatterDisintegrationDrill : ModItem, ILocalizedModType, IModType
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        //TODO
-        recipe.AddIngredient(ModContent.ItemType<PlasmaCore>(), 1);
-        recipe.AddTile(TileID.HeavyWorkBench);
-        recipe.AddTile(TileID.MythrilAnvil);
+        recipe.AddIngredient(ItemID.LunarBar, 15);
+        recipe.AddIngredient(ModContent.ItemType<PlasmaCore>());
+        recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();
     }
 }

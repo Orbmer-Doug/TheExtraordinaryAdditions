@@ -16,8 +16,6 @@ public partial class Asterlin
             writer.Write((int) CurrentState);
             writer.Write(AITimer);
         }
-
-        Dialogue_SendExtraAI(writer);
     }
 
     public override void ReceiveExtraAI(BinaryReader reader)
@@ -35,7 +33,5 @@ public partial class Asterlin
             CurrentState = receivedState;
             AITimer = receivedTime;
         }
-
-        Dialogue_RecieveExtraAI(reader);
     }
 }

@@ -5,16 +5,17 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Summon;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
 using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
 
 public class LazerDrone : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.LazerDrone);
+    public override string Texture => AssetRegistry.GennedTextures.LazerDrone.Path;
 
     public override void SetStaticDefaults()
     {
@@ -55,7 +56,7 @@ public class LazerDrone : ModProjectile
     public const int FireWait = 30;
     public float ChargeCompletion => InverseLerp(0f, 120f, Charge);
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
+    public PlayerMouse Modded => Owner.AdditionsMouse();
     public NPC Target;
     public Vector2 Tip;
     public bool RemoteBeingHeld => Owner.ownedProjectileCounts[ModContent.ProjectileType<RemoteHoldout>()] > 0;
@@ -65,7 +66,7 @@ public class LazerDrone : ModProjectile
     {
         if (!Owner.Available() && this.RunLocal())
         {
-            Modded.LaserDrones = false;
+            Owner.AdditionsMinion().LaserDrones = false;
             return;
         }
 
@@ -75,7 +76,7 @@ public class LazerDrone : ModProjectile
             Projectile.ThisProjectileTexture().Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame)));
 
         Owner.AddBuff(ModContent.BuffType<LaserDrones>(), 3600);
-        if (Modded.LaserDrones)
+        if (Owner.AdditionsMinion().LaserDrones)
             Projectile.timeLeft = 2;
 
         if (this.RunLocal())
@@ -142,11 +143,11 @@ public class LazerDrone : ModProjectile
 
             if (ChargeCompletion >= 1f)
             {
-                AdditionsSound.LaserTwo.Play(tip, 1f, -.1f, .2f);
+                AssetRegistry.GennedSounds.LaserTwo.Play(tip, 1f, -.1f, .2f);
                 Projectile.Kill();
             }
             else
-                AdditionsSound.Laser4.Play(tip, .6f, 0f, .3f);
+                AssetRegistry.GennedSounds.Laser4.Play(tip, .6f, 0f, .3f);
 
             Wait = FireWait;
             Charge = 0f;
@@ -157,7 +158,7 @@ public class LazerDrone : ModProjectile
             Projectile.AI_GetMyGroupIndex(out var index, out var total);
 
             float time = SecondsToFrames(5f);
-            float cycle = Modded.GlobalTimer % time / time * MathF.Tau;
+            float cycle = Owner.AdditionsMisc().GlobalTimer % time / time * MathF.Tau;
             float offset = MathF.Tau * InverseLerp(0f, total, index);
             Vector2 dest = Owner.RotatedRelativePoint(Owner.MountedCenter, false, true) +
                            GetPointOnRotatedEllipse(300f, 110f, offset + cycle, cycle);
@@ -234,7 +235,7 @@ public class LazerDrone : ModProjectile
             Projectile.scale, direction, 0f);
 
         Main.spriteBatch.SetBlendState(BlendState.Additive);
-        Texture2D bloom = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
+        Texture2D bloom = AssetRegistry.GennedTextures.GlowParticleSmall;
         Vector2 orig = bloom.Size() / 2;
         Rectangle target = ToTarget(Tip, new(40f));
         Main.spriteBatch.Draw(bloom, target, null, Color.DarkCyan * ChargeCompletion * 1.25f, .75f, orig, 0, 0f);

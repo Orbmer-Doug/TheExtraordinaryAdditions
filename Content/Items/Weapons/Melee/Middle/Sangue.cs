@@ -4,7 +4,7 @@ using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
-using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
+using TheExtraordinaryAdditions.Content.Rarities;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -12,7 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 
 public class Sangue : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Sangue);
+    public override string Texture => AssetRegistry.GennedTextures.Sangue.Path;
 
     public override void SetDefaults()
     {

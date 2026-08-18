@@ -2,16 +2,15 @@
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 
 public class SanguinePortal : ProjOwnedByNPC<StygainHeart>
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -54,7 +53,7 @@ public class SanguinePortal : ProjOwnedByNPC<StygainHeart>
                 if (i % 2 == 0)
                     vel = vel.RotatedBy(Main.rand.NextFloat(-.1f, .1f));
 
-                if (this.RunServer())
+                if (ModProjectile.RunServer())
                 {
                     SpawnProjectile(Projectile.Center, vel, ModContent.ProjectileType<WrithingEyeball>(),
                         StygainHeart.BloodshotDamage, 0f, ai2: 1);
@@ -74,7 +73,7 @@ public class SanguinePortal : ProjOwnedByNPC<StygainHeart>
 
     public override bool PreDraw(ref Color lightColor)
     {
-        ManagedShader portal = ShaderRegistry.PortalShader;
+        ManagedShader portal = AssetRegistry.GennedShaders.PortalShader;
         Color col1 = ColorSwap(Color.Crimson, Color.DarkRed * 2f, 1f);
         Color col2 = Color.Crimson * 1.5f;
 
@@ -83,16 +82,12 @@ public class SanguinePortal : ProjOwnedByNPC<StygainHeart>
         portal.TrySetParameter("secondColor", col2);
         portal.TrySetParameter("globalTime", Projectile.scale * 1.2f);
 
-        PixelationSystem.QueueTextureRenderAction(Draw, PixelationLayer.UnderProjectiles, null, portal);
-        return false;
-    }
-
-    public void Draw()
-    {
-        Texture2D noiseTexture = AssetRegistry.GetTexture(AdditionsTexture.FractalNoise);
+        Texture2D noiseTexture = AssetRegistry.GennedTextures.FractalNoise;
         Vector2 origin = noiseTexture.Size() * 0.5f;
         Vector2 diskScale = Projectile.scale * Vector2.One;
-        Main.spriteBatch.DrawBetter(noiseTexture, Projectile.Center, null, Color.White, Projectile.rotation, origin,
-            diskScale);
+        SpriteBatch.DrawAltPixelated(PixelationLayer.UnderProjectiles, BlendState.AlphaBlend, noiseTexture,
+            Projectile.Center, null, Color.White, Projectile.rotation, origin,
+            diskScale, shader: portal);
+        return false;
     }
 }

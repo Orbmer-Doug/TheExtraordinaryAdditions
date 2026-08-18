@@ -76,7 +76,7 @@ internal class WeakReferenceSupport
         ];
         Action<SpriteBatch, Rectangle, Color> stygainPortrait = delegate(SpriteBatch sb, Rectangle rect, Color color)
         {
-            Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.StygainHeart_BossChecklist);
+            Texture2D tex = AssetRegistry.GennedTextures.StygainHeart_BossChecklist;
             Vector2 pos = new Vector2(rect.Center.X - tex.Width / 2, rect.Center.Y - tex.Height / 2);
             sb.Draw(tex, pos + Vector2.UnitY * MathHelper.Lerp(-20f, 20f, Sin01(Main.GlobalTimeWrappedHourly)), color);
         };
@@ -106,7 +106,7 @@ internal class WeakReferenceSupport
         ];
         Action<SpriteBatch, Rectangle, Color> asterlinPortrait = delegate(SpriteBatch sb, Rectangle rect, Color color)
         {
-            Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.Asterlin_BossChecklist);
+            Texture2D tex = AssetRegistry.GennedTextures.Asterlin_BossChecklist;
             Vector2 pos = new(rect.Center.X - tex.Width / 2, rect.Center.Y - tex.Height / 2);
             sb.Draw(tex, pos, color);
         };
@@ -131,7 +131,7 @@ internal class WeakReferenceSupport
         ];
         Action<SpriteBatch, Rectangle, Color> auroraPortrait = delegate(SpriteBatch sb, Rectangle rect, Color color)
         {
-            Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.AuroraGuardBestiary);
+            Texture2D tex = AssetRegistry.GennedTextures.AuroraGuardBestiary;
             Vector2 pos = new Vector2(rect.Center.X - tex.Width / 2, rect.Center.Y - tex.Height / 2);
             sb.Draw(tex, pos, color);
         };

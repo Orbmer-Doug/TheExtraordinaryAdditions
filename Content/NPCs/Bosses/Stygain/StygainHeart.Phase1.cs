@@ -5,10 +5,8 @@ using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain;
 
@@ -55,7 +53,7 @@ public sealed partial class StygainHeart
                         shootVelocity = shootDirection.RotatedByRandom(0.56f) * Main.rand.NextFloat(10.5f, 12.5f);
                     }
 
-                    if (this.RunServer())
+                    if (ModNPC.RunServer())
                         NPC.NewNPCProj(shootPosition, shootVelocity, ModContent.ProjectileType<BloodShot>(),
                             BloodBeaconLanceDamage, 0f);
                     for (int a = 0; a < 4; a++)
@@ -155,7 +153,7 @@ public sealed partial class StygainHeart
         ref float start = ref ExtraAI[6];
 
         // Initially pick a random, unchosen position
-        if (this.RunServer() && start == 0f)
+        if (ModNPC.RunServer() && start == 0f)
         {
             List<int> index = [];
             for (int i = 0; i < Directions.Length; i++)
@@ -246,7 +244,7 @@ public sealed partial class StygainHeart
                     {
                         Vector2 pos = i == -1 ? NPC.RotHitbox().Left : NPC.RotHitbox().Right;
                         Vector2 vel = NPC.velocity.RotatedBy(MathHelper.PiOver2).SafeNormalize(Vector2.Zero) * 2.5f * i;
-                        if (this.RunServer())
+                        if (ModNPC.RunServer())
                             NPC.NewNPCProj(pos, vel, ModContent.ProjectileType<TaintedStar>(), BloodshotDamage, 2f);
                         for (int a = 0; a < 18; a++)
                         {
@@ -295,7 +293,7 @@ public sealed partial class StygainHeart
             }
         }
 
-        if (this.RunServer() && AttackTimer == summonTime)
+        if (ModNPC.RunServer() && AttackTimer == summonTime)
         {
             Vector2 pos = target.Center + target.velocity * 65f;
             NPC.NewNPCProj(pos, Vector2.Zero, ModContent.ProjectileType<SanguinePortal>(), 0, 0f, -1);
@@ -333,7 +331,7 @@ public sealed partial class StygainHeart
                 {
                     ParticleRegistry.SpawnBlurParticle(NPC.Center, 30, .2f, 1000f);
                     ScreenShakeSystem.New(new(2f, 1.9f, ScreenShake.DefaultRange * 3f), NPC.Center);
-                    AdditionsSound.etherealSmash.Play(NPC.Center, 30f, -.2f);
+                    AssetRegistry.GennedSounds.etherealSmash.Play(NPC.Center, 30f, -.2f);
                     NPC.velocity *= .2f;
                     AttackTimer = 0;
                     counter++;
@@ -370,7 +368,7 @@ public sealed partial class StygainHeart
         int ass = ModContent.ProjectileType<SanguineAssimilation>();
         if (counter < cycles && AttackTimer % wait == wait - 1)
         {
-            if (this.RunServer())
+            if (ModNPC.RunServer())
             {
                 int dir = Main.rand.NextBool().ToDirectionInt();
                 for (int i = 0; i < count; i++)
@@ -433,7 +431,7 @@ public sealed partial class StygainHeart
             for (int i = 0; i < 5; i++)
                 ParticleRegistry.SpawnPulseRingParticle(NPC.Center, Vector2.Zero, 20 + i * 5, 0f, Vector2.One, 0f,
                     290f + i * 81f, Color.DarkRed, true);
-            AdditionsSound.etherealChargeBoom.Play(NPC.Center, 1f, -.3f);
+            AssetRegistry.GennedSounds.etherealChargeBoom.Play(NPC.Center, 1f, -.3f);
         }
 
         if (AttackTimer >= conjureTime)
@@ -444,7 +442,7 @@ public sealed partial class StygainHeart
 
             // Create the rain
             int wait = DifficultyBasedValue(26, 24, 22, 20, 18, 10);
-            if (AttackTimer % wait == wait - 1 && this.RunServer())
+            if (AttackTimer % wait == wait - 1 && ModNPC.RunServer())
             {
                 const int rainCount = 5;
                 for (int i = 0; i < rainCount; i++)
@@ -465,7 +463,7 @@ public sealed partial class StygainHeart
         if (AttackTimer == lances)
         {
             // Initially spawn in lances
-            if (!AnyProjectile(lanceType) && this.RunServer())
+            if (!AnyProjectile(lanceType) && ModNPC.RunServer())
             {
                 for (int i = 0; i < lanceCount; i++)
                 {
@@ -489,7 +487,7 @@ public sealed partial class StygainHeart
                     }
                 }
 
-                AdditionsSound.BraveAttackAirN01.Play(NPC.Center, 1f, 0f, .2f, 0);
+                AssetRegistry.GennedSounds.BraveAttackAirN01.Play(NPC.Center, 1f, 0f, .2f, 0);
             }
         }
         else if (AttackTimer == throwLances)
@@ -504,7 +502,7 @@ public sealed partial class StygainHeart
                 }
             }
 
-            AdditionsSound.etherealRelease.Play(NPC.Center, 1.2f, -.2f, .1f);
+            AssetRegistry.GennedSounds.etherealRelease.Play(NPC.Center, 1.2f, -.2f, .1f);
             AttackTimer = conjureTime;
             cycles++;
             NPC.netUpdate = true;

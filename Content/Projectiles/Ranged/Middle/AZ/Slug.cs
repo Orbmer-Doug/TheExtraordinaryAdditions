@@ -1,13 +1,12 @@
 ﻿using System;
 using Terraria;
 using Terraria.ModLoader;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle.AZ;
 
 public class Slug : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Slug);
+    public override string Texture => AssetRegistry.GennedTextures.Slug.Path;
 
     public override void SetDefaults()
     {

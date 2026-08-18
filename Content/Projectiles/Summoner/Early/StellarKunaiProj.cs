@@ -7,19 +7,17 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Debuff;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Early;
 
 public class StellarKunaiProj : ModProjectile, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.StellarKunai);
+    public override string Texture => AssetRegistry.GennedTextures.StellarKunai.Path;
 
     public Player Owner => Main.player[Projectile.owner];
 
@@ -103,7 +101,7 @@ public class StellarKunaiProj : ModProjectile, ILocalizedModType, IModType
             if (this.RunLocal())
             {
                 Projectile.velocity = Vector2.SmoothStep(Projectile.velocity,
-                    center.SafeDirectionTo(Owner.Additions().MouseWorld), (1f - ChargeProgress) * .5f);
+                    center.SafeDirectionTo(Owner.AdditionsMouse().MouseWorld), (1f - ChargeProgress) * .5f);
                 if (Projectile.velocity != Projectile.oldVelocity)
                     this.Sync();
             }
@@ -118,14 +116,14 @@ public class StellarKunaiProj : ModProjectile, ILocalizedModType, IModType
 
         if (Timer == ChargeupTime)
         {
-            SoundID.Item1.Play(Projectile.Center, Main.rand.NextFloat(.9f, 1.2f), 0f, .1f, null, 1, Name);
+            SoundID.Item1.Play(Projectile.Center, Main.rand.NextFloat(.9f, 1.2f), 0f, .1f, 1, Name);
             Projectile.velocity *= 13.5f;
             Projectile.tileCollide = true;
         }
 
         Owner.itemRotation = (Projectile.direction * Projectile.velocity).ToRotation();
 
-        if (Owner.Additions().SafeMouseRight.JustPressed && this.RunLocal())
+        if (Owner.AdditionsMouse().SafeMouseRight.JustPressed && this.RunLocal())
         {
             Returning = true;
             this.Sync();
@@ -289,7 +287,7 @@ public class StellarKunaiProj : ModProjectile, ILocalizedModType, IModType
     }
 
     public TrailPoints line = new(30);
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override bool PreDraw(ref Color lightColor)
     {
@@ -300,9 +298,9 @@ public class StellarKunaiProj : ModProjectile, ILocalizedModType, IModType
 
             if (Returning == true)
             {
-                ManagedShader prim = ShaderRegistry.EnlightenedBeam;
-                prim.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Streak), 1, SamplerState.LinearWrap);
-                prim.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.BigWavyBlobNoise), 2,
+                ManagedShader prim = AssetRegistry.GennedShaders.EnlightenedBeam;
+                prim.SetTexture(AssetRegistry.GennedTextures.Streak, 1, SamplerState.LinearWrap);
+                prim.SetTexture(AssetRegistry.GennedTextures.BigWavyBlobNoise, 2,
                     SamplerState.LinearWrap);
                 trail.DrawTrail(prim, line.Points, 100);
             }

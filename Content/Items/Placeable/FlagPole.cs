@@ -7,7 +7,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Placeable;
 
 public class FlagPole : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.FlagPole);
+    public override string Texture => AssetRegistry.GennedTextures.FlagPole.Path;
 
     public override void SetStaticDefaults()
     {

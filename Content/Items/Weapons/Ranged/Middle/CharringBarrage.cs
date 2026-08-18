@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 
 public class CharringBarrage : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CharringBarrage);
+    public override string Texture => AssetRegistry.GennedTextures.CharringBarrage.Path;
 
     public override void SetDefaults()
     {

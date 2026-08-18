@@ -7,7 +7,6 @@ using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
-using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 using Utils = Terraria.Utils;
@@ -16,7 +15,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
 
 public class MicroGun : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.MicroGun);
+    public override string Texture => AssetRegistry.GennedTextures.MicroGun.Path;
 
     public override void SetStaticDefaults()
     {
@@ -31,7 +30,7 @@ public class MicroGun : ModItem
         Item.height = 83;
         Item.useTime = Item.useAnimation = 3;
         Item.knockBack = 0;
-        Item.rare = ModContent.RarityType<ShadowRarity>();
+        Item.rare = ItemRarityID.Purple;
         Item.value = AdditionsGlobalItem.LegendaryRarityPrice;
         Item.UseSound = null;
         Item.autoReuse = true;

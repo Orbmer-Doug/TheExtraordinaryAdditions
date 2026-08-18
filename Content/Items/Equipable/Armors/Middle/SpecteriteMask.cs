@@ -6,14 +6,13 @@ using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
 
 [AutoloadEquip(EquipType.Head)]
 public class SpecteriteMask : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SpecteriteMask);
+    public override string Texture => AssetRegistry.GennedTextures.SpecteriteMask.Path;
 
     public override void SetStaticDefaults()
     {

@@ -9,7 +9,7 @@ public class WaterStream : ModProjectile
 {
     public Player Owner => Main.player[Projectile.owner];
 
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {

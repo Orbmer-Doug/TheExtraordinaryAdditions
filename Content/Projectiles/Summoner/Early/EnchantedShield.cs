@@ -6,16 +6,15 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Summon;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Early;
 
 public class EnchantedShield : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.EnchantedShield);
+    public override string Texture => AssetRegistry.GennedTextures.EnchantedShield.Path;
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer ModdedOwner => Owner.Additions();
     public NPC Target => NPCTargeting.MinionHoming(new(Projectile.Center, 900), Owner);
 
     public const float ReelBackTime = 50f;
@@ -227,10 +226,9 @@ public class EnchantedShield : ModProjectile
                 }
             }
 
-            // Play the sound once
             if (PlayedSound == false)
             {
-                SoundID.DD2_WyvernDiveDown.Play(Projectile.Center, 1.2f, 0f, .1f, null, 10, Name);
+                SoundID.DD2_WyvernDiveDown.Play(Projectile.Center, 1.2f, 0f, .1f, 10, Name);
                 PlayedSound = true;
             }
         }

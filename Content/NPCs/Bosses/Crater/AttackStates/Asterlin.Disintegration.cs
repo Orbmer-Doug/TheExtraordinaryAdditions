@@ -63,7 +63,7 @@ public partial class Asterlin
         if (AITimer == Disintegration_HoverTime)
         {
             // Create the stars
-            if (this.RunServer())
+            if (ModNPC.RunServer())
             {
                 Disintegration_Star1Index = NPC.NewNPCProj(NPC.Center + new Vector2(350f, -200f), Vector2.Zero, proj,
                     HeavyAttackDamage, 0f, ai2: 1);

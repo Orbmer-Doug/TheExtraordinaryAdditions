@@ -6,13 +6,12 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
 
 public class RemoteHoldout : BaseIdleHoldoutProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.RemoteHoldout);
+    public override string Texture => AssetRegistry.GennedTextures.RemoteHoldout.Path;
     public override int AssociatedItemID => ModContent.ItemType<HiTechRemote>();
     public override int IntendedProjectileType => ModContent.ProjectileType<RemoteHoldout>();
 

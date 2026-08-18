@@ -9,15 +9,13 @@ using Terraria.ModLoader.Utilities;
 using TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 using TheExtraordinaryAdditions.Content.Items.Placeable.Banners;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.SolarGuardian;
 
 public class SolarGuardian : ModNPC
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SolarGuardian);
+    public override string Texture => AssetRegistry.GennedTextures.SolarGuardian.Path;
 
     public override void SetStaticDefaults()
     {
@@ -149,7 +147,7 @@ public class SolarGuardian : ModNPC
                         {
                             Vector2 vel = NPC.rotation.ToRotationVector2()
                                 .RotatedBy(MathHelper.Lerp(-.4f, .4f, InverseLerp(0f, count - 1, i))) * 3f;
-                            if (this.RunServer())
+                            if (ModNPC.RunServer())
                                 NPC.NewNPCProj(NPC.Center, vel, ModContent.ProjectileType<Sunray>(), SunrayDamage, 1f);
                             for (int o = 0; o < 6; o++)
                             {

@@ -6,7 +6,7 @@ namespace TheExtraordinaryAdditions.Content.Buffs.Debuff;
 
 public class AuroricCooldown : ModBuff
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AuroricCooldown);
+    public override string Texture => AssetRegistry.GennedTextures.AuroricCooldown.Path;
 
     public override void SetStaticDefaults()
     {

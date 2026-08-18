@@ -5,19 +5,17 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Debuff;
 using TheExtraordinaryAdditions.Content.Items.Materials.Early;
 using TheExtraordinaryAdditions.Content.NPCs.Hostile.Fulgur;
-using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Early;
 
 [AutoloadEquip(EquipType.Head)]
 public class VoltHelmet : ModItem, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.VoltHelmet);
+    public override string Texture => AssetRegistry.GennedTextures.VoltHelmet.Path;
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {
@@ -53,11 +51,11 @@ public class VoltHelmet : ModItem, ILocalizedModType, IModType
             !player.HasBuff(ModContent.BuffType<FulminationCooldown>()))
         {
             player.AddBuff(ModContent.BuffType<FulminationCooldown>(), SecondsToFrames(15));
-            AdditionsSound.LightningStrike.Play(player.Center, 1f, 0f, .2f);
+            AssetRegistry.GennedSounds.LightningStrike.Play(player.Center, 1f, 0f, .2f);
             Projectile bolt =
                 Main.projectile[
                     player.NewPlayerProj(player.Center,
-                        player.Center.SafeDirectionTo(player.Additions().MouseWorld) * 10f,
+                        player.Center.SafeDirectionTo(player.AdditionsMouse().MouseWorld) * 10f,
                         ModContent.ProjectileType<LightningVolt>(), 100, 1f, player.whoAmI)];
             bolt.friendly = true;
             bolt.hostile = false;

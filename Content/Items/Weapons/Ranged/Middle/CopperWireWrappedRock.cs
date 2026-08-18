@@ -8,7 +8,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 
 public class CopperWireWrappedRock : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CopperWireWrappedRock);
+    public override string Texture => AssetRegistry.GennedTextures.CopperWireWrappedRock.Path;
 
     public override void SetDefaults()
     {

@@ -3,18 +3,17 @@ using System;
 using Terraria;
 using TheExtraordinaryAdditions.Assets.Audio;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
 public class CondensedSoulMass : ProjOwnedByNPC<Asterlin>
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public const int AbsorbTime = 50;
     public ref float Time => ref Projectile.ai[0];
@@ -45,7 +44,7 @@ public class CondensedSoulMass : ProjOwnedByNPC<Asterlin>
 
     public override void SafeAI()
     {
-        Holy ??= LoopedSoundManager.CreateNew(new(AdditionsSound.holyLoop, () => 1.2f * Projectile.scale),
+        Holy ??= LoopedSoundManager.CreateNew(new(AssetRegistry.GennedSounds.holyLoop, () => 1.2f * Projectile.scale),
             () => AdditionsLoopedSound.ProjectileNotActive(Projectile));
         Holy?.Update(Projectile.Center);
 
@@ -64,7 +63,7 @@ public class CondensedSoulMass : ProjOwnedByNPC<Asterlin>
 
                 if (player.Center.WithinRange(Projectile.Center, 100f))
                 {
-                    AdditionsSound.BraveEnergy.Play(Projectile.Center, .9f);
+                    AssetRegistry.GennedSounds.BraveEnergy.Play(Projectile.Center, .9f);
                     PlayerIndex = player.whoAmI;
                     Touched = true;
                     this.Sync();
@@ -78,10 +77,10 @@ public class CondensedSoulMass : ProjOwnedByNPC<Asterlin>
             if (player != null)
                 Projectile.velocity = Vector2.Lerp(Projectile.Center, player.Center, .2f) - Projectile.Center;
 
-            Projectile.scale = Animators.MakePoly(2f).InFunction.Evaluate(Time, 0f, AbsorbTime, 1f, 0f);
+            Projectile.scale = MakePoly(2f).InFunction.Evaluate(Time, 0f, AbsorbTime, 1f, 0f);
             if (Time >= AbsorbTime)
             {
-                AdditionsSound.BraveHeavyFireHit.Play(Projectile.Center, 1.2f);
+                AssetRegistry.GennedSounds.BraveHeavyFireHit.Play(Projectile.Center, 1.2f);
                 ScreenShakeSystem.New(new(2f, 1f), Projectile.Center);
                 ParticleRegistry.SpawnBlurParticle(Projectile.Center, 40, .3f, 600f);
                 ParticleRegistry.SpawnDetailedBlastParticle(Projectile.Center, Vector2.Zero, Vector2.One * 600f,
@@ -138,24 +137,20 @@ public class CondensedSoulMass : ProjOwnedByNPC<Asterlin>
     {
         Vector2 size = Projectile.Size;
         Main.spriteBatch.SetBlendState(BlendState.Additive);
-        Texture2D t = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
+        Texture2D t = AssetRegistry.GennedTextures.GlowParticleSmall;
         Main.spriteBatch.DrawBetterRect(t, ToTarget(Projectile.Center, size * 1.5f * Projectile.scale), null,
             Color.Gold, 0f, t.Size() / 2, 0);
         Main.spriteBatch.DrawBetterRect(t, ToTarget(Projectile.Center, size * 2.5f * Projectile.scale), null,
             Color.Gold, 0f, t.Size() / 2, 0);
         Main.spriteBatch.ResetToDefault();
 
-        void draw()
-        {
-            Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
-            Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, size), null,
-                Color.White * Projectile.scale, 0f, tex.Size() / 2, 0);
-        }
-
-        ManagedShader shader = AssetRegistry.GetShader("SoulMass");
+        ManagedShader shader = AssetRegistry.GennedShaders.SoulMass;
         shader.TrySetParameter("time", TimeSystem.RenderTime * .5f);
         shader.TrySetParameter("scale", Projectile.scale);
-        PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.OverPlayers, null, shader);
+        
+        Texture2D tex = AssetRegistry.GennedTextures.Pixel;
+        SpriteBatch.DrawRectPixelated(PixelationLayer.OverPlayers, null, tex, ToTarget(Projectile.Center, size), null,
+            Color.White * Projectile.scale, 0f, tex.Size() / 2, shader: shader);
         return false;
     }
 }

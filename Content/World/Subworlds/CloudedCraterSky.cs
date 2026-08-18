@@ -6,7 +6,7 @@ using Terraria.GameContent;
 using Terraria.Graphics.Effects;
 using Terraria.Graphics.Shaders;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using static Microsoft.Xna.Framework.MathHelper;
 using static Terraria.Main;
 
@@ -120,7 +120,7 @@ public class CloudyCraterSky : CustomSky
 
         #endregion
 
-        ManagedShader cloudShader = AssetRegistry.GetShader(ShaderKey);
+        ManagedShader cloudShader = AssetRegistry.GennedShaders.Shaders[ShaderKey];
 
         //Color ballColor = GetBackgroundColors(out _, out _);
         //MoonPhase phase = Main.GetMoonPhase();
@@ -135,7 +135,7 @@ public class CloudyCraterSky : CustomSky
         cloudShader.TrySetParameter("ScreenRes", graphics.GraphicsDevice.Viewport.Bounds.Size());
         cloudShader.Render();
 
-        Texture2D pix = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
+        Texture2D pix = AssetRegistry.GennedTextures.Pixel;
         Vector2 drawPosition = screenSize * 0.5f;
         Vector2 skyScale = screenSize / pix.Size();
         spriteBatch.Draw(pix, drawPosition, null, Color.White, 0f, pix.Size() * 0.5f, skyScale, 0, 0f);

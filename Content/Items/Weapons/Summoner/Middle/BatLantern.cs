@@ -12,7 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Middle;
 
 public class BatLantern : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BatLantern);
+    public override string Texture => AssetRegistry.GennedTextures.BatLantern.Path;
 
     public override void SetStaticDefaults()
     {

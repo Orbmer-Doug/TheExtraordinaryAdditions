@@ -4,17 +4,16 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Projectiles.Melee.Late.Fulmina;
+using TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
 
 public class CondereFulmina : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CondereFulmina);
+    public override string Texture => AssetRegistry.GennedTextures.CondereFulmina.Path;
 
     public override void SetStaticDefaults()
     {

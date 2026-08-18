@@ -7,9 +7,8 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
@@ -18,7 +17,7 @@ public class LanikeaHoldout : BaseIdleHoldoutProjectile
 {
     public override int AssociatedItemID => ModContent.ItemType<Lanikea>();
     public override int IntendedProjectileType => ModContent.ProjectileType<LanikeaHoldout>();
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Lanikea);
+    public override string Texture => AssetRegistry.GennedTextures.Lanikea.Path;
 
     public const float MaxCharge = 50f;
 
@@ -79,7 +78,7 @@ public class LanikeaHoldout : BaseIdleHoldoutProjectile
 
         if (Charge == (int) (MaxCharge * ChargeNeeded) && Owner.whoAmI == Main.myPlayer)
         {
-            AdditionsSound.WeaponFail.Play(Owner.MountedCenter, 1f, 0f, .1f);
+            AssetRegistry.GennedSounds.WeaponFail.Play(Owner.MountedCenter, 1f, 0f, .1f);
         }
 
         if (FullChargeProgress >= 1f && Main.rand.NextBool())
@@ -132,7 +131,7 @@ public class LanikeaHoldout : BaseIdleHoldoutProjectile
 
         if (FullChargeProgress < 1f)
         {
-            AdditionsSound.SniperShot.Play(Tip, .5f + .3f * ChargeProgress, 0f, .2f);
+            AssetRegistry.GennedSounds.SniperShot.Play(Tip, .5f + .3f * ChargeProgress, 0f, .2f);
 
             int amount = 7;
 
@@ -143,19 +142,19 @@ public class LanikeaHoldout : BaseIdleHoldoutProjectile
             for (int i = 0; i < amount; i++)
             {
                 float angleOffset = MathHelper.Lerp(Spread * -0.3f, Spread * 0.3f, i / (amount - 1f));
-                Vector2 direction = Utils.ToRotationVector2(velRot + angleOffset);
+                Vector2 direction = (velRot + angleOffset).ToRotationVector2();
                 int realDamage = Projectile.damage + (int) (100 * Math.Pow(ChargeProgress * 1.5f, 3f));
 
                 float val = MathHelper.Lerp(val1, val2, i / (float) (amount - 1f));
                 float speed = (val + 11f * ChargeProgress);
                 Vector2 vel = direction * speed;
                 int type = ModContent.ProjectileType<VolatileStar>();
-                Projectile.NewProj(Tip, vel, type, realDamage / 2, Projectile.knockBack, Owner.whoAmI, 0f, 0f, 0f);
+                Projectile.NewProj(Tip, vel, type, realDamage / 2, Projectile.knockBack, Owner.whoAmI);
 
                 Vector2 velocity = direction * 10f;
                 for (int j = 0; j < 12; j++)
                 {
-                    Vector2 pos = Tip + Utils.NextVector2Circular(Main.rand, 5f, 5f);
+                    Vector2 pos = Tip + Main.rand.NextVector2Circular(5f, 5f);
                     float scale = Main.rand.NextFloat(.64f, 1.1f);
                     ParticleRegistry.SpawnSparkParticle(pos,
                         velocity.RotatedByRandom(.45f) * Main.rand.NextFloat(.2f, 2.1f), 90, scale, Color.Wheat);
@@ -166,14 +165,14 @@ public class LanikeaHoldout : BaseIdleHoldoutProjectile
         }
         else
         {
-            AdditionsSound.Laser3.Play(Projectile.Center, 1.4f);
-            Vector2 direction2 = Utils.ToRotationVector2(velRot);
+            AssetRegistry.GennedSounds.Laser3.Play(Projectile.Center, 1.4f);
+            Vector2 direction2 = velRot.ToRotationVector2();
             Owner.velocity = Owner.SafeDirectionTo(Projectile.Center) * -8f;
             Vector2 velocity = direction2 * 10f;
 
             for (int i = 0; i < 27; i++)
             {
-                Vector2 pos = Tip + Utils.NextVector2Circular(Main.rand, 5f, 5f);
+                Vector2 pos = Tip + Main.rand.NextVector2Circular(5f, 5f);
                 ParticleRegistry.SpawnMistParticle(pos, velocity.RotatedByRandom(.55f) * Main.rand.NextFloat(.4f, 4.2f),
                     Main.rand.NextFloat(.9f, 2.1f), Color.BlueViolet, Color.SlateBlue, 180);
             }
@@ -183,13 +182,13 @@ public class LanikeaHoldout : BaseIdleHoldoutProjectile
                 int type = ModContent.ProjectileType<CosmicSlugCharge>();
                 int damage = (int) (Projectile.damage * .65f);
                 Vector2 final = velocity.RotatedByRandom(.36f) * Main.rand.NextFloat(.5f, .7f);
-                Projectile.NewProj(Tip, final, type, damage, 6f, Owner.whoAmI, 0f, 0f, 0f);
+                Projectile.NewProj(Tip, final, type, damage, 6f, Owner.whoAmI);
             }
 
             Projectile.NewProj(Projectile.Center, new Vector2(5 * -Projectile.direction, -5f),
-                ModContent.ProjectileType<GalaxyShell>(), 0, 0f, -1, 0f, 0f, 0f);
+                ModContent.ProjectileType<GalaxyShell>(), 0, 0f);
 
-            Color pulseColor2 = (Utils.NextBool(Main.rand) ? Color.BlueViolet : Color.SlateGray);
+            Color pulseColor2 = (Main.rand.NextBool() ? Color.BlueViolet : Color.SlateGray);
             ParticleRegistry.SpawnPulseRingParticle(Tip, direction2 * 5, 40, direction2.ToRotation(), new(.5f, 1f),
                 160f, 0f, pulseColor2);
             Recoil = 12;
@@ -207,7 +206,7 @@ public class LanikeaHoldout : BaseIdleHoldoutProjectile
             blinkage = (float) Math.Sin(MathHelper.Clamp((Charge - MaxCharge * ChargeNeeded) / 15f, 0f, 1f) *
                                         MathHelper.Pi);
 
-        ManagedShader effect = ShaderRegistry.SpreadTelegraph;
+        ManagedShader effect = AssetRegistry.GennedShaders.SpreadTelegraph;
         effect.TrySetParameter("centerOpacity", 0.7f);
         effect.TrySetParameter("mainOpacity", (float) Math.Sqrt(ChargeProgress) * 2);
         effect.TrySetParameter("halfSpreadAngle", Spread / 3f);
@@ -219,16 +218,16 @@ public class LanikeaHoldout : BaseIdleHoldoutProjectile
         effect.TrySetParameter("edgeBlendStrength", 13f);
 
         Main.spriteBatch.EnterShaderRegion(effect.Effect, BlendState.Additive);
-        Texture2D invis = AssetRegistry.InvisTex;
+        Texture2D invis = AssetRegistry.GennedTextures.Invisible;
         Main.EntitySpriteDraw(invis, Tip - Main.screenPosition, null, Color.White, Projectile.rotation,
-            new Vector2(invis.Width / 2f, invis.Height / 2f), 700f, 0, 0f);
+            new Vector2(invis.Width / 2f, invis.Height / 2f), 700f, 0);
         Main.spriteBatch.ResetToDefault();
 
         Texture2D texture = Projectile.ThisProjectileTexture();
         Rectangle frame = texture.Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame);
         Vector2 drawPosition = Projectile.Center - Main.screenPosition;
         Main.EntitySpriteDraw(texture, drawPosition, frame, Projectile.GetAlpha(Color.White), Projectile.rotation,
-            frame.Size() * 0.5f, Projectile.scale, FixedDirection(), 0);
+            frame.Size() * 0.5f, Projectile.scale, FixedDirection());
         return false;
     }
 }

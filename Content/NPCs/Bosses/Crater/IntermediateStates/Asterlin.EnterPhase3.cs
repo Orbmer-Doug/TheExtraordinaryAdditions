@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using Terraria;
-using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
@@ -27,12 +25,12 @@ public partial class Asterlin
     public void DoBehavior_EnterPhase3()
     {
         if (AITimer == 1)
-            AdditionsSound.SteamRelease.Play(NPC.Center, 1.5f, -.2f);
+            AssetRegistry.GennedSounds.SteamRelease.Play(NPC.Center, 1.5f, -.2f);
 
         HeatDistortionArea =
-            Animators.Sine.InOutFunction.Evaluate(AITimer, 0f, EnterPhase3_Length, 0f,
+            Sine.InOutFunction.Evaluate(AITimer, 0f, EnterPhase3_Length, 0f,
                 EnterPhase3_MaxHeatDistortionArea);
-        HeatDistortionStrength = Animators.MakePoly(3f).InFunction.Evaluate(AITimer, 0f, EnterPhase3_Length / 2f, 0f,
+        HeatDistortionStrength = MakePoly(3f).InFunction.Evaluate(AITimer, 0f, EnterPhase3_Length / 2f, 0f,
             EnterPhase3_MaxHeatDistortionStrength);
         VentGlowInterpolant = Utils.Remap(AITimer, 0f, 80f, 0f, .5f);
 
@@ -45,12 +43,12 @@ public partial class Asterlin
 
         if (AITimer == EnterPhase3_Length / 2)
         {
-            AdditionsSound.AsterlinChange.Play(NPC.Center, 1.2f, -.1f);
+            AssetRegistry.GennedSounds.AsterlinChange.Play(NPC.Center, 1.2f, -.1f);
         }
 
-        EyeGleamInterpolant = new Animators.PiecewiseCurve()
-            .Add(0f, 1f, .5f, Animators.MakePoly(3f).OutFunction)
-            .Add(1f, 0f, 1f, Animators.MakePoly(4f).InOutFunction)
+        EyeGleamInterpolant = new PiecewiseCurve()
+            .Add(0f, 1f, .5f, MakePoly(3f).OutFunction)
+            .Add(1f, 0f, 1f, MakePoly(4f).InOutFunction)
             .Evaluate(InverseLerp(EnterPhase3_Length / 2f, EnterPhase3_Length, AITimer));
 
         NPC.velocity = Vector2.SmoothStep(NPC.Center,

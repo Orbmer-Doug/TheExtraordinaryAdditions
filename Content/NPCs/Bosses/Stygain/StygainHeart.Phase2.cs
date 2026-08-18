@@ -3,9 +3,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain;
@@ -40,7 +38,7 @@ public sealed partial class StygainHeart
         float offsetAngle = RandomRotation();
         if (wrappedTime == shootCycleTime - 1)
         {
-            if (this.RunServer())
+            if (ModNPC.RunServer())
             {
                 for (int i = 0; i < moonCount; i++)
                 {
@@ -97,15 +95,15 @@ public sealed partial class StygainHeart
                 {
                     hoverDestination = ground.Value - Vector2.UnitY * BarrierSize;
 
-                    Vector2? left = RaytraceTiles(hoverDestination, hoverDestination - Vector2.UnitX * BarrierSize);
+                    Vector2? left = RaycastTiles(hoverDestination, hoverDestination - Vector2.UnitX * BarrierSize);
                     if (left.HasValue)
                         hoverDestination = left.Value + Vector2.UnitX * BarrierSize;
 
-                    Vector2? right = RaytraceTiles(hoverDestination, hoverDestination + Vector2.UnitX * BarrierSize);
+                    Vector2? right = RaycastTiles(hoverDestination, hoverDestination + Vector2.UnitX * BarrierSize);
                     if (right.HasValue)
                         hoverDestination = right.Value - Vector2.UnitX * BarrierSize;
 
-                    Vector2? up = RaytraceTiles(hoverDestination, hoverDestination - Vector2.UnitY * BarrierSize);
+                    Vector2? up = RaycastTiles(hoverDestination, hoverDestination - Vector2.UnitY * BarrierSize);
                     if (up.HasValue)
                         hoverDestination = up.Value + Vector2.UnitY * BarrierSize;
                 }
@@ -129,13 +127,13 @@ public sealed partial class StygainHeart
         // Create the telegraph
         if (AttackTimer == dartShootDelay)
         {
-            if (this.RunServer())
+            if (ModNPC.RunServer())
                 NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<HemoglobTelegraph>(), 0, 0f, -1);
             NPC.netUpdate = true;
         }
 
         // Charge energy while waiting
-        if (AttackTimer.BetweenNum(dartShootDelay, dartShootDelay + HemoglobTelegraph.TeleTime))
+        if (AttackTimer > dartShootDelay && AttackTimer < dartShootDelay + HemoglobTelegraph.TeleTime)
         {
             Vector2 pos = NPC.Center + Main.rand.NextVector2Circular(200f, 200f);
             Vector2 vel = RandomVelocity(2f, 4f, 10f);
@@ -145,7 +143,7 @@ public sealed partial class StygainHeart
         }
 
         // Start the barrier
-        if (AttackTimer == dartShootDelay + HemoglobTelegraph.TeleTime && this.RunServer())
+        if (AttackTimer == dartShootDelay + HemoglobTelegraph.TeleTime && ModNPC.RunServer())
         {
             NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<HemoglobBarrier>(), 0,
                 0f, NPC.whoAmI, 0f, 0f, 0f, target.whoAmI);
@@ -153,7 +151,7 @@ public sealed partial class StygainHeart
         }
 
         // Begin releasing darts
-        bool startFiring = AttackTimer.BetweenNum(dartShootDelay + HemoglobTelegraph.TeleTime, totalTime, true);
+        bool startFiring = AttackTimer >= dartShootDelay + HemoglobTelegraph.TeleTime && AttackTimer <= totalTime;
         bool releaseRate = AttackTimer % dartBurstReleaseRate == dartBurstReleaseRate - 1;
 
         if (startFiring && releaseRate)
@@ -164,7 +162,7 @@ public sealed partial class StygainHeart
                 Vector2 dartVelocity = (MathHelper.TwoPi * i / dartShootCount + shootOffsetAngle).ToRotationVector2() *
                                        dartShootSpeed * .5f;
                 int dart = ModContent.ProjectileType<BloodRay>();
-                if (this.RunServer())
+                if (ModNPC.RunServer())
                     NPC.NewNPCProj(NPC.Center, dartVelocity, dart, BulletTwirlDamage, 0f, -1, 0f, NPC.whoAmI,
                         target.whoAmI);
                 ParticleRegistry.SpawnBloomLineParticle(NPC.Center,
@@ -172,7 +170,7 @@ public sealed partial class StygainHeart
                     Main.rand.NextFloat(.3f, .5f), Color.DarkRed);
             }
 
-            AdditionsSound.etherealHit4.Play(NPC.Center, 1.4f, 0f, .2f, 50);
+            AssetRegistry.GennedSounds.etherealHit4.Play(NPC.Center, 1.4f, 0f, .2f, 50);
         }
 
         if (AttackTimer > totalTime)
@@ -264,7 +262,7 @@ public sealed partial class StygainHeart
                 .Evaluate(comp);
             float dist = new Animators.PiecewiseCurve()
                 .Add(500f, 0f, .6f, Animators.MakePoly(4f).InFunction)
-                .Add(0f, 1300f, 1f, Animators.Exp(2.2f).OutFunction)
+                .Add(0f, 1300f, 1f, Animators.Expo(2.2f).OutFunction)
                 .Evaluate(comp);
             Vector2 left = NPC.Center + PolarVector(dist, -leftAngle);
             Vector2 right = NPC.Center + PolarVector(dist, -rightAngle);
@@ -283,7 +281,7 @@ public sealed partial class StygainHeart
             }
 
             if (Math.Abs(MathF.Round(comp, 2) - .6f) < 1e-5)
-                AdditionsSound.IkeSpecial1A.Play(NPC.Center, 1.2f, -.2f);
+                AssetRegistry.GennedSounds.IkeSpecial1A.Play(NPC.Center, 1.2f, -.2f);
         }
 
         if (preparing)
@@ -297,9 +295,9 @@ public sealed partial class StygainHeart
         // Attacking
         if (AttackTimer == riseTime + waitTime)
         {
-            AdditionsSound.Rapture.Play(target.Center, 1.2f, -.1f);
+            AssetRegistry.GennedSounds.Rapture.Play(target.Center, 1.2f, -.1f);
 
-            if (this.RunServer())
+            if (ModNPC.RunServer())
             {
                 NPC.NewNPCProj(NPC.Center - Vector2.UnitY * 2000f, Vector2.Zero,
                     ModContent.ProjectileType<StygainRoar>(), 0, 0f);
@@ -326,7 +324,7 @@ public sealed partial class StygainHeart
                         if ((int) releaseCounter % 2 == 1)
                             pos.Y -= spearSpacing;
 
-                        if (!this.RunServer())
+                        if (!ModNPC.RunServer())
                             continue;
 
                         Projectile lance = Main.projectile[NPC.NewNPCProj(pos, (Vector2.UnitX * x).RotatedBy(rot),
@@ -338,13 +336,13 @@ public sealed partial class StygainHeart
                     }
                 }
 
-                AdditionsSound.etherealHit4.Play(NPC.Center, 1.5f, 0f, .2f, 50);
+                AssetRegistry.GennedSounds.etherealHit4.Play(NPC.Center, 1.5f, 0f, .2f, 50);
 
                 releaseCounter++;
                 NPC.netUpdate = true;
             }
 
-            if (AttackTimer % moonRelease == moonRelease - 1 && this.RunServer())
+            if (AttackTimer % moonRelease == moonRelease - 1 && ModNPC.RunServer())
             {
                 int type = ModContent.ProjectileType<BloodMoonlet>();
                 Vector2 pos = new(NPC.Center.X, target.Center.Y + Main.rand.NextFloat(-120f, 120f));
@@ -357,7 +355,7 @@ public sealed partial class StygainHeart
         {
             if (AttackTimer % starRelease == starRelease - 1)
             {
-                if (this.RunServer())
+                if (ModNPC.RunServer())
                 {
                     int height = BloodBeacon.MaxLaserLength / 2 + Main.rand.Next(-600, 600);
                     for (int x = -1; x <= 1; x += 2)
@@ -374,7 +372,7 @@ public sealed partial class StygainHeart
                     }
                 }
 
-                SoundID.Item163.Play(NPC.Center, 1.4f, -.4f, 0f, null, 80);
+                SoundID.Item163.Play(NPC.Center, 1.4f, -.4f, 0f, 80);
             }
         }
 

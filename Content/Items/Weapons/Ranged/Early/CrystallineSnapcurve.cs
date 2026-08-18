@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Early;
 
 public class CrystallineSnapcurve : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CrystallineSnapcurve);
+    public override string Texture => AssetRegistry.GennedTextures.CrystallineSnapcurve.Path;
 
     public override void SetStaticDefaults()
     {

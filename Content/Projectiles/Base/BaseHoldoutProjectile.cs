@@ -3,6 +3,7 @@ using System.IO;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Base;
@@ -24,7 +25,7 @@ public abstract class BaseHoldoutProjectile : ModProjectile
     }
 
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
+    public PlayerMouse Modded => Owner.AdditionsMouse();
     public Item Item => Owner.HeldItem;
     public Vector2 Center;
     public Vector2 Mouse;
@@ -47,13 +48,14 @@ public abstract class BaseHoldoutProjectile : ModProjectile
         return true;
     }
 
-    public SpriteEffects FixedDirection()
+    public SpriteEffects FixedDirection(bool horiz = false)
     {
+        SpriteEffects fx = horiz ? SpriteEffects.FlipHorizontally : SpriteEffects.FlipVertically;
         SpriteEffects effects = Projectile.direction == -(int) Owner.gravDir
-            ? SpriteEffects.FlipVertically
+            ? fx
             : SpriteEffects.None;
         if ((int) Owner.gravDir == -1 && Projectile.direction == -(int) Owner.gravDir)
-            effects |= SpriteEffects.FlipVertically;
+            effects |= fx;
         return effects;
     }
 

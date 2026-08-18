@@ -3,13 +3,12 @@ using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
 
 public class FireballProj : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     private const int TotalTime = 180;
     private const int TotalSize = 26;
 
@@ -43,7 +42,7 @@ public class FireballProj : ModProjectile
             Color color = FireballHoldout.FireColors[Main.rand.Next(FireballHoldout.FireColors.Length - 1)];
             ParticleRegistry.SpawnHeavySmokeParticle(pos, vel, life, scale, color);
 
-            if (i.BetweenNum(0, 2))
+            if (i is > 0 and 2)
             {
                 ParticleRegistry.SpawnGlowParticle(pos, vel, life, scale, color);
                 if (Main.rand.NextBool())

@@ -1,14 +1,12 @@
 ﻿using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late.Zenith;
 
 public class CoalescedAmalgam : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -96,7 +94,7 @@ public class CoalescedAmalgam : ModProjectile
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        AdditionsSound.etherealHit4.Play(Projectile.Center, .8f, -.1f, .2f, 10);
+        AssetRegistry.GennedSounds.etherealHit4.Play(Projectile.Center, .8f, -.1f, .2f, 10);
         RotatedRectangle rect = Projectile.RotHitbox(Projectile.velocity.ToRotation());
         for (int i = 0; i < 60; i++)
         {
@@ -121,7 +119,7 @@ public class CoalescedAmalgam : ModProjectile
                 Color fireColor = MulticolorLerp(Main.rand.NextFloat(0.2f, 0.8f), Color.Red, Color.OrangeRed,
                     Color.IndianRed, Color.DarkRed, Color.Orange, Color.DarkOrange, Color.OrangeRed * 1.6f);
                 ParticleRegistry.SpawnHeavySmokeParticle(pos, vel, Main.rand.Next(19, 28), Main.rand.NextFloat(.7f, 1f),
-                    fireColor, 1f);
+                    fireColor);
                 ParticleRegistry.SpawnSquishyLightParticle(pos, vel, life, scale, col);
             }
         }

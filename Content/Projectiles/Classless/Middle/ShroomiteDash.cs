@@ -5,18 +5,17 @@ using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 
 public class ShroomiteDash : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -61,7 +60,7 @@ public class ShroomiteDash : ModProjectile
 
     public override void AI()
     {
-        Vector2 mouse = Owner.Additions().MouseWorld;
+        Vector2 mouse = Owner.AdditionsMouse().MouseWorld;
         Time++;
 
         if (!HitEnemy)
@@ -81,7 +80,7 @@ public class ShroomiteDash : ModProjectile
             Projectile.velocity = Projectile.Center.SafeDirectionTo(mouse);
             if (Completion == 1f && Projectile.localAI[0] == 0f)
             {
-                AdditionsSound.HeatTail.Play(Projectile.Center, .8f, .2f);
+                AssetRegistry.GennedSounds.HeatTail.Play(Projectile.Center, .8f, .2f);
                 Projectile.localAI[0] = 1f;
             }
 
@@ -133,7 +132,7 @@ public class ShroomiteDash : ModProjectile
                     trailWidth = 0;
             }
 
-            Owner.Additions().LungingDown = true;
+            Owner.AdditionsMove().FastFall = true;
             float correction = (Owner.direction == -1 ? MathHelper.Pi : 0f);
             Owner.fullRotation = Projectile.rotation + correction + (MathHelper.PiOver2 * -Owner.direction);
             Owner.fullRotationOrigin = Owner.Center - Owner.position;
@@ -176,7 +175,7 @@ public class ShroomiteDash : ModProjectile
             if (this.RunLocal())
                 Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<ShroomiteDashImpact>(),
                     Projectile.damage, Projectile.knockBack, Projectile.owner);
-            AdditionsSound.VirtueAttack.Play(Projectile.Center, 1.2f, .1f);
+            AssetRegistry.GennedSounds.VirtueAttack.Play(Projectile.Center, 1.2f, .1f);
             ScreenShakeSystem.New(new(.7f, .5f), Projectile.Center);
 
             HitEnemy = true;
@@ -185,11 +184,10 @@ public class ShroomiteDash : ModProjectile
 
     public override void OnKill(int timeLeft)
     {
-        Owner.Additions().LungingDown = false;
         Owner.fullRotation = 0f;
     }
 
-    public float WidthFunct(float c) => OptimizedPrimitiveTrail.PyriformWidthFunct(c, 80f * trailWidth, 2.4f, .2f, .4f);
+    public float WidthFunct(float c) => Trail.PyriformWidthFunct(c, 80f * trailWidth, 2.4f, .2f, .4f);
 
     public Color ColorFunct(SystemVector2 c, Vector2 position)
     {
@@ -200,13 +198,13 @@ public class ShroomiteDash : ModProjectile
     }
 
     public TrailPoints cache;
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override bool PreDraw(ref Color lightColor)
     {
         if (!IsDashing)
         {
-            ManagedShader effect = ShaderRegistry.SpreadTelegraph;
+            ManagedShader effect = AssetRegistry.GennedShaders.SpreadTelegraph;
             effect.TrySetParameter("centerOpacity", 1.7f);
             effect.TrySetParameter("mainOpacity", (float) Math.Sqrt(Completion) * 2f);
             effect.TrySetParameter("halfSpreadAngle", Spread / 2f);
@@ -219,7 +217,7 @@ public class ShroomiteDash : ModProjectile
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState,
                 DepthStencilState.None, Main.Rasterizer, effect.Effect, Main.GameViewMatrix.TransformationMatrix);
-            Texture2D invis = AssetRegistry.InvisTex;
+            Texture2D invis = AssetRegistry.GennedTextures.Invisible;
             Main.EntitySpriteDraw(invis, Owner.Center - Main.screenPosition, null, Color.White, Projectile.rotation,
                 new Vector2(invis.Width / 2f, invis.Height / 2f), 700f, 0, 0f);
             Main.spriteBatch.End();
@@ -233,12 +231,12 @@ public class ShroomiteDash : ModProjectile
                 if (trail == null || cache == null)
                     return;
 
-                ManagedShader shader = ShaderRegistry.EnlightenedBeam;
+                ManagedShader shader = AssetRegistry.GennedShaders.EnlightenedBeam;
 
                 shader.TrySetParameter("time", Main.GlobalTimeWrappedHourly * 4f);
                 shader.TrySetParameter("repeats", 12f);
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Streak), 1, SamplerState.LinearWrap);
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.SuperWavyPerlin), 2,
+                shader.SetTexture(AssetRegistry.GennedTextures.Streak, 1, SamplerState.LinearWrap);
+                shader.SetTexture(AssetRegistry.GennedTextures.SuperWavyPerlin, 2,
                     SamplerState.LinearWrap);
 
                 trail.DrawTrail(shader, cache.Points, 100, true);
@@ -250,3 +248,28 @@ public class ShroomiteDash : ModProjectile
         return false;
     }
 }
+
+public class ShroomiteDashImpact : ModProjectile
+{
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
+
+    public override void SetDefaults()
+    {
+        Projectile.width = Projectile.height = 120;
+        Projectile.tileCollide = false;
+        Projectile.ignoreWater = true;
+        Projectile.DamageType = DamageClass.Generic;
+        Projectile.friendly = true;
+        Projectile.hostile = false;
+        Projectile.usesLocalNPCImmunity = true;
+        Projectile.localNPCHitCooldown = 110;
+        Projectile.timeLeft = 10;
+        Projectile.extraUpdates = 0;
+        Projectile.penetrate = -1;
+        Projectile.ownerHitCheck = false;
+        Projectile.light = 0f;
+        Projectile.netImportant = true;
+        Projectile.netUpdate = true;
+    }
+}
+

@@ -6,7 +6,7 @@ namespace TheExtraordinaryAdditions.Content.Buffs.Summon;
 
 public class GearcatBuff : ModBuff
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GearCatBuff);
+    public override string Texture => AssetRegistry.GennedTextures.GearCatBuff.Path;
 
     public override void SetStaticDefaults()
     {

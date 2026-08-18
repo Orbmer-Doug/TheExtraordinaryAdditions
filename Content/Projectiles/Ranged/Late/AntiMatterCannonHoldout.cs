@@ -5,10 +5,8 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
@@ -18,7 +16,7 @@ public class AntiMatterCannonHoldout : BaseIdleHoldoutProjectile
 
     public override int IntendedProjectileType => ModContent.ProjectileType<AntiMatterCannonHoldout>();
 
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AntiMatterCannon);
+    public override string Texture => AssetRegistry.GennedTextures.AntiMatterCannon.Path;
 
     public const int WaitTime = 78;
     public const int ReloadTime = 120;
@@ -111,8 +109,8 @@ public class AntiMatterCannonHoldout : BaseIdleHoldoutProjectile
 
         if ((this.RunLocal() && Modded.SafeMouseLeft.Current) && Wait <= 0f && !Reloading)
         {
-            Modded.LungingDown = true;
-            AdditionsSound.LargeSniperFire.Play(Tip, 1f, 0f, .15f, 2, Name);
+            Owner.AdditionsMove().FastFall = true;
+            AssetRegistry.GennedSounds.LargeSniperFire.Play(Tip, 1f, 0f, .15f, 2, Name);
             Vector2 vel = Projectile.velocity.SafeNormalize(Vector2.Zero);
 
             float playerSpeed = Owner.velocity.Length();
@@ -148,7 +146,6 @@ public class AntiMatterCannonHoldout : BaseIdleHoldoutProjectile
             Recoil = 40f;
             Wait = WaitTime;
             Shots++;
-            Modded.LungingDown = false;
             this.Sync();
         }
 

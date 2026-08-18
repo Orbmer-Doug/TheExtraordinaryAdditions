@@ -3,9 +3,7 @@ using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using State = TheExtraordinaryAdditions.Content.Projectiles.Magic.Late.TesselesticMeltdownProj.State;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
@@ -25,7 +23,7 @@ public partial class Asterlin : ModNPC
         // State transition checks happen after behavior, meaning by the time it reaches back to behaviors setup with the meltdown will already have been set
         StateMachine.RegisterStateEntryCallback(AsterlinAIType.Tesselestic, () =>
         {
-            if (this.RunServer())
+            if (ModNPC.RunServer())
                 NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<TheTesselesticMeltdown>(),
                     MediumAttackDamage, 0f);
         });
@@ -93,7 +91,7 @@ public partial class Asterlin : ModNPC
         if (AITimer < Tesselestic_ChargeUp)
         {
             float interpol = InverseLerp(0f, Tesselestic_ChargeUp, AITimer);
-            int area = (int) Animators.MakePoly(3f).InOutFunction.Evaluate(400, 10, interpol);
+            int area = (int) MakePoly(3f).InOutFunction.Evaluate(400, 10, interpol);
             Vector2 pos = Staff.TipOfStaff.ToRectangle(area, area).ToRotated(0f).RandomPoint(true);
 
             for (int i = 0; i < 20; i++)
@@ -108,14 +106,14 @@ public partial class Asterlin : ModNPC
         {
             ParticleRegistry.SpawnDetailedBlastParticle(Staff.TipOfStaff, Vector2.Zero, Vector2.One * 200f,
                 Vector2.Zero, 50, Color.Cyan);
-            if (this.RunServer())
+            if (ModNPC.RunServer())
             {
                 for (int i = 0; i < Tesselestic_NodeCount; i++)
                     NPC.NewNPCProj(Staff.TipOfStaff, Main.rand.NextVector2CircularLimited(20f, 20f, .3f, 1f), node, 0,
                         0f);
             }
 
-            AdditionsSound.ElectricalPowBoom.Play(Staff.TipOfStaff, 1.2f, 0f, .1f);
+            AssetRegistry.GennedSounds.ElectricalPowBoom.Play(Staff.TipOfStaff, 1.2f, 0f, .1f);
         }
         else
         {
@@ -143,7 +141,7 @@ public partial class Asterlin : ModNPC
                 {
                     if (!p.As<LightningNode>().Channeling)
                     {
-                        if (this.RunServer())
+                        if (ModNPC.RunServer())
                         {
                             for (int i = 0; i < 4; i++)
                             {
@@ -158,7 +156,7 @@ public partial class Asterlin : ModNPC
                         p.netUpdate = true;
                     }
 
-                    if (this.RunServer() && Tesselestic_AttackTime % 8 == 7)
+                    if (ModNPC.RunServer() && Tesselestic_AttackTime % 8 == 7)
                     {
                         /*NPC.NewNPCProj(Staff.TipOfStaff, Vector2.Zero,
                             ModContent.ProjectileType<HonedTesselesticLightning>(),

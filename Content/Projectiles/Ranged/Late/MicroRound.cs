@@ -1,14 +1,13 @@
 ﻿using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
 public class MicroRound : ModProjectile, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -41,8 +40,8 @@ public class MicroRound : ModProjectile, ILocalizedModType, IModType
         {
             int positionVariation = (Projectile.timeLeft < 565) ? 25 : ((Projectile.timeLeft < 585) ? 12 : 5);
             Vector2 pos = Projectile.Center - Projectile.velocity * 0.75f +
-                          Utils.NextVector2Circular(Main.rand, positionVariation, positionVariation);
-            Vector2 vel = -Projectile.velocity * Utils.NextFloat(Main.rand, 0.003f, 0.001f);
+                          Main.rand.NextVector2Circular(positionVariation, positionVariation);
+            Vector2 vel = -Projectile.velocity * Main.rand.NextFloat(0.003f, 0.001f);
             ParticleRegistry.SpawnBloomLineParticle(pos, vel, 4, 1.45f, color);
         }
     }
@@ -53,30 +52,29 @@ public class MicroRound : ModProjectile, ILocalizedModType, IModType
 
         if (Projectile.numHits <= 0)
         {
-            ParticleRegistry.SpawnSparkleParticle(Projectile.Center + Utils.RotatedByRandom(Projectile.velocity, 0.3),
+            ParticleRegistry.SpawnSparkleParticle(Projectile.Center + Projectile.velocity.RotatedByRandom(0.3),
                 -Projectile.velocity / 3, Main.rand.Next(11, 18), Main.rand.NextFloat(.65f, 1.5f), Color.White,
                 Color.Chocolate, 2.5f, Main.rand.NextFloat(-.04f, .04f));
 
             int life = Main.rand.Next(45, 60);
-            float scale = Utils.NextFloat(Main.rand, 1.2f, Utils.NextFloat(Main.rand, .3f, 1.3f)) * 0.75f;
-            Color col = Color.Lerp(Color.OrangeRed, Color.Orange * 1.2f, Utils.NextFloat(Main.rand, 0.7f));
-            col = Color.Lerp(col, Color.Chocolate, Utils.NextFloat(Main.rand));
-            Vector2 vel = Utils.RotatedByRandom(-Projectile.velocity, 0.699) * Utils.NextFloat(Main.rand, .5f, 1.2f);
-            Vector2 pos = Projectile.Center + Utils.RotatedByRandom(Projectile.velocity, 0.3);
+            float scale = Main.rand.NextFloat(1.2f, Main.rand.NextFloat(.3f, 1.3f)) * 0.75f;
+            Color col = Color.Lerp(Color.OrangeRed, Color.Orange * 1.2f, Main.rand.NextFloat(0.7f));
+            col = Color.Lerp(col, Color.Chocolate, Main.rand.NextFloat());
+            Vector2 vel = (-Projectile.velocity).RotatedByRandom(0.699) * Main.rand.NextFloat(.5f, 1.2f);
+            Vector2 pos = Projectile.Center + Projectile.velocity.RotatedByRandom(0.3);
             ParticleRegistry.SpawnSparkParticle(pos, vel, life, scale, col);
 
             for (int i = 0; i <= 7; i++)
             {
                 Dust obj = Dust.NewDustPerfect(
-                    Projectile.Center + Projectile.velocity * 1.5f + Utils.NextVector2Circular(Main.rand, 9f, 9f),
-                    Utils.NextBool(Main.rand, 3) ? 303 : 244,
-                    (Vector2?) (Utils.RotatedByRandom(-Projectile.velocity * Utils.NextFloat(Main.rand, 0.5f, 3f),
-                        (double) MathHelper.ToRadians(20f)) * Utils.NextFloat(Main.rand, 0.1f, 0.8f)), 0,
+                    Projectile.Center + Projectile.velocity * 1.5f + Main.rand.NextVector2Circular(9f, 9f),
+                    Main.rand.NextBool(3) ? 303 : 244,
+                    (Vector2?) ((-Projectile.velocity * Main.rand.NextFloat(0.5f, 3f)).RotatedByRandom((double) MathHelper.ToRadians(20f)) * Main.rand.NextFloat(0.1f, 0.8f)), 0,
                     default(Color), 1.5f);
                 obj.noGravity = true;
                 obj.scale = ((obj.type == 244)
-                    ? Utils.NextFloat(Main.rand, 1.8f, 2.5f)
-                    : Utils.NextFloat(Main.rand, 1.4f, 1.8f));
+                    ? Main.rand.NextFloat(1.8f, 2.5f)
+                    : Main.rand.NextFloat(1.4f, 1.8f));
                 obj.fadeIn = ((obj.type == 244) ? 1.2f : 0f);
             }
         }

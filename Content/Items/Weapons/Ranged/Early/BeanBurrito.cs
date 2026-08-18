@@ -13,7 +13,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Early;
 
 public class BeanBurrito : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BeanBurrito);
+    public override string Texture => AssetRegistry.GennedTextures.BeanBurrito.Path;
 
     public override void SetStaticDefaults()
     {
@@ -49,7 +49,7 @@ public class BeanBurrito : ModItem
 
     public override void UpdateInventory(Player player)
     {
-        if (player.Additions().GlobalTimer % 20 == 19)
+        if (player.AdditionsMisc().GlobalTimer % 20 == 19)
             Item.value = Item.buyPrice(0, Main.rand.Next(1, 5), Main.rand.Next(0, 99), 0);
     }
 

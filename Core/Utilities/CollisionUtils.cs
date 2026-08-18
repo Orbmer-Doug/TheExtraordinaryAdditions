@@ -7,6 +7,250 @@ namespace TheExtraordinaryAdditions.Core.Utilities;
 
 public static class CollisionUtils
 {
+    /// <summary>
+    /// Checks if a given hitbox is within the bounding box of a line <br></br>
+    /// Particularly useful for only checking necessary targets 
+    /// </summary>
+    /// <param name="start">The start of the line</param>
+    /// <param name="end">The end of the line</param>
+    /// <param name="hitbox">The hitbox to check for</param>
+    public static bool IsAABBInRayRange(Vector2 start, Vector2 end, Rectangle hitbox)
+    {
+        // Rays AABB
+        float rayMinX = Math.Min(start.X, end.X);
+        float rayMaxX = Math.Max(start.X, end.X);
+        float rayMinY = Math.Min(start.Y, end.Y);
+        float rayMaxY = Math.Max(start.Y, end.Y);
+
+        // Objects AABB
+        float objMinX = hitbox.Left;
+        float objMaxX = hitbox.Right;
+        float objMinY = hitbox.Top;
+        float objMaxY = hitbox.Bottom;
+
+        // Check for AABB overlap
+        if (rayMaxX < objMinX || rayMinX > objMaxX || rayMaxY < objMinY || rayMinY > objMaxY)
+            return false;
+
+        // Check if the closest point on the AABB is within the maximum distance
+        float closestX = Math.Clamp(start.X, objMinX, objMaxX);
+        float closestY = Math.Clamp(start.Y, objMinY, objMaxY);
+        float distanceSquared =
+            (start.X - closestX) * (start.X - closestX) + (start.Y - closestY) * (start.Y - closestY);
+        return distanceSquared <= (end - start).LengthSquared();
+    }
+
+    public static Vector2 ResolveCollision(ref Rectangle rect, RotatedRectangle rotatedRect, Vector2 velocity,
+        out bool collisionOccurred, int iterations = 4)
+    {
+        collisionOccurred = false;
+        iterations = Math.Max(1, Math.Min(iterations, 10));
+
+        Vector2 newPosition = new Vector2(rect.X, rect.Y) + velocity;
+        Rectangle testRect = new((int) newPosition.X, (int) newPosition.Y, rect.Width, rect.Height);
+
+        Vector2[] rotatedCorners =
+            [rotatedRect.Top, rotatedRect.TopRight, rotatedRect.BottomRight, rotatedRect.BottomLeft];
+        float minX = Math.Min(rotatedCorners[0].X,
+            Math.Min(rotatedCorners[1].X, Math.Min(rotatedCorners[2].X, rotatedCorners[3].X)));
+        float minY = Math.Min(rotatedCorners[0].Y,
+            Math.Min(rotatedCorners[1].Y, Math.Min(rotatedCorners[2].Y, rotatedCorners[3].Y)));
+        float maxX = Math.Max(rotatedCorners[0].X,
+            Math.Max(rotatedCorners[1].X, Math.Max(rotatedCorners[2].X, rotatedCorners[3].X)));
+        float maxY = Math.Max(rotatedCorners[0].Y,
+            Math.Max(rotatedCorners[1].Y, Math.Max(rotatedCorners[2].Y, rotatedCorners[3].Y)));
+
+        if (testRect.Right < minX || testRect.Left > maxX || testRect.Bottom < minY || testRect.Top > maxY)
+        {
+            rect.X = (int) newPosition.X;
+            rect.Y = (int) newPosition.Y;
+            return velocity;
+        }
+
+        Rectangle initialRect = new(rect.X, rect.Y, rect.Width, rect.Height);
+        bool wasColliding = GetSeparationInfo(initialRect, rotatedRect, out _, out _);
+
+        if (!GetSeparationInfo(testRect, rotatedRect, out _, out _))
+        {
+            rect.X = (int) newPosition.X;
+            rect.Y = (int) newPosition.Y;
+            return velocity;
+        }
+
+        Vector2 resolvedVelocity = velocity;
+        Vector2 step = velocity / iterations;
+        Vector2 originalDirection = Vector2.Normalize(velocity.Length() > 0 ? velocity : Vector2.UnitX);
+        float originalSpeed = velocity.Length();
+
+        for (int i = 0; i < iterations; i++)
+        {
+            Vector2 currentPos = new Vector2(rect.X, rect.Y) + (step * i);
+            testRect = new Rectangle((int) currentPos.X, (int) currentPos.Y, rect.Width, rect.Height);
+
+            if (testRect.Right < minX || testRect.Left > maxX || testRect.Bottom < minY || testRect.Top > maxY)
+                continue;
+
+            if (GetSeparationInfo(testRect, rotatedRect, out Vector2 penetration, out Vector2 normal))
+            {
+                if (!wasColliding && i == 0 || (i > 0 && !GetSeparationInfo(
+                        new Rectangle((int) (currentPos.X - step.X), (int) (currentPos.Y - step.Y), rect.Width,
+                            rect.Height),
+                        rotatedRect, out _, out _)))
+                {
+                    collisionOccurred = true;
+                }
+
+                if (penetration == Vector2.Zero)
+                    break;
+
+                Vector2 slideVelocity = resolvedVelocity - Vector2.Dot(resolvedVelocity, normal) * normal;
+                float slideMagnitude = slideVelocity.Length();
+
+                if (slideMagnitude > 0.001f)
+                    slideVelocity = Vector2.Normalize(slideVelocity) * Math.Min(originalSpeed, slideMagnitude);
+                else
+                    slideVelocity = originalDirection * originalSpeed * 0.5f;
+
+                float alignment = Vector2.Dot(Vector2.Normalize(slideVelocity), originalDirection);
+                if (alignment < 0.1f && alignment > -0.1f)
+                    slideVelocity = Vector2.Lerp(slideVelocity, originalDirection * originalSpeed, 0.3f);
+
+                resolvedVelocity = slideVelocity;
+            }
+        }
+
+        rect.X = (int) (newPosition.X + resolvedVelocity.X);
+        rect.Y = (int) (newPosition.Y + resolvedVelocity.Y);
+        return resolvedVelocity;
+    }
+
+    private static bool GetSeparationInfo(Rectangle rect, RotatedRectangle rotatedRect, out Vector2 penetrationVector,
+        out Vector2 normal)
+    {
+        penetrationVector = Vector2.Zero;
+        normal = Vector2.Zero;
+
+        Vector2 c = new(rect.X + rect.Width / 2f, rect.Y + rect.Height / 2f);
+        Vector2 rotatedC = rotatedRect.Center;
+        Vector2 u = rotatedRect.Rotation.ToRotationVector2();
+        Vector2 v = new(-u.Y, u.X);
+
+        float minOverlap = float.MaxValue;
+        Vector2 minAxis = Vector2.Zero;
+
+        // Axis Vector2.UnitX
+        float rectMinX = rect.X;
+        float rectMaxX = rect.X + rect.Width;
+        float rRotatedX = (rotatedRect.Width / 2f) * Math.Abs(u.X) + (rotatedRect.Height / 2f) * Math.Abs(v.X);
+        float rotatedMinX = rotatedC.X - rRotatedX;
+        float rotatedMaxX = rotatedC.X + rRotatedX;
+        float overlapX = Math.Min(rectMaxX, rotatedMaxX) - Math.Max(rectMinX, rotatedMinX);
+        if (overlapX <= 0)
+            return false;
+
+        if (overlapX < minOverlap)
+        {
+            minOverlap = overlapX;
+            minAxis = Vector2.UnitX;
+        }
+
+        // Axis Vector2.UnitY
+        float rectMinY = rect.Y;
+        float rectMaxY = rect.Y + rect.Height;
+        float rRotatedY = (rotatedRect.Width / 2f) * Math.Abs(u.Y) + (rotatedRect.Height / 2f) * Math.Abs(v.Y);
+        float rotatedMinY = rotatedC.Y - rRotatedY;
+        float rotatedMaxY = rotatedC.Y + rRotatedY;
+        float overlapY = Math.Min(rectMaxY, rotatedMaxY) - Math.Max(rectMinY, rotatedMinY);
+        if (overlapY <= 0)
+            return false;
+
+        if (overlapY < minOverlap)
+        {
+            minOverlap = overlapY;
+            minAxis = Vector2.UnitY;
+        }
+
+        // Axis U
+        float rRectU = (rect.Width / 2f) * Math.Abs(u.X) + (rect.Height / 2f) * Math.Abs(u.Y);
+        float rectProjU = Vector2.Dot(c, u);
+        float rectMinU = rectProjU - rRectU;
+        float rectMaxU = rectProjU + rRectU;
+        float rotatedProjU = Vector2.Dot(rotatedC, u);
+        float rotatedMinU = rotatedProjU - (rotatedRect.Width / 2f);
+        float rotatedMaxU = rotatedProjU + (rotatedRect.Width / 2f);
+        float overlapU = Math.Min(rectMaxU, rotatedMaxU) - Math.Max(rectMinU, rotatedMinU);
+        if (overlapU <= 0)
+            return false;
+
+        if (overlapU < minOverlap)
+        {
+            minOverlap = overlapU;
+            minAxis = u;
+        }
+
+        // Axis V
+        float rRectV = (rect.Width / 2f) * Math.Abs(v.X) + (rect.Height / 2f) * Math.Abs(v.Y);
+        float rectProjV = Vector2.Dot(c, v);
+        float rectMinV = rectProjV - rRectV;
+        float rectMaxV = rectProjV + rRectV;
+        float rotatedProjV = Vector2.Dot(rotatedC, v);
+        float rotatedMinV = rotatedProjV - (rotatedRect.Height / 2f);
+        float rotatedMaxV = rotatedProjV + (rotatedRect.Height / 2f);
+        float overlapV = Math.Min(rectMaxV, rotatedMaxV) - Math.Max(rectMinV, rotatedMinV);
+        if (overlapV <= 0)
+            return false;
+
+        if (overlapV < minOverlap)
+        {
+            minOverlap = overlapV;
+            minAxis = v;
+        }
+
+        Vector2 direction = c - rotatedC;
+        if (Vector2.Dot(direction, minAxis) < 0)
+            minAxis = -minAxis;
+
+        normal = minAxis;
+        penetrationVector = minAxis * minOverlap;
+        return true;
+    }
+
+
+    extension(Rectangle target)
+    {
+        public bool CollisionFromPoints(List<Vector2> list, int width)
+        {
+            if (list == null || list.Count <= 0)
+                return false;
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                Vector2 point = list[i];
+                if (new Rectangle((int) point.X - width / 2, (int) point.Y - width / 2, width, width)
+                    .Intersects(target))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public bool CollisionFromPoints(ReadOnlySpan<Vector2> span, Func<float, float> width)
+        {
+            if (span == null || span.Length <= 0)
+                return false;
+
+            for (int i = 0; i < span.Length; i++)
+            {
+                Vector2 point = span[i];
+                int size = (int) width(InverseLerp(0f, span.Length, i));
+                if (new Rectangle((int) point.X - size / 2, (int) point.Y - size / 2, size, size).Intersects(target))
+                    return true;
+            }
+
+            return false;
+        }
+    }
+
     #region Raycasting
 
     [Flags]
@@ -28,7 +272,7 @@ public static class CollisionUtils
         // Collect tile intersections
         if (targets.HasFlag(CollisionTarget.Tiles))
         {
-            Vector2? tilePoint = RaytraceTiles(start, end, false, thickness, numRays);
+            Vector2? tilePoint = RaycastTiles(start, end, false, thickness, numRays);
             if (tilePoint.HasValue)
             {
                 float distanceSquared = (tilePoint.Value - start).LengthSquared();
@@ -42,7 +286,7 @@ public static class CollisionUtils
         // Collect liquid intersections
         if (targets.HasFlag(CollisionTarget.Liquid))
         {
-            Vector2? liquidPoint = RaytraceLiquid(start, end, thickness, numRays);
+            Vector2? liquidPoint = RaycastLiquid(start, end, thickness, numRays);
             if (liquidPoint.HasValue)
             {
                 float distanceSquared = (liquidPoint.Value - start).LengthSquared();
@@ -56,7 +300,7 @@ public static class CollisionUtils
         // Collect NPC intersections
         if (targets.HasFlag(CollisionTarget.NPCs))
         {
-            Vector2? npcPoint = RaytraceNPCs(start, end, thickness, numRays);
+            Vector2? npcPoint = RaycastNPCs(start, end, thickness, numRays);
             if (npcPoint.HasValue)
             {
                 float distanceSquared = (npcPoint.Value - start).LengthSquared();
@@ -81,7 +325,7 @@ public static class CollisionUtils
         // Collect player intersections
         if (targets.HasFlag(CollisionTarget.Players))
         {
-            Vector2? playerPoint = RaytracePlayers(start, end, thickness, numRays);
+            Vector2? playerPoint = RaycastPlayers(start, end, thickness, numRays);
             if (playerPoint.HasValue)
             {
                 float distanceSquared = (playerPoint.Value - start).LengthSquared();
@@ -145,7 +389,7 @@ public static class CollisionUtils
         // Collect tile intersections
         if (targets.HasFlag(CollisionTarget.Tiles))
         {
-            Vector2? tilePoint = RaytraceTiles(start, end, false, thickness, numRays);
+            Vector2? tilePoint = RaycastTiles(start, end, false, thickness, numRays);
             if (tilePoint.HasValue)
             {
                 float distanceSquared = (tilePoint.Value - start).LengthSquared();
@@ -159,7 +403,7 @@ public static class CollisionUtils
         // Collect liquid intersections
         if (targets.HasFlag(CollisionTarget.Liquid))
         {
-            Vector2? liquidPoint = RaytraceLiquid(start, end, thickness, numRays);
+            Vector2? liquidPoint = RaycastLiquid(start, end, thickness, numRays);
             if (liquidPoint.HasValue)
             {
                 float distanceSquared = (liquidPoint.Value - start).LengthSquared();
@@ -173,7 +417,7 @@ public static class CollisionUtils
         // Collect NPC intersections
         if (targets.HasFlag(CollisionTarget.NPCs))
         {
-            Vector2? npcPoint = RaytraceNPCs(start, end, thickness, numRays);
+            Vector2? npcPoint = RaycastNPCs(start, end, thickness, numRays);
             if (npcPoint.HasValue)
             {
                 float distanceSquared = (npcPoint.Value - start).LengthSquared();
@@ -198,7 +442,7 @@ public static class CollisionUtils
         // Collect player intersections
         if (targets.HasFlag(CollisionTarget.Players))
         {
-            Vector2? playerPoint = RaytracePlayers(start, end, thickness, numRays);
+            Vector2? playerPoint = RaycastPlayers(start, end, thickness, numRays);
             if (playerPoint.HasValue)
             {
                 float distanceSquared = (playerPoint.Value - start).LengthSquared();
@@ -268,7 +512,7 @@ public static class CollisionUtils
     /// <param name="thickness">How many pixels wide should the line be?</param>
     /// <param name="numRays">The more rays the more precise</param>
     /// <returns>The point at which the created line hit a tile in any state</returns>
-    public static Vector2? RaytraceTiles(Vector2 start, Vector2 end, bool topSurfaces = false, float thickness = 0f,
+    public static Vector2? RaycastTiles(Vector2 start, Vector2 end, bool topSurfaces = false, float thickness = 0f,
         int numRays = 5)
     {
         if (thickness <= 0 || numRays <= 1)
@@ -415,12 +659,10 @@ public static class CollisionUtils
                                     else
                                     {
                                         float slopeY = slopeStart.Y + tSlope * (slopeEnd.Y - slopeStart.Y);
-                                        if ((tile.Slope == SlopeType.SlopeDownLeft ||
-                                             tile.Slope == SlopeType.SlopeDownRight) && intersection.Y > slopeY + 0.1f)
-                                            isValid = false;
-                                        else if ((tile.Slope == SlopeType.SlopeUpLeft ||
-                                                  tile.Slope == SlopeType.SlopeUpRight) &&
-                                                 intersection.Y < slopeY - 0.1f)
+                                        if (tile.Slope is SlopeType.SlopeDownLeft or SlopeType.SlopeDownRight &&
+                                            intersection.Y > slopeY + 0.1f ||
+                                            tile.Slope is SlopeType.SlopeUpLeft or SlopeType.SlopeUpRight &&
+                                            intersection.Y < slopeY - 0.1f)
                                             isValid = false;
                                     }
                                 }
@@ -484,7 +726,7 @@ public static class CollisionUtils
                 Vector2 offset = offsetFactor * thickness * perp;
                 Vector2 startOffset = start + offset;
                 Vector2 endOffset = end + offset;
-                Vector2? intersect = RaytraceTiles(startOffset, endOffset, topSurfaces, 0f, 1);
+                Vector2? intersect = RaycastTiles(startOffset, endOffset, topSurfaces, 0f, 1);
                 if (intersect.HasValue)
                 {
                     // Project the intersection point onto the main ray
@@ -534,7 +776,7 @@ public static class CollisionUtils
     /// <param name="thickness">How many pixels wide should the line be?</param>
     /// <param name="numRays">The more rays the more precise</param>
     /// <returns>The point at which the created line hit the surface of liquid</returns>
-    public static Vector2? RaytraceLiquid(Vector2 start, Vector2 end, float thickness = 0f, int numRays = 5)
+    public static Vector2? RaycastLiquid(Vector2 start, Vector2 end, float thickness = 0f, int numRays = 5)
     {
         if (thickness <= 0 || numRays <= 1)
         {
@@ -658,7 +900,7 @@ public static class CollisionUtils
                 Vector2 offset = offsetFactor * thickness * perp;
                 Vector2 startOffset = start + offset;
                 Vector2 endOffset = end + offset;
-                Vector2? intersect = RaytraceLiquid(startOffset, endOffset, 0f, 1);
+                Vector2? intersect = RaycastLiquid(startOffset, endOffset, 0f, 1);
                 if (intersect.HasValue)
                 {
                     // Project the intersection point onto the main ray
@@ -709,7 +951,7 @@ public static class CollisionUtils
     /// <param name="numRays">The more rays the more precise</param>
     /// <param name="requireHome">Do NPCs need to pass <see cref="NPCTargeting.CanHomeInto(NPC, bool, bool)"/>?</param>
     /// <returns>The point at which the created line hit a NPC's hitbox</returns>
-    public static Vector2? RaytraceNPCs(Vector2 start, Vector2 end, float thickness = 0f, int numRays = 5,
+    public static Vector2? RaycastNPCs(Vector2 start, Vector2 end, float thickness = 0f, int numRays = 5,
         bool requireHome = true)
     {
         if (thickness <= 0 || numRays <= 1)
@@ -770,7 +1012,7 @@ public static class CollisionUtils
             Vector2 offset = offsetFactor * thickness * perp;
             Vector2 startOffset = start + offset;
             Vector2 endOffset = end + offset;
-            Vector2? intersect = RaytraceNPCs(startOffset, endOffset, 0f, 1, requireHome);
+            Vector2? intersect = RaycastNPCs(startOffset, endOffset, 0f, 1, requireHome);
             if (intersect.HasValue)
             {
                 // Project the intersection point onto the main ray (start to end)
@@ -819,7 +1061,7 @@ public static class CollisionUtils
     /// <param name="thickness">How many pixels wide should the line be?</param>
     /// <param name="numRays">The more rays the more precise</param>
     /// <returns>The point at which the created line hit a players hitbox</returns>
-    public static Vector2? RaytracePlayers(Vector2 start, Vector2 end, float thickness = 0f, int numRays = 5)
+    public static Vector2? RaycastPlayers(Vector2 start, Vector2 end, float thickness = 0f, int numRays = 5)
     {
         if (thickness <= 0 || numRays <= 1)
         {
@@ -879,7 +1121,7 @@ public static class CollisionUtils
             Vector2 offset = offsetFactor * thickness * perp;
             Vector2 startOffset = start + offset;
             Vector2 endOffset = end + offset;
-            Vector2? intersect = RaytracePlayers(startOffset, endOffset, 0f, 1);
+            Vector2? intersect = RaycastPlayers(startOffset, endOffset, 0f, 1);
             if (!intersect.HasValue)
                 continue;
 
@@ -920,40 +1162,7 @@ public static class CollisionUtils
         return null;
     }
 
-    /// <summary>
-    /// Checks if a given hitbox is within the bounding box of a line <br></br>
-    /// Particularly useful for only checking necessary targets 
-    /// </summary>
-    /// <param name="start">The start of the line</param>
-    /// <param name="end">The end of the line</param>
-    /// <param name="hitbox">The hitbox to check for</param>
-    public static bool IsAABBInRayRange(Vector2 start, Vector2 end, Rectangle hitbox)
-    {
-        // Rays AABB
-        float rayMinX = Math.Min(start.X, end.X);
-        float rayMaxX = Math.Max(start.X, end.X);
-        float rayMinY = Math.Min(start.Y, end.Y);
-        float rayMaxY = Math.Max(start.Y, end.Y);
-
-        // Objects AABB
-        float objMinX = hitbox.Left;
-        float objMaxX = hitbox.Right;
-        float objMinY = hitbox.Top;
-        float objMaxY = hitbox.Bottom;
-
-        // Check for AABB overlap
-        if (rayMaxX < objMinX || rayMinX > objMaxX || rayMaxY < objMinY || rayMinY > objMaxY)
-            return false;
-
-        // Check if the closest point on the AABB is within the maximum distance
-        float closestX = Math.Clamp(start.X, objMinX, objMaxX);
-        float closestY = Math.Clamp(start.Y, objMinY, objMaxY);
-        float distanceSquared =
-            (start.X - closestX) * (start.X - closestX) + (start.Y - closestY) * (start.Y - closestY);
-        return distanceSquared <= (end - start).LengthSquared();
-    }
-
-    public static bool RaytraceTo(int x0, int y0, int x1, int y1, bool ignoreHalfTiles = false)
+    public static bool RaycastTo(int x0, int y0, int x1, int y1, bool ignoreHalfTiles = false)
     {
         // Bresenham's algorithm
         int horizontalDistance = Math.Abs(x1 - x0); // Delta X
@@ -993,19 +1202,19 @@ public static class CollisionUtils
         }
     }
 
-    public static Point? RaytraceToFirstSolid(Vector2 pos1, Vector2 pos2)
+    public static Point? RaycastToFirstSolid(Vector2 pos1, Vector2 pos2)
     {
         Point point1 = pos1.ToSafeTileCoordinates();
         Point point2 = pos2.ToSafeTileCoordinates();
-        return RaytraceToFirstSolid(point1, point2);
+        return RaycastToFirstSolid(point1, point2);
     }
 
-    public static Point? RaytraceToFirstSolid(Point pos1, Point pos2)
+    public static Point? RaycastToFirstSolid(Point pos1, Point pos2)
     {
-        return RaytraceToFirstSolid(pos1.X, pos1.Y, pos2.X, pos2.Y);
+        return RaycastToFirstSolid(pos1.X, pos1.Y, pos2.X, pos2.Y);
     }
 
-    public static Point? RaytraceToFirstSolid(int x0, int y0, int x1, int y1)
+    public static Point? RaycastToFirstSolid(int x0, int y0, int x1, int y1)
     {
         //Bresenham's algorithm
         int horizontalDistance = Math.Abs(x1 - x0); //Delta X
@@ -1043,6 +1252,8 @@ public static class CollisionUtils
     }
 
     #endregion
+
+    #region SAT
 
     /// <summary>
     /// Determines if two polygons are intersecting using the Separating Axis Theorem
@@ -1104,181 +1315,9 @@ public static class CollisionUtils
         return (min, max);
     }
 
-    public static Vector2 ResolveCollision(ref Rectangle rect, RotatedRectangle rotatedRect, Vector2 velocity,
-        out bool collisionOccurred, int iterations = 4)
-    {
-        collisionOccurred = false;
-        iterations = Math.Max(1, Math.Min(iterations, 10));
+    #endregion
 
-        Vector2 newPosition = new Vector2(rect.X, rect.Y) + velocity;
-        Rectangle testRect = new((int) newPosition.X, (int) newPosition.Y, rect.Width, rect.Height);
-
-        Vector2[] rotatedCorners =
-            [rotatedRect.Top, rotatedRect.TopRight, rotatedRect.BottomRight, rotatedRect.BottomLeft];
-        float minX = Math.Min(rotatedCorners[0].X,
-            Math.Min(rotatedCorners[1].X, Math.Min(rotatedCorners[2].X, rotatedCorners[3].X)));
-        float minY = Math.Min(rotatedCorners[0].Y,
-            Math.Min(rotatedCorners[1].Y, Math.Min(rotatedCorners[2].Y, rotatedCorners[3].Y)));
-        float maxX = Math.Max(rotatedCorners[0].X,
-            Math.Max(rotatedCorners[1].X, Math.Max(rotatedCorners[2].X, rotatedCorners[3].X)));
-        float maxY = Math.Max(rotatedCorners[0].Y,
-            Math.Max(rotatedCorners[1].Y, Math.Max(rotatedCorners[2].Y, rotatedCorners[3].Y)));
-
-        if (testRect.Right < minX || testRect.Left > maxX || testRect.Bottom < minY || testRect.Top > maxY)
-        {
-            rect.X = (int) newPosition.X;
-            rect.Y = (int) newPosition.Y;
-            return velocity;
-        }
-
-        Rectangle initialRect = new(rect.X, rect.Y, rect.Width, rect.Height);
-        bool wasColliding = GetSeparationInfo(initialRect, rotatedRect, out _, out _);
-
-        if (!GetSeparationInfo(testRect, rotatedRect, out _, out _))
-        {
-            rect.X = (int) newPosition.X;
-            rect.Y = (int) newPosition.Y;
-            return velocity;
-        }
-
-        Vector2 resolvedVelocity = velocity;
-        Vector2 step = velocity / iterations;
-        Vector2 originalDirection = Vector2.Normalize(velocity.Length() > 0 ? velocity : Vector2.UnitX);
-        float originalSpeed = velocity.Length();
-
-        for (int i = 0; i < iterations; i++)
-        {
-            Vector2 currentPos = new Vector2(rect.X, rect.Y) + (step * i);
-            testRect = new Rectangle((int) currentPos.X, (int) currentPos.Y, rect.Width, rect.Height);
-
-            if (testRect.Right < minX || testRect.Left > maxX || testRect.Bottom < minY || testRect.Top > maxY)
-                continue;
-
-            if (GetSeparationInfo(testRect, rotatedRect, out Vector2 penetration, out Vector2 normal))
-            {
-                if (!wasColliding && i == 0 || (i > 0 && !GetSeparationInfo(
-                        new Rectangle((int) (currentPos.X - step.X), (int) (currentPos.Y - step.Y), rect.Width,
-                            rect.Height),
-                        rotatedRect, out _, out _)))
-                {
-                    collisionOccurred = true;
-                }
-
-                if (penetration == Vector2.Zero)
-                    break;
-
-                Vector2 slideVelocity = resolvedVelocity - Vector2.Dot(resolvedVelocity, normal) * normal;
-                float slideMagnitude = slideVelocity.Length();
-
-                if (slideMagnitude > 0.001f)
-                    slideVelocity = Vector2.Normalize(slideVelocity) * Math.Min(originalSpeed, slideMagnitude);
-                else
-                    slideVelocity = originalDirection * originalSpeed * 0.5f;
-
-                float alignment = Vector2.Dot(Vector2.Normalize(slideVelocity), originalDirection);
-                if (alignment < 0.1f && alignment > -0.1f)
-                    slideVelocity = Vector2.Lerp(slideVelocity, originalDirection * originalSpeed, 0.3f);
-
-                currentPos -= penetration;
-                resolvedVelocity = slideVelocity;
-            }
-        }
-
-        rect.X = (int) (newPosition.X + resolvedVelocity.X);
-        rect.Y = (int) (newPosition.Y + resolvedVelocity.Y);
-        return resolvedVelocity;
-    }
-
-    private static bool GetSeparationInfo(Rectangle rect, RotatedRectangle rotatedRect, out Vector2 penetrationVector,
-        out Vector2 normal)
-    {
-        penetrationVector = Vector2.Zero;
-        normal = Vector2.Zero;
-
-        Vector2 C = new(rect.X + rect.Width / 2f, rect.Y + rect.Height / 2f);
-        Vector2 rotatedC = rotatedRect.Center;
-        Vector2 U = rotatedRect.Rotation.ToRotationVector2();
-        Vector2 V = new(-U.Y, U.X);
-
-        float minOverlap = float.MaxValue;
-        Vector2 minAxis = Vector2.Zero;
-
-        // Axis Vector2.UnitX
-        float rectMinX = rect.X;
-        float rectMaxX = rect.X + rect.Width;
-        float r_rotatedX = (rotatedRect.Width / 2f) * Math.Abs(U.X) + (rotatedRect.Height / 2f) * Math.Abs(V.X);
-        float rotatedMinX = rotatedC.X - r_rotatedX;
-        float rotatedMaxX = rotatedC.X + r_rotatedX;
-        float overlapX = Math.Min(rectMaxX, rotatedMaxX) - Math.Max(rectMinX, rotatedMinX);
-        if (overlapX <= 0)
-            return false;
-
-        if (overlapX < minOverlap)
-        {
-            minOverlap = overlapX;
-            minAxis = Vector2.UnitX;
-        }
-
-        // Axis Vector2.UnitY
-        float rectMinY = rect.Y;
-        float rectMaxY = rect.Y + rect.Height;
-        float r_rotatedY = (rotatedRect.Width / 2f) * Math.Abs(U.Y) + (rotatedRect.Height / 2f) * Math.Abs(V.Y);
-        float rotatedMinY = rotatedC.Y - r_rotatedY;
-        float rotatedMaxY = rotatedC.Y + r_rotatedY;
-        float overlapY = Math.Min(rectMaxY, rotatedMaxY) - Math.Max(rectMinY, rotatedMinY);
-        if (overlapY <= 0)
-            return false;
-
-        if (overlapY < minOverlap)
-        {
-            minOverlap = overlapY;
-            minAxis = Vector2.UnitY;
-        }
-
-        // Axis U
-        float r_rectU = (rect.Width / 2f) * Math.Abs(U.X) + (rect.Height / 2f) * Math.Abs(U.Y);
-        float rectProjU = Vector2.Dot(C, U);
-        float rectMinU = rectProjU - r_rectU;
-        float rectMaxU = rectProjU + r_rectU;
-        float rotatedProjU = Vector2.Dot(rotatedC, U);
-        float rotatedMinU = rotatedProjU - (rotatedRect.Width / 2f);
-        float rotatedMaxU = rotatedProjU + (rotatedRect.Width / 2f);
-        float overlapU = Math.Min(rectMaxU, rotatedMaxU) - Math.Max(rectMinU, rotatedMinU);
-        if (overlapU <= 0)
-            return false;
-
-        if (overlapU < minOverlap)
-        {
-            minOverlap = overlapU;
-            minAxis = U;
-        }
-
-        // Axis V
-        float r_rectV = (rect.Width / 2f) * Math.Abs(V.X) + (rect.Height / 2f) * Math.Abs(V.Y);
-        float rectProjV = Vector2.Dot(C, V);
-        float rectMinV = rectProjV - r_rectV;
-        float rectMaxV = rectProjV + r_rectV;
-        float rotatedProjV = Vector2.Dot(rotatedC, V);
-        float rotatedMinV = rotatedProjV - (rotatedRect.Height / 2f);
-        float rotatedMaxV = rotatedProjV + (rotatedRect.Height / 2f);
-        float overlapV = Math.Min(rectMaxV, rotatedMaxV) - Math.Max(rectMinV, rotatedMinV);
-        if (overlapV <= 0)
-            return false;
-
-        if (overlapV < minOverlap)
-        {
-            minOverlap = overlapV;
-            minAxis = V;
-        }
-
-        Vector2 direction = C - rotatedC;
-        if (Vector2.Dot(direction, minAxis) < 0)
-            minAxis = -minAxis;
-
-        normal = minAxis;
-        penetrationVector = minAxis * minOverlap;
-        return true;
-    }
+    #region Shape Collisions
 
     public static bool IsPointInTriangle(Vector2 point, Vector2 v0, Vector2 v1, Vector2 v2)
     {
@@ -1355,80 +1394,6 @@ public static class CollisionUtils
         return false;
     }
 
-    public static (Vector2 start, Vector2 end)? GetIntersectionPoints(Vector2 A, Vector2 B, Rectangle rect)
-    {
-        // Calculate direction and length
-        Vector2 D = B - A;
-        float L = D.Length();
-
-        // Avoid division by zero; if A and B are the same point, there's no line segment
-        if (L == 0)
-            return null;
-
-        // Normalize direction
-        D /= L;
-
-        // Rectangle bounds
-        float minX = rect.X;
-        float maxX = rect.X + rect.Width;
-        float minY = rect.Y;
-        float maxY = rect.Y + rect.Height;
-
-        // Initialize entering and exiting parameters
-        float tEnter = float.NegativeInfinity;
-        float tExit = float.PositiveInfinity;
-
-        // Check X constraints
-        if (D.X > 0)
-        {
-            tEnter = Math.Max(tEnter, (minX - A.X) / D.X); // Entering x >= minX
-            tExit = Math.Min(tExit, (maxX - A.X) / D.X); // Exiting x <= maxX
-        }
-        else if (D.X < 0)
-        {
-            tEnter = Math.Max(tEnter, (maxX - A.X) / D.X); // Entering x <= maxX
-            tExit = Math.Min(tExit, (minX - A.X) / D.X); // Exiting x >= minX
-        }
-        else // D.X == 0
-        {
-            // Parallel and outside
-            if (A.X < minX || A.X > maxX)
-                return null;
-        }
-
-        // Check Y constraints (Y increases downward in FNA)
-        if (D.Y > 0)
-        {
-            tEnter = Math.Max(tEnter, (minY - A.Y) / D.Y); // Entering y >= minY
-            tExit = Math.Min(tExit, (maxY - A.Y) / D.Y); // Exiting y <= maxY
-        }
-        else if (D.Y < 0)
-        {
-            tEnter = Math.Max(tEnter, (maxY - A.Y) / D.Y); // Entering y <= maxY
-            tExit = Math.Min(tExit, (minY - A.Y) / D.Y); // Exiting y >= minY
-        }
-        else // D.Y == 0
-        {
-            // Parallel and outside
-            if (A.Y < minY || A.Y > maxY)
-                return null;
-        }
-
-        // Clip to the line segment's range [0, L]
-        float tStart = Math.Max(0, tEnter);
-        float tEnd = Math.Min(L, tExit);
-
-        // If tStart <= tEnd, there is an intersection
-        if (tStart <= tEnd)
-        {
-            Vector2 start = A + tStart * D;
-            Vector2 end = A + tEnd * D;
-            return (start, end);
-        }
-
-        return null; // No intersection
-    }
-
     public static bool CheckLinearCollision(Vector2 point1, Vector2 point2, Rectangle hitbox, out Vector2 start,
         out Vector2 end)
     {
@@ -1448,37 +1413,6 @@ public static class CollisionUtils
     {
         float _ = 0f;
         return Collision.CheckAABBvLineCollision(target.TopLeft(), target.Size(), start, end, width, ref _);
-    }
-
-    public static bool CollisionFromPoints(this Rectangle target, List<Vector2> list, int width)
-    {
-        if (list == null || list.Count <= 0)
-            return false;
-
-        for (int i = 0; i < list.Count; i++)
-        {
-            Vector2 point = list[i];
-            if (new Rectangle((int) point.X - width / 2, (int) point.Y - width / 2, width, width).Intersects(target))
-                return true;
-        }
-
-        return false;
-    }
-
-    public static bool CollisionFromPoints(this Rectangle target, ReadOnlySpan<Vector2> span, Func<float, float> width)
-    {
-        if (span == null || span.Length <= 0)
-            return false;
-
-        for (int i = 0; i < span.Length; i++)
-        {
-            Vector2 point = span[i];
-            int size = (int) width(InverseLerp(0f, span.Length, i));
-            if (new Rectangle((int) point.X - size / 2, (int) point.Y - size / 2, size, size).Intersects(target))
-                return true;
-        }
-
-        return false;
     }
 
     public static bool EllipseCollision(Rectangle target, float ellipseWidth, float ellipseHeight,
@@ -1541,4 +1475,126 @@ public static class CollisionUtils
 
         return (dx * dx + dy * dy) <= (radius * radius);
     }
+
+    #endregion
+
+    #region Lines
+
+    // Algorithm taken from http://web.archive.org/web/20060911055655/http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline2d/
+    public static bool LinesIntersect(Vector2 segAStart, Vector2 segAEnd, Vector2 segBStart, Vector2 segBEnd,
+        out Vector2 intersectPoint)
+    {
+        intersectPoint = Vector2.Zero;
+
+        // Tells if the second segment is on the left or right of the first one
+        float directionCross = Wedge(segAEnd - segAStart, segBEnd - segBStart);
+
+        // Unnormalized
+        float tANum = Wedge(segBEnd - segBStart, segAStart - segBStart);
+        float tBNum = Wedge(segAEnd - segAStart, segAStart - segBStart);
+
+        if (directionCross == 0)
+        {
+            if (tANum == 0 || tBNum == 0) // Lines are coincident
+            {
+                intersectPoint = segAStart;
+                return true;
+            }
+
+            return false; // Lines are parallel
+        }
+
+        // Normalized
+        float tA = tANum / directionCross;
+        float tB = tBNum / directionCross;
+
+        if (!(tA > 0) || !(tA < 1) || !(tB > 0) || !(tB < 1))
+            return false;
+
+        intersectPoint = Vector2.Lerp(segAStart, segAEnd, tA);
+
+        return true;
+    }
+
+    public static (Vector2 start, Vector2 end)? GetIntersectionPoints(Vector2 a, Vector2 b, Rectangle rect)
+    {
+        // Calculate direction and length
+        Vector2 dist = b - a;
+        float length = dist.Length();
+
+        // Avoid division by zero; if A and B are the same point, there's no line segment
+        if (length == 0)
+            return null;
+
+        // Normalize direction
+        dist /= length;
+
+        // Rectangle bounds
+        float minX = rect.X;
+        float maxX = rect.X + rect.Width;
+        float minY = rect.Y;
+        float maxY = rect.Y + rect.Height;
+
+        // Initialize entering and exiting parameters
+        float tEnter = float.NegativeInfinity;
+        float tExit = float.PositiveInfinity;
+
+        switch (dist.X)
+        {
+            // Check X constraints
+            case > 0:
+                tEnter = Math.Max(tEnter, (minX - a.X) / dist.X); // Entering x >= minX
+                tExit = Math.Min(tExit, (maxX - a.X) / dist.X); // Exiting x <= maxX
+                break;
+            case < 0:
+                tEnter = Math.Max(tEnter, (maxX - a.X) / dist.X); // Entering x <= maxX
+                tExit = Math.Min(tExit, (minX - a.X) / dist.X); // Exiting x >= minX
+                break;
+            // D.X == 0
+            default:
+            {
+                // Parallel and outside
+                if (a.X < minX || a.X > maxX)
+                    return null;
+                break;
+            }
+        }
+
+        switch (dist.Y)
+        {
+            // Check Y constraints (Y increases downward in FNA)
+            case > 0:
+                tEnter = Math.Max(tEnter, (minY - a.Y) / dist.Y); // Entering y >= minY
+                tExit = Math.Min(tExit, (maxY - a.Y) / dist.Y); // Exiting y <= maxY
+                break;
+            case < 0:
+                tEnter = Math.Max(tEnter, (maxY - a.Y) / dist.Y); // Entering y <= maxY
+                tExit = Math.Min(tExit, (minY - a.Y) / dist.Y); // Exiting y >= minY
+                break;
+            // D.Y == 0
+            default:
+            {
+                // Parallel and outside
+                if (a.Y < minY || a.Y > maxY)
+                    return null;
+                break;
+            }
+        }
+
+        // Clip to the line segment's range [0, L]
+        float tStart = Math.Max(0, tEnter);
+        float tEnd = Math.Min(length, tExit);
+
+        // If tStart <= tEnd, there is an intersection
+        if (tStart <= tEnd)
+        {
+            Vector2 start = a + tStart * dist;
+            Vector2 end = a + tEnd * dist;
+            return (start, end);
+        }
+
+        return null; // No intersection
+    }
+
+    #endregion
 }

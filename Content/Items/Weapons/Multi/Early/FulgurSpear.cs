@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Multi.Early;
 
 public class FulgurSpear : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.FulgurSpear);
+    public override string Texture => AssetRegistry.GennedTextures.FulgurSpear.Path;
 
     public override void SetDefaults()
     {

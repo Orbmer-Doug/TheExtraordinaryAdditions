@@ -5,7 +5,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
-using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
+using TheExtraordinaryAdditions.Content.Rarities;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -14,7 +14,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 
 public class Mimicry : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Mimicry);
+    public override string Texture => AssetRegistry.GennedTextures.Mimicry.Path;
 
     public override void SetDefaults()
     {
@@ -46,11 +46,11 @@ public class Mimicry : ModItem
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
         int type, int damage, float knockback)
     {
-        if (player.Additions().MouseLeft.Current)
+        if (player.AdditionsMouse().MouseLeft.Current)
         {
             Projectile.NewProjectile(source, position, velocity, type, damage, knockback, player.whoAmI);
         }
-        else if (player.Additions().MouseRight.Current)
+        else if (player.AdditionsMouse().MouseRight.Current)
             Projectile.NewProjectile(source, position, velocity, ModContent.ProjectileType<MimicrySpear>(),
                 (int) (damage * 1.25f), knockback * 1.25f, player.whoAmI, 0, 0f, 0f);
 

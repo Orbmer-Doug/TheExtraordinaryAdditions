@@ -1,19 +1,16 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Buffs.Debuff;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Late;
 
 public class ThrashedVoid : BaseWhip
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ThrashedVoid);
+    public override string Texture => AssetRegistry.GennedTextures.ThrashedVoid.Path;
 
     public override void Defaults()
     {
@@ -22,32 +19,12 @@ public class ThrashedVoid : BaseWhip
 
     public override int SegmentSkip => 4;
 
-    public int SwingDir
-    {
-        get => (int) Projectile.ai[2];
-        set => Projectile.ai[2] = value;
-    }
-
     public override void SafeAI()
     {
-        if (Time == 0f)
-        {
-            Projectile.velocity = Projectile.velocity.RotatedByRandom(.6f);
-            SwingDir = Main.rand.NextFromList(-1, 1);
-        }
-
         if (Trail == null || Trail.Disposed)
             Trail = new(TrailWidth, TrailColor, null, Samples);
 
         points.Update(Tip);
-
-        if (Main.rand.NextBool(8) && Completion.BetweenNum(.3f, .8f))
-        {
-            Vector2 pos = WhipPoints.Points[Main.rand.Next(0, WhipPoints.Count - 1)];
-            Vector2 vel = OutwardVel * Main.rand.NextFloat(100f, 400f);
-            ParticleRegistry.SpawnLightningArcParticle(pos, vel, Main.rand.Next(4, 10), Main.rand.NextFloat(.4f, .8f),
-                Color.DarkViolet.Lerp(Color.Purple, Main.rand.NextFloat(.4f, .6f)));
-        }
     }
 
     public override void CrackEffects()
@@ -55,12 +32,16 @@ public class ThrashedVoid : BaseWhip
         if (this.RunLocal())
             Projectile.NewProj(Tip, Vector2.Zero, ModContent.ProjectileType<VoidBlast>(), Projectile.damage / 4,
                 Projectile.knockBack, Owner.whoAmI);
-        AdditionsSound.commandoBlast2.Play(Tip, 1.1f, -.1f, .1f);
+        AssetRegistry.GennedSounds.commandoBlast2.Play(Tip, 1.1f, -.1f, .1f);
     }
 
     public override void NPCHitEffects(NPC target, NPC.HitInfo hit, in Vector2 pos, in Vector2 vel, in int index)
     {
         Projectile.damage = (int) (Projectile.damage * .85f);
+        for (int i = 0; i < 20; i++)
+        {
+            ShaderParticleRegistry.SpawnCosmicParticle(pos + Main.rand.NextVector2Circular(5f, 5f), vel.RotatedByRandom(.5f) * Main.rand.NextFloat(1f, 5f), new Vector2(10f, 50f));
+        }
     }
 
     public override Color LineColor(SystemVector2 completion, Vector2 position)
@@ -80,55 +61,34 @@ public class ThrashedVoid : BaseWhip
 
     public static float TrailWidth(float completion)
     {
-        return MathHelper.SmoothStep(1f, 0f, completion) * 25f;
+        return MathHelper.SmoothStep(1f, 0f, completion) * 35f;
     }
 
-    public OptimizedPrimitiveTrail Trail;
-    public TrailPoints points = new(10);
+    public Trail Trail;
+    public TrailPoints points = new(30);
 
     public override void DrawLine()
     {
         if (Trail != null)
         {
-            ManagedShader shader = ShaderRegistry.EnlightenedBeam;
+            ManagedShader shader = AssetRegistry.GennedShaders.EnlightenedBeam;
             shader.TrySetParameter("time", Main.GameUpdateCount * .02f);
             shader.TrySetParameter("repeats", 12f);
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.StreakLightning), 1, SamplerState.LinearWrap);
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FractalNoise), 2, SamplerState.LinearWrap);
+            shader.SetTexture(AssetRegistry.GennedTextures.StreakLightning, 1, SamplerState.LinearWrap);
+            shader.SetTexture(AssetRegistry.GennedTextures.FractalNoise, 2, SamplerState.LinearWrap);
             Trail.DrawTrail(shader, points.Points);
         }
 
         if (Line != null)
         {
-            ManagedShader fire = ShaderRegistry.SpecialLightningTrail;
-            fire.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TurbulentNoise2), 1);
+            ManagedShader fire = AssetRegistry.GennedShaders.SpecialLightningTrail;
+            fire.SetTexture(AssetRegistry.GennedTextures.TurbulentNoise2, 1);
             Line.DrawTrail(fire, WhipPoints.Points);
         }
     }
 
-    public override float GetTheta(float t)
-    {
-        if (SwingDir == -1)
-            return -base.GetTheta(t);
-        return base.GetTheta(t);
-    }
-
     public override void DrawSegments()
     {
-        void bloom()
-        {
-            Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.GlowHarsh);
-
-            for (int i = 0; i < WhipPoints.Count; i++)
-            {
-                Vector2 pos = WhipPoints.Points[i];
-                Main.spriteBatch.DrawBetterRect(tex,
-                    ToTarget(pos, new Vector2(150f) * InverseLerp(0f, WhipPoints.Count, i)), null, Color.Purple, 0f,
-                    tex.Size() / 2);
-            }
-        }
-
-        PixelationSystem.QueueTextureRenderAction(bloom, PixelationLayer.OverProjectiles, BlendState.Additive);
 
         Texture2D texture = Projectile.ThisProjectileTexture();
 

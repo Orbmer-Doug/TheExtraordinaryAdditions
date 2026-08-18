@@ -8,7 +8,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Classless;
 
 public class Eagle500kgBomb : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Eagle500kgBomb);
+    public override string Texture => AssetRegistry.GennedTextures.Eagle500kgBomb.Path;
 
     public override void SetDefaults()
     {

@@ -5,22 +5,22 @@ using System.IO;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 using static TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late.Zenith.CoalescenceHoldout;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
 using Utils = Terraria.Utils;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late.Zenith;
 
 public class DivinityArrow : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.DivinityArrow);
+    public override string Texture => AssetRegistry.GennedTextures.DivinityArrow.Path;
 
     public override void SetDefaults()
     {
@@ -90,12 +90,12 @@ public class DivinityArrow : ModProjectile
     }
 
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
+    public PlayerMouse Modded => Owner.AdditionsMouse();
     public float ChargeCompletion => InverseLerp(0f, ReelTime, Charge);
 
     public override bool ShouldUpdatePosition()
     {
-        if (Owner.Additions().MouseLeft.Current && Release == false)
+        if (Owner.AdditionsMouse().MouseLeft.Current && Release == false)
             return false;
         return true;
     }
@@ -125,11 +125,11 @@ public class DivinityArrow : ModProjectile
         Lighting.AddLight(TipOfArrow, Color.Gold.ToVector3() * ChargeCompletion * 1.4f * Projectile.Opacity);
 
         // Die if not at sufficient charge
-        if (this.RunLocal() && !Owner.Additions().MouseLeft.Current && ChargeCompletion < .33f)
+        if (this.RunLocal() && !Owner.AdditionsMouse().MouseLeft.Current && ChargeCompletion < .33f)
             Projectile.Kill();
 
         // Otherwise rack up the charge and set the positions
-        if ((this.RunLocal() && Owner.Additions().MouseLeft.Current) && Release == false)
+        if ((this.RunLocal() && Owner.AdditionsMouse().MouseLeft.Current) && Release == false)
         {
             Charge++;
 
@@ -145,7 +145,7 @@ public class DivinityArrow : ModProjectile
                     {
                         float speed = Main.rand.NextFloat(2f, 10f);
                         Vector2 vel = -ProjOwner.velocity.RotatedBy(.45f * i) * speed;
-                        float scale = .5f * InverseLerp(10f, 2f, speed, true);
+                        float scale = .5f * InverseLerp(10f, 2f, speed);
                         int life = 20;
                         ParticleRegistry.SpawnSquishyLightParticle(TipOfArrow, vel, life, scale, Color.Gold);
                     }
@@ -250,7 +250,7 @@ public class DivinityArrow : ModProjectile
                         ParticleRegistry.SpawnSparkParticle(TipOfArrow, vel, Main.rand.Next(20, 34), scale, Color.Gold);
                     }
 
-                    AdditionsSound.etherealBounce.Play(TipOfArrow, 1f, 0f, .1f);
+                    AssetRegistry.GennedSounds.etherealBounce.Play(TipOfArrow, 1f, 0f, .1f);
                     HitGround = true;
                 }
                 else
@@ -335,7 +335,7 @@ public class DivinityArrow : ModProjectile
                                 Projectile.owner);
                     }
 
-                    AdditionsSound.etherealSmash2.Play(pos, 7f, 0f, .2f);
+                    AssetRegistry.GennedSounds.etherealSmash2.Play(pos, 7f, 0f, .2f);
                     ScreenShakeSystem.New(new(6f, .7f), pos);
                 }
                 else
@@ -353,7 +353,7 @@ public class DivinityArrow : ModProjectile
 
                 break;
             case CoalescenceState.Pierce:
-                AdditionsSound.etherealHit2.Play(pos, 1f, 0f, .1f, 8);
+                AssetRegistry.GennedSounds.etherealHit2.Play(pos, 1f, 0f, .1f, 8);
                 for (int i = 0; i < 20; i++)
                 {
                     Vector2 sparkVel = Projectile.velocity.RotatedByRandom(Main.rand.NextFloat(.33f, .46f)) *
@@ -384,7 +384,7 @@ public class DivinityArrow : ModProjectile
             int type = ModContent.ProjectileType<ExtraordinaryHyperBlast>();
             int damage = Projectile.damage * 2;
             Projectile blast = Main.projectile[Projectile.NewProj(pos, Vector2.Zero, type, damage,
-                Projectile.knockBack, Projectile.owner, 2f, 0f, 0f, 0f, 0f)];
+                Projectile.knockBack, Projectile.owner, 2f)];
             blast.scale = ArrowType == -1 ? .5f : ArrowType == 0 ? .75f : 1f;
         }
     }
@@ -396,7 +396,7 @@ public class DivinityArrow : ModProjectile
         return width * Projectile.width;
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints trailPoints = new(20);
 
     public override bool PreDraw(ref Color lightColor)
@@ -407,8 +407,8 @@ public class DivinityArrow : ModProjectile
             {
                 if (trail == null || trail.Disposed || trailPoints == null)
                     return;
-                ManagedShader shader = ShaderRegistry.SwingShader;
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.HarshNoise), 1);
+                ManagedShader shader = AssetRegistry.GennedShaders.SwingShader;
+                shader.SetTexture(AssetRegistry.GennedTextures.HarshNoise, 1);
                 shader.TrySetParameter("color", Color.Gold);
                 shader.TrySetParameter("secondColor", Color.Yellow);
                 shader.TrySetParameter("thirdColor", Color.Goldenrod);
@@ -418,23 +418,20 @@ public class DivinityArrow : ModProjectile
             PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
         }
 
-        void star()
-        {
-            Texture2D star = AssetRegistry.GetTexture(AdditionsTexture.LensStar);
-            Vector2 starOrig = star.Size() * .5f;
-            Texture2D bloom = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
-            Vector2 bloomOrig = bloom.Size() * .5f;
-            Vector2 bloomDrawPos = TipOfArrow - Main.screenPosition;
-            float scale = Projectile.scale * ChargeCompletion * .5f;
-            float rot = Projectile.rotation;
+        Texture2D star = AssetRegistry.GennedTextures.LensStar;
+        Vector2 starOrig = star.Size() * .5f;
+        Texture2D bloom = AssetRegistry.GennedTextures.GlowParticleSmall;
+        Vector2 bloomOrig = bloom.Size() * .5f;
+        Vector2 bloomDrawPos = TipOfArrow - Main.screenPosition;
+        float scale = Projectile.scale * ChargeCompletion * .5f;
+        float rot = Projectile.rotation;
 
-            Main.spriteBatch.Draw(star, bloomDrawPos, null, Color.Gold * ChargeCompletion, rot, starOrig,
-                new Vector2(scale * (Sin01(Main.GlobalTimeWrappedHourly) + .5f), scale), 0, 0f);
-            Main.spriteBatch.Draw(bloom, bloomDrawPos, null, Color.PaleGoldenrod * .5f * ChargeCompletion, rot,
-                bloomOrig, scale * .75f, 0, 0f);
-        }
-
-        PixelationSystem.QueueTextureRenderAction(star, PixelationLayer.UnderProjectiles, BlendState.Additive);
+        SpriteBatch.DrawAltPixelated(PixelationLayer.UnderPlayers, BlendState.Additive, star, bloomDrawPos, null,
+            Color.Gold * ChargeCompletion, rot, starOrig,
+            new Vector2(scale * (Sin01(Main.GlobalTimeWrappedHourly) + .5f), scale));
+        SpriteBatch.DrawAltPixelated(PixelationLayer.UnderPlayers, BlendState.Additive, bloom, bloomDrawPos, null,
+            Color.PaleGoldenrod * .5f * ChargeCompletion, rot,
+            bloomOrig, scale * .75f);
 
         void arrow()
         {
@@ -468,12 +465,12 @@ public class DivinityArrow : ModProjectile
 
     private void DrawRing(SpriteBatch sb, Vector2 pos, float w, float h, float rotation, float prog, Color color)
     {
-        Texture2D outerCircleTexture = AssetRegistry.GetTexture(AdditionsTexture.UnfathomablePortal);
+        Texture2D outerCircleTexture = AssetRegistry.GennedTextures.UnfathomablePortal;
 
         Color startingColor = Color.Gold;
         Color endingColor = Color.DarkGoldenrod;
 
-        ManagedShader effect = ShaderRegistry.MagicRing;
+        ManagedShader effect = AssetRegistry.GennedShaders.MagicRing;
         if (effect == null)
             return;
 

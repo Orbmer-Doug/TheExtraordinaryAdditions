@@ -1,16 +1,14 @@
-﻿using System.IO;
-using Terraria;
-using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+﻿using Terraria.ModLoader;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Multi.Early;
 
 public class FulgurZap : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     private const int Life = 30;
 
     public override void SetDefaults()
@@ -55,7 +53,7 @@ public class FulgurZap : ModProjectile
         }
 
         Projectile.Opacity = 1f - Completion;
-        if (Projectile.Opacity.BetweenNum(0f, .05f))
+        if (Projectile.Opacity is > 0f and .05f)
             Projectile.Kill();
 
         Time++;
@@ -72,7 +70,7 @@ public class FulgurZap : ModProjectile
         MulticolorLerp(Completion, Color.White, Color.LightCyan, Color.Cyan, Color.DarkCyan) * Projectile.Opacity;
 
     public TrailPoints points;
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override bool PreDraw(ref Color lightColor)
     {
@@ -80,8 +78,8 @@ public class FulgurZap : ModProjectile
         {
             if (trail != null && points != null)
             {
-                ManagedShader shader = ShaderRegistry.SpecialLightningTrail;
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DarkRidgeNoise), 1);
+                ManagedShader shader = AssetRegistry.GennedShaders.SpecialLightningTrail;
+                shader.SetTexture(AssetRegistry.GennedTextures.DarkRidgeNoise, 1);
                 trail.DrawTrail(shader, points.Points);
             }
         }

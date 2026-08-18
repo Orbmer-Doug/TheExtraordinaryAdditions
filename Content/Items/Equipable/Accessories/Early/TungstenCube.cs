@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Early;
 
 public class TungstenCube : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TungstenCube);
+    public override string Texture => AssetRegistry.GennedTextures.TungstenCube.Path;
 
     public override void SetStaticDefaults()
     {

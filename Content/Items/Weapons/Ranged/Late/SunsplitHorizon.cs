@@ -5,14 +5,13 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
-using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
 
 public class SunsplitHorizon : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SunsplitHorizon);
+    public override string Texture => AssetRegistry.GennedTextures.SunsplitHorizon.Path;
 
     public override void SetStaticDefaults()
     {
@@ -31,7 +30,7 @@ public class SunsplitHorizon : ModItem
         Item.useAnimation = 4;
         Item.knockBack = 0;
         Item.value = AdditionsGlobalItem.LaserRarityPrice;
-        Item.rare = ModContent.RarityType<LaserClassRarity>();
+        Item.rare = ItemRarityID.Red;
         Item.UseSound = null;
         Item.autoReuse = true;
         Item.shoot = ModContent.ProjectileType<SunsplitHoldout>();
@@ -49,8 +48,8 @@ public class SunsplitHorizon : ModItem
     {
         Recipe recipe = CreateRecipe();
         recipe.AddIngredient(ItemID.Flamethrower, 1);
+        recipe.AddIngredient(ItemID.FragmentSolar, 8);
         recipe.AddIngredient(ModContent.ItemType<PlasmaCore>(), 1);
-        //TODO
         recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();
     }

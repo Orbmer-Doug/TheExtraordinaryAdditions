@@ -10,17 +10,15 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Utilities;
 
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 
 public class BowOfGreekFlamesHeld : BaseIdleHoldoutProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BowOfGreekFlamesHeld);
+    public override string Texture => AssetRegistry.GennedTextures.BowOfGreekFlamesHeld.Path;
     public override int AssociatedItemID => ModContent.ItemType<BowOfGreekFlames>();
     public override int IntendedProjectileType => ModContent.ProjectileType<BowOfGreekFlamesHeld>();
 
@@ -66,7 +64,7 @@ public class BowOfGreekFlamesHeld : BaseIdleHoldoutProjectile
         Projectile.rotation = reader.ReadSingle();
     }
 
-    public static readonly Texture2D arrow = AssetRegistry.GetTexture(AdditionsTexture.GreekBombArrow);
+    public static readonly Texture2D arrow = AssetRegistry.GennedTextures.GreekBombArrow;
 
     public override void SafeAI()
     {
@@ -90,7 +88,7 @@ public class BowOfGreekFlamesHeld : BaseIdleHoldoutProjectile
         float close = InverseLerp(0f, 22f, Time);
 
         float armRot = Projectile.rotation + (.72f * Dir);
-        float reelAnim = Animators.MakePoly(2.2f).InFunction
+        float reelAnim = MakePoly(2.2f).InFunction
             .Evaluate(armRot, armRot + (.7f * Dir), Switch != 0 ? reel : OldStringCompletion);
         Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, reelAnim - MathHelper.PiOver2);
         Owner.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.ThreeQuarters,
@@ -135,7 +133,7 @@ public class BowOfGreekFlamesHeld : BaseIdleHoldoutProjectile
             {
                 case 0:
                     Owner.itemTime = Owner.itemAnimation = 0;
-                    StringCompletion = Animators.Elastic.OutFunction.Evaluate(OldStringCompletion, 0f, close);
+                    StringCompletion = Elastic.OutFunction.Evaluate(OldStringCompletion, 0f, close);
                     if (close >= 1f)
                     {
                         Switch = -1;
@@ -145,7 +143,7 @@ public class BowOfGreekFlamesHeld : BaseIdleHoldoutProjectile
 
                     break;
                 case 1:
-                    StringCompletion = Animators.MakePoly(2.2f).InFunction.Evaluate(0f, 1f, reel);
+                    StringCompletion = MakePoly(2.2f).InFunction.Evaluate(0f, 1f, reel);
                     Lighting.AddLight(arrowPos, Color.LawnGreen.ToVector3() * .7f);
                     if (reel >= 1f || (this.RunLocal() && !Modded.MouseLeft.Current))
                     {
@@ -185,12 +183,12 @@ public class BowOfGreekFlamesHeld : BaseIdleHoldoutProjectile
         }
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override bool PreDraw(ref Color lightColor)
     {
         if (trail != null && !trail.Disposed && cache != null)
-            trail.DrawTrail(ShaderRegistry.StandardPrimitiveShader, cache.Points, 100, false, false);
+            trail.DrawTrail(AssetRegistry.GennedShaders.StandardPrimitiveShader, cache.Points, 100, false, false);
 
         Texture2D texture = Projectile.ThisProjectileTexture();
         float rotation = Projectile.rotation;

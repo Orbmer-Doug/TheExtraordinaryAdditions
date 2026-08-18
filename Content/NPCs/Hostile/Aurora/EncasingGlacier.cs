@@ -4,13 +4,14 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 
 public class EncasingGlacier : ModNPC
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetStaticDefaults()
     {
@@ -146,11 +147,11 @@ public class EncasingGlacier : ModNPC
 
         void draw()
         {
-            ManagedShader shader = AssetRegistry.GetShader("RadialCrackingShader");
+            ManagedShader shader = AssetRegistry.GennedShaders.RadialCrackingShader;
             shader.TrySetParameter("Completion", BreakCompletion);
 
             Main.spriteBatch.EnterShaderRegion(shader.Effect, BlendState.NonPremultiplied);
-            Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.Glacier);
+            Texture2D tex = AssetRegistry.GennedTextures.Glacier;
 
             shader.Render();
             Main.spriteBatch.DrawBetter(tex, NPC.Center, null, Lighting.GetColor(NPC.Center.ToTileCoordinates()), 0f,

@@ -5,17 +5,14 @@ using System.IO;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Buffs.Debuff;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
@@ -24,13 +21,13 @@ public class SolarBrandSword : BaseIdleHoldoutProjectile
 {
     public override int AssociatedItemID => ModContent.ItemType<SolarBrand>();
     public override int IntendedProjectileType => ModContent.ProjectileType<SolarBrandSword>();
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SolarBrand);
+    public override string Texture => AssetRegistry.GennedTextures.SolarBrand.Path;
 
     public const int MaxHeight = 242;
     public const int Points = 200;
     public List<Vector2> cache;
     public TrailPoints trailPoints = new(10);
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public ref float Time => ref Projectile.ai[0];
 
@@ -195,7 +192,6 @@ public class SolarBrandSword : BaseIdleHoldoutProjectile
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        target.AddBuff(ModContent.BuffType<PlasmaIncineration>(), SecondsToFrames(3));
         if (AngularDamageFactor > 0.1f)
         {
             Vector2 start = target.Hitbox.ClosestPointInRect(Tip);
@@ -247,9 +243,9 @@ public class SolarBrandSword : BaseIdleHoldoutProjectile
         {
             if (trail != null)
             {
-                ManagedShader shader = ShaderRegistry.SwordRipShader;
+                ManagedShader shader = AssetRegistry.GennedShaders.SwordRipShader;
                 shader.TrySetParameter("flip", Math.Sign(WrapAngle(Projectile.rotation - Projectile.oldRot[1])) > 0);
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.SwordSlashTexture), 1,
+                shader.SetTexture(AssetRegistry.GennedTextures.SwordSlashTexture, 1,
                     SamplerState.LinearWrap);
                 trail.DrawTrail(shader, trailPoints.Points, 200, true);
             }

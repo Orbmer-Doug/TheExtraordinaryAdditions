@@ -4,14 +4,14 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Fulgur;
 
 public class LightningVolt : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.LightningVolt);
+    public override string Texture => AssetRegistry.GennedTextures.LightningVolt.Path;
 
     public override void SetStaticDefaults()
     {
@@ -97,7 +97,7 @@ public class LightningVolt : ModProjectile
     public override bool PreDraw(ref Color lightColor)
     {
         Texture2D texture = Projectile.ThisProjectileTexture();
-        Texture2D glowmask = AssetRegistry.GetTexture(AdditionsTexture.LightningVolt_Glowmask);
+        Texture2D glowmask = AssetRegistry.GennedTextures.LightningVolt_Glowmask;
         Rectangle frame = texture.Frame(1, Main.projFrames[Projectile.type], 0, Projectile.frame);
         Vector2 drawPosition = Projectile.Center - Main.screenPosition;
 

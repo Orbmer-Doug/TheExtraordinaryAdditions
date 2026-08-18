@@ -3,7 +3,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
-using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
+using TheExtraordinaryAdditions.Content.Rarities;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -13,7 +13,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
 [AutoloadEquip(EquipType.Head)]
 public class RedMistHelmet : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.RedMistHelmet);
+    public override string Texture => AssetRegistry.GennedTextures.RedMistHelmet.Path;
 
     public override void SetStaticDefaults()
     {
@@ -51,7 +51,7 @@ public class RedMistHelmet : ModItem
         if (AdditionsKeybinds.SetBonusHotKey.JustPressed && player.ownedProjectileCounts[type] <= 0 && !.HasCooldown(
             player, RedMistCooldown.ID) && player.whoAmI == Main.myPlayer)
         {
-            AdditionsSound.etherealThrow.Play(player.Center, 1f, 0f, .1f);
+            AssetRegistry.GennedSounds.etherealThrow.Play(player.Center, 1f, 0f, .1f);
             player.NewPlayerProj(player.Center, Vector2.Zero, type, AuraDamage, 1f, player.whoAmI);
                 .AddCooldown(player, RedMistCooldown.ID, StygainAura.CooldownTime);
         }

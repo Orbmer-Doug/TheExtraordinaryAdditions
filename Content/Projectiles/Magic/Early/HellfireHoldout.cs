@@ -4,14 +4,13 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Early;
 
 public class HellfireHoldout : BaseHoldoutProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TomeOfHellfire);
+    public override string Texture => AssetRegistry.GennedTextures.TomeOfHellfire.Path;
 
     public ref float Time => ref Projectile.ai[0];
     public ref float Radius => ref Projectile.ai[1];
@@ -29,9 +28,10 @@ public class HellfireHoldout : BaseHoldoutProjectile
     {
         if (this.RunLocal())
         {
-            float interpolant = Utils.GetLerpValue(5f, 40f, Projectile.Distance(Owner.Additions().MouseWorld), true);
+            float interpolant =
+                Utils.GetLerpValue(5f, 40f, Projectile.Distance(Owner.AdditionsMouse().MouseWorld), true);
             Projectile.velocity = Vector2.Lerp(Projectile.velocity,
-                Projectile.SafeDirectionTo(Owner.Additions().MouseWorld), interpolant);
+                Projectile.SafeDirectionTo(Owner.AdditionsMouse().MouseWorld), interpolant);
             if (Projectile.oldVelocity != Projectile.velocity)
                 this.Sync();
         }
@@ -48,14 +48,14 @@ public class HellfireHoldout : BaseHoldoutProjectile
         {
             Radius = 1;
 
-            AdditionsSound.WaterSpell.Play(Projectile.Center, .8f, -.1f, .16f, 10);
+            AssetRegistry.GennedSounds.WaterSpell.Play(Projectile.Center, .8f, -.1f, .16f, 10);
 
             if (this.RunLocal())
             {
                 for (int i = 0; i < Main.rand.Next(3, 5); i++)
                 {
                     Vector2 newVelocity =
-                        (Projectile.SafeDirectionTo(Owner.Additions().MouseWorld) * 15f).RotatedByRandom(
+                        (Projectile.SafeDirectionTo(Owner.AdditionsMouse().MouseWorld) * 15f).RotatedByRandom(
                             Main.rand.NextFloat(.24f, .4f)) * Main.rand.NextFloat(.7f, 1.05f);
 
                     int type = ModContent.ProjectileType<HellishNapalm>();

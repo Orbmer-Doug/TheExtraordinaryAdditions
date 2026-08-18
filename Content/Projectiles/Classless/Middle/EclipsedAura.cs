@@ -2,15 +2,13 @@
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
-using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 
 public class EclipsedAura : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -25,7 +23,6 @@ public class EclipsedAura : ModProjectile
     }
 
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer ModdedOwner => Owner.Additions();
     public ref float Time => ref Projectile.ai[0];
 
     public override void AI()
@@ -72,7 +69,7 @@ public class EclipsedAura : ModProjectile
         {
             if (proj != null && proj.hostile == true && proj.friendly == false
                 && proj.Hitbox.Intersects(Projectile.Hitbox)
-                && proj.velocity != Vector2.Zero && proj.damage.BetweenNum(0, 300))
+                && proj.velocity != Vector2.Zero && proj.damage > 0 && proj.damage < 200)
             {
                 proj.velocity *= .991f;
             }

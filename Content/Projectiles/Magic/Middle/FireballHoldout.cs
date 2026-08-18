@@ -4,14 +4,13 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
 
 public class FireballHoldout : BaseIdleHoldoutProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Fireball);
+    public override string Texture => AssetRegistry.GennedTextures.Fireball.Path;
     public override int AssociatedItemID => ModContent.ItemType<Fireball>();
     public override int IntendedProjectileType => ModContent.ProjectileType<FireballHoldout>();
 
@@ -52,7 +51,7 @@ public class FireballHoldout : BaseIdleHoldoutProjectile
 
         if (this.RunLocal() && Modded.SafeMouseLeft.Current && Time % Item.useTime == Item.useTime - 1 && HasMana())
         {
-            AdditionsSound.FireballShort.Play(Projectile.Center, .6f, 0f, .1f, 30);
+            AssetRegistry.GennedSounds.FireballShort.Play(Projectile.Center, .6f, 0f, .1f, 30);
             Vector2 dir = Projectile.Center.SafeDirectionTo(Modded.MouseWorld);
             Projectile.NewProj(Projectile.Center, dir * Item.shootSpeed,
                 ModContent.ProjectileType<FireballProj>(), Projectile.damage, Projectile.knockBack, Owner.whoAmI);

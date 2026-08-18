@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Tiles;
 
 public class StygainHeartTrophyPlaced : ModTile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.StygainHeartTrophyPlaced);
+    public override string Texture => AssetRegistry.GennedTextures.StygainHeartTrophyPlaced.Path;
 
     public override void SetStaticDefaults()
     {

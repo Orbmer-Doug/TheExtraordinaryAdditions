@@ -4,15 +4,13 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Early;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Early;
 
 public class BoneFlintlockHeld : BaseIdleHoldoutProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BoneFlintlock);
+    public override string Texture => AssetRegistry.GennedTextures.BoneFlintlock.Path;
     public override int AssociatedItemID => ModContent.ItemType<BoneFlintlock>();
     public override int IntendedProjectileType => ModContent.ProjectileType<BoneFlintlockHeld>();
 

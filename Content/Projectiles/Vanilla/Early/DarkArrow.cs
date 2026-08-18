@@ -2,11 +2,9 @@
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Early;
 
@@ -81,7 +79,7 @@ public class DarkArrow : ModProjectile
         }
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints points;
 
     public override bool PreDraw(ref Color lightColor)
@@ -89,7 +87,7 @@ public class DarkArrow : ModProjectile
         void prim()
         {
             if (trail != null && !trail.Disposed)
-                trail.DrawTrail(ShaderRegistry.StandardPrimitiveShader, points.Points, 50, true);
+                trail.DrawTrail(AssetRegistry.GennedShaders.StandardPrimitiveShader, points.Points, 50, true);
         }
 
         PixelationSystem.QueuePrimitiveRenderAction(prim, PixelationLayer.UnderProjectiles);

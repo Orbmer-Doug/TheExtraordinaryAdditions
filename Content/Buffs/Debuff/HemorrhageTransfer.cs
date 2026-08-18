@@ -6,7 +6,7 @@ namespace TheExtraordinaryAdditions.Content.Buffs.Debuff;
 
 public class HemorrhageTransfer : ModBuff
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.HemorrhageTransfer);
+    public override string Texture => AssetRegistry.GennedTextures.HemorrhageTransfer.Path;
 
     public override void SetStaticDefaults()
     {

@@ -8,8 +8,6 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Early;
 
@@ -48,7 +46,7 @@ public class ForkStab : ModProjectile
 
     public Player.CompositeArmStretchAmount stretch = Player.CompositeArmStretchAmount.Full;
 
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Fork);
+    public override string Texture => AssetRegistry.GennedTextures.Fork.Path;
 
     public Player Owner => Main.player[Projectile.owner];
 
@@ -106,7 +104,7 @@ public class ForkStab : ModProjectile
                     if (this.RunLocal())
                     {
                         Projectile.velocity =
-                            Owner.SafeDirectionTo(Owner.Additions().MouseWorld).RotatedByRandom(0.25f);
+                            Owner.SafeDirectionTo(Owner.AdditionsMouse().MouseWorld).RotatedByRandom(0.25f);
                         this.Sync();
                     }
 
@@ -197,7 +195,7 @@ public class ForkStab : ModProjectile
             }
         }
 
-        AdditionsSound.SwordSliceShort.Play(Owner.Center, .4f, -.1f, .1f, 10);
+        AssetRegistry.GennedSounds.SwordSliceShort.Play(Owner.Center, .4f, -.1f, .1f, 10);
     }
 
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)

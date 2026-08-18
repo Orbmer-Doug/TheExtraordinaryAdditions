@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Early;
 
 public class TomeOfHellfire : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TomeOfHellfire);
+    public override string Texture => AssetRegistry.GennedTextures.TomeOfHellfire.Path;
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {

@@ -7,7 +7,7 @@ namespace TheExtraordinaryAdditions.Content.Buffs.Debuff;
 
 public class KunaiTag : ModBuff
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.WhipDebuff);
+    public override string Texture => AssetRegistry.GennedTextures.WhipDebuff.Path;
 
     public override void SetStaticDefaults()
     {

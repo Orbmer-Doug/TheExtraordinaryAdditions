@@ -3,19 +3,17 @@ using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles.Shader;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
 public class LightPillar : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public int Time
     {
@@ -70,13 +68,13 @@ public class LightPillar : ModProjectile
 
         if (HitGround)
         {
-            Projectile.Opacity = Animators.MakePoly(3f).OutFunction.Evaluate(FadeTime, 0f, 30f, 1f, 0f);
+            Projectile.Opacity = MakePoly(3f).OutFunction.Evaluate(FadeTime, 0f, 30f, 1f, 0f);
             if (Projectile.Opacity <= 0)
                 Projectile.Kill();
             FadeTime++;
         }
         else
-            Projectile.Opacity = Animators.BezierEase(InverseLerp(0f, 20f, Time));
+            Projectile.Opacity = BezierEase(InverseLerp(0f, 20f, Time));
 
         Time++;
     }
@@ -85,7 +83,7 @@ public class LightPillar : ModProjectile
     {
         if (!HitGround)
         {
-            AdditionsSound.RockBreak.Play(Projectile.Center, 1f, -.1f, .2f);
+            AssetRegistry.GennedSounds.RockBreak.Play(Projectile.Center, 1f, -.1f, .2f);
             for (int i = 0; i < 30; i++)
             {
                 Vector2 pos = Projectile.Center + Vector2.UnitY * Projectile.width / 2 +
@@ -108,7 +106,7 @@ public class LightPillar : ModProjectile
     public override bool? CanDamage() => Time > Asterlin.Cleave_PillarWait ? null : false;
 
     public TrailPoints trail = new(20);
-    public OptimizedPrimitiveTrail flame;
+    public Trail flame;
     public float WidthFunction(float completionRatio) => Projectile.width;
 
     public Color ColorFunction(SystemVector2 c, Vector2 pos)
@@ -128,8 +126,8 @@ public class LightPillar : ModProjectile
         {
             if (trail != null && flame != null)
             {
-                ManagedShader shader = AssetRegistry.GetShader("LightPillarShader");
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.HarshNoise), 1,
+                ManagedShader shader = AssetRegistry.GennedShaders.LightPillarShader;
+                shader.SetTexture(AssetRegistry.GennedTextures.HarshNoise, 1,
                     SamplerState.AnisotropicWrap);
                 flame.DrawTrail(shader, trail.Points);
             }

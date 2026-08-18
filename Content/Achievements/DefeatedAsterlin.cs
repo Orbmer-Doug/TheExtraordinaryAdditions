@@ -6,7 +6,7 @@ namespace TheExtraordinaryAdditions.Content.Achievements;
 
 public class DefeatedAsterlin : ModAchievement
 {
-    public override string TextureName => AssetRegistry.GetTexturePath(AdditionsTexture.DefeatedAsterlin);
+    public override string TextureName => AssetRegistry.GennedTextures.DefeatedAsterlin.Path;
 
     public override void SetStaticDefaults()
     {

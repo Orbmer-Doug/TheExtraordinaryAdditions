@@ -15,18 +15,14 @@ using TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
 using TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 using TheExtraordinaryAdditions.Content.Items.Placeable.Banners;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
-using TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 using TheExtraordinaryAdditions.Core;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
-using static Terraria.Localization.NetworkText;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 
@@ -35,7 +31,7 @@ public class AuroraGuard : ModNPC, IBossDowned
 {
     #region Defaults/Variables
 
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AuroraTurretHead);
+    public override string Texture => AssetRegistry.GennedTextures.AuroraTurretHead.Path;
 
     public override void SetStaticDefaults()
     {
@@ -44,7 +40,7 @@ public class AuroraGuard : ModNPC, IBossDowned
 
         NPCID.Sets.NPCBestiaryDrawModifiers drawModifiers = new NPCID.Sets.NPCBestiaryDrawModifiers()
         {
-            CustomTexturePath = AssetRegistry.GetTexturePath(AdditionsTexture.AuroraGuardBestiary),
+            CustomTexturePath = AssetRegistry.GennedTextures.AuroraGuardBestiary.Path,
             PortraitScale = 0.6f,
             PortraitPositionYOverride = 0f,
         };
@@ -299,7 +295,7 @@ public class AuroraGuard : ModNPC, IBossDowned
         {
             if ((int) npc.ai[1] != (int) AttackState.Idle)
                 Main.newMusic = MusicLoader.GetMusicSlot(AdditionsMain.Instance,
-                    AssetRegistry.GetMusicPath(AdditionsSound.FrigidGale));
+                    AssetRegistry.GennedSounds.Music.FrigidGale.SoundPath);
         }
     }
 
@@ -391,7 +387,7 @@ public class AuroraGuard : ModNPC, IBossDowned
     {
         if (AttackTimer == 0)
         {
-            if (this.RunServer())
+            if (ModNPC.RunServer())
                 HeadRotation = RandomRotation();
             NPC.Center = FindNearestSurface(NPC.Center, true, Main.bottomWorld, 100, true).Value;
             GlacierPosition = FindNearestSurface(NPC.Center, true, 1000f, 1).Value - Vector2.UnitY * 80f;
@@ -399,7 +395,7 @@ public class AuroraGuard : ModNPC, IBossDowned
             NPC.netUpdate = true;
         }
 
-        if (this.RunServer())
+        if (ModNPC.RunServer())
         {
             int type = ModContent.NPCType<EncasingGlacier>();
             if (GlacierIndex == -1)
@@ -448,9 +444,9 @@ public class AuroraGuard : ModNPC, IBossDowned
         {
             NPC.Center = FindNearestSurface(NPC.Center, true, 2000f, 100, true).Value;
             GlacierPosition = FindNearestSurface(NPC.Center, true, 1000f, 10).Value - Vector2.UnitY * 80f;
-            AdditionsSound.AuroraRise.Play(NPC.Center, 1f, 0f, 0f, 1, null, PauseBehavior.PauseWithGame);
+            AssetRegistry.GennedSounds.AuroraRise.Play(NPC.Center, 1f, 0f, 0f, 1, null, PauseBehavior.PauseWithGame);
 
-            if (this.RunServer())
+            if (ModNPC.RunServer())
             {
                 StruggleSign = Main.rand.NextFromList(-1, 1);
                 StruggleDir = StruggleSign == -1
@@ -475,7 +471,7 @@ public class AuroraGuard : ModNPC, IBossDowned
         {
             StruggleSign = -StruggleSign;
 
-            if (this.RunServer())
+            if (ModNPC.RunServer())
             {
                 StruggleDir = StruggleSign == -1
                     ? -Vector2.UnitY.RotatedBy(-MaxRadius).RotatedByRandom(MaxRadius)
@@ -498,7 +494,7 @@ public class AuroraGuard : ModNPC, IBossDowned
         {
             StruggleSign = -StruggleSign;
 
-            if (this.RunServer())
+            if (ModNPC.RunServer())
             {
                 StruggleDir = StruggleSign == -1
                     ? -Vector2.UnitY.RotatedBy(-MaxRadius).RotatedByRandom(MaxRadius)
@@ -573,9 +569,9 @@ public class AuroraGuard : ModNPC, IBossDowned
         if (AttackTimer % ShootWait == ShootWait - 1)
         {
             Vector2 vel = HeadRotation.ToRotationVector2() * ShootSpeed;
-            if (this.RunServer())
+            if (ModNPC.RunServer())
                 NPC.NewNPCProj(GunPos, vel, ModContent.ProjectileType<GlacialShell>(), IcicleDamage, 0f);
-            AdditionsSound.GunLoop.Play(GunPos, Main.rand.NextFloat(.8f, 1f), 0f, .1f, 20);
+            AssetRegistry.GennedSounds.GunLoop.Play(GunPos, Main.rand.NextFloat(.8f, 1f), 0f, .1f, 20);
 
             for (int i = 0; i < 10; i++)
                 ParticleRegistry.SpawnGlowParticle(GunPos, vel.RotatedByRandom(.2f) * Main.rand.NextFloat(.3f, .8f),
@@ -617,7 +613,7 @@ public class AuroraGuard : ModNPC, IBossDowned
         // big shot
         if (AttackTimer == TimeForBigShot)
         {
-            AdditionsSound.BraveSpecial1C.Play(GunPos, 1.5f, -.2f, .1f, 0);
+            AssetRegistry.GennedSounds.BraveSpecial1C.Play(GunPos, 1.5f, -.2f, .1f, 0);
 
             Vector2 velocity = HeadRotation.ToRotationVector2() * 20f;
             for (int i = 0; i < 40; i++)
@@ -629,7 +625,7 @@ public class AuroraGuard : ModNPC, IBossDowned
 
             ScreenShakeSystem.New(new(1f, .5f, 2000f), GunPos);
 
-            if (this.RunServer())
+            if (ModNPC.RunServer())
                 NPC.NewNPCProj(GunPos, velocity, ModContent.ProjectileType<HeavyFrostBlast>(), HeavyBlastDamage, 10f);
             Recoil = 12;
             BarrelHeat = 1.5f;
@@ -658,12 +654,12 @@ public class AuroraGuard : ModNPC, IBossDowned
             Vector2? ground = FindNearestSurface(potential, true, 2000f, 50, true);
             if (ground.HasValue)
             {
-                AdditionsSound.ColdHitMedium.Play(GunPos, 1f, -.1f, .1f, 10);
+                AssetRegistry.GennedSounds.ColdHitMedium.Play(GunPos, 1f, -.1f, .1f, 10);
                 for (int i = 0; i < 30; i++)
                     ParticleRegistry.SpawnSquishyPixelParticle(HeadRect.RandomPoint(),
                         -Vector2.UnitY * Main.rand.NextFloat(2f, 7f), Main.rand.Next(60, 80),
                         Main.rand.NextFloat(1.4f, 1.8f), SlateBlue, Icey, 4);
-                if (this.RunServer())
+                if (ModNPC.RunServer())
                     NPC.NewNPCProj(potential, Vector2.Zero, ModContent.ProjectileType<GlacialSpike>(), SkewerDamage,
                         0f);
             }
@@ -688,11 +684,12 @@ public class AuroraGuard : ModNPC, IBossDowned
             t.Position = NPC.Center;
         else
             DeathSoundSlot =
-                AdditionsSound.AuroraKABLOOEY.Play(NPC.Center, 1f, 0f, 0f, 1, null, PauseBehavior.PauseWithGame);
+                AssetRegistry.GennedSounds.AuroraKABLOOEY.Play(NPC.Center, 1f, 0f, 0f, 1, null,
+                    PauseBehavior.PauseWithGame);
 
         if (AttackTimer == KablooeyMarker)
         {
-            if (this.RunServer())
+            if (ModNPC.RunServer())
                 NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<OverheatedBlast>(),
                     HeavyBlastDamage * 2, 5f);
             ParticleRegistry.SpawnFlash(NPC.Center, 50, .5f, 900f);
@@ -725,11 +722,11 @@ public class AuroraGuard : ModNPC, IBossDowned
         }
     }
 
-    public static readonly Dictionary<AdditionsSound, float> weights = new()
+    public static readonly Dictionary<SoundStyle, float> weights = new()
     {
-        { AdditionsSound.AuroraTink1, 1f },
-        { AdditionsSound.AuroraTink2, .6f },
-        { AdditionsSound.AuroraTink3, .3f },
+        { AssetRegistry.GennedSounds.AuroraTink1, 1f },
+        { AssetRegistry.GennedSounds.AuroraTink2, .6f },
+        { AssetRegistry.GennedSounds.AuroraTink3, .3f },
     };
 
     public override void HitEffect(NPC.HitInfo hit)
@@ -932,7 +929,7 @@ public class AuroraGuard : ModNPC, IBossDowned
                 float force = InverseLerp(30, 50, KineticForce) * 0.5f + 0.5f;
 
                 ScreenShakeSystem.New(new(force, force * .1f), NPC.Center);
-                AdditionsSound.MediumExplosion.Play(NPC.Center, 1.1f, -.1f);
+                AssetRegistry.GennedSounds.MediumExplosion.Play(NPC.Center, 1.1f, -.1f);
 
                 if (!Main.dedServ)
                 {
@@ -1208,8 +1205,8 @@ public class AuroraGuard : ModNPC, IBossDowned
 
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
-        Texture2D head = AssetRegistry.GetTexture(AdditionsTexture.AuroraTurretHead);
-        Texture2D turretBase = AssetRegistry.GetTexture(AdditionsTexture.AuroraTurretBase);
+        Texture2D head = AssetRegistry.GennedTextures.AuroraTurretHead;
+        Texture2D turretBase = AssetRegistry.GennedTextures.AuroraTurretBase;
 
         if (Legs == null)
             return false;
@@ -1245,7 +1242,7 @@ public class AuroraGuard : ModNPC, IBossDowned
 
     public void DrawSight()
     {
-        Texture2D texture = AssetRegistry.InvisTex;
+        Texture2D texture = AssetRegistry.GennedTextures.Invisible;
 
         Vector2 sightPos = HeadCenter +
                            PolarVector(22f * (HeadFlip == SpriteEffects.FlipVertically ? -1 : 1), HeadRotation) +
@@ -1263,7 +1260,7 @@ public class AuroraGuard : ModNPC, IBossDowned
         float sightsResolution = 2f;
         Color color = Color.DeepSkyBlue;
 
-        ManagedShader scope = ShaderRegistry.PixelatedSightLine;
+        ManagedShader scope = AssetRegistry.GennedShaders.PixelatedSightLine;
         scope.TrySetParameter("noiseOffset", Main.GameUpdateCount * -0.003f);
         scope.TrySetParameter("mainOpacity", 1f);
         scope.TrySetParameter("resolution", new Vector2(sightsResolution * sightsSize));
@@ -1286,26 +1283,22 @@ public class AuroraGuard : ModNPC, IBossDowned
 
     public void DrawBarrelHeat()
     {
-        void heat()
-        {
-            Texture2D glow = AssetRegistry.GetTexture(AdditionsTexture.AuroraTurretBarrelGlow);
-            Texture2D ball = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
-            Main.spriteBatch.DrawBetter(glow,
-                HeadCenter + PolarVector(2f, HeadRotation) + PolarVector(1f, HeadRotation - PiOver2), null,
-                Icey * 5f * BarrelHeat, HeadRotation, glow.Size() / 2f, 1f);
-            Main.spriteBatch.DrawBetterRect(ball, ToTarget(GunPos, new(18f)), null, Icey * 3f * BarrelHeat, 0f,
-                ball.Size() / 2f);
-        }
-
-        PixelationSystem.QueueTextureRenderAction(heat, PixelationLayer.OverNPCs, BlendState.Additive);
+        Texture2D glow = AssetRegistry.GennedTextures.AuroraTurretBarrelGlow;
+        Texture2D ball = AssetRegistry.GennedTextures.GlowParticleSmall;
+        SpriteBatch.DrawAltPixelated(PixelationLayer.OverNPCs, BlendState.Additive, glow,
+            HeadCenter + PolarVector(2f, HeadRotation) + PolarVector(1f, HeadRotation - PiOver2), null,
+            Icey * 5f * BarrelHeat, HeadRotation, glow.Size() / 2f, 1f);
+        SpriteBatch.DrawRectPixelated(PixelationLayer.OverNPCs, BlendState.Additive, ball, ToTarget(GunPos, new(18f)),
+            null, Icey * 3f * BarrelHeat, 0f,
+            ball.Size() / 2f);
     }
 
     public void DrawDeath()
     {
         SpriteBatch sb = Main.spriteBatch;
-        Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.WavyBlotchNoise);
+        Texture2D tex = AssetRegistry.GennedTextures.WavyBlotchNoise;
 
-        ManagedShader shine = AssetRegistry.GetShader("RadialShineShader");
+        ManagedShader shine = AssetRegistry.GennedShaders.RadialShineShader;
         float completion = InverseLerp(0f, KablooeyMarker, AttackTimer);
         float fade = MakePoly(2f).OutFunction(completion);
         Vector2 res = new(800f * fade);
@@ -1314,8 +1307,8 @@ public class AuroraGuard : ModNPC, IBossDowned
         shine.TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly * 3.8f);
         shine.TrySetParameter("resolution", res / 2);
 
-        sb.EnterShaderRegion();
-        shine.Render("AutoloadPass", true, false);
+        sb.EnterShaderRegion(shine.Effect);
+        shine.Render();
         sb.Draw(tex, ToTarget(NPC.Center, res), null, Icey * 0.4f * fade, 0f, tex.Size() / 2, 0, 0f);
         sb.ResetToDefault();
     }

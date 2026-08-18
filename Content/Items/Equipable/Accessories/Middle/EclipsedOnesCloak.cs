@@ -4,14 +4,13 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
 
 [AutoloadEquip(EquipType.Front)]
 public class EclipsedOnesCloak : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.EclipsedOnesCloak);
+    public override string Texture => AssetRegistry.GennedTextures.EclipsedOnesCloak.Path;
 
     public override void SetDefaults()
     {

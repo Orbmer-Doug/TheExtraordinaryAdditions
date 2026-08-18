@@ -5,7 +5,6 @@ using TheExtraordinaryAdditions.Content.Buffs.Debuff;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain;
 
@@ -18,7 +17,7 @@ public sealed partial class StygainHeart
 
         const float totalTime = 180f;
 
-        if (this.RunServer() && !MassInitialize)
+        if (ModNPC.RunServer() && !MassInitialize)
         {
             MassPosition = NPC.Center + Main.rand.NextVector2CircularLimited(400f, 400f, .5f, 1f);
             MassSpinStart = RandomRotation();
@@ -49,7 +48,7 @@ public sealed partial class StygainHeart
 
         if (MassTimer >= totalTime)
         {
-            if (this.RunServer())
+            if (ModNPC.RunServer())
             {
                 int mass = ModContent.NPCType<CoalescentMass>();
                 NPC.NewNPCBetter(MassPosition, Vector2.Zero, mass, 0, 0f, 0f, 0f, 0f, NPC.target);

@@ -4,16 +4,16 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
 public class TechnicBomb : ProjOwnedByNPC<Asterlin>
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -43,7 +43,7 @@ public class TechnicBomb : ProjOwnedByNPC<Asterlin>
 
         Projectile.velocity *= .98f;
         Projectile.Opacity = InverseLerp(0f, 20f, Time) * InverseLerp(0f, 30f, Projectile.timeLeft);
-        Projectile.scale = Animators.MakePoly(3f)
+        Projectile.scale = MakePoly(3f)
             .InFunction(InverseLerp(0f, 30f, Time) * InverseLerp(0f, 30f, Projectile.timeLeft));
 
         if (Main.rand.NextBool(7))
@@ -76,8 +76,8 @@ public class TechnicBomb : ProjOwnedByNPC<Asterlin>
                 continue;
 
             p.As<TheLightripBullet>().HitEffects();
-            AdditionsSound.ElectricalPowBoom.Play(Projectile.Center, 1f, 0f, .14f);
-            if (this.RunServer())
+            AssetRegistry.GennedSounds.ElectricalPowBoom.Play(Projectile.Center, 1f, 0f, .14f);
+            if (ModProjectile.RunServer())
             {
                 float rand = RandomRotation();
                 for (int i = 0; i < 3; i++)
@@ -121,17 +121,17 @@ public class TechnicBomb : ProjOwnedByNPC<Asterlin>
                    MathHelper.PiOver2) * Projectile.Opacity;
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints points = new(10);
-    public OptimizedPrimitiveTrail trail2;
+    public Trail trail2;
     public TrailPoints points2 = new(10);
 
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
         {
-            ManagedShader shader = ShaderRegistry.FireTrail;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DendriticNoiseZoomedOut), 1,
+            ManagedShader shader = AssetRegistry.GennedShaders.FireTrail;
+            shader.SetTexture(AssetRegistry.GennedTextures.DendriticNoiseZoomedOut, 1,
                 SamplerState.AnisotropicWrap);
             if (trail != null && points != null)
                 trail.DrawTrail(shader, points.Points, 50);
@@ -144,7 +144,7 @@ public class TechnicBomb : ProjOwnedByNPC<Asterlin>
 
         void glow()
         {
-            Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.GlowSoft);
+            Texture2D tex = AssetRegistry.GennedTextures.GlowSoft;
             Color col = new Color(87, 211, 255);
 
             Vector2 size = new(Size);
@@ -157,10 +157,10 @@ public class TechnicBomb : ProjOwnedByNPC<Asterlin>
             Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, size * 1.5f), null, col * .6f, 0f,
                 tex.Size() / 2f);
 
-            Texture2D circ = AssetRegistry.GetTexture(AdditionsTexture.HollowCircleSoftEdge);
+            Texture2D circ = AssetRegistry.GennedTextures.HollowCircleSoftEdge;
             float anim = (Time * .22f) % 10 / 10;
-            float radii = Animators.MakePoly(3f).OutFunction.Evaluate(0f, 140f, anim);
-            Color circCol = Color.Cyan * Animators.MakePoly(2f).OutFunction.Evaluate(1f, 0f, anim);
+            float radii = MakePoly(3f).OutFunction.Evaluate(0f, 140f, anim);
+            Color circCol = Color.Cyan * MakePoly(2f).OutFunction.Evaluate(1f, 0f, anim);
             Main.spriteBatch.DrawBetterRect(circ, ToTarget(Projectile.Center, new(radii)), null, circCol, 0f,
                 circ.Size() / 2);
         }
@@ -172,7 +172,7 @@ public class TechnicBomb : ProjOwnedByNPC<Asterlin>
 
 public class TechnicBlast : ProjOwnedByNPC<Asterlin>
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     public override bool IgnoreOwnerActivity => true;
     public static int MaxRadius => 100;
     public static int MaxTime => 30;
@@ -213,7 +213,7 @@ public class TechnicBlast : ProjOwnedByNPC<Asterlin>
         if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct, null, 40);
 
-        Radius = Animators.MakePoly(4f).OutFunction.Evaluate(Time, 0f, MaxTime, 0f, MaxRadius);
+        Radius = MakePoly(4f).OutFunction.Evaluate(Time, 0f, MaxTime, 0f, MaxRadius);
 
         for (int i = 0; i < 40; i++)
             points.SetPoint(i, Projectile.Center + Vector2.One.RotatedBy(i / 19f * MathHelper.TwoPi) * Radius);
@@ -225,12 +225,12 @@ public class TechnicBlast : ProjOwnedByNPC<Asterlin>
         return CircularHitboxCollision(Projectile.Center, Radius, targetHitbox);
     }
 
-    public float WidthFunct(float c) => 30f * Terraria.Utils.Remap(Time, 0f, MaxTime, 1f, 0f);
+    public float WidthFunct(float c) => 30f * Utils.Remap(Time, 0f, MaxTime, 1f, 0f);
 
     public Color ColorFunct(SystemVector2 c, Vector2 pos) => MulticolorLerp(InverseLerp(0f, MaxTime, Time), Color.White,
         Color.LightCyan, Color.Cyan, Color.DarkCyan);
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints points = new(40);
 
     public override bool PreDraw(ref Color lightColor)
@@ -240,7 +240,7 @@ public class TechnicBlast : ProjOwnedByNPC<Asterlin>
             if (trail == null || points == null || trail.Disposed)
                 return;
 
-            ManagedShader shader = ShaderRegistry.PierceTrailShader;
+            ManagedShader shader = AssetRegistry.GennedShaders.PierceTrailShader;
             trail.DrawTrail(shader, points.Points, 300, true);
         }
 

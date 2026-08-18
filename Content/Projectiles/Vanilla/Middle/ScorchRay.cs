@@ -1,17 +1,16 @@
 ﻿using System.IO;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
 public class ScorchRay : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     public const int Lifetime = 20;
 
     public override void SetDefaults()
@@ -82,11 +81,11 @@ public class ScorchRay : ModProjectile
             Projectile.width);
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints points = new(100);
 
     public float WidthFunct(float c) =>
-        OptimizedPrimitiveTrail.HemisphereWidthFunct(1f - c, Projectile.width * Projectile.Opacity, 2f, .1f);
+        Trail.HemisphereWidthFunct(1f - c, Projectile.width * Projectile.Opacity, 2f, .1f);
 
     public Color ColorFunct(SystemVector2 c, Vector2 position)
     {
@@ -99,8 +98,8 @@ public class ScorchRay : ModProjectile
         {
             if (trail == null || trail.Disposed || points == null)
                 return;
-            ManagedShader shader = ShaderRegistry.CrunchyLaserShader;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.CrackedNoise2), 1);
+            ManagedShader shader = AssetRegistry.GennedShaders.CrunchyLaserShader;
+            shader.SetTexture(AssetRegistry.GennedTextures.CrackedNoise2, 1);
             trail.DrawTrail(shader, points.Points);
         }
 

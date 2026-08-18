@@ -6,14 +6,13 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 
@@ -31,7 +30,7 @@ public class FinalStrikeHoldout : ModProjectile
     }
 
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
+    public PlayerMouse Modded => Owner.AdditionsMouse();
     public Vector2 TipOfSpear => Projectile.RotHitbox().TopRight;
 
     public FinalStrikeState CurrentState
@@ -70,7 +69,7 @@ public class FinalStrikeHoldout : ModProjectile
     public ref float DivineFormInterpolant => ref Projectile.localAI[0];
     public ref float OldArmRot => ref Projectile.localAI[1];
     public int Dir => Projectile.velocity.X.NonZeroSign();
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.FinalStrike);
+    public override string Texture => AssetRegistry.GennedTextures.FinalStrike.Path;
 
     public override void SetDefaults()
     {
@@ -125,9 +124,9 @@ public class FinalStrikeHoldout : ModProjectile
         Projectile.Opacity = MakePoly(3f).InFunction(InverseLerp(0f, 12f, Time));
 
         int frequency = 5;
-        if (animationCompletion.BetweenNum(.33f, .66f, true))
+        if (animationCompletion is >= .33f and <= .66f)
             frequency = 3;
-        if (animationCompletion.BetweenNum(.66f, 1f, true))
+        if (animationCompletion is >= .66f and <= 1f)
             frequency = 1;
 
         if (StateTime % frequency == frequency - 1)
@@ -146,7 +145,7 @@ public class FinalStrikeHoldout : ModProjectile
                     Main.rand.NextVector2CircularLimited(10f, 10f, .5f, 1f), Main.rand.Next(90, 150),
                     Main.rand.NextFloat(.9f, 1.6f), Color.AntiqueWhite, Color.Wheat, 9, false, false,
                     Main.rand.NextFloat(-.1f, .1f));
-            AdditionsSound.spearCharge.Play(Owner.Center, 1f, 0f, .1f, 1, Name);
+            AssetRegistry.GennedSounds.spearCharge.Play(Owner.Center, 1f, 0f, .1f, 1, Name);
         }
 
         if (StateTime >= shootDelay)
@@ -198,7 +197,7 @@ public class FinalStrikeHoldout : ModProjectile
 
         if (StateTime >= shootDelay)
         {
-            AdditionsSound.pierce.Play(Projectile.Center, 1f, 0f, .2f);
+            AssetRegistry.GennedSounds.pierce.Play(Projectile.Center, 1f, 0f, .2f);
 
             StateTime = 0;
             CurrentState = FinalStrikeState.Fire;
@@ -287,8 +286,8 @@ public class FinalStrikeHoldout : ModProjectile
                 Color.AntiqueWhite, true);
             Projectile.velocity *= 16f;
             Projectile.MaxUpdates = 8;
-            AdditionsSound.IkeFinal.Play(Projectile.Center, 1f, -.2f, .1f);
-            AdditionsSound.pierce.Play(Projectile.Center, 1.5f, -.5f, .1f);
+            AssetRegistry.GennedSounds.IkeFinal.Play(Projectile.Center, 1f, -.2f, .1f);
+            AssetRegistry.GennedSounds.pierce.Play(Projectile.Center, 1.5f, -.5f, .1f);
             CurrentState = FinalStrikeState.DivinePierce;
             this.Sync();
         }
@@ -358,7 +357,8 @@ public class FinalStrikeHoldout : ModProjectile
 
         if (StateTime == 0f)
         {
-            AdditionsSound.etherealSwordAttackBasic3.Play(TipOfSpear, Main.rand.NextFloat(.8f, 1f), 0f, .2f, 0, Name);
+            AssetRegistry.GennedSounds.etherealSwordAttackBasic3.Play(TipOfSpear, Main.rand.NextFloat(.8f, 1f), 0f, .2f,
+                0, Name);
         }
 
         float pierce = new PiecewiseCurve()
@@ -400,9 +400,9 @@ public class FinalStrikeHoldout : ModProjectile
 
         void Draw()
         {
-            ManagedShader shader = ShaderRegistry.SideStreakTrail;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WavyBlotchNoise), 1);
-            OptimizedPrimitiveTrail line = new(WidthFunct, ColorFunct, null, 40);
+            ManagedShader shader = AssetRegistry.GennedShaders.SideStreakTrail;
+            shader.SetTexture(AssetRegistry.GennedTextures.WavyBlotchNoise, 1);
+            Trail line = new(WidthFunct, ColorFunct, null, 40);
             line.DrawTrail(shader, Cache.Points, 50);
         }
 
@@ -438,11 +438,11 @@ public class FinalStrikeHoldout : ModProjectile
 
             ScreenShakeSystem.New(new ScreenShake(.2f, .1f), TipOfSpear);
 
-            AdditionsSound.etherealSharpImpact.Play(TipOfSpear, 1.3f, -.1f, .3f, 12);
+            AssetRegistry.GennedSounds.etherealSharpImpact.Play(TipOfSpear, 1.3f, -.1f, .3f, 12);
         }
         else
         {
-            AdditionsSound.MediumExplosion.Play(TipOfSpear, 1.2f, 0f, .2f);
+            AssetRegistry.GennedSounds.MediumExplosion.Play(TipOfSpear, 1.2f, 0f, .2f);
             Projectile.damage = (int) MathF.Max(500f, Projectile.damage * 0.91f);
             Vector2 pos = CheckLinearCollision(Projectile.RotHitbox().TopRight, Projectile.RotHitbox().BottomLeft,
                 target.Hitbox,
@@ -481,7 +481,7 @@ public class FinalStrikeHoldout : ModProjectile
     public override bool? CanDamage()
     {
         if (CurrentState == FinalStrikeState.Stab)
-            return Completion.BetweenNum(0f, .7f) ? null : false;
+            return Completion is > 0f and < .7f ? null : false;
         return CurrentState is FinalStrikeState.Aim or FinalStrikeState.Wait ? false : null;
     }
 
@@ -542,34 +542,29 @@ public class FinalStrikeHoldout : ModProjectile
         if (CurrentState != FinalStrikeState.Stab)
             DrawBackglow();
 
-        void draw()
+        for (float i = 1f; i < 1.5f; i += .1f)
         {
-            for (float i = 1f; i < 1.5f; i += .1f)
-            {
-                Texture2D flare = AssetRegistry.GetTexture(AdditionsTexture.LensStar);
-                Vector2 size = new(30f * i * DivineFormInterpolant);
-                size.Y += MathF.Sin(StateTime * .04f) * 10f * i;
-                if (CurrentState == FinalStrikeState.Stab)
-                    size = new(60f * i * Bump);
-                Rectangle target = ToTarget(Projectile.RotHitbox().TopRight, size);
-                Vector2 orig = flare.Size() / 2f;
-                float rot = Projectile.rotation - PiOver4;
-                Main.spriteBatch.Draw(flare, target, null, Color.AntiqueWhite, rot, orig, 0, 0f);
-            }
+            Texture2D flare = AssetRegistry.GennedTextures.LensStar;
+            Vector2 size = new(30f * i * DivineFormInterpolant);
+            size.Y += MathF.Sin(StateTime * .04f) * 10f * i;
+            if (CurrentState == FinalStrikeState.Stab)
+                size = new(60f * i * Bump);
+            Rectangle target = ToTarget(Projectile.RotHitbox().TopRight, size);
+            Vector2 orig = flare.Size() / 2f;
+            float rot = Projectile.rotation - PiOver4;
+            SpriteBatch.DrawRectPixelated(PixelationLayer.OverProjectiles, BlendState.Additive, flare, target, null,
+                Color.AntiqueWhite, rot, orig);
         }
-
-        PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.OverProjectiles, BlendState.Additive);
 
         return false;
     }
 }
 
-
 public class Streaks : ModProjectile
 {
     public const int Life = 75;
     public ref float Time => ref Projectile.ai[0];
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SeamStrike);
+    public override string Texture => AssetRegistry.GennedTextures.SeamStrike.Path;
 
     public override void SetDefaults()
     {
@@ -601,35 +596,32 @@ public class Streaks : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        void draw()
+        Texture2D bloomTexture = AssetRegistry.GennedTextures.GlowParticleSmall;
+        float ratio = InverseLerp(0f, Life, Time);
+        float completion = MakePoly(2).OutFunction(ratio);
+        float opacity = 1f - MakePoly(2.5f).InFunction(ratio);
+        Color color = MulticolorLerp(InverseLerp(0f, 10f, Projectile.identity / 10f % 1),
+            Color.LightSteelBlue, Color.White, Color.WhiteSmoke, Color.FloralWhite, Color.LightSkyBlue) * opacity;
+
+        float x = Projectile.width * completion;
+        float y = Projectile.height * opacity;
+        Vector2 scale = new(x, y);
+        Vector2 bloomOrigin = bloomTexture.Size() / 2;
+
+        for (float i = .1f; i <= 2f; i += .1f)
         {
-            Texture2D bloomTexture = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
-            float ratio = InverseLerp(0f, Life, Time);
-            float completion = Animators.MakePoly(2).OutFunction(ratio);
-            float opacity = 1f - Animators.MakePoly(2.5f).InFunction(ratio);
-            Color color = MulticolorLerp(InverseLerp(0f, 10f, Projectile.identity / 10f % 1),
-                Color.LightSteelBlue, Color.White, Color.WhiteSmoke, Color.FloralWhite, Color.LightSkyBlue) * opacity;
-
-            float x = Projectile.width * completion;
-            float y = Projectile.height * opacity;
-            Vector2 scale = new(x, y);
-            Vector2 bloomOrigin = bloomTexture.Size() / 2;
-
-            for (float i = .1f; i <= 2f; i += .1f)
-            {
-                Main.spriteBatch.Draw(bloomTexture, ToTarget(Projectile.Center, scale * i), null, color * (2f - i),
-                    Projectile.rotation, bloomOrigin, 0, 0f);
-            }
+            SpriteBatch.DrawRectPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, bloomTexture,
+                ToTarget(Projectile.Center, scale * i), null, color * (2f - i),
+                Projectile.rotation, bloomOrigin);
         }
 
-        PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.UnderProjectiles, BlendState.Additive);
         return false;
     }
 }
 
 public class DivineLightning : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     public const int Life = 30;
 
     public override void SetDefaults()
@@ -657,7 +649,7 @@ public class DivineLightning : ModProjectile
         }
     }
 
-    public float Completion => Animators.MakePoly(6).OutFunction(InverseLerp(0f, Life, Time));
+    public float Completion => MakePoly(6).OutFunction(InverseLerp(0f, Life, Time));
 
     private List<Line>[] Branches = [];
     public override bool ShouldUpdatePosition() => false;
@@ -669,7 +661,7 @@ public class DivineLightning : ModProjectile
                 Main.rand.NextFloat(40f, 80f)).ToArray();
 
         Projectile.Opacity = 1f - Completion;
-        if (Projectile.Opacity.BetweenNum(0f, .05f))
+        if (Projectile.Opacity is > 0f and .05f)
             Projectile.Kill();
 
         Time++;
@@ -705,9 +697,9 @@ public class DivineLightning : ModProjectile
         {
             foreach (Line line in list)
             {
-                PixelationSystem.QueueTextureRenderAction(() =>
-                    line.Draw(MulticolorLerp(Completion, Color.White, Color.AntiqueWhite, Color.WhiteSmoke)
-                              * Projectile.Opacity), PixelationLayer.OverNPCs, BlendState.Additive);
+                line.DrawPixelated(PixelationLayer.OverNPCs, BlendState.Additive,
+                    MulticolorLerp(Completion, Color.White, Color.AntiqueWhite, Color.WhiteSmoke)
+                    * Projectile.Opacity);
             }
         }
 
@@ -720,5 +712,3 @@ public sealed class FinalStrikePlayer : ModPlayer
     public int Counter;
     public override void UpdateDead() => Counter = 0;
 }
-
-

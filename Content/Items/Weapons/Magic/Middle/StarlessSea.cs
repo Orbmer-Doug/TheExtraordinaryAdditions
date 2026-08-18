@@ -10,12 +10,12 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Middle;
 
 public class StarlessSea : ModItem
 {
-    public static readonly Texture2D Fracture = AssetRegistry.GetTexture(AdditionsTexture.BloodFracture);
-    public static readonly Texture2D Starless = AssetRegistry.GetTexture(AdditionsTexture.StarlessSea);
+    public static readonly Texture2D Fracture = AssetRegistry.GennedTextures.BloodFracture;
+    public static readonly Texture2D Starless = AssetRegistry.GennedTextures.StarlessSea;
 
     public override string Texture => Main.bloodMoon
-        ? AssetRegistry.GetTexturePath(AdditionsTexture.BloodFracture)
-        : AssetRegistry.GetTexturePath(AdditionsTexture.StarlessSea);
+        ? AssetRegistry.GennedTextures.BloodFracture.Path
+        : AssetRegistry.GennedTextures.StarlessSea.Path;
 
     public override void SetDefaults()
     {

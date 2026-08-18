@@ -1,20 +1,17 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
-using TheExtraordinaryAdditions.Core.Utilities;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
 
 public class CometBlast : ModProjectile, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -66,7 +63,7 @@ public class CometBlast : ModProjectile, ILocalizedModType, IModType
                 for (int j = 0; j <= 1; j++)
                 {
                     ParticleRegistry.SpawnHeavySmokeParticle(pos, vel * rand, lifetime, scale,
-                        Main.rand.NextBool() ? new Color(35, 119, 213) : new Color(30, 64, 128), .6f, true);
+                        Main.rand.NextBool() ? new Color(35, 119, 213) : new Color(30, 64, 128), .6f);
                 }
             }
 
@@ -122,7 +119,7 @@ public class CometBlast : ModProjectile, ILocalizedModType, IModType
     private Color ColorFunct(SystemVector2 c, Vector2 position) =>
         Color.Lerp(Color.White, Color.Cyan * 1.4f, Completion) * GetLerpBump(0f, .2f, 1f, .7f, Completion);
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override bool PreDraw(ref Color lightColor)
     {
@@ -131,12 +128,12 @@ public class CometBlast : ModProjectile, ILocalizedModType, IModType
             if (trail == null || trail.Disposed || points == null)
                 return;
 
-            ManagedShader shader = ShaderRegistry.EnlightenedBeam;
+            ManagedShader shader = AssetRegistry.GennedShaders.EnlightenedBeam;
 
             shader.TrySetParameter("time", Projectile.timeLeft * 0.01f);
             shader.TrySetParameter("repeats", 6f);
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.StreakMagma), 1, SamplerState.LinearWrap);
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FractalNoise), 2, SamplerState.LinearWrap);
+            shader.SetTexture(AssetRegistry.GennedTextures.StreakMagma, 1, SamplerState.LinearWrap);
+            shader.SetTexture(AssetRegistry.GennedTextures.FractalNoise, 2, SamplerState.LinearWrap);
 
             trail.DrawTrail(shader, points.Points, 300, true);
         }

@@ -1,15 +1,14 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
 public class TechnicPortal : ProjOwnedByNPC<Asterlin>
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     public override bool IgnoreOwnerActivity => true;
 
     public override void SetDefaults()
@@ -47,23 +46,7 @@ public class TechnicPortal : ProjOwnedByNPC<Asterlin>
 
     public override bool PreDraw(ref Color lightColor)
     {
-        ManagedShader shader = AssetRegistry.GetShader("PortalShaderAlt");
-
-        void portal()
-        {
-            Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
-            shader.TrySetParameter("scale", Projectile.scale);
-            shader.TrySetParameter("coolColor", Color.DarkCyan.ToVector3());
-            shader.TrySetParameter("mediumColor", Color.Cyan.ToVector3());
-            shader.TrySetParameter("hotColor", Color.DeepSkyBlue.ToVector3());
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise), 1, SamplerState.LinearWrap);
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DendriticNoiseZoomedOut), 2,
-                SamplerState.LinearWrap);
-            Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Projectile.Size), null, Color.White,
-                Projectile.rotation, tex.Size() / 2);
-        }
-
-        PixelationSystem.QueueTextureRenderAction(portal, PixelationLayer.OverNPCs, null, shader);
+        ManagedShader shader = AssetRegistry.GennedShaders.PortalShaderAlt;
         return false;
     }
 }

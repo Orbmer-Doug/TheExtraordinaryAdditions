@@ -11,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 
 public class TremorAlloy : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TremorAlloy);
+    public override string Texture => AssetRegistry.GennedTextures.TremorAlloy.Path;
 
     public override void SetStaticDefaults()
     {

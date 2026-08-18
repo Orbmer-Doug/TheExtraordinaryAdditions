@@ -1,15 +1,14 @@
 ﻿using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
-using TheExtraordinaryAdditions.Core.Utilities;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
 
 public class TesselesticLightning : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     private const int Life = 30;
 
     public override void SetDefaults()
@@ -32,14 +31,14 @@ public class TesselesticLightning : ModProjectile
     public ref float PosY => ref Projectile.ai[2];
 
     public Color MainColor;
-    public float Completion => Animators.MakePoly(6f).OutFunction(InverseLerp(0f, Life, Time));
+    public float Completion => MakePoly(6f).OutFunction(InverseLerp(0f, Life, Time));
 
     public override bool ShouldUpdatePosition() => false;
 
     public override void AI()
     {
         if (trail == null || trail.Disposed)
-            trail = new(WidthFunct, ColorFunct, null);
+            trail = new(WidthFunct, ColorFunct);
 
         if (Time == 0f)
         {
@@ -48,7 +47,7 @@ public class TesselesticLightning : ModProjectile
         }
 
         Projectile.Opacity = 1f - Completion;
-        if (Projectile.Opacity.BetweenNum(0f, .05f))
+        if (Projectile.Opacity is > 0f and < .05f)
             Projectile.Kill();
 
         Time++;
@@ -70,7 +69,7 @@ public class TesselesticLightning : ModProjectile
         MulticolorLerp(Completion, Color.White, MainColor) * Projectile.Opacity;
 
     public TrailPoints points;
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override bool PreDraw(ref Color lightColor)
     {
@@ -78,9 +77,9 @@ public class TesselesticLightning : ModProjectile
         {
             if (trail != null && points != null)
             {
-                ManagedShader shader = ShaderRegistry.SpecialLightningTrail;
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise), 1);
-                trail.DrawTrail(shader, points.Points, -1, false, true);
+                ManagedShader shader = AssetRegistry.GennedShaders.SpecialLightningTrail;
+                shader.SetTexture(AssetRegistry.GennedTextures.TechyNoise, 1);
+                trail.DrawTrail(shader, points.Points);
             }
         }
 

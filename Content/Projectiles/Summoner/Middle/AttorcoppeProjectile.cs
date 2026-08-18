@@ -2,13 +2,12 @@
 using Terraria;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
 
 public class AttorcoppeProjectile : BaseWhip
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SpiderWhipProjectile);
+    public override string Texture => AssetRegistry.GennedTextures.SpiderWhipProjectile.Path;
 
     public bool Second
     {
@@ -25,7 +24,7 @@ public class AttorcoppeProjectile : BaseWhip
 
     public override void SafeAI()
     {
-        if (Completion.BetweenNum(.2f, .8f) && Projectile.numUpdates < 3)
+        if (Completion is > .2f and < .8f && Projectile.numUpdates < 3)
         {
             Dust.NewDustPerfect(Tip, DustID.Venom, Main.rand.NextVector2Circular(5f, 5f), 0, default,
                 Main.rand.NextFloat(.5f, .9f)).noGravity = true;
@@ -59,7 +58,7 @@ public class AttorcoppeProjectile : BaseWhip
 
     public override void ModifyNPCEffects(NPC target, ref NPC.HitModifiers modifiers, in Vector2 pos, in int index)
     {
-        if (index == (WhipPoints.Count - 1) && Completion.BetweenNum(.45f, .55f))
+        if (index == (WhipPoints.Count - 1) && Completion is > .45f and < .55f)
             modifiers.SetCrit();
     }
 

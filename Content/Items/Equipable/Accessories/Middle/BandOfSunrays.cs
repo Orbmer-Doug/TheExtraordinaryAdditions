@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
-using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
+using TheExtraordinaryAdditions.Content.Rarities;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -13,7 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
 
 public class BandOfSunrays : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BandOfSunrays);
+    public override string Texture => AssetRegistry.GennedTextures.BandOfSunrays.Path;
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {

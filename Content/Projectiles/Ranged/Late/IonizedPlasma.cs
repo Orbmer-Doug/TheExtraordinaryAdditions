@@ -1,13 +1,12 @@
 ﻿using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles.Metaball;
 using TheExtraordinaryAdditions.Content.Buffs.Debuff;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
 public class IonizedPlasma : ModProjectile, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public const int Lifetime = 120;
 
@@ -44,6 +43,5 @@ public class IonizedPlasma : ModProjectile, ILocalizedModType, IModType
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         Projectile.damage = (int) (Projectile.damage * .85f);
-        target.AddBuff(ModContent.BuffType<PlasmaIncineration>(), 300);
     }
 }

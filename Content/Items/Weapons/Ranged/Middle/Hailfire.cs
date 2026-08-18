@@ -12,7 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 
 public class Hailfire : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Hailfire);
+    public override string Texture => AssetRegistry.GennedTextures.Hailfire.Path;
 
     public override void SetStaticDefaults()
     {

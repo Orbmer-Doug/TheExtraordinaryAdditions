@@ -9,6 +9,7 @@ using Terraria.ModLoader;
 using Terraria.ObjectData;
 using TheExtraordinaryAdditions.Core;
 using TheExtraordinaryAdditions.Core.DataStructures;
+using TheExtraordinaryAdditions.Core.Graphics.Simulations;
 
 namespace TheExtraordinaryAdditions.Content.Tiles;
 
@@ -20,7 +21,7 @@ public sealed class FlagPolePlaced : ModTile
     public const int Width = 1;
     public const int Height = 11;
 
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.FlagPolePlaced);
+    public override string Texture => AssetRegistry.GennedTextures.FlagPolePlaced.Path;
 
     public override void SetStaticDefaults()
     {

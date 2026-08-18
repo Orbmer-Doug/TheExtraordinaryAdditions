@@ -1,17 +1,16 @@
 ﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Early;
 
 public class PhoenixRound : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -50,7 +49,7 @@ public class PhoenixRound : ModProjectile
 
     private float WidthFunction(float c)
     {
-        return OptimizedPrimitiveTrail.PyriformWidthFunct(c, Projectile.width * 2);
+        return Trail.PyriformWidthFunct(c, Projectile.width * 2);
     }
 
     private Color ColorFunction(SystemVector2 c, Vector2 position)
@@ -58,7 +57,7 @@ public class PhoenixRound : ModProjectile
         return Color.OrangeRed * GetLerpBump(0f, .1f, .8f, .27f, c.X) * Projectile.Opacity;
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints cache;
 
     public override bool PreDraw(ref Color lightColor)
@@ -67,8 +66,8 @@ public class PhoenixRound : ModProjectile
         {
             if (trail != null && !trail.Disposed && cache != null)
             {
-                ManagedShader shader = ShaderRegistry.FlameTrail;
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FireNoise), 1);
+                ManagedShader shader = AssetRegistry.GennedShaders.FlameTrail;
+                shader.SetTexture(AssetRegistry.GennedTextures.FireNoise, 1);
                 trail.DrawTrail(shader, cache.Points, 30);
             }
         }

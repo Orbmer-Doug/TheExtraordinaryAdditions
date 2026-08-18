@@ -8,7 +8,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 
 public class MythicScrap : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.MythicScrap);
+    public override string Texture => AssetRegistry.GennedTextures.MythicScrap.Path;
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {

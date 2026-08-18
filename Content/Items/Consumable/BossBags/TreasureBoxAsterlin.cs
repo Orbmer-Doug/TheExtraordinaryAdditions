@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using Terraria;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -14,7 +13,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Consumable.BossBags;
 
 public class TreasureBoxAsterlin : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TreasureBoxAsterlin);
+    public override string Texture => AssetRegistry.GennedTextures.TreasureBoxAsterlin.Path;
 
     public override void SetStaticDefaults()
     {

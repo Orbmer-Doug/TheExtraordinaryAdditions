@@ -1,23 +1,17 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using Terraria;
-using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
-using TheExtraordinaryAdditions.Core.Systems;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 
 public class HailfireShell : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.HailfireShell);
+    public override string Texture => AssetRegistry.GennedTextures.HailfireShell.Path;
     public Player Owner => Main.player[Projectile.owner];
 
     public override void SetDefaults()
@@ -53,7 +47,7 @@ public class HailfireShell : ModProjectile
         after?.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One, Projectile.Opacity, Projectile.rotation, 0,
             255, 0, 0f, null, false, .4f));
 
-        if (this.RunLocal() && Owner.Additions().SafeMouseRight.JustPressed)
+        if (this.RunLocal() && Owner.AdditionsMouse().SafeMouseRight.JustPressed)
         {
             for (int i = 0; i < 12; i++)
             {
@@ -97,7 +91,7 @@ public class HailfireShell : ModProjectile
 
     private void Boom()
     {
-        AdditionsSound.crosscodeExplosion.Play(Projectile.Center, .8f, 0f, .1f, 10, Name);
+        AssetRegistry.GennedSounds.crosscodeExplosion.Play(Projectile.Center, .8f, 0f, .1f, 10, Name);
         if (this.RunLocal())
             Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<HailfireExplosion>(),
                 Projectile.damage, Projectile.knockBack, Projectile.owner, 1f);
@@ -120,7 +114,7 @@ public class HailfireShell : ModProjectile
 
 public class HailfireRockets : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.HailfireRocket);
+    public override string Texture => AssetRegistry.GennedTextures.HailfireRocket.Path;
 
     public override void SetDefaults()
     {
@@ -160,7 +154,7 @@ public class HailfireRockets : ModProjectile
 
     public override void OnKill(int timeLeft)
     {
-        AdditionsSound.crosscodeExplosion.Play(Projectile.Center, .4f, .3f, .2f, 30, "small");
+        AssetRegistry.GennedSounds.crosscodeExplosion.Play(Projectile.Center, .4f, .3f, .2f, 30, "small");
         if (this.RunLocal())
             Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<HailfireExplosion>(),
                 Projectile.damage, Projectile.knockBack, Projectile.owner, .3f);
@@ -182,7 +176,7 @@ public class HailfireRockets : ModProjectile
 
 public class HailfireExplosion : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public ref float RadiusInterpolant => ref Projectile.ai[0];
 

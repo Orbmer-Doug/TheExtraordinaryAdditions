@@ -8,6 +8,16 @@ namespace TheExtraordinaryAdditions.Core.Utilities;
 
 public static class TileUtils
 {
+    public static Tile TryGetTile(Point point)
+    {
+        return !WorldGen.InWorld(point.X, point.Y) ? default : Main.tile[point.X, point.Y];
+    }
+
+    public static Tile TryGetTile(int x, int y)
+    {
+        return !WorldGen.InWorld(x, y) ? default : Main.tile[x, y];
+    }
+
     public static Vector2? FindNearestSurface(Vector2 searchOrigin, bool searchDown, float maxDistance, int searchWidth,
         bool finePrecision = false)
     {
@@ -319,53 +329,16 @@ public static class TileUtils
         return false;
     }
 
-    public class TileData
-    {
-        public TileTypeData tileTypeData;
-
-        public WallTypeData wallTypeData;
-
-        public TileWallWireStateData tileWallWireStateData;
-
-        public LiquidData liquidData;
-
-        public TileWallBrightnessInvisibilityData tileWallBrightnessInvisibilityData;
-
-        public ref TileTypeData TileTypeData => ref tileTypeData;
-
-        public ref WallTypeData WallTypeData => ref wallTypeData;
-
-        public ref TileWallWireStateData TileWallWireStateData => ref tileWallWireStateData;
-
-        public ref LiquidData LiquidData => ref liquidData;
-
-        public ref TileWallBrightnessInvisibilityData TileWallBrightnessInvisibilityData =>
-            ref tileWallBrightnessInvisibilityData;
-
-        public static implicit operator TileData(Tile tile)
-        {
-            TileData tileData = new()
-            {
-                TileTypeData = tile.Get<TileTypeData>(),
-                WallTypeData = tile.Get<WallTypeData>(),
-                TileWallWireStateData = tile.Get<TileWallWireStateData>(),
-                LiquidData = tile.Get<LiquidData>(),
-                TileWallBrightnessInvisibilityData = tile.Get<TileWallBrightnessInvisibilityData>()
-            };
-            return tileData;
-        }
-    }
-
     public static bool SolidCollisionFix(Vector2 position, int width, int height, bool acceptTopSurfaces = false)
     {
         int value = (int) (position.X / 16f) - 1;
         int value2 = (int) ((position.X + width) / 16f) + 2;
         int value3 = (int) (position.Y / 16f) - 1;
         int value4 = (int) ((position.Y + height) / 16f) + 2;
-        int num = Terraria.Utils.Clamp(value, 0, Main.maxTilesX - 1);
-        value2 = Terraria.Utils.Clamp(value2, 0, Main.maxTilesX - 1);
-        value3 = Terraria.Utils.Clamp(value3, 0, Main.maxTilesY - 1);
-        value4 = Terraria.Utils.Clamp(value4, 0, Main.maxTilesY - 1);
+        int num = Utils.Clamp(value, 0, Main.maxTilesX - 1);
+        value2 = Utils.Clamp(value2, 0, Main.maxTilesX - 1);
+        value3 = Utils.Clamp(value3, 0, Main.maxTilesY - 1);
+        value4 = Utils.Clamp(value4, 0, Main.maxTilesY - 1);
         Vector2 vector = default;
         for (int i = num; i < value2; i++)
         {
@@ -438,7 +411,7 @@ public static class TileUtils
 
     public static bool Active(this Tile tile, bool countActuater = true)
     {
-        if (tile.Get<TileWallWireStateData>().IsActuated == true && countActuater == true)
+        if (tile.Get<TileWallWireStateData>().IsActuated && countActuater)
             return false;
 
         return tile.Get<TileWallWireStateData>().HasTile;
@@ -457,11 +430,6 @@ public static class TileUtils
     public static Tile ParanoidTileRetrieval(int x, int y)
     {
         return !WorldGen.InWorld(x, y) ? default : Main.tile[x, y];
-    }
-
-    public static float GetTileRNG(this Point tilePos, int shift = 0)
-    {
-        return (float) (Math.Sin(tilePos.X * 17.07947 + shift * 36) + Math.Sin(tilePos.Y * 25.13274)) * 0.25f + 0.5f;
     }
 
     public static bool IsTileSolid(this Tile tile) => tile.HasUnactuatedTile && Main.tileSolid[tile.TileType] &&
@@ -514,13 +482,6 @@ public static class TileUtils
             return false;
 
         return Main.tileSolid[tile.TileType] || Main.tileSolidTop[tile.TileType];
-    }
-
-    public static bool IsTileFull(this Tile tile)
-    {
-        if (tile != null && tile.HasTile)
-            return Main.tileSolid[tile.TileType];
-        return false;
     }
 
     public static bool IsTileExposedToAir(int x, int y)

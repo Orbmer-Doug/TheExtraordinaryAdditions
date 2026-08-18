@@ -4,16 +4,14 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
 public class TheTechnicBlitzripper : ProjOwnedByNPC<Asterlin>
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TechnicBlitzripper);
+    public override string Texture => AssetRegistry.GennedTextures.TechnicBlitzripper.Path;
 
     public override void SetDefaults()
     {
@@ -53,7 +51,7 @@ public class TheTechnicBlitzripper : ProjOwnedByNPC<Asterlin>
                 Projectile.Kill();
         }
         else
-            Projectile.Opacity = Animators.MakePoly(2f).OutFunction(InverseLerp(0f, 30f, Time));
+            Projectile.Opacity = MakePoly(2f).OutFunction(InverseLerp(0f, 30f, Time));
 
         Vector2 offset = PolarVector(30f - (Recoil * 4), Projectile.rotation) +
                          PolarVector(10f * Dir, Projectile.rotation - MathHelper.PiOver2);
@@ -62,9 +60,9 @@ public class TheTechnicBlitzripper : ProjOwnedByNPC<Asterlin>
             Projectile.Center.SafeDirectionTo(ModOwner.ReticlePosition), .2f);
         Projectile.rotation = Projectile.velocity.ToRotation();
 
-        Heat = MathHelper.Clamp(Animators.MakePoly(3f).OutFunction.Evaluate(Heat, -.11f, .04f), 0f,
+        Heat = MathHelper.Clamp(MakePoly(3f).OutFunction.Evaluate(Heat, -.11f, .04f), 0f,
             TechnicBlitzripperProj.MaxHeat);
-        Recoil = MathHelper.Clamp(Animators.MakePoly(3f).OutFunction.Evaluate(Recoil, -.25f, .095f), 0f, 40f);
+        Recoil = MathHelper.Clamp(MakePoly(3f).OutFunction.Evaluate(Recoil, -.25f, .095f), 0f, 40f);
 
         if (ShootDelay > 0f)
             ShootDelay--;
@@ -78,7 +76,7 @@ public class TheTechnicBlitzripper : ProjOwnedByNPC<Asterlin>
     {
         if (ShootDelay <= 0f)
         {
-            if (this.RunServer())
+            if (ModProjectile.RunServer())
                 SpawnProjectile(Tip, Projectile.velocity.SafeNormalize(Vector2.Zero) * 12f,
                     ModContent.ProjectileType<TheLightripBullet>(), Asterlin.LightAttackDamage, 0f);
 
@@ -100,7 +98,7 @@ public class TheTechnicBlitzripper : ProjOwnedByNPC<Asterlin>
                     Main.rand.NextFloat(.4f, .6f), Color.Cyan, Color.DarkCyan, Main.rand.NextFloat(50f, 180f));
             }
 
-            AdditionsSound.banditShot1B.Play(Tip, .85f, 0f, .1f, 20, Name);
+            AssetRegistry.GennedSounds.banditShot1B.Play(Tip, .85f, 0f, .1f, 20, Name);
 
             Heat = MathHelper.Clamp(Heat + 1, 0f, TechnicBlitzripperProj.MaxHeat);
             Recoil = 4f;
@@ -121,7 +119,7 @@ public class TheTechnicBlitzripper : ProjOwnedByNPC<Asterlin>
             texture.Size() / 2f, Projectile.scale, effects);
 
         float comp = MathHelper.Lerp(0f, .7f, InverseLerp(0f, TechnicBlitzripperProj.MaxHeat, Heat));
-        Texture2D glow = AssetRegistry.GetTexture(AdditionsTexture.TechnicBlitzripperHeat);
+        Texture2D glow = AssetRegistry.GennedTextures.TechnicBlitzripperHeat;
         for (int i = 0; i < 8; i++)
         {
             Vector2 off = (MathHelper.TwoPi * i / 8).ToRotationVector2() * 5f * comp;
@@ -129,7 +127,7 @@ public class TheTechnicBlitzripper : ProjOwnedByNPC<Asterlin>
                 Projectile.rotation, glow.Size() / 2, Projectile.scale, effects);
         }
 
-        Texture2D invis = AssetRegistry.InvisTex;
+        Texture2D invis = AssetRegistry.GennedTextures.Invisible;
         const float sightsSize = 300f;
         float sightsResolution = 2f;
         Color color = Color.Cyan * Projectile.Opacity;
@@ -137,7 +135,7 @@ public class TheTechnicBlitzripper : ProjOwnedByNPC<Asterlin>
         Vector2 top = Projectile.Center + PolarVector(-12f, Projectile.rotation) +
                       PolarVector(13f * Dir, Projectile.rotation - MathHelper.PiOver2);
 
-        ManagedShader scope = ShaderRegistry.PixelatedSightLine;
+        ManagedShader scope = AssetRegistry.GennedShaders.PixelatedSightLine;
         scope.TrySetParameter("noiseOffset", Main.GameUpdateCount * -0.003f);
         scope.TrySetParameter("mainOpacity", 1f);
         scope.TrySetParameter("resolution", new Vector2(sightsResolution * sightsSize));

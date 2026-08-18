@@ -12,7 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Middle;
 
 public class LokiShrine : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.LokiShrine);
+    public override string Texture => AssetRegistry.GennedTextures.LokiShrine.Path;
 
     public override void SetStaticDefaults()
     {

@@ -5,7 +5,7 @@ using Terraria;
 
 namespace TheExtraordinaryAdditions.Core.Utilities;
 
-public class BitmaskUtils
+public static class BitmaskUtils
 {
     /// <summary>
     /// Number of bits per <see cref="ulong"/> mask element (64)
@@ -15,9 +15,9 @@ public class BitmaskUtils
     /// <summary>
     /// An iterator that goes over active indices in a bitmask
     /// </summary>
-    public readonly ref struct BitmaskEnumerable(ReadOnlySpan<ulong> mask, uint maxIndex)
+    public readonly ref struct IndicesEnumerable(ReadOnlySpan<ulong> mask, uint maxIndex)
     {
-        public ref struct BitmaskEnumerator(ReadOnlySpan<ulong> presenceMask, uint maxIndex)
+        public ref struct IndicesEnumerator(ReadOnlySpan<ulong> presenceMask, uint maxIndex)
         {
             private readonly ReadOnlySpan<ulong> presenceMask = presenceMask;
             private readonly uint maxIndex = maxIndex;
@@ -25,7 +25,7 @@ public class BitmaskUtils
             private ulong currentMask = 0;
             private int currentIndex = -1;
 
-            public readonly BitmaskEnumerator GetEnumerator() => this;
+            public readonly IndicesEnumerator GetEnumerator() => this;
 
             public readonly int Current => currentIndex;
 
@@ -58,9 +58,9 @@ public class BitmaskUtils
         public readonly ReadOnlySpan<ulong> mask = mask;
         public readonly uint maxIndex = maxIndex;
 
-        public BitmaskEnumerator GetEnumerator()
+        public IndicesEnumerator GetEnumerator()
         {
-            return new BitmaskEnumerator(mask, maxIndex);
+            return new IndicesEnumerator(mask, maxIndex);
         }
     }
 

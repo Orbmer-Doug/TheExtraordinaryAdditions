@@ -4,17 +4,16 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Early;
 
 public class MeteorSwing : BaseSwordSwing
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.MeteorKatana);
+    public override string Texture => AssetRegistry.GennedTextures.MeteorKatana.Path;
 
     public int HitCounter
     {
@@ -61,7 +60,7 @@ public class MeteorSwing : BaseSwordSwing
         // swoosh
         if (Animation() >= .26f && !PlayedSound)
         {
-            AdditionsSound.MediumSwing.Play(Projectile.Center, .6f, 0f, .2f);
+            AssetRegistry.GennedSounds.MediumSwing.Play(Projectile.Center, .6f, 0f, .2f);
             PlayedSound = true;
         }
 
@@ -158,7 +157,7 @@ public class MeteorSwing : BaseSwordSwing
         }
 
         ScreenShakeSystem.New(new(.1f, .1f), start);
-        AdditionsSound.RoySpecial2.Play(start, .6f, 0f, .3f);
+        AssetRegistry.GennedSounds.RoySpecial2.Play(start, .6f, 0f, .3f);
         TimeStop = StopTime;
     }
 
@@ -176,7 +175,7 @@ public class MeteorSwing : BaseSwordSwing
         }
 
         ScreenShakeSystem.New(new(.1f, .1f), start);
-        AdditionsSound.RoySpecial2.Play(start, .6f, 0f, .3f);
+        AssetRegistry.GennedSounds.RoySpecial2.Play(start, .6f, 0f, .3f);
         TimeStop = StopTime;
     }
 

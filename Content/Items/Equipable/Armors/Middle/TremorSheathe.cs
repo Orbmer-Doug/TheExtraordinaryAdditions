@@ -11,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
 [AutoloadEquip(EquipType.Legs)]
 public class TremorSheathe : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TremorSheathe);
+    public override string Texture => AssetRegistry.GennedTextures.TremorSheathe.Path;
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {

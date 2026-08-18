@@ -11,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 
 public class BloodShot : ProjOwnedByNPC<StygainHeart>
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Gleam);
+    public override string Texture => AssetRegistry.GennedTextures.Gleam.Path;
 
     public override void SetStaticDefaults()
     {

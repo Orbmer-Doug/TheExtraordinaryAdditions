@@ -5,18 +5,17 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Summon;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Late;
 
 public class LivingStarFlareMinion : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
     public NPC Target => NPCTargeting.MinionHoming(new(Projectile.Center, 1050, false, true), Owner);
 
     public override void SetStaticDefaults()
@@ -54,12 +53,12 @@ public class LivingStarFlareMinion : ModProjectile
     {
         if (!Owner.Available() && this.RunLocal())
         {
-            Modded.Flare = false;
+            Owner.AdditionsMinion().Flare = false;
             return;
         }
 
         Owner.AddBuff(ModContent.BuffType<LittleStar>(), 3600);
-        if (Modded.Flare)
+        if (Owner.AdditionsMinion().Flare)
             Projectile.timeLeft = 2;
 
         if (Time == 0 && this.RunLocal())
@@ -86,7 +85,7 @@ public class LivingStarFlareMinion : ModProjectile
             int wait = LivingStarBeam.BeamTime + LivingStarBeam.FadeTime + 90;
             if (Time % wait == (wait - 1))
             {
-                AdditionsSound.HeavyLaserBlast.Play(Projectile.Center, .6f, -.1f, 0f, 20);
+                AssetRegistry.GennedSounds.HeavyLaserBlast.Play(Projectile.Center, .6f, -.1f, 0f, 20);
                 if (this.RunLocal())
                     Projectile.NewProj(Projectile.Center, Projectile.SafeDirectionTo(Target.Center),
                         ModContent.ProjectileType<LivingStarBeam>(), Projectile.damage, Projectile.knockBack,
@@ -99,8 +98,8 @@ public class LivingStarFlareMinion : ModProjectile
 
     public override bool PreDraw(ref Color lightColor)
     {
-        Texture2D noise = AssetRegistry.GetTexture(AdditionsTexture.FlameMap1);
-        ManagedShader fireball = ShaderRegistry.FireballShader;
+        Texture2D noise = AssetRegistry.GennedTextures.FlameMap1;
+        ManagedShader fireball = AssetRegistry.GennedShaders.FireballShader;
         fireball.SetTexture(noise, 1, SamplerState.AnisotropicWrap);
         fireball.TrySetParameter("mainColor", Color.Lerp(Color.Goldenrod, Color.Gold, 0.3f).ToVector3());
         fireball.TrySetParameter("resolution", new Vector2(Projectile.scale * 100f));
@@ -109,7 +108,7 @@ public class LivingStarFlareMinion : ModProjectile
 
         Main.spriteBatch.EnterShaderRegion(fireball.Effect);
         Vector2 drawPos = Projectile.Center - Main.screenPosition;
-        Texture2D invis = AssetRegistry.GetTexture(AdditionsTexture.Invisible);
+        Texture2D invis = AssetRegistry.GennedTextures.Invisible;
         fireball.Render();
         Main.spriteBatch.Draw(invis, drawPos, null, Color.White * Projectile.Opacity, 0f, invis.Size() * 0.5f,
             Projectile.scale * 100f, SpriteEffects.None, 0f);
@@ -120,7 +119,7 @@ public class LivingStarFlareMinion : ModProjectile
 
 public class LivingStarBeam : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -268,7 +267,7 @@ public class LivingStarBeam : ModProjectile
     }
 
     public TrailPoints points = new(80);
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override bool PreDraw(ref Color lightColor)
     {
@@ -277,9 +276,9 @@ public class LivingStarBeam : ModProjectile
             if (points == null || trail == null)
                 return;
 
-            ManagedShader shader = AssetRegistry.GetShader("DisintegrationBeamShader");
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.StreakMagma), 1, SamplerState.AnisotropicWrap);
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.VoronoiShapes), 2,
+            ManagedShader shader = AssetRegistry.GennedShaders.DisintegrationBeamShader;
+            shader.SetTexture(AssetRegistry.GennedTextures.StreakMagma, 1, SamplerState.AnisotropicWrap);
+            shader.SetTexture(AssetRegistry.GennedTextures.VoronoiShapes, 2,
                 SamplerState.AnisotropicWrap);
             trail.DrawTrail(shader, points.Points);
         }

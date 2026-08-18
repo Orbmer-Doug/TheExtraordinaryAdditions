@@ -8,7 +8,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Placeable;
 
 public class Polarity : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Polarity);
+    public override string Texture => AssetRegistry.GennedTextures.Polarity.Path;
 
     public override void SetStaticDefaults()
     {

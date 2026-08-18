@@ -83,8 +83,8 @@ public class BiomePointerUI : SmartUIState
         }
     }
 
-    public static readonly Texture2D arrow = AssetRegistry.GetTexture(AdditionsTexture.BiomePointer);
-    public static readonly Texture2D back = AssetRegistry.GetTexture(AdditionsTexture.BiomePointerBackground);
+    public static readonly Texture2D arrow = AssetRegistry.GennedTextures.BiomePointer;
+    public static readonly Texture2D back = AssetRegistry.GennedTextures.BiomePointerBackground;
 
     public static readonly Texture2D marble =
         ModContent.Request<Texture2D>(ItemID.Marble.GetTerrariaItem(), AssetRequestMode.ImmediateLoad).Value;

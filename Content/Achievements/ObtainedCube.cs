@@ -7,7 +7,7 @@ namespace TheExtraordinaryAdditions.Content.Achievements;
 
 public class ObtainedCube : ModAchievement
 {
-    public override string TextureName => AssetRegistry.GetTexturePath(AdditionsTexture.ObtainedCube);
+    public override string TextureName => AssetRegistry.GennedTextures.ObtainedCube.Path;
     public ItemCraftCondition Condition { get; private set; }
     public override bool Hidden => !Condition.IsCompleted;
 

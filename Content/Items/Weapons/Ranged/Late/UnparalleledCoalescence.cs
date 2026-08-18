@@ -6,7 +6,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late.Zenith;
-using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
+using TheExtraordinaryAdditions.Content.Rarities;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -14,7 +14,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
 
 public class UnparalleledCoalescence : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.UnparalleledCoalescence);
+    public override string Texture => AssetRegistry.GennedTextures.UnparalleledCoalescence.Path;
 
     public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor,
         Color itemColor, Vector2 origin, float scale)
@@ -62,10 +62,8 @@ public class UnparalleledCoalescence : ModItem
         recipe.AddIngredient(ItemID.FairyQueenRangedItem, 1);
         recipe.AddIngredient(ItemID.Phantasm, 1);
         recipe.AddIngredient(ItemID.Celeb2, 1);
-        recipe.AddIngredient(ModContent.ItemType<HeavenForgedCannon>(), 1);
         recipe.AddIngredient(ModContent.ItemType<Lanikea>(), 1);
-        recipe.AddIngredient(ModContent.ItemType<CosmicImplosion>(), 1);
-        //TODO
+        recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();
     }
 }

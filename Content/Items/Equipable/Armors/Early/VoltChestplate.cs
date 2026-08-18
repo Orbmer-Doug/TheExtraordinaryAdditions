@@ -11,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Early;
 [AutoloadEquip(EquipType.Body)]
 public class VoltChestplate : ModItem, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.VoltChestplate);
+    public override string Texture => AssetRegistry.GennedTextures.VoltChestplate.Path;
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {

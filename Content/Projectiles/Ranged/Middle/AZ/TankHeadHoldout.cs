@@ -8,7 +8,6 @@ using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle.AZ;
@@ -16,7 +15,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle.AZ;
 // this has to be the stupidest thing i have made
 public class TankHeadHoldout : BaseIdleHoldoutProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TankHeadHoldout);
+    public override string Texture => AssetRegistry.GennedTextures.TankHeadHoldout.Path;
     public override int AssociatedItemID => ModContent.ItemType<TroubledTank>();
     public override int IntendedProjectileType => ModContent.ProjectileType<TankHeadHoldout>();
     public ref float Counter => ref Projectile.ai[0];
@@ -102,7 +101,7 @@ public class TankHeadHoldout : BaseIdleHoldoutProjectile
 
         Projectile.scale = 1f;
 
-        bool activatingRight = Firing <= 0f && Owner.Additions().SafeMouseRight.JustPressed;
+        bool activatingRight = Firing <= 0f && Owner.AdditionsMouse().SafeMouseRight.JustPressed;
         if (this.RunLocal() && activatingRight)
         {
             State = (State + 1) % 5;

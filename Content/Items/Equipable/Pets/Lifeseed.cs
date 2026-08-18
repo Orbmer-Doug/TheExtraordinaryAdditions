@@ -8,7 +8,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Pets;
 
 public class Lifeseed : ModItem, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Lifeseed);
+    public override string Texture => AssetRegistry.GennedTextures.Lifeseed.Path;
 
     public override void SetDefaults()
     {

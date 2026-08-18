@@ -11,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
 
 public class StarlessHoldout : BaseIdleHoldoutProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     public override int AssociatedItemID => ModContent.ItemType<StarlessSea>();
     public override int IntendedProjectileType => ModContent.ProjectileType<StarlessHoldout>();
 
@@ -30,7 +30,7 @@ public class StarlessHoldout : BaseIdleHoldoutProjectile
 
     public bool Released
     {
-        get => Projectile.ai[1] == 1f;
+        get => (int) Projectile.ai[1] == 1;
         set => Projectile.ai[1] = value.ToInt();
     }
 
@@ -75,9 +75,9 @@ public class StarlessHoldout : BaseIdleHoldoutProjectile
                 }
             }
 
-            if ((this.RunLocal() && Modded.SafeMouseLeft.Current) && !Released)
+            if (this.RunLocal() && Modded.SafeMouseLeft.Current && !Released)
             {
-                AdditionsSound.MagicStrike.Play(Projectile.Center, 1.2f, 0f, .14f);
+                AssetRegistry.GennedSounds.MagicStrike.Play(Projectile.Center, 1.2f, 0f, .14f);
                 for (int i = 0; i < 4; i++)
                 {
                     int? proj = CurrentLances[i];
@@ -116,7 +116,7 @@ public class StarlessHoldout : BaseIdleHoldoutProjectile
             List<Projectile> waters = AllProjectilesFromOwner(type, Owner);
             if ((this.RunLocal() && Modded.SafeMouseLeft.Current) && !Released && waters.Count > 0)
             {
-                AdditionsSound.MagicStrike.Play(Projectile.Center, 1.2f, .2f, .1f, 20, Name);
+                AssetRegistry.GennedSounds.MagicStrike.Play(Projectile.Center, 1.2f, .2f, .1f, 20, Name);
 
                 foreach (Projectile proj in waters)
                 {

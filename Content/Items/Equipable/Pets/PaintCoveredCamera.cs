@@ -9,7 +9,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Pets;
 
 public class PaintCoveredCamera : ModItem, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.PaintCoveredCamera);
+    public override string Texture => AssetRegistry.GennedTextures.PaintCoveredCamera.Path;
 
     public override void SetDefaults()
     {

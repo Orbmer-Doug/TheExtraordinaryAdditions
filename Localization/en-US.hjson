@@ -415,6 +415,15 @@ Mods: {
 			NebulaicBolt.DisplayName: Nebulaic Bolt
 			SeamstressDraw.DisplayName: Seamstress Draw
 			VermillionDart.DisplayName: Vermillion Dart
+			AlsafiSword.DisplayName: Alsafi Sword
+			ArcadianEruption.DisplayName: Arcadian Eruption
+			AlsafiExplosion.DisplayName: Alsafi Explosion
+			AlsafiPlasmaFlare.DisplayName: Alsafi Plasma Flare
+			FluidSimulationTest.DisplayName: Fluid Simulation Test
+			AlsafiFluidResidue.DisplayName: Alsafi Fluid Residue
+			LightningBlast.DisplayName: Lightning Blast
+			HellPick.DisplayName: Hell Pick
+			DecayingBeam.DisplayName: Decaying Beam
 		}
 
 		Keybinds: {
@@ -869,41 +878,17 @@ Mods: {
 
 			AbsoluteCoreplate: {
 				DisplayName: Absolute Coreplate
-				Tooltip:
-					'''
-					+110 max life
-					+1 life regen
-					Increased effectiveness of life regen
-					'''
+				Tooltip: ""
 			}
 
 			AbsoluteGreathelm: {
 				DisplayName: Absolute Greathelm
-				Tooltip:
-					'''
-					35% increased damage
-					25% increased critical strike chance
-					'''
-				SetBonus:
-					'''
-					Ignore water
-					Enemies are much more likely to target you
-					25% reduced mana cost
-					+90 max mana
-					+4 max minions
-					+2 max turrets
-					Press {0} to conjure a consuming void on a 15 second cooldown
-					'''
+				Tooltip: ""
 			}
 
 			AbsoluteGreaves: {
 				DisplayName: Absolute Greaves
-				Tooltip:
-					'''
-					No fall damage
-					Increased run acceleration and increased slowdown acceleration
-					30% increased movement speed
-					'''
+				Tooltip: ""
 			}
 
 			AvatarDress: {
@@ -1257,7 +1242,8 @@ Mods: {
 				Tooltip:
 					'''
 					Releases lightning sparks
-					Passively charges up a powerful lightning bolt, with hits from sparks speeding up the process
+					Hitting enemies charges the book
+					<right> once charged enough to sling out the book, exploding on contact
 					'''
 			}
 
@@ -1560,7 +1546,7 @@ Mods: {
 
 			HellsToothpick: {
 				DisplayName: Hells Toothpick
-				Tooltip: Charge up a shortsword which releases a flame whose power is proportionate to how much the blade was charged
+				Tooltip: Hold out an artifact which emits burst of flames
 			}
 
 			ImpureAstralKatanas: {
@@ -2041,11 +2027,7 @@ Mods: {
 
 			EbonyNovaBlaster: {
 				DisplayName: Ebony Nova Blaster
-				Tooltip:
-					'''
-					Fires concentrated shots of dark onyx energy
-					Shots don't stop if they do more damage than the enemies available health
-					'''
+				Tooltip: Fires concentrated shots of dark onyx energy
 			}
 
 			PyroclasticVeil: {
@@ -2125,6 +2107,11 @@ Mods: {
 			DeusExMachina: {
 				DisplayName: Deus Ex Machina
 				Tooltip: '''"That's about it!"'''
+			}
+
+			GlareOfAlsafi: {
+				DisplayName: Glare of Alsafi
+				Tooltip: "<right> to crush any enemy "
 			}
 		}
 
@@ -2387,6 +2374,17 @@ Mods: {
 			ObtainedGenedies: {
 				FriendlyName: Transcendence
 				Description: Obtain the Exingenedies, an unfathomable object which warns what's to come.
+			}
+		}
+
+		Mods: {
+			TheExtraordinaryAdditions: {
+				Misc: {
+					Atom: {
+						Description: Mods.TheExtraordinaryAdditions.Mods.TheExtraordinaryAdditions.Misc.Atom.Description
+						Usage: Mods.TheExtraordinaryAdditions.Mods.TheExtraordinaryAdditions.Misc.Atom.Usage
+					}
+				}
 			}
 		}
 	}

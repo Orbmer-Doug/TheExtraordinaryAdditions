@@ -6,7 +6,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 
 public class StygianEyeball : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.StygianEyeball);
+    public override string Texture => AssetRegistry.GennedTextures.StygianEyeball.Path;
 
     public override void SetStaticDefaults()
     {

@@ -1,15 +1,14 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
-using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Early;
 
 public class FulminicSpark : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     public const int Life = 60;
 
     public override void SetDefaults()
@@ -40,7 +39,7 @@ public class FulminicSpark : ModProjectile
         }
 
         Projectile.Opacity = 1f - Completion;
-        if (Projectile.Opacity.BetweenNum(0f, .05f))
+        if (Projectile.Opacity is > 0f and < .05f)
             Projectile.Kill();
 
         Time++;
@@ -65,9 +64,9 @@ public class FulminicSpark : ModProjectile
             return false;
         foreach (Line line in Branches)
         {
-            PixelationSystem.QueueTextureRenderAction(() =>
-                line.Draw(MulticolorLerp(Completion, Color.White, Color.LightPink, Color.Violet, Color.DarkViolet)
-                          * Projectile.Opacity), PixelationLayer.OverNPCs, BlendState.Additive);
+            line.DrawPixelated(PixelationLayer.OverNPCs, BlendState.Additive,
+                MulticolorLerp(Completion, Color.White, Color.LightPink, Color.Violet, Color.DarkViolet)
+                * Projectile.Opacity);
         }
 
         return false;

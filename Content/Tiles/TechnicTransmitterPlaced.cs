@@ -9,9 +9,9 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 using TheExtraordinaryAdditions.Content.World.Subworlds;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Tiles;
@@ -21,7 +21,7 @@ public class TechnicTransmitterPlaced : ModTile
     public const int Width = 7;
     public const int Height = 12;
 
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TechnicTransmitterPlaced);
+    public override string Texture => AssetRegistry.GennedTextures.TechnicTransmitterPlaced.Path;
 
     public override void SetStaticDefaults()
     {
@@ -95,7 +95,7 @@ public class TechnicTransmitterPlaced : ModTile
 
 public class TransmitterLightspeed : ModProjectile, IHasScreenShader
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetStaticDefaults()
     {
@@ -210,7 +210,7 @@ public class TransmitterLightspeed : ModProjectile, IHasScreenShader
 
     public Color ColorFunct(SystemVector2 c, Vector2 pos) => Color.Cyan * InverseLerp(0f, 1.4f, Time);
 
-    public OptimizedPrimitiveTrail beam;
+    public Trail beam;
     public TrailPoints points = new(20);
 
     public override bool PreDraw(ref Color lightColor)
@@ -230,8 +230,8 @@ public class TransmitterLightspeed : ModProjectile, IHasScreenShader
                 if (beam == null || points == null)
                     return;
 
-                ManagedShader shader = ShaderRegistry.CrunchyLaserShader;
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Perlin), 1, SamplerState.AnisotropicWrap);
+                ManagedShader shader = AssetRegistry.GennedShaders.CrunchyLaserShader;
+                shader.SetTexture(AssetRegistry.GennedTextures.Perlin, 1, SamplerState.AnisotropicWrap);
                 beam.DrawTrail(shader, points.Points, 200, true);
             }
 

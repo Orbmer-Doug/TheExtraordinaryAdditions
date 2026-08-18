@@ -2,16 +2,16 @@
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
+using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
 public class SoulCleansingFlame : ProjOwnedByNPC<Asterlin>
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public int Time
     {
@@ -36,7 +36,7 @@ public class SoulCleansingFlame : ProjOwnedByNPC<Asterlin>
     {
         if (trail == null || trail.Disposed)
             trail = new(c => 200f * Projectile.scale, (c, pos) => Color.White, null, 25);
-        Projectile.scale = Animators.MakePoly(2.4f).OutFunction(InverseLerp(0f, FormationTime, Time));
+        Projectile.scale = MakePoly(2.4f).OutFunction(InverseLerp(0f, FormationTime, Time));
         Projectile.rotation = Projectile.velocity.ToRotation();
         Projectile.velocity *= .989f;
         Projectile.velocity = Projectile.velocity.ClampLength(6f, 60f);
@@ -71,13 +71,13 @@ public class SoulCleansingFlame : ProjOwnedByNPC<Asterlin>
         for (int i = 0; i < 4; i++)
         {
             Vector2 vel = (MathHelper.TwoPi * InverseLerp(0, 4, i)).ToRotationVector2();
-            if (this.RunServer())
+            if (ModProjectile.RunServer())
                 SpawnProjectile(Projectile.Center, vel, ModContent.ProjectileType<BurstingLight>(),
                     Asterlin.LightAttackDamage, 0f);
         }
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints points = new(15);
 
     public override bool PreDraw(ref Color lightColor)
@@ -86,7 +86,7 @@ public class SoulCleansingFlame : ProjOwnedByNPC<Asterlin>
         {
             if (trail == null || trail.Disposed || points == null)
                 return;
-            ManagedShader shader = AssetRegistry.GetShader("SoulCleansingFlameShader");
+            ManagedShader shader = AssetRegistry.GennedShaders.SoulCleansingFlameShader;
             shader.TrySetParameter("time", Main.GlobalTimeWrappedHourly * 1.2f);
             shader.TrySetParameter("opacity", Projectile.scale);
             trail.DrawTrail(shader, points.Points, 200, true, true);

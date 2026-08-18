@@ -1,9 +1,9 @@
+if only this could have all been done from the ground-up and done correctly once...
+
 General:
 > Spice up mod panel
 > Resprite icon to something borderless (perhaps something that integrates with the panel)
-> i should totally add a physically accurate simulation of a hydrogen atoms electron field for no reason whatsoever in some inconspicuous place
-> wishes for linux-compat shader hot reloader that isn't bunnns
-> maaayyybbbeee use friflo but that's additional binary 
+> maaayyybbbeee use friflo but that's additional binary
 
 UI:
 > Positioning is weird on different monitor resolutions and UI scale (i think cause it looks weird)
@@ -17,21 +17,12 @@ Weapons:
     > Bats emerge from the lantern in unveiling infernos
     > Bats chase after a controllable light source around the cursor (only visible to user)
     > Does extra damage to tagged enemies
-> Brewing Storms hits instead charges the book, glowing with electric anticipation
-    > Right-Clicking causes the Terrarian to slap with the book like an improvised weapon
-    > This causes it to release an explosion of energies on hit that chain through 1 (2?) enemies (this encourages a back-and-forth playstyle and would likely create meta around wof due to crowd control ease)
-> Noxious Snare
-    > honestly just give nicer visuals
 > Hellfire
     > Short-ranged, high power blast of flame
     > Made with ashwood n' stuff
-> Starless Sea
-    > nicer easing?
 > Loose Sawblade
     > No longer does the weird rouge thing
     > Embedded blades can be hit by other blades, further digging them in and causing extra damage 
-> Hells Toothpick
-    > Does 3 consecutive jabs instead of whatever the hell its doing now
 > Bergcrusher
     > Spins around 3 times while held from middle handle to create quick sniping snowflakes
     > Then pulls out near pommel to do one downward cleave
@@ -43,7 +34,7 @@ Weapons:
 > Exingenedies
     > remove that malicious gamma ray
     > if wotg installed, added to nameless drop pool instead with no recipe
-> and so will come the glare of alsafi...
+    > not even a weapon anymore, just an accessory that replaces the god gauntlet because why not idk at this point man
 
 Optimizations:
 > asterlins balls cause fps to drop for some reason lol

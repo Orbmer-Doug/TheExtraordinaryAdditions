@@ -3,17 +3,16 @@ using System;
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 
 public class BloodMoonlet : ProjOwnedByNPC<StygainHeart>
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BloodMoonlet);
+    public override string Texture => AssetRegistry.GennedTextures.BloodMoonlet.Path;
 
     public override void SetDefaults()
     {
@@ -43,7 +42,7 @@ public class BloodMoonlet : ProjOwnedByNPC<StygainHeart>
     }
 
     public TrailPoints cache;
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override bool PreDraw(ref Color lightColor)
     {
@@ -52,8 +51,8 @@ public class BloodMoonlet : ProjOwnedByNPC<StygainHeart>
 
         sb.EnterShaderRegion();
 
-        Texture2D telegraphBase = AssetRegistry.InvisTex;
-        ManagedShader circle = ShaderRegistry.CircularAoETelegraph;
+        Texture2D telegraphBase = AssetRegistry.GennedTextures.Invisible;
+        ManagedShader circle = AssetRegistry.GennedShaders.CircularAoETelegraph;
         circle.TrySetParameter("opacity", InverseLerp(0f, 60f, Time) * .78f);
         circle.TrySetParameter("color",
             Color.Lerp(Color.MediumVioletRed, Color.PaleVioletRed,
@@ -66,7 +65,7 @@ public class BloodMoonlet : ProjOwnedByNPC<StygainHeart>
         sb.ResetToDefault();
 
         if (trail != null && !trail.Disposed && cache != null)
-            trail.DrawTrail(ShaderRegistry.StandardPrimitiveShader, cache.Points, 40, false, false);
+            trail.DrawTrail(AssetRegistry.GennedShaders.StandardPrimitiveShader, cache.Points, 40, false, false);
 
         Texture2D texture = Projectile.ThisProjectileTexture();
         Main.EntitySpriteDraw(texture, drawPosition, null, Projectile.GetAlpha(Color.DarkRed), Projectile.rotation,
@@ -81,9 +80,9 @@ public class BloodMoonlet : ProjOwnedByNPC<StygainHeart>
     {
         ParticleRegistry.SpawnBlurParticle(Projectile.Center, 35, .12f, 1200f);
         ScreenShakeSystem.New(new(10f, .7f), Projectile.Center);
-        AdditionsSound.GaussBoomLittle.Play(Projectile.Center, 1f, 0f, .1f, 10);
+        AssetRegistry.GennedSounds.GaussBoomLittle.Play(Projectile.Center, 1f, 0f, .1f, 10);
 
-        if (this.RunServer())
+        if (ModProjectile.RunServer())
             SpawnProjectile(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<ConcentratedBloodExplosion>(),
                 Projectile.damage, Projectile.knockBack);
     }

@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 
 public class AnvilAndPropane : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AnvilAndPropane);
+    public override string Texture => AssetRegistry.GennedTextures.AnvilAndPropane.Path;
 
     public override void SetDefaults()
     {
@@ -25,7 +25,7 @@ public class AnvilAndPropane : ModItem
         Item.knockBack = .6f;
         Item.value = Item.buyPrice(0, 90, 50, 0);
         Item.rare = ItemRarityID.Yellow;
-        Item.UseSound = AssetRegistry.GetSound(AdditionsSound.ClairDeLune) with
+        Item.UseSound = AssetRegistry.GennedSounds.ClairDeLune with
         {
             Volume = 2f,
             MaxInstances = 1,

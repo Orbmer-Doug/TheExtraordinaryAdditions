@@ -4,9 +4,9 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -14,7 +14,7 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
 public class DisintegrationBeam : ProjOwnedByNPC<Asterlin>
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -82,14 +82,14 @@ public class DisintegrationBeam : ProjOwnedByNPC<Asterlin>
                 if (!DontTurn)
                     Projectile.velocity =
                         Projectile.velocity.RotatedBy(MaxAngleShift *
-                                                      Animators.MakePoly(12f).InFunction(Convert01To010(teleComp)));
+                                                      MakePoly(12f).InFunction(Convert01To010(teleComp)));
                 Projectile.rotation = Projectile.velocity.ToRotation();
                 Projectile.scale = 0f;
 
                 if (teleComp >= 1f)
                 {
                     ScreenShakeSystem.New(new(.7f, .6f), Projectile.Center);
-                    AdditionsSound.HeavyLaserBlast.Play(Projectile.Center, 2.2f, -.2f);
+                    AssetRegistry.GennedSounds.HeavyLaserBlast.Play(Projectile.Center, 2.2f, -.2f);
                     Time = 0;
                     CurrentState = BeamState.Vaporizing;
                     this.Sync();
@@ -99,8 +99,8 @@ public class DisintegrationBeam : ProjOwnedByNPC<Asterlin>
             case BeamState.Vaporizing:
                 float vaporComp = InverseLerp(0f, BeamTime, Time);
 
-                CurrentLength = Animators.BezierEase.Evaluate(0f, MaxLength, InverseLerp(0f, 80f, Time));
-                Projectile.scale = Animators.MakePoly(3f).OutFunction(InverseLerp(0f, 20f, Time));
+                CurrentLength = BezierEase.Evaluate(0f, MaxLength, InverseLerp(0f, 80f, Time));
+                Projectile.scale = MakePoly(3f).OutFunction(InverseLerp(0f, 20f, Time));
 
                 if (vaporComp >= 1f)
                 {
@@ -112,7 +112,7 @@ public class DisintegrationBeam : ProjOwnedByNPC<Asterlin>
                 break;
             case BeamState.Fading:
                 float fadeComp = InverseLerp(0f, FadeTime, Time);
-                Projectile.scale = Animators.Sine.InOutFunction.Evaluate(1f, 0f, fadeComp);
+                Projectile.scale = Sine.InOutFunction.Evaluate(1f, 0f, fadeComp);
 
                 if (fadeComp >= 1f)
                 {
@@ -147,28 +147,12 @@ public class DisintegrationBeam : ProjOwnedByNPC<Asterlin>
     }
 
     public TrailPoints points = new(80);
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override bool PreDraw(ref Color lightColor)
     {
         if (CurrentState == BeamState.Telegraphing)
         {
-            void line()
-            {
-                Vector2 a = Projectile.Center;
-                Vector2 b = a + Projectile.rotation.ToRotationVector2() * MaxLength;
-                float thickness = Animators.BezierEase.Evaluate(0f, 4f, InverseLerp(0f, 15f, Time));
-                float opacity = Animators.MakePoly(4f).InOutFunction(InverseLerp(0f, 10f, Time));
-
-                Line small = new(a, b, thickness * .3f);
-                small.Draw(Color.PaleGoldenrod * opacity);
-                Line medium = new(a, b, thickness);
-                medium.Draw(Color.Goldenrod * opacity);
-                Line large = new(a, b, thickness * 1.5f);
-                large.Draw(Color.DarkGoldenrod * opacity * .7f);
-            }
-
-            PixelationSystem.QueueTextureRenderAction(line, PixelationLayer.UnderProjectiles, BlendState.Additive);
         }
         else
         {
@@ -177,10 +161,10 @@ public class DisintegrationBeam : ProjOwnedByNPC<Asterlin>
                 if (points == null || trail == null)
                     return;
 
-                ManagedShader shader = AssetRegistry.GetShader("DisintegrationBeamShader");
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.StreakMagma), 1,
+                ManagedShader shader = AssetRegistry.GennedShaders.DisintegrationBeamShader;
+                shader.SetTexture(AssetRegistry.GennedTextures.StreakMagma, 1,
                     SamplerState.AnisotropicWrap);
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.VoronoiShapes), 2,
+                shader.SetTexture(AssetRegistry.GennedTextures.VoronoiShapes, 2,
                     SamplerState.AnisotropicWrap);
                 trail.DrawTrail(shader, points.Points);
             }

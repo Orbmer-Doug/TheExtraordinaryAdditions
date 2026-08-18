@@ -3,14 +3,14 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 
 public class IcyShards : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.IcyShards);
+    public override string Texture => AssetRegistry.GennedTextures.IcyShards.Path;
 
     public override void SetStaticDefaults()
     {
@@ -29,7 +29,6 @@ public class IcyShards : ModProjectile
 
     public ref float Time => ref Projectile.ai[0];
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
     public const int WaitTime = 50;
 
     public override void AI()
@@ -57,7 +56,8 @@ public class IcyShards : ModProjectile
                 Projectile.rotation += dir * InverseLerp(WaitTime, 0f, Time) * .5f;
             else
                 Projectile.rotation =
-                    Projectile.rotation.SmoothAngleLerp(Projectile.AngleTo(Modded.MouseWorld) + MathHelper.PiOver2, .2f,
+                    Projectile.rotation.SmoothAngleLerp(
+                        Projectile.AngleTo(Owner.AdditionsMouse().MouseWorld) + MathHelper.PiOver2, .2f,
                         .4f);
         }
         else if (Time == WaitTime)
@@ -66,7 +66,7 @@ public class IcyShards : ModProjectile
                 Projectile.rotation - MathHelper.PiOver2, new(.3f, 1f), 0f, 40f, Color.SlateBlue);
             if (this.RunLocal())
             {
-                Projectile.velocity = Projectile.SafeDirectionTo(Modded.MouseWorld) * 15f;
+                Projectile.velocity = Projectile.SafeDirectionTo(Owner.AdditionsMouse().MouseWorld) * 15f;
                 this.Sync();
             }
         }
@@ -87,7 +87,7 @@ public class IcyShards : ModProjectile
             ParticleRegistry.SpawnDustParticle(Projectile.RotHitbox().RandomPoint(),
                 Projectile.velocity * Main.rand.NextFloat(.1f, .2f),
                 Main.rand.Next(20, 30), Main.rand.NextFloat(.4f, .6f), Color.LightCyan);
-        SoundID.Item49.Play(Projectile.Center, .7f, 0f, .1f, null, 20);
+        SoundID.Item49.Play(Projectile.Center, .7f, 0f, .1f, 20);
     }
 
     public override bool? CanDamage() => Time > WaitTime ? null : false;

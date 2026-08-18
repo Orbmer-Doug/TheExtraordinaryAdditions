@@ -3,7 +3,6 @@ using System;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Core.Globals.DrawLayers;
 
@@ -16,14 +15,14 @@ public class SupremeBubbleLayer : PlayerDrawLayer
 
     public override bool GetDefaultVisibility(PlayerDrawSet drawInfo)
     {
-        if (drawInfo.drawPlayer.Additions().BigOxygen)
+        if (drawInfo.drawPlayer.AdditionsBuffs().BigOxygen)
             return drawInfo.shadow == 0f;
         return false;
     }
 
     protected override void Draw(ref PlayerDrawSet drawInfo)
     {
-        Texture2D texture = AssetRegistry.GetTexture(AdditionsTexture.Bubble);
+        Texture2D texture = AssetRegistry.GennedTextures.Bubble;
         int drawX = (int) (drawInfo.Center.X - Main.screenPosition.X);
         int drawY = (int) (drawInfo.Center.Y - Main.screenPosition.Y);
         Vector2 bubbleScale = Vector2.One *

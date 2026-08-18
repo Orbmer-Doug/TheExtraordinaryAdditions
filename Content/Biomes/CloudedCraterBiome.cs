@@ -9,11 +9,11 @@ public class CloudedCraterBiome : ModBiome
 {
     public override SceneEffectPriority Priority => SceneEffectPriority.BossMedium;
 
-    public override string BestiaryIcon => AssetRegistry.GetTexturePath(AdditionsTexture.CloudedCraterIcon);
+    public override string BestiaryIcon => AssetRegistry.GennedTextures.CloudedCraterIcon.Path;
 
-    public override string BackgroundPath => AssetRegistry.GetTexturePath(AdditionsTexture.CloudedCraterBackground);
+    public override string BackgroundPath => AssetRegistry.GennedTextures.CloudedCraterBackground.Path;
 
-    public override string MapBackground => AssetRegistry.GetTexturePath(AdditionsTexture.CloudedCraterBackground);
+    public override string MapBackground => AssetRegistry.GennedTextures.CloudedCraterBackground.Path;
 
     public override int Music => MusicLoader.GetMusicSlot(Mod, "Audio/Music/MechanicalInNature");
 

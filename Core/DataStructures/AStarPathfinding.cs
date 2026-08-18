@@ -123,7 +123,7 @@ public static partial class AStarPathfinding
         // Can't navigate if you don't have the height clearance
         for (int i = 0; i < SolidCreatureNavigHeight; i++)
         {
-            if (RaytraceTo(from.Value.X, from.Value.Y - i, p.X, p.Y - i, i == 0))
+            if (RaycastTo(from.Value.X, from.Value.Y - i, p.X, p.Y - i, i == 0))
                 continue;
 
             universallyUnnavigable = false;

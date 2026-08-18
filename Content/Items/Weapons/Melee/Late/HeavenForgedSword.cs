@@ -9,12 +9,10 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
 
-/// <summary>
-/// First breakthrough in more complicated coding
-/// </summary>
+// First breakthrough in more complicated coding
 public class HeavenForgedSword : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.HeavenForgedSword);
+    public override string Texture => AssetRegistry.GennedTextures.HeavenForgedSword.Path;
 
     public override void SetDefaults()
     {
@@ -45,7 +43,7 @@ public class HeavenForgedSword : ModItem
     public override void AddRecipes()
     {
         Recipe recipe = CreateRecipe();
-        recipe.AddIngredient(ModContent.ItemType<RejuvenatedHolySword>(), 1);
+        recipe.AddIngredient(ModContent.ItemType<RejuvenatedHolySword>());
         recipe.AddIngredient(ItemID.LunarBar, 12);
         recipe.AddIngredient(ItemID.SoulofSight, 10);
         recipe.AddTile(TileID.LunarCraftingStation);

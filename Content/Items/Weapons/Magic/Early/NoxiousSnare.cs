@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Early;
 
 public class NoxiousSnare : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.NoxiousSnare);
+    public override string Texture => AssetRegistry.GennedTextures.NoxiousSnare.Path;
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {

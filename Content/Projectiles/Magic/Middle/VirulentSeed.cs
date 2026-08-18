@@ -4,14 +4,14 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
 
 public class VirulentSeed : ModProjectile, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.VirulentSeed);
+    public override string Texture => AssetRegistry.GennedTextures.VirulentSeed.Path;
 
     public override void SetDefaults()
     {
@@ -59,7 +59,7 @@ public class VirulentSeed : ModProjectile, ILocalizedModType, IModType
         after.UpdateFancyAfterimages(new(Projectile.Center, Vector2.One * Projectile.scale, Projectile.Opacity,
             Projectile.rotation, 0, 90, 3));
 
-        if (Time.BetweenNum(30f, 120f))
+        if (Time is > 30f and < 120f)
         {
             NPC target = NPCTargeting.GetWeakestNPC(new(Projectile.Center, 450, false, true));
             if (!target.CanHomeInto())

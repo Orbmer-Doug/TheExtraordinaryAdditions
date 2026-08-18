@@ -9,7 +9,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 
 public class BobmOnAStick : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BobmOnAStick);
+    public override string Texture => AssetRegistry.GennedTextures.BobmOnAStick.Path;
 
     public override void SetDefaults()
     {

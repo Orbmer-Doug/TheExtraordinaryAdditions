@@ -4,17 +4,17 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Early;
 
 public class MeteorSpawn : ModProjectile, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.MeteorSpawn);
+    public override string Texture => AssetRegistry.GennedTextures.MeteorSpawn.Path;
 
     public override void SetStaticDefaults()
     {
@@ -43,7 +43,7 @@ public class MeteorSpawn : ModProjectile, ILocalizedModType, IModType
     }
 
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
+    public PlayerMouse Modded => Owner.AdditionsMouse();
 
     public ref float OffsetAngle => ref Projectile.ai[0];
 
@@ -92,7 +92,7 @@ public class MeteorSpawn : ModProjectile, ILocalizedModType, IModType
             FireTimer++;
 
             // Reel back
-            if (FireTimer.BetweenNum(1f, 10f))
+            if (FireTimer is > 1f and 10f)
             {
                 if (this.RunLocal())
                     Projectile.velocity = Vector2.Lerp(Projectile.velocity,
@@ -101,7 +101,7 @@ public class MeteorSpawn : ModProjectile, ILocalizedModType, IModType
             }
 
             // Fire
-            if (FireTimer.BetweenNum(10f, 12f))
+            if (FireTimer is > 10f and 12f)
             {
                 if (this.RunLocal())
                     Projectile.velocity = Projectile.SafeDirectionTo(Modded.MouseWorld) * 20f;
@@ -133,7 +133,7 @@ public class MeteorSpawn : ModProjectile, ILocalizedModType, IModType
         Projectile.AI_GetMyGroupIndex(out var index, out var total);
 
         float time = SecondsToFrames(11f);
-        float cycle = Modded.GlobalTimer % time / time * MathF.Tau;
+        float cycle = Owner.AdditionsMisc().GlobalTimer % time / time * MathF.Tau;
         float offset = MathF.Tau * InverseLerp(0f, total, index);
         Vector2 dest = Owner.RotatedRelativePoint(Owner.MountedCenter) +
                        GetPointOnRotatedEllipse(200f, 120f, offset + cycle, cycle * 4f);
@@ -174,7 +174,7 @@ public class MeteorSpawn : ModProjectile, ILocalizedModType, IModType
         return Projectile.width;
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints points;
 
     public override bool PreDraw(ref Color lightColor)
@@ -183,7 +183,7 @@ public class MeteorSpawn : ModProjectile, ILocalizedModType, IModType
         {
             if (trail == null || trail.Disposed || points == null)
                 return;
-            ManagedShader shader = ShaderRegistry.StandardPrimitiveShader;
+            ManagedShader shader = AssetRegistry.GennedShaders.StandardPrimitiveShader;
             trail.DrawTrail(shader, points.Points);
         }
 

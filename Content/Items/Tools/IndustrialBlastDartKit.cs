@@ -9,7 +9,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Tools;
 
 public class IndustrialBlastDartKit : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.IndustrialBlastDartKit);
+    public override string Texture => AssetRegistry.GennedTextures.IndustrialBlastDartKit.Path;
 
     public override void SetStaticDefaults()
     {

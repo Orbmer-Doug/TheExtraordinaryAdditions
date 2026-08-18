@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 
 public class SmartPistolMK6 : ModItem, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SmartPistolMK6);
+    public override string Texture => AssetRegistry.GennedTextures.SmartPistolMK6.Path;
 
     public override void SetDefaults()
     {

@@ -67,45 +67,39 @@ public class AdditionsRecipes : ModSystem
 
     public override void AddRecipes()
     {
-        EditVanillaRecipes();
-
-        Recipe.Create(ItemID.AncientBattleArmorMaterial, 1).AddIngredient(ModContent.ItemType<FulguriteInAJar>(), 2)
+        Recipe.Create(ItemID.AncientBattleArmorMaterial).AddIngredient(ModContent.ItemType<FulguriteInAJar>(), 2)
             .AddTile(TileID.AlchemyTable)
             .Register();
-        Recipe.Create(ItemID.FrostCore, 1).AddIngredient(ModContent.ItemType<CracklingFragments>(), 2)
+        Recipe.Create(ItemID.FrostCore).AddIngredient(ModContent.ItemType<CracklingFragments>(), 2)
             .AddTile(TileID.MythrilAnvil)
             .Register();
-        Recipe.Create(ItemID.BloodMoonMonolith, 1).AddIngredient(ItemID.BloodMoonStarter, 2)
+        Recipe.Create(ItemID.BloodMoonMonolith).AddIngredient(ItemID.BloodMoonStarter, 2)
             .AddIngredient(ItemID.GrayBrick, 50).AddTile(TileID.MythrilAnvil)
             .Register();
-        Recipe.Create(ItemID.TruffleWorm, 1).AddIngredient(ItemID.GlowingMushroom, 500).AddIngredient(ItemID.Worm, 1)
-            .AddIngredient(ItemID.EnchantedNightcrawler, 1).AddCondition(Condition.DownedPlantera)
+        Recipe.Create(ItemID.TruffleWorm).AddIngredient(ItemID.GlowingMushroom, 500).AddIngredient(ItemID.Worm)
+            .AddIngredient(ItemID.EnchantedNightcrawler).AddCondition(Condition.DownedPlantera)
             .AddTile(TileID.Autohammer)
             .Register();
-        Recipe.Create(ItemID.EmpressButterfly, 1).AddRecipeGroup("AnyButterfly", 1).AddIngredient(ItemID.UnicornHorn, 2)
+        Recipe.Create(ItemID.EmpressButterfly).AddRecipeGroup("AnyButterfly").AddIngredient(ItemID.UnicornHorn, 2)
             .AddIngredient(ItemID.PixieDust, 10).AddIngredient(ItemID.SoulofLight, 3)
             .AddCondition(Condition.DownedPlantera).AddTile(TileID.AlchemyTable)
             .Register();
-        Recipe.Create(ItemID.ExtendoGrip, 1).AddRecipeGroup("AnySilverBar", 10).AddIngredient(ItemID.Bone, 50)
+        Recipe.Create(ItemID.ExtendoGrip).AddRecipeGroup("AnySilverBar", 10).AddIngredient(ItemID.Bone, 50)
             .AddIngredient(ItemID.Wire, 20).AddCondition(Condition.DownedSkeletron).AddTile(TileID.Anvils)
             .Register();
-        Recipe.Create(ItemID.Spear, 1).AddRecipeGroup("AnyCopperBar", 7).AddIngredient(ItemID.Wood, 15)
+        Recipe.Create(ItemID.Spear).AddRecipeGroup("AnyCopperBar", 7).AddIngredient(ItemID.Wood, 15)
             .AddTile(TileID.Anvils)
             .Register();
-        Recipe.Create(ItemID.BoneSword, 1).AddRecipeGroup("AnyIronBar", 7).AddIngredient(ItemID.Bone, 20)
+        Recipe.Create(ItemID.BoneSword).AddRecipeGroup("AnyIronBar", 7).AddIngredient(ItemID.Bone, 20)
             .AddTile(TileID.Anvils)
             .Register();
 
         if (!Main.remixWorld)
         {
-            Recipe.Create(ItemID.Katana, 1).AddRecipeGroup("AnySilverBar", 9).AddRecipeGroup("AnyGoldBar", 3)
+            Recipe.Create(ItemID.Katana).AddRecipeGroup("AnySilverBar", 9).AddRecipeGroup("AnyGoldBar", 3)
                 .AddIngredient(ItemID.Silk, 3).AddTile(TileID.Anvils)
                 .Register();
         }
-    }
-
-    internal static void EditVanillaRecipes()
-    {
     }
 
     #endregion

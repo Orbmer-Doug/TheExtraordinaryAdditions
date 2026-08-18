@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
 [AutoloadEquip(EquipType.Legs)]
 public class SpecteriteGreaves : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SpecteriteGreaves);
+    public override string Texture => AssetRegistry.GennedTextures.SpecteriteGreaves.Path;
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {

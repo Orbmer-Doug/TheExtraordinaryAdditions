@@ -8,7 +8,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Pets;
 
 public class SmallGear : ModItem, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SmallGear);
+    public override string Texture => AssetRegistry.GennedTextures.SmallGear.Path;
 
     public override void SetDefaults()
     {

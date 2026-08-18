@@ -2,16 +2,16 @@
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
 public class LightripBullet : ModProjectile, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public const int Lifetime = 50;
 
@@ -83,7 +83,7 @@ public class LightripBullet : ModProjectile, ILocalizedModType, IModType
     public void HitEffects()
     {
         if (!Main.dedServ)
-            AdditionsSound.FireImpact.Play(Projectile.Center, .8f, 0f, .1f, 40, Name);
+            AssetRegistry.GennedSounds.FireImpact.Play(Projectile.Center, .8f, 0f, .1f, 40, Name);
         if (this.RunLocal())
             Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<LightripBlast>(),
                 Projectile.damage / 2, 0f, Main.myPlayer);
@@ -101,7 +101,7 @@ public class LightripBullet : ModProjectile, ILocalizedModType, IModType
         Color.Cyan * Animators.MakePoly(2.3f).InOutFunction.Evaluate(1f, 0f, Completion);
 
     public TrailPoints points = new(60);
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override bool PreDraw(ref Color lightColor)
     {
@@ -110,8 +110,8 @@ public class LightripBullet : ModProjectile, ILocalizedModType, IModType
             if (trail == null || points == null)
                 return;
 
-            ManagedShader shader = ShaderRegistry.CrunchyLaserShader;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WavyBlotchNoise), 1, SamplerState.LinearWrap);
+            ManagedShader shader = AssetRegistry.GennedShaders.CrunchyLaserShader;
+            shader.SetTexture(AssetRegistry.GennedTextures.WavyBlotchNoise, 1, SamplerState.LinearWrap);
             trail.DrawTrail(shader, points.Points);
         }
 

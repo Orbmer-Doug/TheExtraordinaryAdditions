@@ -3,14 +3,15 @@ using Terraria;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
 public class SeethingRockball : ProjOwnedByNPC<Asterlin>
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SeethingRockball);
+    public override string Texture => AssetRegistry.GennedTextures.SeethingRockball.Path;
 
     public override void SetDefaults()
     {
@@ -107,24 +108,20 @@ public class SeethingRockball : ProjOwnedByNPC<Asterlin>
     {
         float inter = 1f - InverseLerp(0f, 60f, GroundTimer);
         Color col = Color.Lerp(Color.OrangeRed, Color.White, inter) * Projectile.Opacity;
-        Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
+        Texture2D tex = AssetRegistry.GennedTextures.GlowParticleSmall;
 
         if (inter > 0f)
         {
-            void draw()
-            {
-                Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
-                float inter = 1f - InverseLerp(0f, 60f, GroundTimer);
-                Color col = Color.OrangeRed * inter * .5f;
-                Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, new(260f)), null, col * .6f, 0f,
-                    tex.Size() / 2f);
-                Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, new(230f)), null,
-                    col.Lerp(Color.White * inter, .3f) * .8f, 0f, tex.Size() / 2f);
-                Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, new(150f)), null,
-                    col.Lerp(Color.White * inter, .6f), 0f, tex.Size() / 2f);
-            }
-
-            PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.UnderProjectiles, BlendState.Additive);
+            Color hot = Color.OrangeRed * inter * .5f;
+            SpriteBatch.DrawRectPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, tex,
+                ToTarget(Projectile.Center, new(260f)), null, hot * .6f, 0f,
+                tex.Size() / 2f);
+            SpriteBatch.DrawRectPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, tex,
+                ToTarget(Projectile.Center, new(230f)), null,
+                hot.Lerp(Color.White * inter, .3f) * .8f, 0f, tex.Size() / 2f);
+            SpriteBatch.DrawRectPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, tex,
+                ToTarget(Projectile.Center, new(150f)), null,
+                hot.Lerp(Color.White * inter, .6f), 0f, tex.Size() / 2f);
         }
 
         after?.DrawFancyAfterimages(Projectile.ThisProjectileTexture(), [col], inter);

@@ -5,7 +5,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle.AZ;
 
 public class GrubShrapnel : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GrubShrapnel);
+    public override string Texture => AssetRegistry.GennedTextures.GrubShrapnel.Path;
 
     public override void SetDefaults()
     {

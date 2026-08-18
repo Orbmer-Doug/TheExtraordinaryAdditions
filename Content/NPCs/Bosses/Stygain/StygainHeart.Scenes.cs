@@ -6,7 +6,7 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 using TheExtraordinaryAdditions.Core.Netcode;
 using TheExtraordinaryAdditions.Core.Systems;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain;
 
@@ -43,7 +43,7 @@ public sealed partial class StygainHeart
             {
                 ParticleRegistry.SpawnPulseRingParticle(NPC.Center, Vector2.Zero, 50, 0f, Vector2.One, 2f, 0f,
                     Color.Crimson, true);
-                AdditionsSound.HeatTail.Play(NPC.Center, 1.8f, 0f, .3f, 0);
+                AssetRegistry.GennedSounds.HeatTail.Play(NPC.Center, 1.8f, 0f, .3f, 0);
             }
 
             if (AttackTimer % 4 == 3)
@@ -89,7 +89,7 @@ public sealed partial class StygainHeart
                     new(Main.rand.NextFloat(.6f, 1f), 1f), 0f, i, Color.DarkRed, true);
             }
 
-            AdditionsSound.spearCharge.Play(NPC.Center, 1.2f, -.2f);
+            AssetRegistry.GennedSounds.spearCharge.Play(NPC.Center, 1.2f, -.2f);
 
             HasDoneDramaticBurst = true;
             SelectNextAttack();
@@ -105,7 +105,7 @@ public sealed partial class StygainHeart
         float interpolant = GetLerpBump(0f, 120f, totalTime - 240f, totalTime - 120f, AttackTimer);
         CameraSystem.SetCamera(NPC.Center, interpolant, interpolant * .1f);
 
-        if (AttackTimer.BetweenNum(120, totalTime))
+        if (AttackTimer > 120 && AttackTimer < totalTime)
         {
             float completion = InverseLerp(120f, totalTime, AttackTimer);
             NPC.position += Main.rand.NextVector2Circular(10f, 10f) * completion;
@@ -119,7 +119,7 @@ public sealed partial class StygainHeart
 
         if (AttackTimer >= totalTime)
         {
-            if (this.RunServer())
+            if (ModProjectile.RunServer())
                 NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<StygainRoar>(), 0, 0f, -1);
             SoundID.Roar.Play(NPC.Center, 2f, -.3f);
 
@@ -160,13 +160,13 @@ public sealed partial class StygainHeart
             ParticleRegistry.SpawnDetailedBlastParticle(pos, Vector2.Zero, Vector2.One * 130f,
                 Main.rand.NextVector2Circular(1f, 1f), Main.rand.Next(24, 34), Color.Crimson);
 
-            if (this.RunServer())
+            if (ModProjectile.RunServer())
             {
                 NPC.velocity += Main.rand.NextVector2CircularLimited(6f, 6f, .4f, 1f);
                 NPC.netUpdate = true;
             }
 
-            if (this.RunServer() && Main.rand.NextBool())
+            if (ModProjectile.RunServer() && Main.rand.NextBool())
             {
                 NPC.NewNPCBetter(NPC.RotHitbox().RandomPoint(), Main.rand.NextVector2Circular(10f, 10f),
                     Main.rand.Next(4) switch
@@ -189,7 +189,7 @@ public sealed partial class StygainHeart
 
             for (int i = 0; i < 100; i++)
             {
-                if (i.BetweenNum(1, 6, true))
+                if (i is >= 1 and <= 6)
                 {
                     Color randomColor = Main.rand.Next(4) switch
                     {
@@ -224,7 +224,7 @@ public sealed partial class StygainHeart
                     Color.Crimson.Lerp(Color.DarkRed, Main.rand.NextFloat(.3f, .8f)));
             }
 
-            AdditionsSound.GaussBoomLittle.Play(NPC.Center);
+            AssetRegistry.GennedSounds.GaussBoomLittle.Play(NPC.Center);
             SoundID.Roar.Play(NPC.Center, 1.9f, -.3f);
             NPC.Kill();
         }

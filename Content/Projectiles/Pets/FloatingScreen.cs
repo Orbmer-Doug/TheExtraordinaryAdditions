@@ -9,18 +9,17 @@ using TheExtraordinaryAdditions.Content.Buffs.Summon;
 using TheExtraordinaryAdditions.Content.NPCs.Misc;
 using TheExtraordinaryAdditions.Content.World.Subworlds;
 using TheExtraordinaryAdditions.Core.CrossCompatibility;
-using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
-using static TheExtraordinaryAdditions.Core.Graphics.ManagedRenderTarget;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
+using TheExtraordinaryAdditions.Core.Utilities;
+using static TheExtraordinaryAdditions.Core.Graphics.Resources.ManagedRenderTarget;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Pets;
 
 public class FloatingScreen : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AsterlinFacingForward);
+    public override string Texture => AssetRegistry.GennedTextures.AsterlinFacingForward.Path;
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
     public ref float Time => ref Projectile.ai[0];
 
     public override void SetStaticDefaults()
@@ -76,7 +75,7 @@ public class FloatingScreenManager : ModSystem
 
         Main.QueueMainThreadAction(() =>
         {
-            crtTarget = new ManagedRenderTarget(true, TargetInitializer, true);
+            crtTarget = new ManagedRenderTarget(true, TargetInitializer);
 
             // Initialize target
             GraphicsDevice device = Main.instance.GraphicsDevice;
@@ -133,7 +132,7 @@ public class FloatingScreenManager : ModSystem
 
     private void DrawToTarget()
     {
-        if (!AssetRegistry.HasFinishedLoading || Main.gameMenu || Main.netMode == NetmodeID.Server)
+        if (Main.gameMenu || Main.netMode == NetmodeID.Server)
             return;
 
         GraphicsDevice device = Main.instance.GraphicsDevice;
@@ -155,7 +154,7 @@ public class FloatingScreenManager : ModSystem
             bool avatar = HiAvatar();
             bool garden = InEternalGarden();
 
-            Texture2D background = AssetRegistry.GetTexture(AdditionsTexture.Background_Purity);
+            Texture2D background = AssetRegistry.GennedTextures.Background_Purity;
             Color color = Color.White;
 
             // Get the correct background based on whats happening and where the player is at
@@ -165,164 +164,155 @@ public class FloatingScreenManager : ModSystem
             {
                 int wall = Main.tile[(int) (player.Center.X / 16f), (int) (player.Center.Y / 16f)].wall;
                 if (inCrater)
-                    background = AssetRegistry.GetTexture(AdditionsTexture.Background_CloudedCrater);
+                    background = AssetRegistry.GennedTextures.Background_CloudedCrater;
                 else if (garden)
-                    background = AssetRegistry.GetTexture(AdditionsTexture.Background_EternalGarden);
+                    background = AssetRegistry.GennedTextures.Background_EternalGarden;
 
                 //TODO
                 /*
                 else if (inCrags)
-                    background = AssetRegistry.GetTexture(AdditionsTexture.Background_Brimstone);
+                    background = AssetRegistry.GennedTextures.Background_Brimstone;
                 else if (inAstral)
-                    background = AssetRegistry.GetTexture(AdditionsTexture.Background_AstralInfection);
+                    background = AssetRegistry.GennedTextures.Background_AstralInfection;
                 else if (inSunkenSea)
-                    background = AssetRegistry.GetTexture(AdditionsTexture.Background_SunkenSea);
+                    background = AssetRegistry.GennedTextures.Background_SunkenSea;
                 else if (inAbyss)
                 {
-                    background = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
+                    background = AssetRegistry.GennedTextures.Pixel;
                     color = Color.Black;
                 }
                 */
 
                 else if (Main.screenPosition.Y > (float) ((Main.maxTilesY - 232) * 16))
-                    background = AssetRegistry.GetTexture(AdditionsTexture.Background_Underworld);
+                    background = AssetRegistry.GennedTextures.Background_Underworld;
                 else if (player.ZoneDungeon)
-                    background = AssetRegistry.GetTexture(AdditionsTexture.Background_Dungeon);
+                    background = AssetRegistry.GennedTextures.Background_Dungeon;
                 else if (wall == WallID.LihzahrdBrickUnsafe)
-                    background = AssetRegistry.GetTexture(AdditionsTexture.Background_JungleTemple);
+                    background = AssetRegistry.GennedTextures.Background_JungleTemple;
                 else if (player.ZoneShimmer)
-                    background = AssetRegistry.GetTexture(AdditionsTexture.Background_Shimmer);
+                    background = AssetRegistry.GennedTextures.Background_Shimmer;
                 else if ((double) Main.screenPosition.Y > Main.worldSurface * 16.0)
                 {
                     switch (wall)
                     {
                         case WallID.HiveUnsafe:
                         case WallID.Hive:
-                            background = AssetRegistry.GetTexture(AdditionsTexture.Background_BEES);
+                            background = AssetRegistry.GennedTextures.Background_BEES;
                             break;
                         case WallID.GraniteUnsafe:
                         case WallID.Granite:
-                            background = AssetRegistry.GetTexture(AdditionsTexture.Background_NotPurpleGranite);
+                            background = AssetRegistry.GennedTextures.Background_NotPurpleGranite;
                             break;
                         case WallID.MarbleUnsafe:
                         case WallID.Marble:
-                            background = AssetRegistry.GetTexture(AdditionsTexture.Background_Marble);
+                            background = AssetRegistry.GennedTextures.Background_Marble;
                             break;
                         case WallID.SpiderUnsafe:
                         case WallID.Spider:
-                            background = AssetRegistry.GetTexture(AdditionsTexture.Background_SpiderNest);
+                            background = AssetRegistry.GennedTextures.Background_SpiderNest;
                             break;
                         default:
                             // vanilla shenanigans
                             background = player.ZoneGemCave
-                                ? AssetRegistry.GetTexture(AdditionsTexture.Background_GemCave)
-                                : (player.ZoneGlowshroom
-                                    ? AssetRegistry.GetTexture(AdditionsTexture.Background_GlowingShrooms)
-                                    : (player.ZoneCorrupt
+                                ? AssetRegistry.GennedTextures.Background_GemCave
+                                : player.ZoneGlowshroom
+                                    ? AssetRegistry.GennedTextures.Background_GlowingShrooms
+                                    : player.ZoneCorrupt
                                         ? (player.ZoneDesert
-                                            ? AssetRegistry.GetTexture(AdditionsTexture.Background_Corruption)
-                                            : ((!player.ZoneSnow)
-                                                ? AssetRegistry.GetTexture(AdditionsTexture.Background_Corruption)
-                                                : AssetRegistry.GetTexture(AdditionsTexture.Background_Corruption)))
-                                        : (player.ZoneCrimson
+                                            ? AssetRegistry.GennedTextures.Background_Corruption
+                                            : (AssetRegistry.GennedTextures.Background_Corruption))
+                                        : player.ZoneCrimson
                                             ? (player.ZoneDesert
-                                                ? AssetRegistry.GetTexture(AdditionsTexture.Background_Crimson)
-                                                : ((!player.ZoneSnow)
-                                                    ? AssetRegistry.GetTexture(AdditionsTexture.Background_Crimson)
-                                                    : AssetRegistry.GetTexture(AdditionsTexture.Background_Crimson)))
-                                            : (player.ZoneHallow
+                                                ? AssetRegistry.GennedTextures.Background_Crimson
+                                                : (AssetRegistry.GennedTextures.Background_Crimson))
+                                            : player.ZoneHallow
                                                 ? (player.ZoneDesert
-                                                    ? AssetRegistry.GetTexture(AdditionsTexture.Background_Hallow)
-                                                    : ((!player.ZoneSnow)
-                                                        ? AssetRegistry.GetTexture(AdditionsTexture.Background_Hallow)
-                                                        : AssetRegistry.GetTexture(AdditionsTexture.Background_Hallow)))
-                                                : (player.ZoneSnow
-                                                    ? AssetRegistry.GetTexture(AdditionsTexture.Background_Snow)
-                                                    : (player.ZoneJungle
-                                                        ? AssetRegistry.GetTexture(AdditionsTexture.Background_Jungle)
-                                                        : (player.ZoneDesert
-                                                            ? AssetRegistry.GetTexture(AdditionsTexture
-                                                                .Background_Desert)
-                                                            : ((!player.ZoneRockLayerHeight)
-                                                                ? AssetRegistry.GetTexture(AdditionsTexture
-                                                                    .Background_Undergound)
-                                                                : AssetRegistry.GetTexture(AdditionsTexture
-                                                                    .Background_Cavern)))))))));
+                                                    ? AssetRegistry.GennedTextures.Background_Hallow
+                                                    : (AssetRegistry.GennedTextures.Background_Hallow))
+                                                : player.ZoneSnow
+                                                    ? AssetRegistry.GennedTextures.Background_Snow
+                                                    : player.ZoneJungle
+                                                        ? AssetRegistry.GennedTextures.Background_Jungle
+                                                        : player.ZoneDesert
+                                                            ? AssetRegistry.GennedTextures.Background_Desert
+                                                            : (!player.ZoneRockLayerHeight)
+                                                                ? AssetRegistry.GennedTextures.Background_Undergound
+                                                                : AssetRegistry.GennedTextures.Background_Cavern;
                             break;
                     }
                 }
 
                 else if (player.ZoneTowerSolar)
-                    background = AssetRegistry.GetTexture(AdditionsTexture.Background_SolarPillar);
+                    background = AssetRegistry.GennedTextures.Background_SolarPillar;
                 else if (player.ZoneTowerVortex)
-                    background = AssetRegistry.GetTexture(AdditionsTexture.Background_VortexPillar);
+                    background = AssetRegistry.GennedTextures.Background_VortexPillar;
                 else if (player.ZoneTowerNebula)
-                    background = AssetRegistry.GetTexture(AdditionsTexture.Background_NebularPillar);
+                    background = AssetRegistry.GennedTextures.Background_NebularPillar;
                 else if (player.ZoneTowerStardust)
-                    background = AssetRegistry.GetTexture(AdditionsTexture.Background_StardustPillar);
+                    background = AssetRegistry.GennedTextures.Background_StardustPillar;
                 else if (Main.invasionType == InvasionID.GoblinArmy)
-                    background = AssetRegistry.GetTexture(AdditionsTexture.Background_Goblin);
+                    background = AssetRegistry.GennedTextures.Background_Goblin;
                 else if (Main.invasionType == InvasionID.PirateInvasion)
-                    background = AssetRegistry.GetTexture(AdditionsTexture.Background_Pirates);
+                    background = AssetRegistry.GennedTextures.Background_Pirates;
                 else if (Main.invasionType == InvasionID.MartianMadness)
-                    background = AssetRegistry.GetTexture(AdditionsTexture.Background_Martian);
+                    background = AssetRegistry.GennedTextures.Background_Martian;
                 else if (player.ZoneOldOneArmy)
-                    background = AssetRegistry.GetTexture(AdditionsTexture.Background_OldOnesArmy);
+                    background = AssetRegistry.GennedTextures.Background_OldOnesArmy;
                 else if (Main.snowMoon)
-                    background = AssetRegistry.GetTexture(AdditionsTexture.Background_FrostMoon);
+                    background = AssetRegistry.GennedTextures.Background_FrostMoon;
                 else if (Main.pumpkinMoon)
-                    background = AssetRegistry.GetTexture(AdditionsTexture.Background_PumpkinMoon);
+                    background = AssetRegistry.GennedTextures.Background_PumpkinMoon;
                 else if (Main.slimeRain && player.ZoneOverworldHeight)
-                    background = AssetRegistry.GetTexture(AdditionsTexture.Background_Slime);
+                    background = AssetRegistry.GennedTextures.Background_Slime;
 
                 else if (player.ZoneGlowshroom)
-                    background = AssetRegistry.GetTexture(AdditionsTexture.Background_GlowingShrooms);
+                    background = AssetRegistry.GennedTextures.Background_GlowingShrooms;
                 else
                 {
-                    int centerTile = (int) ((Main.screenPosition.X + (float) (Main.screenWidth / 2)) / 16f);
+                    int centerTile = (int) ((Main.screenPosition.X + Main.screenWidth / 2f) / 16f);
                     if (player.ZoneSkyHeight)
-                        background = AssetRegistry.GetTexture(AdditionsTexture.Background_Space);
+                        background = AssetRegistry.GennedTextures.Background_Space;
                     else if (player.ZoneCorrupt)
-                        background = AssetRegistry.GetTexture(AdditionsTexture.Background_Corruption);
+                        background = AssetRegistry.GennedTextures.Background_Corruption;
                     else if (player.ZoneCrimson)
-                        background = AssetRegistry.GetTexture(AdditionsTexture.Background_Crimson);
+                        background = AssetRegistry.GennedTextures.Background_Crimson;
                     else if (player.ZoneHallow)
-                        background = AssetRegistry.GetTexture(AdditionsTexture.Background_Hallow);
+                        background = AssetRegistry.GennedTextures.Background_Hallow;
                     else if ((double) (Main.screenPosition.Y / 16f) < Main.worldSurface + 10.0 &&
                              (centerTile < 380 || centerTile > Main.maxTilesX - 380))
-                        background = AssetRegistry.GetTexture(AdditionsTexture.Background_Ocean);
+                        background = AssetRegistry.GennedTextures.Background_Ocean;
                     else if (player.ZoneSnow && player.ZoneRain)
-                        background = AssetRegistry.GetTexture(AdditionsTexture.Background_Blizzard);
+                        background = AssetRegistry.GennedTextures.Background_Blizzard;
                     else if (player.ZoneSnow)
-                        background = AssetRegistry.GetTexture(AdditionsTexture.Background_Snow);
+                        background = AssetRegistry.GennedTextures.Background_Snow;
                     else if (player.ZoneJungle)
-                        background = AssetRegistry.GetTexture(AdditionsTexture.Background_Jungle);
+                        background = AssetRegistry.GennedTextures.Background_Jungle;
                     else if (player.ZoneSandstorm)
-                        background = AssetRegistry.GetTexture(AdditionsTexture.Background_Sandstorm);
+                        background = AssetRegistry.GennedTextures.Background_Sandstorm;
                     else if (player.ZoneDesert)
-                        background = AssetRegistry.GetTexture(AdditionsTexture.Background_Desert);
+                        background = AssetRegistry.GennedTextures.Background_Desert;
                     else if (Main.bloodMoon)
-                        background = AssetRegistry.GetTexture(AdditionsTexture.Background_BloodMoon);
+                        background = AssetRegistry.GennedTextures.Background_BloodMoon;
                     else if (Main.eclipse)
-                        background = AssetRegistry.GetTexture(AdditionsTexture.Background_SolarEclipse);
+                        background = AssetRegistry.GennedTextures.Background_SolarEclipse;
                     else if (player.ZoneGraveyard)
-                        background = AssetRegistry.GetTexture(AdditionsTexture.Background_Graveyard);
+                        background = AssetRegistry.GennedTextures.Background_Graveyard;
                     else if (player.ZoneMeteor)
-                        background = AssetRegistry.GetTexture(AdditionsTexture.Background_Meteor);
+                        background = AssetRegistry.GennedTextures.Background_Meteor;
                     else if (player.ZoneRain && Main.IsItStorming)
-                        background = AssetRegistry.GetTexture(AdditionsTexture.Background_Thunder);
+                        background = AssetRegistry.GennedTextures.Background_Thunder;
                     else if (player.ZoneRain)
-                        background = AssetRegistry.GetTexture(AdditionsTexture.Background_Rain);
+                        background = AssetRegistry.GennedTextures.Background_Rain;
                 }
 
                 if (NPC.AnyNPCs(ModContent.NPCType<TheGiantSnailFromAncientTimes>()))
-                    background = AssetRegistry.GetTexture(AdditionsTexture.Background_Snail);
+                    background = AssetRegistry.GennedTextures.Background_Snail;
                 Main.spriteBatch.DrawBetterRect(background, ToTarget(Main.screenPosition, resolution), null, color, 0f,
-                    Vector2.Zero, SpriteEffects.None, false);
+                    Vector2.Zero);
             }
             else
             {
-                background = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
+                background = AssetRegistry.GennedTextures.Pixel;
                 Vector2 size = new(resolution.X / 2f, resolution.Y);
 
                 // Similar to the item rarities of avatars drops
@@ -333,12 +323,12 @@ public class FloatingScreenManager : ModSystem
 
                 Main.spriteBatch.DrawBetterRect(background,
                     ToTarget(Main.screenPosition + Vector2.UnitX * resolution.X / 2f, size), null,
-                    Color.Lerp(a, b, 1f - colorInterpolant), 0f, Vector2.Zero, SpriteEffects.None, false);
+                    Color.Lerp(a, b, 1f - colorInterpolant), 0f, Vector2.Zero);
                 Main.spriteBatch.DrawBetterRect(background, ToTarget(Main.screenPosition, size), null,
-                    Color.Lerp(a, b, colorInterpolant), 0f, Vector2.Zero, SpriteEffects.None, false);
+                    Color.Lerp(a, b, colorInterpolant), 0f, Vector2.Zero);
             }
 
-            Texture2D asterlin = AssetRegistry.GetTexture(AdditionsTexture.AsterlinFacingForward);
+            Texture2D asterlin = AssetRegistry.GennedTextures.AsterlinFacingForward;
             Main.spriteBatch.Draw(asterlin,
                 new Vector2(Main.screenWidth / 2f, Main.screenHeight) - projectile.velocity * 4f, null, Color.White, 0f,
                 asterlin.Size() / 2f, 6f, 0, 0f);
@@ -351,11 +341,11 @@ public class FloatingScreenManager : ModSystem
     {
         orig(self);
 
-        if (!AssetRegistry.HasFinishedLoading || Main.gameMenu || Main.netMode == NetmodeID.Server)
+        if (Main.gameMenu || Main.netMode == NetmodeID.Server)
             return;
 
         Vector2 res = new Vector2(300f, 200f);
-        crtShader = AssetRegistry.GetShader("AsterlinScreen");
+        crtShader = AssetRegistry.GennedShaders.AsterlinScreen;
         crtShader.TrySetParameter("time", Main.GlobalTimeWrappedHourly);
         crtShader.TrySetParameter("findingChannel", false);
         crtShader.TrySetParameter("resolution", res);
@@ -370,7 +360,7 @@ public class FloatingScreenManager : ModSystem
             Player player = screen.Owner;
 
             Main.spriteBatch.DrawBetterRect(crtTarget, ToTarget(projectile.Center, res), null, Color.White, 0f,
-                crtTarget.Size() / 2f, SpriteEffects.None, false);
+                crtTarget.Size() / 2f);
         }
 
         Main.spriteBatch.End();

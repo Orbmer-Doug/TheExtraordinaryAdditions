@@ -8,11 +8,11 @@ namespace TheExtraordinaryAdditions.Content.NPCs.BossBars;
 
 public class StygainBossbar : ModBossBar
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.StygainBossbar);
+    public override string Texture => AssetRegistry.GennedTextures.StygainBossbar.Path;
 
     public override Asset<Texture2D> GetIconTexture(ref Rectangle? iconFrame)
     {
-        return ModContent.Request<Texture2D>(AssetRegistry.GetTexturePath(AdditionsTexture.StygainHeart_Head_Boss));
+        return ModContent.Request<Texture2D>(AssetRegistry.GennedTextures.StygainHeart_Head_Boss.Path);
     }
 
     public override bool PreDraw(SpriteBatch sb, NPC npc, ref BossBarDrawParams drawParams)

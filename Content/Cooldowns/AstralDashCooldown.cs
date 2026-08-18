@@ -2,7 +2,7 @@
 using Terraria;
 using Terraria.Localization;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
+using TheExtraordinaryAdditions.Core.Graphics.Particles;
 
 namespace TheExtraordinaryAdditions.Content.Cooldowns;
 
@@ -11,7 +11,7 @@ public class AstralDashCooldown : CooldownHandler
     public static new string ID => "AstralDash";
     public override bool ShouldDisplay => true;
     public override LocalizedText DisplayName => GetText($"Cooldowns.{ID}");
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CooldownAstralDash);
+    public override string Texture => AssetRegistry.GennedTextures.CooldownAstralDash.Path;
     public override Color OutlineColor => Color.White;
     public override Color CooldownStartColor => new(66, 189, 181);
     public override Color CooldownEndColor => new(109, 242, 196);
@@ -34,5 +34,6 @@ public class AstralDashCooldown : CooldownHandler
     }
 }
 */
+
 
 

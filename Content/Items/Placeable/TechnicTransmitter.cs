@@ -1,14 +1,14 @@
 ﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
+using TheExtraordinaryAdditions.Content.Rarities;
 using TheExtraordinaryAdditions.Content.Tiles;
 
 namespace TheExtraordinaryAdditions.Content.Items.Placeable;
 
 public class TechnicTransmitter : ModItem, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TechnicTransmitter);
+    public override string Texture => AssetRegistry.GennedTextures.TechnicTransmitter.Path;
 
     public override void SetStaticDefaults()
     {

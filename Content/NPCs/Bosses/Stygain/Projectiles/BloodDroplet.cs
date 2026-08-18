@@ -4,13 +4,12 @@ using Terraria.Audio;
 using Terraria.ID;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 
 public class BloodDroplet : ProjOwnedByNPC<StygainHeart>
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BloodParticle2);
+    public override string Texture => AssetRegistry.GennedTextures.BloodParticle2.Path;
 
     public override void SetDefaults()
     {

@@ -1,8 +1,8 @@
 ﻿using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
+using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
@@ -45,7 +45,7 @@ public partial class Asterlin
 
     public void DoBehavior_GetScrewed()
     {
-        if (AITimer == 1 && this.RunServer())
+        if (AITimer == 1 && ModProjectile.RunServer())
         {
             GetScrewed_Type = animDict.GetRandom();
             NPC.netUpdate = true;

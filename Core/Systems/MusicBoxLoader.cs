@@ -19,53 +19,53 @@ public class MusicBoxLoader : ModSystem
 
     public override void Load()
     {
-        MusicBoxAutoloader.Create(Mod, AssetRegistry.GetTexturePath(AdditionsTexture.AngelsRage),
-            AssetRegistry.GetTexturePath(AdditionsTexture.AngelsRagePlaced),
-            AssetRegistry.GetMusicPath(AdditionsSound.Infinite), out AngelsRageID);
+        MusicBoxAutoloader.Create(Mod, AssetRegistry.GennedTextures.AngelsRage.Path,
+            AssetRegistry.GennedTextures.AngelsRagePlaced.Path,
+            AssetRegistry.GennedSounds.Music.Infinite.SoundPath, out AngelsRageID);
 
-        MusicBoxAutoloader.Create(Mod, AssetRegistry.GetTexturePath(AdditionsTexture.FierceBattle),
-            AssetRegistry.GetTexturePath(AdditionsTexture.FierceBattlePlaced),
-            AssetRegistry.GetMusicPath(AdditionsSound.SRank), out FierceBattleID);
+        MusicBoxAutoloader.Create(Mod, AssetRegistry.GennedTextures.FierceBattle.Path,
+            AssetRegistry.GennedTextures.FierceBattlePlaced.Path,
+            AssetRegistry.GennedSounds.Music.SRank.SoundPath, out FierceBattleID);
 
-        MusicBoxAutoloader.Create(Mod, AssetRegistry.GetTexturePath(AdditionsTexture.FrigidGale),
-            AssetRegistry.GetTexturePath(AdditionsTexture.FrigidGalePlaced),
-            AssetRegistry.GetMusicPath(AdditionsSound.FrigidGale), out _);
+        MusicBoxAutoloader.Create(Mod, AssetRegistry.GennedTextures.FrigidGale.Path,
+            AssetRegistry.GennedTextures.FrigidGalePlaced.Path,
+            AssetRegistry.GennedSounds.Music.FrigidGale.SoundPath, out _);
 
-        MusicBoxAutoloader.Create(Mod, AssetRegistry.GetTexturePath(AdditionsTexture.Ladikerfos),
-            AssetRegistry.GetTexturePath(AdditionsTexture.LadikerfosPlaced),
-            AssetRegistry.GetMusicPath(AdditionsSound.Ladikerfos), out _);
+        MusicBoxAutoloader.Create(Mod, AssetRegistry.GennedTextures.Ladikerfos.Path,
+            AssetRegistry.GennedTextures.LadikerfosPlaced.Path,
+            AssetRegistry.GennedSounds.Music.Ladikerfos.SoundPath, out _);
 
-        MusicBoxAutoloader.Create(Mod, AssetRegistry.GetTexturePath(AdditionsTexture.MechanicalInNature),
-            AssetRegistry.GetTexturePath(AdditionsTexture.MechanicalInNaturePlaced),
-            AssetRegistry.GetMusicPath(AdditionsSound.MechanicalInNature), out _);
+        MusicBoxAutoloader.Create(Mod, AssetRegistry.GennedTextures.MechanicalInNature.Path,
+            AssetRegistry.GennedTextures.MechanicalInNaturePlaced.Path,
+            AssetRegistry.GennedSounds.Music.MechanicalInNature.SoundPath, out _);
 
-        MusicBoxAutoloader.Create(Mod, AssetRegistry.GetTexturePath(AdditionsTexture.MechanicalInNature2),
-            AssetRegistry.GetTexturePath(AdditionsTexture.MechanicalInNature2Placed),
-            AssetRegistry.GetMusicPath(AdditionsSound.MechanicalInNature2), out _);
+        MusicBoxAutoloader.Create(Mod, AssetRegistry.GennedTextures.MechanicalInNature2.Path,
+            AssetRegistry.GennedTextures.MechanicalInNature2Placed.Path,
+            AssetRegistry.GennedSounds.Music.MechanicalInNature2.SoundPath, out _);
 
-        MusicBoxAutoloader.Create(Mod, AssetRegistry.GetTexturePath(AdditionsTexture.MenuMusic),
-            AssetRegistry.GetTexturePath(AdditionsTexture.MenuMusicPlaced),
-            AssetRegistry.GetMusicPath(AdditionsSound.Protostar), out MenuMusicID);
+        MusicBoxAutoloader.Create(Mod, AssetRegistry.GennedTextures.MenuMusic.Path,
+            AssetRegistry.GennedTextures.MenuMusicPlaced.Path,
+            AssetRegistry.GennedSounds.Music.Protostar.SoundPath, out MenuMusicID);
 
-        MusicBoxAutoloader.Create(Mod, AssetRegistry.GetTexturePath(AdditionsTexture.RainDance),
-            AssetRegistry.GetTexturePath(AdditionsTexture.RainDancePlaced),
-            AssetRegistry.GetMusicPath(AdditionsSound.RainDance), out RainDanceID);
+        MusicBoxAutoloader.Create(Mod, AssetRegistry.GennedTextures.RainDance.Path,
+            AssetRegistry.GennedTextures.RainDancePlaced.Path,
+            AssetRegistry.GennedSounds.Music.RainDance.SoundPath, out RainDanceID);
 
-        MusicBoxAutoloader.Create(Mod, AssetRegistry.GetTexturePath(AdditionsTexture.SereneSatellite),
-            AssetRegistry.GetTexturePath(AdditionsTexture.SereneSatellitePlaced),
-            AssetRegistry.GetMusicPath(AdditionsSound.clairdelune), out SereneSatelliteID);
+        MusicBoxAutoloader.Create(Mod, AssetRegistry.GennedTextures.SereneSatellite.Path,
+            AssetRegistry.GennedTextures.SereneSatellitePlaced.Path,
+            AssetRegistry.GennedSounds.Music.clairdelune.SoundPath, out SereneSatelliteID);
 
-        MusicBoxAutoloader.Create(Mod, AssetRegistry.GetTexturePath(AdditionsTexture.SnailRoar),
-            AssetRegistry.GetTexturePath(AdditionsTexture.SnailRoarPlaced),
-            AssetRegistry.GetMusicPath(AdditionsSound.sickest_beat_ever), out _);
+        MusicBoxAutoloader.Create(Mod, AssetRegistry.GennedTextures.SnailRoar.Path,
+            AssetRegistry.GennedTextures.SnailRoarPlaced.Path,
+            AssetRegistry.GennedSounds.Music.sickest_beat_ever.SoundPath, out _);
 
-        MusicBoxAutoloader.Create(Mod, AssetRegistry.GetTexturePath(AdditionsTexture.SpiderMusic),
-            AssetRegistry.GetTexturePath(AdditionsTexture.SpiderMusicPlaced),
-            AssetRegistry.GetMusicPath(AdditionsSound.Spider), out SpiderMusicID);
+        MusicBoxAutoloader.Create(Mod, AssetRegistry.GennedTextures.SpiderMusic.Path,
+            AssetRegistry.GennedTextures.SpiderMusicPlaced.Path,
+            AssetRegistry.GennedSounds.Music.Spider.SoundPath, out SpiderMusicID);
 
-        MusicBoxAutoloader.Create(Mod, AssetRegistry.GetTexturePath(AdditionsTexture.WereYouFoolin),
-            AssetRegistry.GetTexturePath(AdditionsTexture.WereYouFoolinPlaced),
-            AssetRegistry.GetMusicPath(AdditionsSound.wereyoufoolin), out WereYouFoolinID);
+        MusicBoxAutoloader.Create(Mod, AssetRegistry.GennedTextures.WereYouFoolin.Path,
+            AssetRegistry.GennedTextures.WereYouFoolinPlaced.Path,
+            AssetRegistry.GennedSounds.Music.wereyoufoolin.SoundPath, out WereYouFoolinID);
     }
 
     public override void AddRecipes()

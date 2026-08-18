@@ -12,7 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 
 public class BirchTree : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BirchTree);
+    public override string Texture => AssetRegistry.GennedTextures.BirchTree.Path;
 
     public override void SetDefaults()
     {

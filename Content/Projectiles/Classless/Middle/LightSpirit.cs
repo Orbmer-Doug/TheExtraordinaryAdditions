@@ -3,15 +3,14 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 
 public class LightSpirit : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetStaticDefaults()
     {
@@ -80,17 +79,17 @@ public class LightSpirit : ModProjectile
     public override bool PreDraw(ref Color lightColor)
     {
         SpriteBatch sb = Main.spriteBatch;
-        Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.WavyNeurons);
+        Texture2D tex = AssetRegistry.GennedTextures.WavyNeurons;
 
         Vector2 res = new(150f);
-        ManagedShader shine = AssetRegistry.GetShader("RadialShineShader");
+        ManagedShader shine = AssetRegistry.GennedShaders.RadialShineShader;
         shine.TrySetParameter("glowPower", .2f);
         shine.TrySetParameter("glowColor", Color.Goldenrod.ToVector4());
         shine.TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly * 1f);
         shine.TrySetParameter("resolution", res);
 
-        sb.EnterShaderRegion();
-        shine.Render("AutoloadPass", true, false);
+        sb.EnterShaderRegion(shine.Effect);
+        shine.Render();
 
         sb.Draw(tex, ToTarget(Projectile.Center, res), null, Color.Gold * Projectile.Opacity, Projectile.rotation,
             tex.Size() * 0.5f, 0, 0f);

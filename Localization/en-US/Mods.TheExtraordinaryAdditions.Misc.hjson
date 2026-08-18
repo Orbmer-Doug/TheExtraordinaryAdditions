@@ -1,0 +1,14 @@
+Atom: {
+	Description: allows for viewing something funy
+	Usage:
+		'''
+		J and L to cycle quantum numbers
+		I and K to increase/decrease quantum number
+		U to toggle sorting
+		O to toggle different blends
+		] to spawn spheres
+		[ to remove spheres
+		Hold Right-Click and drag to orbit around
+		Scroll to zoom
+		'''
+}

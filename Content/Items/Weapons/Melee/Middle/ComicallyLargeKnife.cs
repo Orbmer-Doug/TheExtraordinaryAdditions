@@ -9,7 +9,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 
 public class ComicallyLargeKnife : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ComicallyLargeKnife);
+    public override string Texture => AssetRegistry.GennedTextures.ComicallyLargeKnife.Path;
 
     public override void SetDefaults()
     {

@@ -7,7 +7,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
 public class GalaxyShell : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GalaxyShell);
+    public override string Texture => AssetRegistry.GennedTextures.GalaxyShell.Path;
     private const int Lifetime = 400;
 
     public override void SetDefaults()
@@ -65,11 +65,11 @@ public class GalaxyShell : ModProjectile
             Color color = Projectile.GetAlpha(lightColor) *
                           ((Projectile.oldPos.Length - k) / (float) Projectile.oldPos.Length);
             Main.EntitySpriteDraw(texture, drawPos, null, color, Projectile.rotation, drawOrigin, Projectile.scale,
-                SpriteEffects.None, 0);
+                SpriteEffects.None);
         }
 
         Main.EntitySpriteDraw(texture, drawPosition, texture.Frame(), Projectile.GetAlpha(lightColor),
-            Projectile.rotation, texture.Size() * 0.5f, Projectile.scale, direction, 0);
+            Projectile.rotation, texture.Size() * 0.5f, Projectile.scale, direction);
         return false;
     }
 }

@@ -9,7 +9,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Pets;
 
 public class JellyfishVro : ModProjectile, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.JellyfishBro);
+    public override string Texture => AssetRegistry.GennedTextures.JellyfishBro.Path;
     public Player Owner => Main.player[Projectile.owner];
     public ref float Time => ref Projectile.ai[0];
 

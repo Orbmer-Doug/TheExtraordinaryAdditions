@@ -1,15 +1,13 @@
 ﻿using System;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
 public class LightripBlast : ModProjectile, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -31,18 +29,18 @@ public class LightripBlast : ModProjectile, ILocalizedModType, IModType
         {
             for (int i = 0; i < 6; i++)
             {
-                Vector2 off = Main.rand.NextVector2Unit(0f, MathHelper.TwoPi) *
+                Vector2 off = Main.rand.NextVector2Unit() *
                               (float) Math.Pow(Main.rand.NextFloat(), 2.4) * Projectile.Size * 0.5f;
                 Vector2 vel = off.SafeNormalize(Vector2.UnitY)
                     .RotatedByRandom((double) (MathHelper.PiOver2 * Main.rand.NextFloatDirection()));
                 Vector2 val2 = off / Projectile.Size / 0.5f;
-                vel *= MathHelper.Lerp(3f, 9f, Utils.GetLerpValue(0.05f, 0.85f, val2.Length(), false));
+                vel *= MathHelper.Lerp(3f, 9f, Utils.GetLerpValue(0.05f, 0.85f, val2.Length()));
 
                 Vector2 pos = Projectile.Center + off;
                 Color color = MulticolorLerp(Main.rand.NextFloat(0.2f, 0.8f), Color.Cyan, Color.DeepSkyBlue,
                     Color.SkyBlue, Color.LightCyan);
 
-                ParticleRegistry.SpawnHeavySmokeParticle(pos, vel / 2, 50, 1f, color, .4f, true);
+                ParticleRegistry.SpawnHeavySmokeParticle(pos, vel / 2, 50, 1f, color, .4f);
                 ParticleRegistry.SpawnMistParticle(pos, vel.RotatedByRandom(.3f), Main.rand.NextFloat(.7f, 1.1f), color,
                     Color.Transparent, Main.rand.NextFloat(160f, 190f), Main.rand.NextFloat(-.2f, .2f));
             }

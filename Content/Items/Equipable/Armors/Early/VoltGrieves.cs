@@ -11,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Early;
 [AutoloadEquip(EquipType.Legs)]
 public class VoltGrieves : ModItem, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.VoltGrieves);
+    public override string Texture => AssetRegistry.GennedTextures.VoltGrieves.Path;
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {

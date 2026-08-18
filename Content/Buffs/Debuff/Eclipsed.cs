@@ -7,7 +7,7 @@ namespace TheExtraordinaryAdditions.Content.Buffs.Debuff;
 
 public class Eclipsed : ModBuff
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Eclipsed);
+    public override string Texture => AssetRegistry.GennedTextures.Eclipsed.Path;
 
     public override void SetStaticDefaults()
     {

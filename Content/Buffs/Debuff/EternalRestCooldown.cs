@@ -6,7 +6,7 @@ namespace TheExtraordinaryAdditions.Content.Buffs.Debuff;
 
 public class EternalRestCooldown : ModBuff
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.EternalRestCooldown);
+    public override string Texture => AssetRegistry.GennedTextures.EternalRestCooldown.Path;
 
     public override void SetStaticDefaults()
     {

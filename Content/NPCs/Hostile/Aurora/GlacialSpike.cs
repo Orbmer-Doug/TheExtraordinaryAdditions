@@ -4,15 +4,15 @@ using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 
 public class GlacialSpike : ProjOwnedByNPC<AuroraGuard>
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GlacialSpike);
+    public override string Texture => AssetRegistry.GennedTextures.GlacialSpike.Path;
 
     public const float Scale = 1.5f;
     public static readonly int SnowflakeCount = DifficultyBasedValue(7, 10, 12, 14, 16, 22);
@@ -61,7 +61,7 @@ public class GlacialSpike : ProjOwnedByNPC<AuroraGuard>
         }
         else if (Time == AuroraGuard.TimeToRise)
         {
-            AdditionsSound.ColdHitMassive.Play(Projectile.Center, .9f, .1f, .1f);
+            AssetRegistry.GennedSounds.ColdHitMassive.Play(Projectile.Center, .9f, .1f, .1f);
             for (int i = 0; i < 40; i++)
             {
                 Vector2 pos = GroundPos +
@@ -74,7 +74,7 @@ public class GlacialSpike : ProjOwnedByNPC<AuroraGuard>
                     Main.rand.NextFloat(.5f, .9f), Color.DeepSkyBlue, Color.LightSkyBlue, null, 1.5f, 5, true);
             }
 
-            if (this.RunServer())
+            if (ModProjectile.RunServer())
             {
                 for (int i = 0; i < SnowflakeCount; i++)
                 {
@@ -109,7 +109,7 @@ public class GlacialSpike : ProjOwnedByNPC<AuroraGuard>
 
     public override bool CanHitPlayer(Player target)
     {
-        return Time.BetweenNum(AuroraGuard.TimeToRise, AuroraGuard.TimeToRise + 20);
+        return Time > AuroraGuard.TimeToRise && Time < AuroraGuard.TimeToRise + 20;
     }
 
     public override bool PreDraw(ref Color lightColor)

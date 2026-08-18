@@ -1,14 +1,13 @@
 ﻿using Terraria;
 using Terraria.Audio;
 using Terraria.ModLoader;
-using static Terraria.ModLoader.BackupIO;
 
 namespace TheExtraordinaryAdditions.UI.CrossUI;
 
 public class ElementalBalance : ModPlayer
 {
     public const int DefaultElementalResourceMax = 200;
-    public static readonly SoundStyle OverloadSound = AssetRegistry.GetSound(AdditionsSound.AdrenalineMajorLoss);
+    public static readonly SoundStyle OverloadSound = AssetRegistry.GennedSounds.AdrenalineMajorLoss;
 
     public int ElementalResourceCurrent;
     public int Max;

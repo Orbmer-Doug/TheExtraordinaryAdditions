@@ -1,17 +1,16 @@
 ﻿using System.Collections.Generic;
-using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
 public class HonedTesselesticLightning : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     private const int Life = 30;
 
     public override void SetDefaults()
@@ -36,7 +35,7 @@ public class HonedTesselesticLightning : ModProjectile
         }
     }
 
-    public float Completion => Animators.MakePoly(6f).OutFunction(InverseLerp(0f, Life, Time));
+    public float Completion => MakePoly(6f).OutFunction(InverseLerp(0f, Life, Time));
 
     public override bool ShouldUpdatePosition() => false;
 
@@ -53,7 +52,7 @@ public class HonedTesselesticLightning : ModProjectile
         }
 
         Projectile.Opacity = 1f - Completion;
-        if (Projectile.Opacity.BetweenNum(0f, .05f))
+        if (Projectile.Opacity is > 0f and < .05f)
             Projectile.Kill();
 
         Time++;
@@ -70,7 +69,7 @@ public class HonedTesselesticLightning : ModProjectile
         MulticolorLerp(Completion, Color.White, Color.Cyan) * Projectile.Opacity;
 
     public TrailPoints points;
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override bool PreDraw(ref Color lightColor)
     {
@@ -78,8 +77,8 @@ public class HonedTesselesticLightning : ModProjectile
         {
             if (trail != null && points != null)
             {
-                ManagedShader shader = ShaderRegistry.SpecialLightningTrail;
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise), 1);
+                ManagedShader shader = AssetRegistry.GennedShaders.SpecialLightningTrail;
+                shader.SetTexture(AssetRegistry.GennedTextures.TechyNoise, 1);
                 trail.DrawTrail(shader, points.Points);
             }
         }

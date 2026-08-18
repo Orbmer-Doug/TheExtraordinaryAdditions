@@ -2,23 +2,22 @@
 using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
 public class SangueSpin : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Sangue);
+    public override string Texture => AssetRegistry.GennedTextures.Sangue.Path;
 
     public const float SwordRot = 1.071632161f / 2f;
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
+    public PlayerMouse Modded => Owner.AdditionsMouse();
     public Vector2 Center => Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
     public float Speed => Owner.GetAttackSpeed(DamageClass.Melee);
     public int Dir => Projectile.velocity.X.NonZeroSign();
@@ -105,7 +104,7 @@ public class SangueSpin : ModProjectile
 
                 if (Time > ReelTime)
                 {
-                    AdditionsSound.IkeSpecial1B.Play(Projectile.Center, .8f, 0f, .2f, 10, Name);
+                    AssetRegistry.GennedSounds.IkeSpecial1B.Play(Projectile.Center, .8f, 0f, .2f, 10, Name);
                     State = SangueState.Throw;
                     Time = 0f;
                     Projectile.netUpdate = true;
@@ -144,7 +143,7 @@ public class SangueSpin : ModProjectile
                 }
 
                 int wait = (int) (5 / Speed);
-                if (lerper.BetweenNum(.8f, 1f) && Time % wait == (wait - 1) && this.RunLocal())
+                if (lerper is > .8f and < 1f && Time % wait == (wait - 1) && this.RunLocal())
                 {
                     Projectile.NewProj(Rect().Top, (Projectile.rotation - SwordRot).ToRotationVector2(),
                         ModContent.ProjectileType<SangueGlare>(),
@@ -184,7 +183,7 @@ public class SangueSpin : ModProjectile
             ParticleRegistry.SpawnHeavySmokeParticle(pos, vel, life, scale, Color.DarkRed, .6f);
         }
 
-        AdditionsSound.MimicryLand.Play(Projectile.Center, 1.4f, .4f, .05f, 10, Name);
+        AssetRegistry.GennedSounds.MimicryLand.Play(Projectile.Center, 1.4f, .4f, .05f, 10, Name);
     }
 
     public override bool? CanDamage() => State == SangueState.Throw ? null : false;
@@ -199,7 +198,7 @@ public class SangueSpin : ModProjectile
     public Color ColorFunct(SystemVector2 c, Vector2 pos) =>
         Color.DarkRed * Convert01To010(InverseLerp(0f, ThrowTime, Time));
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints points = new(10);
 
     public override bool PreDraw(ref Color lightColor)
@@ -230,8 +229,8 @@ public class SangueSpin : ModProjectile
             if (trail == null || points == null)
                 return;
 
-            ManagedShader shader = ShaderRegistry.SwordRipShader;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.SwordSlashTexture), 1, SamplerState.LinearWrap);
+            ManagedShader shader = AssetRegistry.GennedShaders.SwordRipShader;
+            shader.SetTexture(AssetRegistry.GennedTextures.SwordSlashTexture, 1, SamplerState.LinearWrap);
             shader.TrySetParameter("flip", flip);
 
             trail.DrawTrail(shader, points.Points);

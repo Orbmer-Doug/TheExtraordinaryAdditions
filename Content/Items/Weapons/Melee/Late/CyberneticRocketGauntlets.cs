@@ -5,16 +5,17 @@ using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
-using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
+using TheExtraordinaryAdditions.Content.Rarities;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
 
 public class CyberneticRocketGauntlets : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CyberneticRocketGauntlets);
+    public override string Texture => AssetRegistry.GennedTextures.CyberneticRocketGauntlets.Path;
 
     public override void SetStaticDefaults()
     {
@@ -54,7 +55,7 @@ public class CyberneticRocketGauntlets : ModItem
     {
         if (player.whoAmI == Main.myPlayer && Main.mouseItem.IsAir && player.ownedProjectileCounts[Item.shoot] <= 0)
         {
-            GlobalPlayer gp = player.Additions();
+            PlayerMouse gp = player.AdditionsMouse();
             CyberneticPlayer cyber = player.GetModPlayer<CyberneticPlayer>();
 
             if (gp.SafeMouseLeft.JustPressed)
@@ -73,7 +74,7 @@ public class CyberneticRocketGauntlets : ModItem
 
     public void AddInput(Player player, char input)
     {
-        GlobalPlayer gp = player.Additions();
+        PlayerMouse gp = player.AdditionsMouse();
         CyberneticPlayer cyber = player.GetModPlayer<CyberneticPlayer>();
         cyber.inputSequence.Add(input);
         cyber.ComboTimer = CyberneticPlayer.COMBO_WINDOW;
@@ -97,7 +98,7 @@ public class CyberneticRocketGauntlets : ModItem
         {
             CyberneticSwing swing = Main.projectile[Projectile.NewProjectile(
                 new EntitySource_ItemUse_WithAmmo(player, Item, Item.ammo),
-                player.Center, player.Center.SafeDirectionTo(player.Additions().MouseWorld),
+                player.Center, player.Center.SafeDirectionTo(player.AdditionsMouse().MouseWorld),
                 Item.shoot, Item.damage, Item.knockBack, Main.myPlayer, 0f, 0f, 0f)].As<CyberneticSwing>();
             swing.State = state.Value;
 

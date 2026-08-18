@@ -5,11 +5,10 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
@@ -418,7 +417,7 @@ public class SnowmanRocket : ModProjectile
         _ => ProjectileID.RocketSnowmanI.GetTerrariaProj(),
     }, AssetRequestMode.AsyncLoad).Value;
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override bool PreDraw(ref Color lightColor)
     {
@@ -426,9 +425,9 @@ public class SnowmanRocket : ModProjectile
         {
             if (trail == null || trail.Disposed || points == null)
                 return;
-            ManagedShader fire = ShaderRegistry.SmoothFlame;
+            ManagedShader fire = AssetRegistry.GennedShaders.SmoothFlame;
             fire.TrySetParameter("heatInterpolant", 6f * Projectile.Opacity);
-            fire.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WavyNeurons), 1);
+            fire.SetTexture(AssetRegistry.GennedTextures.WavyNeurons, 1);
             trail.DrawTrail(fire, points.Points, 100, true);
         }
 

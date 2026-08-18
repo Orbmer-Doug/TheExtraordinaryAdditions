@@ -7,7 +7,7 @@ namespace TheExtraordinaryAdditions.Content.Buffs.Buff;
 
 public class WinterHeart : ModBuff
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.WinterHeart);
+    public override string Texture => AssetRegistry.GennedTextures.WinterHeart.Path;
 
     public override void SetStaticDefaults()
     {
@@ -16,7 +16,7 @@ public class WinterHeart : ModBuff
 
     public override void Update(Player player, ref int buffIndex)
     {
-        player.GetModPlayer<GlobalPlayer>().FrigidTonic = true;
+        player.AdditionsBuffs().FrigidTonic = true;
         player.buffImmune[BuffID.Chilled] = true;
         player.endurance += 0.05f;
     }

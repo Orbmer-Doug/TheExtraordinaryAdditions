@@ -5,9 +5,7 @@ using System.Runtime.InteropServices;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
-using Terraria.ModLoader;
-using Terraria.Utilities;
-using TheExtraordinaryAdditions.Core.Utilities;
+using TargetSearchResults = Terraria.Utilities.NPCUtils.TargetSearchResults;
 
 namespace TheExtraordinaryAdditions.Core.Utilities;
 
@@ -206,14 +204,17 @@ public static class SeekingUtils
         }
     }
 
-    public static bool IsEater(this NPC target) =>
-        target.type >= NPCID.EaterofWorldsHead && target.type <= NPCID.EaterofWorldsTail;
+    extension(NPC target)
+    {
+        public bool IsEater() =>
+            target.type >= NPCID.EaterofWorldsHead && target.type <= NPCID.EaterofWorldsTail;
 
-    public static bool IsDestroyer(this NPC target) =>
-        target.type >= NPCID.TheDestroyer && target.type <= NPCID.TheDestroyerTail;
+        public bool IsDestroyer() =>
+            target.type >= NPCID.TheDestroyer && target.type <= NPCID.TheDestroyerTail;
 
-    public static bool IsWormBoss(this NPC target) => target.IsDestroyer() ||
-                                                      target.IsEater();
+        public bool IsWormBoss() => target.IsDestroyer() ||
+                                    target.IsEater();
+    }
 
     public static bool AnyBosses()
     {
@@ -964,51 +965,53 @@ public static class PlayerTargeting
         return true;
     }
 
-    /// <summary>
-    /// Searches for players and NPC's and updates the target accordingly
-    /// </summary>
     /// <param name="npc">This <see cref="NPC"/></param>
-    /// <param name="target">Most typically <see cref="NPC.GetTargetData(bool)"/></param>
-    public static void SearchForTarget(this NPC npc, NPCAimedTarget target)
+    extension(NPC npc)
     {
-        if (!target.Invalid)
-            return;
-
-        NPCUtils.TargetSearchResults targetSearchResults = NPCUtils.SearchForTarget(npc);
-
-        if (!targetSearchResults.FoundTarget)
-            return;
-
-        // Check for players.
-        npc.target = targetSearchResults.NearestTargetIndex;
-        npc.targetRect = targetSearchResults.NearestTargetHitbox;
-    }
-
-    public static bool SearchForPlayerTarget(this NPC npc, out Player target, bool faceTarget = true)
-    {
-        if (npc.target < 0 || npc.target > Main.maxPlayers || !npc.HasValidTarget)
+        /// <summary>
+        /// Searches for players and NPC's and updates the target accordingly
+        /// </summary>
+        /// <param name="target">Most typically <see cref="NPC.GetTargetData(bool)"/></param>
+        public void SearchForTarget(NPCAimedTarget target)
         {
-            float distance = 0f;
-            float realDist = 0f;
-            bool t = false;
-            int tankTarget = -1;
-            foreach (Player player in Main.ActivePlayers)
+            if (!target.Invalid)
+                return;
+            TargetSearchResults targetSearchResults = Terraria.Utilities.NPCUtils.SearchForTarget(npc);
+
+            if (!targetSearchResults.FoundTarget)
+                return;
+
+            // Check for players.
+            npc.target = targetSearchResults.NearestTargetIndex;
+            npc.targetRect = targetSearchResults.NearestTargetHitbox;
+        }
+
+        public bool SearchForPlayerTarget(out Player target, bool faceTarget = true)
+        {
+            if (npc.target < 0 || npc.target > Main.maxPlayers || !npc.HasValidTarget)
             {
-                if (player.DeadOrGhost)
-                    npc.TryTrackingTarget(ref distance, ref realDist, ref t, ref tankTarget, player.whoAmI);
+                float distance = 0f;
+                float realDist = 0f;
+                bool t = false;
+                int tankTarget = -1;
+                foreach (Player player in Main.ActivePlayers)
+                {
+                    if (player.DeadOrGhost)
+                        npc.TryTrackingTarget(ref distance, ref realDist, ref t, ref tankTarget, player.whoAmI);
+                }
+
+                npc.SetTargetTrackingValues(faceTarget, realDist, tankTarget);
             }
 
-            npc.SetTargetTrackingValues(faceTarget, realDist, tankTarget);
-        }
+            if (npc.target >= 0 && npc.target < Main.maxPlayers && npc.HasValidTarget)
+            {
+                target = Main.player[npc.target];
+                return true;
+            }
 
-        if (npc.target >= 0 && npc.target < Main.maxPlayers && npc.HasValidTarget)
-        {
-            target = Main.player[npc.target];
-            return true;
+            target = null;
+            return false;
         }
-
-        target = null;
-        return false;
     }
 }
 

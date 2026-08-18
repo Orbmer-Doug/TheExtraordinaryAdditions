@@ -11,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 
 public class AlucardsSword : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AlucardsSword);
+    public override string Texture => AssetRegistry.GennedTextures.AlucardsSword.Path;
 
     public override void SetDefaults()
     {

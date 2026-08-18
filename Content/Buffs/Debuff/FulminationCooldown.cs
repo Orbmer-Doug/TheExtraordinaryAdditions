@@ -6,7 +6,7 @@ namespace TheExtraordinaryAdditions.Content.Buffs.Debuff;
 
 public class FulminationCooldown : ModBuff
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.FulminationCooldown);
+    public override string Texture => AssetRegistry.GennedTextures.FulminationCooldown.Path;
 
     public override void SetStaticDefaults()
     {

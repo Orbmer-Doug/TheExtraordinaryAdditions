@@ -9,7 +9,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Tools;
 
 public class PortableDONTTOUCHME : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.PortableDONTTOUCHME);
+    public override string Texture => AssetRegistry.GennedTextures.PortableDONTTOUCHME.Path;
 
     public override void SetStaticDefaults()
     {

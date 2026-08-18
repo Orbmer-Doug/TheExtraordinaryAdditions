@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 
 public class CryingEyeOfCthulhu : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CryingEyeOfCthulhu);
+    public override string Texture => AssetRegistry.GennedTextures.CryingEyeOfCthulhu.Path;
 
     public override void SetStaticDefaults()
     {

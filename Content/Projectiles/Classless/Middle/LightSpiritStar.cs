@@ -4,13 +4,14 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 
 public class LightSpiritStar : ModProjectile, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public static Color CurrentColor => MulticolorLerp(
         MathF.Pow(Sin01(Main.GlobalTimeWrappedHourly * MathHelper.Pi), 3), Color.Gold, Color.Goldenrod,
@@ -46,7 +47,7 @@ public class LightSpiritStar : ModProjectile, ILocalizedModType, IModType
             Projectile.soundDelay = 30 + Main.rand.Next(40);
             if (Main.rand.NextBool(5))
             {
-                SoundID.Item9.Play(Projectile.Center, .7f, 0f, 0f, null);
+                SoundID.Item9.Play(Projectile.Center, .7f, 0f, 0f);
             }
         }
 
@@ -70,7 +71,7 @@ public class LightSpiritStar : ModProjectile, ILocalizedModType, IModType
 
     public override void OnKill(int timeLeft)
     {
-        SoundID.Item4.Play(Projectile.Center, .7f, .1f, .1f, null, 20);
+        SoundID.Item4.Play(Projectile.Center, .7f, .1f, .1f, 20);
 
         for (int i = 0; i < 12; i++)
         {
@@ -100,8 +101,8 @@ public class LightSpiritStar : ModProjectile, ILocalizedModType, IModType
     {
         void star()
         {
-            Texture2D starTexture = AssetRegistry.GetTexture(AdditionsTexture.Sparkle);
-            Texture2D bloomTexture = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
+            Texture2D starTexture = AssetRegistry.GennedTextures.Sparkle;
+            Texture2D bloomTexture = AssetRegistry.GennedTextures.GlowParticleSmall;
             float rotation = Main.GlobalTimeWrappedHourly * 14f;
 
             Main.spriteBatch.DrawBetterRect(bloomTexture,

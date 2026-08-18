@@ -10,18 +10,15 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Early;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Early;
 
 public class DownpourHeld : BaseIdleHoldoutProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.DownpourHeld);
+    public override string Texture => AssetRegistry.GennedTextures.DownpourHeld.Path;
     public override int AssociatedItemID => ModContent.ItemType<Downpour>();
     public override int IntendedProjectileType => ModContent.ProjectileType<DownpourHeld>();
 
@@ -69,7 +66,7 @@ public class DownpourHeld : BaseIdleHoldoutProjectile
         Item ammoItem = Owner.ChooseAmmo(Item);
         Texture2D arrow = ammoItem != null
             ? ammoItem.ThisItemTexture()
-            : AssetRegistry.GetTexture(AdditionsTexture.Pixel);
+            : AssetRegistry.GennedTextures.Pixel;
 
         if (trail == null || trail.Disposed)
             trail = new(c => 2f,
@@ -191,17 +188,17 @@ public class DownpourHeld : BaseIdleHoldoutProjectile
         }
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override bool PreDraw(ref Color lightColor)
     {
         Item ammoItem = Owner.ChooseAmmo(Item);
         Texture2D arrow = ammoItem != null
             ? ammoItem.ThisItemTexture()
-            : AssetRegistry.GetTexture(AdditionsTexture.Pixel);
+            : AssetRegistry.GennedTextures.Pixel;
 
         if (trail != null && !trail.Disposed && cache != null)
-            trail.DrawTrail(ShaderRegistry.StandardPrimitiveShader, cache.Points, 100, false, false);
+            trail.DrawTrail(AssetRegistry.GennedShaders.StandardPrimitiveShader, cache.Points, 100, false, false);
 
         Texture2D texture = Projectile.ThisProjectileTexture();
         float rotation = Projectile.rotation;

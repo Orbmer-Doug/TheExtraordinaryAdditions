@@ -4,16 +4,14 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 
 public class GarciaShotgunHoldout : BaseIdleHoldoutProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GarciaShotgun);
+    public override string Texture => AssetRegistry.GennedTextures.GarciaShotgun.Path;
     public override int AssociatedItemID => ModContent.ItemType<GarciaShotgun>();
     public override int IntendedProjectileType => ModContent.ProjectileType<GarciaShotgunHoldout>();
 
@@ -129,7 +127,7 @@ public class GarciaShotgunHoldout : BaseIdleHoldoutProjectile
                     Main.rand.NextFloat(130f, 160f));
             }
 
-            AdditionsSound.Garciaboom.Play(pos, Shells > 0 ? 1.2f : .9f, Shells > 0 ? -.3f : 0f, .1f, 2);
+            AssetRegistry.GennedSounds.Garciaboom.Play(pos, Shells > 0 ? 1.2f : .9f, Shells > 0 ? -.3f : 0f, .1f, 2);
 
             // Push back the player
             float playerSpeed = Owner.velocity.Length();
@@ -149,7 +147,7 @@ public class GarciaShotgunHoldout : BaseIdleHoldoutProjectile
 
         if ((this.RunLocal() && Modded.SafeMouseRight.Current) && Wait <= 0f && !Taunting && Shells <= 0)
         {
-            AdditionsSound.Afraid.Play(Owner.Center, .7f);
+            AssetRegistry.GennedSounds.Afraid.Play(Owner.Center, .7f);
             Wait = time * 1.8f;
             Taunting = true;
             this.Sync();

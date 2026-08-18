@@ -7,23 +7,34 @@ using Terraria.GameContent.UI.BigProgressBar;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.BossBars;
 
 public class AsterlinBossbar : ModBossBar
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AsterlinBossbar);
+    public override string Texture => AssetRegistry.GennedTextures.AsterlinBossbar.Path;
 
     public override Asset<Texture2D> GetIconTexture(ref Rectangle? iconFrame)
     {
-        return ModContent.Request<Texture2D>(AssetRegistry.GetTexturePath(AdditionsTexture.Asterlin_Head_Boss));
+        return ModContent.Request<Texture2D>(AssetRegistry.GennedTextures.Asterlin_Head_Boss.Path);
     }
 
     public override bool PreDraw(SpriteBatch spriteBatch, NPC npc, ref BossBarDrawParams drawParams)
     {
-        (Texture2D barTexture, Vector2 barCenter, _, _, Color iconColor, float life, float lifeMax, float shield,
-            float shieldMax, float iconScale, bool showText, Vector2 textOffset) = drawParams;
+        drawParams.Deconstruct(out Texture2D barTexture,
+            out Vector2 barCenter,
+            out Color _,
+            out Texture2D _,
+            out Rectangle _,
+            out Color iconColor,
+            out float _,
+            out float _,
+            out float _,
+            out float _,
+            out float iconScale,
+            out bool showText,
+            out Vector2 textOffset);
 
         life = npc.life;
         lifeMax = npc.lifeMax;
@@ -40,8 +51,8 @@ public class AsterlinBossbar : ModBossBar
                 return false;
         }
 
-        Texture2D iconTexture = TextureAssets.NpcHeadBoss[headTextureIndex].Value;
-        Rectangle iconFrame = iconTexture.Frame();
+        Texture2D headtex = TextureAssets.NpcHeadBoss[headTextureIndex].Value;
+        Rectangle headframe = headtex.Frame();
 
         Point barSize = new(456, 22);
         Point topLeftOffset = new(32, 24);
@@ -50,8 +61,6 @@ public class AsterlinBossbar : ModBossBar
         Rectangle bgFrame = barTexture.Frame(verticalFrames: frameCount, frameY: 3);
         Color bgColor = Color.White * 0.2f;
 
-        int scale = (int) (barSize.X * lifeRatio);
-        scale -= scale % 2;
         Rectangle barFrame = barTexture.Frame(verticalFrames: frameCount, frameY: 2);
         barFrame.X += topLeftOffset.X;
         barFrame.Y += topLeftOffset.Y;
@@ -67,14 +76,14 @@ public class AsterlinBossbar : ModBossBar
 
         // Bar
         Main.spriteBatch.EnterShaderRegion();
-        ManagedShader shader = AssetRegistry.GetShader("AsterlinHealthbar");
-        shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise), 1, SamplerState.LinearWrap);
+        ManagedShader shader = AssetRegistry.GennedShaders.AsterlinHealthbar;
+        shader.SetTexture(AssetRegistry.GennedTextures.TechyNoise, 1, SamplerState.LinearWrap);
         shader.TrySetParameter("res", barSize.ToVector2() / 2f);
         shader.TrySetParameter("ratio", lifeRatio);
         shader.TrySetParameter("golden", npc.life == 1);
         shader.Render();
 
-        Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
+        Texture2D tex = AssetRegistry.GennedTextures.Pixel;
         Main.spriteBatch.Draw(tex,
             new Rectangle(((int) barTopLeft.X), ((int) barTopLeft.Y), ((int) barSize.X), ((int) barSize.Y)), null,
             Color.White, 0f, Vector2.Zero, SpriteEffects.None, 0);
@@ -88,7 +97,7 @@ public class AsterlinBossbar : ModBossBar
         Vector2 iconOffset = new(0f, 10f);
         Vector2 iconSize = new(34f, 46f);
         Vector2 iconPosition = iconOffset + iconSize * 0.5f;
-        spriteBatch.Draw(iconTexture, topLeft + iconPosition, iconFrame, iconColor, 0f, iconFrame.Size() / 2f,
+        spriteBatch.Draw(tex, topLeft + iconPosition, headframe, iconColor, 0f, headframe.Size() / 2f,
             iconScale * .6f, 0, 0f);
 
         // Health text

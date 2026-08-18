@@ -8,13 +8,11 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late.Zenith;
@@ -23,7 +21,7 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
 {
     public override int AssociatedItemID => ModContent.ItemType<UnparalleledCoalescence>();
     public override int IntendedProjectileType => ModContent.ProjectileType<CoalescenceHoldout>();
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.UnparalleledCoalescence);
+    public override string Texture => AssetRegistry.GennedTextures.UnparalleledCoalescence.Path;
 
     public override void Defaults()
     {
@@ -180,7 +178,7 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
                         {
                             LeadArrowIndex = Projectile.NewProj(middle, Projectile.velocity.SafeNormalize(Vector2.Zero),
                                 ModContent.ProjectileType<DivinityArrow>(), Projectile.damage, Projectile.knockBack,
-                                Owner.whoAmI, Projectile.whoAmI, 0f, 0);
+                                Owner.whoAmI, Projectile.whoAmI);
                             SecondArrowIndex = Projectile.NewProj(middle,
                                 Projectile.velocity.SafeNormalize(Vector2.Zero),
                                 ModContent.ProjectileType<DivinityArrow>(), Projectile.damage, Projectile.knockBack,
@@ -207,7 +205,7 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
                         }
 
                         CurrentState = CoalescenceState.Richochet;
-                        AdditionsSound.etherealBlazeStart.Play(middle, .7f, -.2f);
+                        AssetRegistry.GennedSounds.etherealBlazeStart.Play(middle, .7f, -.2f);
                         this.Sync();
                     }
 
@@ -242,7 +240,7 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
                         }
 
                         CurrentState = CoalescenceState.Pierce;
-                        AdditionsSound.etherealBlazeStart.Play(middle);
+                        AssetRegistry.GennedSounds.etherealBlazeStart.Play(middle);
                         this.Sync();
                     }
 
@@ -258,7 +256,7 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
                         }
 
                         CurrentState = CoalescenceState.Blast;
-                        AdditionsSound.etherealBlazeStart.Play(middle, 1.5f, .2f);
+                        AssetRegistry.GennedSounds.etherealBlazeStart.Play(middle, 1.5f, .2f);
                         this.Sync();
                     }
 
@@ -270,7 +268,8 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
 
                     if (!Modded.MouseLeft.Current && this.RunLocal())
                     {
-                        AdditionsSound.etherealRelease2.Play(middle, Main.rand.NextFloat(.9f, 1.2f), 0f, .1f, 0, Name);
+                        AssetRegistry.GennedSounds.etherealRelease2.Play(middle, Main.rand.NextFloat(.9f, 1.2f), 0f,
+                            .1f, 0, Name);
                         float speed = Utils.MultiLerp(InverseLerp(.33f, 1f, reel), 14f, 16f, 22f);
 
                         if (reel > .33f)
@@ -319,7 +318,7 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
         }
     }
 
-    public OptimizedPrimitiveTrail line;
+    public Trail line;
     public TrailPoints cache;
 
     public override bool PreDraw(ref Color lightColor)
@@ -328,8 +327,8 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
         {
             if (line == null || line.Disposed || cache == null)
                 return;
-            ManagedShader strings = ShaderRegistry.SmoothFlame;
-            strings.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DendriticNoise), 1);
+            ManagedShader strings = AssetRegistry.GennedShaders.SmoothFlame;
+            strings.SetTexture(AssetRegistry.GennedTextures.DendriticNoise, 1);
             strings.TrySetParameter("heatInterpolant", 10f);
             line.DrawTrail(strings, cache.Points, 150);
         }
@@ -345,7 +344,7 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
         // Draw the main bow
         Main.spriteBatch.Draw(texture, drawPosition, null, Projectile.GetAlpha(lightColor), rotation, origin,
             Projectile.scale, direction, 0f);
-        Main.spriteBatch.Draw(AssetRegistry.GetTexture(AdditionsTexture.UnparalleledCoalescence_Glow), drawPosition,
+        Main.spriteBatch.Draw(AssetRegistry.GennedTextures.UnparalleledCoalescence_Glow, drawPosition,
             null, Projectile.GetAlpha(Color.White), rotation, origin, Projectile.scale, direction, 0f);
         return false;
     }

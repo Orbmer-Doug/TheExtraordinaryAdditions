@@ -6,20 +6,18 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Middle;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
 
 public class StarWater : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.StarWater);
+    public override string Texture => AssetRegistry.GennedTextures.StarWater.Path;
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer ModdedOwner => Owner.Additions();
 
     public Vector2 Offset;
     public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(Offset);
@@ -51,7 +49,7 @@ public class StarWater : ModProjectile
     internal Color ColorFunction(SystemVector2 completionRatio, Vector2 position)
     {
         return Color.Lerp(Color.DarkSlateBlue, Color.MidnightBlue, completionRatio.X) *
-               UltrasmoothStep(1f, 0, completionRatio.X);
+               MathHelper.SmoothStep(1f, 0, completionRatio.X);
     }
 
     internal float WidthFunction(float completionRatio)
@@ -87,12 +85,12 @@ public class StarWater : ModProjectile
         {
             Projectile.timeLeft = 400;
             Projectile.Center = Vector2.Lerp(Projectile.Center,
-                Vector2.Lerp(Owner.Center, Owner.Center + new Vector2(0f, -300f) + Offset, Completion), .75f);
+                Vector2.Lerp(Owner.Center, Owner.Center + new Vector2(0f, -300f) + Offset, Back.OutFunction(Completion)), .75f);
             Projectile.Opacity = Completion;
             if (this.RunLocal())
             {
                 Projectile.velocity = Vector2.Lerp(Projectile.velocity,
-                    Projectile.SafeDirectionTo(ModdedOwner.MouseWorld + Offset) * 1.1f, .4f);
+                    Projectile.SafeDirectionTo(Owner.AdditionsMouse().MouseWorld + Offset) * 1.1f, .4f);
                 if (Projectile.velocity != Projectile.oldVelocity)
                     this.Sync();
             }
@@ -154,7 +152,7 @@ public class StarWater : ModProjectile
     }
 
     public TrailPoints cache = new(6);
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override bool PreDraw(ref Color lightColor)
     {
@@ -164,8 +162,8 @@ public class StarWater : ModProjectile
                 return;
             if (Released)
             {
-                ManagedShader shader = ShaderRegistry.WaterCurrent;
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WaterNoise), 1);
+                ManagedShader shader = AssetRegistry.GennedShaders.WaterCurrent;
+                shader.SetTexture(AssetRegistry.GennedTextures.WaterNoise, 1);
                 trail.DrawTrail(shader, cache.Points, 30);
             }
         }

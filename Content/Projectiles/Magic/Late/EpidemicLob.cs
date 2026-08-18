@@ -1,16 +1,13 @@
 ﻿using System.IO;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles.Shader;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
 
 public class EpidemicLob : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     private bool HitTarget
     {
@@ -58,8 +55,8 @@ public class EpidemicLob : ModProjectile
     {
         Lighting.AddLight(Projectile.Center, Color.Olive.ToVector3() * Projectile.scale);
 
-        float fadeInter = Terraria.Utils.GetLerpValue(0f, FadeIn, Timer, true);
-        float inter = InverseLerp(0f, Charge, Counter, true);
+        float fadeInter = Utils.GetLerpValue(0f, FadeIn, Timer, true);
+        float inter = InverseLerp(0f, Charge, Counter);
         Projectile.scale = fadeInter * (1f - inter);
 
         ShaderParticleRegistry.SpawnEpidemicParticle(Projectile.Center,
@@ -71,7 +68,7 @@ public class EpidemicLob : ModProjectile
             for (int i = 0; i < amt; i++)
             {
                 Vector2 vel = GetPointOnRotatedEllipse(3f, 8f, Projectile.velocity.ToRotation(),
-                    Terraria.Utils.Remap(i, 0, amt, 0f, MathHelper.TwoPi));
+                    Utils.Remap(i, 0, amt, 0f, MathHelper.TwoPi));
                 Vector2 pos = Projectile.Center + vel;
                 ShaderParticleRegistry.SpawnEpidemicParticle(pos, vel * Projectile.scale, Projectile.scale * 40f);
             }
@@ -79,7 +76,7 @@ public class EpidemicLob : ModProjectile
 
         if (Timer > FadeIn)
         {
-            if (HitTarget == false && HitGround == false)
+            if (!HitTarget && !HitGround)
             {
                 if (Projectile.velocity.Y < 16f)
                     Projectile.velocity.Y += .4f;
@@ -90,7 +87,7 @@ public class EpidemicLob : ModProjectile
         {
             NPC target = Main.npc[(int) EnemyID];
 
-            if (target == null || target.active == false)
+            if (target == null || !target.active)
                 return;
 
             if (!target.active)
@@ -190,7 +187,7 @@ public class EpidemicLob : ModProjectile
             }
         }
 
-        AdditionsSound.etherealChargeBoom2.Play(Projectile.Center, 1f, -.2f, 0f, 20, Name);
+        AssetRegistry.GennedSounds.etherealChargeBoom2.Play(Projectile.Center, 1f, -.2f, 0f, 20, Name);
         Projectile.friendly = true;
         Projectile.penetrate = -1;
         Projectile.ExpandHitboxBy(350);

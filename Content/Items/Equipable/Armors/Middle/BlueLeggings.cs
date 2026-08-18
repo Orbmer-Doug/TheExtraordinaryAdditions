@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
 [AutoloadEquip(EquipType.Legs)]
 public class BlueLeggings : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BlueLeggings);
+    public override string Texture => AssetRegistry.GennedTextures.BlueLeggings.Path;
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {

@@ -6,7 +6,7 @@ namespace TheExtraordinaryAdditions.Content.Buffs.Summon;
 
 public class DoohickeyBuff : ModBuff
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.DoohickeyBuff);
+    public override string Texture => AssetRegistry.GennedTextures.DoohickeyBuff.Path;
 
     public override void SetStaticDefaults()
     {

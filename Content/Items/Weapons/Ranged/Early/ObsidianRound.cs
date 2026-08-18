@@ -8,7 +8,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Early;
 
 public class ObsidianRound : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ObsidianRound);
+    public override string Texture => AssetRegistry.GennedTextures.ObsidianRound.Path;
 
     public override void SetStaticDefaults()
     {

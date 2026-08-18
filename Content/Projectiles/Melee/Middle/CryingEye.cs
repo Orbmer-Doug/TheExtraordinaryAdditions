@@ -8,7 +8,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
 public class CryingEye : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CryingEye);
+    public override string Texture => AssetRegistry.GennedTextures.CryingEye.Path;
 
     public override void SetStaticDefaults()
     {

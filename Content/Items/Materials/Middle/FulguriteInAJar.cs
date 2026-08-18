@@ -6,7 +6,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 
 public class FulguriteInAJar : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.FulguriteInAJar);
+    public override string Texture => AssetRegistry.GennedTextures.FulguriteInAJar.Path;
 
     public override void SetStaticDefaults()
     {

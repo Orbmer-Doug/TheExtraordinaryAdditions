@@ -2,15 +2,15 @@
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Debuff;
 using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
 // p
 public class AntiBulletp : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AntiBulletp);
+    public override string Texture => AssetRegistry.GennedTextures.AntiBulletp.Path;
 
     public override void SetDefaults()
     {
@@ -48,7 +48,7 @@ public class AntiBulletp : ModProjectile
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        AdditionsSound.AsterlinHit.Play(Projectile.Center, .9f, -.2f);
+        AssetRegistry.GennedSounds.AsterlinHit.Play(Projectile.Center, .9f, -.2f);
         Vector2 splatterDirection = Projectile.velocity * .5f;
         for (int i = 0; i < 12; i++)
         {

@@ -6,7 +6,7 @@ namespace TheExtraordinaryAdditions.Content.Buffs.Buff;
 
 public class SupremeWaterbreathing : ModBuff
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SupremeWaterbreathing);
+    public override string Texture => AssetRegistry.GennedTextures.SupremeWaterbreathing.Path;
 
     public override void SetStaticDefaults()
     {
@@ -16,7 +16,7 @@ public class SupremeWaterbreathing : ModBuff
 
     public override void Update(Player player, ref int buffIndex)
     {
-        player.Additions().BigOxygen = true;
+        player.AdditionsBuffs().BigOxygen = true;
         player.breath = player.breathMax + 91;
     }
 }

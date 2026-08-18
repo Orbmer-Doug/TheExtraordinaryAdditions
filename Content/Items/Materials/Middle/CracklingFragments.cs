@@ -9,7 +9,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 
 public class CracklingFragments : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CracklingFragments);
+    public override string Texture => AssetRegistry.GennedTextures.CracklingFragments.Path;
 
     public override void SetStaticDefaults()
     {

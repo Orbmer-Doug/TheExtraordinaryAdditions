@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Early;
 
 public class BrewingStorms : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BrewingStorms);
+    public override string Texture => AssetRegistry.GennedTextures.BrewingStorms.Path;
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {

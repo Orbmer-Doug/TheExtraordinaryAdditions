@@ -3,6 +3,7 @@ using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 using TheExtraordinaryAdditions.Core.DataStructures;
+using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
@@ -36,7 +37,7 @@ public partial class Asterlin : ModNPC
 
         if (AITimer > 50 && Sword == null && ExtraAI[0] < Swings_MaxSwingCount)
         {
-            if (this.RunServer())
+            if (ModProjectile.RunServer())
                 NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<CyberneticSword>(),
                     MediumAttackDamage, 0f);
         }

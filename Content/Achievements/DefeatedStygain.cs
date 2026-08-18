@@ -6,7 +6,7 @@ namespace TheExtraordinaryAdditions.Content.Achievements;
 
 public class DefeatedStygain : ModAchievement
 {
-    public override string TextureName => AssetRegistry.GetTexturePath(AdditionsTexture.DefeatedStygain);
+    public override string TextureName => AssetRegistry.GennedTextures.DefeatedStygain.Path;
 
     public override void SetStaticDefaults()
     {

@@ -5,20 +5,20 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
 
 public class TheStarsAreAfraid : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TheStarsAreAfraid);
+    public override string Texture => AssetRegistry.GennedTextures.TheStarsAreAfraid.Path;
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer ModdedOwner => Owner.Additions();
+    public PlayerMouse ModdedOwner => Owner.AdditionsMouse();
 
     public Vector2 Offset;
     public override void SendExtraAI(BinaryWriter writer) => writer.WriteVector2(Offset);
@@ -203,7 +203,7 @@ public class TheStarsAreAfraid : ModProjectile
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        AdditionsSound.MimicryLand.Play(target.Center, 1.2f, .1f);
+        AssetRegistry.GennedSounds.MimicryLand.Play(target.Center, 1.2f, .1f);
         for (int i = 0; i < 6; i++)
         {
             Vector2 pos = Projectile.RotHitbox().Right;
@@ -251,8 +251,8 @@ public class TheStarsAreAfraid : ModProjectile
             10f * Projectile.scale);
     }
 
-    public OptimizedPrimitiveTrail trail;
-    public OptimizedPrimitiveTrail tele;
+    public Trail trail;
+    public Trail tele;
     public TrailPoints cache;
     public TrailPoints teleCache;
 
@@ -262,13 +262,13 @@ public class TheStarsAreAfraid : ModProjectile
         {
             if (Released && trail != null && cache != null)
             {
-                ManagedShader shader = ShaderRegistry.BloodBeacon;
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FlameMap1), 1);
+                ManagedShader shader = AssetRegistry.GennedShaders.BloodBeaconShader;
+                shader.SetTexture(AssetRegistry.GennedTextures.FlameMap1, 1);
                 trail.DrawTrail(shader, cache.Points, 40);
             }
 
             if (tele != null && teleCache != null)
-                tele.DrawTrail(ShaderRegistry.StandardPrimitiveShader, teleCache.Points, 30);
+                tele.DrawTrail(AssetRegistry.GennedShaders.StandardPrimitiveShader, teleCache.Points, 30);
         }
 
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);

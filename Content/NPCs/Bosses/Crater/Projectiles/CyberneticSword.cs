@@ -6,22 +6,20 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 using static System.MathF;
 using static TheExtraordinaryAdditions.Content.Projectiles.Base.BaseSwordSwing;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 
 public class CyberneticSword : ProjOwnedByNPC<Asterlin>
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CyberneticSword);
+    public override string Texture => AssetRegistry.GennedTextures.CyberneticSword.Path;
 
     #region Variables
 
@@ -97,7 +95,7 @@ public class CyberneticSword : ProjOwnedByNPC<Asterlin>
     /// </summary>
     public float Animation()
     {
-        return Animators.Exp(2.2f).InOutFunction.Evaluate(Time, 0f, MaxTime, -1f, 1f);
+        return Expo(2.2f).InOutFunction.Evaluate(Time, 0f, MaxTime, -1f, 1f);
     }
 
     public float SwingOffset()
@@ -168,7 +166,7 @@ public class CyberneticSword : ProjOwnedByNPC<Asterlin>
         return Rect().Intersects(targetHitbox);
     }
 
-    public override bool? CanDamage() => SwingCompletion.BetweenNum(.3f, .8f, true) ? null : false;
+    public override bool? CanDamage() => SwingCompletion is >= .3f and <= .8f ? null : false;
 
     public override void CutTiles()
     {
@@ -200,7 +198,7 @@ public class CyberneticSword : ProjOwnedByNPC<Asterlin>
                 Main.rand.NextFloat(.4f, .6f), Color.Crimson);
         }
 
-        AdditionsSound.RoySpecial2.Play(start, .6f, 0f, .3f);
+        AssetRegistry.GennedSounds.RoySpecial2.Play(start, .6f, 0f, .3f);
     }
 
     #endregion
@@ -258,7 +256,7 @@ public class CyberneticSword : ProjOwnedByNPC<Asterlin>
                     float angle = initDir + Lerp(-maxRad / 2, maxRad / 2, completion) + angleOffset + off;
                     Vector2 pos = Owner.Center + PolarVector(dist, angle);
                     Vector2 vel = PolarVector(10f, angle);
-                    if (this.RunServer())
+                    if (ModProjectile.RunServer())
                         SpawnProjectile(pos, vel * speed, ModContent.ProjectileType<GodPiercingDart>(),
                             Asterlin.LightAttackDamage, 0f);
                 }
@@ -267,7 +265,7 @@ public class CyberneticSword : ProjOwnedByNPC<Asterlin>
                 speed /= 2;
             }
 
-            AdditionsSound.MediumSwing.Play(Projectile.Center, .6f, 0f, .2f, 20, Name);
+            AssetRegistry.GennedSounds.MediumSwing.Play(Projectile.Center, .6f, 0f, .2f, 20, Name);
             PlayedSound = true;
             Projectile.netUpdate = true;
         }
@@ -331,7 +329,7 @@ public class CyberneticSword : ProjOwnedByNPC<Asterlin>
     /// </summary>
     public override bool ShouldUpdatePosition() => false;
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints old = new(25);
 
     public float WidthFunct(float c)
@@ -372,8 +370,8 @@ public class CyberneticSword : ProjOwnedByNPC<Asterlin>
             if (trail == null || old == null || SwingCompletion < .4f)
                 return;
 
-            ManagedShader shader = AssetRegistry.GetShader("CyberneticTrail");
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise), 0, SamplerState.AnisotropicWrap);
+            ManagedShader shader = AssetRegistry.GennedShaders.CyberneticTrail;
+            shader.SetTexture(AssetRegistry.GennedTextures.TechyNoise, 0, SamplerState.AnisotropicWrap);
             shader.TrySetParameter("firstColor", Color.Cyan.ToVector3());
             shader.TrySetParameter("secondaryColor", Color.Cyan.ToVector3());
             shader.TrySetParameter("tertiaryColor", Color.DarkCyan.ToVector3());

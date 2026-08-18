@@ -3,16 +3,13 @@ using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
-using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles.Shader;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Pets;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 using TheExtraordinaryAdditions.Core.Netcode;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Core.Globals.NPCGlobal;
 
@@ -226,7 +223,7 @@ public class AdditionsGlobalNPC : GlobalNPC
         if (Eclipsed > 0)
         {
             spriteBatch.SetBlendState(BlendState.Additive);
-            Texture2D bloomTexture = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
+            Texture2D bloomTexture = AssetRegistry.GennedTextures.GlowParticleSmall;
             float properBloomSize = bloomTexture.Height / (float) bloomTexture.Height;
             Color color = Color.Lerp(Color.OrangeRed, Color.Gray, (float) MathF.Sin(Main.GlobalTimeWrappedHourly * 2f));
             Vector2 sparkCenter = npc.Center - Main.screenPosition;
@@ -253,7 +250,7 @@ public class AdditionsGlobalNPC : GlobalNPC
                 if (!NPC.downedGolemBoss)
                 {
                     if (!Main.LocalPlayer.dead && Main.LocalPlayer.active)
-                        AdditionsSound.heartbeat.Play(npc.Center, 7f);
+                        AssetRegistry.GennedSounds.heartbeat.Play(npc.Center, 7f);
 
                     for (int i = 0; i < 120; i++)
                     {

@@ -5,7 +5,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Late.Zenith;
-using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
+using TheExtraordinaryAdditions.Content.Rarities;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
 
@@ -13,7 +13,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
 
 public class FinalStrike : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.FinalStrike);
+    public override string Texture => AssetRegistry.GennedTextures.FinalStrike.Path;
 
     public override void SetDefaults()
     {
@@ -79,13 +79,11 @@ public class FinalStrike : ModItem
         Recipe recipe = CreateRecipe();
         recipe.AddIngredient(ItemID.Spear);
         recipe.AddIngredient(ItemID.DarkLance);
-        recipe.AddIngredient(ModContent.ItemType<DecayingCutlery>());
         recipe.AddIngredient(ItemID.Gungnir);
         recipe.AddIngredient(ItemID.NorthPole);
         recipe.AddIngredient(ItemID.DayBreak);
-        recipe.AddIngredient(ModContent.ItemType<AbyssalCurrents>());
         recipe.AddIngredient(ModContent.ItemType<CondereFulmina>());
-        //TODO
+        recipe.AddTile(TileID.LunarCraftingStation);
         recipe.Register();
     }
 }

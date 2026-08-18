@@ -1,15 +1,14 @@
-﻿using Terraria;
-using Terraria.ID;
+﻿using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
-using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
+using TheExtraordinaryAdditions.Content.Rarities;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
 
 public class LightripRounds : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.LightripRounds);
+    public override string Texture => AssetRegistry.GennedTextures.LightripRounds.Path;
 
     public override void SetStaticDefaults()
     {

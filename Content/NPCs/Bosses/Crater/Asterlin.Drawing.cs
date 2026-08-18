@@ -9,9 +9,9 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 using TheExtraordinaryAdditions.Content.World.Subworlds;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 
@@ -204,13 +204,13 @@ public partial class Asterlin : IHasScreenShader
     public TrailPoints OldPositions = new(30);
 
     public TrailPoints LeftLegPoints = new(30);
-    public OptimizedPrimitiveTrail LeftLegFlame;
+    public Trail LeftLegFlame;
 
     public TrailPoints RightLegPoints = new(30);
-    public OptimizedPrimitiveTrail RightLegFlame;
+    public Trail RightLegFlame;
 
     public TrailPoints FlameEngulfPoints = new(10);
-    public OptimizedPrimitiveTrail FlameEngulfTrail;
+    public Trail FlameEngulfTrail;
 
     public static float[] BlurWeights = new float[12];
 
@@ -266,24 +266,10 @@ public partial class Asterlin : IHasScreenShader
         if (SubworldSystem.IsActive<CloudedCrater>() && FindNPC(out NPC npc, ModContent.NPCType<Asterlin>()))
         {
             Asterlin aster = npc.As<Asterlin>();
-            if (Main.netMode == NetmodeID.SinglePlayer && aster.CurrentState == AsterlinAIType.DesperationDrama &&
-                aster.AITimer >= DesperationDrama_Wait)
-            {
-                if (aster.PlayerTarget.whoAmI == Main.myPlayer)
-                {
-                    string text = GetTextValue(LocalizedKey + "DialogueHint");
-                    Main.spriteBatch.ResetToDefaultUI(false);
-                    Main.spriteBatch.DrawText(text, 1,
-                        aster.PlayerTarget.Center + Vector2.UnitY * 60f - Main.screenPosition, Color.White, Color.Black,
-                        new(.5f, 0f), aster.Dialogue_ScreenInterpolant);
-                    Main.spriteBatch.End();
-                }
-            }
-
             if (aster.CurrentState == AsterlinAIType.UnveilingZenith)
             {
                 Main.spriteBatch.ResetToDefaultUI(false);
-                Texture2D arrow = AssetRegistry.GetTexture(AdditionsTexture.FireballArrow);
+                Texture2D arrow = AssetRegistry.GennedTextures.FireballArrow;
                 arrowFrameCounter++;
                 if (arrowFrameCounter > 10)
                 {
@@ -512,12 +498,12 @@ public partial class Asterlin : IHasScreenShader
         if (FlameEngulfTrail == null || FlameEngulfTrail.Disposed)
             FlameEngulfTrail = new(FlameEngulfWidthFunct, FlameEngulfColorFunct, null, 8);
 
-        RotatedHitbox = new(NPC.position, NPC.Size, BodyRotation);
+        RotatedHitbox = new(NPC.position, NPC.Size, BodyRotation, Vector2.Zero);
         FlameEngulfPoints?.Update(RotatedHitbox.Center + fixedVel +
                                   fixedVel.SafeNormalize(Vector2.Zero) * RotatedHitbox.Height / 2);
 
         if (!ManualMotionBlurInterpolant)
-            MotionBlurInterpolant = Animators.MakePoly(2.5f).InFunction(InverseLerp(30f, 80f, fixedVel.Length()));
+            MotionBlurInterpolant = MakePoly(2.5f).InFunction(InverseLerp(30f, 80f, fixedVel.Length()));
     }
 
     public void ResetGraphics()
@@ -626,7 +612,7 @@ public partial class Asterlin : IHasScreenShader
             offset = PolarVector(6f * Direction, handRot);
             fx |= FXForArmJoint(handRot) | flip;
             Main.spriteBatch.DrawBetter(atlas, joints[2].Position + offset,
-                handSource, color, handRot, new(handSource.Width / 2, 0f), ZPosition, fx);
+                handSource, color, handRot, new(handSource.Width / 2f, 0f), ZPosition, fx);
             DrawGlowForPiece(glow, joints[2].Position + offset, handSource, handRot, new(handSource.Width / 2f, 0f),
                 fx);
         }
@@ -662,24 +648,19 @@ public partial class Asterlin : IHasScreenShader
 
         if (EyeGleamInterpolant > 0f)
         {
-            void gleam()
-            {
-                Texture2D star = AssetRegistry.GetTexture(AdditionsTexture.LensStar);
-                Vector2 scale = new(Animators.MakePoly(4f).OutFunction.Evaluate(0f, 400f, EyeGleamInterpolant),
-                    Animators.MakePoly(2f).InOutFunction.Evaluate(0f, 50f, EyeGleamInterpolant));
-                float rot = BodyRotation;
-                Main.spriteBatch.DrawBetterRect(star, ToTarget(EyePosition + NPC.velocity, scale * .4f), null,
-                    Color.LightCyan, rot, star.Size() / 2);
-                Main.spriteBatch.DrawBetterRect(star, ToTarget(EyePosition + NPC.velocity, scale), null, Color.Cyan,
-                    rot, star.Size() / 2);
-            }
-
-            PixelationSystem.QueueTextureRenderAction(gleam, PixelationLayer.OverNPCs, BlendState.Additive);
+            Texture2D star = AssetRegistry.GennedTextures.LensStar;
+            Vector2 scale = new(MakePoly(4f).OutFunction.Evaluate(0f, 400f, EyeGleamInterpolant),
+                MakePoly(2f).InOutFunction.Evaluate(0f, 50f, EyeGleamInterpolant));
+            float rot = BodyRotation;
+            SpriteBatch.DrawRectPixelated(PixelationLayer.OverNPCs, BlendState.Additive, star, ToTarget(EyePosition + NPC.velocity, scale * .4f), null,
+                Color.LightCyan, rot, star.Size() / 2);
+            SpriteBatch.DrawRectPixelated(PixelationLayer.OverNPCs, BlendState.Additive, star, ToTarget(EyePosition + NPC.velocity, scale), null, Color.Cyan,
+                rot, star.Size() / 2);
         }
     }
 
     public float FlameWidthFunct(float completionRatio) =>
-        SmoothStep(32f, 8f, Animators.MakePoly(1.4f).OutFunction(completionRatio)) * NPC.scale;
+        SmoothStep(32f, 8f, MakePoly(1.4f).OutFunction(completionRatio)) * NPC.scale;
 
     public Color FlameColorFunct(SystemVector2 completionRatio, Vector2 pos)
     {
@@ -718,9 +699,9 @@ public partial class Asterlin : IHasScreenShader
 
         void flame()
         {
-            ManagedShader shader = ShaderRegistry.SmoothFlame;
+            ManagedShader shader = AssetRegistry.GennedShaders.SmoothFlame;
             shader.TrySetParameter("heatInterpolant", 1.9f);
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WavyBlotchNoise), 1, SamplerState.LinearWrap);
+            shader.SetTexture(AssetRegistry.GennedTextures.WavyBlotchNoise, 1, SamplerState.LinearWrap);
 
             if (LeftLegFlame != null && !LeftLegFlame.Disposed)
                 LeftLegFlame.DrawTrail(shader, LeftLegPoints.Points, 200, true);
@@ -735,13 +716,13 @@ public partial class Asterlin : IHasScreenShader
     public float FlameEngulfWidthFunct(float c)
     {
         float baseWidth = Lerp(RotatedHitbox.Height, 50f, c);
-        float tipSmoothenFactor = MathF.Sqrt(1f - Animators.MakePoly(3f).InFunction(InverseLerp(0.3f, 0.015f, c)));
+        float tipSmoothenFactor = MathF.Sqrt(1f - MakePoly(3f).InFunction(InverseLerp(0.3f, 0.015f, c)));
         return NPC.scale * baseWidth * tipSmoothenFactor;
     }
 
     public Color FlameEngulfColorFunct(SystemVector2 c, Vector2 pos)
     {
-        Color trailColor = MulticolorLerp(Animators.MakePoly(2.45f).OutFunction(c.X) * 0.7f, new(196, 240, 255),
+        Color trailColor = MulticolorLerp(MakePoly(2.45f).OutFunction(c.X) * 0.7f, new(196, 240, 255),
             new(125, 222, 255), new(31, 198, 255));
         return trailColor * (1 - c.X) * FlameEngulfInterpolant;
     }
@@ -752,8 +733,8 @@ public partial class Asterlin : IHasScreenShader
         {
             if (FlameEngulfTrail != null && !FlameEngulfTrail.Disposed && FlameEngulfPoints != null)
             {
-                ManagedShader shader = AssetRegistry.GetShader("FlameEngulfShader");
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TurbulentNoise), 1,
+                ManagedShader shader = AssetRegistry.GennedShaders.FlameEngulfShader;
+                shader.SetTexture(AssetRegistry.GennedTextures.TurbulentNoise, 1,
                     SamplerState.AnisotropicWrap);
                 shader.TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly * 1.2f);
                 FlameEngulfTrail.DrawTrail(shader, FlameEngulfPoints.Points, 100, true);
@@ -836,9 +817,9 @@ public partial class Asterlin : IHasScreenShader
             return;
         Asterlin asterlin = npc.As<Asterlin>();
 
-        Texture2D atlas = AssetRegistry.GetTexture(AdditionsTexture.AsterlinAtlas);
-        Texture2D glow = AssetRegistry.GetTexture(AdditionsTexture.AsterlinAtlasGlow);
-        Texture2D vent = AssetRegistry.GetTexture(AdditionsTexture.AsterlinAtlasVentGlow);
+        Texture2D atlas = AssetRegistry.GennedTextures.AsterlinAtlas;
+        Texture2D glow = AssetRegistry.GennedTextures.AsterlinAtlasGlow;
+        Texture2D vent = AssetRegistry.GennedTextures.AsterlinAtlasVentGlow;
 
         SpriteEffects flip = asterlin.LookingStraight
             ? SpriteEffects.None
@@ -893,7 +874,7 @@ public partial class Asterlin : IHasScreenShader
 
         if (asterlin.PowerInterpolant > 0f)
         {
-            ManagedShader shader = AssetRegistry.GetShader("AsterlinPower");
+            ManagedShader shader = AssetRegistry.GennedShaders.AsterlinPower;
             shader.TrySetParameter("time", Main.GlobalTimeWrappedHourly * 3f);
             shader.TrySetParameter("resolution", new Vector2(2000f));
             shader.TrySetParameter("opacity", asterlin.PowerInterpolant);
@@ -924,20 +905,20 @@ public partial class Asterlin : IHasScreenShader
         if (asterlin.CurrentState == AsterlinAIType.GabrielLeave && asterlin.AITimer > GabrielLeave_HoverTime)
         {
             color = Color.Black;
-            ManagedShader shader = AssetRegistry.GetShader("AsterlinDisintegration");
+            ManagedShader shader = AssetRegistry.GennedShaders.AsterlinDisintegration;
             shader.TrySetParameter("interpolant", asterlin.DisintegrationInterpolant);
             shader.TrySetParameter("center", WorldSpaceToScreenUV(asterlin.NPC.Center));
             shader.TrySetParameter("screenPosition", Main.screenPosition);
             shader.TrySetParameter("texSize", post.Size());
             shader.TrySetParameter("direction", Vector2.UnitY);
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.OrganicNoise), 1, SamplerState.LinearWrap);
+            shader.SetTexture(AssetRegistry.GennedTextures.OrganicNoise, 1, SamplerState.LinearWrap);
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp,
                 DepthStencilState.None, Main.Rasterizer, shader.Effect, Main.GameViewMatrix.TransformationMatrix);
         }
         else if (asterlin.MotionBlurInterpolant > 0f)
         {
-            ManagedShader shader = AssetRegistry.GetShader("MotionBlurShader");
+            ManagedShader shader = AssetRegistry.GennedShaders.MotionBlurShader;
             shader.TrySetParameter("blurInterpolant", asterlin.MotionBlurInterpolant);
             shader.TrySetParameter("blurWeights", BlurWeights);
             shader.TrySetParameter("blurDirection", asterlin.NPC.velocity.SafeNormalize(Vector2.UnitY) * 2f);

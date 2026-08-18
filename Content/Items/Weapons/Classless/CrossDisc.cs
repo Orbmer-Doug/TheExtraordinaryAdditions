@@ -3,15 +3,15 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Projectiles.Classless.Late.CrossCode;
-using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
+using TheExtraordinaryAdditions.Content.Projectiles.Classless.Late;
+using TheExtraordinaryAdditions.Content.Rarities;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Classless;
 
 public class CrossDisc : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CrossDisc);
+    public override string Texture => AssetRegistry.GennedTextures.CrossDisc.Path;
 
     public override void SetStaticDefaults()
     {

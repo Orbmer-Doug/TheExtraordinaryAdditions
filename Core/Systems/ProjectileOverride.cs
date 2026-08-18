@@ -1,10 +1,8 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Reflection;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using Terraria;
-using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Config;
 
@@ -24,11 +22,12 @@ public abstract class ProjectileOverride
 
             ProjectileOverride instance = (ProjectileOverride) Activator.CreateInstance(type);
 
-            BehaviorOverrideSet.Add(instance.ProjectileOverrideType, instance);
+            if (instance != null)
+                BehaviorOverrideSet.Add(instance.ProjectileOverrideType, instance);
         }
     }
 
-    public abstract int ProjectileOverrideType { get; }
+    protected abstract int ProjectileOverrideType { get; }
 
     public virtual void SetDefaults(Projectile proj)
     {

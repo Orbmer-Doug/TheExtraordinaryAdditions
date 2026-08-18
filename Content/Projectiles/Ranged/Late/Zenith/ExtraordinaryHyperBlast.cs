@@ -3,13 +3,11 @@ using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late.Zenith;
@@ -19,7 +17,7 @@ public class ExtraordinaryHyperBlast : ModProjectile, ILocalizedModType, IModTyp
     private const int Lifetime = 35;
     public float Completion => 1f - Utils.GetLerpValue(0f, Lifetime, Projectile.timeLeft);
     public float Radius => Circ.OutFunction.Evaluate(0f, 120f * Projectile.scale, Completion);
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -41,7 +39,7 @@ public class ExtraordinaryHyperBlast : ModProjectile, ILocalizedModType, IModTyp
 
         if (Projectile.ai[2] == 0f)
         {
-            AdditionsSound.etherealMagicBlast.Play(Projectile.Center, 2.5f, 0f, .1f, 1, Name);
+            AssetRegistry.GennedSounds.etherealMagicBlast.Play(Projectile.Center, 2.5f, 0f, .1f, 1, Name);
             for (int i = 0; i < 130; i++)
             {
                 Vector2 pos = Projectile.Center;
@@ -50,7 +48,7 @@ public class ExtraordinaryHyperBlast : ModProjectile, ILocalizedModType, IModTyp
                 int life = Main.rand.Next(20, 35);
                 Color col = Color.Lerp(Color.Gold, Color.DarkGoldenrod, Main.rand.NextFloat());
                 ParticleRegistry.SpawnGlowParticle(pos, vel, life, size, col);
-                ParticleRegistry.SpawnHeavySmokeParticle(pos, vel, life, size, col * 1.4f, .9f, true);
+                ParticleRegistry.SpawnHeavySmokeParticle(pos, vel, life, size, col * 1.4f, .9f);
 
                 if (i % 2 == 1)
                     ParticleRegistry.SpawnBloomLineParticle(pos, vel * Main.rand.NextFloat(1.4f, 2.2f), life - 10,
@@ -115,17 +113,17 @@ public class ExtraordinaryHyperBlast : ModProjectile, ILocalizedModType, IModTyp
     private Color ColorFunct(SystemVector2 c, Vector2 position) => Color.Lerp(Color.White, Color.Gold, Completion) *
                                                                    GetLerpBump(0f, .1f, 1f, .8f, Completion);
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override bool PreDraw(ref Color lightColor)
     {
         void draw()
         {
-            ManagedShader beam = ShaderRegistry.EnlightenedBeam;
+            ManagedShader beam = AssetRegistry.GennedShaders.EnlightenedBeam;
             beam.TrySetParameter("time", Projectile.timeLeft * 0.01f);
             beam.TrySetParameter("repeats", 6f);
-            beam.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.StreakMagma), 1, SamplerState.LinearWrap);
-            beam.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WavyNeurons), 2, SamplerState.LinearWrap);
+            beam.SetTexture(AssetRegistry.GennedTextures.StreakMagma, 1, SamplerState.LinearWrap);
+            beam.SetTexture(AssetRegistry.GennedTextures.WavyNeurons, 2, SamplerState.LinearWrap);
             trail.DrawTrail(beam, points.Points, 500);
         }
 

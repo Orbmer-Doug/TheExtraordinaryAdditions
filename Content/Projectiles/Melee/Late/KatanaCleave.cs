@@ -4,20 +4,19 @@ using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
-using static TheExtraordinaryAdditions.Core.Graphics.Animators;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
 
 public class KatanaCleave : BaseSwordSwing
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.KatanaCleave);
+    public override string Texture => AssetRegistry.GennedTextures.KatanaCleave.Path;
 
     public override int SwingTime => 30;
     public override int StopTimeFrames => 0;
@@ -92,7 +91,7 @@ public class KatanaCleave : BaseSwordSwing
         // swoosh
         if (Animation() >= .26f && !PlayedSound && !Main.dedServ)
         {
-            AdditionsSound.MediumSwing2.Play(Projectile.Center, .6f,
+            AssetRegistry.GennedSounds.MediumSwing2.Play(Projectile.Center, .6f,
                 Swing switch { Power.Main => 0f, Power.Second => -.3f, Power.Third => -.5f, _ => 0f }, .2f, 0, Name);
             PlayedSound = true;
         }
@@ -201,7 +200,7 @@ public class KatanaCleave : BaseSwordSwing
         npc.velocity += SwordDir * Item.knockBack * npc.knockBackResist;
 
         ScreenShakeSystem.New(new(.1f, .1f), start);
-        AdditionsSound.RoySpecial2.Play(start, .6f, 0f, .3f);
+        AssetRegistry.GennedSounds.RoySpecial2.Play(start, .6f, 0f, .3f);
     }
 
     public override void PlayerHitEffects(in Vector2 start, in Vector2 end, Player player, Player.HurtInfo info)
@@ -221,7 +220,7 @@ public class KatanaCleave : BaseSwordSwing
         }
 
         ScreenShakeSystem.New(new(.1f, .1f), start);
-        AdditionsSound.RoySpecial2.Play(start, .6f, 0f, .3f);
+        AssetRegistry.GennedSounds.RoySpecial2.Play(start, .6f, 0f, .3f);
     }
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
@@ -258,7 +257,7 @@ public class KatanaCleave : BaseSwordSwing
         return MulticolorLerp(c.X, Color.White, Color.Gray, Color.DarkGray) * opacity;
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints points = new(40);
 
     public override bool PreDraw(ref Color lightColor)
@@ -289,9 +288,9 @@ public class KatanaCleave : BaseSwordSwing
             if (trail == null || points == null)
                 return;
 
-            ManagedShader shader = AssetRegistry.GetShader("KatanaTrail");
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.WavyBlotchNoise), 0);
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DarkTurbulentNoise), 1);
+            ManagedShader shader = AssetRegistry.GennedShaders.KatanaTrail;
+            shader.SetTexture(AssetRegistry.GennedTextures.WavyBlotchNoise, 0);
+            shader.SetTexture(AssetRegistry.GennedTextures.DarkTurbulentNoise, 1);
             shader.TrySetParameter("flip", flip);
             shader.TrySetParameter("globalTime", Main.GlobalTimeWrappedHourly);
             trail.DrawTrail(shader, points.Points);
@@ -321,7 +320,7 @@ public class KatanaCleave : BaseSwordSwing
 
 public class KatanaSweep : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.KatanaCleave);
+    public override string Texture => AssetRegistry.GennedTextures.KatanaCleave.Path;
 
     public override void SetDefaults()
     {
@@ -336,7 +335,7 @@ public class KatanaSweep : ModProjectile
     }
 
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
+    public PlayerMouse Modded => Owner.AdditionsMouse();
 
     public int Time
     {
@@ -398,12 +397,12 @@ public class KatanaSweep : ModProjectile
 
             Vector2 start = Projectile.Center;
             Vector2 end = start + Projectile.velocity * Dist;
-            Vector2? tile = RaytraceTiles(start, end);
+            Vector2? tile = RaycastTiles(start, end);
             if (tile.HasValue)
                 End = tile.Value - PolarVector(Owner.Size.Length() / 2, Projectile.velocity.ToRotation());
             else
                 End = end;
-            AdditionsSound.HeavySwordSwing.Play(Owner.Center, 1.5f, .2f);
+            AssetRegistry.GennedSounds.HeavySwordSwing.Play(Owner.Center, 1.5f, .2f);
 
             Init = true;
             this.Sync();
@@ -463,7 +462,7 @@ public class KatanaSweep : ModProjectile
                         Projectile.NewProj(pos, vel, ModContent.ProjectileType<KatanaSlice>(),
                             (int) (Projectile.damage * .3f), 0f, Owner.whoAmI);
 
-                        AdditionsSound.SwordSliceShort.Play(pos, .4f, .1f, 0f, 0, Name);
+                        AssetRegistry.GennedSounds.SwordSliceShort.Play(pos, .4f, .1f, 0f, 0, Name);
                     }
                 }
 
@@ -520,32 +519,30 @@ public class KatanaSweep : ModProjectile
 
         if (Init)
         {
-            void slice()
+            Texture2D line = AssetRegistry.GennedTextures.BloomLine;
+
+            Vector2 lineOrig = line.Size() * 0.5f;
+            float opac = MakePoly(2f).InFunction(InverseLerp(20f, 0f, TotalTime)) * 3f;
+            Color col = Color.Lerp(Color.SlateGray, Color.Gray, Projectile.identity / 7f % 1f) * opac;
+
+            float width = InitialStart.Distance(End) *
+                          MakePoly(6f).OutFunction(InverseLerp(0f, SliceTime * 2, TotalTime));
+            float height = Projectile.ThisProjectileTexture().Height / 3f;
+            float rot = Projectile.velocity.ToRotation();
+            Vector2 size = new(width, height);
+            Vector2 pos = (InitialStart + End) / 2f;
+
+            for (float i = .5f; i < 1f; i += .05f)
             {
-                Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.BloomLine);
-
-                Vector2 origin = tex.Size() * 0.5f;
-                float opac = MakePoly(2f).InFunction(InverseLerp(20f, 0f, TotalTime)) * 3f;
-                Color col = Color.Lerp(Color.SlateGray, Color.Gray, Projectile.identity / 7f % 1f) * opac;
-
-                float width = InitialStart.Distance(End) *
-                              MakePoly(6f).OutFunction(InverseLerp(0f, SliceTime * 2, TotalTime));
-                float height = Projectile.ThisProjectileTexture().Height / 3;
-                float rot = Projectile.velocity.ToRotation();
-                Vector2 size = new(width, height);
-                Vector2 pos = (InitialStart + End) / 2f;
-
-                for (float i = .5f; i < 1f; i += .05f)
-                {
-                    Main.spriteBatch.DrawBetterRect(tex, ToTarget(pos, size * i * .4f * opac), null, Color.White * opac,
-                        rot, origin);
-                    Main.spriteBatch.DrawBetterRect(tex, ToTarget(pos, size * i), null, col, rot, origin);
-                    Main.spriteBatch.DrawBetterRect(tex, ToTarget(pos, size * i * 1.3f), null,
-                        Color.DarkSlateBlue * opac * .4f, rot, origin);
-                }
+                SpriteBatch.DrawRectPixelated(PixelationLayer.Dusts, BlendState.Additive, line,
+                    ToTarget(pos, size * i * .4f * opac), null, Color.White * opac,
+                    rot, lineOrig);
+                SpriteBatch.DrawRectPixelated(PixelationLayer.Dusts, BlendState.Additive, line, ToTarget(pos, size * i),
+                    null, col, rot, lineOrig);
+                SpriteBatch.DrawRectPixelated(PixelationLayer.Dusts, BlendState.Additive, line,
+                    ToTarget(pos, size * i * 1.3f), null,
+                    Color.DarkSlateBlue * opac * .4f, rot, lineOrig);
             }
-
-            PixelationSystem.QueueTextureRenderAction(slice, PixelationLayer.Dusts, BlendState.Additive);
         }
 
         return false;
@@ -554,7 +551,7 @@ public class KatanaSweep : ModProjectile
 
 public class KatanaSlice : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SeamStrike);
+    public override string Texture => AssetRegistry.GennedTextures.SeamStrike.Path;
 
     public override void SetDefaults()
     {
@@ -606,34 +603,32 @@ public class KatanaSlice : ModProjectile
     public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
     {
         Vector2 size = new(Size.X / 2, 10);
-        return new RotatedRectangle(Projectile.Center - size / 2, size, Projectile.rotation).Intersects(targetHitbox);
+        return new RotatedRectangle(Projectile.Center - size / 2, size, Projectile.rotation, Vector2.Zero)
+            .Intersects(targetHitbox);
     }
 
     public override bool ShouldUpdatePosition() => false;
 
     public override bool PreDraw(ref Color lightColor)
     {
-        void draw()
+        Texture2D tex = AssetRegistry.GennedTextures.GlowParticleSmall;
+
+        Vector2 origin = tex.Size() * 0.5f;
+        Color col = Color.Lerp(Color.SlateGray, Color.Gray, Projectile.identity / 7f % 1f) * Projectile.Opacity;
+
+        for (float i = .5f; i < 1f; i += .1f)
         {
-            float progress = InverseLerp(0f, Time, MaxTime);
-            Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
-
-            Vector2 origin = tex.Size() * 0.5f;
-            Color col = Color.Lerp(Color.SlateGray, Color.Gray, Projectile.identity / 7f % 1f) * Projectile.Opacity;
-
-            for (float i = .5f; i < 1f; i += .1f)
-            {
-                Main.spriteBatch.DrawBetterRect(tex,
-                    ToTarget(Projectile.Center, Size.ToVector2() * i * .4f * Projectile.Opacity), null,
-                    Color.White * Projectile.Opacity, Projectile.rotation, origin);
-                Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Size.ToVector2() * i), null, col,
-                    Projectile.rotation, origin);
-                Main.spriteBatch.DrawBetterRect(tex, ToTarget(Projectile.Center, Size.ToVector2() * i * 1.3f), null,
-                    Color.DarkSlateBlue * Projectile.Opacity * .4f, Projectile.rotation, origin);
-            }
+            SpriteBatch.DrawRectPixelated(PixelationLayer.Dusts, BlendState.Additive, tex,
+                ToTarget(Projectile.Center, Size.ToVector2() * i * .4f * Projectile.Opacity), null,
+                Color.White * Projectile.Opacity, Projectile.rotation, origin);
+            SpriteBatch.DrawRectPixelated(PixelationLayer.Dusts, BlendState.Additive, tex,
+                ToTarget(Projectile.Center, Size.ToVector2() * i), null, col,
+                Projectile.rotation, origin);
+            SpriteBatch.DrawRectPixelated(PixelationLayer.Dusts, BlendState.Additive, tex,
+                ToTarget(Projectile.Center, Size.ToVector2() * i * 1.3f), null,
+                Color.DarkSlateBlue * Projectile.Opacity * .4f, Projectile.rotation, origin);
         }
 
-        PixelationSystem.QueueTextureRenderAction(draw, PixelationLayer.Dusts, BlendState.Additive);
         return false;
     }
 }

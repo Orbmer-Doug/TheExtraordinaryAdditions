@@ -5,7 +5,6 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Early;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
 using Utils = Terraria.Utils;
 
@@ -37,7 +36,7 @@ public class SnapcurveHeld : BaseIdleHoldoutProjectile
     {
         Item item = Owner.HeldItem;
 
-        bool left = this.RunLocal() && Owner.Additions().MouseLeft.Current;
+        bool left = this.RunLocal() && Owner.AdditionsMouse().MouseLeft.Current;
         bool activatingShoot = Switch == -1 && left && !Main.mapFullscreen && !Owner.mouseInterface;
         if (this.RunLocal() && Owner.HasAmmo(Item) && activatingShoot)
         {
@@ -50,10 +49,10 @@ public class SnapcurveHeld : BaseIdleHoldoutProjectile
         if (this.RunLocal())
         {
             float aimInterpolant =
-                Utils.GetLerpValue(10f, 40f, Projectile.Distance(Owner.Additions().MouseWorld), true);
+                Utils.GetLerpValue(10f, 40f, Projectile.Distance(Owner.AdditionsMouse().MouseWorld), true);
             Vector2 oldVelocity = Projectile.velocity;
             Projectile.velocity = Vector2.Lerp(Projectile.velocity,
-                Projectile.SafeDirectionTo(Owner.Additions().MouseWorld), aimInterpolant);
+                Projectile.SafeDirectionTo(Owner.AdditionsMouse().MouseWorld), aimInterpolant);
             if (Projectile.velocity != oldVelocity)
                 this.Sync();
         }
@@ -103,10 +102,10 @@ public class SnapcurveHeld : BaseIdleHoldoutProjectile
         }
     }
 
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CrystallineSnapcurve);
+    public override string Texture => AssetRegistry.GennedTextures.CrystallineSnapcurve.Path;
 
-    public static readonly Texture2D limb1 = AssetRegistry.GetTexture(AdditionsTexture.CrystallineSnapcurveProjLimb1);
-    public static readonly Texture2D limb2 = AssetRegistry.GetTexture(AdditionsTexture.CrystallineSnapcurveProjLimb2);
+    public static readonly Texture2D limb1 = AssetRegistry.GennedTextures.CrystallineSnapcurveProjLimb1;
+    public static readonly Texture2D limb2 = AssetRegistry.GennedTextures.CrystallineSnapcurveProjLimb2;
 
     public override bool PreDraw(ref Color lightColor)
     {

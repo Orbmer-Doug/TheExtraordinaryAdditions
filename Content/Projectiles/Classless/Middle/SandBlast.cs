@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
-using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -10,7 +9,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 
 public class SandBlast : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SandBlast);
+    public override string Texture => AssetRegistry.GennedTextures.SandBlast.Path;
 
     public override void SetStaticDefaults()
     {

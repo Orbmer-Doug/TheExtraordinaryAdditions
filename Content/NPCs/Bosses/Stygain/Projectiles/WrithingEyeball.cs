@@ -3,19 +3,20 @@ using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
+using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain.Projectiles;
 
 public class WrithingEyeball : ProjOwnedByNPC<StygainHeart>
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.WrithingEyeball);
+    public override string Texture => AssetRegistry.GennedTextures.WrithingEyeball.Path;
 
     public int Time
     {
@@ -132,7 +133,7 @@ public class WrithingEyeball : ProjOwnedByNPC<StygainHeart>
             if (!Free)
             {
                 // Choose a direction to rotate
-                if (Time == 0f && this.RunServer())
+                if (Time == 0f && ModProjectile.RunServer())
                 {
                     Dir = Main.rand.NextFromList(1, -1);
                     this.Sync();
@@ -196,7 +197,7 @@ public class WrithingEyeball : ProjOwnedByNPC<StygainHeart>
 
     public TrailPoints cache;
     public FancyAfterimages after;
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
 
     public override bool PreDraw(ref Color lightColor)
     {
@@ -206,8 +207,8 @@ public class WrithingEyeball : ProjOwnedByNPC<StygainHeart>
             {
                 if (trail == null || trail.Disposed || cache == null)
                     return;
-                ManagedShader prim = ShaderRegistry.SideStreakTrail;
-                prim.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DendriticNoise), 1);
+                ManagedShader prim = AssetRegistry.GennedShaders.SideStreakTrail;
+                prim.SetTexture(AssetRegistry.GennedTextures.DendriticNoise, 1);
                 trail.DrawTrail(prim, cache.Points, 90);
             }
 

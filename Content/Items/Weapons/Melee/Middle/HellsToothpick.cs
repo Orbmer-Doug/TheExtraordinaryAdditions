@@ -3,6 +3,7 @@ using Terraria;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -11,7 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 
 public class HellsToothpick : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.HellsToothpick);
+    public override string Texture => AssetRegistry.GennedTextures.HellsToothpick.Path;
 
     public override void SetStaticDefaults()
     {
@@ -20,15 +21,14 @@ public class HellsToothpick : ModItem
 
     public override void SetDefaults()
     {
-        Item.damage = 60;
+        Item.damage = 50;
         Item.knockBack = 0f;
         Item.useStyle = ItemUseStyleID.Swing;
-        Item.useAnimation = 12;
-        Item.useTime = 12;
-        Item.width = 24;
-        Item.height = 100;
+        Item.useAnimation = Item.useTime = 36;
+        Item.width = Item.height = 12;
+        Item.mana = 10;
         Item.UseSound = SoundID.Item1;
-        Item.DamageType = DamageClass.MeleeNoSpeed;
+        Item.DamageType = DamageClass.Magic;
         Item.autoReuse = false;
         Item.noUseGraphic = true;
         Item.noMelee = true;

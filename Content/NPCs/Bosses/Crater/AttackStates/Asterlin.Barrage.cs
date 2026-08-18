@@ -4,8 +4,9 @@ using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
+using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
@@ -47,14 +48,14 @@ public partial class Asterlin
             {
                 if (AITimer % Barrage_BeamRate == (Barrage_BeamRate - 1))
                 {
-                    if (this.RunServer())
+                    if (ModNPC.RunServer())
                         NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<BarrageBeam>(),
                             MediumAttackDamage, 0f);
                 }
 
                 if (AITimer % (Barrage_BeamRate * 2) == (Barrage_BeamRate * 2 - 1))
                 {
-                    if (this.RunServer())
+                    if (ModNPC.RunServer())
                         NPC.NewNPCProj(NPC.Center, Main.rand.NextVector2Circular(40f, 40f),
                             ModContent.ProjectileType<DartBomb>(), MediumAttackDamage, 0f);
                 }
@@ -66,23 +67,19 @@ public partial class Asterlin
 
     public void Barrage_Draw()
     {
-        ManagedShader shader = AssetRegistry.GetShader("EnergyOrbShader");
-        shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TurbulentNoise), 1, SamplerState.PointWrap);
+        ManagedShader shader = AssetRegistry.GennedShaders.EnergyOrbShader;
+        shader.SetTexture(AssetRegistry.GennedTextures.TurbulentNoise, 1, SamplerState.PointWrap);
         shader.TrySetParameter("pulseIntensity", 0.05f);
         shader.TrySetParameter("glowIntensity", 0.8f);
         shader.TrySetParameter("glowPower", 2.74f);
 
-        void orb()
-        {
-            float factor = InverseLerp(0f, 40f, AITimer) * Animators.MakePoly(3f)
-                .OutFunction(InverseLerp(Barrage_AttackTime, Barrage_AttackTime - 60, AITimer));
-            Vector2 size = new Vector2(40) * factor;
-            Texture2D pixel = AssetRegistry.GetTexture(AdditionsTexture.Pixel);
-            Vector2 scale = size / pixel.Size() * 1.2f;
-            Vector2 pixelOrig = pixel.Size() * 0.5f;
-            Main.spriteBatch.DrawBetter(pixel, NPC.Center, null, new Color(12, 76, 229), 0f, pixelOrig, scale, 0);
-        }
-
-        PixelationSystem.QueueTextureRenderAction(orb, PixelationLayer.OverNPCs, null, shader);
+        float factor = InverseLerp(0f, 40f, AITimer) * MakePoly(3f)
+            .OutFunction(InverseLerp(Barrage_AttackTime, Barrage_AttackTime - 60, AITimer));
+        Vector2 size = new Vector2(40) * factor;
+        Texture2D pixel = AssetRegistry.GennedTextures.Pixel;
+        Vector2 scale = size / pixel.Size() * 1.2f;
+        Vector2 pixelOrig = pixel.Size() * 0.5f;
+        SpriteBatch.DrawAltPixelated(PixelationLayer.OverNPCs, BlendState.AlphaBlend, pixel, NPC.Center, null,
+            new Color(12, 76, 229), 0f, pixelOrig, scale, 0);
     }
 }

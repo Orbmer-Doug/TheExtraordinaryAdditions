@@ -15,7 +15,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 
 public class SolarBrand : ModItem, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SolarBrand);
+    public override string Texture => AssetRegistry.GennedTextures.SolarBrand.Path;
 
     public override void SetStaticDefaults()
     {

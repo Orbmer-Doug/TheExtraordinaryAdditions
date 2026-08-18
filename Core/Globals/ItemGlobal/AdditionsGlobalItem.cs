@@ -1,18 +1,11 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
-using TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Early;
-using TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
-using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
-using TheExtraordinaryAdditions.Core.Utilities;
-using TheExtraordinaryAdditions.UI;
-using TheExtraordinaryAdditions.UI.LaserUI;
+using TheExtraordinaryAdditions.Content.Rarities;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
 
 namespace TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
@@ -135,11 +128,6 @@ public class AdditionsGlobalItem : GlobalItem
             case 11:
                 return RarityPurpleBuyPrice;
             default:
-                if (rarity == ModContent.RarityType<LaserClassRarity>())
-                {
-                    return LaserRarityPrice;
-                }
-
                 if (rarity == ModContent.RarityType<UniqueRarity>())
                 {
                     return UniqueRarityPrice;
@@ -158,7 +146,7 @@ public class AdditionsGlobalItem : GlobalItem
 
     public override bool OnPickup(Item item, Player player)
     {
-        GlobalPlayer modPlayer = player.GetModPlayer<GlobalPlayer>();
+        PlayerBuffs modPlayer = player.AdditionsBuffs();
 
         if ((item.type == ItemID.Heart || item.type == ItemID.CandyApple || item.type == ItemID.CandyCane)
             && modPlayer.FrigidTonic)

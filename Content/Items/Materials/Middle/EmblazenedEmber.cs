@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Materials.Middle;
 
 public class EmblazenedEmber : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.EmblazenedEmber);
+    public override string Texture => AssetRegistry.GennedTextures.EmblazenedEmber.Path;
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {

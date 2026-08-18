@@ -1,9 +1,8 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
-using System.IO;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using Utils = Terraria.Utils;
 
@@ -11,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 
 public class TorrentialLightning : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     public const int Life = 60;
 
     public override void SetDefaults()
@@ -29,7 +28,7 @@ public class TorrentialLightning : ModProjectile
 
     public ref float Time => ref Projectile.ai[0];
     public ref float Power => ref Projectile.ai[1];
-    public float Completion => Animators.MakePoly(6).OutFunction(InverseLerp(0f, Life, Time));
+    public float Completion => MakePoly(6).OutFunction(InverseLerp(0f, Life, Time));
 
     private List<List<Line>> Branches;
     public override bool ShouldUpdatePosition() => false;
@@ -46,7 +45,7 @@ public class TorrentialLightning : ModProjectile
         }
 
         Projectile.Opacity = 1f - Completion;
-        if (Projectile.Opacity.BetweenNum(0f, .05f))
+        if (Projectile.Opacity is > 0f and .05f)
             Projectile.Kill();
 
         Time++;
@@ -77,9 +76,9 @@ public class TorrentialLightning : ModProjectile
         {
             foreach (Line line in list)
             {
-                PixelationSystem.QueueTextureRenderAction(() =>
-                    line.Draw(MulticolorLerp(Completion, Color.White, Color.LightCyan, Color.Cyan, Color.DarkCyan)
-                              * Projectile.Opacity), PixelationLayer.OverNPCs, BlendState.Additive);
+                line.DrawPixelated(PixelationLayer.OverNPCs, BlendState.Additive,
+                    MulticolorLerp(Completion, Color.White, Color.LightCyan, Color.Cyan, Color.DarkCyan)
+                    * Projectile.Opacity);
             }
         }
 

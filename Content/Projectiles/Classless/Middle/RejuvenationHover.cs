@@ -5,16 +5,16 @@ using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 
 public class RejuvenationHover : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.RejuvenationArtifact);
+    public override string Texture => AssetRegistry.GennedTextures.RejuvenationArtifact.Path;
 
     public override void SetDefaults()
     {
@@ -62,7 +62,7 @@ public class RejuvenationHover : ModProjectile
             {
                 if (Projectile.soundDelay <= 0)
                 {
-                    AdditionsSound.etherealSwordSwoosh.Play(Projectile.Center, 0f, .2f);
+                    AssetRegistry.GennedSounds.etherealSwordSwoosh.Play(Projectile.Center, 0f, .2f);
                     Projectile.soundDelay = 1;
                 }
 
@@ -130,15 +130,15 @@ public class RejuvenationHover : ModProjectile
             void draw()
             {
                 float completion = player.GetModPlayer<RejuvenationPlayer>().Completion;
-                ManagedShader prim = ShaderRegistry.SpecialLightningTrail;
-                prim.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DendriticNoise), 1);
+                ManagedShader prim = AssetRegistry.GennedShaders.SpecialLightningTrail;
+                prim.SetTexture(AssetRegistry.GennedTextures.DendriticNoise, 1);
 
                 TrailPoints points = new(20);
                 points.SetPoints(Projectile.Center.GetLaserControlPoints(
                     Projectile.Center + Projectile.SafeDirectionTo(player.Center) *
                     (Projectile.Center.Distance(player.Center) * completion), 20));
 
-                OptimizedPrimitiveTrail line = new(WidthFunct,
+                Trail line = new(WidthFunct,
                     (c, pos) => MulticolorLerp(c.X + Sin01(Main.GlobalTimeWrappedHourly), Color.Red, Color.IndianRed,
                         Color.PaleVioletRed, Color.Red * 1.8f) * completion, null, 20);
                 line.DrawTrail(prim, points.Points, 90);

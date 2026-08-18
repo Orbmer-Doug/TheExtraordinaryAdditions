@@ -12,7 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Late;
 
 public class CometStorm : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CometStorm);
+    public override string Texture => AssetRegistry.GennedTextures.CometStorm.Path;
 
     public override void SetStaticDefaults()
     {

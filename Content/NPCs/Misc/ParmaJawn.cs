@@ -1,13 +1,12 @@
 ﻿using Terraria;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Misc;
 
 public class ParmaJawn : ProjOwnedByNPC<TheGiantSnailFromAncientTimes>
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ParmaJawn);
+    public override string Texture => AssetRegistry.GennedTextures.ParmaJawn.Path;
     public override bool IgnoreOwnerActivity => true;
 
     public override void SetDefaults()
@@ -40,6 +39,7 @@ public class ParmaJawn : ProjOwnedByNPC<TheGiantSnailFromAncientTimes>
         Projectile.ExpandHitboxBy(300);
         Projectile.Damage();
 
-        AdditionsSound.BlueBerryBUFFINS.Play(Projectile.Center, Main.rand.NextFloat(1f, 1.6f), 0f, 9.4f, 0, Name);
+        AssetRegistry.GennedSounds.BlueBerryBUFFINS.Play(Projectile.Center, Main.rand.NextFloat(1f, 1.6f), 0f, 9.4f, 0,
+            Name);
     }
 }

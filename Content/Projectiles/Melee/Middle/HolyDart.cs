@@ -1,22 +1,20 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
-using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
 public class HolyDart : ModProjectile, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -96,10 +94,10 @@ public class HolyDart : ModProjectile, ILocalizedModType, IModType
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        SoundID.DD2_WitherBeastDeath.Play(Projectile.Center, Main.rand.NextFloat(1.5f, 2.2f), 0f, .3f, null, 20);
+        SoundID.DD2_WitherBeastDeath.Play(Projectile.Center, Main.rand.NextFloat(1.5f, 2.2f), 0f, .3f, 20);
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints cache;
 
     public override bool PreDraw(ref Color lightColor)
@@ -108,27 +106,23 @@ public class HolyDart : ModProjectile, ILocalizedModType, IModType
         {
             if (trail == null || trail.Disposed || cache == null)
                 return;
-            ManagedShader shader = ShaderRegistry.SmoothFlame;
+            ManagedShader shader = AssetRegistry.GennedShaders.SmoothFlame;
             shader.TrySetParameter("heatInterpolant", 2f);
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.CrackedNoise), 1);
+            shader.SetTexture(AssetRegistry.GennedTextures.CrackedNoise, 1);
             trail.DrawTrail(shader, cache.Points, 120);
         }
 
         PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
 
-        void flare()
+        for (float i = .1f; i < .4f; i += .1f)
         {
-            for (float i = .1f; i < .4f; i += .1f)
-            {
-                Texture2D bloomTexture = AssetRegistry.GetTexture(AdditionsTexture.LensStar);
-                Color color = Main.hslToRgb(Main.GlobalTimeWrappedHourly * 0.6f % 1f, 1f, 0.85f, byte.MaxValue);
-                Vector2 bloomCenter = cache.Points[0] - Main.screenPosition;
-                Main.EntitySpriteDraw(bloomTexture, bloomCenter, null, color * 0.6f * Projectile.Opacity,
-                    Projectile.rotation, bloomTexture.Size() / 2f, i * Projectile.scale, 0, 0f);
-            }
+            Texture2D bloomTexture = AssetRegistry.GennedTextures.LensStar;
+            Color color = Main.hslToRgb(Main.GlobalTimeWrappedHourly * 0.6f % 1f, 1f, 0.85f, byte.MaxValue);
+            Vector2 bloomCenter = cache.Points[0] - Main.screenPosition;
+            SpriteBatch.DrawAltPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, bloomTexture,
+                bloomCenter, null, color * 0.6f * Projectile.Opacity,
+                Projectile.rotation, bloomTexture.Size() / 2f, i * Projectile.scale);
         }
-
-        PixelationSystem.QueueTextureRenderAction(flare, PixelationLayer.UnderProjectiles, BlendState.Additive);
 
         return false;
     }

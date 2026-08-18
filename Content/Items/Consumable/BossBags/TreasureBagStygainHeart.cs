@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using Terraria;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -15,7 +14,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Consumable.BossBags;
 
 public class TreasureBagStygainHeart : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TreasureBagStygainHeart);
+    public override string Texture => AssetRegistry.GennedTextures.TreasureBagStygainHeart.Path;
 
     public override void SetStaticDefaults()
     {

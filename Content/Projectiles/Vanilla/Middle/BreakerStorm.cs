@@ -1,13 +1,12 @@
 ﻿using Terraria;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
 public class BreakerStorm : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -27,7 +26,7 @@ public class BreakerStorm : ModProjectile
     public override void AI()
     {
         if (Time % 10 == 9)
-            AdditionsSound.BreakerStorm.Play(Projectile.Center, 1.1f, 0f, .1f, 20);
+            AssetRegistry.GennedSounds.BreakerStorm.Play(Projectile.Center, 1.1f, 0f, .1f, 20);
 
         if (Time % 2 == 1)
         {

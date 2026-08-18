@@ -9,7 +9,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Placeable;
 
 public class GreenBlock : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GreenBlock);
+    public override string Texture => AssetRegistry.GennedTextures.GreenBlock.Path;
 
     public override void ModifyTooltips(List<TooltipLine> tooltips)
     {

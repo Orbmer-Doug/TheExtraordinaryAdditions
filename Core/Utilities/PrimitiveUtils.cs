@@ -1,82 +1,186 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using static Microsoft.Xna.Framework.MathHelper;
 
 namespace TheExtraordinaryAdditions.Core.Utilities;
 
 public static class PrimitiveUtils
 {
-    public static readonly short[] TextureQuadIndices = [0, 1, 2, 2, 3, 0];
-
-    public static void LogDeviceInfo(this GraphicsDevice g)
+    public static RasterizerState CullOnlyScreen
     {
-        ($"BlendFactor: {g.BlendFactor}" +
-         $" BlendState: {g.BlendState}" +
-         $" DepthStencilState: {g.DepthStencilState}" +
-         $" DisplayMode: {g.DisplayMode}" +
-         $" GraphicsDeviceStatus: {g.GraphicsDeviceStatus}" +
-         $" GraphicsProfile: {g.GraphicsProfile}" +
-         $" IsDisposed: {g.IsDisposed}" +
-         $" RasterizerState: {g.RasterizerState}" +
-         $" ScissorRectangle: {g.ScissorRectangle}" +
-         $" Viewport: {g.Viewport}").Log();
+        get
+        {
+            if (field is not null)
+                return field;
+
+            field = RasterizerState.CullNone;
+            field.ScissorTestEnable = true;
+
+            return field;
+        }
     }
 
-    #region 2D
+    #region Matrices
 
-    public static void Get2DMatrices(out Matrix effectWorld, out Matrix effectProjection, out Matrix effectView)
+    public static Matrix GetOrthographicMeshMatrix(bool zoom = true, int planeLength = 1000)
     {
-        // Screen bounds
-        int height = Main.instance.GraphicsDevice.Viewport.Height;
+        Matrix final = Matrix.CreateTranslation(new Vector3(-Main.screenPosition, 0));
+        if (zoom)
+            final = Matrix.Multiply(final, Main.GameViewMatrix.ZoomMatrix);
+        final = Matrix.Multiply(final,
+            Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, -planeLength, planeLength));
+        return final;
+    }
 
+    public static Matrix GetPerspectiveMeshMatrix(float cameraDist = 2000f, float fov = 50f, float nearPlaneDist = 1f,
+        float farPlaneDist = 3000f)
+    {
+        Matrix world = Matrix.CreateTranslation(-Main.screenPosition.X, -Main.screenPosition.Y, 0f);
+
+        int width = Main.screenWidth;
+        int height = Main.screenHeight;
         Vector2 zoom = Main.GameViewMatrix.Zoom;
         Matrix zoomScaleMatrix = Matrix.CreateScale(zoom.X, zoom.Y, 1f);
 
-        // Get a matrix that aims towards the Z axis (these calculations are relative to a 2D world)
-        effectView = Matrix.CreateLookAt(Vector3.Zero, Vector3.UnitZ, Vector3.Up);
+        // Set up the camera
+        Matrix view = Matrix.CreateLookAt(
+            new Vector3(width / 2f, -height / 2f, -cameraDist), // Camera position
+            new Vector3(width / 2f, -height / 2f, 0f), // Look at screen center
+            Vector3.Up);
 
-        // Offset the matrix to the appropriate position
-        effectView *= Matrix.CreateTranslation(0f, -height, 0f);
+        view *= Matrix.CreateTranslation(0f, -height, 0f); // Adjust for Y being down
+        view *= Matrix.CreateRotationZ(Pi); // Flip to match orientation
+        view *= zoomScaleMatrix;
 
-        // Flip the matrix around 180 degrees
-        effectView *= Matrix.CreateRotationZ(Pi);
+        Matrix projection = Matrix.CreatePerspectiveFieldOfView(
+            ToRadians(fov),
+            (float) width / height, // Aspect ratio
+            nearPlaneDist, farPlaneDist); // Near and far planes
 
-        // Account for the inverted gravity effect
-        if ((int) Main.LocalPlayer.gravDir == -1)
-            effectView *= Matrix.CreateScale(1f, -1f, 1f) * Matrix.CreateTranslation(0f, height, 0f);
-
-        // And account for the current zoom
-        effectView *= zoomScaleMatrix;
-
-        effectProjection =
-            Matrix.CreateOrthographicOffCenter(0f, Main.screenWidth * zoom.X, 0f, Main.screenHeight * zoom.Y, 0f, 1f) *
-            zoomScaleMatrix;
-        effectWorld = Matrix.CreateTranslation(new Vector3(-Main.screenPosition, 0));
+        return world * view * projection;
     }
 
-    public static void GetPixelated2DMatrices(out Matrix effectWorld, out Matrix effectProjection,
-        out Matrix effectView)
+    /// <param name="center">World-space position of the model</param>
+    /// <param name="rotation">Local rotation of the model</param>
+    /// <param name="scale">Multiplier on the models scale</param>
+    /// <param name="startRot">An additional angle change on the 2D plane applied to <paramref name="rotation"/></param>
+    /// <param name="flip">Whether or not to reflect the model</param>
+    /// <param name="flipRot">General rotation of the model plane when reflected</param>
+    /// <param name="unflipRot">General rotation of the model plane</param>
+    /// <returns></returns>
+    public static Matrix Get3DTextureMatrix(Vector2 center, Quaternion rotation, float scale, float startRot = 0f,
+        bool flip = false, float flipRot = 0f, float unflipRot = 0f)
     {
-        effectWorld = Matrix.CreateTranslation(new Vector3(-Main.screenPosition, 0));
-        effectProjection = Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, -1, 1);
-        effectView = Matrix.Identity;
-    }
+        Matrix model = Matrix.CreateScale(scale);
+        model = Matrix.Multiply(model,
+            Matrix.CreateFromQuaternion(Quaternion.Concatenate(rotation,
+                Quaternion.CreateFromAxisAngle(Vector3.UnitZ, startRot))));
+        model = Matrix.Multiply(model, Matrix.CreateTranslation(new Vector3(center, 0f)));
+        Matrix view = Matrix.Multiply(Matrix.CreateTranslation(new Vector3(-Main.screenPosition, 0f)),
+            Main.GameViewMatrix.ZoomMatrix);
+        Matrix projection =
+            Matrix.CreateOrthographicOffCenter(0f, Main.screenWidth, Main.screenHeight, 0f, -450f, 450f);
+        Matrix mvp = model * view * projection;
+        if (flip)
+            mvp = Matrix.Multiply(
+                Matrix.Multiply(Matrix.CreateReflection(new Plane(Vector3.UnitX, 1f)), Matrix.CreateRotationZ(flipRot)),
+                mvp);
+        mvp = Matrix.Multiply(Matrix.CreateRotationZ(unflipRot), mvp);
 
-    public static Matrix GetCustomSkyBackgroundMatrix()
-    {
-        Matrix transformationMatrix = Main.BackgroundViewMatrix.TransformationMatrix;
-        Vector3 translationDirection = new(1f,
-            Main.BackgroundViewMatrix.Effects.HasFlag(SpriteEffects.FlipVertically) ? -1f : 1f, 1f);
-
-        transformationMatrix.Translation -= Main.BackgroundViewMatrix.ZoomMatrix.Translation * translationDirection;
-        return transformationMatrix;
+        return mvp;
     }
 
     #endregion
 
-    #region 3D
+    #region Drawing
+
+    public static void Draw3D(Texture2D texture, Vector2 pos, Quaternion rotation, float scale, float startRot,
+        Color? color = null, Vector2? pivot = null, bool flip = false, float flipRot = 0f, float unflipRot = 0f)
+    {
+        VertexPositionColorTexture[] quad = GenerateQuadClockwise(texture.Size(), color, pivot);
+        ManagedShader projectionShader = AssetRegistry.GennedShaders.PrimitiveProjection;
+        projectionShader.TrySetParameter("vertexMatrix",
+            Get3DTextureMatrix(pos, rotation, scale, startRot, flip, flipRot, unflipRot));
+        projectionShader.Render();
+
+        GraphicsDevice gd = Main.instance.GraphicsDevice;
+
+        RasterizerState prevRast = gd.RasterizerState;
+        SamplerState prevState = gd.SamplerStates[1];
+        Texture prevTex = gd.Textures[1];
+
+        gd.RasterizerState = RasterizerState.CullNone;
+        gd.SamplerStates[1] = SamplerState.PointClamp;
+        gd.Textures[1] = texture;
+
+        gd.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, quad, 0, quad.Length, TextureQuadIndices, 0,
+            TextureQuadIndices.Length / 3);
+
+        gd.RasterizerState = prevRast;
+        gd.SamplerStates[1] = prevState;
+        gd.Textures[1] = prevTex;
+    }
+
+    #endregion
+
+    #region Shaping
+
+    public static readonly short[] TextureQuadIndices = [0, 1, 2, 2, 3, 0];
+
+    public static VertexPositionColorTexture[] GenerateQuadClockwise(Vector2 quadArea, Color? color = null,
+        Vector2? pivot = null)
+    {
+        Vector2 p = pivot ?? Vector2.Zero;
+
+        float ox = p.X * quadArea.X;
+        float oy = p.Y * quadArea.Y;
+
+        Vector3 topLeftPos = new(0f - ox, -quadArea.Y + oy, 0f);
+        Vector3 topRightPos = new(quadArea.X - ox, -quadArea.Y + oy, 0f);
+        Vector3 bottomRightPos = new(quadArea.X - ox, 0f + oy, 0f);
+        Vector3 bottomLeftPos = new(0f - ox, 0f + oy, 0f);
+
+        Color col = color ?? Color.White;
+        VertexPositionColorTexture topLeft = new(topLeftPos, col, new Vector2(0.01f, 0.01f));
+        VertexPositionColorTexture topRight = new(topRightPos, col, new Vector2(0.99f, 0.01f));
+        VertexPositionColorTexture bottomRight = new(bottomRightPos, col, new Vector2(0.99f, 0.99f));
+        VertexPositionColorTexture bottomLeft = new(bottomLeftPos, col, new Vector2(0.01f, 0.99f));
+        return [topLeft, topRight, bottomRight, bottomLeft];
+    }
+
+    public static VertexPositionColorTexture[] GenerateQuadClockwise(Vector2 quadArea, Vector3 position,
+        Quaternion rotation, Color? color = null, Vector2? pivot = null)
+    {
+        Vector2 p = pivot ?? Vector2.Zero;
+
+        float ox = p.X * quadArea.X;
+        float oy = p.Y * quadArea.Y;
+
+        Vector3 topLeftPos = new(0f - ox, -quadArea.Y + oy, 0f);
+        Vector3 topRightPos = new(quadArea.X - ox, -quadArea.Y + oy, 0f);
+        Vector3 bottomRightPos = new(quadArea.X - ox, 0f + oy, 0f);
+        Vector3 bottomLeftPos = new(0f - ox, 0f + oy, 0f);
+
+        Matrix rotationMatrix = Matrix.CreateFromQuaternion(rotation);
+        Matrix translationMatrix = Matrix.CreateTranslation(position);
+
+        topLeftPos = Vector3.Transform(topLeftPos, rotationMatrix * translationMatrix);
+        topRightPos = Vector3.Transform(topRightPos, rotationMatrix * translationMatrix);
+        bottomRightPos = Vector3.Transform(bottomRightPos, rotationMatrix * translationMatrix);
+        bottomLeftPos = Vector3.Transform(bottomLeftPos, rotationMatrix * translationMatrix);
+
+        Color col = color ?? Color.White;
+        return
+        [
+            new VertexPositionColorTexture(topLeftPos, col, new Vector2(0.01f, 0.01f)),
+            new VertexPositionColorTexture(topRightPos, col, new Vector2(0.99f, 0.01f)),
+            new VertexPositionColorTexture(bottomRightPos, col, new Vector2(0.99f, 0.99f)),
+            new VertexPositionColorTexture(bottomLeftPos, col, new Vector2(0.01f, 0.99f))
+        ];
+    }
 
     public static short[] GenerateCylinderIndices(int baseVertexOffset, int widthSegments, int heightSegments)
     {
@@ -112,9 +216,40 @@ public static class PrimitiveUtils
         return indices;
     }
 
-    public static void FillCylinderVertices(float thickness, Matrix rotationMatrix, Color baseColor, Vector3 start,
+    public static short[] GenerateCylinderIndices(int widthSegments, int heightSegments)
+    {
+        int numIndices = widthSegments * heightSegments * 6;
+        short[] indices = new short[numIndices];
+
+        int idx = 0;
+        for (int i = 0; i < heightSegments; i++)
+        {
+            for (int j = 0; j < widthSegments; j++)
+            {
+                int bottomLeft = i * (widthSegments + 1) + j;
+                int bottomRight = bottomLeft + 1;
+                int topLeft = bottomLeft + (widthSegments + 1);
+                int topRight = topLeft + 1;
+
+                // First triangle
+                indices[idx++] = (short) bottomLeft;
+                indices[idx++] = (short) topLeft;
+                indices[idx++] = (short) bottomRight;
+
+                // Second triangle
+                indices[idx++] = (short) bottomRight;
+                indices[idx++] = (short) topLeft;
+                indices[idx++] = (short) topRight;
+            }
+        }
+
+        return indices;
+    }
+
+    public static void FillTaperedCylinderVertices(float thickness, Matrix rotationMatrix, Color baseColor,
+        Vector3 start,
         Vector3 end, Span<VertexPositionColorTexture> vertices, int widthSegments, int heightSegments,
-        float widthFactor = 1f, int vertexStartOffset = 0)
+        float widthFactor = 1f, int vertexStartOffset = 0, float percentageFromEnd = .2f)
     {
         float widthStep = 1f / widthSegments;
         float heightStep = 1f / heightSegments;
@@ -131,8 +266,7 @@ public static class PrimitiveUtils
                 Vector3 cylinderPoint = Vector3.Lerp(start, end, heightInterpolant);
 
                 float width;
-                const float percentageFromEnd = 0.2f;
-                const float transitionPoint = 1f - percentageFromEnd;
+                float transitionPoint = 1f - percentageFromEnd;
 
                 if (heightInterpolant <= transitionPoint)
                     width = thickness;
@@ -161,231 +295,119 @@ public static class PrimitiveUtils
         }
     }
 
-    public static Matrix Get3DPerspectivePrimitiveMatrix(float cameraDist = 2000f, float fov = 50f)
+    public static Vertex3DTex[] FillOpenCylinderVertices(int widthSegments, int heightSegments,
+        float radius, float length, Matrix rotation, Vector3 start, Color color)
     {
+        int numVertices = (widthSegments + 1) * (heightSegments + 1);
+        Vertex3DTex[] vertices = new Vertex3DTex[numVertices];
+
+        for (int i = 0; i <= heightSegments; i++)
+        {
+            float v = (float) i / heightSegments;
+            float y = v * length;
+
+            for (int j = 0; j <= widthSegments; j++)
+            {
+                float u = (float) j / widthSegments;
+                float angle = u * TwoPi;
+
+                float x = MathF.Cos(angle) * radius;
+                float z = MathF.Sin(angle) * radius;
+
+                Vector3 localPosition = new Vector3(x, y, z);
+                Vector3 transformedPosition = Vector3.Transform(localPosition, rotation) + start;
+
+                int index = i * (widthSegments + 1) + j;
+                float angleCosine = MathF.Cos(angle);
+                vertices[index] = new Vertex3DTex(transformedPosition.ToNumerics(), color,
+                    new SystemVector3(u, v, angleCosine));
+            }
+        }
+
+        return vertices;
+    }
+
+    #endregion
+
+    #region Debug
+
+    public static void LogDeviceInfo(this GraphicsDevice g)
+    {
+        ($"BlendFactor: {g.BlendFactor}" +
+         $" BlendState: {g.BlendState}" +
+         $" DepthStencilState: {g.DepthStencilState}" +
+         $" DisplayMode: {g.DisplayMode}" +
+         $" GraphicsDeviceStatus: {g.GraphicsDeviceStatus}" +
+         $" GraphicsProfile: {g.GraphicsProfile}" +
+         $" IsDisposed: {g.IsDisposed}" +
+         $" RasterizerState: {g.RasterizerState}" +
+         $" ScissorRectangle: {g.ScissorRectangle}" +
+         $" Viewport: {g.Viewport}").Log();
+    }
+
+    public static void Debug3DLine(Vector3 position, Quaternion rotation, float rad = 10f, float len = 500f)
+    {
+        const int widthSegments = 50, heightSegments = 50;
+        const int numVertices = (widthSegments + 1) * (heightSegments + 1);
+
+        short[] indices = GenerateCylinderIndices(widthSegments, heightSegments);
+        Vertex3DTex[] vertices = new Vertex3DTex[numVertices];
+
+        for (int i = 0; i <= heightSegments; i++)
+        {
+            float v = (float) i / heightSegments;
+            float y = v * len;
+
+            for (int j = 0; j <= widthSegments; j++)
+            {
+                float u = (float) j / widthSegments;
+                float angle = u * TwoPi;
+
+                float x = MathF.Cos(angle) * rad;
+                float z = MathF.Sin(angle) * rad;
+
+                Vector3 localPosition = new Vector3(x, y, z);
+                int index = i * (widthSegments + 1) + j;
+                float angleCosine = MathF.Cos(angle);
+                vertices[index] = new Vertex3DTex(localPosition.ToNumerics(), Color.White,
+                    new SystemVector3(u, v, angleCosine));
+            }
+        }
+
+        Matrix world = Matrix.CreateScale(1f);
+        world = Matrix.Multiply(world, Matrix.CreateFromQuaternion(rotation));
+        world = Matrix.Multiply(world, Matrix.CreateTranslation(position - new Vector3(Main.screenPosition, 0f)));
         int width = Main.screenWidth;
         int height = Main.screenHeight;
         Vector2 zoom = Main.GameViewMatrix.Zoom;
         Matrix zoomScaleMatrix = Matrix.CreateScale(zoom.X, zoom.Y, 1f);
-
-        // Set up the camera
-        Matrix effectView = Matrix.CreateLookAt(
-            new Vector3(width / 2f, -height / 2f, -cameraDist), // Camera position
-            new Vector3(width / 2f, -height / 2f, 0f), // Look at screen center
-            Vector3.Up);
-
-        effectView *= Matrix.CreateTranslation(0f, -height, 0f); // Adjust for Y being down
-        effectView *= Matrix.CreateRotationZ(Pi); // Flip to match orientation
-        effectView *= zoomScaleMatrix;
-
-        Matrix effectProjection = Matrix.CreatePerspectiveFieldOfView(
-            ToRadians(fov),
-            (float) width / height, // Aspect ratio
-            1f, 3000f); // Near and far planes
-
-        // Position in world
-        Matrix effectWorld = Matrix.CreateTranslation(-Main.screenPosition.X, -Main.screenPosition.Y, 0f);
-        return effectWorld * effectView * effectProjection;
-    }
-
-    public static Matrix Get3DOrthoPrimitiveMatrix(Vector2 center, Quaternion quaternion, float size,
-        float startRot = 0f, int horizontalDir = 1)
-    {
-        Matrix mainZoom = Main.GameViewMatrix.ZoomMatrix;
-        Matrix invertedZoom =
-            Matrix.Invert(Matrix.CreateScale(Main.GameViewMatrix.Zoom.X, Main.GameViewMatrix.Zoom.Y, 1f));
-
-        Vector2 screenPos = center - Main.screenPosition; // Convert to screen position
-        screenPos = Vector2.Transform(screenPos, Matrix.Invert(mainZoom)); // Account for zoom
-
-        Matrix translation =
-            Matrix.CreateTranslation(new Vector3(screenPos.X, screenPos.Y, 0f)) * mainZoom; // zoom again...
-        Matrix projection =
-            Matrix.CreateOrthographicOffCenter(0f, Main.screenWidth, Main.screenHeight, 0f, -450f, 450f) *
-            invertedZoom; // AGAIN
-
-        // Apply rotation, scaling, and flipping
-        Matrix rotation = Matrix.CreateFromQuaternion(quaternion) * Matrix.CreateRotationZ(startRot);
-        Matrix scale = Matrix.CreateScale(size);
-        Matrix vertexMatrix = rotation * scale * translation * projection;
-        if (horizontalDir == -1)
-            vertexMatrix = Matrix.CreateReflection(new Plane(Vector3.UnitX, 1f)) * Matrix.CreateRotationZ(PiOver2) *
-                           vertexMatrix;
-
-        return vertexMatrix;
-    }
-
-    public static Matrix Get3DTextureMatrix(Vector2 center, Quaternion quaternion, float size, float startRot = 0f,
-        int horizontalDir = 1)
-    {
-        Matrix translation =
-            Matrix.CreateTranslation(
-                new Vector3(center.X - Main.screenPosition.X, center.Y - Main.screenPosition.Y, 0f));
-        Matrix projection =
-            Matrix.CreateOrthographicOffCenter(0f, Main.screenWidth, Main.screenHeight, 0f, -450f, 450f);
-        Matrix view = translation * Main.GameViewMatrix.TransformationMatrix * projection;
-
-        // Apply rotation, scaling, and flipping
-        Matrix rotation = Matrix.CreateFromQuaternion(quaternion) * Matrix.CreateRotationZ(startRot);
-        Matrix scale = Matrix.CreateScale(size);
-        Matrix vertexMatrix = rotation * scale * view;
-        if (horizontalDir == -1)
-            vertexMatrix = Matrix.CreateReflection(new Plane(Vector3.UnitX, 1f)) * Matrix.CreateRotationZ(PiOver2) *
-                           vertexMatrix;
-
-        return vertexMatrix;
-    }
-
-    public static Matrix Get3DPerspectiveTextureMatrix(Vector2 center, Quaternion quaternion, float startRot,
-        float size, int horizontalDir = 1, float cameraDist = 1000f, float fov = 50f)
-    {
-        int width = Main.screenWidth;
-        int height = Main.screenHeight;
-        Vector2 zoom = Main.GameViewMatrix.Zoom;
-        Matrix zoomScaleMatrix = Matrix.CreateScale(zoom.X, zoom.Y, 1f);
-
-        // Set up the camera
         Matrix view = Matrix.CreateLookAt(
-            new Vector3(width / 2f, -height / 2f, -cameraDist), // Camera position
-            new Vector3(width / 2f, -height / 2f, 0f), // Look at screen center
+            new Vector3(width / 2f, -height / 2f, -1000f),
+            new Vector3(width / 2f, -height / 2f, 0f),
             Vector3.Up);
-
-        view *= Matrix.CreateTranslation(0f, -height, 0f); // Adjust for Y being down
-        view *= Matrix.CreateRotationZ(Pi); // Flip to match orientation
-        if ((int) Main.LocalPlayer.gravDir == -1)
-            view *= Matrix.CreateScale(1f, -1f, 1f);
+        view *= Matrix.CreateTranslation(0f, -height, 0f);
+        view *= Matrix.CreateRotationZ(Pi);
         view *= zoomScaleMatrix;
-
         Matrix projection = Matrix.CreatePerspectiveFieldOfView(
-            ToRadians(fov),
-            (float) width / height, // Aspect ratio
-            1f, 3000f); // Near and far planes
+            ToRadians(45f),
+            (float) width / height,
+            .1f, 10_000f);
 
-        // Position in world
-        Matrix world =
-            Matrix.CreateTranslation(
-                new Vector3(center.X - Main.screenPosition.X, center.Y - Main.screenPosition.Y, 0f));
+        ManagedShader shader = AssetRegistry.GennedShaders.GenericLighting;
+        shader.TrySetParameter("model", world);
+        shader.TrySetParameter("view", view);
+        shader.TrySetParameter("projection", projection);
+        shader.Render();
 
-        // Apply rotation, scaling, and flipping
-        Matrix rotation = Matrix.CreateFromQuaternion(quaternion) * Matrix.CreateRotationZ(startRot);
-        Matrix scale = Matrix.CreateScale(size);
-        Matrix objectMatrix = rotation * scale;
-        if (horizontalDir == -1)
-            objectMatrix = Matrix.CreateReflection(new Plane(Vector3.UnitX, 1f)) * Matrix.CreateRotationZ(PiOver2) *
-                           objectMatrix;
-
-        return objectMatrix * world * view * projection;
-    }
-
-    public static VertexPositionColorTexture[] GenerateQuadClockwise(Vector2 quadArea, Color? color = null,
-        bool center = false)
-    {
-        Vector3 topLeftPos;
-        Vector3 topRightPos;
-        Vector3 bottomRightPos;
-        Vector3 bottomLeftPos;
-
-        if (center)
-        {
-            float halfW = quadArea.X / 2f;
-            float halfH = quadArea.Y / 2f;
-            topLeftPos = new(-halfW, -halfH, 0f);
-            topRightPos = new(halfW, -halfH, 0f);
-            bottomRightPos = new(halfW, halfH, 0f);
-            bottomLeftPos = new(-halfW, halfH, 0f);
-        }
-        else
-        {
-            topLeftPos = new(0f, -quadArea.Y, 0f);
-            topRightPos = new(quadArea.X, -quadArea.Y, 0f);
-            bottomRightPos = new(quadArea.X, 0f, 0f);
-            bottomLeftPos = new(0f, 0f, 0f);
-        }
-
-        Color col = color ?? Color.White;
-        VertexPositionColorTexture topLeft = new(topLeftPos, col, new Vector2(0.01f, 0.01f));
-        VertexPositionColorTexture topRight = new(topRightPos, col, new Vector2(0.99f, 0.01f));
-        VertexPositionColorTexture bottomRight = new(bottomRightPos, col, new Vector2(0.99f, 0.99f));
-        VertexPositionColorTexture bottomLeft = new(bottomLeftPos, col, new Vector2(0.01f, 0.99f));
-        return [topLeft, topRight, bottomRight, bottomLeft];
-    }
-
-    public static VertexPositionColorTexture[] GenerateQuadClockwise(Vector2 quadArea, Vector3 position,
-        Quaternion rotation, Color? color = null, bool center = false)
-    {
-        Vector3 topLeftPos;
-        Vector3 topRightPos;
-        Vector3 bottomRightPos;
-        Vector3 bottomLeftPos;
-
-        if (center)
-        {
-            float halfW = quadArea.X / 2f;
-            float halfH = quadArea.Y / 2f;
-            topLeftPos = new(-halfW, -halfH, 0f);
-            topRightPos = new(halfW, -halfH, 0f);
-            bottomRightPos = new(halfW, halfH, 0f);
-            bottomLeftPos = new(-halfW, halfH, 0f);
-        }
-        else
-        {
-            topLeftPos = new(0f, -quadArea.Y, 0f);
-            topRightPos = new(quadArea.X, -quadArea.Y, 0f);
-            bottomRightPos = new(quadArea.X, 0f, 0f);
-            bottomLeftPos = new(0f, 0f, 0f);
-        }
-
-        Matrix rotationMatrix = Matrix.CreateFromQuaternion(rotation);
-        Matrix translationMatrix = Matrix.CreateTranslation(position);
-
-        topLeftPos = Vector3.Transform(topLeftPos, rotationMatrix * translationMatrix);
-        topRightPos = Vector3.Transform(topRightPos, rotationMatrix * translationMatrix);
-        bottomRightPos = Vector3.Transform(bottomRightPos, rotationMatrix * translationMatrix);
-        bottomLeftPos = Vector3.Transform(bottomLeftPos, rotationMatrix * translationMatrix);
-
-        Color col = color ?? Color.White;
-        return new[]
-        {
-            new VertexPositionColorTexture(topLeftPos, col, new Vector2(0.01f, 0.01f)),
-            new VertexPositionColorTexture(topRightPos, col, new Vector2(0.99f, 0.01f)),
-            new VertexPositionColorTexture(bottomRightPos, col, new Vector2(0.99f, 0.99f)),
-            new VertexPositionColorTexture(bottomLeftPos, col, new Vector2(0.01f, 0.99f))
-        };
-    }
-
-    /// <summary>
-    /// Renders a 2D texture in a 3D plane using dark evil wizard magic
-    /// </summary>
-    /// <param name="texture">The texture</param>
-    /// <param name="pos">The position of this in world space</param>
-    /// <param name="rotation">The quaternion to use to define 3D rotation</param>
-    /// <param name="scale">The scale of this</param>
-    /// <param name="start">The starting 2D rotation for the quaternion</param>
-    public static void DrawTextureIn3D(Texture2D texture, Vector2 pos, Quaternion rotation, float scale, float start,
-        Color? color = null, bool center = false, int horizontalDir = 1)
-    {
-        VertexPositionColorTexture[] quad = GenerateQuadClockwise(texture.Size(), color, center);
-        ManagedShader projectionShader = AssetRegistry.GetShader("PrimitiveProjection");
-        projectionShader.TrySetParameter("vertexMatrix",
-            Get3DTextureMatrix(pos, rotation, scale, start, horizontalDir));
-        projectionShader.Render();
-
-        GraphicsDevice gd = Main.instance.GraphicsDevice;
-
-        RasterizerState prevRast = gd.RasterizerState;
-        SamplerState prevState = gd.SamplerStates[1];
-        Texture prevTex = gd.Textures[1];
-
+        var gd = Main.instance.GraphicsDevice;
+        BlendState prev = gd.BlendState;
         gd.RasterizerState = RasterizerState.CullNone;
-        gd.SamplerStates[1] = SamplerState.PointClamp;
-        gd.Textures[1] = texture;
+        gd.BlendState = BlendState.AlphaBlend;
+        gd.DepthStencilState = DepthStencilState.Default;
 
-        gd.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, quad, 0, quad.Length, TextureQuadIndices, 0,
-            TextureQuadIndices.Length / 3);
-
-        gd.RasterizerState = prevRast;
-        gd.SamplerStates[1] = prevState;
-        gd.Textures[1] = prevTex;
+        gd.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertices, 0, vertices.Length, indices, 0,
+            vertices.Length / 3);
+        gd.BlendState = prev;
     }
 
     #endregion

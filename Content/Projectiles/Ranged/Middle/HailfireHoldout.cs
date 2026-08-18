@@ -5,11 +5,10 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 
@@ -19,7 +18,7 @@ public class HailfireHoldout : BaseIdleHoldoutProjectile
 
     public override int IntendedProjectileType => ModContent.ProjectileType<HailfireHoldout>();
 
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Hailfire);
+    public override string Texture => AssetRegistry.GennedTextures.Hailfire.Path;
 
     public const int WaitTime = 32;
     public ref float Wait => ref Projectile.ai[0];
@@ -77,7 +76,7 @@ public class HailfireHoldout : BaseIdleHoldoutProjectile
             this.Sync();
         }
 
-        Recoil = MathHelper.Clamp(Animators.MakePoly(3f).OutFunction.Evaluate(Recoil, -.25f, .03f), 0f, 40f);
+        Recoil = MathHelper.Clamp(MakePoly(3f).OutFunction.Evaluate(Recoil, -.25f, .03f), 0f, 40f);
 
         if (Wait > 0f)
             Wait--;
@@ -120,7 +119,7 @@ public class HailfireHoldout : BaseIdleHoldoutProjectile
         return points;
     }
 
-    private OptimizedPrimitiveTrail prediction;
+    private Trail prediction;
     private TrailPoints predictionPoints;
 
     public override bool PreDraw(ref Color lightColor)
@@ -139,8 +138,8 @@ public class HailfireHoldout : BaseIdleHoldoutProjectile
                 if (prediction == null || predictionPoints == null || prediction.Disposed)
                     return;
 
-                ManagedShader shader = ShaderRegistry.SideStreakTrail;
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Pixel), 1, SamplerState.LinearWrap);
+                ManagedShader shader = AssetRegistry.GennedShaders.SideStreakTrail;
+                shader.SetTexture(AssetRegistry.GennedTextures.Pixel, 1, SamplerState.LinearWrap);
                 prediction.DrawTrail(shader, predictionPoints.Points, -1, true);
             }
 

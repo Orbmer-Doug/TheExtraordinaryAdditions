@@ -3,17 +3,15 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Early;
 
 public class CrimtaneArrow : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CrimtaneArrow);
+    public override string Texture => AssetRegistry.GennedTextures.CrimtaneArrow.Path;
 
     public override void SetDefaults()
     {
@@ -151,7 +149,7 @@ public class CrimtaneArrow : ModProjectile
         }
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints points;
 
     public override bool PreDraw(ref Color lightColor)
@@ -161,7 +159,7 @@ public class CrimtaneArrow : ModProjectile
             if (points == null)
                 return;
             if (trail != null && !trail.Disposed && TrailOpacity > .01f)
-                trail.DrawTrail(ShaderRegistry.StandardPrimitiveShader, points.Points, 50, true);
+                trail.DrawTrail(AssetRegistry.GennedShaders.StandardPrimitiveShader, points.Points, 50, true);
         }
 
         PixelationSystem.QueuePrimitiveRenderAction(prim, PixelationLayer.UnderProjectiles);

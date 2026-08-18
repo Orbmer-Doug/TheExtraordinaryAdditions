@@ -2,15 +2,14 @@
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Summon;
-using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Late;
 
 public class SuperIztMinion : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.LokiShrinep);
+    public override string Texture => AssetRegistry.GennedTextures.LokiShrinep.Path;
 
     public override void SetStaticDefaults()
     {
@@ -67,8 +66,7 @@ public class SuperIztMinion : ModProjectile
         if (target != null)
         {
             if (HasHitTarget)
-                Projectile.velocity = Terraria.Utils.RotatedBy(Projectile.velocity,
-                    (double) ((Projectile.identity % 2f == 0f).ToDirectionInt() * 0.06f), default(Vector2)) * 0.93f;
+                Projectile.velocity = Projectile.velocity.RotatedBy((Projectile.identity % 2f == 0f).ToDirectionInt() * 0.06f, default(Vector2)) * 0.93f;
             else
                 TargetPosition(target.Center);
         }
@@ -83,7 +81,7 @@ public class SuperIztMinion : ModProjectile
         if (HitTime <= 0)
             HasHitTarget = false;
 
-        CoreUtils.ProjAntiClump(Projectile, .1f);
+        Projectile.ProjAntiClump(.1f);
     }
 
     private bool CheckActive()
@@ -141,7 +139,7 @@ public class SuperIztMinion : ModProjectile
         // Its funny when there is a bunch of enemies because they start to run down the chain individually
         if (HitTime <= 0)
         {
-            float flySpeed = 60f;
+            const float flySpeed = 60f;
             Projectile.velocity =
                 Vector2.Lerp(Projectile.velocity, Projectile.SafeDirectionTo(target) * flySpeed, 0.02f);
             ParticleRegistry.SpawnGlowParticle(Projectile.RandAreaInEntity(), -Projectile.velocity * .5f, 30,

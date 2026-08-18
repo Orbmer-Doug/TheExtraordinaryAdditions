@@ -14,7 +14,7 @@ namespace TheExtraordinaryAdditions.Content.Tiles;
 
 public class MonsterBanner : ModTile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.MonsterBanner);
+    public override string Texture => AssetRegistry.GennedTextures.MonsterBanner.Path;
 
     public override void SetStaticDefaults()
     {

@@ -1,17 +1,17 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
+using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Hostile.SolarGuardian;
 
 public class Sunray : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetStaticDefaults()
     {
@@ -62,7 +62,7 @@ public class Sunray : ModProjectile
         return new Color(255, 172, 28) * Projectile.Opacity;
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints points = new(20);
 
     public override bool PreDraw(ref Color lightColor)
@@ -72,8 +72,8 @@ public class Sunray : ModProjectile
             if (trail == null || trail.Disposed || points == null)
                 return;
 
-            ManagedShader shader = ShaderRegistry.SpecialLightningTrail;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.Perlin), 1, SamplerState.LinearWrap);
+            ManagedShader shader = AssetRegistry.GennedShaders.SpecialLightningTrail;
+            shader.SetTexture(AssetRegistry.GennedTextures.Perlin, 1, SamplerState.LinearWrap);
             trail.DrawTrail(shader, points.Points, 100);
         }
 

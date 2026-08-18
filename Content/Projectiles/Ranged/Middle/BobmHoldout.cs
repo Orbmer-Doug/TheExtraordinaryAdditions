@@ -8,7 +8,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 
 public class BobmHoldout : BaseHoldoutProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.BobmOnAStick);
+    public override string Texture => AssetRegistry.GennedTextures.BobmOnAStick.Path;
 
     public override void Defaults()
     {

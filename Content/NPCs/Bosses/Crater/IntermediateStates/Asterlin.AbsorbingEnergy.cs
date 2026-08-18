@@ -6,23 +6,22 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
 public partial class Asterlin
 {
-    public static readonly Dictionary<AsterlinAIType, float> AbsorbingEnery_PossibleStates =
+    public static readonly Dictionary<AsterlinAIType, float> AbsorbingEneryPossibleStates =
         new Dictionary<AsterlinAIType, float> { { AsterlinAIType.Barrage, 1f } };
 
     [AutomatedMethodInvoke]
     public void LoadStateTransitions_AbsorbingEnergy()
     {
-        StateMachine.RegisterTransition(AsterlinAIType.AbsorbingEnergy, AbsorbingEnery_PossibleStates, false, ()
+        StateMachine.RegisterTransition(AsterlinAIType.AbsorbingEnergy, AbsorbingEneryPossibleStates, false, ()
                 => FightStarted,
             () => { NPC.Opacity = 1; });
 
@@ -46,17 +45,17 @@ public partial class Asterlin
             SetDirection((mass.Center.X > NPC.Center.X).ToDirectionInt());
             SetLegFlamesInterpolant(0f);
 
-            for (int i = 0; i < absorb.Length; i++)
+            for (int i = 0; i < Absorb.Length; i++)
             {
-                if (absorb[i] == null || absorb[i].Disposed)
-                    absorb[i] = new(_ => 24f * mass.scale,
+                if (Absorb[i] == null || Absorb[i].Disposed)
+                    Absorb[i] = new(_ => 24f * mass.scale,
                         (c, _) => MulticolorLerp(1f - c.X, Color.White, Color.Gold, Color.DarkGoldenrod) *
                                   NPC.Opacity, null, 100);
             }
 
-            for (int i = 0; i < points.Length; i++)
+            for (int i = 0; i < Points.Length; i++)
             {
-                points[i] ??= new(100);
+                Points[i] ??= new(100);
                 List<Vector2> positions =
                 [
                     RightHandPosition,
@@ -69,13 +68,13 @@ public partial class Asterlin
                     mass.Center
                 ];
                 for (int j = 0; j < 100; j++)
-                    points[i].SetPoint(j,
-                        Animators.CatmullRomSpline(positions,
-                            InverseLerp(0, 100, j) * Animators.MakePoly(4f).InFunction(mass.scale)));
+                    Points[i].SetPoint(j,
+                        CatmullRomSpline(positions,
+                            InverseLerp(0, 100, j) * MakePoly(4f).InFunction(mass.scale)));
 
                 if (Main.rand.NextBool(25))
                 {
-                    Vector2 point = points[i].Points[Main.rand.Next(points[i].Count)];
+                    Vector2 point = Points[i].Points[Main.rand.Next(Points[i].Count)];
                     ParticleRegistry.SpawnBloomPixelParticle(point, Main.rand.NextVector2Circular(3f, 3f),
                         Main.rand.Next(50, 90), Main.rand.NextFloat(.5f, 1.1f), Color.Gold, Color.PaleGoldenrod);
                 }
@@ -136,44 +135,40 @@ public partial class Asterlin
         }
     }
 
-    public OptimizedPrimitiveTrail[] absorb = new OptimizedPrimitiveTrail[3];
-    public TrailPoints[] points = new TrailPoints[3];
+    public Trail[] Absorb = new Trail[3];
+    public TrailPoints[] Points = new TrailPoints[3];
 
     public void AbsorbingEnergy_Draw()
     {
-        void draw()
+        void Draw()
         {
             if (!FindProjectile(out _, ModContent.ProjectileType<CondensedSoulMass>()))
                 return;
 
-            for (int i = 0; i < absorb.Length; i++)
+            for (int i = 0; i < Absorb.Length; i++)
             {
-                OptimizedPrimitiveTrail trail = absorb[i];
-                TrailPoints manual = points[i];
+                Trail trail = Absorb[i];
+                TrailPoints manual = Points[i];
                 if (trail == null || trail.Disposed || manual == null || manual.Points.ContainsZeroedPoint())
                     continue;
 
-                ManagedShader shader = AssetRegistry.GetShader("OverchargedLaserShader");
-                shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TurbulentNoise2), 1,
+                ManagedShader shader = AssetRegistry.GennedShaders.OverchargedLaserShader;
+                shader.SetTexture(AssetRegistry.GennedTextures.TurbulentNoise2, 1,
                     SamplerState.AnisotropicWrap);
                 shader.TrySetParameter("time", -Main.GlobalTimeWrappedHourly);
                 trail.DrawTrail(shader, manual.Points, -1, true);
             }
         }
-
-        PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderNPCs);
-
-        void glow()
-        {
-            Texture2D tex = AssetRegistry.GetTexture(AdditionsTexture.GlowParticleSmall);
-            Main.spriteBatch.DrawBetterRect(tex, ToTarget(RightHandPosition, new Vector2(20f)), null, Color.White, 0f,
-                tex.Size() / 2);
-            Main.spriteBatch.DrawBetterRect(tex, ToTarget(RightHandPosition, new Vector2(40f)), null, Color.Gold, 0f,
-                tex.Size() / 2);
-            Main.spriteBatch.DrawBetterRect(tex, ToTarget(RightHandPosition, new Vector2(60f)), null,
-                Color.DarkGoldenrod, 0f, tex.Size() / 2);
-        }
-
-        PixelationSystem.QueueTextureRenderAction(glow, PixelationLayer.OverNPCs, BlendState.Additive);
+        PixelationSystem.QueuePrimitiveRenderAction(Draw, PixelationLayer.UnderNPCs);
+        Texture2D tex = AssetRegistry.GennedTextures.GlowParticleSmall;
+        SpriteBatch.DrawRectPixelated(PixelationLayer.OverNPCs, BlendState.Additive, tex,
+            ToTarget(RightHandPosition, new Vector2(20f)), null, Color.White, 0f,
+            tex.Size() / 2);
+        SpriteBatch.DrawRectPixelated(PixelationLayer.OverNPCs, BlendState.Additive, tex,
+            ToTarget(RightHandPosition, new Vector2(40f)), null, Color.Gold, 0f,
+            tex.Size() / 2);
+        SpriteBatch.DrawRectPixelated(PixelationLayer.OverNPCs, BlendState.Additive, tex,
+            ToTarget(RightHandPosition, new Vector2(60f)), null,
+            Color.DarkGoldenrod, 0f, tex.Size() / 2);
     }
 }

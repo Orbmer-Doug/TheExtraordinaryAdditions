@@ -7,7 +7,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Early;
 
 public class ObsidianFlail : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ObsidianFlail);
+    public override string Texture => AssetRegistry.GennedTextures.ObsidianFlail.Path;
 
     public override void SetStaticDefaults()
     {

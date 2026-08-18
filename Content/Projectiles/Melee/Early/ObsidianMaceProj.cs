@@ -5,17 +5,18 @@ using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
 using TheExtraordinaryAdditions.Core.Graphics;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Early;
 
 public class ObsidianMaceProj : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.ObsidianMaceProj);
+    public override string Texture => AssetRegistry.GennedTextures.ObsidianMaceProj.Path;
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
+    public PlayerMouse Modded => Owner.AdditionsMouse();
     public Vector2 Center => Owner.RotatedRelativePoint(Owner.MountedCenter, false, true);
 
     public enum MaceState
@@ -443,8 +444,8 @@ public class ObsidianMaceProj : ModProjectile
     public void DrawChain()
     {
         Vector2 hand = Owner.GetFrontHandPositionImproved();
-        Texture2D chain = AssetRegistry.GetTexture(AdditionsTexture.ObsidianChain);
-        Texture2D chain2 = AssetRegistry.GetTexture(AdditionsTexture.ObsidianChainAlt);
+        Texture2D chain = AssetRegistry.GennedTextures.ObsidianChain;
+        Texture2D chain2 = AssetRegistry.GennedTextures.ObsidianChainAlt;
 
         float chainHeightAdjustment = 0f;
 
@@ -492,7 +493,7 @@ public class ObsidianMaceProj : ModProjectile
 
 public class ObsidianPow : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 
     public override void SetDefaults()
     {
@@ -510,7 +511,7 @@ public class ObsidianPow : ModProjectile
     {
         if (Projectile.ai[0] == 0f)
         {
-            SoundID.DD2_ExplosiveTrapExplode.Play(Projectile.Center, .9f, -.2f, .1f, null, 10, Name);
+            SoundID.DD2_ExplosiveTrapExplode.Play(Projectile.Center, .9f, -.2f, .1f, 10, Name);
             for (int i = 0; i < 30; i++)
             {
                 Vector2 vel = NextVector2Ellipse(90f * .3f, 90f, Projectile.velocity.ToRotation());

@@ -1,28 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.DataStructures;
-using Terraria.GameContent;
 using Terraria.GameContent.Events;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Late;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
 
 public class MoonBlades : BaseHoldoutProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.MoonBlade);
+    public override string Texture => AssetRegistry.GennedTextures.MoonBlade.Path;
 
     public override void Defaults()
     {
@@ -74,7 +72,7 @@ public class MoonBlades : BaseHoldoutProjectile
     {
         Projectile.Opacity = InverseLerp(0f, MaxOpacTime, OpacTime);
 
-        NPC closest = NPCTargeting.GetClosestNPC(new(Mouse, 4000, false, false));
+        NPC closest = NPCTargeting.GetClosestNPC(new(Mouse, 4000));
 
         if (OpacTime < MaxOpacTime)
             OpacTime++;
@@ -84,7 +82,7 @@ public class MoonBlades : BaseHoldoutProjectile
             if (AimTime < MaxAimTime)
                 AimTime++;
 
-            if (AimTime == MaxAimTime && TryUseMana(true) && ShootTime == 0)
+            if (AimTime == MaxAimTime && TryUseMana() && ShootTime == 0)
             {
                 Vector2 pos = closest.Center;
                 Projectile.NewProj(pos, Vector2.Zero, ModContent.ProjectileType<MoonPortal>(), Projectile.damage,
@@ -123,7 +121,7 @@ public class MoonBlades : BaseHoldoutProjectile
         Projectile.Center = Owner.Center;
         Projectile.velocity = Projectile.Center.SafeDirectionTo(Mouse);
 
-        float interpol = Animators.MakePoly(4f).OutFunction(InverseLerp(0f, MaxAimTime, AimTime));
+        float interpol = MakePoly(4f).OutFunction(InverseLerp(0f, MaxAimTime, AimTime));
         float target = PiOver2.AngleLerp(Projectile.velocity.ToRotation(), interpol);
         BackRot = BackRot.AngleLerp(target, .14f);
         FrontRot = FrontRot.AngleLerp(target, .14f);
@@ -175,22 +173,22 @@ public class MoonBlades : BaseHoldoutProjectile
     public void DrawPortal()
     {
         float to = BackRot;
-        Quaternion portalRot = Animators.EulerAnglesConversion(1, to + PiOver2, 0f);
+        Quaternion portalRot = QuaternionUtils.CreateFromPolarAngles(to + PiOver2);
         Vector2 start = Vector2.Transform(Projectile.Center - Main.screenPosition + PolarVector(150f, to),
             Matrix.Invert(Main.GameViewMatrix?.ZoomMatrix ?? Matrix.Identity));
         start += Main.screenPosition;
 
-        float interpol = Animators.MakePoly(4f).OutFunction(InverseLerp(0f, MaxAimTime, AimTime));
+        float interpol = MakePoly(4f).OutFunction(InverseLerp(0f, MaxAimTime, AimTime));
         float scale = 400f * interpol;
-        VertexPositionColorTexture[] quad = GenerateQuadClockwise(new(scale, scale / 2), Color.White, true);
+        VertexPositionColorTexture[] quad = GenerateQuadClockwise(new(scale, scale / 2), Color.White, Vector2.One / 2);
 
-        ManagedShader portalShader = AssetRegistry.GetShader("MoonPortalBack");
-        portalShader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.OrganicNoise), 1, SamplerState.LinearWrap);
-        portalShader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.NeuronNoise), 2,
+        ManagedShader portalShader = AssetRegistry.GennedShaders.MoonPortalBack;
+        portalShader.SetTexture(AssetRegistry.GennedTextures.OrganicNoise, 1, SamplerState.LinearWrap);
+        portalShader.SetTexture(AssetRegistry.GennedTextures.NeuronNoise, 2,
             SamplerState.LinearWrap);
         portalShader.TrySetParameter("globalTime", -Main.GlobalTimeWrappedHourly * .9f);
         portalShader.TrySetParameter("scale", interpol);
-        portalShader.TrySetParameter("vertexMatrix", Get3DTextureMatrix(start, portalRot, Projectile.scale, 0f, 1));
+        portalShader.TrySetParameter("vertexMatrix", Get3DTextureMatrix(start, portalRot, Projectile.scale, 0f, true));
         portalShader.Effect.CurrentTechnique.Passes[ManagedShader.DefaultPassName].Apply();
 
         GraphicsDevice gd = Main.graphics.GraphicsDevice;
@@ -207,7 +205,7 @@ public class MoonBlades : BaseHoldoutProjectile
 
 public class MoonPortal : ModProjectile
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.GlowRing);
+    public override string Texture => AssetRegistry.GennedTextures.GlowRing.Path;
 
     public static readonly Color StripColor = new(16, 254, 254);
     public static readonly Color OuterColor = new(39, 78, 255);
@@ -288,16 +286,16 @@ public class MoonPortal : ModProjectile
 
             Position = new Vector3(Target, 0f) + RandomInSphere(800f, .5f, 1f);
 
-            AdditionsSound.MachinaBlast.Play(new Vector2(Position.X, Position.Y), .4f, 0f, .2f, 50);
+            AssetRegistry.GennedSounds.MachinaBlast.Play(new Vector2(Position.X, Position.Y), .4f, 0f, .2f, 50);
 
             Quaternion offset = Quaternion.CreateFromAxisAngle(Vector3.Right, ToRadians(-90f));
-            Rotation = LookAt(
+            Rotation = QuaternionUtils.LookAt(
                            Position,
                            new Vector3(Target, 0f), Vector3.Up) *
                        offset;
 
             Vector2 start = new Vector2(Position.X, Position.Y);
-            Vector2 strikePos = RaytraceNPCs(start, Target) ?? Vector2.Zero;
+            Vector2 strikePos = RaycastNPCs(start, Target) ?? Vector2.Zero;
             for (int i = 0; i < 20; i++)
             {
                 float rand = Main.rand.NextFloat();
@@ -315,8 +313,8 @@ public class MoonPortal : ModProjectile
                 Main.rand.NextFloat(2.4f, 3.2f), Color.White, StripColor, 1.4f);
         }
 
-        float bump = Animators.MakePoly(2f).InOutFunction(InverseLerp(0, 10, Time))
-                     * Animators.MakePoly(3f).OutFunction(InverseLerp(Lifetime, Lifetime - 10, Time));
+        float bump = MakePoly(2f).InOutFunction(InverseLerp(0, 10, Time))
+                     * MakePoly(3f).OutFunction(InverseLerp(Lifetime, Lifetime - 10, Time));
         Projectile.scale = bump;
 
         Projectile.rotation = Time * .02f;
@@ -337,13 +335,13 @@ public class MoonPortal : ModProjectile
     {
         short[] indices = GenerateCylinderIndices(widthSegs, heightSegs);
         Matrix rotationMatrix = Matrix.CreateFromQuaternion(rotation);
-        Vertex3D[] vertices =
-            GenerateCylinderVertices(widthSegs, heightSegs, 100f * extraScale * Projectile.scale, 600f, rotationMatrix,
+        Vertex3DTex[] vertices =
+            FillOpenCylinderVertices(widthSegs, heightSegs, 100f * extraScale * Projectile.scale, 600f, rotationMatrix,
                 Position, color);
 
-        ManagedShader ringShader = AssetRegistry.GetShader("MoonPortalGlowShader");
-        ringShader.TrySetParameter("projection", Get3DPerspectivePrimitiveMatrix());
-        ringShader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.DendriticNoiseZoomedOut), 1,
+        ManagedShader ringShader = AssetRegistry.GennedShaders.MoonPortalGlowShader;
+        ringShader.TrySetParameter("projection", GetPerspectiveMeshMatrix());
+        ringShader.SetTexture(AssetRegistry.GennedTextures.DendriticNoiseZoomedOut, 1,
             SamplerState.LinearWrap);
         ringShader.Render();
 
@@ -368,15 +366,15 @@ public class MoonPortal : ModProjectile
     {
         short[] indices = GenerateCylinderIndices(widthSegs, heightSegs);
         Matrix rotationMatrix = Matrix.CreateFromQuaternion(rotation);
-        Vertex3D[] vertices =
-            GenerateCylinderVertices(widthSegs, heightSegs, 100f * extraScale * Projectile.scale,
+        Vertex3DTex[] vertices =
+            FillOpenCylinderVertices(widthSegs, heightSegs, 100f * extraScale * Projectile.scale,
                 200f * Projectile.scale, rotationMatrix,
                 Position + drawOffset, ringColor);
 
-        ManagedShader ringShader = AssetRegistry.GetShader("MoonPortalShader");
-        ringShader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.TechyNoise), 1, SamplerState.LinearWrap);
+        ManagedShader ringShader = AssetRegistry.GennedShaders.MoonPortalShader;
+        ringShader.SetTexture(AssetRegistry.GennedTextures.TechyNoise, 1, SamplerState.LinearWrap);
         ringShader.TrySetParameter("spinScrollOffset", Projectile.rotation * -0.75f);
-        ringShader.TrySetParameter("projection", Get3DPerspectivePrimitiveMatrix());
+        ringShader.TrySetParameter("projection", GetPerspectiveMeshMatrix());
         ringShader.Render();
 
         var gd = Main.instance.GraphicsDevice;
@@ -404,116 +402,6 @@ public class MoonPortal : ModProjectile
     {
         return false;
     }
-
-    #region Utils
-
-    private static Quaternion LookAt(Vector3 from, Vector3 to, Vector3 up)
-    {
-        Vector3 forward = Vector3.Normalize(to - from);
-        Matrix rotMatrix = Matrix.CreateWorld(Vector3.Zero, forward, up);
-        return Quaternion.CreateFromRotationMatrix(rotMatrix);
-    }
-
-    private static Vector3 RandomInSphere(float radius, float minPercent, float maxPercent)
-    {
-        float theta = RandomRotation();
-        float phi = (float) Math.Acos(2.0 * Main.rand.NextDouble() - 1.0);
-
-        float x = (float) (Math.Sin(phi) * Math.Cos(theta));
-        float y = (float) (Math.Sin(phi) * Math.Sin(theta));
-        float z = (float) Math.Cos(phi);
-
-        float t = (float) Math.Pow(Main.rand.NextDouble(), 1.0 / 3.0);
-        float r = radius * Lerp(minPercent, maxPercent, t);
-
-        return new Vector3(x, y, z) * r;
-    }
-
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public readonly struct Vertex3D(Vector3 position, Color color, Vector3 texCoord) : IVertexType
-    {
-        public static readonly VertexDeclaration VertexDeclaration2D = new(
-        [
-            new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
-            new VertexElement(12, VertexElementFormat.Color, VertexElementUsage.Color, 0),
-            new VertexElement(16, VertexElementFormat.Vector3, VertexElementUsage.TextureCoordinate, 0)
-        ]);
-
-        public static readonly VertexDeclaration VertexDeclaration = VertexDeclaration2D;
-
-        VertexDeclaration IVertexType.VertexDeclaration
-        {
-            get => VertexDeclaration;
-        }
-
-        public readonly Vector3 position = position;
-        public readonly Color color = color;
-        public readonly Vector3 texCoord = texCoord;
-    }
-
-    private static Vertex3D[] GenerateCylinderVertices(int widthSegments, int heightSegments,
-        float radius, float length, Matrix rotation, Vector3 start, Color color)
-    {
-        int numVertices = (widthSegments + 1) * (heightSegments + 1);
-        Vertex3D[] vertices = new Vertex3D[numVertices];
-
-        for (int i = 0; i <= heightSegments; i++)
-        {
-            float v = (float) i / heightSegments;
-            float y = v * length;
-
-            for (int j = 0; j <= widthSegments; j++)
-            {
-                float u = (float) j / widthSegments;
-                float angle = u * TwoPi;
-
-                float x = MathF.Cos(angle) * radius;
-                float z = MathF.Sin(angle) * radius;
-
-                Vector3 localPosition = new Vector3(x, y, z);
-                Vector3 transformedPosition = Vector3.Transform(localPosition, rotation) + start;
-
-                int index = i * (widthSegments + 1) + j;
-                float angleCosine = MathF.Cos(angle);
-                vertices[index] = new Vertex3D(transformedPosition, color, new Vector3(u, v, angleCosine));
-            }
-        }
-
-        return vertices;
-    }
-
-    private static short[] GenerateCylinderIndices(int widthSegments, int heightSegments)
-    {
-        int numIndices = widthSegments * heightSegments * 6;
-        short[] indices = new short[numIndices];
-
-        int idx = 0;
-        for (int i = 0; i < heightSegments; i++)
-        {
-            for (int j = 0; j < widthSegments; j++)
-            {
-                int bottomLeft = i * (widthSegments + 1) + j;
-                int bottomRight = bottomLeft + 1;
-                int topLeft = bottomLeft + (widthSegments + 1);
-                int topRight = topLeft + 1;
-
-                // First triangle
-                indices[idx++] = (short) bottomLeft;
-                indices[idx++] = (short) topLeft;
-                indices[idx++] = (short) bottomRight;
-
-                // Second triangle
-                indices[idx++] = (short) bottomRight;
-                indices[idx++] = (short) topLeft;
-                indices[idx++] = (short) topRight;
-            }
-        }
-
-        return indices;
-    }
-
-    #endregion
 }
 
 public class MoonPortalDrawSystem : ModSystem
@@ -546,10 +434,10 @@ public class MoonPortalDrawSystem : ModSystem
         Main.QueueMainThreadAction(static () =>
         {
             GraphicsDevice gd = Main.instance.GraphicsDevice;
-            _beforeRenderTarget = new ManagedRenderTarget(true, (w, h) => new RenderTarget2D(gd, w / 2, h / 2), true);
+            _beforeRenderTarget = new ManagedRenderTarget(true, (w, h) => new RenderTarget2D(gd, w / 2, h / 2));
             gd.SetRenderTarget(_beforeRenderTarget);
             gd.Clear(Color.Transparent);
-            _afterRenderTarget = new ManagedRenderTarget(true, (w, h) => new RenderTarget2D(gd, w / 2, h / 2), true);
+            _afterRenderTarget = new ManagedRenderTarget(true, (w, h) => new RenderTarget2D(gd, w / 2, h / 2));
             gd.SetRenderTarget(_afterRenderTarget);
             gd.Clear(Color.Transparent);
             gd.SetRenderTarget(null);
@@ -577,7 +465,7 @@ public class MoonPortalDrawSystem : ModSystem
 
     private static void DrawToTargets()
     {
-        if (!AssetRegistry.HasFinishedLoading || Main.gameMenu || Main.netMode == NetmodeID.Server)
+        if (Main.gameMenu || Main.netMode == NetmodeID.Server)
             return;
 
         GraphicsDevice device = Main.instance.GraphicsDevice;
@@ -610,7 +498,7 @@ public class MoonPortalDrawSystem : ModSystem
 
     private static void BeforeAnything(On_Main.orig_DoDraw_WallsTilesNPCs orig, Main self)
     {
-        if (ActivePortals.Count != 0 && AssetRegistry.HasFinishedLoading &&
+        if (ActivePortals.Count != 0 &&
             Main.netMode != NetmodeID.Server)
         {
             Main.spriteBatch.End();
@@ -630,7 +518,7 @@ public class MoonPortalDrawSystem : ModSystem
 
     private static void AfterAnything(On_ScreenObstruction.orig_Draw orig, SpriteBatch sb)
     {
-        if (ActivePortals.Count != 0 && AssetRegistry.HasFinishedLoading && !Main.gameMenu &&
+        if (ActivePortals.Count != 0 && !Main.gameMenu &&
             Main.netMode != NetmodeID.Server)
         {
             Main.spriteBatch.End();

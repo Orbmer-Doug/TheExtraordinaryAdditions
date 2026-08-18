@@ -8,8 +8,8 @@ using Terraria.Graphics.Effects;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
+using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
 using TheExtraordinaryAdditions.Core.Globals.ProjectileGlobal;
-using TheExtraordinaryAdditions.Core.Graphics;
 using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 using static System.MathF;
@@ -89,7 +89,7 @@ public abstract class BaseSwordSwing : ModProjectile
     public virtual int MaxUpdates { get; set; } = 3;
 
     public Player Owner => Main.player[Projectile.owner];
-    public GlobalPlayer Modded => Owner.Additions();
+    public PlayerMouse Modded => Owner.AdditionsMouse();
     public Item Item => Owner.HeldItem;
     public float MeleeScale => Owner.GetAdjustedItemScale(Item);
     public float MeleeSpeed => Owner.GetTotalAttackSpeed(DamageClass.MeleeNoSpeed);
@@ -132,7 +132,7 @@ public abstract class BaseSwordSwing : ModProjectile
     /// <returns></returns>
     public virtual float Animation()
     {
-        return Animators.Exp(2.2f).InOutFunction.Evaluate(Time, 0f, MaxTime, -1f, 1f);
+        return Expo(2.2f).InOutFunction.Evaluate(Time, 0f, MaxTime, -1f, 1f);
     }
 
     public virtual float SwingOffset()
@@ -235,7 +235,7 @@ public abstract class BaseSwordSwing : ModProjectile
         return Rect().Intersects(targetHitbox);
     }
 
-    public override bool? CanDamage() => SwingCompletion.BetweenNum(.3f, .8f, true) ? null : false;
+    public override bool? CanDamage() => SwingCompletion is >= .3f and <= .8f ? null : false;
 
     public override void CutTiles()
     {

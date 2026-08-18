@@ -9,7 +9,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 
 public class EbonyNovaBlaster : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.EbonyNovaBlaster);
+    public override string Texture => AssetRegistry.GennedTextures.EbonyNovaBlaster.Path;
 
     public override void SetStaticDefaults()
     {

@@ -6,7 +6,7 @@ namespace TheExtraordinaryAdditions.Content.Buffs.Summon;
 
 public class MidnightBats : ModBuff
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.MidnightBats);
+    public override string Texture => AssetRegistry.GennedTextures.MidnightBats.Path;
 
     public override void SetStaticDefaults()
     {

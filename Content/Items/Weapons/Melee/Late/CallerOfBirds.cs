@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Late;
 
 public class CallerOfBirds : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.CallerOfBirds);
+    public override string Texture => AssetRegistry.GennedTextures.CallerOfBirds.Path;
 
     public override void SetDefaults()
     {

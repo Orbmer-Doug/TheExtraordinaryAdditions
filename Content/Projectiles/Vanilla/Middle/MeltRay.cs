@@ -1,17 +1,16 @@
 ﻿using System.IO;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Common.Particles.Shader;
-using TheExtraordinaryAdditions.Core.Graphics;
-using TheExtraordinaryAdditions.Core.Graphics.Primitives;
-using TheExtraordinaryAdditions.Core.Graphics.Shaders;
+using TheExtraordinaryAdditions.Core.Graphics.Meshes;
+using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
 public class MeltRay : ModProjectile
 {
-    public override string Texture => AssetRegistry.Invis;
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     public const int Lifetime = 30;
 
     public override void SetDefaults()
@@ -82,11 +81,11 @@ public class MeltRay : ModProjectile
             Projectile.width);
     }
 
-    public OptimizedPrimitiveTrail trail;
+    public Trail trail;
     public TrailPoints points = new(100);
 
     public float WidthFunct(float c) =>
-        OptimizedPrimitiveTrail.HemisphereWidthFunct(1f - c, Projectile.width * Projectile.Opacity);
+        Trail.HemisphereWidthFunct(1f - c, Projectile.width * Projectile.Opacity);
 
     public Color ColorFunct(SystemVector2 c, Vector2 position)
     {
@@ -100,8 +99,8 @@ public class MeltRay : ModProjectile
         {
             if (trail == null || trail.Disposed || points == null)
                 return;
-            ManagedShader shader = ShaderRegistry.FlameTrail;
-            shader.SetTexture(AssetRegistry.GetTexture(AdditionsTexture.FlameMap1), 1);
+            ManagedShader shader = AssetRegistry.GennedShaders.FlameTrail;
+            shader.SetTexture(AssetRegistry.GennedTextures.FlameMap1, 1);
             trail.DrawTrail(shader, points.Points);
         }
 

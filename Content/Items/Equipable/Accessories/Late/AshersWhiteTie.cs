@@ -4,16 +4,15 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Buffs.Debuff;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Late;
-using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
+using TheExtraordinaryAdditions.Content.Rarities;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Late;
 
 [AutoloadEquip(EquipType.Neck)]
 public class AshersWhiteTie : ModItem, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.AshersWhiteTie);
+    public override string Texture => AssetRegistry.GennedTextures.AshersWhiteTie.Path;
 
     public override void SetDefaults()
     {
@@ -78,7 +77,7 @@ public sealed class AshersWhiteTiePlayer : ModPlayer
     {
         if (Equipped && !Player.HasBuff<TheTiesCooldown>())
         {
-            AdditionsSound.etherealNuhUh.Play(Player.Center);
+            AssetRegistry.GennedSounds.etherealNuhUh.Play(Player.Center);
             for (int l = 0; l < 50; l++)
             {
                 Vector2 vel = Main.rand.NextVector2CircularLimited(10f, 10f, .7f, 1f) * Main.rand.NextFloat(.6f, 1f);

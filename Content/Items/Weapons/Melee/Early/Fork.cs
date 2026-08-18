@@ -11,7 +11,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Early;
 
 public class Fork : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.Fork);
+    public override string Texture => AssetRegistry.GennedTextures.Fork.Path;
 
     public override void SetDefaults()
     {

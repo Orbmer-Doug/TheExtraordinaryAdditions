@@ -9,7 +9,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Middle;
 
 public class HiTechRemote : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.HiTechRemote);
+    public override string Texture => AssetRegistry.GennedTextures.HiTechRemote.Path;
 
     public override void SetStaticDefaults()
     {

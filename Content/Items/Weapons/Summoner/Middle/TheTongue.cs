@@ -10,7 +10,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Summoner.Middle;
 
 public class TheTongue : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.TheTongue);
+    public override string Texture => AssetRegistry.GennedTextures.TheTongue.Path;
 
     public override void SetDefaults()
     {

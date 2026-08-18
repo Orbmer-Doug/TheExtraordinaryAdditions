@@ -12,7 +12,7 @@ namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Middle;
 
 public class VirulentEntrapment : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.VirulentEntrapment);
+    public override string Texture => AssetRegistry.GennedTextures.VirulentEntrapment.Path;
 
     public override void SetStaticDefaults()
     {

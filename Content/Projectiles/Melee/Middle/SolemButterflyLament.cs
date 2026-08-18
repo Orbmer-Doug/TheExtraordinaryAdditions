@@ -6,7 +6,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
 public class SolemButterflyLament : ModProjectile, ILocalizedModType, IModType
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.SolemButterflyLament);
+    public override string Texture => AssetRegistry.GennedTextures.SolemButterflyLament.Path;
 
     public override void SetStaticDefaults()
     {

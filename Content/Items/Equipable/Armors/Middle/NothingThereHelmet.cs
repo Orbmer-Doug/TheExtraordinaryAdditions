@@ -4,19 +4,18 @@ using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
-using TheExtraordinaryAdditions.Content.Rarities.AdditionRarities;
+using TheExtraordinaryAdditions.Content.Rarities;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
-using ParticleRegistry = TheExtraordinaryAdditions.Common.Particles.Particle.ParticleRegistry;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Middle;
 
 [AutoloadEquip(EquipType.Head)]
 public class NothingThereHelmet : ModItem
 {
-    public override string Texture => AssetRegistry.GetTexturePath(AdditionsTexture.NothingThereHelmet);
+    public override string Texture => AssetRegistry.GennedTextures.NothingThereHelmet.Path;
 
     public override void SetStaticDefaults()
     {
@@ -78,7 +77,7 @@ public class NothingThereHelmet : ModItem
         // Summon the teeth while counting down
         if (counter % 5f == 4f)
         {
-            Vector2 mouse = player.Additions().MouseWorld;
+            Vector2 mouse = player.AdditionsMouse().MouseWorld;
             float rand = Main.rand.NextFloat(300f, 300f);
             Vector2 pos = mouse + Main.rand.NextVector2CircularEdge(rand, rand);
             Vector2 vel = pos.SafeDirectionTo(mouse) * Main.rand.NextFloat(10f, 20f);
