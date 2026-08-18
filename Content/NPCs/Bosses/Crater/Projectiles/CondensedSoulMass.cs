@@ -9,7 +9,7 @@ using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using Utils = Terraria.Utils;
 
-namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
+namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
 public class CondensedSoulMass : ProjOwnedByNPC<Asterlin>
 {

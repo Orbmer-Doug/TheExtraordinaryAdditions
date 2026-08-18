@@ -14,6 +14,7 @@ using TheExtraordinaryAdditions.Core.Globals.ProjectileGlobal;
 using TheExtraordinaryAdditions.Core.Netcode;
 using TheExtraordinaryAdditions.Core.Systems;
 using static TheExtraordinaryAdditions.Content.World.Subworlds.CloudedCrater;
+using Asterlin = TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Asterlin;
 
 namespace TheExtraordinaryAdditions.Content.World.Subworlds;
 

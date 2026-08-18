@@ -6,7 +6,7 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
+
 using TheExtraordinaryAdditions.Content.World.Subworlds;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics.Meshes;

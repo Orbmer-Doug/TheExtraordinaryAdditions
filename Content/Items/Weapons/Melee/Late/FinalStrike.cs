@@ -4,7 +4,7 @@ using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
-using TheExtraordinaryAdditions.Content.Projectiles.Melee.Late.Zenith;
+using TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
 using TheExtraordinaryAdditions.Content.Rarities;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 using TheExtraordinaryAdditions.Core.Utilities;

@@ -4,7 +4,7 @@ using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Graphics.Systems;
 
-namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
+namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
 public class TechnicPortal : ProjOwnedByNPC<Asterlin>
 {

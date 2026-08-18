@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
+
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Utilities;
 using Utils = Terraria.Utils;
@@ -57,7 +57,7 @@ public partial class Asterlin
             NPC.velocity =
                 Vector2.Lerp(NPC.velocity,
                     NPC.SafeDirectionTo(airTarget) * Math.Max(2f, NPC.Distance(airTarget)) * 0.2f, 0.08f) *
-                Utils.GetLerpValue(90f, 75f, AITimer, true);
+                Utils.GetLerpValue((float)90f, (float)75f, (float)AITimer, true);
         }
 
         if (AITimer == Disintegration_HoverTime)

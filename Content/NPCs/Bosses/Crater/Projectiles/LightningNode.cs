@@ -3,7 +3,7 @@ using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Utilities;
 
-namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
+namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
 public class LightningNode : ProjOwnedByNPC<Asterlin>
 {

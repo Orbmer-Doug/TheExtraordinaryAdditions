@@ -12,7 +12,7 @@ using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
-namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
+namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
 /* TODO: There seems to be a itty bitty problem with the bloom where if there is enough projectiles the renderer falls back to earlier beams
  * This causes triangular artifacts to arc between them and is more noticeable early on the more bloom layers there is

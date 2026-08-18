@@ -1,9 +1,8 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.Enums;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Graphics.Systems;
@@ -130,9 +129,9 @@ public partial class Asterlin
 
                     SetLeftHandTarget(LeftArm.RootPosition + PolarVector(400f,
                         (MathHelper.PiOver2 + (.1f * Direction)).AngleLerp(-MathHelper.PiOver2,
-                            Animators.MakePoly(3f).OutFunction(InverseLerp(0f, 40f, AITimer)))));
+                            MakePoly(3f).OutFunction(InverseLerp(0f, 40f, AITimer)))));
                     SetRightHandTarget(RightArm.RootPosition +
-                                       Gun.Projectile.velocity.SafeNormalize(Vector2.Zero) * 400f);
+                                       Utils.SafeNormalize(Gun.Projectile.velocity, Vector2.Zero) * 400f);
                 }
 
                 if (AITimer % TechnicBombBarrage_BombReleaseRate == (TechnicBombBarrage_BombReleaseRate - 1))
@@ -168,7 +167,7 @@ public partial class Asterlin
         float interpol = InverseLerp(0f, 30f, AITimer) *
                          (1f - InverseLerp(0f, TechnicBombBarrage_WaitTime, TechnicBombBarrage_FadeTimer));
         ManagedShader shader = AssetRegistry.GennedShaders.RadialTelegraph;
-        shader.TrySetParameter("direction", LeftHandPosition.AngleTo(Target.Center));
+        shader.TrySetParameter("direction", Utils.AngleTo(LeftHandPosition, Target.Center));
         shader.TrySetParameter("angle", MathHelper.PiOver4 * interpol);
         shader.TrySetParameter("color", Color.DeepSkyBlue.ToVector4() * interpol);
         

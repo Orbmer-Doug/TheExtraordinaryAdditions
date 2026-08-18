@@ -1,10 +1,8 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
+
 using TheExtraordinaryAdditions.Core.DataStructures;
-using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 using Utils = Terraria.Utils;
@@ -109,7 +107,7 @@ public partial class Asterlin : ModNPC
                         {
                             NPC.velocity = Vector2.Zero;
                             Vector2 spawnPos = Target.Center -
-                                               Target.Velocity.SafeNormalize(Main.rand.NextVector2Unit())
+                                               Utils.SafeNormalize(Target.Velocity, Main.rand.NextVector2Unit())
                                                    .RotatedByRandom(.2f) * new Vector2(700f, 420f);
                             spawnPos = spawnPos.ClampInWorld();
                             NPC.Center = spawnPos;

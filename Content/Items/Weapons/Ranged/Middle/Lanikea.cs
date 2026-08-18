@@ -2,12 +2,11 @@
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 using TheExtraordinaryAdditions.Content.Rarities;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
-namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
+namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 
 public class Lanikea : ModItem, ILocalizedModType, IModType
 {

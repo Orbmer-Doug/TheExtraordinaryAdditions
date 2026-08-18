@@ -10,6 +10,7 @@ using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain;
 using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Systems;
+using Asterlin = TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Asterlin;
 
 namespace TheExtraordinaryAdditions.Content.World.Subworlds;
 

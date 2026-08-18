@@ -1,7 +1,5 @@
-﻿using Microsoft.Xna.Framework.Input;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
-using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Assets.Audio;
 using TheExtraordinaryAdditions.Core.DataStructures;
@@ -61,9 +59,9 @@ public partial class Asterlin : ModNPC
         //PowerInterpolant = Utils.Remap(AITimer, TimeToUhOh, TimeToLast, 0f, 1f);
 
         SetLegFlamesInterpolant(InverseLerp(70f, 0f, AITimer));
-        SetLeftLegRotation(LeftLegRotation.AngleLerp(-1.5f * Direction, .2f));
-        SetRightLegRotation(RightLegRotation.AngleLerp(-1.5f * Direction, .2f));
-        SetHeadRotation(EyePosition.AngleTo(EyePosition + PolarVector(400f,
+        SetLeftLegRotation(Utils.AngleLerp(LeftLegRotation, -1.5f * Direction, .2f));
+        SetRightLegRotation(Utils.AngleLerp(RightLegRotation, -1.5f * Direction, .2f));
+        SetHeadRotation(Utils.AngleTo(EyePosition, EyePosition + PolarVector(400f,
             Direction == -1 ? MathHelper.PiOver4 : -(MathHelper.PiOver4 + MathHelper.Pi))));
 
         NPC.velocity.X *= .6f;

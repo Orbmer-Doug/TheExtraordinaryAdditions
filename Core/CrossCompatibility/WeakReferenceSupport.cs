@@ -12,6 +12,7 @@ using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Stygain;
 using TheExtraordinaryAdditions.Content.NPCs.Hostile.Aurora;
 using TheExtraordinaryAdditions.Core.Systems;
+using Asterlin = TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Asterlin;
 
 namespace TheExtraordinaryAdditions.Core.CrossCompatibility;
 

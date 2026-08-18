@@ -1,10 +1,10 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
+
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics.Meshes;
 using TheExtraordinaryAdditions.Core.Graphics.Resources;
@@ -37,8 +37,8 @@ public partial class Asterlin
         int type = ModContent.ProjectileType<CondensedSoulMass>();
         if (FindProjectile(out Projectile mass, type))
         {
-            SetHeadRotation(EyePosition.AngleTo(mass.Center +
-                                                Vector2.UnitX * MathF.Cos(Main.GlobalTimeWrappedHourly * .5f) * 40f));
+            SetHeadRotation(Utils.AngleTo(EyePosition, mass.Center +
+                                                       Vector2.UnitX * MathF.Cos(Main.GlobalTimeWrappedHourly * .5f) * 40f));
             SetRightHandTarget(mass.Center + Vector2.UnitY * MathF.Sin(Main.GlobalTimeWrappedHourly) * 50f);
             SetLeftLegRotation(-1.5f);
             SetRightLegRotation(-1.5f);

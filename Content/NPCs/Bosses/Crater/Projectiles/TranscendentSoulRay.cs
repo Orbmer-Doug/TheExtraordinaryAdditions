@@ -11,7 +11,7 @@ using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
-namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
+namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
 // An adaptation of the deathray made by Lucille Karma in Wrath of the Machines:
 // https://github.com/LucilleKarma/WrathOfTheMachines/blob/main/Content/NPCs/ExoMechs/Projectiles/ExoOverloadDeathray.cs

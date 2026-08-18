@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
+
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Utilities;
 

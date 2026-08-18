@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
+
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Graphics.Meshes;
 using TheExtraordinaryAdditions.Core.Graphics.Systems;
@@ -104,7 +104,7 @@ public partial class Asterlin
                 NPC.velocity = Vector2.Lerp(NPC.velocity, idealVelocity, 0.3f);
                 break;
             case LightripperState.Hover:
-                hoverDestination = Target.Center + Target.Center.SafeDirectionTo(NPC.Center) * new Vector2(650f, 450f);
+                hoverDestination = Target.Center + MathUtils.SafeDirectionTo(Target.Center, NPC.Center) * new Vector2(650f, 450f);
                 float flySpeed = InverseLerp(0f, Lightripper_HoverTime, AITimer).Cubed() * 0.15f + 0.01f;
                 NPC.SmoothFlyNear(hoverDestination, flySpeed, 1f - flySpeed);
                 if (AITimer >= Lightripper_HoverTime)

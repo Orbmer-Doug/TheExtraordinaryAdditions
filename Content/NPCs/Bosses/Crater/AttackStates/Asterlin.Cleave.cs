@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
+
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -100,9 +100,9 @@ public partial class Asterlin
             {
                 if (!Hammer.Free)
                 {
-                    Hammer.Projectile.velocity = RightArm.RootPosition.SafeDirectionTo(RightHandPosition) * 35f;
+                    Hammer.Projectile.velocity = MathUtils.SafeDirectionTo((Vector2)RightArm.RootPosition, RightHandPosition) * 35f;
                     Hammer.Free = true;
-                    Hammer.Sync();
+                    ProjectileUtils.Sync(Hammer);
                 }
             }
 
@@ -113,7 +113,7 @@ public partial class Asterlin
         if (!Cleave_Diving)
         {
             float interpol = InverseLerp(0f, Cleave_HammerReelTime, AITimer);
-            NPC.SmoothFlyNear(new Vector2(Target.Center.X + Target.Velocity.ClampLength(0f, 50f).X * 20f,
+            NPC.SmoothFlyNear(new Vector2(Target.Center.X + MathUtils.ClampLength(Target.Velocity, 0f, 50f).X * 20f,
                 Target.Center.Y - MakePoly(3f).InFunction.Evaluate(100f, 450f, interpol)), .15f, .9f);
 
             float rot = (dir == 1 ? 0f : MathHelper.Pi).AngleLerp(behind,
@@ -162,8 +162,8 @@ public partial class Asterlin
             SetFlipped(false);
             FlameEngulfInterpolant = InverseLerp(0f, 20f, AITimer);
             SetHeadRotation(Direction == 1 ? 0 : MathHelper.Pi);
-            SetBodyRotation(BodyRotation.AngleLerp(-MathHelper.Pi, .2f));
-            SetRightHandTarget(RightHandTarget.Lerp(RightArm.RootPosition + PolarVector(400f, MathHelper.PiOver2),
+            SetBodyRotation(Utils.AngleLerp(BodyRotation, -MathHelper.Pi, .2f));
+            SetRightHandTarget(MathUtils.Lerp(RightHandTarget, RightArm.RootPosition + PolarVector(400f, MathHelper.PiOver2),
                 .3f));
 
             if (!Cleave_HitGround)

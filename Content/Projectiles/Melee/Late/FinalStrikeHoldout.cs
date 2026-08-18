@@ -1,7 +1,7 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
@@ -16,7 +16,7 @@ using static Microsoft.Xna.Framework.MathHelper;
 using Utils = Terraria.Utils;
 
 
-namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Late.Zenith;
+namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Late;
 
 public class FinalStrikeHoldout : ModProjectile
 {

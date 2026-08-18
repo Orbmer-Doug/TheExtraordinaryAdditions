@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
-using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Utilities;
 using State = TheExtraordinaryAdditions.Content.Projectiles.Magic.Late.TesselesticMeltdownProj.State;
@@ -92,7 +91,7 @@ public partial class Asterlin : ModNPC
         {
             float interpol = InverseLerp(0f, Tesselestic_ChargeUp, AITimer);
             int area = (int) MakePoly(3f).InOutFunction.Evaluate(400, 10, interpol);
-            Vector2 pos = Staff.TipOfStaff.ToRectangle(area, area).ToRotated(0f).RandomPoint(true);
+            Vector2 pos = MathUtils.ToRectangle(Staff.TipOfStaff, area, area).ToRotated(0f).RandomPoint(true);
 
             for (int i = 0; i < 20; i++)
             {
@@ -120,7 +119,7 @@ public partial class Asterlin : ModNPC
             if (Staff.CurrentState != State.Barrage)
             {
                 Staff.CurrentState = State.Barrage;
-                Staff.Sync();
+                ProjectileUtils.Sync(Staff);
             }
 
             SetRightHandTarget(RightArm.RootPosition - Vector2.UnitY * 400f);

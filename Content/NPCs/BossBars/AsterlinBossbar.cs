@@ -8,6 +8,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using Asterlin = TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Asterlin;
 
 namespace TheExtraordinaryAdditions.Content.NPCs.BossBars;
 

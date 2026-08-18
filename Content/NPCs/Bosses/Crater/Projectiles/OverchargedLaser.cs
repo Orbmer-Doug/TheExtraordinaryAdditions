@@ -7,7 +7,7 @@ using TheExtraordinaryAdditions.Core.Graphics.Resources;
 using TheExtraordinaryAdditions.Core.Graphics.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
 
-namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
+namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
 public class OverchargedLaser : ProjOwnedByNPC<Asterlin>
 {

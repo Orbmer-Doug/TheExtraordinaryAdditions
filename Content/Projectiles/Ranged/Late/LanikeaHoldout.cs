@@ -5,6 +5,7 @@ using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
+using TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 using TheExtraordinaryAdditions.Content.Projectiles.Base;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Graphics.Resources;

@@ -5,7 +5,7 @@ using TheExtraordinaryAdditions.Assets.Audio;
 using TheExtraordinaryAdditions.Core.DataStructures;
 using static TheExtraordinaryAdditions.Content.Projectiles.Magic.Late.TesselesticMeltdownProj;
 
-namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
+namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
 public class TheTesselesticMeltdown : ProjOwnedByNPC<Asterlin>
 {

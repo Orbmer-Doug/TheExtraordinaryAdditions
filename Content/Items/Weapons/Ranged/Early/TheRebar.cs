@@ -6,7 +6,7 @@ using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
-namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
+namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Early;
 
 //TODO
 public class TheRebar : ModItem

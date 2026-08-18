@@ -11,7 +11,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 using static Microsoft.Xna.Framework.MathHelper;
 using Utils = Terraria.Utils;
 
-namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
+namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
 public class JudgementHammer : ProjOwnedByNPC<Asterlin>
 {

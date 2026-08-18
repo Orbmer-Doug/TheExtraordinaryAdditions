@@ -1,4 +1,4 @@
-﻿namespace TheExtraordinaryAdditions.Common.Particles;
+﻿namespace TheExtraordinaryAdditions.Core.Graphics;
 
 public enum Layer
 {

@@ -15,7 +15,7 @@ using static System.MathF;
 using static TheExtraordinaryAdditions.Content.Projectiles.Base.BaseSwordSwing;
 using Utils = Terraria.Utils;
 
-namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater.Projectiles;
+namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
 
 public class CyberneticSword : ProjOwnedByNPC<Asterlin>
 {
