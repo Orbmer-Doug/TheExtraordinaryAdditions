@@ -198,7 +198,7 @@ public class HeavenForgedSwing : BaseSwordSwing
         Owner.heldProj = Projectile.whoAmI;
         Owner.SetDummyItemTime(2);
         Owner.ChangeDir(Direction);
-        Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, Projectile.rotation);
+        Owner.SetFrontHandBetter(Player.CompositeArmStretchAmount.Full, Projectile.rotation + MathHelper.Pi);
         Owner.itemRotation = WrapAngle(Projectile.rotation);
 
         float scaleUp = MeleeScale;
@@ -244,9 +244,9 @@ public class HeavenForgedSwing : BaseSwordSwing
         if (this.RunLocal())
         {
             RotatedRectangle rect = Rect();
-            Vector2 position = rect.Bottom;
+            Vector2 position = rect.Top;
 
-            Vector2 vel = rect.Top.SafeDirectionTo(rect.Bottom) * rand.NextFloat(10f, 15f);
+            Vector2 vel = rect.Bottom.SafeDirectionTo(rect.Top) * rand.NextFloat(10f, 15f);
             vel.Y += rand.NextFloat(-2f, 2f);
 
             int proj = ModContent.ProjectileType<HeavenForgedSpear>();
@@ -256,7 +256,7 @@ public class HeavenForgedSwing : BaseSwordSwing
             for (int i = 0; i < 10; i++)
             {
                 ParticleRegistry.SpawnSparkleParticle(position, vel / 3 + RandomVelocity(1f, 1f, 2f),
-                    rand.Next(30, 40), rand.NextFloat(.3f, .5f), Color.Cyan, Color.CornflowerBlue, 1.4f);
+                    rand.Next(30, 40), rand.NextFloat(.2f, .3f), Color.Cyan, Color.CornflowerBlue, 1.4f);
                 ParticleRegistry.SpawnBloomPixelParticle(position, vel / 3 + RandomVelocity(1.4f, 2f, 5f),
                     rand.Next(20, 30), rand.NextFloat(.4f, .5f), Color.Cyan, Color.DeepSkyBlue, null, 1f, 4);
             }
