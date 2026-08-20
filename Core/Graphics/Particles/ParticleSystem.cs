@@ -2401,7 +2401,7 @@ public static class ParticleRegistry
                 p.Opacity = MathF.Pow(MathHelper.SmoothStep(1, 0, p.TimeRatio), 0.3f);
                 p.Velocity *= 0.89f;
                 p.Rotation += custom.Spin * p.Velocity.X.NonZeroSign() * (p.TimeRatio > 0.5f ? 1f : 0.5f);
-                p.Scale = 1f + MakePoly(7f).OutFunction(p.TimeRatio) * p.Init.Scale;
+                p.Scale = MakePoly(7f).OutFunction(p.TimeRatio) * p.Init.Scale;
                 Lighting.AddLight(p.Position, custom.BloomColor.ToVector3() * p.Opacity);
             },
             draw: static (ref p, sb) =>
