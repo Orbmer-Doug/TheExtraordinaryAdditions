@@ -52,6 +52,7 @@ public class TheExingendies : ModProjectile
         writer.Write(Preset.Bulge);
         writer.Write(Preset.Additive);
         writer.Write(Preset.Negative);
+        writer.Write(Preset.Friend);
     }
     public override void ReceiveExtraAI(BinaryReader reader)
     {
@@ -66,7 +67,8 @@ public class TheExingendies : ModProjectile
         float bulge = reader.ReadSingle();
         bool add = reader.ReadBoolean();
         bool neg = reader.ReadBoolean();
-        Preset = new(speed, new(r, g, b), arms, armstight, dust, bulge, add, neg);
+        bool fren = reader.ReadBoolean();
+        Preset = new(speed, new(r, g, b), arms, armstight, dust, bulge, add, neg, fren);
     }
 
     public override void SetStaticDefaults()
@@ -171,7 +173,8 @@ public class TheExingendies : ModProjectile
         float dust,
         float bulge,
         bool add,
-        bool neg)
+        bool neg,
+        bool fren)
     {
         public readonly float Speed = speed;
         public readonly Vector3 Tint = tint;
@@ -181,6 +184,7 @@ public class TheExingendies : ModProjectile
         public readonly float Bulge = bulge;
         public readonly bool Additive = add;
         public readonly bool Negative = neg;
+        public readonly bool Friend = fren;
     }
 
     public GalaxyPreset Preset;
@@ -195,6 +199,7 @@ public class TheExingendies : ModProjectile
         float bulge = 16f;
         bool additive = false;
         bool negative = false;
+        bool friend = false;
 
         if (Owner.name.Equals("chinny", StringComparison.OrdinalIgnoreCase) ||
             Owner.name.Equals("chinny winny 2nd", StringComparison.OrdinalIgnoreCase))
@@ -240,10 +245,11 @@ public class TheExingendies : ModProjectile
         else if (Owner.name.Equals("bugman", StringComparison.OrdinalIgnoreCase))
         {
             bulge = 20f;
-            speed = 3f;
+            speed = 1f;
             tint = new(40, 230, 20);
-            arms = 8;
+            arms = 0;
             armTightness = 2f;
+            friend = true;
         }
         else if (Owner.name.Equals("wacey", StringComparison.OrdinalIgnoreCase))
         {
@@ -312,7 +318,7 @@ public class TheExingendies : ModProjectile
             negative = rand.NextBool(60);
         }
 
-        Preset = new GalaxyPreset(speed, tint, arms, armTightness, dust, bulge, additive, negative);
+        Preset = new GalaxyPreset(speed, tint, arms, armTightness, dust, bulge, additive, negative, friend);
     }
 
     public override bool PreDraw(ref Color lightColor)
@@ -333,6 +339,7 @@ public class TheExingendies : ModProjectile
         shader.TrySetParameter("BulgeAmount", Preset.Bulge);
         shader.TrySetParameter("DustDensity", Preset.Dust);
         shader.TrySetParameter("Negative", Preset.Negative);
+        shader.TrySetParameter("Friend", Preset.Friend);
         shader.TrySetParameter("ForwardRotation", ForwardRotation); // PI = perpindicular PI/2 = flat
 
         ScreenShaderUpdates.QueueDrawAction(draw, Preset.Additive ? BlendState.Additive : BlendState.AlphaBlend,
