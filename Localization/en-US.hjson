@@ -424,6 +424,9 @@ Mods: {
 			LightningBlast.DisplayName: Lightning Blast
 			HellPick.DisplayName: Hell Pick
 			DecayingBeam.DisplayName: Decaying Beam
+			HomingRazorflake.DisplayName: Homing Razorflake
+			BergThatsCrushed.DisplayName: Berg Thats Crushed
+			FlungShard.DisplayName: Flung Shard
 		}
 
 		Keybinds: {

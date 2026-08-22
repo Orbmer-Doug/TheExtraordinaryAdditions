@@ -29,7 +29,7 @@ public class HeavyFrostBlast : ProjOwnedByNPC<AuroraGuard>
     public override void SafeAI()
     {
         float interpolant = InverseLerp(0f, Lifetime, Time);
-        float size = Animators.MakePoly(2.4f).InFunction.Evaluate(Time, 0f, Lifetime, .2f, 1.5f);
+        float size = MakePoly(2.4f).InFunction.Evaluate(Time, 0f, Lifetime, .2f, 1.5f);
         Projectile.ExpandHitboxBy((int) (size * 170));
 
         Color col = MulticolorLerp(interpolant, Icey, LightCornflower, MauveBright, Lavender, BrightViolet);

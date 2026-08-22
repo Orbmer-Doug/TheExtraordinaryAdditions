@@ -11,6 +11,7 @@ using TheExtraordinaryAdditions.Core.Graphics.Systems;
 
 namespace TheExtraordinaryAdditions.Core.Utilities;
 
+// TODO: split up methods with large optional parameters
 public static class MathUtils
 {
     #region Constants
@@ -38,7 +39,7 @@ public static class MathUtils
         float inverse = (x - from) / (to - from);
         return !clamped ? inverse : MathHelper.Clamp(inverse, 0f, 1f);
     }
-
+    
     public static float GetLerpBump(float from1, float to1, float from2, float to2, float x, bool clamp = true) =>
         InverseLerp(from1, to1, x, clamp) * InverseLerp(from2, to2, x, clamp);
 

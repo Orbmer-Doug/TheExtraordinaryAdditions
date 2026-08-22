@@ -72,7 +72,7 @@ public sealed class AuroraGuardLeg : Entity
 
     public AuroraGuardLeg(AuroraGuard turret, bool frontPair, bool leftSet, float baseRotation)
     {
-        this.Turret = turret;
+        Turret = turret;
         FrontPair = frontPair;
         LeftSet = leftSet;
         BaseRotation = baseRotation;

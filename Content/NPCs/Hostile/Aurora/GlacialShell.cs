@@ -24,19 +24,6 @@ public class GlacialShell : ProjOwnedByNPC<AuroraGuard>
         CooldownSlot = ImmunityCooldownID.Bosses;
     }
 
-    public override void OnHitPlayer(Player target, Player.HurtInfo info)
-    {
-        for (int i = 0; i < 10; i++)
-        {
-            ParticleRegistry.SpawnDustParticle(Projectile.RotHitbox().RandomPoint(),
-                Projectile.velocity * Main.rand.NextFloat(.2f, .4f),
-                Main.rand.Next(20, 30), Main.rand.NextFloat(.3f, .6f), Color.WhiteSmoke,
-                Main.rand.NextFloat(-.1f, .1f));
-        }
-
-        SoundID.Item51.Play(Projectile.Center, .8f, .14f, .05f, 10);
-        Projectile.Kill();
-    }
 
     public bool HitGround
     {
@@ -76,6 +63,29 @@ public class GlacialShell : ProjOwnedByNPC<AuroraGuard>
         }
 
         Time++;
+    }
+
+    public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+    {
+        Vector2 vel = Projectile.velocity.SafeNormalize(Vector2.Zero);
+        return targetHitbox.LineCollision(Projectile.Center - vel * Projectile.height / 2f,
+            Projectile.Center + vel * Projectile.height / 2f, Projectile.width)
+            ? null
+            : false;
+    }
+
+    public override void OnHitPlayer(Player target, Player.HurtInfo info)
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            ParticleRegistry.SpawnDustParticle(Projectile.RotHitbox().RandomPoint(),
+                Projectile.velocity * Main.rand.NextFloat(.2f, .4f),
+                Main.rand.Next(20, 30), Main.rand.NextFloat(.3f, .6f), Color.WhiteSmoke,
+                Main.rand.NextFloat(-.1f, .1f));
+        }
+
+        SoundID.Item51.Play(Projectile.Center, .8f, .14f, .05f, 10);
+        Projectile.Kill();
     }
 
     public FancyAfterimages after;

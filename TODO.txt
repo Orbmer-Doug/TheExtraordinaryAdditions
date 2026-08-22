@@ -29,6 +29,7 @@ Weapons:
 > Deepest Nadir
     > releases lingering cosmiball sticks
     > no longer multiple whips
+    > make it go to cursor
 > Rebar
     > wacky
 > Exingenedies
@@ -97,6 +98,7 @@ Asterlin:
 
 
 Stygain:
+> lowk red impact frames could be hype
 > Add an ambient background object post-golem kind of like the eyes
 > turn crimson beetle into an actual bug (unconsumable still) that is released and flutters up to the sky
     > reduces confusion with the current held-down item style

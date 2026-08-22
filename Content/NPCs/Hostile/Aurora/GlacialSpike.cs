@@ -91,12 +91,12 @@ public class GlacialSpike : ProjOwnedByNPC<AuroraGuard>
         }
         else if (Time > AuroraGuard.TimeToRise)
         {
-            float interpol = Animators.MakePoly(8f)
+            float interpol = MakePoly(8f)
                 .OutFunction(InverseLerp(AuroraGuard.TimeToRise, AuroraGuard.TimeToRise + 20f, Time));
             Projectile.Center = Vector2.Lerp(Projectile.Center, SavedPos, interpol);
         }
 
-        Projectile.Opacity = Animators.MakePoly(2.5f)
+        Projectile.Opacity = MakePoly(2.5f)
             .InFunction(InverseLerp(AuroraGuard.TimeToRise + 80, AuroraGuard.TimeToRise + 65f, Time));
         if (Projectile.Opacity <= 0f)
             Projectile.Kill();
@@ -117,7 +117,7 @@ public class GlacialSpike : ProjOwnedByNPC<AuroraGuard>
         {
             Texture2D tex = Projectile.ThisProjectileTexture();
             Color col = Color.White * Projectile.Opacity;
-            Vector2 scale = new Vector2(Animators.MakePoly(3f).OutFunction(InverseLerp(0f, 20f, Time)), 1f) * Scale;
+            Vector2 scale = new Vector2(MakePoly(3f).OutFunction(InverseLerp(0f, 20f, Time)), 1f) * Scale;
             Color color = Projectile.GetAlpha(Color.White * InverseLerp(35f, 0f, Time)) with { A = 0 };
 
             Main.spriteBatch.DrawBetter(tex, Projectile.Center, null, col, 0f, tex.Size() / 2, scale);

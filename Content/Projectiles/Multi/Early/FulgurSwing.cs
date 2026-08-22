@@ -41,20 +41,8 @@ public class FulgurSwing : BaseSwordSwing
 
     public override int SwingTime => SwingDir == SwingDirection.Up ? 40 : 90;
 
-    public bool Stabbing
-    {
-        get => Projectile.AdditionsInfo().ExtraAI[7] == 1f;
-        set => Projectile.AdditionsInfo().ExtraAI[7] = value.ToInt();
-    }
-
-    public override bool? CanDamage()
-    {
-        if (SwingDir == SwingDirection.Down)
-            return SwingCompletion is > .2f and < .7f ? null : false;
-
-        return SwingCompletion is > .2f and < .7f ? null : false;
-    }
-
+    public override bool? CanDamage() => SwingCompletion is > .2f and < .7f ? null : false;
+    
     public override void OnSpawn(IEntitySource source)
     {
         SwingDir = SwingDirection.Up;
@@ -139,13 +127,13 @@ public class FulgurSwing : BaseSwordSwing
             {
                 SwingDir = SwingDir == SwingDirection.Up ? SwingDirection.Down : SwingDirection.Up;
                 Initialized = false;
-                this.Sync();
             }
             else
             {
                 VanishTime++;
-                this.Sync();
             }
+
+            this.Sync();
         }
 
         CreateSparkles();
