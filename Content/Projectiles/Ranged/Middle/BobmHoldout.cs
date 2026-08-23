@@ -46,7 +46,7 @@ public class BobmHoldout : BaseHoldoutProjectile
 
             Vector2 pos = Projectile.Center + Projectile.rotation.ToRotationVector2() * Projectile.width;
             if (this.RunLocal())
-                Projectile.NewProj(pos, Vector2.Zero, ModContent.ProjectileType<StickBoom>(), Projectile.damage, 0f,
+                Projectile.CreateProj(pos, Vector2.Zero, ModContent.ProjectileType<StickBoom>(), Projectile.damage, 0f,
                     Owner.whoAmI);
             Owner.mount.Dismount(Owner);
         }

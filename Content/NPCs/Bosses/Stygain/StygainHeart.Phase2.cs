@@ -44,14 +44,14 @@ public sealed partial class StygainHeart
                 {
                     Vector2 shootVelocity = (MathHelper.TwoPi * i / moonCount + offsetAngle).ToRotationVector2() *
                                             moonSpeed;
-                    NPC.NewNPCProj(NPC.Center, shootVelocity, ModContent.ProjectileType<BloodMoonlet>(),
+                    NPC.CreateNPCProj(NPC.Center, shootVelocity, ModContent.ProjectileType<BloodMoonlet>(),
                         BloodBeaconDamage / 2, 10f);
                 }
 
                 for (int i = 0; i < eyeCount; i++)
                 {
                     Vector2 shootVelocity = (MathHelper.TwoPi * i / eyeCount + offsetAngle).ToRotationVector2() * 4f;
-                    NPC.NewNPCProj(NPC.Center, shootVelocity, ModContent.ProjectileType<WrithingEyeball>(),
+                    NPC.CreateNPCProj(NPC.Center, shootVelocity, ModContent.ProjectileType<WrithingEyeball>(),
                         RadialEyesDamage, 0f);
                 }
             }
@@ -128,7 +128,7 @@ public sealed partial class StygainHeart
         if (AttackTimer == dartShootDelay)
         {
             if (ModNPC.RunServer())
-                NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<HemoglobTelegraph>(), 0, 0f, -1);
+                NPC.CreateNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<HemoglobTelegraph>(), 0, 0f, -1);
             NPC.netUpdate = true;
         }
 
@@ -145,7 +145,7 @@ public sealed partial class StygainHeart
         // Start the barrier
         if (AttackTimer == dartShootDelay + HemoglobTelegraph.TeleTime && ModNPC.RunServer())
         {
-            NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<HemoglobBarrier>(), 0,
+            NPC.CreateNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<HemoglobBarrier>(), 0,
                 0f, NPC.whoAmI, 0f, 0f, 0f, target.whoAmI);
             NPC.netUpdate = true;
         }
@@ -163,7 +163,7 @@ public sealed partial class StygainHeart
                                        dartShootSpeed * .5f;
                 int dart = ModContent.ProjectileType<BloodRay>();
                 if (ModNPC.RunServer())
-                    NPC.NewNPCProj(NPC.Center, dartVelocity, dart, BulletTwirlDamage, 0f, -1, 0f, NPC.whoAmI,
+                    NPC.CreateNPCProj(NPC.Center, dartVelocity, dart, BulletTwirlDamage, 0f, -1, 0f, NPC.whoAmI,
                         target.whoAmI);
                 ParticleRegistry.SpawnBloomLineParticle(NPC.Center,
                     dartVelocity.RotatedByRandom(.1f) * Main.rand.NextFloat(1f, 4f), Main.rand.Next(25, 40),
@@ -299,9 +299,9 @@ public sealed partial class StygainHeart
 
             if (ModNPC.RunServer())
             {
-                NPC.NewNPCProj(NPC.Center - Vector2.UnitY * 2000f, Vector2.Zero,
+                NPC.CreateNPCProj(NPC.Center - Vector2.UnitY * 2000f, Vector2.Zero,
                     ModContent.ProjectileType<StygainRoar>(), 0, 0f);
-                NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<BloodBeacon>(), BloodBeaconDamage,
+                NPC.CreateNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<BloodBeacon>(), BloodBeaconDamage,
                     10f);
                 NPC.netUpdate = true;
             }
@@ -327,7 +327,7 @@ public sealed partial class StygainHeart
                         if (!ModNPC.RunServer())
                             continue;
 
-                        Projectile lance = Main.projectile[NPC.NewNPCProj(pos, (Vector2.UnitX * x).RotatedBy(rot),
+                        Projectile lance = Main.projectile[NPC.CreateNPCProj(pos, (Vector2.UnitX * x).RotatedBy(rot),
                             ModContent.ProjectileType<ExsanguinationLance>(), BloodBeaconLanceDamage, 0f,
                             ai1: 1)];
                         lance.ai[1] = 1;
@@ -347,7 +347,7 @@ public sealed partial class StygainHeart
                 int type = ModContent.ProjectileType<BloodMoonlet>();
                 Vector2 pos = new(NPC.Center.X, target.Center.Y + Main.rand.NextFloat(-120f, 120f));
                 Vector2 vel = pos.SafeDirectionTo(target.Center) * Main.rand.NextFloat(15f, 20f);
-                NPC.NewNPCProj(pos, vel, type, BloodBeaconDamage / 2, 0f, -1);
+                NPC.CreateNPCProj(pos, vel, type, BloodBeaconDamage / 2, 0f, -1);
                 SoundID.Item28.Play(pos, 0f, -.3f);
             }
         }
@@ -366,7 +366,7 @@ public sealed partial class StygainHeart
                             if ((int) releaseCounter % 2 == 1)
                                 pos.Y -= spearSpacing;
 
-                            NPC.NewNPCProj(pos, Vector2.UnitX * x * 3f, ModContent.ProjectileType<TaintedStar>(),
+                            NPC.CreateNPCProj(pos, Vector2.UnitX * x * 3f, ModContent.ProjectileType<TaintedStar>(),
                                 BloodBeaconLanceDamage, 0f, -1, 0f, 1f);
                         }
                     }

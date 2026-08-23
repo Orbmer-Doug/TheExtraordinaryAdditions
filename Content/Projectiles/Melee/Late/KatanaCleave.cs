@@ -111,7 +111,7 @@ public class KatanaCleave : BaseSwordSwing
         {
             KatanaCleave cleave = Main
                 .projectile[
-                    Projectile.NewProj(Projectile.Center, Projectile.velocity, Type, Projectile.damage,
+                    Projectile.CreateProj(Projectile.Center, Projectile.velocity, Type, Projectile.damage,
                         Projectile.knockBack, Owner.whoAmI)].As<KatanaCleave>();
             cleave.SwingDir = SwingDir == SwingDirection.Up ? SwingDirection.Down : SwingDirection.Up;
             switch (Swing)
@@ -459,7 +459,7 @@ public class KatanaSweep : ModProjectile
                         Vector2 pos = Vector2.Lerp(InitialStart, End, Main.rand.NextFloat()) +
                                       Main.rand.NextVector2Circular(150f, 150f);
                         Vector2 vel = Main.rand.NextVector2Circular(1f, 1f);
-                        Projectile.NewProj(pos, vel, ModContent.ProjectileType<KatanaSlice>(),
+                        Projectile.CreateProj(pos, vel, ModContent.ProjectileType<KatanaSlice>(),
                             (int) (Projectile.damage * .3f), 0f, Owner.whoAmI);
 
                         AssetRegistry.GennedSounds.SwordSliceShort.Play(pos, .4f, .1f, 0f, 0, Name);

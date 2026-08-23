@@ -33,7 +33,7 @@ public class CursedFlamesHoldout : BaseIdleHoldoutProjectile
             SoundEngine.PlaySound(SoundID.Item20, Projectile.Center);
             Vector2 vel = Projectile.velocity;
             vel *= Item.shootSpeed;
-            Projectile.NewProj(pos + vel, vel, ModContent.ProjectileType<RagingCursedFire>(), Item.damage,
+            Projectile.CreateProj(pos + vel, vel, ModContent.ProjectileType<RagingCursedFire>(), Item.damage,
                 Item.knockBack, Owner.whoAmI);
         }
 
@@ -43,7 +43,7 @@ public class CursedFlamesHoldout : BaseIdleHoldoutProjectile
             SoundEngine.PlaySound(SoundID.Item20 with { Pitch = -.45f, Volume = 1.1f }, Projectile.Center);
             Vector2 vel = Projectile.velocity;
             vel *= Item.shootSpeed * .44f;
-            Projectile.NewProj(pos + vel, vel, ModContent.ProjectileType<CursedEruption>(), (int) (Item.damage * 1.42f),
+            Projectile.CreateProj(pos + vel, vel, ModContent.ProjectileType<CursedEruption>(), (int) (Item.damage * 1.42f),
                 (int) (Item.knockBack * 1.1f), Owner.whoAmI);
         }
 

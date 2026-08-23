@@ -173,7 +173,7 @@ public class ShroomiteDash : ModProjectile
             }
 
             if (this.RunLocal())
-                Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<ShroomiteDashImpact>(),
+                Projectile.CreateProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<ShroomiteDashImpact>(),
                     Projectile.damage, Projectile.knockBack, Projectile.owner);
             AssetRegistry.GennedSounds.VirtueAttack.Play(Projectile.Center, 1.2f, .1f);
             ScreenShakeSystem.New(new(.7f, .5f), Projectile.Center);

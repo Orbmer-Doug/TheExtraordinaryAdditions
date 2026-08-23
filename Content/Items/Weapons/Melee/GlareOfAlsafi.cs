@@ -57,7 +57,7 @@ public sealed class GlareOfAlsafi : ModItem
     {
         AlsafiSword safi = Main
             .projectile[
-                player.NewPlayerProj(player.Center, Vector2.Zero, Item.shoot, Item.damage, Item.knockBack,
+                player.CreatePlayerProj(player.Center, Vector2.Zero, Item.shoot, Item.damage, Item.knockBack,
                     player.whoAmI)].As<AlsafiSword>();
         safi.CurrentState = player.altFunctionUse == ItemAlternativeFunctionID.ActivatedAndUsed
             ? AlsafiSword.AlsafiState.Annihilation
@@ -309,9 +309,9 @@ public sealed class AlsafiSword : ModProjectile
             }
 
 
-            Projectile.NewProj(target.Center, Vector2.Zero, ModContent.ProjectileType<AlsafiExplosion>(), 500_000, 0f,
+            Projectile.CreateProj(target.Center, Vector2.Zero, ModContent.ProjectileType<AlsafiExplosion>(), 500_000, 0f,
                 Owner.whoAmI);
-            Projectile.NewProj(target.Center - Vector2.UnitY * 80f, Vector2.Zero,
+            Projectile.CreateProj(target.Center - Vector2.UnitY * 80f, Vector2.Zero,
                 ModContent.ProjectileType<AlsafiPlasmaFlare>(), 1000, 0f, Owner.whoAmI);
 
             AssetRegistry.GennedSounds.harpoonStop.Play(rect.Center, 1.1f, -.3f, .1f);

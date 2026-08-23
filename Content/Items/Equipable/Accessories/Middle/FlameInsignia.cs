@@ -87,7 +87,7 @@ public sealed class FlameInsigniaPlayer : ModPlayer
                             int dmg = (int) Player.GetTotalDamage(Player.GetBestClass()).ApplyTo(25);
                             int type = ModContent.ProjectileType<InsigniaBlaze>();
                             if (Main.myPlayer == Player.whoAmI)
-                                Player.NewPlayerProj(target.Center, Vector2.Zero, type, dmg, 0f, Player.whoAmI,
+                                Player.CreatePlayerProj(target.Center, Vector2.Zero, type, dmg, 0f, Player.whoAmI,
                                     target.whoAmI);
                         }
                     }

@@ -18,8 +18,8 @@ using Utils = Terraria.Utils;
 namespace TheExtraordinaryAdditions.Content.Projectiles.Base;
 
 /// <summary>
-/// Creates a new held sword projectile <br></br>
-/// The derived class of all swords in the mod <br></br>
+/// Creates a new held sword projectile <br />
+/// The derived class of all swords in the mod <br />
 /// Any <see cref="AdditionsProjectileInfo.ExtraAI"/> at and before 6 is taken and all of <see cref="Projectile.ai"/>
 /// </summary>
 /// Tip: bring up desmos scientific and use round(sqrt(width^2 + height^2)) to get accurate sizes (cause the sprites usually diagonal) 

@@ -56,10 +56,10 @@ public static class Animators
 
         for (int i = 0; i < points.Count - 1; i++)
         {
-            Vector2 p0 = (i == 0) ? points[i] : points[i - 1]; // First point (or previous)
+            Vector2 p0 = i == 0 ? points[i] : points[i - 1]; // First point (or previous)
             Vector2 p1 = points[i]; // Current point
             Vector2 p2 = points[i + 1]; // Next point
-            Vector2 p3 = (i == points.Count - 2) ? points[i + 1] : points[i + 2]; // Next (or next-next)
+            Vector2 p3 = i == points.Count - 2 ? points[i + 1] : points[i + 2]; // Next (or next-next)
 
             for (int j = 0; j < segments; j++)
             {
@@ -107,10 +107,10 @@ public static class Animators
     {
         return t =>
         {
-            Vector2 _p0 = new(0f, 0f); // Start point
-            Vector2 _p1 = new(x1, y1); // First control point
-            Vector2 _p2 = new(x2, y2); // Second control point
-            Vector2 _p3 = new(1f, 1f); // End point
+            Vector2 p0 = new(0f, 0f); // Start point
+            Vector2 p1 = new(x1, y1); // First control point
+            Vector2 p2 = new(x2, y2); // Second control point
+            Vector2 p3 = new(1f, 1f); // End point
 
             float u = 1f - t;
             float tt = t * t;
@@ -119,10 +119,10 @@ public static class Animators
             float ttt = tt * t;
 
             // Cubic Bézier formula: B(t) = (1-t)^3 * P0 + 3(1-t)^2 * t * P1 + 3(1-t) * t^2 * P2 + t^3 * P3
-            Vector2 point = uuu * _p0 +
-                            3f * uu * t * _p1 +
-                            3f * u * tt * _p2 +
-                            ttt * _p3;
+            Vector2 point = uuu * p0 +
+                            3f * uu * t * p1 +
+                            3f * u * tt * p2 +
+                            ttt * p3;
 
             return point.Y;
         };
@@ -147,28 +147,21 @@ public static class Animators
 
     public static Curve Expo(float exponent = 2f)
     {
-        return new(interpolant =>
+        return new(interpolant => interpolant <= 0f ? 0f : Pow(exponent, 10f * interpolant - 10f), interpolant =>
         {
-            if (interpolant == 0f)
-                return 0f;
-
-            return Pow(exponent, 10f * interpolant - 10f);
-        }, interpolant =>
-        {
-            if (interpolant == 1f)
+            if (interpolant >= 1f)
                 return 1f;
 
             return 1f - Pow(exponent, -10f * interpolant);
         }, interpolant =>
         {
-            if (interpolant == 0f)
-                return 0f;
-            if (interpolant == 1f)
-                return 1f;
-            if (interpolant <= .5f)
-                return Pow(exponent, (20f * interpolant) - 10f) / 2f;
-
-            return (2f - Pow(exponent, (-20f * interpolant) + 10f)) / 2f;
+            return interpolant switch
+            {
+                0f => 0f,
+                >= 1f => 1f,
+                <= .5f => Pow(exponent, 20f * interpolant - 10f) / 2f,
+                _ => (2f - Pow(exponent, -20f * interpolant + 10f)) / 2f
+            };
         });
     }
 
@@ -189,7 +182,7 @@ public static class Animators
         interpolant => Pow(2, -10 * interpolant) * Sin((interpolant * 10f - 0.75f) * c4) + 1,
         interpolant => interpolant < 0.5
             ? -(Pow(2, 20 * interpolant - 10) * Sin((20 * interpolant - 11.125f) * c5)) / 2
-            : (Pow(2, -20 * interpolant + 10) * Sin((20 * interpolant - 11.125f) * c5)) / 2 + 1);
+            : Pow(2, -20 * interpolant + 10) * Sin((20 * interpolant - 11.125f) * c5) / 2 + 1);
 
     private static float BounceOutFunction(float interpolant) => interpolant < 1 / d1 ? n1 * interpolant.Squared()
         : interpolant < 2 / d1 ? n1 * (interpolant - 1.5f / d1) * interpolant + 0.75f
@@ -206,74 +199,32 @@ public static class Animators
 
     #region Evaluators
 
-    /// <summary>
-    /// Evaluates an interpolation function at a given interpolant, scaling from start to end
-    /// </summary>
-    public static float Evaluate(this InterpolationFunction interpol, float start, float end, float interpolant,
-        bool clamp = true)
+    extension(InterpolationFunction interpol)
     {
-        if (clamp)
-            interpolant = Clamp(interpolant, 0f, 1f);
-        return Lerp(start, end, interpol(interpolant));
-    }
-
-    /// <summary>
-    /// Maps a value from one range to another using an interpolation function
-    /// </summary>
-    public static float Evaluate(this InterpolationFunction interpol, float fromValue, float fromMin, float fromMax,
-        float toMin, float toMax, bool clamp = true)
-    {
-        float lerpValue = InverseLerp(fromMin, fromMax, fromValue, clamp);
-        return interpol.Evaluate(toMin, toMax, lerpValue, clamp);
-    }
-
-    /// <summary>
-    /// Maps a value through two ranges with a bump effect (multiplies results) using an interpolation function
-    /// </summary>
-    public static float EvaluateBump(this (InterpolationFunction first, InterpolationFunction second) curves,
-        float fromValue,
-        float fromMin1, float fromMax1, float toMin1, float toMax1,
-        float fromMin2, float fromMax2, float toMin2, float toMax2,
-        bool clampInput = true, bool clampOutput = true)
-    {
-        float lerp1 = curves.first.Evaluate(fromValue, fromMin1, fromMax1, toMin1, toMax1, clampInput);
-        float lerp2 = curves.second.Evaluate(fromValue, fromMin2, fromMax2, toMin2, toMax2, clampInput);
-        float result = lerp1 * lerp2;
-
-        if (clampOutput)
+        /// <summary>
+        /// Evaluates an interpolation function at a given interpolant, scaling from start to end
+        /// </summary>
+        public float Evaluate(float start, float end, float interpolant,
+            bool clamp = true)
         {
-            float minResult = Math.Min(toMin1 * toMin2, toMax1 * toMax2);
-            float maxResult = Math.Max(toMin1 * toMax2, toMax1 * toMin2);
-            result = Clamp(result, minResult, maxResult);
+            if (clamp)
+                interpolant = Clamp(interpolant, 0f, 1f);
+            return Lerp(start, end, interpol(interpolant));
         }
 
-        return result;
+        /// <summary>
+        /// Maps a value from one range to another using an interpolation function
+        /// </summary>
+        public float Evaluate(float fromValue, float fromMin, float fromMax,
+            float toMin, float toMax, bool clamp = true)
+        {
+            float lerpValue = InverseLerp(fromMin, fromMax, fromValue, clamp);
+            return interpol.Evaluate(toMin, toMax, lerpValue, clamp);
+        }
     }
-
-    /// <summary>
-    /// <inheritdoc cref="EvaluateBump(ValueTuple{InterpolationFunction, InterpolationFunction}, float, float, float, float, float, float, float, float, float, bool)"></inheritdoc>
-    /// </summary>
-    public static float EvaluateBump(this InterpolationFunction curve, float fromValue,
-        float fromMin1, float fromMax1, float toMin1, float toMax1,
-        float fromMin2, float fromMax2, float toMin2, float toMax2,
-        bool clampInput = true, bool clampOutput = true) =>
-        EvaluateBump((curve, curve), fromValue, fromMin1, fromMax1, toMin1, toMax1, fromMin2, fromMax2, toMin2, toMax2,
-            clampInput, clampOutput);
 
     public sealed class PiecewiseCurve
     {
-        /// <summary>
-        /// A piecewise curve that takes up part of a domain
-        /// </summary>
-        private readonly struct CurveSegment(float from, float to, float start, float end, InterpolationFunction funct)
-        {
-            internal readonly float From = from;
-            internal readonly float To = to;
-            internal readonly float Start = start;
-            internal readonly float End = end;
-            internal readonly InterpolationFunction Funct = funct;
-        }
-
         private readonly List<CurveSegment> segments = [];
 
         public PiecewiseCurve Add(float from, float to, float end, InterpolationFunction funct)
@@ -299,13 +250,23 @@ public static class Animators
 
             CurveSegment use = default;
             for (int i = segments.Count - 1; i >= 0; --i)
-            {
                 if (interpolant >= segments[i].Start && interpolant <= segments[i].End)
                     use = segments[i];
-            }
 
             float localInterpol = InverseLerp(use.Start, use.End, interpolant);
             return Lerp(use.From, use.To, use.Funct!(localInterpol));
+        }
+
+        /// <summary>
+        /// A piecewise curve that takes up part of a domain
+        /// </summary>
+        private readonly struct CurveSegment(float from, float to, float start, float end, InterpolationFunction funct)
+        {
+            internal readonly float From = from;
+            internal readonly float To = to;
+            internal readonly float Start = start;
+            internal readonly float End = end;
+            internal readonly InterpolationFunction Funct = funct;
         }
     }
 

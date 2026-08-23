@@ -85,7 +85,7 @@ public sealed class FulminicEyePlayer : ModPlayer
             SoundEngine.PlaySound(SoundID.DD2_LightningAuraZap, Player.Center);
             Vector2 vel = Player.SafeDirectionTo(n.Center) * 10f;
             if (Main.myPlayer == Player.whoAmI)
-                Player.NewPlayerProj(Player.Center, n.Center.ToRectangle(6, 6).RandomRectangle(),
+                Player.CreatePlayerProj(Player.Center, n.Center.ToRectangle(6, 6).RandomRectangle(),
                     ModContent.ProjectileType<FulminicSpark>(), 30, 1f, Player.whoAmI);
 
             for (int i = 0; i < 12; i++)

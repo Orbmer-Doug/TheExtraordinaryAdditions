@@ -70,7 +70,7 @@ public class TechnicBlitzripperProj : BaseIdleHoldoutProjectile, ILocalizedModTy
         {
             Owner.PickAmmo(Item, out int type, out float speed, out int dmg, out float kb, out int ammoID,
                 Owner.IsAmmoFreeThisShot(Item, Owner.ChooseAmmo(Item), Owner.ChooseAmmo(Item).type));
-            Projectile.NewProj(Tip, Projectile.velocity.SafeNormalize(Vector2.Zero) * 12f, type, dmg, kb,
+            Projectile.CreateProj(Tip, Projectile.velocity.SafeNormalize(Vector2.Zero) * 12f, type, dmg, kb,
                 Main.myPlayer);
 
             for (int i = 0; i < 12; i++)
@@ -130,7 +130,7 @@ public class TechnicBlitzripperProj : BaseIdleHoldoutProjectile, ILocalizedModTy
             if (SniperTimer >= FireSniper)
             {
                 AssetRegistry.GennedSounds.LargeSniperFire.Play(Tip, 1.3f, -.1f, 0f, 2, Name);
-                Projectile.NewProj(Tip, Projectile.velocity * 20f, ModContent.ProjectileType<EtherealRipBlast>(),
+                Projectile.CreateProj(Tip, Projectile.velocity * 20f, ModContent.ProjectileType<EtherealRipBlast>(),
                     Projectile.damage * 70, Projectile.knockBack * 10f);
 
                 for (int i = 0; i < 12; i++)

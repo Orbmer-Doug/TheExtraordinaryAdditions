@@ -164,7 +164,7 @@ public class ManagedScreenShader : IDisposable
     }
 
     /// <summary>
-    /// Sets a texture at a given index for this shader to use <br></br>
+    /// Sets a texture at a given index for this shader to use <br />
     /// Remember, index 0 may be populated with whatever was passed into a <see cref="SpriteBatch"/>.Draw call
     /// </summary>
     /// <param name="texture">The texture to supply</param>
@@ -696,7 +696,7 @@ public interface IHasScreenShader
     void ReleaseShader();
 
     /// <summary>
-    /// Used to tell <see cref="ScreenShaderUpdates"/> when to remove a object in case it failed to call <see cref="ReleaseShader"/> <br></br>
+    /// Used to tell <see cref="ScreenShaderUpdates"/> when to remove a object in case it failed to call <see cref="ReleaseShader"/> <br />
     /// Most notably seen when something like a projectile gets removed with setting active to false and its <see cref="ModProjectile.OnKill(int)"/> not being called
     /// </summary>
     /// <returns>Whether this object is successfully updating in-game</returns>

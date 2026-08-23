@@ -83,7 +83,7 @@ public class BreakerBladeCrush : BaseSwordSwing
 
                     if (Beam && this.RunLocal())
                     {
-                        Projectile.NewProj(Projectile.Center, Vector2.UnitX * 15 * Direction,
+                        Projectile.CreateProj(Projectile.Center, Vector2.UnitX * 15 * Direction,
                             ModContent.ProjectileType<BreakerBeam>(),
                             Projectile.damage, Projectile.knockBack * .25f, Projectile.owner, 0f,
                             Owner.CheckSolidGround().ToInt(), 0f, SpecialAttack.ToInt());

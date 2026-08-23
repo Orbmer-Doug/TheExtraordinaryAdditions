@@ -52,7 +52,7 @@ public class InfernalFork : ModProjectile, ILocalizedModType, IModType
     public override void OnKill(int timeLeft)
     {
         if (this.RunLocal())
-            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<InfernalBlast>(),
+            Projectile.CreateProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<InfernalBlast>(),
                 (int) (Projectile.damage * .75f), Projectile.knockBack, Projectile.owner);
     }
 }

@@ -146,7 +146,7 @@ public class HolySwordSwing : BaseSwordSwing
                             {
                                 Vector2 pos = Rect().Top;
                                 if (this.RunLocal())
-                                    Projectile.NewProj(pos, Center.SafeDirectionTo(pos) * Main.rand.NextFloat(5f, 9f),
+                                    Projectile.CreateProj(pos, Center.SafeDirectionTo(pos) * Main.rand.NextFloat(5f, 9f),
                                         ModContent.ProjectileType<HolyDart>(), Projectile.damage, Projectile.knockBack,
                                         Projectile.owner);
                                 Shots++;

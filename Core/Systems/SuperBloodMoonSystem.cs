@@ -212,7 +212,7 @@ public class SuperBloodMoonGlobalNPC : GlobalNPC
             if (timer % EyeShootWait == (EyeShootWait - 1) && tip.IsInFieldOfView(rot, target.Center, .55f, Eyesight))
             {
                 Vector2 vel = npc.Center.SafeDirectionTo(target.Center) * 7;
-                npc.Shoot(tip, vel, ModContent.ProjectileType<VermillionTear>(), npc.damage / 2, 2f);
+                npc.CreateNPCProjAlt(tip, vel, ModContent.ProjectileType<VermillionTear>(), npc.damage / 2, 2f);
             }
 
             timer++;

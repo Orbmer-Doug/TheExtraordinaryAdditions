@@ -41,7 +41,7 @@ public class BandOfSunrays : ModItem
                 int damage = (int) totalDamage.ApplyTo(150f);
                 for (int i = 0; i < 3; i++)
                 {
-                    Projectile star = Main.projectile[player.NewPlayerProj(player.Center, Vector2.Zero,
+                    Projectile star = Main.projectile[player.CreatePlayerProj(player.Center, Vector2.Zero,
                         ModContent.ProjectileType<LightSpirit>(), damage,
                         0f, player.whoAmI, MathHelper.TwoPi * i / 3f)];
                     star.rotation = star.ai[0];

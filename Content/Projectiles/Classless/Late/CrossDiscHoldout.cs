@@ -263,7 +263,7 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
             Vector2 velocity = Projectile.SafeDirectionTo(Modded.MouseWorld);
 
             // Make the swing
-            Projectile swing = Main.projectile[Projectile.NewProj(Center, velocity, swingType,
+            Projectile swing = Main.projectile[Projectile.CreateProj(Center, velocity, swingType,
                 Projectile.damage, Projectile.knockBack, Projectile.owner)];
             swing.AdditionsInfo().ExtraAI[6] = (float) BaseSwordSwing.SwingDirection.Up;
             swing.AdditionsInfo().ExtraAI[7] = (float) State;
@@ -338,7 +338,7 @@ public class CrossDiscHoldout : BaseIdleHoldoutProjectile
             float state = Projectile.ai[0];
             float progress = ReticleProgress;
 
-            Projectile vrp = Main.projectile[Projectile.NewProj(pos, vel, type, damage, kB, own, state, progress)];
+            Projectile vrp = Main.projectile[Projectile.CreateProj(pos, vel, type, damage, kB, own, state, progress)];
             vrp.AdditionsInfo().ExtraAI[2] = (FullReticleProgress >= 1f).ToInt();
             vrp.netUpdate = true;
 
@@ -834,7 +834,7 @@ public class CrossSwing : BaseSwordSwing
 
                         newVelocity *= 1f - Main.rand.NextFloat(0.3f);
 
-                        Projectile.NewProj(Center, newVelocity, ModContent.ProjectileType<BouncyIcicle>(),
+                        Projectile.CreateProj(Center, newVelocity, ModContent.ProjectileType<BouncyIcicle>(),
                             Projectile.damage / 3, Projectile.knockBack / 9, Projectile.owner);
                     }
 
@@ -848,7 +848,7 @@ public class CrossSwing : BaseSwordSwing
                         Vector2 pos = target - new Vector2(Main.rand.NextFloat(-40f, 40f), 800f);
                         pos.Y -= 200 * i;
                         Vector2 vel = Vector2.UnitY.RotatedByRandom(.3f) * Main.rand.NextFloat(4f, 10f);
-                        Projectile.NewProj(pos, vel, ModContent.ProjectileType<ScarletMeteor>(), Projectile.damage,
+                        Projectile.CreateProj(pos, vel, ModContent.ProjectileType<ScarletMeteor>(), Projectile.damage,
                             Projectile.knockBack / 2, Owner.whoAmI);
                     }
 
@@ -859,7 +859,7 @@ public class CrossSwing : BaseSwordSwing
                 case Element.Wave:
                     for (int i = 0; i < 4; i++)
                     {
-                        Projectile.NewProj(Center,
+                        Projectile.CreateProj(Center,
                             Center.SafeDirectionTo(Modded.MouseWorld).RotatedByRandom(.6f) *
                             Main.rand.NextFloat(10f, 12f),
                             ModContent.ProjectileType<WaveSiphon>(), Projectile.damage / 5, 0f, Projectile.owner);
@@ -976,7 +976,7 @@ public class CrossSwing : BaseSwordSwing
 
                 if (this.RunLocal())
                 {
-                    ShockLightning shock = Main.projectile[Projectile.NewProj(npc.Center - Vector2.UnitY * 800f,
+                    ShockLightning shock = Main.projectile[Projectile.CreateProj(npc.Center - Vector2.UnitY * 800f,
                             Vector2.Zero,
                             ModContent.ProjectileType<ShockLightning>(), Projectile.damage / 2, 0f, Projectile.owner)]
                         .As<ShockLightning>();
@@ -1230,7 +1230,7 @@ public class ScarletMeteor : ModProjectile
             for (int i = 0; i < 4; i++)
             {
                 Vector2 vel = (MathHelper.TwoPi * InverseLerp(0f, 4, i) + off).ToRotationVector2();
-                Projectile.NewProj(Projectile.Center, vel, ModContent.ProjectileType<ScarletMeteorExplosion>(),
+                Projectile.CreateProj(Projectile.Center, vel, ModContent.ProjectileType<ScarletMeteorExplosion>(),
                     Projectile.damage / 4, Projectile.knockBack / 4f, Projectile.owner);
             }
         }

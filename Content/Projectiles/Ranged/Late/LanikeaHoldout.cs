@@ -148,7 +148,7 @@ public class LanikeaHoldout : BaseIdleHoldoutProjectile
                 float speed = (val + 11f * ChargeProgress);
                 Vector2 vel = direction * speed;
                 int type = ModContent.ProjectileType<VolatileStar>();
-                Projectile.NewProj(Tip, vel, type, realDamage / 2, Projectile.knockBack, Owner.whoAmI);
+                Projectile.CreateProj(Tip, vel, type, realDamage / 2, Projectile.knockBack, Owner.whoAmI);
 
                 Vector2 velocity = direction * 10f;
                 for (int j = 0; j < 12; j++)
@@ -181,10 +181,10 @@ public class LanikeaHoldout : BaseIdleHoldoutProjectile
                 int type = ModContent.ProjectileType<CosmicSlugCharge>();
                 int damage = (int) (Projectile.damage * .65f);
                 Vector2 final = velocity.RotatedByRandom(.36f) * Main.rand.NextFloat(.5f, .7f);
-                Projectile.NewProj(Tip, final, type, damage, 6f, Owner.whoAmI);
+                Projectile.CreateProj(Tip, final, type, damage, 6f, Owner.whoAmI);
             }
 
-            Projectile.NewProj(Projectile.Center, new Vector2(5 * -Projectile.direction, -5f),
+            Projectile.CreateProj(Projectile.Center, new Vector2(5 * -Projectile.direction, -5f),
                 ModContent.ProjectileType<GalaxyShell>(), 0, 0f);
 
             Color pulseColor2 = (Main.rand.NextBool() ? Color.BlueViolet : Color.SlateGray);

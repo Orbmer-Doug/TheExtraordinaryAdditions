@@ -51,7 +51,7 @@ public class CallerOfBirdsCall : BaseHoldoutProjectile
                     vel.Y *= -1f;
 
                 vel *= Item.shootSpeed;
-                Projectile.NewProj(position, vel, ModContent.ProjectileType<Pigeon>(), Projectile.damage / 3, 0f,
+                Projectile.CreateProj(position, vel, ModContent.ProjectileType<Pigeon>(), Projectile.damage / 3, 0f,
                     Owner.whoAmI);
             }
         }

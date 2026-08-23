@@ -83,7 +83,7 @@ public partial class Asterlin
                     if (ModNPC.RunServer() && AITimer % Lightripper_ReleaseRate == Lightripper_ReleaseRate - 1)
                     {
                         int type = ModContent.ProjectileType<LightrippingBeam>();
-                        NPC.NewNPCProj(RightHandPosition + shootVelocity.SafeNormalize(Vector2.Zero) * 100f,
+                        NPC.CreateNPCProj(RightHandPosition + shootVelocity.SafeNormalize(Vector2.Zero) * 100f,
                             shootVelocity, type, HeavyAttackDamage, 0f);
                     }
 
@@ -149,7 +149,7 @@ public partial class Asterlin
                         Vector2 pos = NPC.Center;
                         Vector2 vel = NPC.SafeDirectionTo(Target.Center).RotatedByRandom(.85f) *
                                       Main.rand.NextFloat(11f, 99f);
-                        NPC.NewNPCProj(pos, vel, ModContent.ProjectileType<DartBomb>(), LightAttackDamage, 0f);
+                        NPC.CreateNPCProj(pos, vel, ModContent.ProjectileType<DartBomb>(), LightAttackDamage, 0f);
                     }
                 }
 

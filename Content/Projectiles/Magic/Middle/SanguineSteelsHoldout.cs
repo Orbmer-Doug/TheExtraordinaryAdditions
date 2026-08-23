@@ -86,7 +86,7 @@ public class SanguineSteelsHoldout : BaseHoldoutProjectile
             {
                 Vector2 pos = Projectile.Center;
                 Vector2 vel = pos.SafeDirectionTo((Center + Projectile.velocity * 100f));
-                Projectile.NewProj(pos, vel * 10f, ModContent.ProjectileType<SanguineLance>(), Projectile.damage * 4,
+                Projectile.CreateProj(pos, vel * 10f, ModContent.ProjectileType<SanguineLance>(), Projectile.damage * 4,
                     Projectile.knockBack, Projectile.owner);
 
                 for (int i = 0; i < 20; i++)
@@ -109,7 +109,7 @@ public class SanguineSteelsHoldout : BaseHoldoutProjectile
                     Vector2 pos = Projectile.Center + PolarVector(PortalSize / 4 + ExtraPortalSize,
                         Utils.Remap(i, 0, 3, 0f, MathHelper.TwoPi) + Rot);
                     Vector2 vel = pos.SafeDirectionTo(Modded.MouseWorld) * 12f;
-                    Projectile.NewProj(pos, vel, ModContent.ProjectileType<VermillionDart>(),
+                    Projectile.CreateProj(pos, vel, ModContent.ProjectileType<VermillionDart>(),
                         (int) (Projectile.damage / 4f), 0f,
                         Owner.whoAmI);
                 }

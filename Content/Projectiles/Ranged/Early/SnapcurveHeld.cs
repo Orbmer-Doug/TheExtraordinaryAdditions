@@ -41,7 +41,7 @@ public class SnapcurveHeld : BaseIdleHoldoutProjectile
         if (this.RunLocal() && Owner.HasAmmo(Item) && activatingShoot)
         {
             Switch = 1;
-            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<CrystallineBlast>(),
+            Projectile.CreateProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<CrystallineBlast>(),
                 Projectile.damage, Projectile.knockBack, Owner.whoAmI, 0f, Projectile.whoAmI);
             this.Sync();
         }

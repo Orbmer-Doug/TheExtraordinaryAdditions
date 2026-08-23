@@ -122,7 +122,7 @@ public class GunSwordSword : BaseSwordSwing
             Vector2 close = npc.RotHitbox().GetClosestPoint(Rect().Center, true);
             for (int i = 0; i < 4; i++)
             {
-                Projectile.NewProj(close, SwordDir.RotatedByRandom(.6f) * Main.rand.NextFloat(7f, 10f),
+                Projectile.CreateProj(close, SwordDir.RotatedByRandom(.6f) * Main.rand.NextFloat(7f, 10f),
                     ModContent.ProjectileType<SplinteredBone>(), Projectile.damage / 4, 0f, Owner.whoAmI);
             }
         }
@@ -371,7 +371,7 @@ public class GunGunSword : ModProjectile
                     for (int i = 0; i < 4; i++)
                     {
                         vel *= Main.rand.NextFloat(.8f, 1.2f);
-                        Projectile.NewProj(pos, vel.RotatedByRandom(.2f), ModContent.ProjectileType<SkeleShot>(), dmg,
+                        Projectile.CreateProj(pos, vel.RotatedByRandom(.2f), ModContent.ProjectileType<SkeleShot>(), dmg,
                             kb, Projectile.owner);
                     }
 

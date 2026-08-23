@@ -264,7 +264,7 @@ public class SpoonSwing : BaseSwordSwing
                     ParticleRegistry.SpawnBlurParticle(Projectile.Center, 40, .4f, 800f);
 
                     int dmg = (int) Owner.GetTotalDamage<MeleeDamageClass>().ApplyTo(1000);
-                    Projectile.NewProj(npc.Bottom, Vector2.Zero, type, dmg, 0f, Owner.whoAmI);
+                    Projectile.CreateProj(npc.Bottom, Vector2.Zero, type, dmg, 0f, Owner.whoAmI);
                 }
 
                 AssetRegistry.GennedSounds.metalSlam.Play(Projectile.Center, 2.2f);

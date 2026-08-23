@@ -145,7 +145,7 @@ public class StarWater : ModProjectile
                 Vector2 vel = -Projectile.velocity.RotatedByRandom(MathHelper.TwoPi);
                 vel *= Main.rand.NextFloat(.2f, .3f);
                 int proj = ModContent.ProjectileType<StarWaterBreak>();
-                Projectile.NewProj(pos, vel, proj, Projectile.damage / (amt + 10), Projectile.knockBack,
+                Projectile.CreateProj(pos, vel, proj, Projectile.damage / (amt + 10), Projectile.knockBack,
                     Projectile.owner, 0f);
             }
         }

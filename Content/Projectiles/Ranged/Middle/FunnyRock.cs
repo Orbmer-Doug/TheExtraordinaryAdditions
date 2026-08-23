@@ -141,7 +141,7 @@ public class FunnyRock : ModProjectile
         AssetRegistry.GennedSounds.LightningStrike.Play(Projectile.Center, .7f, 0f, 0f, 1, Name);
         AssetRegistry.GennedSounds.ElectricalPowBoom.Play(Projectile.Center, 1.2f, .2f, 0f, 0, Name);
         if (this.RunLocal())
-            Projectile.NewProj(target.Center, Vector2.Zero, ModContent.ProjectileType<RockLightning>(),
+            Projectile.CreateProj(target.Center, Vector2.Zero, ModContent.ProjectileType<RockLightning>(),
                 Projectile.damage, Projectile.knockBack, Owner.whoAmI);
 
         for (int i = 0; i < 50; i++)

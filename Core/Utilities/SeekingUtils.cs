@@ -309,7 +309,7 @@ public static class NPCTargeting
                (!data.LOS || Collision.CanHit(origin, 1, 1, npc.Center, 1, 1));
     }
 
-    public static bool CanHomeInto(this NPC npc, bool ignoreInvis = false, bool ignoreInvincibility = false)
+    public static bool CanHomeInto(this NPC npc, bool ignoreInvincibility = false)
     {
         if (npc != null && npc.active)
             return npc.life > 0 && npc.CanBeChasedBy(null, ignoreInvincibility) && !npc.townNPC && npc.Opacity > 0f;
@@ -319,8 +319,8 @@ public static class NPCTargeting
     public static NPC MinionHoming(NPCSeekingData data, Player owner, bool checksRange = false)
     {
         // Validate owner and target index
-        if (owner == null || !owner.whoAmI.WithinBounds(byte.MaxValue) ||
-            !owner.MinionAttackTargetNPC.WithinBounds(Main.maxNPCs))
+        if (owner == null || !(owner.whoAmI > 0 && owner.whoAmI < Main.maxPlayers) ||
+            !(owner.MinionAttackTargetNPC > 0 && owner.MinionAttackTargetNPC < Main.maxNPCs))
         {
             return GetClosestNPC(data);
         }

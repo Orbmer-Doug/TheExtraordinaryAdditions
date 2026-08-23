@@ -125,8 +125,8 @@ public unsafe struct ParticleData
         : SupportedBlendStates[blendStateIndex - 1];
 
     /// <summary>
-    /// Helper to cast CustomData to a specific struct <br></br>
-    /// Maximum size of a struct is 255 bytes. <see cref="float"/> is 4 bytes, <see cref="bool"/> is 4 bytes because of padding, etc. <br></br>
+    /// Helper to cast CustomData to a specific struct <br />
+    /// Maximum size of a struct is 255 bytes. <see cref="float"/> is 4 bytes, <see cref="bool"/> is 4 bytes because of padding, etc. <br />
     /// Use packing if necessary
     /// </summary>
     /// <typeparam name="T">The struct</typeparam>
@@ -150,7 +150,7 @@ public unsafe struct ParticleData
 public enum DrawTypes
 {
     /// <summary>
-    /// Draw in <see cref="PixelationSystem"/> at a specified <see cref="PixelationLayer"/> <br></br>
+    /// Draw in <see cref="PixelationSystem"/> at a specified <see cref="PixelationLayer"/> <br />
     /// <b>Only for primitives</b>
     /// </summary>
     Pixelize = 0,

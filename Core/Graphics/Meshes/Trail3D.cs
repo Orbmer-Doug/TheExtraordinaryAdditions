@@ -15,7 +15,7 @@ public readonly struct TrailSample3D(Vector3 position, Vector3 normal, float opa
 }
 
 /// <summary>
-/// Manages a fixed-size shift buffer of <see cref="TrailSample3D"/> values. <br></br>
+/// Manages a fixed-size shift buffer of <see cref="TrailSample3D"/> values. <br />
 /// The newest sample is always inserted at index 0; older samples shift right.
 /// </summary>
 public sealed class TrailPoints3D

@@ -37,7 +37,7 @@ public class RejuvenationArtifact : ModItem
     {
         int gem = ModContent.ProjectileType<RejuvenationHover>();
         if (Main.myPlayer == player.whoAmI && player.ownedProjectileCounts[gem] <= 0)
-            player.NewPlayerProj(player.Center, Vector2.Zero, gem, 0, 0f, player.whoAmI);
+            player.CreatePlayerProj(player.Center, Vector2.Zero, gem, 0, 0f, player.whoAmI);
 
         player.GetModPlayer<RejuvenationArtifactPlayer>().Equipped = true;
     }

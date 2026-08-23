@@ -145,7 +145,7 @@ public class SangueSpin : ModProjectile
                 int wait = (int) (5 / Speed);
                 if (lerper is > .8f and < 1f && Time % wait == (wait - 1) && this.RunLocal())
                 {
-                    Projectile.NewProj(Rect().Top, (Projectile.rotation - SwordRot).ToRotationVector2(),
+                    Projectile.CreateProj(Rect().Top, (Projectile.rotation - SwordRot).ToRotationVector2(),
                         ModContent.ProjectileType<SangueGlare>(),
                         Projectile.damage / 4, Projectile.knockBack, Projectile.owner);
                 }

@@ -120,7 +120,7 @@ public sealed partial class StygainHeart
         if (AttackTimer >= totalTime)
         {
             if (ModProjectile.RunServer())
-                NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<StygainRoar>(), 0, 0f, -1);
+                NPC.CreateNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<StygainRoar>(), 0, 0f, -1);
             SoundID.Roar.Play(NPC.Center, 2f, -.3f);
 
             HasDonePhase2Drama = true;

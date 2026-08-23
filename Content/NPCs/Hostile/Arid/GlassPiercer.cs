@@ -132,7 +132,7 @@ public class GlassPiercer : ModNPC
         if (NPC.localAI[0] == 0)
         {
             if (ModNPC.RunServer())
-                NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<GlassFocusedSniper>(), NPC.damage,
+                NPC.CreateNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<GlassFocusedSniper>(), NPC.damage,
                     2f, NPC.whoAmI);
             Running = false;
             NPC.localAI[0] = 1;

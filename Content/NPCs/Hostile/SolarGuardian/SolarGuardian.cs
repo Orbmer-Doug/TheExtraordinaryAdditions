@@ -148,7 +148,7 @@ public class SolarGuardian : ModNPC
                             Vector2 vel = NPC.rotation.ToRotationVector2()
                                 .RotatedBy(MathHelper.Lerp(-.4f, .4f, InverseLerp(0f, count - 1, i))) * 3f;
                             if (ModNPC.RunServer())
-                                NPC.NewNPCProj(NPC.Center, vel, ModContent.ProjectileType<Sunray>(), SunrayDamage, 1f);
+                                NPC.CreateNPCProj(NPC.Center, vel, ModContent.ProjectileType<Sunray>(), SunrayDamage, 1f);
                             for (int o = 0; o < 6; o++)
                             {
                                 ParticleRegistry.SpawnBloomLineParticle(

@@ -133,7 +133,7 @@ public sealed class TheGiantSnailFromAncientTimes : ModNPC
             int damage = DifficultyBasedValue(30, 50, 65, 69, 80);
             const float speed = 10f;
             if (ModNPC.RunServer())
-                NPC.NewNPCProj(NPC.Center, direction.RotatedByRandom(.5f) * speed,
+                NPC.CreateNPCProj(NPC.Center, direction.RotatedByRandom(.5f) * speed,
                     ModContent.ProjectileType<ParmaJawn>(), damage, 1f);
             NPC.netUpdate = true;
         }

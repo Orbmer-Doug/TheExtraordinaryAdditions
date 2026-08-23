@@ -76,7 +76,7 @@ public class SnareHoldout : BaseHoldoutProjectile
 
                 SoundID.Grass.Play(Mouse, 1f, 0f, .2f);
                 if (this.RunLocal())
-                    Projectile.NewProj(Mouse, newVelocity, type, Projectile.damage, Projectile.knockBack, Owner.whoAmI);
+                    Projectile.CreateProj(Mouse, newVelocity, type, Projectile.damage, Projectile.knockBack, Owner.whoAmI);
             }
         }
 

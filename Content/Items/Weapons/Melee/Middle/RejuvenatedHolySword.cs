@@ -10,7 +10,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 
 /// <summary>
-/// First item in the mod. (was just holy sword) <br></br>
+/// First item in the mod. (was just holy sword) <br />
 /// 7/8/2023
 /// </summary>
 public class RejuvenatedHolySword : ModItem

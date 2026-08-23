@@ -124,7 +124,7 @@ public class LazerDrone : ModProjectile
             float power = MathHelper.Clamp(ChargeCompletion * 2.5f, 1f, 2.5f);
             int dmg = (int) (Projectile.damage * power);
             float kb = Projectile.knockBack * power;
-            Projectile.NewProj(tip, vel, ModContent.ProjectileType<DroneLaser>(), dmg, kb, Owner.whoAmI, 0f, 0f,
+            Projectile.CreateProj(tip, vel, ModContent.ProjectileType<DroneLaser>(), dmg, kb, Owner.whoAmI, 0f, 0f,
                 ChargeCompletion);
             for (int i = 0; i < 20 + (20 * ChargeCompletion); i++)
             {

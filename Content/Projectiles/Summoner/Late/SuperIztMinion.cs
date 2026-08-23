@@ -127,7 +127,7 @@ public class SuperIztMinion : ModProjectile
         if (!HasHitTarget)
         {
             if (this.RunLocal())
-                Projectile.NewProj(target.RandAreaInEntity(), Vector2.Zero, ModContent.ProjectileType<LokiBoom>(),
+                Projectile.CreateProj(target.RandAreaInEntity(), Vector2.Zero, ModContent.ProjectileType<LokiBoom>(),
                     Projectile.damage, 0f, Projectile.owner);
             HitTime = 50;
             Projectile.velocity *= 2f;

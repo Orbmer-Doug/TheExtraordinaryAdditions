@@ -121,7 +121,7 @@ public sealed class ManagedShader : IDisposable
     }
 
     /// <summary>
-    /// Sets a texture at a given index for this shader to use <br></br>
+    /// Sets a texture at a given index for this shader to use <br />
     /// Remember, index 0 may be populated with whatever was passed into a <see cref="SpriteBatch"/>.Draw call
     /// </summary>
     /// <param name="texture">The texture to supply</param>

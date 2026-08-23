@@ -87,7 +87,7 @@ public class LivingStarFlareMinion : ModProjectile
             {
                 AssetRegistry.GennedSounds.HeavyLaserBlast.Play(Projectile.Center, .6f, -.1f, 0f, 20);
                 if (this.RunLocal())
-                    Projectile.NewProj(Projectile.Center, Projectile.SafeDirectionTo(Target.Center),
+                    Projectile.CreateProj(Projectile.Center, Projectile.SafeDirectionTo(Target.Center),
                         ModContent.ProjectileType<LivingStarBeam>(), Projectile.damage, Projectile.knockBack,
                         Owner.whoAmI, Projectile.whoAmI, Target.whoAmI);
             }

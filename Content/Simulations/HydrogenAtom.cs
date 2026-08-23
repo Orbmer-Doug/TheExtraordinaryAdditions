@@ -53,7 +53,7 @@ public struct QuantumCdfCache
 #endregion
 
 /// <summary>
-/// Simulates a hydrogen atom, since it's the only atom (right now) that has exact analytical solutions. <br></br>
+/// Simulates a hydrogen atom, since it's the only atom (right now) that has exact analytical solutions. <br />
 /// This is just the electron probability cloud, so some of these following features are technically missing:
 /// <list type="bullet">
 /// <item>Emissions Spectrum Colors</item>
@@ -63,7 +63,7 @@ public struct QuantumCdfCache
 /// </list>
 /// </summary>
 ///
-/// <br></br>
+/// <br />
 /// 
 /// Some resources if you want to go in more for whatever reason:
 /// <list type="bullet">
@@ -255,15 +255,15 @@ public sealed class AtomicParticleSimulation : ModSystem
     #region Orbital State Quantum Numbers
 
     /// <summary>
-    /// <i>n</i>, controls the energy level and overall size of the orbital. <br></br>
-    /// This is what people mean by "electron shell". <br></br>
+    /// <i>n</i>, controls the energy level and overall size of the orbital. <br />
+    /// This is what people mean by "electron shell". <br />
     /// Higher numbers means the electron is more likely to be found further from the nucleus and has higher energy.
     /// </summary>
     internal static int Principal = 3;
 
     /// <summary>
-    /// <i>l</i>, the angular momentum. <br></br>
-    /// Controls the shape of the orbital. <br></br>
+    /// <i>l</i>, the angular momentum. <br />
+    /// Controls the shape of the orbital. <br />
     /// 0 = sphere (s), 1 = dumbbell (p), 2 = clover (d), 3 = complex (f), and so on.
     /// </summary>
     /// <remarks>Must be between 0 and <see cref="Principal"/> - 1</remarks>
@@ -271,7 +271,7 @@ public sealed class AtomicParticleSimulation : ModSystem
 
     /// <summary>
     /// <i>m</i>, controls the orientation of the orbital in space. For a given l there are 2l+l possible orientations,
-    /// which is why p orbitals come in sets of three (px, py, pz) and d orbitals in sets of five. <br></br>
+    /// which is why p orbitals come in sets of three (px, py, pz) and d orbitals in sets of five. <br />
     /// In the abscence of a magnetic field all same-l orbitals have identical energy, but a magnetic field breaks that degeneracy and splits them.
     /// </summary>
     internal static int Magnetic = 1;
@@ -303,7 +303,7 @@ public sealed class AtomicParticleSimulation : ModSystem
     /// <item>rho   = 2r / (n*a0) (dimensionless scaled radius)</item>
     /// </list>
     /// 
-    /// <br></br>
+    /// <br />
     ///
     /// Recurrence (Rodrigues' formula derived):
     /// <list type="">
@@ -312,7 +312,7 @@ public sealed class AtomicParticleSimulation : ModSystem
     /// <item>  L_j^alpha(rho) = ((2j - 1 + alpha - rho) * L_{j-1} - (j - 1 + alpha) * L_{j-2}) / j </item>
     /// </list>
     /// 
-    /// <br></br>
+    /// <br />
     /// 
     /// This is numerically stable for the small degrees encountered in low-n orbitals.
     /// </summary>
@@ -347,15 +347,15 @@ public sealed class AtomicParticleSimulation : ModSystem
     /// Evaluates the associated Legendre polynomial P_l^m(x) where x = cos(theta),
     /// using upward recurrence in l starting from the closed-form seed P_m^m.
     ///
-    /// <br></br>
-    /// <br></br>
+    /// <br />
+    /// <br />
     /// 
     /// Only handles m >= 0. Negative m is related by:
     /// P_l^{-m}(x) = (-1)^m * (l-m)! / (l+m)! * P_l^m(x)
-    /// <br></br>
+    /// <br />
     /// but since |Y_l^m|^2 = |Y_l^{-m}|^2, negative m produces identical orbital shapes.
     /// 
-    /// <br></br>
+    /// <br />
     /// 
     /// Seed (closed form):
     /// <list type="">
@@ -363,7 +363,7 @@ public sealed class AtomicParticleSimulation : ModSystem
     /// <item> where (2m-1)!! = 1 * 3 * 5 * ... * (2m-1) is the double factorial </item>
     /// </list>
     /// 
-    /// <br></br>
+    /// <br />
     /// 
     /// Recurrence:
     /// <list type="">
@@ -415,8 +415,8 @@ public sealed class AtomicParticleSimulation : ModSystem
     /// <summary>
     /// Computes the probability current velocity for a particle at its position.
     ///
-    /// <br></br>
-    /// <br></br>
+    /// <br />
+    /// <br />
     /// 
     /// In quantum mechanics, the probability current J describes the flow of probability
     /// density through space. For a hydrogen eigenstate with quantum numbers (n, l, m),
@@ -556,8 +556,8 @@ public sealed class AtomicParticleSimulation : ModSystem
     /// <summary>
     /// Samples a radial distance r from the hydrogen radial probability distribution P(r).
     ///
-    /// <br></br>
-    /// <br></br>
+    /// <br />
+    /// <br />
     /// 
     /// The radial wavefunction R_nl(r) is built from:
     /// <list type="bullet">
@@ -569,8 +569,8 @@ public sealed class AtomicParticleSimulation : ModSystem
     /// The radial probability density is P(r) = r^2 * |R_nl(r)|^2, where the r^2
     /// factor comes from the spherical volume element r^2 sin(theta) dr dtheta dphi.
     ///
-    /// <br></br>
-    /// <br></br>
+    /// <br />
+    /// <br />
     /// 
     /// We build a cumulative distribution function (CDF) over a discrete grid,
     /// then invert it with a uniform random sample (inverse transform sampling).
@@ -592,22 +592,22 @@ public sealed class AtomicParticleSimulation : ModSystem
     /// <summary>
     /// Samples a polar angle theta from the angular probability distribution P(theta).
     ///
-    /// <br></br>
-    /// <br></br>
+    /// <br />
+    /// <br />
     /// 
     /// The angular part of the hydrogen wavefunction is a spherical harmonic Y_l^m(theta, phi).
     /// Its theta-dependent factor is the associated Legendre polynomial P_l^m(cos theta), normalized so that the probability density over the sphere is:
-    /// <br></br>
+    /// <br />
     /// P(theta) = sin(theta) * |P_l^m(cos theta)|^2
     ///
-    /// <br></br>
-    /// <br></br>
+    /// <br />
+    /// <br />
     /// 
     /// The sin(theta) factor is again the spherical coordinate Jacobian.
     /// We use the same inverse-transform CDF approach as SampleRadialDistance.
     ///
-    /// <br></br>
-    /// <br></br>
+    /// <br />
+    /// <br />
     /// 
     /// P_l^m is evaluated via upward recurrence from P_m^m:
     /// <list type="">
@@ -632,8 +632,8 @@ public sealed class AtomicParticleSimulation : ModSystem
     /// <summary>
     /// Samples an azimuthal angle phi uniformly from [0, 2*pi).
     ///
-    /// <br></br>
-    /// <br></br>
+    /// <br />
+    /// <br />
     /// 
     /// The phi-dependent part of |Y_l^m|^2 is |e^(i*m*phi)|^2 = 1, so the probability
     /// distribution over phi is perfectly uniform regardless of m.
@@ -647,8 +647,8 @@ public sealed class AtomicParticleSimulation : ModSystem
     /// Computes a color for a particle based on |psi(r, theta, phi)|^2 using
     /// logarithmic compression to handle the enormous dynamic range of the wavefunction.
     ///
-    /// <br></br>
-    /// <br></br>
+    /// <br />
+    /// <br />
     /// 
     /// The full probability density is:
     /// <list type="">
@@ -656,7 +656,7 @@ public sealed class AtomicParticleSimulation : ModSystem
     /// <item> = |R_nl(r)|^2 * |P_l^m(cos theta)|^2 / (2*pi) </item>
     /// </list>
     /// 
-    /// <br></br>
+    /// <br />
     /// 
     /// Raw intensity spans many orders of magnitude, so we apply log10 compression
     /// before mapping to the inferno colormap. The +1e-12 guard prevents log(0).
@@ -716,7 +716,7 @@ public sealed class AtomicParticleSimulation : ModSystem
     /// Maps a normalized intensity value in [0, 1] to a fire-themed color
     /// by linearly interpolating between a set of perceptually ordered color stops.
     /// 
-    /// <br></br>
+    /// <br />
     /// 
     /// Stop order (black body radiation inspired):
     /// <list type="bullet">
@@ -753,16 +753,16 @@ public sealed class AtomicParticleSimulation : ModSystem
     /// Computes a display color for a particle at spherical coordinates (r, theta, phi)
     /// based on the hydrogen wavefunction probability density |psi_nlm|^2.
     ///
-    /// <br></br>
-    /// <br></br>
+    /// <br />
+    /// <br />
     /// 
     /// Unlike ComputeWavefunctionColorLogarithmic, this uses linear scaling with a
     /// manual LightingScaler constant to map the raw density into [0, 1] before
     /// passing to the fire colormap. Better for visualizing relative density differences
     /// in a single orbital where the dynamic range is manageable.
     ///
-    /// <br></br>
-    /// <br></br>
+    /// <br />
+    /// <br />
     ///
     /// Full probability density:
     /// <list type="">

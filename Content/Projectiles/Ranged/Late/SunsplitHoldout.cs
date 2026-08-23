@@ -50,7 +50,7 @@ public class SunsplitHoldout : BaseIdleHoldoutProjectile
         Owner.SetBackHandBetter(Player.CompositeArmStretchAmount.Full, Projectile.rotation);
         Projectile.Center = Center + PolarVector(62f, Projectile.rotation) +
                             PolarVector(20f * Dir * Owner.gravDir, Projectile.rotation + MathHelper.PiOver2);
-        Projectile.SetAnimation(4, 6, true);
+        Projectile.SetAnimation(4, 6, pingPong: true);
 
         Vector3 col = new Color(255, 153, 0).ToVector3();
         Lighting.AddLight(
@@ -84,7 +84,7 @@ public class SunsplitHoldout : BaseIdleHoldoutProjectile
         if (ShootTime % 3 == 2)
         {
             if (this.RunLocal())
-                Projectile.NewProj(Tip, Projectile.velocity.SafeNormalize(Vector2.Zero) * 5f,
+                Projectile.CreateProj(Tip, Projectile.velocity.SafeNormalize(Vector2.Zero) * 5f,
                     ModContent.ProjectileType<IonizedPlasma>(), Projectile.damage, Projectile.knockBack, Owner.whoAmI);
         }
 

@@ -86,7 +86,7 @@ public class NothingThereHelmet : ModItem
             float kb = 0f;
             float turnX = Main.rand.NextFloat(-.02f, .02f);
             float turnY = Main.rand.NextFloat(-.02f, .02f);
-            player.NewPlayerProj(pos, vel, type, dmg, kb, player.whoAmI, 0f, turnX, turnY);
+            player.CreatePlayerProj(pos, vel, type, dmg, kb, player.whoAmI, 0f, turnX, turnY);
             SoundEngine.PlaySound(
                 SoundID.DD2_JavelinThrowersAttack with { MaxInstances = 0, PitchVariance = .3f, Volume = 1.2f }, pos,
                 null);

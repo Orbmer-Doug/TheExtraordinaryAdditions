@@ -52,7 +52,7 @@ public class BoneGunsword : ModItem
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
         int type, int damage, float knockback)
     {
-        player.NewPlayerProj(position, velocity,
+        player.CreatePlayerProj(position, velocity,
             player.altFunctionUse == 2
                 ? ModContent.ProjectileType<GunGunSword>()
                 : ModContent.ProjectileType<GunSwordSword>(), damage, knockback, player.whoAmI);

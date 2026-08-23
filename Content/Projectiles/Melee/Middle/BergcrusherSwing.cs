@@ -228,7 +228,7 @@ public class BergcrusherSwing : BaseSwordSwing
         Vector2 norm = Projectile.velocity.SafeNormalize(Vector2.Zero);
         Vector2 offset = Center + norm * Projectile.height;
         RotatedRectangle bergRect =
-            new RotatedRectangle(50f, offset + norm.Perp(true) * 78f, offset + norm.Perp() * 78f);
+            new RotatedRectangle(50f, offset + norm.PerpCCW() * 78f, offset + norm.PerpCW() * 78f);
         if (MathF.Round(Animation(), 1) == 0.5f)
         {
             Slap = true;
@@ -238,7 +238,7 @@ public class BergcrusherSwing : BaseSwordSwing
             {
                 Vector2 pos = bergRect.RandomPoint();
                 if (this.RunLocal())
-                    Projectile.NewProj(pos, norm * Main.rand.NextFloat(8f, 14f), ModContent.ProjectileType<FlungShard>(),
+                    Projectile.CreateProj(pos, norm * Main.rand.NextFloat(8f, 14f), ModContent.ProjectileType<FlungShard>(),
                         (int) (Projectile.damage * .25f), Projectile.knockBack * .2f, Owner.whoAmI);
 
                 for (int j = 0; j < 4; j++)
@@ -270,7 +270,7 @@ public class BergcrusherSwing : BaseSwordSwing
             if (OverallTime % 4 == 3)
                 ParticleRegistry.SpawnBloomPixelParticle(
                     bergRect.RandomPoint(),
-                    norm.Perp() * Main.rand.NextFloat(.2f, .9f), Main.rand.Next(20, 40), Main.rand.NextFloat(.3f, .6f),
+                    norm.PerpCW() * Main.rand.NextFloat(.2f, .9f), Main.rand.Next(20, 40), Main.rand.NextFloat(.3f, .6f),
                     AuroraGuard.SlateBlue, AuroraGuard.Icey);
         }
     }

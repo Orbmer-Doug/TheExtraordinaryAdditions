@@ -45,7 +45,7 @@ public class HeatRayHoldout : BaseIdleHoldoutProjectile
             TryUseMana(false))
         {
             SoundEngine.PlaySound(SoundID.Item12, Projectile.Center);
-            Projectile.NewProj(pos, vel, ModContent.ProjectileType<ScorchRay>(), Item.damage, Item.knockBack / 5,
+            Projectile.CreateProj(pos, vel, ModContent.ProjectileType<ScorchRay>(), Item.damage, Item.knockBack / 5,
                 Owner.whoAmI);
             for (int i = 0; i < 8; i++)
                 ParticleRegistry.SpawnSparkParticle(pos, vel.RotatedByRandom(.4f) * Main.rand.NextFloat(.1f, .6f),
@@ -58,7 +58,7 @@ public class HeatRayHoldout : BaseIdleHoldoutProjectile
             if (TryUseMana())
             {
                 SoundEngine.PlaySound(SoundID.Item12 with { Pitch = -.1f, Volume = 1.2f }, Projectile.Center);
-                Projectile.NewProj(pos, vel, ModContent.ProjectileType<MeltRay>(), Item.damage, Item.knockBack,
+                Projectile.CreateProj(pos, vel, ModContent.ProjectileType<MeltRay>(), Item.damage, Item.knockBack,
                     Owner.whoAmI);
                 for (int i = 0; i < 15; i++)
                     ParticleRegistry.SpawnSparkParticle(pos, vel.RotatedByRandom(.4f) * Main.rand.NextFloat(.1f, .6f),

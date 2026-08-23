@@ -64,7 +64,7 @@ public class SnowmanCannonHoldout : BaseIdleHoldoutProjectile
                 ProjectileID.MiniNukeSnowmanRocketII => (int) SnowmanRocket.RocketType.MiniNuke2,
                 _ => (int) SnowmanRocket.RocketType.One
             };
-            Projectile.NewProj(right, vel, ModContent.ProjectileType<SnowmanRocket>(), dmg, kb, Owner.whoAmI, typeOf);
+            Projectile.CreateProj(right, vel, ModContent.ProjectileType<SnowmanRocket>(), dmg, kb, Owner.whoAmI, typeOf);
 
             for (int i = 0; i < 12; i++)
             {

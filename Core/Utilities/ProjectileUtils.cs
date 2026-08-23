@@ -110,7 +110,7 @@ public static class ProjectileUtils
         /// <summary>
         /// Make a new projectile from a source of a projectile
         /// </summary>
-        public int NewProj(Vector2 center, Vector2 velocity, int type, int damage,
+        public int CreateProj(Vector2 center, Vector2 velocity, int type, int damage,
             float knockback, int owner = -1,
             float ai0 = 0f, float ai1 = 0f, float ai2 = 0f, float extra0 = 0f, float extra1 = 0f)
         {
@@ -137,7 +137,7 @@ public static class ProjectileUtils
         /// <param name="ticksPerFrame">How many frames to wait before going to the next frame</param>
         /// <param name="pingPong">Goes back and forth</param>
         /// <returns>The current frame</returns>
-        public int SetAnimation(int frames, int ticksPerFrame, bool pingPong = false)
+        public void SetAnimation(int frames, int ticksPerFrame, bool pingPong = false)
         {
             proj.frameCounter++;
 
@@ -145,7 +145,7 @@ public static class ProjectileUtils
             {
                 if (proj.frameCounter % ticksPerFrame == ticksPerFrame - 1)
                     proj.frame = (proj.frame + 1) % frames;
-                return proj.frame;
+                return;
             }
 
             // forward + backward
@@ -168,8 +168,6 @@ public static class ProjectileUtils
 
                 proj.frame = Math.Clamp(proj.frame, 0, frames - 1);
             }
-
-            return proj.frame;
         }
 
         public bool IsOffscreen()
@@ -218,49 +216,41 @@ public static class ProjectileUtils
                 bool killProj = false;
                 bool spawnDust = false;
 
-                //the projectile follows the NPC, even if it goes into blocks
+                // projectile follows the NPC, even if it goes into blocks
                 proj.tileCollide = false;
 
-                //timer for triggering hit effects
+                // for triggering hit effects
                 proj.localAI[0]++;
                 if (proj.localAI[0] % 30f == 0f)
-                {
                     spawnDust = true;
-                }
 
-                //So AI knows what NPC it is sticking to
                 int npcIndex = (int) proj.ai[1];
                 NPC npc = Main.npc[npcIndex];
 
-                //Kill projectile after so many seconds or if the NPC it is stuck to no longer exists
+                // Kill projectile after so many seconds or if the NPC it is stuck to no longer exists
                 if (proj.localAI[0] >= 60 * timeLeft)
-                {
                     killProj = true;
-                }
-                else if (!npcIndex.WithinBounds(Main.maxNPCs))
-                {
+                else if (!(npcIndex > 0 && npcIndex < Main.maxNPCs))
                     killProj = true;
-                }
 
                 else if (npc.active && !npc.dontTakeDamage)
                 {
-                    //follow the NPC
+                    // Follow the NPC
                     proj.Center = npc.Center - proj.velocity * 2f;
                     proj.gfxOffY = npc.gfxOffY;
 
-                    //if attached to npc, trigger npc hit effects every half a second
+                    // trigger npc hit effects every half a second
                     if (spawnDust)
-                    {
                         npc.HitEffect(0, 1.0);
-                    }
                 }
                 else
                 {
                     killProj = true;
                 }
 
-                //Kill the projectile or reset stats if needed
-                if (!killProj) return;
+                // Kill the projectile or reset stats if needed
+                if (!killProj) 
+                    return;
 
                 if (findNewNPC)
                     proj.ai[0] = 0f;
@@ -295,7 +285,7 @@ public static class ProjectileUtils
                         continue;
 
                     bool stickingToNPC;
-                    //Solar Crawltipede tail has special collision
+                    // Solar Crawltipede tail has special collision
                     if (npc.type == NPCID.SolarCrawltipedeTail)
                     {
                         Rectangle rect = npc.Hitbox;

@@ -65,9 +65,9 @@ public partial class Asterlin
             // Create the stars
             if (ModNPC.RunServer())
             {
-                Disintegration_Star1Index = NPC.NewNPCProj(NPC.Center + new Vector2(350f, -200f), Vector2.Zero, proj,
+                Disintegration_Star1Index = NPC.CreateNPCProj(NPC.Center + new Vector2(350f, -200f), Vector2.Zero, proj,
                     HeavyAttackDamage, 0f, ai2: 1);
-                Disintegration_Star2Index = NPC.NewNPCProj(NPC.Center + new Vector2(-350f, -200f), Vector2.Zero, proj,
+                Disintegration_Star2Index = NPC.CreateNPCProj(NPC.Center + new Vector2(-350f, -200f), Vector2.Zero, proj,
                     HeavyAttackDamage, 0f, ai2: -1);
                 this.Sync();
             }

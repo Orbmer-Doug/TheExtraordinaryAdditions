@@ -23,7 +23,7 @@ public partial class Asterlin : ModNPC
         StateMachine.RegisterStateEntryCallback(AsterlinAIType.Tesselestic, () =>
         {
             if (ModNPC.RunServer())
-                NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<TheTesselesticMeltdown>(),
+                NPC.CreateNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<TheTesselesticMeltdown>(),
                     MediumAttackDamage, 0f);
         });
 
@@ -108,7 +108,7 @@ public partial class Asterlin : ModNPC
             if (ModNPC.RunServer())
             {
                 for (int i = 0; i < Tesselestic_NodeCount; i++)
-                    NPC.NewNPCProj(Staff.TipOfStaff, Main.rand.NextVector2CircularLimited(20f, 20f, .3f, 1f), node, 0,
+                    NPC.CreateNPCProj(Staff.TipOfStaff, Main.rand.NextVector2CircularLimited(20f, 20f, .3f, 1f), node, 0,
                         0f);
             }
 
@@ -146,7 +146,7 @@ public partial class Asterlin : ModNPC
                             {
                                 Vector2 vel =
                                     (MathHelper.TwoPi * InverseLerp(0, 4, i) + p.rotation).ToRotationVector2() * 8f;
-                                NPC.NewNPCProj(p.Center, vel, ModContent.ProjectileType<OverchargedLaser>(),
+                                NPC.CreateNPCProj(p.Center, vel, ModContent.ProjectileType<OverchargedLaser>(),
                                     LightAttackDamage, 0f, -1, 1f);
                             }
                         }

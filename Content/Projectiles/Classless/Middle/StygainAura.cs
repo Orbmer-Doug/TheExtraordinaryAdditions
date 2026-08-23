@@ -93,7 +93,7 @@ public class StygainAura : ModProjectile
                 ParticleRegistry.SpawnPulseRingParticle(Owner.Center, vel * (14f * i), 40, vel.ToRotation(),
                     new(.5f, 1f), 0f, i * 320f, Color.Crimson);
             if (this.RunLocal())
-                Projectile.NewProj(pos, vel, ModContent.ProjectileType<SanguineRay>(), Projectile.damage * 2, 0f,
+                Projectile.CreateProj(pos, vel, ModContent.ProjectileType<SanguineRay>(), Projectile.damage * 2, 0f,
                     Owner.whoAmI);
 
             AssetRegistry.GennedSounds.VirtueAttack.Play(pos, .8f, -.3f);

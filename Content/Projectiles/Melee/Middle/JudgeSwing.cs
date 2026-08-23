@@ -369,7 +369,7 @@ public class JudgeSpear : ModProjectile
             return;
 
         if (this.RunLocal())
-            Projectile.NewProj(Projectile.RotHitbox().Top, Vector2.Zero, ModContent.ProjectileType<JudgeKaboom>(),
+            Projectile.CreateProj(Projectile.RotHitbox().Top, Vector2.Zero, ModContent.ProjectileType<JudgeKaboom>(),
                 (int) (Projectile.damage * .5f), 1f, Projectile.owner);
         AssetRegistry.GennedSounds.GenericExplo.Play(Top, .6f, 0f, .2f, 20);
         Hit = true;

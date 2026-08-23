@@ -53,7 +53,7 @@ public class CrimsonCarvedBeetle : ModItem, ILocalizedModType, IModType
     public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity,
         int type, int damage, float knockback)
     {
-        player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI, 0f,
+        player.CreatePlayerProj(position, velocity, type, damage, knockback, player.whoAmI, 0f,
             (player.altFunctionUse == ItemAlternativeFunctionID.ActivatedAndUsed).ToInt());
         return false;
     }

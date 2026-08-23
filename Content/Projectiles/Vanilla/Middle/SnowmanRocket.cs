@@ -280,7 +280,7 @@ public class SnowmanRocket : ModProjectile
                 float rand = randRot + i * MathHelper.TwoPi;
                 Vector2 vel = rand.ToRotationVector2() * (4f + Main.rand.NextFloat() * 2f);
                 vel += Vector2.UnitY * -1f;
-                int cluster = Projectile.NewProj(Projectile.Center, vel,
+                int cluster = Projectile.CreateProj(Projectile.Center, vel,
                     State == (int) RocketType.Cluster1
                         ? ProjectileID.ClusterSnowmanFragmentsI
                         : ProjectileID.ClusterSnowmanFragmentsII, Projectile.damage / 2, 0f, Projectile.owner);

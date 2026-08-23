@@ -53,7 +53,7 @@ public class BoneFlintlockHeld : BaseIdleHoldoutProjectile
                           PolarVector(8f * Dir, Projectile.rotation - MathHelper.PiOver2);
             Vector2 vel = Projectile.velocity * MathHelper.Clamp(speed, Item.shootSpeed, Item.shootSpeed * 2);
             if (this.RunLocal())
-                Projectile.NewProj(pos, vel, ModContent.ProjectileType<CalciumShot>(), dmg, kb, Projectile.owner);
+                Projectile.CreateProj(pos, vel, ModContent.ProjectileType<CalciumShot>(), dmg, kb, Projectile.owner);
 
             for (int i = 0; i < 15; i++)
             {
@@ -75,7 +75,7 @@ public class BoneFlintlockHeld : BaseIdleHoldoutProjectile
             //TODO
             Owner.ownedProjectileCounts[bomb] <= 0 && Wait <= 0)
         {
-            Projectile.NewProj(Projectile.Center, Center.SafeDirectionTo(Modded.MouseWorld) * 10f, bomb,
+            Projectile.CreateProj(Projectile.Center, Center.SafeDirectionTo(Modded.MouseWorld) * 10f, bomb,
                 Projectile.damage * 2, Projectile.knockBack * 2f, Owner.whoAmI);
             SoundID.Item1.Play(Projectile.Center);
             Wait = time;

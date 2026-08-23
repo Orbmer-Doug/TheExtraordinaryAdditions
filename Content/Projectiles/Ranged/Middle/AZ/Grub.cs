@@ -43,7 +43,7 @@ public class Grub : ModProjectile
             float rand = Main.rand.NextFloat(5f, 10f);
             Vector2 vel = Main.rand.NextVector2CircularEdge(rand, rand);
             if (this.RunLocal())
-                Projectile.NewProj(Projectile.Center, vel, ModContent.ProjectileType<GrubShrapnel>(), Projectile.damage,
+                Projectile.CreateProj(Projectile.Center, vel, ModContent.ProjectileType<GrubShrapnel>(), Projectile.damage,
                     0f, Projectile.owner);
         }
     }

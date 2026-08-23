@@ -399,7 +399,7 @@ public static class PrimitiveUtils
         shader.TrySetParameter("projection", projection);
         shader.Render();
 
-        var gd = Main.instance.GraphicsDevice;
+        GraphicsDevice gd = Main.instance.GraphicsDevice;
         BlendState prev = gd.BlendState;
         gd.RasterizerState = RasterizerState.CullNone;
         gd.BlendState = BlendState.AlphaBlend;

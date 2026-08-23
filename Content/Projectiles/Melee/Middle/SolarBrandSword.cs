@@ -141,9 +141,9 @@ public class SolarBrandSword : BaseIdleHoldoutProjectile
             Vector2 vel = Projectile.velocity * 15f;
             if (this.RunLocal())
             {
-                Projectile.NewProj(Projectile.Center, vel, ModContent.ProjectileType<SolarBrandSparks>(),
+                Projectile.CreateProj(Projectile.Center, vel, ModContent.ProjectileType<SolarBrandSparks>(),
                     (int) (Projectile.damage * 0.2f), 0f, Owner.whoAmI, 0f, 0f, 0f);
-                Projectile.NewProj(Projectile.Center, vel * 2f, ModContent.ProjectileType<SolarBrandSparks>(),
+                Projectile.CreateProj(Projectile.Center, vel * 2f, ModContent.ProjectileType<SolarBrandSparks>(),
                     (int) (Projectile.damage * 0.35f), 0f, Owner.whoAmI, 0f, 0f, 0f);
             }
 

@@ -40,7 +40,7 @@ public class ThrashedVoid : BaseWhip
     public override void CrackEffects()
     {
         if (this.RunLocal())
-            Projectile.NewProj(Tip, Vector2.Zero, ModContent.ProjectileType<VoidBlast>(), Projectile.damage / 4,
+            Projectile.CreateProj(Tip, Vector2.Zero, ModContent.ProjectileType<VoidBlast>(), Projectile.damage / 4,
                 Projectile.knockBack, Owner.whoAmI);
         AssetRegistry.GennedSounds.commandoBlast2.Play(Tip, 1.1f, -.1f, .1f);
     }

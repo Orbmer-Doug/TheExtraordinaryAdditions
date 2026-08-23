@@ -69,7 +69,7 @@ public class HailfireHoldout : BaseIdleHoldoutProjectile
                     Main.rand.NextFloat(.4f, .8f), Color.OrangeRed, Color.DarkGray, Main.rand.NextFloat(190f, 244f));
 
             if (this.RunLocal())
-                Projectile.NewProj(Tip, vel * 22f, shell, Projectile.damage, Projectile.knockBack, Owner.whoAmI);
+                Projectile.CreateProj(Tip, vel * 22f, shell, Projectile.damage, Projectile.knockBack, Owner.whoAmI);
 
             Recoil = 10f;
             Wait = WaitTime;

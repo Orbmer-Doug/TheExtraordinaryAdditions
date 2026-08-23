@@ -68,8 +68,8 @@ public unsafe struct Metaball
     public Span<byte> CustomData => MemoryMarshal.CreateSpan(ref customData[0], CustomDataSize);
 
     /// <summary>
-    /// Helper to cast CustomData to a specific struct <br></br>
-    /// Maximum size of a struct is 32 bytes. <see cref="float"/> is 4 bytes, <see cref="bool"/> is 4 bytes because of padding, etc. <br></br>
+    /// Helper to cast CustomData to a specific struct <br />
+    /// Maximum size of a struct is 32 bytes. <see cref="float"/> is 4 bytes, <see cref="bool"/> is 4 bytes because of padding, etc. <br />
     /// Use packing if necessary
     /// </summary>
     /// <typeparam name="T">The struct</typeparam>

@@ -54,7 +54,7 @@ public class VoltHelmet : ModItem, ILocalizedModType, IModType
             AssetRegistry.GennedSounds.LightningStrike.Play(player.Center, 1f, 0f, .2f);
             Projectile bolt =
                 Main.projectile[
-                    player.NewPlayerProj(player.Center,
+                    player.CreatePlayerProj(player.Center,
                         player.Center.SafeDirectionTo(player.AdditionsMouse().MouseWorld) * 10f,
                         ModContent.ProjectileType<LightningVolt>(), 100, 1f, player.whoAmI)];
             bolt.friendly = true;

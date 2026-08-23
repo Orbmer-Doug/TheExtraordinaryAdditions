@@ -71,7 +71,7 @@ public class MartianCapsule : ModProjectile
             int dmg = (int) (Projectile.damage * .25);
             int type = ModContent.ProjectileType<MartianLaser>();
             if (this.RunLocal())
-                Projectile.NewProj(Projectile.Center, shootVelocity, type, dmg, 0f);
+                Projectile.CreateProj(Projectile.Center, shootVelocity, type, dmg, 0f);
 
             for (int j = 0; j < 4; j++)
             {

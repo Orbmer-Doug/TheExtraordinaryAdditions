@@ -24,7 +24,7 @@ public class EbonySnipe : ModProjectile
     {
         if ((int) Time % 2 == 1)
         {
-            float rot = Projectile.velocity.SafeNormalize(Vector2.Zero).Perp().ToRotation();
+            float rot = Projectile.velocity.SafeNormalize(Vector2.Zero).PerpCW().ToRotation();
             MetaballRegistry.SpawnOnyxMetaball(Projectile.Center, Vector2.Zero, 40, 40, rot);
         }
 

@@ -110,7 +110,7 @@ public static class QuaternionUtils
         public Vector3 Rotate(Vector3 v)
         {
             // Embed v as a pure quaternion  
-            Quaternion pureV = new Quaternion(v.X, v.Y, v.Z, 0);
+            Quaternion pureV = new(v.X, v.Y, v.Z, 0);
 
             // Sandwich product
             // Result will always have w = 0  
@@ -126,7 +126,7 @@ public static class QuaternionUtils
         /// <returns>A <see cref="Vector3" /> rotated in the direction of <paramref name="q" /> </returns>
         public Vector3 RotateFast(Vector3 v)
         {
-            Vector3 qv = new Vector3(q.X, q.Y, q.Z);
+            Vector3 qv = new(q.X, q.Y, q.Z);
             Vector3 t = Vector3.Cross(qv, v) * 2f;
             return v + t * q.W + Vector3.Cross(qv, t);
         }
@@ -257,7 +257,7 @@ public static class QuaternionAnimators
         float wNext = dtPrev / total; // weight for logToNext  
         float wPrev = dtNext / total; // weight for logToPrev  
 
-        Quaternion avgLog = new Quaternion(
+        Quaternion avgLog = new(
             -(logToNext.X * wNext + logToPrev.X * wPrev) / 2f,
             -(logToNext.Y * wNext + logToPrev.Y * wPrev) / 2f,
             -(logToNext.Z * wNext + logToPrev.Z * wPrev) / 2f,
@@ -496,7 +496,7 @@ public sealed class PiecewiseRotation
     ///     Adds a curve segment to this piecewise rotations collection of segments
     /// </summary>        /// <returns><see langword="this"/></returns>
     /// <exception cref="InvalidOperationException"><paramref name="animationEnd"/> must be between [0, 1] and must be greater than the start</exception>        
-    public PiecewiseRotation Add(Animators.InterpolationFunction interpolant, Quaternion endingRotation,
+    public PiecewiseRotation Add(InterpolationFunction interpolant, Quaternion endingRotation,
         float animationEnd,
         Quaternion? startingRotation = null, bool optimalRoute = true)
     {
@@ -545,7 +545,7 @@ public sealed class PiecewiseRotation
         Quaternion EndingRotation,
         float AnimationStart,
         float AnimationEnd,
-        Animators.InterpolationFunction Interpolant,
+        InterpolationFunction Interpolant,
         bool OptimalRoute);
 }
 

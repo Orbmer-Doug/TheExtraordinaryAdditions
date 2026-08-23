@@ -27,7 +27,7 @@ public static class NPCUtils
         public static bool RunClient() => Main.netMode != NetmodeID.Server;
 
         /// <summary>
-        /// Sudden shifts in position, state changes/variable updates, persistent position movements (like a dash) <br></br>
+        /// Sudden shifts in position, state changes/variable updates, persistent position movements (like a dash) <br />
         /// <b>The server is in charge of NPCs, changes to NPC data should only happen on the server in multiplayer</b>
         /// </summary>
         public void Sync()
@@ -52,13 +52,16 @@ public static class NPCUtils
     /// <param name="npc">The NPC to access the ModNPC from</param>
     extension(NPC npc)
     {
+        public Texture2D ThisNPCTexture() =>
+            TextureAssets.Npc[npc.type].Value;
+
         public bool IsAnEnemy(bool allowStatues = true, bool checkDead = true, bool checkDamage = true)
         {
             if (npc is null || (!npc.active && (!checkDead || npc.life > 0)) || npc.townNPC || npc.friendly)
                 return false;
             if (!allowStatues && npc.SpawnedFromStatue)
                 return false;
-            if (npc.lifeMax <= 5 || ((npc.defDamage <= 5 && checkDamage) && npc.lifeMax <= 5))
+            if (npc.lifeMax <= 5 || (npc.defDamage <= 5 && checkDamage && npc.lifeMax <= 5))
                 return false;
             return true;
         }
@@ -86,12 +89,12 @@ public static class NPCUtils
         }
 
         /// <summary>
-        /// Spawns a projectile from this NPC <br></br>
+        /// Spawns a projectile from this NPC <br />
         /// Automatically assigns the relationship between the NPC and projectile, assuming it is a <see cref="ProjOwnedByNPC{T}"/>
         /// </summary>
         /// <param name="damage">Automatically fixes damage from current difficulty</param>
         /// <returns>The index within <see cref="Main.projectile"/></returns>
-        public int NewNPCProj(Vector2 position, Vector2 velocity, int type, int damage,
+        public int CreateNPCProj(Vector2 position, Vector2 velocity, int type, int damage,
             float knockback,
             float ai0 = 0f, float ai1 = 0f, float ai2 = 0f, float extra0 = 0f, float extra1 = 0f)
         {
@@ -117,10 +120,10 @@ public static class NPCUtils
         }
 
         /// <summary>
-        /// Spawns a new projectile from this NPC <br></br>
-        /// Use <see cref="NewNPCProj(NPC, Vector2, Vector2, int, int, float, float, float, float, float, float)"/> if the projectile should have an owner
+        /// Spawns a new projectile from this NPC <br />
+        /// Use <see cref="NPCUtils.CreateNPCProj"/> if the projectile should have an owner
         /// </summary>
-        public int Shoot(Vector2 center, Vector2 velocity, int type, int damage, float knockback,
+        public int CreateNPCProjAlt(Vector2 center, Vector2 velocity, int type, int damage, float knockback,
             int owner = -1, float ai0 = 0f, float ai1 = 0f, float ai2 = 0f)
         {
             IEntitySource source = npc.GetSource_FromThis();
@@ -160,8 +163,6 @@ public static class NPCUtils
             return npc.HasPlayerTarget ? Main.player[npc.target] : Main.npc[npc.target - 300];
         }
 
-        public Texture2D ThisNPCTexture() =>
-            TextureAssets.Npc[npc.type].Value;
 
         /// <summary>
         /// Determines if an NPC is "fleshy" based on it's hit sound
@@ -180,12 +181,12 @@ public static class NPCUtils
                    npc.HitSound != SoundID.NPCHit54 && npc.HitSound != null;
         }
     }
-    
+
     public static IBigProgressBar HideBossBar(NPC npc)
     {
         return npc.BossBar = Main.BigBossProgressBar.NeverValid;
     }
-    
+
     public static NPCShop AddWithCustomValue(this NPCShop shop, int itemType, int customValue,
         params Condition[] conditions)
     {
@@ -195,7 +196,7 @@ public static class NPCUtils
         };
         return shop.Add(item, conditions);
     }
-    
+
     public static void BossAwakenMessage(int npcIndex)
     {
         string typeName = Main.npc[npcIndex].TypeName;
@@ -203,7 +204,7 @@ public static class NPCUtils
             Main.NewText(Language.GetTextValue("Announcement.HasAwoken", typeName), new Color(175, 75, 255));
         else if (Main.dedServ)
             ChatHelper.BroadcastChatMessage(
-                NetworkText.FromKey("Announcement.HasAwoken", [Main.npc[npcIndex].GetTypeNetName()]),
+                NetworkText.FromKey("Announcement.HasAwoken", Main.npc[npcIndex].GetTypeNetName()),
                 new Color(175, 75, 255));
     }
 }

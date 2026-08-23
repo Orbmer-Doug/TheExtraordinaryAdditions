@@ -267,7 +267,7 @@ public class CondereFulminaHoldout : ModProjectile
         int type = ModContent.ProjectileType<HonedLightning>();
         HonedLightning lightning = Main
             .projectile[
-                Projectile.NewProj(pos, vel, type, Projectile.damage, Projectile.knockBack, Owner.whoAmI, 0f,
+                Projectile.CreateProj(pos, vel, type, Projectile.damage, Projectile.knockBack, Owner.whoAmI, 0f,
                     TotalTime)].As<HonedLightning>();
         lightning.End = target.RandAreaInEntity();
         lightning.Sync();
@@ -280,7 +280,7 @@ public class CondereFulminaHoldout : ModProjectile
 
         LightningChain chain = Main
             .projectile[
-                Projectile.NewProj(Tip, Vector2.Zero, ModContent.ProjectileType<LightningChain>(), Projectile.damage,
+                Projectile.CreateProj(Tip, Vector2.Zero, ModContent.ProjectileType<LightningChain>(), Projectile.damage,
                     0f, Projectile.owner, 0f, TotalTime)].As<LightningChain>();
 
         for (int i = 0; i < (Charge == FulminaCharge.First || Charge == FulminaCharge.Second ? 1 : 2); i++)
@@ -510,7 +510,7 @@ public class LightningChain : ModProjectile
                 Vector2 end = close.RandAreaInEntity();
                 LightningChain chain = Main
                     .projectile[
-                        Projectile.NewProj(end, Vector2.Zero, ModContent.ProjectileType<LightningChain>(),
+                        Projectile.CreateProj(end, Vector2.Zero, ModContent.ProjectileType<LightningChain>(),
                             Projectile.damage, Projectile.knockBack, Projectile.owner)].As<LightningChain>();
                 chain.NotPrimary = true;
                 chain.Start = End;

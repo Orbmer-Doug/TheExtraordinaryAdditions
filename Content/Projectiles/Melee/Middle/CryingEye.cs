@@ -33,7 +33,7 @@ public class CryingEye : ModProjectile
         Projectile.rotation += .3f;
         Vector2 val = Projectile.position - Main.player[Projectile.owner].position;
         if (Projectile.AdditionsInfo().ExtraAI[0]++ % 10f == 0f && this.RunLocal())
-            Projectile.NewProj(Projectile.Center, Vector2.UnitY.RotatedByRandom(.2f) * Main.rand.NextFloat(3f, 9f),
+            Projectile.CreateProj(Projectile.Center, Vector2.UnitY.RotatedByRandom(.2f) * Main.rand.NextFloat(3f, 9f),
                 ModContent.ProjectileType<CryingTear>(), Projectile.damage / 2, 0f, Projectile.owner);
         if (val.Length() > 3200f)
             Projectile.Kill();

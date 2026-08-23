@@ -209,7 +209,7 @@ public static class PlayerUtils
         /// <summary>
         /// Make a new projectile from a source of a player
         /// </summary>
-        public int NewPlayerProj(Vector2 center, Vector2 velocity, int type, int damage,
+        public int CreatePlayerProj(Vector2 center, Vector2 velocity, int type, int damage,
             float knockback, int owner = -1,
             float ai0 = 0f, float ai1 = 0f, float ai2 = 0f, float extra0 = 0f, float extra1 = 0f)
         {

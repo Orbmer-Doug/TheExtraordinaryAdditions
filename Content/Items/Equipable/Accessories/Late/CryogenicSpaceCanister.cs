@@ -82,7 +82,7 @@ public sealed class CryogenicSpaceCanisterPlayer : ModPlayer
         {
             AssetRegistry.GennedSounds.ColdHitMassive.Play(Player.Center, .7f, 0f, .1f);
             if (Main.myPlayer == Player.whoAmI)
-                Player.NewPlayerProj(Player.Center, Vector2.Zero, ModContent.ProjectileType<CryogenicBlast>(),
+                Player.CreatePlayerProj(Player.Center, Vector2.Zero, ModContent.ProjectileType<CryogenicBlast>(),
                     (int) Player.GetTotalDamage<GenericDamageClass>().ApplyTo(4000), 4f, Player.whoAmI);
             Counter = 0;
         }

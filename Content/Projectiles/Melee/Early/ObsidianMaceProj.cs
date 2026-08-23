@@ -317,7 +317,7 @@ public class ObsidianMaceProj : ModProjectile
             return;
 
         if (this.RunLocal())
-            Projectile.NewProj(Projectile.Center, Projectile.velocity, ModContent.ProjectileType<ObsidianPow>(),
+            Projectile.CreateProj(Projectile.Center, Projectile.velocity, ModContent.ProjectileType<ObsidianPow>(),
                 Projectile.damage, Projectile.knockBack, Projectile.owner);
         State = MaceState.Ricochet;
 

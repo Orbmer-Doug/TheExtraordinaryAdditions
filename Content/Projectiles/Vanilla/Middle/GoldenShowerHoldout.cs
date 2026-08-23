@@ -48,7 +48,7 @@ public class GoldenShowerHoldout : BaseIdleHoldoutProjectile
 
             vel *= item.shootSpeed;
 
-            Projectile.NewProj(pos, vel, ModContent.ProjectileType<IchorStream>(), item.damage, item.knockBack,
+            Projectile.CreateProj(pos, vel, ModContent.ProjectileType<IchorStream>(), item.damage, item.knockBack,
                 Owner.whoAmI);
         }
 
@@ -62,7 +62,7 @@ public class GoldenShowerHoldout : BaseIdleHoldoutProjectile
             {
                 Vector2 vel = -Vector2.UnitY.RotatedByRandom(.36f) * item.shootSpeed * Main.rand.NextFloat(.66f, 1f);
                 SoundEngine.PlaySound(SoundID.Item13, Projectile.Center);
-                Projectile.NewProj(pos, vel, ModContent.ProjectileType<IchorSwirl>(), item.damage, item.knockBack * 2,
+                Projectile.CreateProj(pos, vel, ModContent.ProjectileType<IchorSwirl>(), item.damage, item.knockBack * 2,
                     Owner.whoAmI, 0f, 1f);
             }
         }
@@ -231,7 +231,7 @@ public class IchorSwirl : ModProjectile
                 Main.rand.NextFloat(.2f, .4f), Color.Gold, Color.DarkGoldenrod, Main.rand.NextByte(130, 190));
 
         if (this.RunLocal())
-            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<IchorStreamBlast>(),
+            Projectile.CreateProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<IchorStreamBlast>(),
                 (int) (Projectile.damage * .75f), 0f, Projectile.owner);
     }
 }

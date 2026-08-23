@@ -14,6 +14,8 @@ global using static TheExtraordinaryAdditions.Core.Utilities.ItemUtils;
 global using static TheExtraordinaryAdditions.Core.Utilities.ProjectileUtils;
 global using static TheExtraordinaryAdditions.Core.Utilities.NPCUtils;
 global using static TheExtraordinaryAdditions.Core.Utilities.EntityUtils;
+global using static TheExtraordinaryAdditions.Core.Utilities.BalancingUtils;
+global using static TheExtraordinaryAdditions.Core.Utilities.WorldUtils;
 global using RotatedRectangle = TheExtraordinaryAdditions.Core.DataStructures.RotatedRectangle;
 global using SystemVector2 = System.Numerics.Vector2;
 global using SystemVector3 = System.Numerics.Vector3;

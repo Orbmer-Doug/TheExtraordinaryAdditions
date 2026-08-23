@@ -58,7 +58,7 @@ public class HellsToothpickHeld : BaseIdleHoldoutProjectile
         int wait = Item.useAnimation;
         if (this.RunLocal() && Modded.SafeMouseLeft.Current && Delay == 0 && TryUseMana())
         {
-            Projectile.NewProj(pos, PolarVector(2f, rot),
+            Projectile.CreateProj(pos, PolarVector(2f, rot),
                 ModContent.ProjectileType<HellPick>(), Projectile.damage / 3, Projectile.knockBack, Projectile.owner);
             AssetRegistry.GennedSounds.IkeSpecial1A.Play(pos, .3f, .5f, .2f, 20);
             Delay = wait;
@@ -68,7 +68,7 @@ public class HellsToothpickHeld : BaseIdleHoldoutProjectile
         if (Delay == wait * 2 / 3)
         {
             if (this.RunLocal())
-                Projectile.NewProj(pos, PolarVector(4f, rot),
+                Projectile.CreateProj(pos, PolarVector(4f, rot),
                     ModContent.ProjectileType<HellPick>(), Projectile.damage / 2, Projectile.knockBack, Projectile.owner);
             AssetRegistry.GennedSounds.IkeSpecial1A.Play(pos, .5f, .3f, .2f, 20);
         }
@@ -76,7 +76,7 @@ public class HellsToothpickHeld : BaseIdleHoldoutProjectile
         if (Delay == wait * 1 / 3)
         {
             if (this.RunLocal())
-                Projectile.NewProj(pos, PolarVector(7f, rot),
+                Projectile.CreateProj(pos, PolarVector(7f, rot),
                     ModContent.ProjectileType<HellPick>(), Projectile.damage, Projectile.knockBack, Projectile.owner);  
             AssetRegistry.GennedSounds.IkeSpecial1A.Play(pos, .7f, .2f, .2f, 20);
         }

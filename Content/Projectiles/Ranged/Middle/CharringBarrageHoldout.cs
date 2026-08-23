@@ -50,7 +50,7 @@ public class CharringBarrageHoldout : BaseIdleHoldoutProjectile
             Vector2 vel = Center.SafeDirectionTo(Modded.MouseWorld) *
                           MathHelper.Clamp(speed, Item.shootSpeed, Item.shootSpeed * 2);
             if (this.RunLocal())
-                Projectile.NewProj(pos, vel, ModContent.ProjectileType<CharringBlast>(), dmg, kb, Projectile.owner);
+                Projectile.CreateProj(pos, vel, ModContent.ProjectileType<CharringBlast>(), dmg, kb, Projectile.owner);
 
             for (int i = 0; i < 20; i++)
             {

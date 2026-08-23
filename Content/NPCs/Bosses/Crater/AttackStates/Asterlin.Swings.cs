@@ -38,7 +38,7 @@ public partial class Asterlin : ModNPC
         if (AITimer > 50 && Sword == null && ExtraAI[0] < Swings_MaxSwingCount)
         {
             if (ModProjectile.RunServer())
-                NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<CyberneticSword>(),
+                NPC.CreateNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<CyberneticSword>(),
                     MediumAttackDamage, 0f);
         }
     }

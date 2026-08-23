@@ -65,7 +65,7 @@ public class CharringBlast : ModProjectile, ILocalizedModType, IModType
                 Volume = Main.rand.NextFloat(1.1f, 1.25f), Pitch = .15f, PitchVariance = .1f, MaxInstances = 10
             }, Projectile.Center);
         if (this.RunLocal())
-            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<CharringBlastBlast>(),
+            Projectile.CreateProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<CharringBlastBlast>(),
                 Projectile.damage, Projectile.knockBack, Projectile.owner, 0f, 0f, 0f);
     }
 

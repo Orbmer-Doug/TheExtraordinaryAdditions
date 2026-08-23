@@ -43,7 +43,7 @@ public class BirchStick : ModItem
         int type, int damage, float knockback)
     {
         BirchStickLance lance = Main
-            .projectile[player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI)]
+            .projectile[player.CreatePlayerProj(position, velocity, type, damage, knockback, player.whoAmI)]
             .As<BirchStickLance>();
 
         if (player.AdditionsMouse().MouseRight.Current)

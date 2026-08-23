@@ -46,7 +46,7 @@ public class SpecteriteMask : ModItem
         int type = ModContent.ProjectileType<ShroomiteDash>();
         if (AdditionsKeybinds.SetBonusHotKey.Current && player.CountOwnerProjectiles(type) <= 0 &&
             player.whoAmI == Main.myPlayer)
-            player.NewPlayerProj(player.Center, Vector2.Zero, type, 500, 10f, player.whoAmI);
+            player.CreatePlayerProj(player.Center, Vector2.Zero, type, 500, 10f, player.whoAmI);
 
         player.GetModPlayer<SpecteritePlayer>().Equipped = true;
     }

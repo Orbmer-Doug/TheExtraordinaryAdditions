@@ -176,14 +176,14 @@ public class CoalescenceHoldout : BaseIdleHoldoutProjectile
                     {
                         if (this.RunLocal())
                         {
-                            LeadArrowIndex = Projectile.NewProj(middle, Projectile.velocity.SafeNormalize(Vector2.Zero),
+                            LeadArrowIndex = Projectile.CreateProj(middle, Projectile.velocity.SafeNormalize(Vector2.Zero),
                                 ModContent.ProjectileType<DivinityArrow>(), Projectile.damage, Projectile.knockBack,
                                 Owner.whoAmI, Projectile.whoAmI);
-                            SecondArrowIndex = Projectile.NewProj(middle,
+                            SecondArrowIndex = Projectile.CreateProj(middle,
                                 Projectile.velocity.SafeNormalize(Vector2.Zero),
                                 ModContent.ProjectileType<DivinityArrow>(), Projectile.damage, Projectile.knockBack,
                                 Owner.whoAmI, Projectile.whoAmI, 0f, 1);
-                            ThirdArrowIndex = Projectile.NewProj(middle,
+                            ThirdArrowIndex = Projectile.CreateProj(middle,
                                 Projectile.velocity.SafeNormalize(Vector2.Zero),
                                 ModContent.ProjectileType<DivinityArrow>(), Projectile.damage, Projectile.knockBack,
                                 Owner.whoAmI, Projectile.whoAmI, 0f, -1);

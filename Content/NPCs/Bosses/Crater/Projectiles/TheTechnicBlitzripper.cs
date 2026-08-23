@@ -69,7 +69,7 @@ public class TheTechnicBlitzripper : ProjOwnedByNPC<Asterlin>
 
         Time++;
 
-        Projectile.Center = Projectile.Center.ClampInWorld();
+        Projectile.Center = ClampToWorld(Projectile.Center);
     }
 
     public void Shoot()

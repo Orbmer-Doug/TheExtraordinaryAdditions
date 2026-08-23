@@ -4,7 +4,7 @@ namespace TheExtraordinaryAdditions.UI;
 
 /// <summary>
 /// A class which contains safe overridables for common mouse events in a ui element to allow both events to be used together
-/// <br></br>
+/// <br />
 /// Primary credit to Starlight River
 /// </summary>
 public class SmartUIElement : UIElement

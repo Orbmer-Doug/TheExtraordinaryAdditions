@@ -62,7 +62,7 @@ public class EtherealRipBlast : ModProjectile
             Projectile.damage = (int) (Projectile.damage * .95f);
 
         if (this.RunLocal())
-            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<LightripBlast>(),
+            Projectile.CreateProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<LightripBlast>(),
                 (int) (Projectile.damage * .5f), Projectile.knockBack, Projectile.owner);
 
         for (int i = 0; i < 20; i++)

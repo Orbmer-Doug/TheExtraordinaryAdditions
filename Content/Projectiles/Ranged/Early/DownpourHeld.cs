@@ -141,7 +141,7 @@ public class DownpourHeld : BaseIdleHoldoutProjectile
                         speed *= reel;
                         dmg = (int) (dmg * MathHelper.Clamp(reel, .1f, 1f));
                         kb *= reel;
-                        Projectile.NewProj(arrowPos, Projectile.velocity * speed, type, dmg, kb, Owner.whoAmI);
+                        Projectile.CreateProj(arrowPos, Projectile.velocity * speed, type, dmg, kb, Owner.whoAmI);
 
                         for (int i = 0; i < (reel < .33f ? 1 : reel < .66f ? 2 : 3); i++)
                         {
@@ -151,7 +151,7 @@ public class DownpourHeld : BaseIdleHoldoutProjectile
                             {
                                 Vector2 vel = pos.SafeDirectionTo(Modded.MouseWorld + offset) * speed *
                                               Main.rand.NextFloat(.8f, 1.3f);
-                                Projectile.NewProj(pos, vel, ModContent.ProjectileType<RainDrop>(), dmg / 3, kb / 3,
+                                Projectile.CreateProj(pos, vel, ModContent.ProjectileType<RainDrop>(), dmg / 3, kb / 3,
                                     Owner.whoAmI);
                                 ParticleRegistry.SpawnPulseRingParticle(pos, vel.SafeNormalize(Vector2.Zero),
                                     Main.rand.Next(20, 30), vel.ToRotation(), new(.5f, 1f), 0f, 30f,

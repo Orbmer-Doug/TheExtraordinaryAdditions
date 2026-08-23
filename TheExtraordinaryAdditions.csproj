@@ -1,7 +1,7 @@
 <Project Sdk="Tomat.Terraria.ModLoader.Sdk/2.1.1">
 
     <!-- Import tModLoader mod properties -->
-    <Import Project="/home/doug/.local/share/tml-build/versions/2026.6.3.4/tMLMod.targets"/>
+    <Import Project="/mnt/Games/SteamLibrary/steamapps/common/tModLoader/tMLMod.targets"/>
 
     <!-- General -->
     <PropertyGroup>

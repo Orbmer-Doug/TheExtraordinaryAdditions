@@ -68,7 +68,7 @@ public sealed partial class StygainHeart : ModNPC, IBossDowned
         NPC.width = 198;
         NPC.height = 162;
         NPC.defense = 12;
-        NPC.SetLifeMaxByMode(100000, 125000, 150000, 175000, 200000);
+        NPC.SetLifeMaxByMode(100000, 125000, 150000, 175000);
         NPC.aiStyle = AIType = -1;
         NPC.knockBackResist = 0f;
         NPC.canGhostHeal = false;
@@ -378,7 +378,7 @@ public sealed partial class StygainHeart : ModNPC, IBossDowned
         if (target.HasBuff(ModContent.BuffType<HemorrhageTransfer>()))
         {
             if (ModNPC.RunServer())
-                NPC.NewNPCProj(target.Center, Vector2.Zero, ModContent.ProjectileType<BloodletRelay>(), 0, 0f,
+                NPC.CreateNPCProj(target.Center, Vector2.Zero, ModContent.ProjectileType<BloodletRelay>(), 0, 0f,
                     hurtInfo.Damage * .25f);
         }
 

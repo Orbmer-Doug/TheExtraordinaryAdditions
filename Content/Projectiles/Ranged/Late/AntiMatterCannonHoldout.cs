@@ -135,11 +135,11 @@ public class AntiMatterCannonHoldout : BaseIdleHoldoutProjectile
 
             if (this.RunLocal())
             {
-                Projectile.NewProj(Tip, vel * 15f, ModContent.ProjectileType<AntiBulletp>(), Projectile.damage,
+                Projectile.CreateProj(Tip, vel * 15f, ModContent.ProjectileType<AntiBulletp>(), Projectile.damage,
                     Projectile.knockBack, Owner.whoAmI);
                 Vector2 pos = Projectile.Center - PolarVector(77f, Projectile.rotation) +
                               PolarVector(18f * Dir * Owner.gravDir, Projectile.rotation - MathHelper.PiOver2);
-                Projectile.NewProj(pos, -vel.RotatedBy(.5f * Dir * Owner.gravDir) * 10f,
+                Projectile.CreateProj(pos, -vel.RotatedBy(.5f * Dir * Owner.gravDir) * 10f,
                     ModContent.ProjectileType<AntiBulletShell>(), 0, 0f, Owner.whoAmI);
             }
 

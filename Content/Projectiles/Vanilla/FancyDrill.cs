@@ -142,7 +142,7 @@ public class FancyDrill : ModProjectile
                 Vector2 samplePoint = Vector2.Lerp(left, right, (float) j / heightSamples);
 
                 // Convert to tile coordinates
-                Point tilePoint = ClampToWorld(samplePoint.ToTileCoordinates(), true);
+                Point tilePoint = ClampToTiles(samplePoint.ToTileCoordinates());
 
                 Tile tile = Main.tile[tilePoint.X, tilePoint.Y];
                 if (tile != null && tile.HasTile && !Main.tileAxe[tile.TileType])

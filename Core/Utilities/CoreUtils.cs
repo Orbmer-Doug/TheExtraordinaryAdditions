@@ -30,7 +30,7 @@ public static class CoreUtils
         if (maxIntensity <= 0)
             return 0;
 
-        var decayRate = medium switch
+        float decayRate = medium switch
         {
             LightMaskMode.Solid => 0.56f, // LightDecayThroughSolid
             LightMaskMode.Water => 0.88f * 0.91f, // Min of LightDecayThroughWater (R channel), avg random factor ~0.99
@@ -163,14 +163,17 @@ public static class CoreUtils
         return cursor;
     }
 
-    public static void Log(this string message) => AdditionsMain.Instance?.Logger.Info(" " + message);
-    public static void Warn(this string message) => AdditionsMain.Instance?.Logger.Warn(" " + message);
-
-    public static void ServerLog(this string message)
+    extension(string message)
     {
-        DateTime time = DateTime.Now;
-        Console.WriteLine(
-            $"[TEA] [{time.Hour}.{time.Minute}.{time.Second}.{time.Millisecond}.{time.Microsecond}]: {message}");
+        public void Log() => AdditionsMain.Instance?.Logger.Info(" " + message);
+        public void Warn() => AdditionsMain.Instance?.Logger.Warn(" " + message);
+
+        public void ServerLog()
+        {
+            DateTime time = DateTime.Now;
+            Console.WriteLine(
+                $"[TEA] [{time.Hour}.{time.Minute}.{time.Second}.{time.Millisecond}.{time.Microsecond}]: {message}");
+        }
     }
 
     public static NetworkText GetNetworkText(string key, params object[] substitutions) =>
@@ -273,6 +276,8 @@ public static class CoreUtils
 
         public string ToHexRGBA() =>
             BitConverter.ToString([color.R, color.G, color.B, color.A]).Replace("-", "");
+
+        public Color Lerp(Color color2, float amount) => Color.Lerp(color, color2, amount);
     }
 
     public static string ColorMessage(string msg, Color color)
@@ -329,8 +334,6 @@ public static class CoreUtils
 
         return new Color(r, g, b, a);
     }
-
-    public static Color Lerp(this Color color, Color color2, float amount) => Color.Lerp(color, color2, amount);
 
     public static Color ColorSwap(Color firstColor, Color secondColor, float seconds)
     {

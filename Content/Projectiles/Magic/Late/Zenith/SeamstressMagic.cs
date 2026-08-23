@@ -77,7 +77,7 @@ public class SeamstressDraw : ModProjectile
                         if (this.RunLocal())
                         {
                             Vector2 vel = pos.SafeDirectionTo(point) * 5f;
-                            Projectile.NewProj(point, vel, ModContent.ProjectileType<ConcentratedEnergy>(),
+                            Projectile.CreateProj(point, vel, ModContent.ProjectileType<ConcentratedEnergy>(),
                                 Projectile.damage, 0f, Owner.whoAmI);
                         }
 
@@ -135,7 +135,7 @@ public class SeamstressDraw : ModProjectile
                                                           Main.rand.NextFloatDirection();
                                     Vector2 sliceVelocity = spawnOffset.SafeNormalize(Vector2.UnitY) * 0.1f;
 
-                                    Projectile.NewProj(pos, sliceVelocity,
+                                    Projectile.CreateProj(pos, sliceVelocity,
                                         ModContent.ProjectileType<Seams>(), Projectile.damage, 0f,
                                         Projectile.owner);
                                 }
@@ -151,7 +151,7 @@ public class SeamstressDraw : ModProjectile
                                         Vector2 pos = npc.Center + PolarVector(npc.Size.Length() * 1.4f + 200f,
                                             RandomRotation());
                                         Vector2 vel = pos.SafeDirectionTo(npc.Center) * Main.rand.NextFloat(14f, 22f);
-                                        Projectile.NewProj(pos, vel, ModContent.ProjectileType<NeedleStar>(),
+                                        Projectile.CreateProj(pos, vel, ModContent.ProjectileType<NeedleStar>(),
                                             Projectile.damage, Projectile.knockBack, Owner.whoAmI);
                                     }
                                 }

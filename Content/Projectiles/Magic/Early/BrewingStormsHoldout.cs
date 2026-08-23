@@ -89,7 +89,7 @@ public class BrewingStormsHoldout : BaseIdleHoldoutProjectile
                             vel.RotatedByRandom(.25f).SafeNormalize(Vector2.Zero) * Main.rand.NextFloat(80f, 120f),
                             Main.rand.Next(6, 8), Main.rand.NextFloat(.3f, .4f), Color.LightPink);
 
-                        Projectile.NewProj(Projectile.Center + vel, vel,
+                        Projectile.CreateProj(Projectile.Center + vel, vel,
                             ModContent.ProjectileType<LightningNimbusSparks>(),
                             Item.damage, Item.knockBack, Owner.whoAmI);
                     }
@@ -208,7 +208,7 @@ public class BrewingStormsHoldout : BaseIdleHoldoutProjectile
         if (Charge > 0)
         {
             if (this.RunLocal())
-                Projectile.NewProj(target.BaseRotHitbox().GetClosestPoint(Projectile.Center), Vector2.Zero,
+                Projectile.CreateProj(target.BaseRotHitbox().GetClosestPoint(Projectile.Center), Vector2.Zero,
                     ModContent.ProjectileType<LightningBlast>(),
                     (int) (Projectile.damage * 3.5f), 6f, Owner.whoAmI, ai2: 200f);
             AssetRegistry.GennedSounds.IkeSpecial4.Play(Owner.Center, .6f, .3f, .15f);

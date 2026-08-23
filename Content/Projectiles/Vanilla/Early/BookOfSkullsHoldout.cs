@@ -33,7 +33,7 @@ public class BookOfSkullsHoldout : BaseIdleHoldoutProjectile
         {
             Vector2 vel = Projectile.velocity * item.shootSpeed;
             SoundEngine.PlaySound(SoundID.Item8, pos);
-            Projectile.NewProj(pos + vel, vel, ModContent.ProjectileType<HomingSkull>(), item.damage, item.knockBack,
+            Projectile.CreateProj(pos + vel, vel, ModContent.ProjectileType<HomingSkull>(), item.damage, item.knockBack,
                 Owner.whoAmI);
         }
 
@@ -72,7 +72,7 @@ public class BookOfSkullsHoldout : BaseIdleHoldoutProjectile
             for (int i = -radius; i <= radius; i += radius)
             {
                 Vector2 rotVel = Projectile.velocity.RotatedBy(MathHelper.ToRadians(i)) * item.shootSpeed * 2;
-                Projectile.NewProj(pos, rotVel, ModContent.ProjectileType<BlastSkull>(), item.damage, item.knockBack,
+                Projectile.CreateProj(pos, rotVel, ModContent.ProjectileType<BlastSkull>(), item.damage, item.knockBack,
                     Owner.whoAmI, 0f, 1f);
             }
 

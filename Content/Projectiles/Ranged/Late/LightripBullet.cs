@@ -85,7 +85,7 @@ public class LightripBullet : ModProjectile, ILocalizedModType, IModType
         if (!Main.dedServ)
             AssetRegistry.GennedSounds.FireImpact.Play(Projectile.Center, .8f, 0f, .1f, 40, Name);
         if (this.RunLocal())
-            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<LightripBlast>(),
+            Projectile.CreateProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<LightripBlast>(),
                 Projectile.damage / 2, 0f, Main.myPlayer);
         Time = 0;
         Wait = true;

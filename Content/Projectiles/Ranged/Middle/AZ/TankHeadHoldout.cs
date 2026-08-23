@@ -129,7 +129,7 @@ public class TankHeadHoldout : BaseIdleHoldoutProjectile
             if (State == LaserState)
             {
                 if (this.RunLocal())
-                    Projectile.NewProj(tipOfGun, vel, ModContent.ProjectileType<LaserGuide>(), 0, 0f, Projectile.owner);
+                    Projectile.CreateProj(tipOfGun, vel, ModContent.ProjectileType<LaserGuide>(), 0, 0f, Projectile.owner);
                 Projectile.frame = 4;
             }
             else if (State == MaggotState)
@@ -191,7 +191,7 @@ public class TankHeadHoldout : BaseIdleHoldoutProjectile
                 }
 
                 if (this.RunLocal())
-                    Projectile.NewProj(tipOfGun, vel, type, (int) damage, 3f, Projectile.owner);
+                    Projectile.CreateProj(tipOfGun, vel, type, (int) damage, 3f, Projectile.owner);
                 Recoil = 6;
             }
             else if (State == 4f)
@@ -202,7 +202,7 @@ public class TankHeadHoldout : BaseIdleHoldoutProjectile
                     Vector2 veloc = vel.RotatedByRandom(.35f) * Main.rand.NextFloat(.75f, 1.4f);
                     int damage = Projectile.damage / 9;
                     if (this.RunLocal())
-                        Projectile.NewProj(tipOfGun, veloc, ModContent.ProjectileType<TheSwarm>(), damage, 0f,
+                        Projectile.CreateProj(tipOfGun, veloc, ModContent.ProjectileType<TheSwarm>(), damage, 0f,
                             Projectile.owner);
                     SoundEngine.PlaySound(SoundID.Item11 with { MaxInstances = 0, Pitch = .15f, Volume = .9f },
                         tipOfGun);
@@ -213,7 +213,7 @@ public class TankHeadHoldout : BaseIdleHoldoutProjectile
             {
                 if (State == GrubState)
                     Projectile.scale = 1.1f;
-                Projectile.SetAnimation(4, 7, true);
+                Projectile.SetAnimation(4, 7, pingPong: true);
             }
 
             if (State == MaggotState)

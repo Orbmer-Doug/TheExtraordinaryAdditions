@@ -49,7 +49,7 @@ public class DivineArrow : ModProjectile
             Projectile.height);
         SoundID.Dig.Play(Projectile.Center);
 
-        Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<DissipatingLight>(),
+        Projectile.CreateProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<DissipatingLight>(),
             (int) (Projectile.damage * .55f), 0f, Projectile.owner);
 
         float offsetAngle = RandomRotation();

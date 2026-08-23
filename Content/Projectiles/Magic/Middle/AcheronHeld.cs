@@ -72,7 +72,7 @@ public class AcheronHeld : BaseIdleHoldoutProjectile
         {
             Vector2 pos = SummonPos + new Vector2(Main.rand.NextFloat(-TeleWidth, TeleWidth) / 2,
                 -Main.rand.NextFloat(20f, 80f));
-            Projectile.NewProj(pos, Vector2.UnitY, ModContent.ProjectileType<HellishLance>(), Projectile.damage,
+            Projectile.CreateProj(pos, Vector2.UnitY, ModContent.ProjectileType<HellishLance>(), Projectile.damage,
                 Projectile.knockBack, Owner.whoAmI);
             SoundID.Item71.Play(SummonPos, 1.1f, 0f, .1f);
 

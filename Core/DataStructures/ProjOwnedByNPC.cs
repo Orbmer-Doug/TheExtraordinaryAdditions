@@ -87,7 +87,7 @@ public abstract class ProjOwnedByNPC<T> : ModProjectile where T : ModNPC
     }
 
     /// <summary>
-    /// Spawns a new projectile that inherits the owner of this projectile <br></br>
+    /// Spawns a new projectile that inherits the owner of this projectile <br />
     /// </summary>
     /// <param name="damage">Automatically fixes damage from current difficulty</param>
     /// <returns>The index within <see cref="Main.projectile"/></returns>

@@ -427,7 +427,7 @@ public struct RotatedRectangle
                 Vector2 samplePoint = startPoint + direction * sampleIncrement * j;
 
                 // Convert sample point to tile coordinates
-                Point tilePoint = ClampToWorld(samplePoint.ToTileCoordinates(), true);
+                Point tilePoint = ClampToTiles(samplePoint.ToTileCoordinates());
 
                 // Check if the tile is solid
                 Tile tile = Main.tile[tilePoint.X, tilePoint.Y];
@@ -466,7 +466,7 @@ public struct RotatedRectangle
                 Vector2 samplePoint = startPoint + direction * sampleIncrement * j;
 
                 // Convert sample point to tile coordinates
-                Point tilePoint = ClampToWorld(samplePoint.ToTileCoordinates(), true);
+                Point tilePoint = ClampToTiles(samplePoint.ToTileCoordinates());
 
                 // Check if the tile is solid
                 Tile tile = Main.tile[tilePoint.X, tilePoint.Y];

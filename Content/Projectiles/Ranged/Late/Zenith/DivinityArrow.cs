@@ -330,7 +330,7 @@ public class DivinityArrow : ModProjectile
                                                          (i % 2f == 0f).ToDirectionInt()) *
                                           Main.rand.NextFloat(16f, 26f);
                         if (this.RunLocal())
-                            Projectile.NewProj(pos, amalVel, amal, Projectile.damage, Projectile.knockBack,
+                            Projectile.CreateProj(pos, amalVel, amal, Projectile.damage, Projectile.knockBack,
                                 Projectile.owner);
                     }
 
@@ -382,7 +382,7 @@ public class DivinityArrow : ModProjectile
         {
             int type = ModContent.ProjectileType<ExtraordinaryHyperBlast>();
             int damage = Projectile.damage * 2;
-            Projectile blast = Main.projectile[Projectile.NewProj(pos, Vector2.Zero, type, damage,
+            Projectile blast = Main.projectile[Projectile.CreateProj(pos, Vector2.Zero, type, damage,
                 Projectile.knockBack, Projectile.owner, 2f)];
             blast.scale = ArrowType == -1 ? .5f : ArrowType == 0 ? .75f : 1f;
         }

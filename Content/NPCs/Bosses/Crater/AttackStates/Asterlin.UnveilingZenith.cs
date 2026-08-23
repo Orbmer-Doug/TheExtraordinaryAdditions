@@ -25,7 +25,7 @@ public partial class Asterlin
             foreach (Player player in Main.ActivePlayers)
             {
                 if (ModNPC.RunServer())
-                    NPC.NewNPCProj(player.Center - Vector2.UnitY * 400f, Main.rand.NextVector2Circular(10f, 10f),
+                    NPC.CreateNPCProj(player.Center - Vector2.UnitY * 400f, Main.rand.NextVector2Circular(10f, 10f),
                         ModContent.ProjectileType<ConvergentFireball>(), 0, 0f);
             }
         });
@@ -64,7 +64,7 @@ public partial class Asterlin
             if (UnveilingZenith_CollapseTimer >= UnveilingZenith_StarCollapseTime)
             {
                 if (ModNPC.RunServer())
-                    NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<DisintegrationNova>(),
+                    NPC.CreateNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<DisintegrationNova>(),
                         SuperHeavyAttackDamage * 5, 100f);
                 foreach (Projectile p in AllProjectilesByID(ModContent.ProjectileType<ConvergentFireball>()))
                     p.Kill();
@@ -79,7 +79,7 @@ public partial class Asterlin
             if (AITimer % UnveilingZenith_BeamReleaseRate == (UnveilingZenith_BeamReleaseRate - 1))
             {
                 if (ModNPC.RunServer())
-                    NPC.NewNPCProj(pos, Vector2.Zero, ModContent.ProjectileType<BarrageBeam>(), LightAttackDamage, 0f);
+                    NPC.CreateNPCProj(pos, Vector2.Zero, ModContent.ProjectileType<BarrageBeam>(), LightAttackDamage, 0f);
             }
         }
 

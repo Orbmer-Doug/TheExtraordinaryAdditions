@@ -49,14 +49,14 @@ public partial class Asterlin
                 if (AITimer % Barrage_BeamRate == (Barrage_BeamRate - 1))
                 {
                     if (ModNPC.RunServer())
-                        NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<BarrageBeam>(),
+                        NPC.CreateNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<BarrageBeam>(),
                             MediumAttackDamage, 0f);
                 }
 
                 if (AITimer % (Barrage_BeamRate * 2) == (Barrage_BeamRate * 2 - 1))
                 {
                     if (ModNPC.RunServer())
-                        NPC.NewNPCProj(NPC.Center, Main.rand.NextVector2Circular(40f, 40f),
+                        NPC.CreateNPCProj(NPC.Center, Main.rand.NextVector2Circular(40f, 40f),
                             ModContent.ProjectileType<DartBomb>(), MediumAttackDamage, 0f);
                 }
             }

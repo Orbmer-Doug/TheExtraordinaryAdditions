@@ -68,7 +68,7 @@ public class StarlessHoldout : BaseIdleHoldoutProjectile
                     if (proj.HasValue)
                         continue;
 
-                    int p = Projectile.NewProj(Owner.Center, Vector2.Zero, type, Projectile.damage,
+                    int p = Projectile.CreateProj(Owner.Center, Vector2.Zero, type, Projectile.damage,
                         Projectile.knockBack, Owner.whoAmI, 0f, i, 0f, 0f, Projectile.whoAmI);
                     CurrentLances[i] = Main.projectile[p].whoAmI;
                     break;
@@ -108,7 +108,7 @@ public class StarlessHoldout : BaseIdleHoldoutProjectile
 
             if (Time % 10 == 9 && amt < 30 && TryUseMana())
             {
-                StarWater water = Main.projectile[Projectile.NewProj(Owner.Center, Vector2.Zero, type,
+                StarWater water = Main.projectile[Projectile.CreateProj(Owner.Center, Vector2.Zero, type,
                     Projectile.damage, Projectile.knockBack, Owner.whoAmI)].As<StarWater>();
                 water.Offset = Main.rand.NextVector2Circular(OffsetMax, OffsetMax);
             }

@@ -116,7 +116,7 @@ public class CoalescentMass : ModNPC
     public override void OnKill()
     {
         AssetRegistry.GennedSounds.BlackHoleExplosion.Play(NPC.Center, .9f, -.3f);
-        NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<MassExplosion>(), 5000, 6f);
+        NPC.CreateNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<MassExplosion>(), 5000, 6f);
     }
 
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)

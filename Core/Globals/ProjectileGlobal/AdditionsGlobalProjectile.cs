@@ -52,7 +52,7 @@ public class AdditionsGlobalProjectile : GlobalProjectile
                         Vector2 vel = new Vector2(Main.rand.Next(-13, 14), Main.rand.Next(-13, 14)) * 0.25f;
                         for (int n = 0; n < 3; n++)
                         {
-                            projectile.NewProj(projectile.Center, vel, ten, projectile.damage, 2f, projectile.owner, 0f,
+                            projectile.CreateProj(projectile.Center, vel, ten, projectile.damage, 2f, projectile.owner, 0f,
                                 0f, projectile.whoAmI);
                         }
                     }
@@ -74,7 +74,7 @@ public class AdditionsGlobalProjectile : GlobalProjectile
                             // Make the mini's
                             for (int i = 0; i <= 2; i++)
                             {
-                                int obj = projectile.NewProj(projectile.Center, Vector2.One, mini,
+                                int obj = projectile.CreateProj(projectile.Center, Vector2.One, mini,
                                     (int) (projectile.damage * .33f), 0f, player.whoAmI, i, projectile.whoAmI);
                                 Main.projectile[obj].AdditionsInfo().ExtraAI[1] = MathHelper.TwoPi * i / 3f;
                                 Main.projectile[obj].AdditionsInfo().ExtraAI[2] = Main.rand.NextFromList(-1, 1);
@@ -100,7 +100,7 @@ public class AdditionsGlobalProjectile : GlobalProjectile
             case ProjectileID.TheEyeOfCthulhu:
             {
                 if (Main.myPlayer == projectile.owner && Main.rand.NextBool())
-                    projectile.NewProj(projectile.Center, Main.rand.NextVector2CircularEdge(4f, 4f),
+                    projectile.CreateProj(projectile.Center, Main.rand.NextVector2CircularEdge(4f, 4f),
                         ModContent.ProjectileType<TinyServant>(), (int) (projectile.damage * .25f), 0f,
                         projectile.owner);
             }

@@ -59,7 +59,7 @@ public class HellfireHoldout : BaseHoldoutProjectile
                             Main.rand.NextFloat(.24f, .4f)) * Main.rand.NextFloat(.7f, 1.05f);
 
                     int type = ModContent.ProjectileType<HellishNapalm>();
-                    Projectile.NewProj(Projectile.Center, newVelocity, type, Projectile.damage, Projectile.knockBack);
+                    Projectile.CreateProj(Projectile.Center, newVelocity, type, Projectile.damage, Projectile.knockBack);
 
                     for (int j = 0; j < 6; j++)
                         ParticleRegistry.SpawnDustParticle(Projectile.Center,

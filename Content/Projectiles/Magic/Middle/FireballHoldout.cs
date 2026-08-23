@@ -53,7 +53,7 @@ public class FireballHoldout : BaseIdleHoldoutProjectile
         {
             AssetRegistry.GennedSounds.FireballShort.Play(Projectile.Center, .6f, 0f, .1f, 30);
             Vector2 dir = Projectile.Center.SafeDirectionTo(Modded.MouseWorld);
-            Projectile.NewProj(Projectile.Center, dir * Item.shootSpeed,
+            Projectile.CreateProj(Projectile.Center, dir * Item.shootSpeed,
                 ModContent.ProjectileType<FireballProj>(), Projectile.damage, Projectile.knockBack, Owner.whoAmI);
 
             for (int i = 0; i < 22; i++)

@@ -149,7 +149,7 @@ public class TheExingendies : ModProjectile
                 {
                     if (npc.Hitbox.Intersects(MouseHitbox))
                     {
-                        Projectile.NewProj(ModdedOwner.MouseWorld, PolarVector(1f, RandomRotation()),
+                        Projectile.CreateProj(ModdedOwner.MouseWorld, PolarVector(1f, RandomRotation()),
                             ModContent.ProjectileType<ScreenSplit>(), int.MaxValue / 4, Projectile.knockBack, Owner.whoAmI);
                         AssetRegistry.GennedSounds.VirtueAttack.Play(ModdedOwner.MouseWorld, 1.4f, -.7f, 0f, 300, Name);
                         AssetRegistry.GennedSounds.LargeWeaponFireDifferent.Play(ModdedOwner.MouseWorld, 1.3f, .5f, 0f,

@@ -100,7 +100,7 @@ public class JudgementHammer : ProjOwnedByNPC<Asterlin>
             Projectile.velocity.Y = Clamp(Projectile.velocity.Y + .3f, -40f, 40f);
         }
 
-        Projectile.Center = Projectile.Center.ClampInWorld();
+        Projectile.Center = ClampToWorld(Projectile.Center);
         Time++;
     }
 

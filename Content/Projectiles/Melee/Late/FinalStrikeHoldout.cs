@@ -428,7 +428,7 @@ public class FinalStrikeHoldout : ModProjectile
                 {
                     Vector2 end = TipOfSpear + Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.4f) *
                         Main.rand.NextFloat(300f, 600f);
-                    Projectile.NewProj(TipOfSpear, Vector2.Zero, ModContent.ProjectileType<DivineLightning>(),
+                    Projectile.CreateProj(TipOfSpear, Vector2.Zero, ModContent.ProjectileType<DivineLightning>(),
                         (int) (Projectile.damage * 4.25f), 0f, Owner.whoAmI, ai1: end.X, ai2: end.Y);
                 }
             }

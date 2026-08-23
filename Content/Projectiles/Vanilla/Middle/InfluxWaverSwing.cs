@@ -37,7 +37,7 @@ public class InfluxWaverSwing : BaseSwordSwing
         if (Animation() >= .26f && !PlayedSound)
         {
             if (this.RunLocal())
-                Projectile.NewProj(Center, Projectile.velocity * 7f, ModContent.ProjectileType<InfluxWaverProj>(),
+                Projectile.CreateProj(Center, Projectile.velocity * 7f, ModContent.ProjectileType<InfluxWaverProj>(),
                     Projectile.damage, Projectile.knockBack, Projectile.owner, 0f, 0f);
 
             SoundID.Item1.Play(Projectile.Center, 1f, 0f, .2f);
@@ -159,7 +159,7 @@ public class InfluxWaverCreator : ModProjectile
         if (Time % 25 == 24 && this.RunLocal())
         {
             Vector2 pos = target.RandAreaInEntity();
-            InfluxWaverProj slash = Main.projectile[Projectile.NewProj(pos, Vector2.Zero,
+            InfluxWaverProj slash = Main.projectile[Projectile.CreateProj(pos, Vector2.Zero,
                 ModContent.ProjectileType<InfluxWaverProj>(),
                 Projectile.damage, Projectile.knockBack, Projectile.owner)].As<InfluxWaverProj>();
 
@@ -322,7 +322,7 @@ public class InfluxWaverProj : ModProjectile
 
             if (this.RunLocal())
             {
-                Projectile.NewProj(target.Center, Vector2.Zero, ModContent.ProjectileType<InfluxWaverCreator>(),
+                Projectile.CreateProj(target.Center, Vector2.Zero, ModContent.ProjectileType<InfluxWaverCreator>(),
                     Projectile.damage, Projectile.knockBack, Projectile.owner, 0f, target.whoAmI);
             }
 

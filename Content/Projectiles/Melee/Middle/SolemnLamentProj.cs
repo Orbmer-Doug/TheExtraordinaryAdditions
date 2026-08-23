@@ -118,7 +118,7 @@ public class SolemnLamentProj : BaseHoldoutProjectile
                     ParticleRegistry.SpawnSparkParticle(gunPos, vele, Main.rand.Next(50, 70),
                         Main.rand.NextFloat(.6f, 1.1f), Color.Wheat);
                     if (this.RunLocal())
-                        Projectile.NewProj(gunPos, vele, shootType, damage, Projectile.knockBack, Owner.whoAmI, 0f, 0f,
+                        Projectile.CreateProj(gunPos, vele, shootType, damage, Projectile.knockBack, Owner.whoAmI, 0f, 0f,
                             0f);
                 }
 

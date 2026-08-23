@@ -80,7 +80,7 @@ public class VirulentHoldout : BaseHoldoutProjectile
 
             SoundID.Item14.Play(Mouse, 1f, -.2f, .1f);
             if (this.RunLocal())
-                Projectile.NewProj(Mouse, Vector2.Zero, type, Projectile.damage, Projectile.knockBack, Owner.whoAmI);
+                Projectile.CreateProj(Mouse, Vector2.Zero, type, Projectile.damage, Projectile.knockBack, Owner.whoAmI);
         }
 
         // Expand radius
@@ -129,7 +129,7 @@ public class VirulentHoldout : BaseHoldoutProjectile
                 Main.rand.NextByte(0, 3));
 
         if (Time % 30f == 29f && this.RunLocal())
-            Projectile.NewProj(pos, Vector2.Zero, ModContent.ProjectileType<VirulentFlower>(), Projectile.damage, 0f,
+            Projectile.CreateProj(pos, Vector2.Zero, ModContent.ProjectileType<VirulentFlower>(), Projectile.damage, 0f,
                 Owner.whoAmI);
 
         Time++;

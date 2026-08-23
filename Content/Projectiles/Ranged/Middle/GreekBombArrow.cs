@@ -63,7 +63,7 @@ public class GreekBombArrow : ModProjectile
         if (this.RunLocal())
         {
             for (int i = 0; i < Main.rand.Next(3, 5); i++)
-                Projectile.NewProj(Projectile.Center,
+                Projectile.CreateProj(Projectile.Center,
                     -Projectile.oldVelocity.RotatedByRandom(1.8f) * Main.rand.NextFloat(.2f, .4f),
                     ModContent.ProjectileType<GreekNapalm>(), Projectile.damage / 2, 0f, Projectile.owner);
         }

@@ -76,7 +76,7 @@ public sealed class NitrogenCoolingPackPlayer : ModPlayer
                               Player.fullRotation + MathHelper.PiOver2);
             Vector2 vel = Main.rand.NextVector2CircularEdge(5f, 5f);
             if (Main.myPlayer == Player.whoAmI)
-                Player.NewPlayerProj(pos, vel, ModContent.ProjectileType<IcyShards>(), DamageSoftCap(item.damage, 150),
+                Player.CreatePlayerProj(pos, vel, ModContent.ProjectileType<IcyShards>(), DamageSoftCap(item.damage, 150),
                     1f, Main.myPlayer);
             Counter = 0;
         }

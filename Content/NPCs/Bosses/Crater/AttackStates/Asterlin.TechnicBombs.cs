@@ -23,7 +23,7 @@ public partial class Asterlin
         StateMachine.RegisterStateEntryCallback(AsterlinAIType.TechnicBombBarrage, () =>
         {
             if (ModNPC.RunServer())
-                NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<TheTechnicBlitzripper>(),
+                NPC.CreateNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<TheTechnicBlitzripper>(),
                     MediumAttackDamage, 0f);
             ReticlePosition = Target.Center - Vector2.UnitY * 200f;
         });
@@ -139,7 +139,7 @@ public partial class Asterlin
                     Vector2 home = GetHomingVelocity(LeftHandPosition, Target.Center, Target.Velocity,
                         Main.rand.NextFloat(22f, 34f));
                     if (ModNPC.RunServer())
-                        NPC.NewNPCProj(LeftHandPosition, home, ModContent.ProjectileType<TechnicBomb>(),
+                        NPC.CreateNPCProj(LeftHandPosition, home, ModContent.ProjectileType<TechnicBomb>(),
                             MediumAttackDamage, 0f);
 
                     for (int i = 0; i < 18; i++)

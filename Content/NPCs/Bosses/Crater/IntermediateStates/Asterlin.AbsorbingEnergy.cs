@@ -88,7 +88,7 @@ public partial class Asterlin
         {
             if (!FindProjectile(out _, type))
             {
-                int index = NPC.NewNPCProj(NPC.Center, Vector2.Zero, type, 0, 0f);
+                int index = NPC.CreateNPCProj(NPC.Center, Vector2.Zero, type, 0, 0f);
                 Main.projectile[index].netUpdate = true;
                 this.Sync();
             }

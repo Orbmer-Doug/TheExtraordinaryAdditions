@@ -132,7 +132,7 @@ public class Comet : ModProjectile
             }
 
             if (this.RunLocal())
-                Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<CometBlast>(),
+                Projectile.CreateProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<CometBlast>(),
                     Projectile.damage, Projectile.knockBack, Projectile.owner, Projectile.scale);
             AssetRegistry.GennedSounds.etherealSlam.Play(Projectile.Center, .6f, -Projectile.scale * .18f, .06f, 50);
 
@@ -152,7 +152,7 @@ public class Comet : ModProjectile
     {
         Projectile.damage = (int) (Projectile.damage * .5f);
         if (this.RunLocal())
-            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<CometBlast>(),
+            Projectile.CreateProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<CometBlast>(),
                 Projectile.damage, Projectile.knockBack, Projectile.owner, Projectile.scale);
     }
 

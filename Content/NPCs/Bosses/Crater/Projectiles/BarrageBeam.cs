@@ -22,7 +22,7 @@ namespace TheExtraordinaryAdditions.Content.NPCs.Bosses.Crater;
  */
 
 /// <summary>
-/// A system meant to conduct the drawing of all <see cref="BarrageBeam"/>'s <br></br>
+/// A system meant to conduct the drawing of all <see cref="BarrageBeam"/>'s <br />
 /// Optimizes drawing by drawing all beams as one continuous mesh
 /// </summary>
 public sealed class BarrageBeamManager : ModSystem
@@ -395,7 +395,7 @@ public class BarrageBeam : ProjOwnedByNPC<Asterlin>
                 pos = Target.Center +
                       Vector2.Zero.SafeNormalize(Main.rand.NextVector2Unit()).RotatedByRandom(RandomRotation()) *
                       (new Vector2(700f, 420f) * Main.rand.NextFloat(.1f, 1f));
-                pos = pos.ClampInWorld();
+                pos = ClampToWorld(pos);
 
                 foreach (Projectile r in AllProjectilesByID(Type))
                 {

@@ -47,7 +47,7 @@ public partial class Asterlin
         if (AITimer == 1)
         {
             if (ModNPC.RunServer())
-                NPC.NewNPCProj(RightHandPosition, Vector2.Zero, ModContent.ProjectileType<RadiantPulser>(),
+                NPC.CreateNPCProj(RightHandPosition, Vector2.Zero, ModContent.ProjectileType<RadiantPulser>(),
                     HeavyAttackDamage, 0f);
         }
 

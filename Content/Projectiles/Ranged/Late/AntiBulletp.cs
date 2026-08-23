@@ -64,7 +64,7 @@ public class AntiBulletp : ModProjectile
             // Fly off shrapnel
             if (Main.rand.NextBool(2) && this.RunLocal())
             {
-                Projectile.NewProj(pos, vel, ModContent.ProjectileType<AntiBulletShrapnel>(),
+                Projectile.CreateProj(pos, vel, ModContent.ProjectileType<AntiBulletShrapnel>(),
                     (int) (Projectile.damage * .33f), 0f, Projectile.owner);
             }
         }

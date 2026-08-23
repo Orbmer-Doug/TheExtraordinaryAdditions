@@ -139,7 +139,7 @@ public class ConcentratedEnergy : ModProjectile
             if (target.CanHomeInto() && this.RunLocal())
             {
                 Vector2 vel = Projectile.SafeDirectionTo(targ) * Main.rand.NextFloat(9f, 14f);
-                Projectile.NewProj(pos, vel, ModContent.ProjectileType<NeedleStar>(), Projectile.damage / 2,
+                Projectile.CreateProj(pos, vel, ModContent.ProjectileType<NeedleStar>(), Projectile.damage / 2,
                     Projectile.knockBack, Projectile.owner);
                 SoundEngine.PlaySound(SoundID.Item105 with { Volume = .8f, MaxInstances = 20, Pitch = .4f },
                     Projectile.Center);

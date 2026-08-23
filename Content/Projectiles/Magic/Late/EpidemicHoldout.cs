@@ -57,7 +57,7 @@ public class EpidemicHoldout : BaseIdleHoldoutProjectile
             int spear = ModContent.ProjectileType<EpidemicSpear>();
             if (Owner.CountOwnerProjectiles(spear) <= 0 && Owner.HeldItem.CheckManaBetter(Owner, 15, true))
             {
-                Projectile.NewProj(Projectile.Center, Vector2.Zero, spear, Projectile.damage * 3, Projectile.knockBack,
+                Projectile.CreateProj(Projectile.Center, Vector2.Zero, spear, Projectile.damage * 3, Projectile.knockBack,
                     Projectile.owner, 0f, Projectile.whoAmI);
             }
 
@@ -83,7 +83,7 @@ public class EpidemicHoldout : BaseIdleHoldoutProjectile
             if (this.RunLocal() && LeftCounter % wait == wait - 1f && Owner.HeldItem.CheckManaBetter(Owner, 8, true))
             {
                 AssetRegistry.GennedSounds.WaterSpell.Play(Projectile.Center, 1f, 0f, 0f, 0);
-                Projectile.NewProj(Projectile.Center, Projectile.SafeDirectionTo(Modded.MouseWorld) * 15f,
+                Projectile.CreateProj(Projectile.Center, Projectile.SafeDirectionTo(Modded.MouseWorld) * 15f,
                     ModContent.ProjectileType<EpidemicLob>(), Projectile.damage, Projectile.knockBack,
                     Projectile.owner);
             }

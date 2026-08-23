@@ -29,7 +29,7 @@ public partial class Asterlin
         StateMachine.RegisterStateEntryCallback(AsterlinAIType.Cleave, () =>
         {
             if (ModNPC.RunServer())
-                NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<JudgementHammer>(),
+                NPC.CreateNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<JudgementHammer>(),
                     HeavyAttackDamage, 10f);
         });
 
@@ -139,7 +139,7 @@ public partial class Asterlin
 
                             int maxWait = -Cleave_PillarWait * i;
                             int wait = (int) MathHelper.Lerp(maxWait, maxWait / 2f, lerp);
-                            NPC.NewNPCProj(RotatedHitbox.Top + new Vector2(x, y), Vector2.Zero,
+                            NPC.CreateNPCProj(RotatedHitbox.Top + new Vector2(x, y), Vector2.Zero,
                                 ModContent.ProjectileType<LightPillar>(), MediumAttackDamage, 2f, ai0: wait,
                                 ai2: speed);
                         }
@@ -185,7 +185,7 @@ public partial class Asterlin
                             float angle = -MathHelper.PiOver2 +
                                           MathHelper.Lerp(-MathHelper.PiOver2, MathHelper.PiOver2, completion);
                             Vector2 vel = PolarVector(3f, angle);
-                            NPC.NewNPCProj(ground, vel * 3, ModContent.ProjectileType<OverloadedLightDart>(),
+                            NPC.CreateNPCProj(ground, vel * 3, ModContent.ProjectileType<OverloadedLightDart>(),
                                 LightAttackDamage, 0f);
                         }
                     }

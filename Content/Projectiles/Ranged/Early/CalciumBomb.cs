@@ -40,7 +40,7 @@ public class CalciumBomb : ModProjectile
                 for (int i = 0; i < 8; i++)
                 {
                     Vector2 vel = (MathHelper.TwoPi * i / 8).ToRotationVector2().RotatedByRandom(.3f) * 12f;
-                    Projectile.NewProj(Projectile.Center, vel, ModContent.ProjectileType<CalciumSplinter>(),
+                    Projectile.CreateProj(Projectile.Center, vel, ModContent.ProjectileType<CalciumSplinter>(),
                         Projectile.damage, Projectile.knockBack, Owner.whoAmI);
                 }
 

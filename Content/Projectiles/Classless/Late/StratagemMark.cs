@@ -114,7 +114,7 @@ public class StratagemMark : ModProjectile
         {
             Vector2 pos = Projectile.Center - Vector2.UnitY.RotatedByRandom(.18f) * 1000f;
             Vector2 vel = pos.SafeDirectionTo(Projectile.Center) * 10f;
-            Projectile.NewProj(pos, vel, ModContent.ProjectileType<_500kg>(), Projectile.damage, 55f, Projectile.owner);
+            Projectile.CreateProj(pos, vel, ModContent.ProjectileType<_500kg>(), Projectile.damage, 55f, Projectile.owner);
         }
     }
 

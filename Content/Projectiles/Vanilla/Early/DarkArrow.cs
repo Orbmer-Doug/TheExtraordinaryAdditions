@@ -48,7 +48,7 @@ public class DarkArrow : ModProjectile
         {
             Vector2 orbVel = Main.rand.NextVector2Circular(2f, 2f);
             if (this.RunLocal())
-                Projectile.NewProj(pos, orbVel, ModContent.ProjectileType<CorruptOrb>(),
+                Projectile.CreateProj(pos, orbVel, ModContent.ProjectileType<CorruptOrb>(),
                     (int) (Projectile.damage * .4f), Projectile.knockBack * .4f, Projectile.owner);
             for (int i = 0; i < 12; i++)
                 ParticleRegistry.SpawnSquishyPixelParticle(pos,

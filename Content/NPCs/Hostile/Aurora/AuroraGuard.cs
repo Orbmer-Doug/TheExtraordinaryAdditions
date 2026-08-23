@@ -570,7 +570,7 @@ public class AuroraGuard : ModNPC, IBossDowned
         {
             Vector2 vel = HeadRotation.ToRotationVector2() * ShootSpeed;
             if (ModNPC.RunServer())
-                NPC.NewNPCProj(GunPos, vel, ModContent.ProjectileType<GlacialShell>(), IcicleDamage, 0f);
+                NPC.CreateNPCProj(GunPos, vel, ModContent.ProjectileType<GlacialShell>(), IcicleDamage, 0f);
             AssetRegistry.GennedSounds.GunLoop.Play(GunPos, Main.rand.NextFloat(.8f, 1f), 0f, .1f, 20);
 
             for (int i = 0; i < 10; i++)
@@ -626,7 +626,7 @@ public class AuroraGuard : ModNPC, IBossDowned
             ScreenShakeSystem.New(new(1f, .5f, 2000f), GunPos);
 
             if (ModNPC.RunServer())
-                NPC.NewNPCProj(GunPos, velocity, ModContent.ProjectileType<HeavyFrostBlast>(), HeavyBlastDamage, 10f);
+                NPC.CreateNPCProj(GunPos, velocity, ModContent.ProjectileType<HeavyFrostBlast>(), HeavyBlastDamage, 10f);
             Recoil = 12;
             BarrelHeat = 1.5f;
             NPC.netUpdate = true;
@@ -660,7 +660,7 @@ public class AuroraGuard : ModNPC, IBossDowned
                         -Vector2.UnitY * Main.rand.NextFloat(2f, 7f), Main.rand.Next(60, 80),
                         Main.rand.NextFloat(1.4f, 1.8f), SlateBlue, Icey, 4);
                 if (ModNPC.RunServer())
-                    NPC.NewNPCProj(potential, Vector2.Zero, ModContent.ProjectileType<GlacialSpike>(), SkewerDamage,
+                    NPC.CreateNPCProj(potential, Vector2.Zero, ModContent.ProjectileType<GlacialSpike>(), SkewerDamage,
                         0f);
             }
         }
@@ -690,7 +690,7 @@ public class AuroraGuard : ModNPC, IBossDowned
         if (AttackTimer == KablooeyMarker)
         {
             if (ModNPC.RunServer())
-                NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<OverheatedBlast>(),
+                NPC.CreateNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<OverheatedBlast>(),
                     HeavyBlastDamage * 2, 5f);
             ParticleRegistry.SpawnFlash(NPC.Center, 50, .5f, 900f);
             ScreenShakeSystem.New(new(.9f, 2f, 2000f), NPC.Center);

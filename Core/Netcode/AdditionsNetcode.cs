@@ -23,7 +23,7 @@ public enum AdditionsModMessageType : byte
 }
 
 /// <summary>
-/// Facilitates all handling of packets in the mod to make things work on multiplayer <br></br>
+/// Facilitates all handling of packets in the mod to make things work on multiplayer <br />
 /// Reminder: Check if something is synced by checking <see cref="MessageID"/> and looking for it in <see cref="NetMessage.SendData(int, int, int, Terraria.Localization.NetworkText, int, float, float, float, int, int, int)"/>
 /// </summary>
 public class AdditionsNetcode

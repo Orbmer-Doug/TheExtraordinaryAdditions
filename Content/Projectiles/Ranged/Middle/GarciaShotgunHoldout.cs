@@ -106,7 +106,7 @@ public class GarciaShotgunHoldout : BaseIdleHoldoutProjectile
                 {
                     float reduction = Shells > 0 ? Main.rand.NextFloat(.5f, .8f) : Main.rand.NextFloat(.7f, 1f);
                     Vector2 perturbedSpeed = vel.RotatedByRandom(MathHelper.ToRadians(Shells > 0 ? 10 : 5)) * reduction;
-                    Projectile.NewProj(pos, perturbedSpeed, ModContent.ProjectileType<ShotgunBullet>(), dmg, kb,
+                    Projectile.CreateProj(pos, perturbedSpeed, ModContent.ProjectileType<ShotgunBullet>(), dmg, kb,
                         Owner.whoAmI);
                 }
             }

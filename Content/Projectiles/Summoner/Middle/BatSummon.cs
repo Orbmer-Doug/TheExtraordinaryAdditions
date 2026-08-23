@@ -68,7 +68,7 @@ public class BatSummon : ModProjectile
         Projectile.spriteDirection = -Projectile.direction;
         Lighting.AddLight(Projectile.Center, Color.Orange.ToVector3() * .4f);
 
-        Projectile.SetAnimation(Main.projFrames[Type], 7, true);
+        Projectile.SetAnimation(Main.projFrames[Type], 7, pingPong: true);
     }
 
     private void Charging(Vector2 t)

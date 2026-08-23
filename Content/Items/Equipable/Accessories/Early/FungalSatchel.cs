@@ -88,7 +88,7 @@ public sealed class FungalSatchelPlayer : ModPlayer
             Vector2 pos = target.RandAreaInEntity();
             Vector2 vel = GetHomingVelocity(pos, Player.Center, Player.velocity, 6f);
             if (Main.myPlayer == Player.whoAmI)
-                Player.NewPlayerProj(pos, vel, ModContent.ProjectileType<HealingFungus>(), 0, 0f, Player.whoAmI);
+                Player.CreatePlayerProj(pos, vel, ModContent.ProjectileType<HealingFungus>(), 0, 0f, Player.whoAmI);
             Counter = 0;
         }
     }

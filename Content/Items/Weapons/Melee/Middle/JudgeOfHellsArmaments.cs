@@ -48,14 +48,14 @@ public class JudgeOfHellsArmaments : ModItem
     {
         if (player.altFunctionUse == ItemAlternativeFunctionID.ActivatedAndUsed)
         {
-            player.NewPlayerProj(position, velocity, ModContent.ProjectileType<JudgeSpear>(), damage, knockback,
+            player.CreatePlayerProj(position, velocity, ModContent.ProjectileType<JudgeSpear>(), damage, knockback,
                 player.whoAmI);
             return false;
         }
         else if (player.altFunctionUse == ItemAlternativeFunctionID.None)
         {
-            player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI);
-            Main.projectile[player.NewPlayerProj(position, velocity, type, damage / 2, knockback, player.whoAmI)]
+            player.CreatePlayerProj(position, velocity, type, damage, knockback, player.whoAmI);
+            Main.projectile[player.CreatePlayerProj(position, velocity, type, damage / 2, knockback, player.whoAmI)]
                 .As<JudgeSwing>().Splendor = true;
             return false;
         }

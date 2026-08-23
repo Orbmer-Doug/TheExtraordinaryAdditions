@@ -74,7 +74,7 @@ public class TheTesselesticMeltdown : ProjOwnedByNPC<Asterlin>
 
         Projectile.timeLeft = 2;
         OverallTime++;
-        Projectile.Center = Projectile.Center.ClampInWorld();
+        Projectile.Center = ClampToWorld(Projectile.Center);
     }
 
     private void Behavior_Idle()

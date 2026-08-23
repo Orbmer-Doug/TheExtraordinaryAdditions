@@ -67,7 +67,7 @@ public class CometStormHoldout : BaseHoldoutProjectile
                     velocity *= 22;
                     velocity.Y += Main.rand.NextFloat(-.1f, .1f);
                     velocity.X += Main.rand.NextFloat(-2f, 2f);
-                    Projectile.NewProj(position, velocity, ModContent.ProjectileType<Comet>(), Projectile.damage, 0f,
+                    Projectile.CreateProj(position, velocity, ModContent.ProjectileType<Comet>(), Projectile.damage, 0f,
                         Owner.whoAmI);
                 }
             }

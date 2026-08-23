@@ -41,11 +41,11 @@ public class TripleKatanas : ModItem
     {
         if (player.altFunctionUse == 2)
         {
-            player.NewPlayerProj(position, velocity, ModContent.ProjectileType<KatanaSweep>(), damage, knockback,
+            player.CreatePlayerProj(position, velocity, ModContent.ProjectileType<KatanaSweep>(), damage, knockback,
                 player.whoAmI);
         }
         else
-            player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI);
+            player.CreatePlayerProj(position, velocity, type, damage, knockback, player.whoAmI);
 
         return false;
     }

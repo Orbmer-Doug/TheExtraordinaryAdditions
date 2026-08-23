@@ -45,7 +45,7 @@ public class EclipsedDuo : ModItem
         int type, int damage, float knockback)
     {
         EclipseWhip whip = Main
-            .projectile[player.NewPlayerProj(position, velocity, type, damage, knockback, player.whoAmI)]
+            .projectile[player.CreatePlayerProj(position, velocity, type, damage, knockback, player.whoAmI)]
             .As<EclipseWhip>();
         whip.Moon = Switch == 1;
         Switch = (Switch + 1) % 2;

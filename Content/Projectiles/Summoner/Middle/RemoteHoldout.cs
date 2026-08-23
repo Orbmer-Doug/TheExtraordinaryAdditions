@@ -55,7 +55,7 @@ public class RemoteHoldout : BaseIdleHoldoutProjectile
                           new Vector2(
                               Main.rand.NextFloat(-Main.LogicCheckScreenWidth / 3, Main.LogicCheckScreenWidth / 3),
                               800f);
-            Projectile.NewProj(pos, Vector2.Zero, ModContent.ProjectileType<LazerDrone>(), Projectile.damage,
+            Projectile.CreateProj(pos, Vector2.Zero, ModContent.ProjectileType<LazerDrone>(), Projectile.damage,
                 Projectile.knockBack, Owner.whoAmI);
             for (int i = 0; i < 7; i++)
                 ParticleRegistry.SpawnPulseRingParticle(Projectile.Center, Vector2.Zero, 25, 0f, Vector2.One, 0f, .05f,

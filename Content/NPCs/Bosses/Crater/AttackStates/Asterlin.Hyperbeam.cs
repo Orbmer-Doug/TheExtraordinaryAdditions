@@ -65,7 +65,7 @@ public partial class Asterlin
                 if (AITimer >= Hyperbeam_HoverTime)
                 {
                     if (ModNPC.RunServer())
-                        NPC.NewNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<SoulForgedRift>(), 0, 0f);
+                        NPC.CreateNPCProj(NPC.Center, Vector2.Zero, ModContent.ProjectileType<SoulForgedRift>(), 0, 0f);
                     Hyperbeam_CurrentState = Hyperbeam_States.SummonPortal;
                     AITimer = 0;
                     NPC.netUpdate = true;
@@ -91,7 +91,7 @@ public partial class Asterlin
                 if (AITimer % Hyperbeam_FireInterval == (Hyperbeam_FireInterval - 1))
                 {
                     if (ModNPC.RunServer())
-                        NPC.NewNPCProj(NPC.Center, NPC.SafeDirectionTo(Target.Center + Target.Velocity * 10f) * 25f,
+                        NPC.CreateNPCProj(NPC.Center, NPC.SafeDirectionTo(Target.Center + Target.Velocity * 10f) * 25f,
                             ModContent.ProjectileType<SoulCleansingFlame>(), 0, 0f);
                 }
 

@@ -8,7 +8,7 @@ namespace TheExtraordinaryAdditions.Core.Utilities;
 public static class CollisionUtils
 {
     /// <summary>
-    /// Checks if a given hitbox is within the bounding box of a line <br></br>
+    /// Checks if a given hitbox is within the bounding box of a line <br />
     /// Particularly useful for only checking necessary targets 
     /// </summary>
     /// <param name="start">The start of the line</param>
@@ -1268,7 +1268,7 @@ public static class CollisionUtils
         for (int i = 0; i < poly1Count; i++)
         {
             Vector2 edge = polygon1[(i + 1) % poly1Count] - polygon1[i];
-            Vector2 axis = edge.Perp(true); // Normal vector
+            Vector2 axis = edge.PerpCCW(); // Normal vector
 
             if (!IsOverlappingOnAxis(polygon1, polygon2, axis))
                 return false; // Found a separating axis
@@ -1279,7 +1279,7 @@ public static class CollisionUtils
         for (int i = 0; i < poly2Count; i++)
         {
             Vector2 edge = polygon2[(i + 1) % poly2Count] - polygon2[i];
-            Vector2 axis = edge.Perp(true); // Normal vector
+            Vector2 axis = edge.PerpCCW(); // Normal vector
 
             if (!IsOverlappingOnAxis(polygon1, polygon2, axis))
                 return false; // Found a separating axis

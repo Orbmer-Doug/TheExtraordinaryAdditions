@@ -55,7 +55,7 @@ public class LightSpirit : ModProjectile
             Vector2 vel = Projectile.SafeDirectionTo(potentialTarget.Center) * 10f;
             Projectile p =
                 Main.projectile[
-                    Projectile.NewProj(Projectile.Center, vel, ModContent.ProjectileType<LightSpiritStar>(),
+                    Projectile.CreateProj(Projectile.Center, vel, ModContent.ProjectileType<LightSpiritStar>(),
                         Projectile.damage, Projectile.knockBack, Projectile.owner, 0f, 0f, 0f)];
             p.originalDamage = Projectile.originalDamage;
 

@@ -11,26 +11,10 @@ using TheExtraordinaryAdditions.Core.Graphics.Systems;
 
 namespace TheExtraordinaryAdditions.Core.Utilities;
 
-// TODO: split up methods with large optional parameters
 public static class MathUtils
 {
-    #region Constants
-
-    // just as a reminder...
-    // at one time never realized importance of delta time in games because i didn't know terraria happened to be capped at 60fps
-    public const int FramesPerSecond = 60;
-
-    public const float GoldenRatio = 1.618033989f;
-    public const float InverseGoldenRatio = 0.618033989f;
-    public const float PiOver3 = MathF.PI / 3f;
-    public const float ThreePIOver4 = MathHelper.Pi * 3 / 4;
-    public const float ThreePIOver2 = MathHelper.Pi * 3 / 2;
-
-    #endregion
-
     public static int SecondsToFrames(int x) => x * FramesPerSecond;
     public static int SecondsToFrames(float x) => (int) MathF.Round(x * FramesPerSecond);
-    public static bool WithinBounds(this int index, int cap) => index >= 0 && index < cap;
     public static float Convert01To010(float value) => MathF.Sin(MathHelper.Pi * MathHelper.Clamp(value, 0f, 1f));
     public static float Convert01To101(float value) => -Convert01To010(value) + 1;
 
@@ -39,7 +23,7 @@ public static class MathUtils
         float inverse = (x - from) / (to - from);
         return !clamped ? inverse : MathHelper.Clamp(inverse, 0f, 1f);
     }
-    
+
     public static float GetLerpBump(float from1, float to1, float from2, float to2, float x, bool clamp = true) =>
         InverseLerp(from1, to1, x, clamp) * InverseLerp(from2, to2, x, clamp);
 
@@ -108,35 +92,31 @@ public static class MathUtils
         }
     }
 
-    public static Vector2 ClampToWorld(Vector2 position, bool tilePos = false)
+    public static Vector2 ClampToWorld(Vector2 position)
     {
-        if (tilePos)
-        {
-            position.X = (int) MathHelper.Clamp(position.X, 0f, Main.maxTilesX);
-            position.Y = (int) MathHelper.Clamp(position.Y, 0f, Main.maxTilesY);
-        }
-        else
-        {
-            position.X = (int) MathHelper.Clamp(position.X, 0f, Main.maxTilesX * 16);
-            position.Y = (int) MathHelper.Clamp(position.Y, 0f, Main.maxTilesY * 16);
-        }
-
+        position.X = (int) MathHelper.Clamp(position.X, 0f, Main.maxTilesX * 16);
+        position.Y = (int) MathHelper.Clamp(position.Y, 0f, Main.maxTilesY * 16);
         return position;
     }
 
-    public static Point ClampToWorld(Point position, bool tilePos = false)
+    public static Vector2 ClampToTiles(Vector2 position)
     {
-        if (tilePos)
-        {
-            position.X = (int) MathHelper.Clamp(position.X, 0f, Main.maxTilesX);
-            position.Y = (int) MathHelper.Clamp(position.Y, 0f, Main.maxTilesY);
-        }
-        else
-        {
-            position.X = (int) MathHelper.Clamp(position.X, 0f, Main.maxTilesX * 16);
-            position.Y = (int) MathHelper.Clamp(position.Y, 0f, Main.maxTilesY * 16);
-        }
+        position.X = (int) MathHelper.Clamp(position.X, 0f, Main.maxTilesX);
+        position.Y = (int) MathHelper.Clamp(position.Y, 0f, Main.maxTilesY);
+        return position;
+    }
 
+    public static Point ClampToWorld(Point position)
+    {
+        position.X = (int) MathHelper.Clamp(position.X, 0f, Main.maxTilesX * 16);
+        position.Y = (int) MathHelper.Clamp(position.Y, 0f, Main.maxTilesY * 16);
+        return position;
+    }
+
+    public static Point ClampToTiles(Point position)
+    {
+        position.X = (int) MathHelper.Clamp(position.X, 0f, Main.maxTilesX);
+        position.Y = (int) MathHelper.Clamp(position.Y, 0f, Main.maxTilesY);
         return position;
     }
 
@@ -162,77 +142,68 @@ public static class MathUtils
         return lowerValue + (int) (difference * (scaledIndex - lowerIndex));
     }
 
-    #region Balancing
+    #region Trails
 
-    public static int FixDamageFromDifficulty(int damage, bool opposite = false)
+    extension(ReadOnlySpan<Vector2> points)
     {
-        float damageJankCorrectionFactor = 1f / 2f;
-        if (Main.expertMode)
-            damageJankCorrectionFactor = 1f / 4f;
-        if (Main.masterMode)
-            damageJankCorrectionFactor = 1f / 6f;
-        return (int) (damage * damageJankCorrectionFactor);
+        public bool ContainsZeroedPoint()
+        {
+            for (int i = 0; i < points.Length; i++)
+                if (points[i] == Vector2.Zero)
+                    return true;
+
+            return false;
+        }
+
+        public bool ContainsInvalidPoint()
+        {
+            for (int i = 0; i < points.Length; i++)
+                if (float.IsNaN(points[i].X) || float.IsNaN(points[i].Y) ||
+                    float.IsInfinity(points[i].X) || float.IsInfinity(points[i].Y))
+                    return true;
+
+            return false;
+        }
+
+        public bool AllPointsEqual()
+        {
+            if (points.Length <= 1)
+                return true; // 0 or 1 point is trivially "all equal"
+
+            Vector2 first = points[0];
+            for (int i = 1; i < points.Length; i++)
+                if (points[i] != first)
+                    return false;
+
+            return true;
+        }
     }
 
-    public static int DifficultyBasedValue(int normal, int? expert = null, int? master = null, int? ftw = null,
-        int? legendary = null, int? gfb = null)
+    #endregion
+
+    #region 3D
+
+    public static Vector3 SphericalToCartesian(float r, float theta, float phi)
     {
-        int val = normal;
-        if (expert.HasValue && Main.expertMode)
-            val = expert.Value;
-        if (master.HasValue && Main.masterMode)
-            val = master.Value;
-        if (ftw.HasValue && Main.getGoodWorld)
-            val = ftw.Value;
-        if (legendary.HasValue && Main.getGoodWorld && Main.masterMode)
-            val = legendary.Value;
-        if (gfb.HasValue && Main.zenithWorld)
-            val = gfb.Value;
-        return val;
+        float x = r * MathF.Sin(theta) * MathF.Cos(phi);
+        float y = r * MathF.Cos(theta);
+        float z = r * MathF.Sin(theta) * MathF.Sin(phi);
+        return new Vector3(x, y, z);
     }
 
-    public static float DifficultyBasedValue(float normal, float? expert = null, float? master = null,
-        float? ftw = null, float? legendary = null, float? gfb = null)
-    {
-        float val = normal;
-        if (expert.HasValue && Main.expertMode)
-            val = expert.Value;
-        if (master.HasValue && Main.masterMode)
-            val = master.Value;
-        if (ftw.HasValue && Main.getGoodWorld)
-            val = ftw.Value;
-        if (legendary.HasValue && Main.getGoodWorld && Main.masterMode)
-            val = legendary.Value;
-        if (gfb.HasValue && Main.zenithWorld)
-            val = gfb.Value;
-        return val;
-    }
+    #endregion
 
-    /// <summary>
-    /// Defines a given <see cref="NPC"/>'s HP based on the current difficulty mode
-    /// </summary>
-    public static void SetLifeMaxByMode(this NPC npc, int normalModeHP, int expertModeHP, int revengeanceModeHP,
-        int? deathModeHP = null, int? gfbModeHP = null)
-    {
-        npc.lifeMax = normalModeHP;
-        if (Main.expertMode)
-            npc.lifeMax = expertModeHP;
-        if (Main.masterMode)
-            npc.lifeMax = revengeanceModeHP;
-        if (deathModeHP.HasValue)
-            npc.lifeMax = deathModeHP.Value;
-        if (gfbModeHP.HasValue && Main.zenithWorld)
-            npc.lifeMax = gfbModeHP.Value;
-    }
+    #region Constants
 
-    public static int DamageSoftCap(double dmgInput, int cap)
-    {
-        if (dmgInput < cap)
-            return (int) dmgInput;
+    // just as a reminder...
+    // at one time never realized importance of delta time in games because i didn't know terraria happened to be capped at 60fps
+    public const int FramesPerSecond = 60;
 
-        double cappedRatio = Math.Pow(dmgInput / cap, 0.5) / 1.25 + 0.2;
-        return (int) (cap * cappedRatio);
-    }
+    public const float GoldenRatio = 1.618033989f;
+    public const float InverseGoldenRatio = 0.618033989f;
+    public const float PiOver3 = MathF.PI / 3f;
+    public const float ThreePIOver4 = MathHelper.Pi * 3 / 4;
+    public const float ThreePIOver2 = MathHelper.Pi * 3 / 2;
 
     #endregion
 
@@ -240,7 +211,8 @@ public static class MathUtils
 
     extension(Vector2 start)
     {
-        public Vector2 Perp(bool ccw = false) => ccw ? new Vector2(-start.Y, start.X) : new Vector2(start.Y, -start.X);
+        public Vector2 PerpCCW() => new(-start.Y, start.X);
+        public Vector2 PerpCW() => new(start.Y, -start.X);
 
         public Vector2 Lerp(Vector2 end, float t) => Vector2.Lerp(start, end, t);
 
@@ -308,10 +280,8 @@ public static class MathUtils
                 return true;
 
             if (maxDistance != null)
-            {
                 if (distanceSquared > maxDistance * maxDistance)
                     return false;
-            }
 
             directionToTarget = directionToTarget.SafeNormalize(Vector2.Zero);
             Vector2 viewerDirection = viewerRotation.ToRotationVector2();
@@ -325,7 +295,7 @@ public static class MathUtils
         public Vector2 ClampLength(float min, float max) =>
             start.SafeNormalize(Vector2.UnitY) * MathHelper.Clamp(start.Length(), min, max);
 
-        /// <param name="function">Put a desired periodic function here to define what to rotate by <br></br>Is already multiplied by PI</param>
+        /// <param name="function">Put a desired periodic function here to define what to rotate by <br />Is already multiplied by PI</param>
         /// <param name="delayAmount">The length of a period, in frames</param>
         /// <param name="amplitude">How powerful</param>
         /// <param name="delay">Decrements on its own</param>
@@ -447,6 +417,7 @@ public static class MathUtils
         bool flip)
     {
         float c = Vector2.Distance(start, end);
+        // law of cosines rearranged to find angles
         float angle =
             (float) Math.Acos(Math.Clamp(
                 (c * c + limbLength * limbLength - secondLimbLength * secondLimbLength) / (c * limbLength * 2f), -1f,
@@ -491,16 +462,16 @@ public static class MathUtils
         }
     }
 
-    extension(in SystemVector2 from)
+    extension(SystemVector2 from)
     {
-        public SystemVector2 SafeDirectionTo(in SystemVector2 to,
+        public SystemVector2 SafeDirectionTo(SystemVector2 to,
             SystemVector2? fallback = null)
         {
             fallback ??= SystemVector2.Zero;
             return (to - from).SafeNormalize(fallback.Value);
         }
 
-        public float AngleTo(in SystemVector2 to)
+        public float AngleTo(SystemVector2 to)
         {
             SystemVector2 v = to - from;
             return (float) Math.Atan2(v.Y, v.X);
@@ -523,8 +494,8 @@ public static class MathUtils
     }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    public static SystemVector2 CatmullRom(in SystemVector2 p0, in SystemVector2 p1, in SystemVector2 p2,
-        in SystemVector2 p3, float t)
+    public static SystemVector2 CatmullRom(SystemVector2 p0, SystemVector2 p1, SystemVector2 p2,
+        SystemVector2 p3, float t)
     {
         SystemVector2 spline = new();
 
@@ -545,10 +516,10 @@ public static class MathUtils
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static SystemVector2 ToNumerics(this in Vector2 v) => new(v.X, v.Y);
+    public static SystemVector2 ToNumerics(this Vector2 v) => new(v.X, v.Y);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 FromNumerics(this in SystemVector2 v) => new(v.X, v.Y);
+    public static Vector2 FromNumerics(this SystemVector2 v) => new(v.X, v.Y);
 
     #region 3D
 
@@ -568,7 +539,7 @@ public static class MathUtils
         }
     }
 
-    public static SystemVector3 SafeDirectionTo(this in SystemVector3 from, in SystemVector3 to,
+    public static SystemVector3 SafeDirectionTo(this SystemVector3 from, SystemVector3 to,
         SystemVector3? fallback = null)
     {
         fallback ??= SystemVector3.Zero;
@@ -576,8 +547,8 @@ public static class MathUtils
     }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    public static SystemVector3 CatmullRom(in SystemVector3 p0, in SystemVector3 p1, in SystemVector3 p2,
-        in SystemVector3 p3, float t)
+    public static SystemVector3 CatmullRom(SystemVector3 p0, SystemVector3 p1, SystemVector3 p2,
+        SystemVector3 p3, float t)
     {
         SystemVector3 spline = new();
 
@@ -603,10 +574,10 @@ public static class MathUtils
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static SystemVector3 ToNumerics(this in Vector3 v) => new(v.X, v.Y, v.Z);
+    public static SystemVector3 ToNumerics(this Vector3 v) => new(v.X, v.Y, v.Z);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 FromNumerics(this in SystemVector3 v) => new(v.X, v.Y, v.Z);
+    public static Vector3 FromNumerics(this SystemVector3 v) => new(v.X, v.Y, v.Z);
 
     #endregion
 
@@ -646,10 +617,8 @@ public static class MathUtils
 
         List<Vector2> pos = [];
         foreach (List<Line> bolt in bolts)
-        {
-            foreach (Line line in bolt)
-                pos.Add(line.A);
-        }
+        foreach (Line line in bolt)
+            pos.Add(line.A);
 
         for (int i = 0; i < branchPoints.Length; i++)
         {
@@ -740,7 +709,7 @@ public static class MathUtils
         float length = tangent.Length();
 
         int estimatedSegments = (int) (length / segmentDensity) + 2;
-        List<float> positions = new List<float>(estimatedSegments) { 0f };
+        List<float> positions = new(estimatedSegments) { 0f };
 
         // Generate positions without sorting
         float step = 1f / estimatedSegments;
@@ -894,7 +863,7 @@ public static class MathUtils
     public static RotatedRectangle ToRotated(this Rectangle rect, float rot, Vector2? pivot = null)
         => new(new(rect.X, rect.Y), new(rect.Width, rect.Height), rot, pivot ?? Vector2.One / 2);
 
-    /// <remarks>Due to terraria's updating, this should only be used in a update method</remarks>
+    /// <remarks>Due to terraria's updating, this should only be used  a update method</remarks>
     public static RotatedRectangle RotHitbox(this Entity entity, float rotation, Vector2? pivot = null)
     {
         Point point = (entity.Center + entity.velocity).ToPoint();
@@ -966,7 +935,7 @@ public static class MathUtils
     {
         offset ??= Vector2.Zero;
 
-        // Generate a random radius and angle in polar coordinates
+        // Generate a random radius and angle  polar coordinates
         float randomAngle = RandomRotation();
         float randomRadius =
             (float) (Main.rand.NextDouble() * 0.5) + 0.5f; // Random radius between 0.5 and 1.0 for ellipse scaling
@@ -1047,7 +1016,7 @@ public static class MathUtils
         /// Smoothly interpolates between current and target angles
         /// </summary>
         /// <param name="smoothness">0-1 value, 0 is instant, 1 is very smooth</param>
-        /// <param name="shiftSpeed">Base rotation speed in radians per frame</param>
+        /// <param name="shiftSpeed">Base rotation speed  radians per frame</param>
         public float SmoothAngleLerp(float targetAngle, float smoothness, float shiftSpeed)
         {
             // Normalize angles
@@ -1166,7 +1135,7 @@ public static class MathUtils
 
     /// <summary>
     /// Applies 2D FBM, an iterative process commonly use with things like Perlin noise to give a natural, "crisp" aesthetic to noise, rather than a blobby one.
-    /// <br></br>
+    /// <br />
     /// The greater the amount of octaves, the more pronounced this effect is, but the more performance intensive it is.
     /// </summary>
     /// <param name="x">The X position to sample from.</param>
@@ -1281,51 +1250,6 @@ public static class MathUtils
 
     #endregion
 
-    #region Trails
-
-    extension(ReadOnlySpan<Vector2> points)
-    {
-        public bool ContainsZeroedPoint()
-        {
-            for (int i = 0; i < points.Length; i++)
-            {
-                if (points[i] == Vector2.Zero)
-                    return true;
-            }
-
-            return false;
-        }
-
-        public bool ContainsInvalidPoint()
-        {
-            for (int i = 0; i < points.Length; i++)
-            {
-                if (float.IsNaN(points[i].X) || float.IsNaN(points[i].Y) ||
-                    float.IsInfinity(points[i].X) || float.IsInfinity(points[i].Y))
-                    return true;
-            }
-
-            return false;
-        }
-
-        public bool AllPointsEqual()
-        {
-            if (points.Length <= 1)
-                return true; // 0 or 1 point is trivially "all equal"
-
-            Vector2 first = points[0];
-            for (int i = 1; i < points.Length; i++)
-            {
-                if (points[i] != first)
-                    return false;
-            }
-
-            return true;
-        }
-    }
-
-    #endregion
-
     #region Graphical
 
     /// <summary>
@@ -1361,18 +1285,6 @@ public static class MathUtils
 
     #endregion
 
-    #region 3D
-
-    public static Vector3 SphericalToCartesian(float r, float theta, float phi)
-    {
-        float x = r * MathF.Sin(theta) * MathF.Cos(phi);
-        float y = r * MathF.Cos(theta);
-        float z = r * MathF.Sin(theta) * MathF.Sin(phi);
-        return new Vector3(x, y, z);
-    }
-
-    #endregion
-
     #region General
 
     /// <summary>
@@ -1397,7 +1309,6 @@ public static class MathUtils
     /// </summary>
     /// <param name="x">The input number.</param>
     public static float Cos01(float x) => MathF.Cos(x) * 0.5f + 0.5f;
-
 
     public static float QuadraticBump(float input) => input * (4 - input * 4);
     public static float InverseQuadraticBump(float input) => -input * (4 + input * 4);
@@ -1424,7 +1335,7 @@ public static class MathUtils
     /// <param name="center">The center of the Gaussian (the peak)</param>
     /// <param name="point">The vector to sample from</param>
     /// <param name="amplitude">The maximum height of the Gaussian (the intensity)</param>
-    /// <param name="sigma">Standard deviation in both X and Y directions (the max distance)<br></br> Smaller values make a sharper curve</param>
+    /// <param name="sigma">Standard deviation  both X and Y directions (the max distance)<br /> Smaller values make a sharper curve</param>
     /// <param name="minValue">The minimum value the Gaussian may calculate</param>
     /// <returns>The intensity at a <paramref name="point"/> from the <paramref name="center"/></returns>
     public static float GaussianFalloff2D(Vector2 center, Vector2 point, float amplitude, float sigma,
@@ -1440,7 +1351,7 @@ public static class MathUtils
     /// <param name="center">The center of the Gaussian (the peak)</param>
     /// <param name="point">The vector to sample from</param>
     /// <param name="amplitude">The maximum height of the Gaussian (the intensity)</param>
-    /// <param name="sigma">Standard deviation in both X and Y directions <br></br> Smaller values make a sharper curve in each direction</param>
+    /// <param name="sigma">Standard deviation  both X and Y directions <br /> Smaller values make a sharper curve  each direction</param>
     /// <param name="minValue">The minimum value the Gaussian may calculate</param>
     /// <returns>The intensity at a <paramref name="point"/> from the <paramref name="center"/></returns>
     public static float GaussianFalloff2D(Vector2 center, Vector2 point, float amplitude, Vector2 sigma,
@@ -1507,7 +1418,7 @@ public static class MathUtils
             // This uses the Newton-Raphson method to iteratively get closer and closer to roots of a given function.
             // The exactly formula is as follows:
             // x = x - f(x) / f'(x)
-            // In most circumstances repeating the above equation will result in closer and closer approximations to a root.
+            // In most circumstances repeating the above equation will result  closer and closer approximations to a root.
             // The exact reason as to why this intuitively works can be found at the following video:
             // https://www.youtube.com/watch?v=-RdOwhmqP5s
             double result = initialGuess;
@@ -1526,6 +1437,7 @@ public static class MathUtils
     #region Complex Numbers
 
     // Derived from Math.NET.Numerics: https://numerics.mathdotnet.com/
+    // Lanczos approximation
     private static readonly double[] GammaDk =
     [
         2.4857408913875355E-05,

@@ -155,7 +155,7 @@ static file class DrawActionGrouper
 }
 
 /// <summary>
-/// Facilitates all rendering actions associated with pixelated drawing, for textures and for primitives. <br></br>
+/// Facilitates all rendering actions associated with pixelated drawing, for textures and for primitives. <br />
 /// This is done with the intention of bringing complicated shaders and textures down to the resolution of Terraria for the sake of consistency.
 /// </summary>
 [Autoload(Side = ModSide.Client)]
@@ -407,10 +407,10 @@ public class PixelationSystem : ModSystem
     /// Renders a sprite in half-resolution on a specific draw layer.
     /// </summary>
     /// <remarks>
-    /// Textures in graphics device slots >= 1 may be cleared due to the other <see cref="SpriteBatch.End"/>'s in the system. <br></br>
+    /// Textures in graphics device slots >= 1 may be cleared due to the other <see cref="SpriteBatch.End"/>'s in the system. <br />
     /// Slot 0 is set by <see cref="SpriteBatch.Draw"/>, but for anything higher than that you must call <see cref="ManagedShader.SetTexture(Texture2D, int, SamplerState)"/> in <paramref name="renderAction"/> before the draw call <i>constantly</i>.
     /// </remarks>
-    /// <br></br>Leave null if you want logic like variables (e.g. a timer) specific to a projectile being passed into shader parameters to not effect all projectiles of that shader.
+    /// <br />Leave null if you want logic like variables (e.g. a timer) specific to a projectile being passed into shader parameters to not effect all projectiles of that shader.
     /// <param name="tex">The texture to use</param>
     /// <param name="pos">The position in screen space</param>
     /// <param name="source">The extracted rectangle of space, if any</param>
@@ -458,10 +458,10 @@ public class PixelationSystem : ModSystem
     /// Renders a sprite in half-resolution on a specific draw layer.
     /// </summary>
     /// <remarks>
-    /// Textures in graphics device slots >= 1 may be cleared due to the other <see cref="SpriteBatch.End"/>'s in the system. <br></br>
+    /// Textures in graphics device slots >= 1 may be cleared due to the other <see cref="SpriteBatch.End"/>'s in the system. <br />
     /// Slot 0 is set by <see cref="SpriteBatch.Draw"/>, but for anything higher than that you must call <see cref="ManagedShader.SetTexture(Texture2D, int, SamplerState)"/> in <paramref name="renderAction"/> before the draw call <i>constantly</i>.
     /// </remarks>
-    /// <br></br>Leave null if you want logic like variables (e.g. a timer) specific to a projectile being passed into shader parameters to not effect all projectiles of that shader.
+    /// <br />Leave null if you want logic like variables (e.g. a timer) specific to a projectile being passed into shader parameters to not effect all projectiles of that shader.
     /// <param name="tex">The texture to use</param>
     /// <param name="pos">The position in screen space</param>
     /// <param name="source">The extracted rectangle of space, if any</param>

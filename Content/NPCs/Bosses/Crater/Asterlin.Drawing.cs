@@ -70,8 +70,8 @@ public partial class Asterlin : IHasScreenShader
     private float _ZPosition;
 
     /// <summary>
-    /// Controls how "close" Asterlin should be to the screen to give psuedo 3D <br></br>
-    /// Takes an input between 0 - 1 and outputs a value between .5 - 1 <br></br>
+    /// Controls how "close" Asterlin should be to the screen to give psuedo 3D <br />
+    /// Takes an input between 0 - 1 and outputs a value between .5 - 1 <br />
     /// .5 for far away, 1 for close up
     /// </summary>
     public float ZPosition

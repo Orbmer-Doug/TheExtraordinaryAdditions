@@ -59,7 +59,7 @@ public class MeltRay : ModProjectile
                 if (this.RunLocal())
                 {
                     for (int i = 0; i < 2; i++)
-                        Projectile.NewProj(End, Main.rand.NextVector2CircularEdge(5f, 5f) + Vector2.UnitY * -6f,
+                        Projectile.CreateProj(End, Main.rand.NextVector2CircularEdge(5f, 5f) + Vector2.UnitY * -6f,
                             ModContent.ProjectileType<MeltGlobule>(),
                             (int) (Projectile.damage * .45f), Projectile.knockBack, Projectile.owner);
                 }

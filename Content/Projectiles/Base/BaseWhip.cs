@@ -18,8 +18,8 @@ using Utils = Terraria.Utils;
 namespace TheExtraordinaryAdditions.Content.Projectiles.Base;
 
 /// <summary>
-/// Creates a new whip projectile <br></br>
-/// The derived class of all whips in the mod <br></br>
+/// Creates a new whip projectile <br />
+/// The derived class of all whips in the mod <br />
 /// Any <see cref="Projectile.ai"/> before 2 is taken
 /// </summary>
 public abstract class BaseWhip : ModProjectile

@@ -142,7 +142,7 @@ public class SillyPinkSwing : BaseSwordSwing
         if (this.RunLocal())
         {
             for (int i = 0; i < 2; i++)
-                Projectile.NewProj(pos, -SwordDir.RotatedByRandom(.4f) * Main.rand.NextFloat(5f, 12f),
+                Projectile.CreateProj(pos, -SwordDir.RotatedByRandom(.4f) * Main.rand.NextFloat(5f, 12f),
                     ProjectileID.PartyGirlGrenade, Projectile.damage, 0f, Owner.whoAmI);
         }
 

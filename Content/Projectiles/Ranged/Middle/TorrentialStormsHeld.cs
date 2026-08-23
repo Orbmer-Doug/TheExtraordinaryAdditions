@@ -145,7 +145,7 @@ public class TorrentialStormsHeld : BaseIdleHoldoutProjectile
                         kb *= reel;
                         if (this.RunLocal())
                         {
-                            Projectile.NewProj(arrowPos, Projectile.velocity * speed, type, dmg, kb, Owner.whoAmI);
+                            Projectile.CreateProj(arrowPos, Projectile.velocity * speed, type, dmg, kb, Owner.whoAmI);
                         }
 
                         if (this.RunLocal())
@@ -193,7 +193,7 @@ public class TorrentialStormsHeld : BaseIdleHoldoutProjectile
                             mouseYDist *= mouseDistance;
                             Vector2 vel = new Vector2(mouseXDist, mouseYDist).SafeNormalize(Vector2.Zero)
                                 .RotatedByRandom(.35f * (1f - reel));
-                            Projectile.NewProj(pos, vel, ModContent.ProjectileType<TorrentialLightning>(), dmg, kb,
+                            Projectile.CreateProj(pos, vel, ModContent.ProjectileType<TorrentialLightning>(), dmg, kb,
                                 Owner.whoAmI, 0f, reel);
                             AssetRegistry.GennedSounds.LightningStrike.Play(pos, MathHelper.Max(.2f, reel) * 2f,
                                 -MathHelper.Max(.2f, reel) * .4f);
@@ -213,7 +213,7 @@ public class TorrentialStormsHeld : BaseIdleHoldoutProjectile
                             {
                                 Vector2 veloc = posit.SafeDirectionTo(Modded.MouseWorld + offset) * speed *
                                                 Main.rand.NextFloat(.6f, 1.25f);
-                                Projectile.NewProj(posit, veloc, ModContent.ProjectileType<RainDrop>(), dmg / 3, kb / 3,
+                                Projectile.CreateProj(posit, veloc, ModContent.ProjectileType<RainDrop>(), dmg / 3, kb / 3,
                                     Owner.whoAmI);
                                 ParticleRegistry.SpawnPulseRingParticle(posit, veloc.SafeNormalize(Vector2.Zero),
                                     Main.rand.Next(35, 50), veloc.ToRotation(), new(.5f, 1f), 0f, 30f,

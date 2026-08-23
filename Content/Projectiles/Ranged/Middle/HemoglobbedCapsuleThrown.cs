@@ -218,7 +218,7 @@ public class HemoglobbedCapsuleThrown : ModProjectile
         AssetRegistry.GennedSounds.Rapture.Play(Projectile.Center, 1.2f, -.1f);
         ScreenShakeSystem.New(new(.6f, .6f, 3000f), Projectile.Center);
         if (this.RunLocal())
-            Projectile.NewProj(Projectile.Center, Vector2.UnitY, ModContent.ProjectileType<LesserBloodBeacon>(),
+            Projectile.CreateProj(Projectile.Center, Vector2.UnitY, ModContent.ProjectileType<LesserBloodBeacon>(),
                 Projectile.damage / 2, 0f);
     }
 

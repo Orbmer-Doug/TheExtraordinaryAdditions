@@ -154,7 +154,7 @@ public class BowOfGreekFlamesHeld : BaseIdleHoldoutProjectile
                         kb *= reel;
                         if (this.RunLocal())
                         {
-                            Projectile.NewProj(arrowPos, Projectile.velocity * speed,
+                            Projectile.CreateProj(arrowPos, Projectile.velocity * speed,
                                 ModContent.ProjectileType<GreekBombArrow>(), dmg, kb, Owner.whoAmI);
                         }
 

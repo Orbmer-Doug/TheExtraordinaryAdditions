@@ -68,7 +68,7 @@ public class BlueTopHat : ModItem
                 Vector2 randPos = Main.rand.NextVector2FromRectangle(pos);
 
                 Vector2 shroomPos = onGround ? randPos : position;
-                player.NewPlayerProj(shroomPos, vel, ModContent.ProjectileType<Myceliumite>(), 100, 1f, player.whoAmI);
+                player.CreatePlayerProj(shroomPos, vel, ModContent.ProjectileType<Myceliumite>(), 100, 1f, player.whoAmI);
 
                 for (int j = 0; j < 5; j++)
                 {

@@ -83,7 +83,7 @@ public class MoonBlades : BaseHoldoutProjectile
             if (AimTime == MaxAimTime && TryUseMana() && ShootTime == 0)
             {
                 Vector2 pos = closest.Center;
-                Projectile.NewProj(pos, Vector2.Zero, ModContent.ProjectileType<MoonPortal>(), Projectile.damage,
+                Projectile.CreateProj(pos, Vector2.Zero, ModContent.ProjectileType<MoonPortal>(), Projectile.damage,
                     Projectile.knockBack, Owner.whoAmI, 0f, pos.X, pos.Y);
                 ShootTime = ShootWait;
                 Swap = !Swap;

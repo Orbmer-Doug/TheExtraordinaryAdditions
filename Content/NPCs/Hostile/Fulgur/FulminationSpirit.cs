@@ -218,7 +218,7 @@ public class FulminationSpirit : ModNPC
         {
             Vector2 vel = NPC.rotation.ToRotationVector2();
             if (ModNPC.RunServer())
-                NPC.NewNPCProj(NPC.Center, vel * 10f, ModContent.ProjectileType<LightningVolt>(), VoltDamage, 0f);
+                NPC.CreateNPCProj(NPC.Center, vel * 10f, ModContent.ProjectileType<LightningVolt>(), VoltDamage, 0f);
             for (int i = 0; i < 14; i++)
             {
                 ParticleRegistry.SpawnSparkParticle(NPC.Center, vel.RotatedByRandom(.5f) * Main.rand.NextFloat(7f, 15f),

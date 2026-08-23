@@ -29,7 +29,7 @@ public class EclipsedOnesCloak : ModItem
         int type = ModContent.ProjectileType<EclipsedAura>();
         if (player.CountOwnerProjectiles(type) <= 0 && Main.myPlayer == player.whoAmI)
         {
-            int p = player.NewPlayerProj(player.Center, Vector2.Zero, type, 1, 0f, player.whoAmI);
+            int p = player.CreatePlayerProj(player.Center, Vector2.Zero, type, 1, 0f, player.whoAmI);
             Main.projectile[p].DamageType = player.GetBestClass();
         }
 

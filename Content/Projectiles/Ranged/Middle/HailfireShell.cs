@@ -53,7 +53,7 @@ public class HailfireShell : ModProjectile
                 Vector2 pos = Projectile.RandAreaInEntity();
                 Vector2 vel = Projectile.velocity.RotatedByRandom(.3f) * Main.rand.NextFloat(.5f, 1.4f);
                 int type = ModContent.ProjectileType<HailfireRockets>();
-                Projectile.NewProj(pos, vel,
+                Projectile.CreateProj(pos, vel,
                     type, (int) (Projectile.damage * .25f),
                     Projectile.knockBack * .4f, Owner.whoAmI);
 
@@ -92,7 +92,7 @@ public class HailfireShell : ModProjectile
     {
         AssetRegistry.GennedSounds.crosscodeExplosion.Play(Projectile.Center, .8f, 0f, .1f, 10, Name);
         if (this.RunLocal())
-            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<HailfireExplosion>(),
+            Projectile.CreateProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<HailfireExplosion>(),
                 Projectile.damage, Projectile.knockBack, Projectile.owner, 1f);
     }
 
@@ -155,7 +155,7 @@ public class HailfireRockets : ModProjectile
     {
         AssetRegistry.GennedSounds.crosscodeExplosion.Play(Projectile.Center, .4f, .3f, .2f, 30, "small");
         if (this.RunLocal())
-            Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<HailfireExplosion>(),
+            Projectile.CreateProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<HailfireExplosion>(),
                 Projectile.damage, Projectile.knockBack, Projectile.owner, .3f);
     }
 

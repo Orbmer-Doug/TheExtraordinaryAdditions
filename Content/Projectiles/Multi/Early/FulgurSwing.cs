@@ -95,7 +95,7 @@ public class FulgurSwing : BaseSwordSwing
                     if (this.RunLocal())
                     {
                         Vector2 rand = target.RandAreaInEntity();
-                        FulgurZap chain = Main.projectile[Projectile.NewProj(pos, Vector2.Zero,
+                        FulgurZap chain = Main.projectile[Projectile.CreateProj(pos, Vector2.Zero,
                             ModContent.ProjectileType<FulgurZap>(),
                             (int) (Projectile.damage * .28f), Projectile.knockBack / 4, Owner.whoAmI, ai1: rand.X,
                             ai2: rand.Y)].As<FulgurZap>();

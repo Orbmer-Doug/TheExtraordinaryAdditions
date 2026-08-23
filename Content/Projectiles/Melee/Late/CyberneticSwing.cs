@@ -222,7 +222,7 @@ public class CyberneticSwing : ModProjectile
             if (this.RunLocal())
             {
                 Vector2 dir = Projectile.velocity.SafeNormalize(Vector2.Zero);
-                Projectile.NewProj(Center + PolarVector(100f, dir.ToRotation()), dir * 10f,
+                Projectile.CreateProj(Center + PolarVector(100f, dir.ToRotation()), dir * 10f,
                     ModContent.ProjectileType<CyberPierce>(), (int) (Projectile.damage * .75f), 2f, Projectile.owner);
             }
 
@@ -266,7 +266,7 @@ public class CyberneticSwing : ModProjectile
                     Vector2 pos = Center + PolarVector(100f,
                         Projectile.velocity.ToRotation() + (MathHelper.PiOver2 - .2f) *
                         MathHelper.Lerp(1f, -1f, InverseLerp(0, 3 - 1, i)) * Dir);
-                    Projectile.NewProj(pos, Projectile.velocity * 18f, ModContent.ProjectileType<CyberDart>(),
+                    Projectile.CreateProj(pos, Projectile.velocity * 18f, ModContent.ProjectileType<CyberDart>(),
                         (int) (Projectile.damage * .33f), 0f, Projectile.owner);
                 }
 
@@ -319,7 +319,7 @@ public class CyberneticSwing : ModProjectile
         if (State == SwingState.LightningPunch)
         {
             if (this.RunLocal())
-                Projectile.NewProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<CyberneticBlast>(),
+                Projectile.CreateProj(Projectile.Center, Vector2.Zero, ModContent.ProjectileType<CyberneticBlast>(),
                     Projectile.damage / 2, Projectile.knockBack / 2, Projectile.owner);
             AssetRegistry.GennedSounds.etherealSlam.Play(Projectile.Center, 1.4f, -.2f, .1f, 20, Name);
             ScreenShakeSystem.New(new(.5f, .3f), Projectile.Center);

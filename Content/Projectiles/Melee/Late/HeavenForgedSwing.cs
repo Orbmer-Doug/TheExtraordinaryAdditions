@@ -251,7 +251,7 @@ public class HeavenForgedSwing : BaseSwordSwing
 
             int proj = ModContent.ProjectileType<HeavenForgedSpear>();
             int dmg = (int) (Projectile.damage * .25f);
-            Projectile.NewProj(position, vel, proj, dmg, Projectile.knockBack / 2, Owner.whoAmI);
+            Projectile.CreateProj(position, vel, proj, dmg, Projectile.knockBack / 2, Owner.whoAmI);
 
             for (int i = 0; i < 10; i++)
             {
@@ -292,10 +292,10 @@ public class HeavenForgedSwing : BaseSwordSwing
     {
         for (int i = 0; i < 24; i++)
         {
-            Vector2 vel =
-                Projectile.rotation.ToRotationVector2()
-                    .Perp(SwingDir == (Direction == -1 ? SwingDirection.Up : SwingDirection.Down))
-                    .RotatedByRandom(.3f) * rand.NextFloat(7f, 15f);
+            Vector2 dir = SwingDir == (Direction == -1 ? SwingDirection.Up : SwingDirection.Down)
+                ? Projectile.rotation.ToRotationVector2().PerpCW()
+                : Projectile.rotation.ToRotationVector2().PerpCCW();
+            Vector2 vel = dir.RotatedByRandom(.3f) * rand.NextFloat(7f, 15f);
             ParticleRegistry.SpawnSparkParticle(start + rand.NextVector2Circular(9f, 9f), vel, rand.Next(30, 40),
                 rand.NextFloat(.7f, 1f), Color.DeepSkyBlue);
         }
@@ -308,10 +308,10 @@ public class HeavenForgedSwing : BaseSwordSwing
     {
         for (int i = 0; i < 24; i++)
         {
-            Vector2 vel =
-                Projectile.rotation.ToRotationVector2()
-                    .Perp(SwingDir == (Direction == -1 ? SwingDirection.Up : SwingDirection.Down))
-                    .RotatedByRandom(.3f) * rand.NextFloat(7f, 15f);
+            Vector2 dir = SwingDir == (Direction == -1 ? SwingDirection.Up : SwingDirection.Down)
+                ? Projectile.rotation.ToRotationVector2().PerpCW()
+                : Projectile.rotation.ToRotationVector2().PerpCCW();
+            Vector2 vel = dir.RotatedByRandom(.3f) * rand.NextFloat(7f, 15f);
             ParticleRegistry.SpawnSparkParticle(start + rand.NextVector2Circular(9f, 9f), vel, rand.Next(30, 40),
                 rand.NextFloat(.7f, 1f), Color.DeepSkyBlue);
         }

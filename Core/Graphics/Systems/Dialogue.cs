@@ -8,6 +8,8 @@ using Terraria.UI.Chat;
 
 namespace TheExtraordinaryAdditions.Core.Graphics.Systems;
 
+#nullable enable
+
 // Primarily from Fables
 // TODO: Shaders? Opacity delegate?
 
@@ -139,11 +141,11 @@ public struct TextSnippet
         string text,
         Color? color = null,
         float characterDelay = .025f,
-        CharacterAppearDelegate textAppear = null,
-        CharacterDisplacementDelegate textDisplacement = null,
+        CharacterAppearDelegate? textAppear = null,
+        CharacterDisplacementDelegate? textDisplacement = null,
         Vector2? origin = null,
         float fontSize = 1f,
-        DynamicSpriteFont font = null)
+        DynamicSpriteFont? font = null)
     {
         Content = text;
         TextColor = delegate { return color ?? Color.White; };

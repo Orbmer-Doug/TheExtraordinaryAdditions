@@ -179,7 +179,7 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
             {
                 int type = ModContent.ProjectileType<TesselesticLightning>();
                 Vector2 pos = Modded.MouseWorld.ClampOutCircle(Center, StaffLength / 2).ClampInCircle(Center, 1000f);
-                TesselesticLightning tess = Main.projectile[Projectile.NewProj(TipOfStaff, Projectile.velocity,
+                TesselesticLightning tess = Main.projectile[Projectile.CreateProj(TipOfStaff, Projectile.velocity,
                         type, Projectile.damage, Projectile.knockBack, Owner.whoAmI, 0f, pos.X, pos.Y)]
                     .As<TesselesticLightning>();
                 tess.MainColor = HeatColor;
@@ -258,7 +258,7 @@ public class TesselesticMeltdownProj : BaseIdleHoldoutProjectile
                 {
                     AssetRegistry.GennedSounds.VirtueAttack.Play(Projectile.Center, 1.3f, 0f, .1f);
                     if (this.RunLocal())
-                        Projectile.NewProj(Rect().Top, Projectile.velocity.SafeNormalize(Vector2.Zero),
+                        Projectile.CreateProj(Rect().Top, Projectile.velocity.SafeNormalize(Vector2.Zero),
                             ModContent.ProjectileType<TesselesticBeam>(),
                             Projectile.damage, Projectile.knockBack, Projectile.owner, 0f, 0f, Projectile.whoAmI);
 

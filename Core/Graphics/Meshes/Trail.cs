@@ -129,7 +129,7 @@ public sealed class TrailPoints
 }
 
 /// <summary>
-/// I suspect there to be better options but this is the only reliable thing I can think of to <br></br>
+/// I suspect there to be better options but this is the only reliable thing I can think of to <br />
 /// ensure a trail sometime somewhere is removed to prevent memory leak when whatever object that needed it is gone
 /// </summary>
 public sealed class TrailCleaner : ModSystem

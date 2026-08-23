@@ -43,7 +43,7 @@ public static class TileUtils
 
             // Determine the direction to scan
             int yIncrement = searchDown.ToDirectionInt();
-            int maxY = Math.Clamp(startY + (yIncrement * maxDepth), 0, Main.maxTilesY - 1);
+            int maxY = Math.Clamp(startY + yIncrement * maxDepth, 0, Main.maxTilesY - 1);
 
             // Scan vertically in the specified direction
             while (y >= 0 && y < Main.maxTilesY && (searchDown ? y <= maxY : y >= maxY))
@@ -81,7 +81,6 @@ public static class TileUtils
                             float leftY = tileTopY;
                             float rightY = tileTopY;
                             if (validGroundSlope && !tile.IsHalfBlock)
-                            {
                                 switch (tile.Slope)
                                 {
                                     case SlopeType.SlopeDownLeft:
@@ -93,7 +92,6 @@ public static class TileUtils
                                         rightY = tileTopY;
                                         break;
                                 }
-                            }
 
                             // Define the line segment for the tile's top edge
                             Vector2 leftEdge = new(x * 16f, leftY);
@@ -112,7 +110,6 @@ public static class TileUtils
                             float leftY = tileBottomY;
                             float rightY = tileBottomY;
                             if (validCeilingSlope && !tile.IsHalfBlock)
-                            {
                                 switch (tile.Slope)
                                 {
                                     case SlopeType.SlopeUpLeft:
@@ -124,7 +121,6 @@ public static class TileUtils
                                         rightY = tileBottomY;
                                         break;
                                 }
-                            }
 
                             // Define the line segment for the tile's bottom edge
                             Vector2 leftEdge = new(x * 16f, leftY);
@@ -177,7 +173,7 @@ public static class TileUtils
     {
         // Convert entity position to tile coordinates
         int ex = (int) entity.Center.X >> 4; // X tile at entity's center
-        int ey = (int) entity.position.Y + entity.height >> 4; // Y tile just below entity's feet
+        int ey = ((int) entity.position.Y + entity.height) >> 4; // Y tile just below entity's feet
         int direction = entity.direction; // 1 (right) or -1 (left)
         int heightInTiles = (int) Math.Ceiling(entity.height / 16f); // Entity height in tiles
         int clearanceHeight = heightInTiles; // Clearance height above the chasm, set to entity's height
@@ -341,48 +337,36 @@ public static class TileUtils
         value4 = Utils.Clamp(value4, 0, Main.maxTilesY - 1);
         Vector2 vector = default;
         for (int i = num; i < value2; i++)
+        for (int j = value3; j < value4; j++)
         {
-            for (int j = value3; j < value4; j++)
+            Tile tile = Main.tile[i, j];
+            if (tile == null || !tile.HasUnactuatedTile)
+                continue;
+
+            bool flag = Main.tileSolid[tile.TileType] && !Main.tileSolidTop[tile.TileType];
+            if (acceptTopSurfaces)
+                flag |= (Main.tileSolidTop[tile.TileType] && tile.TileFrameY == 0) ||
+                        TileID.Sets.Platforms[tile.TileType];
+
+            if (flag)
             {
-                Tile tile = Main.tile[i, j];
-                if (tile == null || !tile.HasUnactuatedTile)
-                    continue;
-
-                bool flag = Main.tileSolid[tile.TileType] && !Main.tileSolidTop[tile.TileType];
-                if (acceptTopSurfaces)
-                    flag |= (Main.tileSolidTop[tile.TileType] && tile.TileFrameY == 0) ||
-                            TileID.Sets.Platforms[tile.TileType];
-
-                if (flag)
+                vector.X = i * 16;
+                vector.Y = j * 16;
+                int num2 = 16;
+                if (tile.IsHalfBlock)
                 {
-                    vector.X = i * 16;
-                    vector.Y = j * 16;
-                    int num2 = 16;
-                    if (tile.IsHalfBlock)
-                    {
-                        vector.Y += 8f;
-                        num2 -= 8;
-                    }
-
-                    if (position.X + width > vector.X && position.X < vector.X + 16f &&
-                        position.Y + height > vector.Y && position.Y < vector.Y + num2)
-                        return true;
+                    vector.Y += 8f;
+                    num2 -= 8;
                 }
+
+                if (position.X + width > vector.X && position.X < vector.X + 16f &&
+                    position.Y + height > vector.Y && position.Y < vector.Y + num2)
+                    return true;
             }
         }
 
         return false;
     }
-
-    public static bool IsInWorld(this Point16 point) =>
-        point.X >= 0 && point.Y >= 0 && point.X < Main.maxTilesX && point.Y < Main.maxTilesY;
-
-    public static bool IsInWorld(this Point point) =>
-        point.X >= 0 && point.Y >= 0 && point.X < Main.maxTilesX && point.Y < Main.maxTilesY;
-
-    public static Vector2 ClampInWorld(this Vector2 vector) => new(
-        MathHelper.Clamp(vector.X, Main.leftWorld, Main.rightWorld),
-        MathHelper.Clamp(vector.Y, Main.topWorld, Main.bottomWorld));
 
     public static bool CheckSolidGround(this Player player, int solidGroundAhead = 0, int airExposureNeeded = 0)
     {

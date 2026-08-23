@@ -52,7 +52,7 @@ public class VirulentFlower : ModProjectile, ILocalizedModType, IModType
                     Vector2 shootVelocity = (MathHelper.TwoPi * a / 6f + offsetAngle).ToRotationVector2() *
                                             Main.rand.NextFloat(4f, 6f);
                     if (this.RunLocal())
-                        Projectile.NewProj(Projectile.Center, shootVelocity, ModContent.ProjectileType<VirulentSeed>(),
+                        Projectile.CreateProj(Projectile.Center, shootVelocity, ModContent.ProjectileType<VirulentSeed>(),
                             Projectile.damage, Projectile.knockBack, Projectile.owner, 1f);
                 }
 

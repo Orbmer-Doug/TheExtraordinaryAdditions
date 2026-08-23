@@ -54,7 +54,7 @@ public sealed partial class StygainHeart
                     }
 
                     if (ModNPC.RunServer())
-                        NPC.NewNPCProj(shootPosition, shootVelocity, ModContent.ProjectileType<BloodShot>(),
+                        NPC.CreateNPCProj(shootPosition, shootVelocity, ModContent.ProjectileType<BloodShot>(),
                             BloodBeaconLanceDamage, 0f);
                     for (int a = 0; a < 4; a++)
                     {
@@ -245,7 +245,7 @@ public sealed partial class StygainHeart
                         Vector2 pos = i == -1 ? NPC.RotHitbox().Left : NPC.RotHitbox().Right;
                         Vector2 vel = NPC.velocity.RotatedBy(MathHelper.PiOver2).SafeNormalize(Vector2.Zero) * 2.5f * i;
                         if (ModNPC.RunServer())
-                            NPC.NewNPCProj(pos, vel, ModContent.ProjectileType<TaintedStar>(), BloodshotDamage, 2f);
+                            NPC.CreateNPCProj(pos, vel, ModContent.ProjectileType<TaintedStar>(), BloodshotDamage, 2f);
                         for (int a = 0; a < 18; a++)
                         {
                             ParticleRegistry.SpawnGlowParticle(pos + Main.rand.NextVector2Circular(10f, 10f),
@@ -296,7 +296,7 @@ public sealed partial class StygainHeart
         if (ModNPC.RunServer() && AttackTimer == summonTime)
         {
             Vector2 pos = target.Center + target.velocity * 65f;
-            NPC.NewNPCProj(pos, Vector2.Zero, ModContent.ProjectileType<SanguinePortal>(), 0, 0f, -1);
+            NPC.CreateNPCProj(pos, Vector2.Zero, ModContent.ProjectileType<SanguinePortal>(), 0, 0f, -1);
         }
 
         // Race towards it
@@ -375,7 +375,7 @@ public sealed partial class StygainHeart
                 {
                     Projectile p =
                         Main.projectile[
-                            NPC.NewNPCProj(NPC.Center + Main.rand.NextVector2CircularLimited(200f, 200f, .4f, 1f),
+                            NPC.CreateNPCProj(NPC.Center + Main.rand.NextVector2CircularLimited(200f, 200f, .4f, 1f),
                                 Vector2.Zero, ass, BloodBeaconLanceDamage, 0f, -1)];
                     SanguineAssimilation sangue = p.As<SanguineAssimilation>();
                     sangue.Rot = MathHelper.TwoPi * i / count;
@@ -454,7 +454,7 @@ public sealed partial class StygainHeart
 
                     Vector2 pos = target.Center + new Vector2(posX2, posY);
                     Vector2 vel = Vector2.UnitY;
-                    NPC.NewNPCProj(pos, vel, ModContent.ProjectileType<BloodDroplet>(), BloodshotDamage, 0f, -1);
+                    NPC.CreateNPCProj(pos, vel, ModContent.ProjectileType<BloodDroplet>(), BloodshotDamage, 0f, -1);
                 }
             }
         }
@@ -469,7 +469,7 @@ public sealed partial class StygainHeart
                 {
                     Projectile p =
                         Main.projectile[
-                            NPC.NewNPCProj(NPC.Center, Vector2.Zero, lanceType, BloodBeaconLanceDamage, 0f, -1)];
+                            NPC.CreateNPCProj(NPC.Center, Vector2.Zero, lanceType, BloodBeaconLanceDamage, 0f, -1)];
                     p.As<ExsanguinationLance>().Rot = MathHelper.TwoPi * i / lanceCount;
                 }
             }

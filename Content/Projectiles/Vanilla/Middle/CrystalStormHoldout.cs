@@ -36,7 +36,7 @@ public class CrystalStormHoldout : BaseIdleHoldoutProjectile
             SoundID.Item9.Play(pos);
             Vector2 vel = Projectile.velocity.RotatedByRandom(.25f) * Item.shootSpeed;
 
-            Projectile.NewProj(pos, vel, shard, Item.damage, Item.knockBack, Owner.whoAmI);
+            Projectile.CreateProj(pos, vel, shard, Item.damage, Item.knockBack, Owner.whoAmI);
         }
 
         if (this.RunLocal())

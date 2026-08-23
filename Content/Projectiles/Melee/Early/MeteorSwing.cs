@@ -151,7 +151,7 @@ public class MeteorSwing : BaseSwordSwing
         {
             HitCounter++;
             if (HitCounter % 3 == 0)
-                Projectile.NewProj(start, Vector2.Zero, type, Projectile.damage, Projectile.knockBack / 3,
+                Projectile.CreateProj(start, Vector2.Zero, type, Projectile.damage, Projectile.knockBack / 3,
                     Projectile.owner);
         }
 

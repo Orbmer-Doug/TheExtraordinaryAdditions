@@ -161,7 +161,7 @@ public class HallowedGreatbowHeld : BaseIdleHoldoutProjectile
                                 float shootOffsetAngle = MathHelper.Lerp(-0.1f, 0.1f, i / (2 - 1f));
                                 Vector2 shootVelocity = Projectile.velocity.RotatedByRandom(shootOffsetAngle) *
                                                         Main.rand.NextFloat(.7f, 1f) * speed;
-                                Projectile.NewProj(arrowPos, shootVelocity,
+                                Projectile.CreateProj(arrowPos, shootVelocity,
                                     ModContent.ProjectileType<AcceleratingLight>(), dmg, kb, Owner.whoAmI, 0f, 0f,
                                     30f * (.2f + reel));
                             }

@@ -161,7 +161,7 @@ public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
             {
                 if (Main.rand.NextBool(2))
                 {
-                    int p = Projectile.NewProj(pos, vel, ModContent.ProjectileType<IchorGlobule>(), Projectile.damage,
+                    int p = Projectile.CreateProj(pos, vel, ModContent.ProjectileType<IchorGlobule>(), Projectile.damage,
                         Projectile.knockBack, Projectile.owner);
                     Main.projectile[p].DamageType = DamageClass.Summon;
                     Main.projectile[p].tileCollide = false;
