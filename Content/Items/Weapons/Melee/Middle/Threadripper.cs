@@ -5,7 +5,7 @@ using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 
-public class Threadripper : ModItem, ILocalizedModType, IModType
+public class Threadripper : ModItem
 {
     public override string Texture => AssetRegistry.GennedTextures.Threadripper.Path;
 

@@ -5,7 +5,7 @@ using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
-public class LightripBlast : ModProjectile, ILocalizedModType, IModType
+public class LightripBlast : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 

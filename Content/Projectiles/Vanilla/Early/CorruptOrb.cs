@@ -4,7 +4,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Early;
 
-public class CorruptOrb : ModProjectile, ILocalizedModType, IModType
+public class CorruptOrb : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 

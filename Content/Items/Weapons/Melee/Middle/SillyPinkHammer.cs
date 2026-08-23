@@ -8,7 +8,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Melee.Middle;
 
-public class SillyPinkHammer : ModItem, ILocalizedModType, IModType
+public class SillyPinkHammer : ModItem
 {
     public override string Texture => AssetRegistry.GennedTextures.SillyPinkHammer.Path;
 

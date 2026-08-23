@@ -9,7 +9,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
 
-public class FlameInsignia : ModItem, ILocalizedModType, IModType
+public class FlameInsignia : ModItem
 {
     public override string Texture => AssetRegistry.GennedTextures.FlameInsignia.Path;
 

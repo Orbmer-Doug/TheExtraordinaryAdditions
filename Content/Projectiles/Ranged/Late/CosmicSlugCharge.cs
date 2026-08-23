@@ -10,7 +10,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
-public class CosmicSlugCharge : ModProjectile, ILocalizedModType, IModType
+public class CosmicSlugCharge : ModProjectile
 {
     internal static readonly int UpdateCount = 8;
     internal static readonly int Lifetime = UpdateCount * SecondsToFrames(2);

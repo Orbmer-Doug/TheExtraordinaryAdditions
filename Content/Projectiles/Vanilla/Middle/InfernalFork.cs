@@ -5,7 +5,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
-public class InfernalFork : ModProjectile, ILocalizedModType, IModType
+public class InfernalFork : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 

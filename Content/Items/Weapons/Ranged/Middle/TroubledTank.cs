@@ -8,7 +8,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 
-public class TroubledTank : ModItem, ILocalizedModType, IModType
+public class TroubledTank : ModItem
 {
     public override string Texture => AssetRegistry.GennedTextures.TroubledTank.Path;
 

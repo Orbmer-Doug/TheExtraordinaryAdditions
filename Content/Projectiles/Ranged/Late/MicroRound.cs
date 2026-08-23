@@ -4,7 +4,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
-public class MicroRound : ModProjectile, ILocalizedModType, IModType
+public class MicroRound : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 

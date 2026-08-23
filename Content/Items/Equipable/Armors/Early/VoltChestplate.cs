@@ -9,7 +9,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Early;
 
 [AutoloadEquip(EquipType.Body)]
-public class VoltChestplate : ModItem, ILocalizedModType, IModType
+public class VoltChestplate : ModItem
 {
     public override string Texture => AssetRegistry.GennedTextures.VoltChestplate.Path;
 

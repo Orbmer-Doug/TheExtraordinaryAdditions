@@ -9,7 +9,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
-public class LaserBlast : ModProjectile, ILocalizedModType, IModType
+public class LaserBlast : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 

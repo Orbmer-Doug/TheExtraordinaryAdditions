@@ -8,7 +8,7 @@ using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 
-public class Lanikea : ModItem, ILocalizedModType, IModType
+public class Lanikea : ModItem
 {
     public override string Texture => AssetRegistry.GennedTextures.Lanikea.Path;
 

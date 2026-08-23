@@ -5,7 +5,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
 
-public class StarWaterBreak : ModProjectile, ILocalizedModType, IModType
+public class StarWaterBreak : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.StarWaterBreak.Path;
 

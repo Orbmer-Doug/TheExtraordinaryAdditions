@@ -5,7 +5,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Late;
 
-public class SharpTie : ModProjectile, ILocalizedModType, IModType
+public class SharpTie : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.SharpTie.Path;
 

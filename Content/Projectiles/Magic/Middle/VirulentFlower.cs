@@ -7,7 +7,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
 
-public class VirulentFlower : ModProjectile, ILocalizedModType, IModType
+public class VirulentFlower : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.VirulentFlower.Path;
     private readonly int Timeleft = SecondsToFrames(5);

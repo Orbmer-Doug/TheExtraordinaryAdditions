@@ -6,7 +6,7 @@ using TheExtraordinaryAdditions.Content.Tiles;
 
 namespace TheExtraordinaryAdditions.Content.Items.Placeable;
 
-public class TechnicTransmitter : ModItem, ILocalizedModType, IModType
+public class TechnicTransmitter : ModItem
 {
     public override string Texture => AssetRegistry.GennedTextures.TechnicTransmitter.Path;
 

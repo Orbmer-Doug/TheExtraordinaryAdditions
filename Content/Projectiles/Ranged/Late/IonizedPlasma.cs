@@ -3,7 +3,7 @@ using Terraria.ModLoader;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
-public class IonizedPlasma : ModProjectile, ILocalizedModType, IModType
+public class IonizedPlasma : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 

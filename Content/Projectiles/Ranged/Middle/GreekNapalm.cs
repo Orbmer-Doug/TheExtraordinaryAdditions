@@ -7,7 +7,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 
-public class GreekNapalm : ModProjectile, ILocalizedModType, IModType
+public class GreekNapalm : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 

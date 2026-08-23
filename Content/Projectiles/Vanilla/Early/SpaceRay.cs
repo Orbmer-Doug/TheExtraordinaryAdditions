@@ -9,7 +9,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Early;
 
-public class SpaceRay : ModProjectile, ILocalizedModType, IModType
+public class SpaceRay : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 

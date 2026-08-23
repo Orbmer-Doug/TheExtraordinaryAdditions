@@ -7,7 +7,7 @@ using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Pets;
 
-public class PaintCoveredCamera : ModItem, ILocalizedModType, IModType
+public class PaintCoveredCamera : ModItem
 {
     public override string Texture => AssetRegistry.GennedTextures.PaintCoveredCamera.Path;
 

@@ -4,7 +4,7 @@ using Terraria.ModLoader;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
-public class SolemButterflyLament : ModProjectile, ILocalizedModType, IModType
+public class SolemButterflyLament : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.SolemButterflyLament.Path;
 

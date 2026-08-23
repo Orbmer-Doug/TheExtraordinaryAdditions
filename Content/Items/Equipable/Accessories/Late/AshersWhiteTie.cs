@@ -10,7 +10,7 @@ using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Late;
 
 [AutoloadEquip(EquipType.Neck)]
-public class AshersWhiteTie : ModItem, ILocalizedModType, IModType
+public class AshersWhiteTie : ModItem
 {
     public override string Texture => AssetRegistry.GennedTextures.AshersWhiteTie.Path;
 

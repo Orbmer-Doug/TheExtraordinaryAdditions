@@ -13,7 +13,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Early;
 
 [AutoloadEquip(EquipType.Head)]
-public class VoltHelmet : ModItem, ILocalizedModType, IModType
+public class VoltHelmet : ModItem
 {
     public override string Texture => AssetRegistry.GennedTextures.VoltHelmet.Path;
 

@@ -6,7 +6,7 @@ using TheExtraordinaryAdditions.Content.Projectiles.Pets;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Pets;
 
-public class Lifeseed : ModItem, ILocalizedModType, IModType
+public class Lifeseed : ModItem
 {
     public override string Texture => AssetRegistry.GennedTextures.Lifeseed.Path;
 

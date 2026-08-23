@@ -9,7 +9,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
-public class VolatileStar : ModProjectile, ILocalizedModType, IModType
+public class VolatileStar : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     public ref float Time => ref Projectile.ai[0];

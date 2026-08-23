@@ -6,7 +6,7 @@ using TheExtraordinaryAdditions.Content.Projectiles.Pets;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Pets;
 
-public class TVRemote : ModItem, ILocalizedModType, IModType
+public class TVRemote : ModItem
 {
     public override string Texture => AssetRegistry.GennedTextures.TVRemote.Path;
 

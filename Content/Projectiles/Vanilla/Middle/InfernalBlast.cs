@@ -7,7 +7,7 @@ using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
-public class InfernalBlast : ModProjectile, ILocalizedModType, IModType
+public class InfernalBlast : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 

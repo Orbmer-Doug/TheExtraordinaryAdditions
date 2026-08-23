@@ -6,7 +6,7 @@ using TheExtraordinaryAdditions.Content.Tiles;
 
 namespace TheExtraordinaryAdditions.Content.Items.Placeable.Base;
 
-public abstract class BaseBannerItem : ModItem, ILocalizedModType, IModType
+public abstract class BaseBannerItem : ModItem
 {
     public virtual int BannerTileID => ModContent.TileType<MonsterBanner>();
 

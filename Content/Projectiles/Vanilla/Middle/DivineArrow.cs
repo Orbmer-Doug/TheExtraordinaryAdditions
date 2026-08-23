@@ -64,7 +64,7 @@ public class DivineArrow : ModProjectile
     }
 }
 
-public class DissipatingLight : ModProjectile, ILocalizedModType, IModType
+public class DissipatingLight : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
     public Player Owner => Main.player[Projectile.owner];

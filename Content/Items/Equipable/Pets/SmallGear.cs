@@ -6,7 +6,7 @@ using TheExtraordinaryAdditions.Content.Projectiles.Pets;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Pets;
 
-public class SmallGear : ModItem, ILocalizedModType, IModType
+public class SmallGear : ModItem
 {
     public override string Texture => AssetRegistry.GennedTextures.SmallGear.Path;
 

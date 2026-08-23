@@ -11,7 +11,7 @@ using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
-public class KrakenTentacle : ModProjectile, ILocalizedModType, IModType
+public class KrakenTentacle : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.KrakenTentacle.Path;
     public ref float Time => ref Projectile.ai[0];

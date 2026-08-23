@@ -9,7 +9,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Early;
 
 [AutoloadEquip(EquipType.Legs)]
-public class VoltGrieves : ModItem, ILocalizedModType, IModType
+public class VoltGrieves : ModItem
 {
     public override string Texture => AssetRegistry.GennedTextures.VoltGrieves.Path;
 

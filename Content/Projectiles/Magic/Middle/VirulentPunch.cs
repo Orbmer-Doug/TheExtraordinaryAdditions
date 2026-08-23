@@ -3,7 +3,7 @@ using Terraria.ModLoader;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
 
-public class VirulentPunch : ModProjectile, ILocalizedModType, IModType
+public class VirulentPunch : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 

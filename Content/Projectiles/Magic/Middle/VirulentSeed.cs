@@ -8,7 +8,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Middle;
 
-public class VirulentSeed : ModProjectile, ILocalizedModType, IModType
+public class VirulentSeed : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.VirulentSeed.Path;
 

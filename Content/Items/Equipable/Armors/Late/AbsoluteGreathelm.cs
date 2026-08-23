@@ -9,7 +9,7 @@ using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Armors.Late;
 
 [AutoloadEquip(EquipType.Head)]
-public class AbsoluteGreathelm : ModItem, ILocalizedModType, IModType
+public class AbsoluteGreathelm : ModItem
 {
     public override string Texture => AssetRegistry.GennedTextures.AbsoluteGreathelm.Path;
     public static int HeadSlotID { get; private set; }

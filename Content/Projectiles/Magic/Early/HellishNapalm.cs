@@ -8,7 +8,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Early;
 
-public class HellishNapalm : ModProjectile, ILocalizedModType, IModType
+public class HellishNapalm : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 

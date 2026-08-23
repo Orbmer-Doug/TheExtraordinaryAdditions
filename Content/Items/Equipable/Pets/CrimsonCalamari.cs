@@ -6,7 +6,7 @@ using TheExtraordinaryAdditions.Content.Projectiles.Pets;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Pets;
 
-public class CrimsonCalamari : ModItem, ILocalizedModType, IModType
+public class CrimsonCalamari : ModItem
 {
     public override string Texture => AssetRegistry.GennedTextures.CrimsonCalamari.Path;
 

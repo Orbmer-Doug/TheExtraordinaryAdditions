@@ -8,7 +8,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Classless.Middle;
 
-public class LightSpiritStar : ModProjectile, ILocalizedModType, IModType
+public class LightSpiritStar : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 

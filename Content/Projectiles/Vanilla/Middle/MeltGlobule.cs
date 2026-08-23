@@ -3,7 +3,7 @@ using Terraria.ModLoader;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla.Middle;
 
-public class MeltGlobule : ModProjectile, ILocalizedModType, IModType
+public class MeltGlobule : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 

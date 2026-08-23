@@ -6,7 +6,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 
-public class CharringBlast : ModProjectile, ILocalizedModType, IModType
+public class CharringBlast : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 

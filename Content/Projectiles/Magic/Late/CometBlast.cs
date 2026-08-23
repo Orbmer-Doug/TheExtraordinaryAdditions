@@ -9,7 +9,7 @@ using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Magic.Late;
 
-public class CometBlast : ModProjectile, ILocalizedModType, IModType
+public class CometBlast : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 

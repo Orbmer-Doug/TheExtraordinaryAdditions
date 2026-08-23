@@ -12,7 +12,7 @@ using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late.Zenith;
 
-public class ExtraordinaryHyperBlast : ModProjectile, ILocalizedModType, IModType
+public class ExtraordinaryHyperBlast : ModProjectile
 {
     private const int Lifetime = 35;
     public float Completion => 1f - Utils.GetLerpValue(0f, Lifetime, Projectile.timeLeft);

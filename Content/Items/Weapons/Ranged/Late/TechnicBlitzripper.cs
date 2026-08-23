@@ -8,7 +8,7 @@ using TheExtraordinaryAdditions.Core.Globals.ItemGlobal;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Late;
 
-public class TechnicBlitzripper : ModItem, ILocalizedModType, IModType
+public class TechnicBlitzripper : ModItem
 {
     public override string Texture => AssetRegistry.GennedTextures.TechnicBlitzripper.Path;
 

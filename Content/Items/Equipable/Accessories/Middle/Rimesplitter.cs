@@ -10,7 +10,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Equipable.Accessories.Middle;
 
-public class Rimesplitter : ModItem, ILocalizedModType, IModType
+public class Rimesplitter : ModItem
 {
     public override string Texture => AssetRegistry.GennedTextures.Rimesplitter.Path;
 

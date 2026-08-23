@@ -11,7 +11,7 @@ using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
-public class AlucardsSwordThrow : ModProjectile, ILocalizedModType, IModType
+public class AlucardsSwordThrow : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.AlucardsSwordThrow.Path;
     public Player Owner => Main.player[Projectile.owner];

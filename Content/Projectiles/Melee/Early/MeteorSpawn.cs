@@ -12,7 +12,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Early;
 
-public class MeteorSpawn : ModProjectile, ILocalizedModType, IModType
+public class MeteorSpawn : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.MeteorSpawn.Path;
 

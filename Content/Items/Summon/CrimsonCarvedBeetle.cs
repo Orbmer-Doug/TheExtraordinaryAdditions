@@ -11,7 +11,7 @@ using static Terraria.ID.ContentSamples.CreativeHelper;
 
 namespace TheExtraordinaryAdditions.Content.Items.Summon;
 
-public class CrimsonCarvedBeetle : ModItem, ILocalizedModType, IModType
+public class CrimsonCarvedBeetle : ModItem
 {
     public override string Texture => AssetRegistry.GennedTextures.CrimsonCarvedBeetle.Path;
 

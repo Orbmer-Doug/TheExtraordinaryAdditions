@@ -15,7 +15,7 @@ using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Early;
 
-public class StellarKunaiProj : ModProjectile, ILocalizedModType, IModType
+public class StellarKunaiProj : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.StellarKunai.Path;
 

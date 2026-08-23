@@ -10,7 +10,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Middle;
 
-public class LanceOfSanguineSteels : ModItem, ILocalizedModType, IModType
+public class LanceOfSanguineSteels : ModItem
 {
     public override string Texture => AssetRegistry.GennedTextures.LanceOfSanguineSteels.Path;
 

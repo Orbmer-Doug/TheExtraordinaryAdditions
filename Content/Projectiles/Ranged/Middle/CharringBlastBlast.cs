@@ -7,7 +7,7 @@ using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Middle;
 
-public class CharringBlastBlast : ModProjectile, ILocalizedModType, IModType
+public class CharringBlastBlast : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 

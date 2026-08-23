@@ -22,7 +22,7 @@ using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Vanilla;
 
-public class FancyTool : ModProjectile, ILocalizedModType, IModType
+public class FancyTool : ModProjectile
 {
     #region Variables
 

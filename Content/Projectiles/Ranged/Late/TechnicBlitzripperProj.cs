@@ -11,7 +11,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Late;
 
-public class TechnicBlitzripperProj : BaseIdleHoldoutProjectile, ILocalizedModType, IModType
+public class TechnicBlitzripperProj : BaseIdleHoldoutProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.TechnicBlitzripper.Path;
 

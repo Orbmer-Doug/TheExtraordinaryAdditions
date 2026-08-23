@@ -18,7 +18,7 @@ namespace TheExtraordinaryAdditions.Content.Projectiles.Summoner.Middle;
 /// This was not my idea...
 /// Was more cursed in execution than in thought
 /// </summary>
-public class TheTongueWhip : ModProjectile, ILocalizedModType, IModType
+public class TheTongueWhip : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.TheTongueWhip.Path;
     public const int SegmentCount = 20;

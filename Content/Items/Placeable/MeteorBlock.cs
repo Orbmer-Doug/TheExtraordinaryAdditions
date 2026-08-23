@@ -4,7 +4,7 @@ using TheExtraordinaryAdditions.Content.Tiles;
 
 namespace TheExtraordinaryAdditions.Content.Items.Placeable;
 
-public class MeteorBlock : ModItem, ILocalizedModType, IModType
+public class MeteorBlock : ModItem
 {
     public override string Texture => AssetRegistry.GennedTextures.MeteorBlock.Path;
 

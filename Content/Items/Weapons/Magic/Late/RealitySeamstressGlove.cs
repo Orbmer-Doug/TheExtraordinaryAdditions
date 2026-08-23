@@ -15,7 +15,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Magic.Late;
 
-public class RealitySeamstressesGlove : ModItem, ILocalizedModType, IModType
+public class RealitySeamstressesGlove : ModItem
 {
     public override string Texture => AssetRegistry.GennedTextures.RealitySeamstressesGlove.Path;
 

@@ -12,7 +12,7 @@ using Utils = Terraria.Utils;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Melee.Middle;
 
-public class HolyDart : ModProjectile, ILocalizedModType, IModType
+public class HolyDart : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
 

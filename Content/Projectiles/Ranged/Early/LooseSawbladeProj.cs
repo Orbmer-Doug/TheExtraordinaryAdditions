@@ -9,7 +9,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Projectiles.Ranged.Early;
 
-public class LooseSawbladeProj : ModProjectile, ILocalizedModType, IModType
+public class LooseSawbladeProj : ModProjectile
 {
     public override string Texture => AssetRegistry.GennedTextures.LooseSawblade.Path;
 

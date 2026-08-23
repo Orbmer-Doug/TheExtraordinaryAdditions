@@ -8,7 +8,7 @@ using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Content.Items.Weapons.Ranged.Middle;
 
-public class SmartPistolMK6 : ModItem, ILocalizedModType, IModType
+public class SmartPistolMK6 : ModItem
 {
     public override string Texture => AssetRegistry.GennedTextures.SmartPistolMK6.Path;
 
