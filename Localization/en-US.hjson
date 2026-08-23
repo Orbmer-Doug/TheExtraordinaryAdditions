@@ -1518,8 +1518,8 @@ Mods: {
 				Tooltip:
 					'''
 					A titanic greataxe of windtorn ice
-					Striking enemies creates shards of ice
-					Hitting the ice causes it to burst towards your cursor
+					Every other swing crushes glaciers which release ice shards
+					Knockback is directional with the swing
 					'''
 			}
 
