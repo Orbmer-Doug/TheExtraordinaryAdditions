@@ -69,7 +69,7 @@ public class AbsoluteLeggingsDrawer : ModSystem
             if (Main.LocalPlayer.cLegs != 0)
                 GameShaders.Armor.Apply(Main.LocalPlayer.cLegs, Main.LocalPlayer);
 
-            Main.spriteBatch.Draw(AfterimageTargetPrevious, Main.screenLastPosition - Main.screenPosition,
+            Main.spriteBatch.Draw(AfterimageTargetPrevious, Main.ScreenDelta,
                 LocalPlayerDrawManager.ShaderDrawAction is not null ? Color.Transparent : Color.White);
             Main.spriteBatch.End();
         }

@@ -1023,7 +1023,7 @@ public sealed class AtomicParticleSimulation : ModSystem
             orig(self);
             return;
         }
-        
+
         int width = Main.screenWidth;
         int height = Main.screenHeight;
 

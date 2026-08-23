@@ -255,7 +255,7 @@ public class ShaderParticleSystem : ModSystem
             shader.SetTexture(typeRenderTargets[type], 1, SamplerState.AnisotropicWrap);
             def.PrepareShader?.Invoke(shader, typeRenderTargets[type], type);
 
-            Main.spriteBatch.Draw(typeRenderTargets[type], Main.screenLastPosition - Main.screenPosition, null,
+            Main.spriteBatch.Draw(typeRenderTargets[type], Main.ScreenDelta, null,
                 Color.White, 0f, Vector2.Zero, 2f, 0, 0f);
         }
 
@@ -296,7 +296,7 @@ public static class ShaderParticleRegistry
         shader.TrySetParameter("layerOffset", layerScrollOffset);
         shader.TrySetParameter("edgeColor", def.EdgeColor.ToVector4());
         shader.TrySetParameter("singleFrameScreenOffset",
-            (Main.screenLastPosition - Main.screenPosition) / screenSize / 2);
+            (Main.ScreenDelta) / screenSize / 2);
         shader.SetTexture(layer, 2, SamplerState.LinearWrap);
         shader.Render();
     }

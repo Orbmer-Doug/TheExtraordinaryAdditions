@@ -68,7 +68,7 @@ public class AbsoluteHeadDrawer : ModSystem
             if (Main.LocalPlayer.cHead != 0)
                 GameShaders.Armor.Apply(Main.LocalPlayer.cHead, Main.LocalPlayer);
 
-            Main.spriteBatch.Draw(AfterimageTargetPrevious, Main.screenLastPosition - Main.screenPosition,
+            Main.spriteBatch.Draw(AfterimageTargetPrevious, Main.ScreenDelta,
                 LocalPlayerDrawManager.ShaderDrawAction is not null ? Color.Transparent : Color.White);
             Main.spriteBatch.End();
         }

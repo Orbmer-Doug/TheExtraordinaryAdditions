@@ -147,7 +147,7 @@ public class CondensedSoulMass : ProjOwnedByNPC<Asterlin>
         ManagedShader shader = AssetRegistry.GennedShaders.SoulMass;
         shader.TrySetParameter("time", TimeSystem.RenderTime * .5f);
         shader.TrySetParameter("scale", Projectile.scale);
-        
+
         Texture2D tex = AssetRegistry.GennedTextures.Pixel;
         SpriteBatch.DrawRectPixelated(PixelationLayer.OverPlayers, null, tex, ToTarget(Projectile.Center, size), null,
             Color.White * Projectile.scale, 0f, tex.Size() / 2, shader: shader);

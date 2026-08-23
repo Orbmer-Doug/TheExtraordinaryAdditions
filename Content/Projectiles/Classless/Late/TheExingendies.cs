@@ -54,6 +54,7 @@ public class TheExingendies : ModProjectile
         writer.Write(Preset.Negative);
         writer.Write(Preset.Friend);
     }
+
     public override void ReceiveExtraAI(BinaryReader reader)
     {
         Size = reader.ReadVector2();
@@ -150,7 +151,8 @@ public class TheExingendies : ModProjectile
                     if (npc.Hitbox.Intersects(MouseHitbox))
                     {
                         Projectile.CreateProj(ModdedOwner.MouseWorld, PolarVector(1f, RandomRotation()),
-                            ModContent.ProjectileType<ScreenSplit>(), int.MaxValue / 4, Projectile.knockBack, Owner.whoAmI);
+                            ModContent.ProjectileType<ScreenSplit>(), int.MaxValue / 4, Projectile.knockBack,
+                            Owner.whoAmI);
                         AssetRegistry.GennedSounds.VirtueAttack.Play(ModdedOwner.MouseWorld, 1.4f, -.7f, 0f, 300, Name);
                         AssetRegistry.GennedSounds.LargeWeaponFireDifferent.Play(ModdedOwner.MouseWorld, 1.3f, .5f, 0f,
                             300, Name);
@@ -388,9 +390,9 @@ public class ScreenSplit : ModProjectile, IHasScreenShader
             .Add(250f, 0f, 1f, MakePoly(3f).OutFunction)
             .Evaluate(comp);
         Projectile.ExpandHitboxBy(new Vector2(hitbox));
-        
+
         Projectile.ResetLocalNPCHitImmunity();
-        
+
         Time++;
     }
 
@@ -413,9 +415,10 @@ public class ScreenSplit : ModProjectile, IHasScreenShader
         {
             float angle = TwoPi * InverseLerp(0, 4, i);
             Vector2 dir = Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedBy(angle);
-            return targetHitbox.LineCollision(Projectile.Center - dir * 1000f, Projectile.Center + dir * 1000f, Projectile.width / 2f);
+            return targetHitbox.LineCollision(Projectile.Center - dir * 1000f, Projectile.Center + dir * 1000f,
+                Projectile.width / 2f);
         }
-        
+
         return false;
     }
 

@@ -892,7 +892,7 @@ public sealed class AlsafiRenderer : ModSystem
             gd.Clear(Color.Transparent);
 
             Vector2 center = sword.Projectile.Center;
-            Vector2 correction = Main.screenLastPosition - Main.screenPosition;
+            Vector2 correction = Main.ScreenDelta;
             int dir = (sword.Direction < 0 ? -(int) sword.SwingDir : (int) sword.SwingDir) * (int) sword.Owner.gravDir;
             Draw3D(sword.Tex, center + correction, sword.Rotation, sword.Projectile.scale, sword.InitialMouseAngle,
                 Color.White, new Vector2(.5f, 0f), dir == -1);

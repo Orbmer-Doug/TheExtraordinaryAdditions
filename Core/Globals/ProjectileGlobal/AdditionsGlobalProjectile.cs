@@ -52,7 +52,8 @@ public class AdditionsGlobalProjectile : GlobalProjectile
                         Vector2 vel = new Vector2(Main.rand.Next(-13, 14), Main.rand.Next(-13, 14)) * 0.25f;
                         for (int n = 0; n < 3; n++)
                         {
-                            projectile.CreateProj(projectile.Center, vel, ten, projectile.damage, 2f, projectile.owner, 0f,
+                            projectile.CreateProj(projectile.Center, vel, ten, projectile.damage, 2f, projectile.owner,
+                                0f,
                                 0f, projectile.whoAmI);
                         }
                     }

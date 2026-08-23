@@ -22,6 +22,11 @@ public static class PrimitiveUtils
             return field;
         }
     }
+    
+    extension(Main)
+    {
+        public static Vector2 ScreenDelta => Main.screenLastPosition - Main.screenPosition;
+    }
 
     #region Matrices
 

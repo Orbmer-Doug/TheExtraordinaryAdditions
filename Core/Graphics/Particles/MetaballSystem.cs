@@ -410,7 +410,7 @@ public static class MetaballRegistry
 
     public static void DefaultDraw(ref Metaball metaball, Texture2D tex)
     {
-        Vector2 screenDelta = Main.screenLastPosition - Main.screenPosition;
+        Vector2 screenDelta = Main.ScreenDelta;
         Vector2 position = (metaball.Position + screenDelta - Main.screenPosition) / 2f;
         Rectangle destRect = new(
             (int) position.X,

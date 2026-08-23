@@ -80,7 +80,7 @@ public class AbsoluteTorsoDrawer : ModSystem
             Main.spriteBatch.Draw(AfterimageTargetPrevious,
                 Main.screenLastPosition - Main.LocalPlayer.velocity * .1f - Main.screenPosition,
                 LocalPlayerDrawManager.ShaderDrawAction is not null ? Color.Transparent : Color.White);
-            Main.spriteBatch.Draw(BrokenGlassTarget, Main.screenLastPosition - Main.screenPosition, Color.White);
+            Main.spriteBatch.Draw(BrokenGlassTarget, Main.ScreenDelta, Color.White);
             Main.spriteBatch.End();
         }
 

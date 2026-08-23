@@ -199,10 +199,11 @@ public class BergcrusherSwing : BaseSwordSwing
     }
 
     public ref float BergScale => ref Projectile.AdditionsInfo().ExtraAI[7];
-    public ref float BergOpacity => ref Projectile.AdditionsInfo().ExtraAI[8]; 
+    public ref float BergOpacity => ref Projectile.AdditionsInfo().ExtraAI[8];
+
     public bool Slap
     {
-        get => (int)Projectile.AdditionsInfo().ExtraAI[9] == 1;
+        get => (int) Projectile.AdditionsInfo().ExtraAI[9] == 1;
         set => Projectile.AdditionsInfo().ExtraAI[9] = value.ToInt();
     }
 
@@ -216,11 +217,13 @@ public class BergcrusherSwing : BaseSwordSwing
                 BergScale = BergOpacity = 0f;
                 this.Sync();
             }
+
             if (up)
             {
                 Slap = false;
                 this.Sync();
             }
+
             return;
         }
 
@@ -238,7 +241,8 @@ public class BergcrusherSwing : BaseSwordSwing
             {
                 Vector2 pos = bergRect.RandomPoint();
                 if (this.RunLocal())
-                    Projectile.CreateProj(pos, norm * Main.rand.NextFloat(8f, 14f), ModContent.ProjectileType<FlungShard>(),
+                    Projectile.CreateProj(pos, norm * Main.rand.NextFloat(8f, 14f),
+                        ModContent.ProjectileType<FlungShard>(),
                         (int) (Projectile.damage * .25f), Projectile.knockBack * .2f, Owner.whoAmI);
 
                 for (int j = 0; j < 4; j++)
@@ -270,7 +274,8 @@ public class BergcrusherSwing : BaseSwordSwing
             if (OverallTime % 4 == 3)
                 ParticleRegistry.SpawnBloomPixelParticle(
                     bergRect.RandomPoint(),
-                    norm.PerpCW() * Main.rand.NextFloat(.2f, .9f), Main.rand.Next(20, 40), Main.rand.NextFloat(.3f, .6f),
+                    norm.PerpCW() * Main.rand.NextFloat(.2f, .9f), Main.rand.Next(20, 40),
+                    Main.rand.NextFloat(.3f, .6f),
                     AuroraGuard.SlateBlue, AuroraGuard.Icey);
         }
     }

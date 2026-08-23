@@ -213,7 +213,8 @@ public class TorrentialStormsHeld : BaseIdleHoldoutProjectile
                             {
                                 Vector2 veloc = posit.SafeDirectionTo(Modded.MouseWorld + offset) * speed *
                                                 Main.rand.NextFloat(.6f, 1.25f);
-                                Projectile.CreateProj(posit, veloc, ModContent.ProjectileType<RainDrop>(), dmg / 3, kb / 3,
+                                Projectile.CreateProj(posit, veloc, ModContent.ProjectileType<RainDrop>(), dmg / 3,
+                                    kb / 3,
                                     Owner.whoAmI);
                                 ParticleRegistry.SpawnPulseRingParticle(posit, veloc.SafeNormalize(Vector2.Zero),
                                     Main.rand.Next(35, 50), veloc.ToRotation(), new(.5f, 1f), 0f, 30f,

@@ -272,4 +272,3 @@ public class ShroomiteDashImpact : ModProjectile
         Projectile.netUpdate = true;
     }
 }
-

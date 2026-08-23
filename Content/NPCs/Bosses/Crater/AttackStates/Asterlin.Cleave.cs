@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
-
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Systems;
 using TheExtraordinaryAdditions.Core.Utilities;
@@ -100,7 +99,8 @@ public partial class Asterlin
             {
                 if (!Hammer.Free)
                 {
-                    Hammer.Projectile.velocity = MathUtils.SafeDirectionTo((Vector2)RightArm.RootPosition, RightHandPosition) * 35f;
+                    Hammer.Projectile.velocity =
+                        MathUtils.SafeDirectionTo((Vector2) RightArm.RootPosition, RightHandPosition) * 35f;
                     Hammer.Free = true;
                     ProjectileUtils.Sync(Hammer);
                 }
@@ -163,7 +163,8 @@ public partial class Asterlin
             FlameEngulfInterpolant = InverseLerp(0f, 20f, AITimer);
             SetHeadRotation(Direction == 1 ? 0 : MathHelper.Pi);
             SetBodyRotation(Utils.AngleLerp(BodyRotation, -MathHelper.Pi, .2f));
-            SetRightHandTarget(MathUtils.Lerp(RightHandTarget, RightArm.RootPosition + PolarVector(400f, MathHelper.PiOver2),
+            SetRightHandTarget(MathUtils.Lerp(RightHandTarget,
+                RightArm.RootPosition + PolarVector(400f, MathHelper.PiOver2),
                 .3f));
 
             if (!Cleave_HitGround)

@@ -926,7 +926,7 @@ public partial class Asterlin : IHasScreenShader
                 DepthStencilState.None, Main.Rasterizer, shader.Effect, Main.GameViewMatrix.TransformationMatrix);
         }
 
-        Main.spriteBatch.Draw(post, Main.screenLastPosition - Main.screenPosition, color);
+        Main.spriteBatch.Draw(post, Main.ScreenDelta, color);
         if (asterlin.MotionBlurInterpolant > 0f || asterlin.DisintegrationInterpolant > 0f)
             Main.spriteBatch.ResetToDefault();
     }

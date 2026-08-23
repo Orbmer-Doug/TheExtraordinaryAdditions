@@ -1,6 +1,9 @@
-﻿using Terraria;
+﻿using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using Terraria;
 using Terraria.GameInput;
 using Terraria.ModLoader;
+using TheExtraordinaryAdditions.Core.Utilities;
 
 namespace TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
 
@@ -60,13 +63,12 @@ public sealed class PlayerMouse : ModPlayer
                 trigger.Current.MouseMiddle && CanUseMouseButton,
                 trigger.JustReleased.MouseMiddle && CanUseMouseButton);
 
-            MouseScreen = new Vector2(PlayerInput.MouseX, PlayerInput.MouseY);
+            MouseScreen = Main.MouseScreen;
             Vector2 transform = Vector2.Transform(MouseScreen,
                 Matrix.Invert(Main.GameViewMatrix?.ZoomMatrix ?? Matrix.Identity));
-            MouseWorld = transform + Main.screenPosition + (Main.screenPosition - Main.screenLastPosition);
+            MouseWorld = transform + Main.screenPosition - Main.ScreenDelta;
             if ((int) Player.gravDir == -1)
-                MouseWorld.Y = Main.screenPosition.Y + (Main.screenPosition - Main.screenLastPosition).Y +
-                    Main.screenHeight - transform.Y;
+                MouseWorld.Y = Main.screenPosition.Y - Main.ScreenDelta.Y + Main.screenHeight - transform.Y;
 
             if (OldMouseWorld == null)
             {

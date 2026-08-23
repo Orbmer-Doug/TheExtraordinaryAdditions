@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Terraria.ModLoader;
-
 using TheExtraordinaryAdditions.Core.DataStructures;
 using TheExtraordinaryAdditions.Core.Utilities;
 

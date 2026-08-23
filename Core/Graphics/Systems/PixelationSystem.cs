@@ -7,6 +7,7 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Graphics.Resources;
+using TheExtraordinaryAdditions.Core.Utilities;
 using static TheExtraordinaryAdditions.Core.Graphics.Resources.ManagedRenderTarget;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 
@@ -340,16 +341,17 @@ public class PixelationSystem : ModSystem
 
                     foreach (SpriteDrawEntry entry in entries)
                     {
+                        Vector2 offset = Main.ScreenDelta;
                         if (entry.Destination)
                         {
                             sb.Draw(entry.Texture,
-                                new Rectangle((int) entry.Position.X, (int) entry.Position.Y, (int) entry.Scale.X,
+                                new Rectangle((int)(entry.Position.X + offset.X), (int)(entry.Position.Y + offset.Y), (int) entry.Scale.X,
                                     (int) entry.Scale.Y), entry.SourceRectangle, entry.Color, entry.Rotation,
                                 entry.Origin, entry.Effects, 0f);
                         }
                         else
                         {
-                            sb.Draw(entry.Texture, entry.Position, entry.SourceRectangle, entry.Color,
+                            sb.Draw(entry.Texture, entry.Position + offset, entry.SourceRectangle, entry.Color,
                                 entry.Rotation, entry.Origin, entry.Scale, entry.Effects, 0f);
                         }
                     }
@@ -557,7 +559,7 @@ public class PixelationSystem : ModSystem
 
             sb.Begin(SpriteSortMode.Deferred, blend, SamplerState.PointClamp, DepthStencilState.None,
                 Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-            sb.Draw(target.Target, Main.screenLastPosition - Main.screenPosition, null, Color.White, 0f, Vector2.Zero, 2f, 0, 0f);
+            sb.Draw(target.Target, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, 2f, 0, 0f);
             sb.End();
 
             if (endSB)

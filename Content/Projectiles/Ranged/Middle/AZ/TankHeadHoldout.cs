@@ -129,7 +129,8 @@ public class TankHeadHoldout : BaseIdleHoldoutProjectile
             if (State == LaserState)
             {
                 if (this.RunLocal())
-                    Projectile.CreateProj(tipOfGun, vel, ModContent.ProjectileType<LaserGuide>(), 0, 0f, Projectile.owner);
+                    Projectile.CreateProj(tipOfGun, vel, ModContent.ProjectileType<LaserGuide>(), 0, 0f,
+                        Projectile.owner);
                 Projectile.frame = 4;
             }
             else if (State == MaggotState)

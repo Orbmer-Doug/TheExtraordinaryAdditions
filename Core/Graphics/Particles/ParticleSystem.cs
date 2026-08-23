@@ -1609,11 +1609,14 @@ public static class ParticleRegistry
                 {
                     Texture2D aura = AssetRegistry.GennedTextures.HollowCircleHighRes;
                     Vector2 orig = aura.Size() / 2;
-                    SpriteBatch.DrawRectPixelated(PixelationLayer.Dusts, BlendState.Additive,aura, target, null, custom.AuraCol.Value * p.Opacity, p.Rotation, orig);
-                    SpriteBatch.DrawRectPixelated(PixelationLayer.Dusts, BlendState.Additive,aura, target, null, custom.AuraCol.Value * p.Opacity, p.Rotation, orig);
+                    SpriteBatch.DrawRectPixelated(PixelationLayer.Dusts, BlendState.Additive, aura, target, null,
+                        custom.AuraCol.Value * p.Opacity, p.Rotation, orig);
+                    SpriteBatch.DrawRectPixelated(PixelationLayer.Dusts, BlendState.Additive, aura, target, null,
+                        custom.AuraCol.Value * p.Opacity, p.Rotation, orig);
                 }
 
-                SpriteBatch.DrawRectPixelated(PixelationLayer.Dusts, BlendState.Additive,tex, target, null, p.Color * p.Opacity, p.Rotation, tex.Size() / 2f);
+                SpriteBatch.DrawRectPixelated(PixelationLayer.Dusts, BlendState.Additive, tex, target, null,
+                    p.Color * p.Opacity, p.Rotation, tex.Size() / 2f);
             },
             drawType: DrawTypes.Manual,
             canCull: false
@@ -2411,7 +2414,8 @@ public static class ParticleRegistry
                     AssetRegistry.GennedTextures.CritSpark;
                 Texture2D bloomTexture = AssetRegistry.GennedTextures.GlowParticleSmall;
                 SpriteBatch.DrawRectPixelated(PixelationLayer.Dusts, BlendState.Additive, bloomTexture,
-                    ToTarget(p.Position, sparkTexture.Size() * new Vector2(p.Scale * custom.BloomScale)), null, custom.BloomColor * p.Opacity * .5f,
+                    ToTarget(p.Position, sparkTexture.Size() * new Vector2(p.Scale * custom.BloomScale)), null,
+                    custom.BloomColor * p.Opacity * .5f,
                     0f, bloomTexture.Size() / 2f);
                 SpriteBatch.DrawRectPixelated(PixelationLayer.Dusts, BlendState.Additive, sparkTexture,
                     ToTarget(p.Position, sparkTexture.Size() * new Vector2(p.Scale)), null, p.Color * p.Opacity,

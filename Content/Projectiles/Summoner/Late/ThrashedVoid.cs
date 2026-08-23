@@ -25,12 +25,12 @@ public class ThrashedVoid : BaseWhip
         {
             if (this.RunLocal())
             {
-                int x = (int)MathHelper.Clamp((int)Projectile.Center.Distance(Modded.MouseWorld), 100, 700);
-                Projectile.Size = new(x, (int)Utils.Remap(x, 100, 700, 80, 250));
+                int x = (int) MathHelper.Clamp((int) Projectile.Center.Distance(Modded.MouseWorld), 100, 700);
+                Projectile.Size = new(x, (int) Utils.Remap(x, 100, 700, 80, 250));
                 this.Sync();
             }
         }
-    
+
         if (Trail == null || Trail.Disposed)
             Trail = new(TrailWidth, TrailColor, null, Samples);
 
@@ -50,7 +50,8 @@ public class ThrashedVoid : BaseWhip
         Projectile.damage = (int) (Projectile.damage * .85f);
         for (int i = 0; i < 20; i++)
         {
-            ShaderParticleRegistry.SpawnCosmicParticle(pos + Main.rand.NextVector2Circular(5f, 5f), vel.RotatedByRandom(.5f) * Main.rand.NextFloat(1f, 5f), new Vector2(10f, 50f));
+            ShaderParticleRegistry.SpawnCosmicParticle(pos + Main.rand.NextVector2Circular(5f, 5f),
+                vel.RotatedByRandom(.5f) * Main.rand.NextFloat(1f, 5f), new Vector2(10f, 50f));
         }
     }
 
@@ -99,7 +100,6 @@ public class ThrashedVoid : BaseWhip
 
     public override void DrawSegments()
     {
-
         Texture2D texture = Projectile.ThisProjectileTexture();
 
         Rectangle hiltFrame = new(0, 0, 14, 26);
@@ -147,7 +147,6 @@ public class ThrashedVoid : BaseWhip
     }
 }
 
-
 public class VoidBlast : ModProjectile
 {
     private const int Lifetime = 35;
@@ -185,7 +184,7 @@ public class VoidBlast : ModProjectile
                     Main.rand.NextFloat(.7f, 1.4f), Color.Violet, Color.DarkViolet, Main.rand.NextFloat(150f, 220f),
                     Main.rand.NextFloat(-.1f, .1f));
         }
-        
+
         Vector2 pos = Projectile.Center + Main.rand.NextVector2CircularEdge(Radius, Radius);
         int life = Main.rand.Next(30, 40);
         float scale = Main.rand.NextFloat(.4f, .8f);
@@ -203,4 +202,3 @@ public class VoidBlast : ModProjectile
         return CircularHitboxCollision(Projectile.Center, Radius / 2f, targetHitbox);
     }
 }
-

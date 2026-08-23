@@ -151,7 +151,8 @@ public class BreakerBeam : ModProjectile
             new(Main.rand.NextFloat(.9f, 1.4f)), Color * 1.5f, 8, default, RandomRotation());
 
         if (Special && this.RunLocal())
-            Projectile.CreateProj(Projectile.Center + norm * 10f, Vector2.Zero, ModContent.ProjectileType<BreakerStorm>(),
+            Projectile.CreateProj(Projectile.Center + norm * 10f, Vector2.Zero,
+                ModContent.ProjectileType<BreakerStorm>(),
                 Projectile.damage, Projectile.knockBack * 2, Projectile.owner);
 
         AssetRegistry.GennedSounds.BreakerStorm.Play(Projectile.Center, .5f, -.2f);

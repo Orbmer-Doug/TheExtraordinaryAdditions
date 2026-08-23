@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
+using Terraria.Audio;
+using Terraria.ID;
 using Terraria.ModLoader;
 using TheExtraordinaryAdditions.Core.Globals;
 using TheExtraordinaryAdditions.Core.Globals.PlayerGlobal;
@@ -49,16 +52,17 @@ public class SeamstressDraw : ModProjectile
 
     public override void AI()
     {
+        Vector2 uppos = Modded.MouseScreen;
         if (Time == 0)
         {
-            points.Update(Modded.MouseScreen);
+            points.Update(uppos);
         }
 
         if (trail == null || trail.Disposed)
             trail = new(WidthFunct, ColorFunct);
 
-        if (Modded.MouseScreen.Distance(points.Points[1]) > 20f)
-            points.Update(Modded.MouseScreen);
+        if (uppos.Distance(points.Points[1]) > 20f)
+            points.Update(uppos);
         CurrentType = Classify(points.Points);
 
         if (!Modded.SafeMouseLeft.Current)
@@ -276,12 +280,15 @@ public class SeamstressDraw : ModProjectile
             Texture2D tex = AssetRegistry.GennedTextures.LensStar;
             Vector2 orig = tex.Size() / 2;
 
+            Vector2 offset = Main.ScreenDelta;
             for (int i = 0; i < 4; i++)
-                SpriteBatch.DrawRectPixelated(PixelationLayer.OverProjectiles, BlendState.Additive, tex, ToTarget(points.Points[0] + Main.screenPosition, new(50f)), null,
+                SpriteBatch.DrawRectPixelated(PixelationLayer.OverProjectiles, BlendState.Additive, tex,
+                    ToTarget(points.Points[0] + Main.screenPosition - offset, new(50f)), null,
                     Color.Violet.Lerp(Color.White, InverseLerp(0f, 4f, i)), 0f, orig);
 
             for (int i = 0; i < 4; i++)
-                SpriteBatch.DrawRectPixelated(PixelationLayer.OverProjectiles, BlendState.Additive, tex, ToTarget(points.Points[^1] + Main.screenPosition, new(50f)), null,
+                SpriteBatch.DrawRectPixelated(PixelationLayer.OverProjectiles, BlendState.Additive, tex,
+                    ToTarget(points.Points[^1] + Main.screenPosition - offset, new(50f)), null,
                     Color.Violet.Lerp(Color.White, InverseLerp(0f, 4f, i)), 0f, orig);
         }
 
@@ -295,9 +302,8 @@ public class SeamstressDraw : ModProjectile
             ManagedShader shader = AssetRegistry.GennedShaders.RealityTearShader;
             shader.SetTexture(AssetRegistry.GennedTextures.Cosmos2, 0, SamplerState.LinearWrap);
             shader.SetTexture(AssetRegistry.GennedTextures.Cosmos, 1, SamplerState.LinearWrap);
-
-            trail.DrawTrail(shader, points.Points,
-                Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, -1, 1), 300, true);
+            
+            trail.DrawTrail(shader, points.Points, Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, -1000f, 1000f), 300, true);
         }
     }
 
@@ -807,4 +813,360 @@ public class SeamstressDraw : ModProjectile
     }
 
     #endregion
+}
+
+public class Seams : ModProjectile
+{
+    public override string Texture => AssetRegistry.GennedTextures.SeamStrike.Path;
+
+    public override void SetDefaults()
+    {
+        Projectile.width = Projectile.height = 1;
+        Projectile.friendly = true;
+        Projectile.DamageType = DamageClass.Magic;
+        Projectile.ignoreWater = true;
+        Projectile.tileCollide = false;
+        Projectile.penetrate = 3;
+        Projectile.Opacity = 1f;
+        Projectile.timeLeft = MaxTime;
+        Projectile.MaxUpdates = 2;
+        Projectile.usesLocalNPCImmunity = true;
+        Projectile.localNPCHitCooldown = -1;
+        Projectile.noEnchantmentVisuals = true;
+        Projectile.stopsDealingDamageAfterPenetrateHits = true;
+    }
+
+    public ref float Time => ref Projectile.ai[0];
+    public const int MaxTime = 25;
+    public const int MaxWidth = 1400;
+    public float Interpolant => InverseLerp(0f, MaxTime, Time);
+    public Point Size;
+
+    public override void SendExtraAI(BinaryWriter writer)
+    {
+        writer.Write(Size.X);
+        writer.Write(Size.Y);
+    }
+
+    public override void ReceiveExtraAI(BinaryReader reader)
+    {
+        Size.X = reader.ReadInt32();
+        Size.Y = reader.ReadInt32();
+    }
+
+    public override void AI()
+    {
+        Projectile.rotation = Projectile.velocity.ToRotation();
+
+        int width = (int) MakePoly(3f).InOutFunction.Evaluate(70f, MaxWidth, Interpolant);
+        int height = (int) MakePoly(3f).OutFunction.Evaluate(100f, 10f, Interpolant);
+        Size = new(width, height);
+        Projectile.Opacity = MakePoly(2f)
+            .InFunction(InverseLerp(0f, 5f * Projectile.MaxUpdates, Projectile.timeLeft));
+
+        Time++;
+    }
+
+    public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+    {
+        Vector2 size = new(Size.X / 2f, 10);
+        return new RotatedRectangle(Projectile.Center - size / 2, size, Projectile.rotation, Vector2.Zero)
+            .Intersects(targetHitbox);
+    }
+
+    public override bool ShouldUpdatePosition() => false;
+
+    public override bool PreDraw(ref Color lightColor)
+    {
+        Texture2D tex = AssetRegistry.GennedTextures.GlowParticleSmall;
+
+        Vector2 origin = tex.Size() * 0.5f;
+        Color col = Color.Lerp(Color.Magenta, Color.LightCoral, Projectile.identity / 7f % 1f) * Projectile.Opacity;
+
+        for (float i = .5f; i < 1f; i += .1f)
+        {
+            SpriteBatch.DrawRectPixelated(PixelationLayer.Dusts, BlendState.Additive, tex,
+                ToTarget(Projectile.Center, Size.ToVector2() * i * .4f * Projectile.Opacity), null,
+                Color.White * Projectile.Opacity, Projectile.rotation, origin);
+            SpriteBatch.DrawRectPixelated(PixelationLayer.Dusts, BlendState.Additive, tex,
+                ToTarget(Projectile.Center, Size.ToVector2() * i), null, col,
+                Projectile.rotation, origin);
+            SpriteBatch.DrawRectPixelated(PixelationLayer.Dusts, BlendState.Additive, tex,
+                ToTarget(Projectile.Center, Size.ToVector2() * i * 1.3f), null,
+                new Color(77, 0, 110) * Projectile.Opacity * .4f, Projectile.rotation, origin);
+        }
+
+        return false;
+    }
+}
+
+public class NeedleStar : ModProjectile
+{
+    public override string Texture => AssetRegistry.GennedTextures.Invisible.Path;
+
+    public override void SetDefaults()
+    {
+        Projectile.width = Projectile.height = 25;
+        Projectile.friendly = true;
+        Projectile.tileCollide = false;
+        Projectile.DamageType = DamageClass.Magic;
+        Projectile.penetrate = 2;
+        Projectile.extraUpdates = 5;
+        Projectile.timeLeft = 120;
+        Projectile.localNPCHitCooldown = 20;
+        Projectile.usesLocalNPCImmunity = true;
+    }
+
+    public ref float Time => ref Projectile.ai[0];
+
+    public override void AI()
+    {
+        if (trail == null || trail.Disposed)
+            trail = new(WidthFunction, ColorFunction, null, 30);
+
+        cache ??= new(20);
+        cache.Update(Projectile.Center);
+
+        if (Projectile.numHits > 0 || Projectile.timeLeft < 20)
+        {
+            Projectile.velocity *= .96f;
+            Projectile.timeLeft = 20;
+            if (cache.Points.AllPointsEqual())
+                Projectile.Kill();
+        }
+
+        Projectile.Opacity = InverseLerp(0f, 5f * Projectile.MaxUpdates, Time) *
+                             InverseLerp(0f, 2f, Projectile.velocity.Length());
+        Time++;
+    }
+
+    internal Color ColorFunction(SystemVector2 completionRatio, Vector2 position)
+    {
+        float fadeToEnd = MathHelper.Lerp(0.65f, 1f, Cos01((0f - Main.GlobalTimeWrappedHourly) * 3f));
+        float fadeOpacity = Utils.GetLerpValue(1f, 0.64f, completionRatio.X, true) * Projectile.Opacity;
+        Color endColor = Color.Lerp(Color.Cyan, Color.Magenta,
+            Sin01(completionRatio.X * (float) Math.PI * 1.6f - Main.GlobalTimeWrappedHourly * 4f));
+        return Color.Lerp(Color.White, endColor, fadeToEnd) * fadeOpacity;
+    }
+
+    internal float WidthFunction(float c)
+    {
+        return Trail.HemisphereWidthFunct(c, MathHelper.SmoothStep(Projectile.height * .75f, 0f, c));
+    }
+
+    public TrailPoints cache;
+    public Trail trail;
+    public override bool? CanHitNPC(NPC target) => Projectile.numHits <= 0 ? null : false;
+
+    public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+    {
+        SoundID.DD2_WitherBeastCrystalImpact.Play(Projectile.Center, .7f, 0f, .1f);
+    }
+
+    public override bool PreDraw(ref Color lightColor)
+    {
+        void draw()
+        {
+            if (trail != null)
+            {
+                ManagedShader shader = AssetRegistry.GennedShaders.FadedStreak;
+                shader.SetTexture(AssetRegistry.GennedTextures.StreakMagma, 1);
+                shader.SetTexture(AssetRegistry.GennedTextures.WavyBlotchNoise, 2);
+                trail.DrawTrail(shader, cache.Points, 100);
+            }
+        }
+
+        PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
+
+        Texture2D starTexture = AssetRegistry.GennedTextures.CritSpark;
+        Texture2D bloomTexture = AssetRegistry.GennedTextures.GlowParticleSmall;
+        Color color = ColorFunction(SystemVector2.Zero, Vector2.Zero);
+        float rotation = Main.GlobalTimeWrappedHourly * 8f;
+
+        SpriteBatch.DrawRectPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, bloomTexture,
+            ToTarget(Projectile.Center, new Vector2(50)), null,
+            color * .6f, 0f, bloomTexture.Size() / 2);
+        SpriteBatch.DrawRectPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, bloomTexture,
+            ToTarget(Projectile.Center, new Vector2(90)), null,
+            color * .4f, 0f, bloomTexture.Size() / 2);
+        SpriteBatch.DrawAltPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, starTexture,
+            Projectile.Center, null, Color.White * Projectile.Opacity,
+            rotation, starTexture.Size() / 2, Projectile.scale * 2.3f);
+        SpriteBatch.DrawAltPixelated(PixelationLayer.UnderProjectiles, BlendState.Additive, starTexture,
+            Projectile.Center, null, Color.White * Projectile.Opacity,
+            -rotation + MathHelper.PiOver4, starTexture.Size() / 2, Projectile.scale * 1.6f);
+
+        return false;
+    }
+}
+
+public class ConcentratedEnergy : ModProjectile
+{
+    public override string Texture => AssetRegistry.GennedTextures.ConcentratedEnergy.Path;
+
+    public override void SetDefaults()
+    {
+        Projectile.width = 74;
+        Projectile.height = 30;
+        Projectile.friendly = true;
+        Projectile.tileCollide = false;
+        Projectile.penetrate = -1;
+        Projectile.timeLeft = 200;
+        Projectile.DamageType = DamageClass.Magic;
+        Projectile.tileCollide = false;
+        Projectile.localNPCHitCooldown = 10;
+        Projectile.usesLocalNPCImmunity = true;
+        Projectile.Opacity = 0f;
+    }
+
+    public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+    {
+        return targetHitbox.LineCollision(Projectile.BaseRotHitbox().Left, Projectile.BaseRotHitbox().Right,
+            Projectile.height);
+    }
+
+    public override bool? CanHitNPC(NPC target) => HasHitTarget ? false : null;
+
+    public bool HasHitTarget
+    {
+        get => Projectile.ai[0] == 1f;
+        set => Projectile.ai[0] = value.ToInt();
+    }
+
+    public int Time
+    {
+        get => (int) Projectile.ai[1];
+        set => Projectile.ai[1] = value;
+    }
+
+    public override void AI()
+    {
+        if (trail == null || trail.Disposed)
+            trail = new(WidthFunction, ColorFunction, null, 10);
+
+        Lighting.AddLight(Projectile.Center, Color.Fuchsia.ToVector3() * 1.2f * Projectile.scale);
+
+        if (Time > SecondsToFrames(.5f) && !HasHitTarget)
+        {
+            if (NPCTargeting.TryGetClosestNPC(new(Projectile.Center, 1400, false, true), out NPC target))
+                Projectile.velocity = Vector2.SmoothStep(Projectile.velocity,
+                    Projectile.SafeDirectionTo(target.Center) * 30f, .22f);
+        }
+
+        if (HasHitTarget)
+        {
+            int type = (Projectile.identity % 2f == 0f).ToDirectionInt();
+            Projectile.velocity = Projectile.velocity.RotatedBy(MathHelper.Pi / 120f * type) * 0.9f;
+            Projectile.Center += Main.rand.NextVector2CircularEdge(3f, 3f);
+            Projectile.Opacity = InverseLerp(0f, 40f, Projectile.timeLeft);
+        }
+        else
+        {
+            Projectile.Opacity = Projectile.scale = MakePoly(2f).InFunction(InverseLerp(0f, 15f, Time)) *
+                                                    InverseLerp(0f, 20f, Projectile.timeLeft);
+        }
+
+        Projectile.FacingRight();
+
+        cache ??= new(10);
+        cache.Update(Projectile.RotHitbox().Left);
+
+        Time++;
+    }
+
+    internal Color ColorFunction(SystemVector2 completionRatio, Vector2 position)
+    {
+        float fadeToEnd = MathHelper.Lerp(0.65f, 1f, Cos01((0f - Main.GlobalTimeWrappedHourly) * 3f));
+        float fadeOpacity = Utils.GetLerpValue(1f, 0.64f, completionRatio.X, true) * InverseLerp(0f, 8f, Time) *
+                            Projectile.Opacity;
+        Color endColor = Color.Lerp(Color.DarkMagenta, Color.Cyan,
+            Sin01(completionRatio.X * (float) Math.PI * 1.6f - Main.GlobalTimeWrappedHourly * 4f));
+        return Color.Lerp(Color.White, endColor, fadeToEnd) * fadeOpacity;
+    }
+
+    internal float WidthFunction(float completionRatio)
+    {
+        return Projectile.width * 0.4f *
+               MathHelper.SmoothStep(0.2f, 1f, Utils.GetLerpValue(0f, 0.3f, completionRatio, true)) *
+               Projectile.Opacity;
+    }
+
+    public TrailPoints cache;
+    public Trail trail;
+
+    public override bool PreDraw(ref Color lightColor)
+    {
+        void draw()
+        {
+            if (trail != null)
+            {
+                ManagedShader shader = AssetRegistry.GennedShaders.FadedStreak;
+                shader.SetTexture(AssetRegistry.GennedTextures.ShadowTrail, 1);
+                trail.DrawTrail(shader, cache.Points, 40, true);
+            }
+        }
+
+        PixelationSystem.QueuePrimitiveRenderAction(draw, PixelationLayer.UnderProjectiles);
+
+        Texture2D texture = Projectile.ThisProjectileTexture();
+        Main.spriteBatch.DrawBetter(texture, Projectile.Center, null,
+            Color.Lerp(lightColor, Color.White, 0.5f) * Projectile.Opacity,
+            Projectile.rotation, texture.Size() / 2f, Projectile.scale);
+
+        return false;
+    }
+
+    public override void OnKill(int timeLeft)
+    {
+        SoundID.DD2_WitherBeastDeath.Play(Projectile.Center, 1.1f, 0f, .1f);
+
+        if (NPCTargeting.TryGetClosestNPC(new(Projectile.Center, 900, false, true), out NPC target))
+        {
+            Vector2 targ = target.RandAreaInEntity();
+            Vector2 pos = Projectile.RotHitbox().Left + Projectile.velocity.SafeNormalize(Vector2.Zero) * 22f;
+            if (target.CanHomeInto() && this.RunLocal())
+            {
+                Vector2 vel = Projectile.SafeDirectionTo(targ) * Main.rand.NextFloat(9f, 14f);
+                Projectile.CreateProj(pos, vel, ModContent.ProjectileType<NeedleStar>(), Projectile.damage / 2,
+                    Projectile.knockBack, Projectile.owner);
+                SoundEngine.PlaySound(SoundID.Item105 with { Volume = .8f, MaxInstances = 20, Pitch = .4f },
+                    Projectile.Center);
+                ParticleRegistry.SpawnDetailedBlastParticle(pos, Vector2.Zero, new Vector2(.45f, 1f) * 60f,
+                    Vector2.Zero, 30, Color.Magenta, vel.ToRotation(), null, true);
+                ParticleRegistry.SpawnDetailedBlastParticle(pos, Vector2.Zero, new Vector2(.45f, 1f) * 90f,
+                    Vector2.Zero, 30, Color.Magenta, vel.ToRotation(), null, true);
+            }
+
+            const int amount = 30;
+            for (int i = 0; i < amount; i++)
+            {
+                Vector2 vel = NextVector2Ellipse(5f, 10f, Projectile.AngleTo(targ));
+                float scale = Main.rand.NextFloat(.3f, .6f);
+                ParticleRegistry.SpawnSparkParticle(pos, vel, 40, scale,
+                    Color.DarkViolet.Lerp(Color.Violet, Main.rand.NextFloat(.2f, .9f)));
+            }
+        }
+    }
+
+    public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+    {
+        if (!HasHitTarget)
+        {
+            Projectile.velocity *= 2f;
+            Projectile.timeLeft = 40;
+            HasHitTarget = true;
+        }
+
+        Vector2 pos = Projectile.BaseRotHitbox().Right;
+        for (int i = 0; i < 12; i++)
+        {
+            Vector2 vel = Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(.2f) *
+                          -Main.rand.NextFloat(2f, 12f);
+            int life = Main.rand.Next(20, 40);
+            float scale = Main.rand.NextFloat(.5f, .78f);
+            Color col = Color.Magenta.Lerp(Color.DodgerBlue, Main.rand.NextFloat());
+            ParticleRegistry.SpawnBloomPixelParticle(pos, vel, life, scale * 1.2f, col, Color.White, null, 1.1f);
+            ParticleRegistry.SpawnSparkleParticle(pos, vel, life, scale * 1.3f, col, Color.White, 1.4f, .14f);
+        }
+    }
 }

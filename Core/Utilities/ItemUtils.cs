@@ -210,16 +210,16 @@ public static class ItemUtils
 
     public static string TooltipHotkeyString(this ModKeybind mhk)
     {
-        if (Main.dedServ || mhk == null) 
+        if (Main.dedServ || mhk == null)
             return string.Empty;
 
         List<string> keys = mhk.GetAssignedKeys();
-        if (keys.Count == 0) 
+        if (keys.Count == 0)
             return "[NONE]";
 
         StringBuilder sb = new(16);
         sb.Append(keys[0]);
-        for (int i = 1; i < keys.Count; i++) 
+        for (int i = 1; i < keys.Count; i++)
             sb.Append(" / ").Append(keys[i]);
 
         return sb.ToString();

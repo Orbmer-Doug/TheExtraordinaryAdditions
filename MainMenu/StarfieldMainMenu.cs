@@ -20,7 +20,10 @@ public class StarfieldMainMenu : ModMenu
 {
     public override bool IsAvailable => true;
     public override string DisplayName => GetText(Name + ".Name").Value;
-    public override int Music => MusicLoader.GetMusicSlot(AdditionsMain.Instance, AssetRegistry.GennedSounds.Music.Protostar.SoundPath);
+
+    public override int Music =>
+        MusicLoader.GetMusicSlot(AdditionsMain.Instance, AssetRegistry.GennedSounds.Music.Protostar.SoundPath);
+
     public override Asset<Texture2D> Logo => ModContent.Request<Texture2D>("TheExtraordinaryAdditions/icon_menu");
     public override Asset<Texture2D> SunTexture => null;
     public override Asset<Texture2D> MoonTexture => null;
@@ -31,12 +34,10 @@ public class StarfieldMainMenu : ModMenu
 
     public override void OnSelected()
     {
-        
     }
 
     public override void Update(bool isOnTitleScreen)
     {
-        
     }
 
     public override bool PreDrawLogo(SpriteBatch spriteBatch, ref Vector2 logoDrawCenter, ref float logoRotation,
